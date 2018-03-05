@@ -1,0 +1,12 @@
+template st:start(?in) {
+  format {
+    """
+    <span class='errors'>%s</span>
+    """
+    ?res 
+  }  
+}
+where {
+    bind (st:call-template(st:main, ?in) as ?res)
+    filter (bound(?res) && strlen(?res) > 0)
+} 

@@ -1,0 +1,28 @@
+prefix p:    <http://fr.dbpedia.org/property/>
+prefix o:    <http://dbpedia.org/ontology/>
+
+template st:descperson(?r) {
+
+st:call-template(st:desctriple, 
+  st:number(), ?r, ?p, ?tt, if (?href, st:href, st:property))
+
+}
+where {
+  bind (unnest(us:person()) as (?p,  ?title, ?titleen))   
+
+  bind (if (?p in (o:wikipedia, o:dbpedia), true, false) as ?href)
+  
+  filter ( ?href || exists { ?r ?p ?v } )
+  
+  bind (if (st:get(st:lang, "en"), ?titleen, ?title) as ?tt)
+
+}
+
+#
+# Properties to be displayed for Person (see profile.rq)
+#
+function us:define(){ 
+  let (?m = us:definition(st:person)){
+    if (xt:size(?m) = 0) { us:person() } else { ?m }
+  }
+}

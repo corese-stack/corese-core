@@ -1,0 +1,12 @@
+template st:esc(?x) {
+
+  str(?tt)
+    
+}
+where {
+   
+   bind (
+    let (?t = st:turtle(?x)) { replace(?t, "<", "&lt;") } 
+   as ?tt)
+       
+}

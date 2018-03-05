@@ -1,0 +1,17 @@
+#
+# defaut processing of a variable is 
+# st:turtle on URI 
+# st:apply-templates on Blank and Literal
+# Literals are displayed by st:xsdLiteral  (literalvalue.rq)
+# otherwise must use st:turtle explicitely (e.g. cardinality.rq)
+#
+# Olivier Corby, Wimmics Inria I3S, 2014
+#
+prefix owlfs: <http://ns.inria.fr/sparql-template/owlfs/>
+
+template st:profile(?in) {
+     
+}
+where {
+}
+function st:process(?in) {  owlfs:process(?in) }

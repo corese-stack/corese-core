@@ -1,0 +1,11 @@
+template st:start {
+  
+  st:head()
+  
+  st:call-template(st:locate)
+  
+  st:tail()
+}
+where {
+
+}

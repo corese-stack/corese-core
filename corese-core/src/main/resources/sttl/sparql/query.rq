@@ -1,0 +1,15 @@
+template st:query(?q) {
+
+format {
+
+  us:format("query.html")
+  
+  st:get(st:service)
+  if (bound(?prof), st:format(us:format("option.html"), ?prof), "")
+  str(?q)
+  }
+}
+where {
+  bind (st:get(st:profile) as ?prof)
+
+}

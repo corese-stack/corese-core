@@ -1,0 +1,23 @@
+template st:profile {
+
+}
+where {}
+
+function st:process(?x) {
+    if (isLiteral(?x), xsd:string(?x), st:apply-templates(?x))
+  }
+    
+  function st:default(?x) { 
+    xsd:string(?x)
+  }
+       
+  function st:misc(?name) { 
+    st:protocol(
+      concat(st:get(st:service), "?name=", st:get(st:server), ?name, "&profile=st:sparql"))
+      #"&transform=st:sparql%23core&profile=st:dbpedia"))
+  }
+  
+function us:format(?name) {
+    st:getFormat("cdn", ?name)
+}
+  

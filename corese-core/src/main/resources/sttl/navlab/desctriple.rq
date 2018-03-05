@@ -1,0 +1,10 @@
+prefix ft:  <http://ns.inria.fr/sparql-template/format/navlab/>
+template st:desctriple(?n, ?r, ?p, ?title, ?temp) {
+format {
+  ft:triple.html
+ 
+  str(?title)
+  st:call-template(?temp, ?r, ?p)
+ }
+}
+where {} 

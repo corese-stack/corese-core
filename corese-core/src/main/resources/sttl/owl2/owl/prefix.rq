@@ -1,0 +1,12 @@
+prefix owlfs: <http://ns.inria.fr/sparql-template/owlfs/>
+
+template st:prefix {
+  format {
+    "Prefix(%s: = %s%s>)\n"
+    str(?p) owlfs:display("<") str(?n)
+    }
+    ; separator= ""
+}
+where {
+  bind (kg:unnest(st:prefix()) as (?p, ?n))
+}

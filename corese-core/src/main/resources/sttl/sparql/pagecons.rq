@@ -1,0 +1,8 @@
+template st:pagecons {
+   format {
+    us:format("construct.html")
+    st:call-template(st:tablecons)
+   }
+}
+where {
+}

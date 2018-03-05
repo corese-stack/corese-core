@@ -1,0 +1,8 @@
+prefix ft:  <http://ns.inria.fr/sparql-template/format/navlab/>
+template st:icon(?label, ?ic) {
+  format {
+    ft:img.html   
+    str(?label) str(?ic)
+  }
+}
+where {}

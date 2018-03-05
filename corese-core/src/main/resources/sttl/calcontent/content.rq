@@ -1,0 +1,42 @@
+prefix cal: <http://ns.inria.fr/sparql-extension/calendar/>
+template st:content(?year) {
+
+format {
+  """
+  <a name='%s'/>
+  <h4>%s</h4>  
+  <p>%s</p>
+  """
+  
+  str(?dd)
+  str(?dd)
+  group {
+    format {
+      "<a href='%s'>%s</a>"  
+      
+      st:plink(?x, st:dbpedia)
+      str(?title)
+    } 
+    
+    ; separator = "<br/>"
+  }
+}
+
+}
+where {
+
+  bind (coalesce(st:get(st:allyear), false) as ?all)
+  
+  {select distinct ?x ?date 
+  where {
+    ?x ?p ?date 
+    filter (datatype(?date) in (xsd:date, xsd:dateTime))     
+  }}
+  
+  filter (?all || year(?date) = ?year)
+  bind (cal:date(year(?date), month(?date), day(?date)) as ?dd)
+  ?x rdfs:label ?l 
+  bind (if (bound(?l), ?l, ?x) as ?title)
+}
+group by ?date
+order by ?date 

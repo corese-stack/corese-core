@@ -1,0 +1,29 @@
+prefix cal: <http://ns.inria.fr/sparql-extension/calendar/>
+template st:profile {
+                    
+}
+where {}
+
+function us:format(?name){
+    st:getFormat("calendar", ?name)
+}
+
+  function xt:space(?n) { 
+         if (?n = 0, "", concat("   " , xt:space(?n - 1)))
+       }
+      
+    function xt:td(?n) { 
+         if (?n = 0, "", concat("<td/>" , xt:td(?n - 1)))
+     } 
+      
+  
+  function xt:pretty(?n) { 
+    if (?n < 10, concat(" ", ?n), ?n) 
+  }
+  
+  function us:display(?y) {
+    if (st:get(st:date, st:romain), xt:romain(?y), ?y)
+  }
+
+
+    

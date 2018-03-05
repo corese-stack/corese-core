@@ -1,0 +1,30 @@
+prefix cal: <http://ns.inria.fr/sparql-extension/calendar/>
+template st:monthtab(?y, ?m) {
+  format {
+  us:format("month.html")
+      
+  cal:month(?m)
+  st:call-template(st:title)
+  xt:td(?first - 1)
+  
+  group {            
+	  format {
+        us:format("day.html")
+        st:call-template(st:date, ?date)
+	  }
+	  if (?day = "Sunday", st:format(us:format("sunday.html")), "")
+		  
+	  ; separator = ""
+  }
+  
+  if (?first + ?days - 1 <= 35 , st:format(us:format("last.html")), "")   
+  }
+
+}
+where {
+    bind (cal:days(?y, ?m)       as ?days)
+    bind (cal:num(xt:day(cal:date(?y, ?m, 1))) as ?first)
+    bind (unnest(xt:iota(?days)) as ?n)
+    bind (cal:date(?y, ?m, ?n)   as ?date)
+    bind (xt:day(?date)          as ?day)        
+}

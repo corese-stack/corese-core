@@ -1,0 +1,10 @@
+template st:pperror(?in) {
+	format {
+        "<span class='fail'>%s</span>"
+	
+        ?in
+	}
+}
+where {
+
+}

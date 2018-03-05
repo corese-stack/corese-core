@@ -1,0 +1,22 @@
+prefix o:    <http://dbpedia.org/ontology/>
+prefix w:    <http://fr.wikipedia.org/wiki/>
+prefix r:    <http://fr.dbpedia.org/resource/>
+prefix p:    <http://fr.dbpedia.org/property/>
+
+template {
+
+st:call-template(st:frame, ?label, coalesce(?ic, ""), 
+   st:call-template(st:descperson, ?in))
+ 
+}
+where {
+
+  ?in a foaf:Person
+  minus { ?in a o:Resource }
+    
+  ?in rdfs:label ?label 
+        
+  optional { ?in o:thumbnail  ?ic  }
+  
+  
+}

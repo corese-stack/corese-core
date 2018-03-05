@@ -1,0 +1,35 @@
+prefix p:    <http://fr.dbpedia.org/property/>
+prefix o:    <http://dbpedia.org/ontology/>
+prefix r:    <http://fr.dbpedia.org/resource/>
+
+template st:descplace(?r) {
+
+st:call-template(st:desctriple, 
+  st:number(), ?r, ?p, ?tt, if (?href, st:href, st:property))
+
+}
+where { 
+
+  values (?p ?title ?titleen) {
+    (rdfs:comment 	"Résumé" 	"Abstract")
+    (p:nord		"Nord"		"North")
+    (p:nordEst		"Nord Est"	"North East")
+    (p:est		"Est"		"East")
+    (p:sudEst		"Sud Est"	"South East")
+    (p:sud		"Sud"		"South")
+    (p:sudOuest		"Sud Ouest"	"South West")
+    (p:ouest		"Ouest"		"West")
+    (p:nordOuest	"Nord Ouest"	"North West")
+    (p:latitude		"Latitude"	"Latitude")
+    (p:longitude	"Longitude"	"Longitude")
+    
+    (o:wikipedia	"Wikipedia"	"Wikipedia")
+    (o:dbpedia		"DBpedia"	"DBpedia")
+  }
+  
+  bind   (if (?p in (o:wikipedia, o:dbpedia), true, false) as ?href)
+  filter (if (?p in (o:wikipedia, o:dbpedia), strstarts(?r, r:), true))
+  filter ( ?href || exists { ?r ?p ?v } )
+  bind (if (st:get(st:lang, "en"), ?titleen, ?title) as ?tt)
+
+}

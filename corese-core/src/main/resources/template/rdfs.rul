@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+SPARQL Template Transformation
+Olivier Corby - Wimmics - Inria UNS CNRS I3S
+Thu Oct 26 16:48:59 CEST 2017
+-->
+<rdf:RDF  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns='http://ns.inria.fr/sparql-template/'>
+<rule>
+<body>
+<![CDATA[
+#
+# Generate HTML from SPARQL Query Results
+# RDF is either construct where graph or 
+# select where in W3C DAWG result-set RDF vocabulary
+#
+# Olivier Corby - Wimmics Inria I3S - 2015
+#
+
+template st:body {
+  "<p>"
+  "<span class='color'>Namespace: </span>" 
+  "<span class='bold'>" str(?uri) "</span>"  
+  "</p>"
+
+}
+where {
+
+  bind(st:get(st:uri) as ?uri)
+  
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Generate HTML from SPARQL Query Results
+# RDF is either construct where graph or 
+# select where in W3C DAWG result-set RDF vocabulary
+#
+# Olivier Corby - Wimmics Inria I3S - 2015
+#
+template st:classdesc {
+"<p>"
+  "<span class='color'>Class </span>" "<span class='bold'>" strafter(?in, ?uri) "</span>" "<br/>"
+  "<span class='color'>subClassOf</span>: " group distinct { strafter(?s, ?uri) } "<br/>"
+  "<span class='color'>label</span>: "     group distinct { str(?l) ; separator="; "} "<br/>"
+  "<span class='color'>comment</span>: "  group distinct { str(?c) ; separator="<br/>"} 
+"</p>"
+}
+where {
+  bind (coalesce(st:get(st:uri), "") as ?uri)
+  ?in a rdfs:Class
+  optional { ?in rdfs:subClassOf ?s }
+  optional { ?in rdfs:label      ?l }
+  optional { ?in rdfs:comment    ?c }  
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Generate HTML from SPARQL Query Results
+# RDF is either construct where graph or 
+# select where in W3C DAWG result-set RDF vocabulary
+#
+# Olivier Corby - Wimmics Inria I3S - 2015
+#
+
+template st:start {
+
+  st:call-template-with(st:server, st:head)
+  
+  st:call-template(st:body)
+     
+  st:call-template(st:class)
+    
+  st:call-template(st:property)
+
+  st:call-template-with(st:server, st:tail)
+
+}
+where {
+
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Generate HTML from SPARQL Query Results
+# RDF is either construct where graph or 
+# select where in W3C DAWG result-set RDF vocabulary
+#
+# Olivier Corby - Wimmics Inria I3S - 2015
+#
+
+template st:class {
+
+ st:call-template(st:classdesc, ?x) 
+
+}
+where {
+ ?x a rdfs:Class
+}
+order by ?x
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Generate HTML from SPARQL Query Results
+# RDF is either construct where graph or 
+# select where in W3C DAWG result-set RDF vocabulary
+#
+# Olivier Corby - Wimmics Inria I3S - 2015
+#
+template st:propertydesc {
+"<p>"
+  "<span class='color'>Property </span>" "<span class='bold'>"   strafter(?in, ?uri) "</span>" "<br/>"
+  "<span class='color'>subPropertyOf</span>: " 	group distinct { strafter(?s, ?uri) } "<br/>"
+  "<span class='color'>domain</span>: " 	group distinct { strafter(?d, ?uri) } "<br/>"
+  "<span class='color'>range</span>: " 		group distinct { strafter(?r, ?uri) } "<br/>"
+
+  "<span class='color'>label</span>: "     	group distinct { str(?l) ; separator="; "} "<br/>"
+  "<span class='color'>comment</span>: "  	group distinct { str(?c) ; separator="<br/>"} 
+  "</p>"
+}
+where {
+  bind (coalesce(st:get(st:uri), "") as ?uri)
+  ?in a rdf:Property
+  filter( strstarts(?in, ?uri) )
+  optional { ?in rdfs:subProperty ?s }
+  optional { ?in rdfs:domain      ?d }
+  optional { ?in rdfs:range       ?r }
+  optional { ?in rdfs:label       ?l }
+  optional { ?in rdfs:comment     ?c }  
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Generate HTML from SPARQL Query Results
+# RDF is either construct where graph or 
+# select where in W3C DAWG result-set RDF vocabulary
+#
+# Olivier Corby - Wimmics Inria I3S - 2015
+#
+
+template st:property {
+
+ st:call-template(st:propertydesc, ?x) 
+
+}
+where {
+ ?x a rdf:Property
+}
+order by ?x
+]]>
+</body>
+</rule>
+
+</rdf:RDF>

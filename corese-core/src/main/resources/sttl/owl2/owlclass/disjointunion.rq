@@ -1,0 +1,9 @@
+template {
+   "DisjointUnion("  
+     	?in " " box { group { ?e ; separator = "\n" } }
+    ")" 
+}
+where {
+  ?in owl:disjointUnionOf ?y 
+  ?y rdf:rest*/rdf:first ?e
+}

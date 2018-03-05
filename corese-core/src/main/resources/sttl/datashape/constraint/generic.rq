@@ -1,0 +1,22 @@
+prefix sh: <http://www.w3.org/ns/shacl#> 
+
+template (?shape, ?sh, ?vis, ?ls) {
+  sh:safe(?shape, ?sh, ?suc)
+}
+where {
+  graph ?shape {  
+    values ?q { 
+        sh:hasValue sh:datatype sh:minInclusive sh:minExclusive sh:maxInclusive sh:maxExclusive sh:minLength sh:maxLength sh:nodeKind sh:node sh:in sh:languageIn 
+    }
+    ?sh ?q ?m 
+    #filter not exists { ?sh sh:path ?p }
+ 
+  }
+  
+  values ?s { unnest(?ls) }
+    
+  bind (coalesce(sh:functioncall(?q, ?shape, ?s, ?m), false) as ?suc )
+  
+  bind (st:report(?q, ?sh, ?shape, ?s, st:null, ?s, ?suc, ?vis) as ?b)
+}
+

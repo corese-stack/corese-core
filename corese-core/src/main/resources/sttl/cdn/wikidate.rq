@@ -1,0 +1,14 @@
+prefix cn: <http://cdn.fr/schema/>
+prefix foaf: <http://xmlns.com/foaf/0.1/>
+
+template  cn:wikidate(?d) {
+
+  format {
+    "<a href='http://fr.wikipedia.org/wiki/%s'>%s</a>"
+    ?d ?d
+  }
+
+}
+where {
+
+}

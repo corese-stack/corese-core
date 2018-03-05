@@ -1,0 +1,22 @@
+prefix o:    <http://dbpedia.org/ontology/>
+prefix w:    <http://fr.wikipedia.org/wiki/>
+prefix r:    <http://fr.dbpedia.org/resource/>
+prefix p:    <http://fr.dbpedia.org/property/>
+
+template {
+
+  st:call-template(st:frame, ?label, coalesce(?ic, ""), 
+     st:call-template(st:descresource, ?in))
+
+
+}
+where {
+
+  ?in a o:Resource
+    
+  ?in rdfs:label ?label 
+  filter(lang(?label) = 'fr')
+        
+  optional { ?in o:thumbnail  ?ic  }
+    
+}

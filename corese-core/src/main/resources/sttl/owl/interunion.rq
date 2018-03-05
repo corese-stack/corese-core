@@ -1,0 +1,22 @@
+#
+# template called by subclass in special case:
+# subclassOf(intersectionOf() ?y)
+#
+template st:interunion {
+    xsd:string(if (bound(?t), ?ld, ?lo))
+    "(" 
+      ibox {
+	?x  
+      }
+    ")" 
+}
+where {
+  ?in ?p ?x 
+  optional { ?in a ?t  filter(?t = rdfs:Datatype) }
+ }
+values (?p ?lo ?ld) {
+  (owl:unionOf         "ObjectUnionOf" 		"DataUnionOf")
+  (owl:intersectionOf  "ObjectIntersectionOf" 	"DataIntersectionOf")
+  (owl:complementOf 	"ObjectComplementOf" 	"DataComplementOf")
+  (owl:datatypeComplementOf "DataComplementOf" 	"DataComplementOf")
+}

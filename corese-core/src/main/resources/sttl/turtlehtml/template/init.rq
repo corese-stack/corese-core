@@ -1,0 +1,100 @@
+#
+# defaut processing of a variable is st:apply-templates 
+#
+# Olivier Corby, Wimmics Inria I3S, 2014
+#
+template st:profile {
+
+}
+where {}
+
+#
+# extended datatype xt:graph is a string which represents a Turtle (sub)graph
+# display it as is
+#
+function st:process(?in) { 
+  if (isBlank(?in), st:blank(?in),	  
+  if (isURI(?in), us:puri(?in),
+  if (datatype(?in) = xt:graph, st:clean(str(?in)),
+  st:literal(st:clean(st:turtle(?in))))))
+}
+
+
+function st:clean(?in){
+    replace(?in, "<", "&lt;") 		
+}
+
+function st:literal(?lit){
+   st:format("<span class='literal'>%s</span>", replace(?lit, "\\\\n", "\n"))
+}
+  
+function st:blank(?in){
+  st:format(
+    "<span id='%s'>%s</span>", 
+    st:id(?in), st:apply-templates(?in))
+}
+
+function us:puri(?in){
+    if (st:get(st:hyperlink, true),    
+        st:display(?in), us:uri(?in))
+}
+
+function us:uri(?in){
+    st:clean(st:turtle(?in))
+}
+
+function st:id(?in){
+  coalesce(
+    concat("it", st:vget(?in, st:id)), 
+    concat("ab", st:index()))
+}
+      
+function st:default(?in) {
+   st:turtle(?in)
+}
+
+
+
+# LOD URI hypertext link generated as is 
+# set by profile.ttl : st:param [ st:lod (URI) ]
+#
+function st:lod(?x){
+     coalesce(mapany(rq:strstarts, ?x, st:get(st:lod)), false)
+}
+    
+
+# display resource uri
+function st:display(?x){
+    let (?profile = coalesce(st:get(st:profile), st:null)){
+      if (?profile = st:null){ 
+        us:uri(?x) 
+      }
+      else if (st:lod(?x) || coalesce(st:getprofile(?x) = st:lod, false) ){
+        st:call-template(st:link, ?x, us:uri(?x))
+      }
+      else {
+        st:call-template(st:link, coalesce(st:pplink(us:prepare(?x)), us:prepare(?x)), us:uri(?x))
+      }     
+    }
+}
+
+function us:prepare(?uri){
+    ?uri
+#    coalesce(funcall(st:get(st:prepare), ?uri), ?uri)
+}
+
+
+
+function st:display2(?x){
+    let (?profile = coalesce(st:get(st:profile), st:null)){
+      if (?profile = st:null){ 
+        st:call-template-with(st:sparql, st:esc, ?x) 
+      }
+      else if (st:lod(?x) || coalesce(st:getprofile(?x) = st:lod, false) ){
+        st:call-template-with(st:sparql, st:linkesc, ?x)
+      }
+      else {
+        st:call-template-with(st:sparql, st:linkprofile, ?x)
+      }     
+    }
+}

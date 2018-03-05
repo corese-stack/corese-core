@@ -1,0 +1,14 @@
+prefix cn: <http://cdn.fr/schema/>
+
+template st:navlab(?u, ?t) { 
+  
+  format { 
+    "<a href='%s'>%s</a>" 
+    
+    st:plink(?u, st:dbpedia) 
+    ?t 
+  }
+
+}
+where {
+}
