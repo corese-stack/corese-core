@@ -1,0 +1,346 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+SPARQL Template Transformation
+Olivier Corby - Wimmics - Inria UNS CNRS I3S
+Thu Oct 26 16:48:59 CEST 2017
+-->
+<rdf:RDF  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns='http://ns.inria.fr/sparql-template/'>
+<rule>
+<body>
+<![CDATA[
+#
+# SPARQL Tutorial
+# st:get(st:uri) is the name of a query to execute (st:minus)
+# It is used 1) to select a query and 2) to display the result of the query
+# RDF graph is either RDF dataset or Query Result
+# Query definitions are stored in st:context named graph 
+#
+template st:start {
+
+  st:head()
+
+  st:call-template(st:head)
+    
+  st:call-template(st:selectform, ?uri)
+  
+  st:call-template(st:display, ?uri)
+   
+  st:call-template(st:tail)
+
+  st:tail()
+}
+where {
+
+  bind (coalesce(st:get(st:uri), st:intro) as ?uri)
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:content {
+  
+  st:call-template(st:content2, "Data:",   st:data)
+  st:call-template(st:content2, "Schema:", st:schema)
+  st:call-template(st:content2, "Query:",  st:context)
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Display result of query
+# RDF graph is a result graph
+#
+
+prefix spq: <http://ns.inria.fr/sparql-template/sparql#>
+template st:result {
+
+   st:apply-templates-with(?sttl)
+    
+}
+where {
+  bind (st:get(st:query) as ?query)
+  bind (coalesce(st:get(st:sttl), spq:result)  as ?sttl)
+  filter bound(?query)
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:tail {
+format {
+  us:format("tail.html")
+  
+  st:call-template(st:content)
+}
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:prev(?t) {
+
+format {
+  us:format("prev.html")
+  st:plink(?n)
+  }
+  
+}
+where {
+  bind (st:get(st:context) as ?g)
+  
+  graph ?g {
+    ?q1 st:name ?t ; st:index ?i
+    bind (?i - 1 as ?j)
+    ?q2 st:index ?j ;
+	st:name ?n 
+  }
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:next(?t) {
+
+format {
+  us:format("next.html")
+  st:plink(?n)
+ }
+    
+}
+where {
+  bind (st:get(st:context) as ?g)
+  
+  graph ?g {
+    ?q1 st:name ?t ; st:index ?i
+    bind (?i + 1 as ?j)
+    ?q2 st:index ?j ;
+	st:name ?n 
+  }
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:profile {
+   
+}
+where {}
+ 
+  function st:proto() {
+    coalesce(st:get(st:protocol), st:std)
+  }
+  
+function us:format(?name) {
+   st:getFormat("tutorial", ?name)
+}
+
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Select a query name to display and execute
+# query name bound to uri param
+# Generate query names list from context graph
+#
+template st:selectform(?t) {
+
+format {
+
+  us:format("selectform.html")
+  
+  st:get(st:service) 
+  st:get(st:profile)   
+  st:call-template(st:prev, ?t)  
+  st:call-template(st:list, ?t)  
+  st:call-template(st:next, ?t)
+}
+}
+where {
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Generate a form with a SPARQL query ?q to submit
+# Argument  ?n is the name of query (st:minus)
+# ?q actual query, ?t query template, ?s query solution
+#
+template st:form(?n, ?q, ?t, ?s) {
+   
+   format {   
+    us:format("form.html")
+   
+    st:get(st:service) 
+    st:get(st:profile)
+    str(?t) 
+    str(?s) 
+    ?n 
+    if (?s = st:null, "", st:format(us:format("nav.html")))
+    str(?q)
+    }
+   
+}
+where {
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Generate query names list from context graph
+#
+template st:list(?t) {
+
+format {
+  us:format(if (?q = ?t, "optionselected.html", "option.html") )
+  
+  ?q
+  str(?i)
+  str(?title)
+}
+   
+}
+where {
+  bind (st:get(st:context) as ?g)
+  graph ?g {
+  values ?qt {st:Query sw:Query}
+    [] a ?qt ;
+      st:index ?i ;
+      st:name ?q ;
+      rdfs:label ?title
+  }
+}
+order by ?i
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:content2(?t, ?p) {
+
+  str(?t) "<br/>"  
+  
+  group distinct { 
+    "<a href='" str(?d) "'>" str(?d) "</a>" 
+    ; separator="<br/>"
+  } 
+  
+  "<br/>"
+ 
+}
+where {
+  bind (st:get(st:context) as ?g)
+  graph ?g {
+    ?ds a st:Dataset
+    ?ds ?p [ st:uri ?d ]
+  }
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:head {
+   
+  format {
+    us:format("head.html")  str(?title)
+  }
+  
+}
+where {
+  bind (coalesce(st:get(st:title), "Tutorial") as ?title)
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# ?n is the st:name of a query
+# get definition of query in context graph
+# display query and eventually result of query
+# st:get(st:query) is user query
+# ?q is tutorial query
+#
+template st:display(?n) {
+
+format {
+   us:format("display.html")
+
+   str(?l)
+   str(?c)   
+   if (bound(?r), st:format(us:format("documentation.html"), str(?r)), "")
+   
+   st:call-template(st:form, 
+     ?n,
+     coalesce(st:get(st:query), str(?q)), 
+     str(?q), 
+     coalesce(?s, st:null)) 
+     
+   st:call-template(st:result)
+ }
+      
+}
+where {
+  # named graph that contains definition of queries
+  bind (st:get(st:context) as ?g)
+  graph ?g {
+    ?qt st:name    ?n ;
+      rdfs:label   ?l ;
+      rdfs:comment ?c ;
+      st:query     ?q
+      optional { ?qt st:reference ?r }
+      optional { ?qt st:solution  ?s }
+      optional { ?qt sw:body  ?s }
+      filter(lang(?c) = (coalesce(st:get(st:lang), "fr")))
+  }
+}
+]]>
+</body>
+</rule>
+
+</rdf:RDF>

@@ -1,0 +1,22 @@
+#
+# Turtle Pretty Printer
+# Olivier Corby, Wimmics Inria I3S, 2013
+#
+prefix rs: <http://www.w3.org/2001/sw/DataAccess/tests/result-set#>
+template st:main {
+      
+    st:clean(st:prolog("prefix"))
+    st:nl()
+    str(?main)
+
+}
+where {
+   bind (exists { ?rs a rs:ResultSet }  &&  ! st:get(st:param, "verbatim") as ?b)
+   bind (if (?b, true, st:export(st:uri,   st:focus())) as ?e)
+   
+   bind (if (?b, 
+    st:call-template(st:resultset),
+    st:apply-templates-with(st:turtlehtml)) as ?main)
+    
+}
+

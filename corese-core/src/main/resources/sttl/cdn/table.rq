@@ -1,0 +1,23 @@
+#
+# Timeline SPARQL Template - Olivier Corby - 2014
+#
+prefix cn: <http://cdn.fr/schema/>
+prefix foaf: <http://xmlns.com/foaf/0.1/>
+
+template  cn:table(?min, ?max) {
+format {
+
+  us:format("date.html")
+  
+  st:call-template(cn:wikidate, ?d)
+  st:call-template(cn:row, ?d)
+}
+}
+where {
+  {select distinct ?d  where {
+    values ?p { cn:date cn:begin } 
+    ?uri ?p ?d 
+  }}
+  filter(?min <= ?d && ?d <= ?max)
+}
+order by asc(?d)

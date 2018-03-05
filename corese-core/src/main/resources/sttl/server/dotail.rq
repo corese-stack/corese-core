@@ -1,0 +1,10 @@
+template st:dotail {
+format {
+    st:home("tail.html")
+    now()
+}
+
+}
+where {
+
+}

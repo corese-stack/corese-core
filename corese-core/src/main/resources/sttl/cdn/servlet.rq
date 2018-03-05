@@ -1,0 +1,14 @@
+#
+# Hypertext link trigger Corese server 
+# Answer using SPARQL Template Transformation
+#
+prefix cn: <http://cdn.fr/schema/>
+
+template st:servlet {
+
+      st:get(st:service)
+      "?query=" 
+              
+}
+where {
+}

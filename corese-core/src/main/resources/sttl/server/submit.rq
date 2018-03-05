@@ -1,0 +1,11 @@
+#
+# <input type='submit' ...
+#
+template st:submit {
+      
+  "onClick='trans(this.form); return false;'"
+  
+}
+where {
+  filter (st:get(st:protocol, st:ajax))
+}

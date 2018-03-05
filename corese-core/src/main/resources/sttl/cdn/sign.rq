@@ -1,0 +1,14 @@
+#
+# Timeline SPARQL Template - Olivier Corby - 2014
+#
+prefix cn: <http://cdn.fr/schema/>
+template cn:sign {
+
+   st:call-template(cn:icon, cn:icon)
+   
+   format { us:format("sign.html") }
+   
+   now()
+}
+where {
+}

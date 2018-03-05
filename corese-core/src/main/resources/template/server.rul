@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+SPARQL Template Transformation
+Olivier Corby - Wimmics - Inria UNS CNRS I3S
+Thu Oct 26 16:48:59 CEST 2017
+-->
+<rdf:RDF  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns='http://ns.inria.fr/sparql-template/'>
+<rule>
+<body>
+<![CDATA[
+template st:dotail {
+format {
+    st:home("tail.html")
+    now()
+}
+
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:sstyle {
+  "class='form-control select'"
+}
+where {}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:dohead {
+
+  st:call-template(st:header)
+ # st:call-template(st:banner)
+  
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Hyper text link to server
+# May return javascript:trans(?uri)
+#
+template st:link (?uri) {
+
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# <input type='submit' ...
+#
+template st:submit {
+      
+  "onClick='trans(this.form); return false;'"
+  
+}
+where {
+  filter (st:get(st:protocol, st:ajax))
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:tail {
+
+if (st:get(st:protocol, st:ajax), "",
+    st:call-template(st:dotail))
+
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# onChange=''
+#
+template st:change {
+      
+ if (st:get(st:protocol, st:ajax), 
+    "trans(this.form); return false;",
+    "submit();")  
+}
+where {
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:header {
+
+  """
+  <html>
+  <head>
+    <title>Corese Semantic Web Server</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="/style.css" rel="stylesheet" type="text/css" />       
+  </head>
+  <body>
+  """
+     
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:head {
+
+  if (st:get(st:protocol, st:ajax), "",
+    st:call-template(st:dohead))
+    
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:bstyle { 
+    
+      "class='btn btn-warning'" 
+        
+}
+where {
+  filter (st:get(st:protocol, st:ajax))
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:profile {}
+where {}
+
+
+function st:home(?name) {
+    concat(st:get(st:server), "/data/format/server/", ?name)
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:banner  {
+format { st:home("banner.html") }
+}
+where {}
+]]>
+</body>
+</rule>
+
+</rdf:RDF>

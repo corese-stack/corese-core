@@ -1,0 +1,19 @@
+template {
+    if (bound(?t), "Data", "Object") 
+    "IntersectionOf(" 
+	ibox {
+	  ?y  
+	}
+    ")" 
+}
+where {
+  ?in owl:intersectionOf ?y 
+  
+  # in case there is also subClassof, 
+  # a named template is used: interunion.rq
+  filter not exists { 
+    { ?in rdfs:subClassOf | owl:equivalentClass |owl:disjointUnionOf ?z } 
+   }
+
+  optional { ?in a ?t  filter(?t = rdfs:Datatype) }
+}

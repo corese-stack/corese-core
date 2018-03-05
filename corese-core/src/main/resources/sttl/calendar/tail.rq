@@ -1,0 +1,9 @@
+template st:tail {
+
+format {
+    us:format("tail.html")
+    now()
+}
+
+}
+where {}

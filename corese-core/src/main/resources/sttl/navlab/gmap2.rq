@@ -1,0 +1,21 @@
+#
+# Geolocate  resources on a map 
+# ?list = list(list(uri, lat, lon))
+#
+prefix ft:  <http://ns.inria.fr/sparql-template/format/navlab/>
+template st:gmap2(?list) {
+  format {
+    ft:map2.html
+    
+    st:number()
+    str(?lat)
+    str(?lon)
+    coalesce(st:get(st:mapicon2), "/img/smarker.png")
+    st:plink(?r)
+  }
+}
+where {
+
+  bind (unnest(?list) as (?r, ?lat, ?lon))
+  
+}

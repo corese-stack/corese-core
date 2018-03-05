@@ -1,0 +1,33 @@
+#
+# URI <http://ns.inria.fr/sparql-template/date/10/2015>
+# translated as "10/2015"^^xsd:gYearMonth
+#
+template st:month {
+
+  st:call-template(st:title, ?date)
+
+  format {
+
+    """<p>%s</p>"""
+    
+    if (bound(?type), 
+      st:call-template(st:dbpediafortype, ?date, ?type),
+      st:call-template(st:dbpediafortest, ?date))
+    
+  }
+  
+  st:call-template(st:title, ?date)
+  
+  st:call-template(st:tail)
+ 
+}
+where {
+
+   bind (st:get(st:uri)  as ?uri)
+   # type of resoures to focus on
+   bind (st:get(st:mode) as ?type)
+   bind (strafter(?uri, us:root()) as ?str)
+   bind (strdt(?str, xsd:gYearMonth) as ?date)
+   bind (st:set(st:date, ?date) as ?tmp)
+   
+}

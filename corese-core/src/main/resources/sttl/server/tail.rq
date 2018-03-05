@@ -1,0 +1,9 @@
+template st:tail {
+
+if (st:get(st:protocol, st:ajax), "",
+    st:call-template(st:dotail))
+
+}
+where {
+
+}

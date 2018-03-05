@@ -1,0 +1,19 @@
+template st:query(?q) {
+
+format {
+  """
+  <h3>SPARQL Query</h3>
+  <form method='post' id='spin' action='/spin/tospin'>  
+    <input type='hidden' name='transform' value='%s' />    
+    <textarea cols='60' rows='15' id='query' name='query'>%s</textarea>
+    <br/>       
+    <input type='submit' value='submit' class='btn btn-warning' onClick='trans(this.form); return false;' />      
+  </form>
+  """
+  
+  st:get(st:transform)
+  str(?q)
+  }
+}
+where {
+}

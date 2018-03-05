@@ -1,0 +1,15 @@
+template st:enum(?year, ?f, ?l) {
+format {
+  us:format("enum1.html")      
+  group {
+    format {
+      us:format("enum2.html")      
+      st:call-template(st:monthtab, ?year, ?month)
+     }
+  }
+}
+}
+where {
+
+    bind (unnest(xt:iota(?f, ?l)) as ?month)
+}

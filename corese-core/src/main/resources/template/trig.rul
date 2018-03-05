@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+SPARQL Template Transformation
+Olivier Corby - Wimmics - Inria UNS CNRS I3S
+Thu Oct 26 16:48:59 CEST 2017
+-->
+<rdf:RDF  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns='http://ns.inria.fr/sparql-template/'>
+<rule>
+<body>
+<![CDATA[
+#
+# Trig Pretty Printer
+# Olivier Corby, Wimmics Inria I3S, 2014
+#
+template st:graph {
+  format {
+  """graph %s {%s}"""
+  
+  xt:turtle(?g)
+  box {
+       st:apply-templates-with-graph(<http://ns.inria.fr/sparql-template/turtle#main>, ?g) 
+    }
+  }
+  ; separator = "\n\n"
+}
+where {
+  select ?g where {
+    graph ?g {
+      filter exists { ?x ?p ?y }
+    }
+  }
+}
+order by ?g 
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Trig Pretty Printer
+# Olivier Corby, Wimmics Inria I3S, 2014
+#
+template st:start {
+  st:prolog("@prefix")
+  st:nl()
+  str(?str)
+}
+where {
+    bind (st:call-template(st:graph) as ?str)
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# defaut processing of a variable 
+#
+# Olivier Corby, Wimmics Inria I3S, 2014
+#
+template st:profile(?in) {    
+    
+}
+where {}
+
+function st:process(?in) { st:turtle(?in) }
+     
+function st:default(?in) { st:turtle(?in) }
+
+]]>
+</body>
+</rule>
+
+</rdf:RDF>

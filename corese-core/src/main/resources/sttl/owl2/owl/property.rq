@@ -1,0 +1,25 @@
+
+template  st:property  {
+
+    xt:nl(st:apply-templates-with-all(st:owlproperty, ?in), 2)
+    ; separator = ""
+   
+}
+where {
+
+  select distinct ?in where {
+  values ?p { rdf:type owl:propertyChainAxiom owl:propertyDisjointWith owl:inverseOf rdfs:domain rdfs:range rdfs:subPropertyOf owl:equivalentProperty}
+     ?in ?p ?y 
+    filter (
+      (isURI(?in)   && not exists { ?in a owl:Ontology }) ||
+      (isBlank(?in) && not exists { ?x ?q ?in } )
+    )
+  # OWL vocabulary must not be pretty printed
+    filter (! xt:system(?in))
+
+        
+  }
+  order by ?in
+        
+}
+

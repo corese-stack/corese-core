@@ -1,0 +1,39 @@
+#
+# Generate Century Index
+# Hypertext link may trigger Corese server 
+# Answer using SPARQL Template Transformation
+#
+prefix cn: <http://cdn.fr/schema/>
+
+template cn:index(?title) {
+
+format {
+  us:format("indextable.html")
+
+  if (bound(?before), 
+    st:format(us:format("before.html"), st:plink(?before)), 
+    "")
+    
+  st:call-template(cn:elem, ?title) 
+  
+  if (bound(?after), 
+    st:format(us:format("after.html"), st:plink(?after)), 
+    "")  
+}
+
+st:call-template(cn:list)   
+
+}
+where {
+
+  ?century rdfs:label ?title ; 
+    cn:start ?min 
+       
+  bind (if (?min = 1, 0, ?min) - 100 as ?be)
+  bind (if (?min = -100, -99, ?min) + 100 as ?af)
+  bind (coalesce(st:get(st:min), -1000) as ?fst)
+  bind (coalesce(st:get(st:max),  3000) as ?rst)
+  
+  optional { ?before cn:start ?be filter (?be >= ?fst) }
+  optional { ?after  cn:start ?af filter (?af <= ?rst) }
+}

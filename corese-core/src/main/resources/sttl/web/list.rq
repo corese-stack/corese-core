@@ -1,0 +1,25 @@
+#
+# Generate query names list from context graph
+#
+template st:list(?t) {
+
+format {
+  us:format(if (?q = ?t, "optionselected.html", "option.html") )
+  
+  ?q
+  str(?i)
+  str(?title)
+}
+   
+}
+where {
+  bind (st:get(st:context) as ?g)
+  graph ?g {
+  values ?qt {st:Query sw:Query}
+    [] a ?qt ;
+      st:index ?i ;
+      st:name ?q ;
+      rdfs:label ?title
+  }
+}
+order by ?i

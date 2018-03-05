@@ -1,0 +1,10 @@
+template st:head {
+   
+  format {
+    us:format("head.html")  str(?title)
+  }
+  
+}
+where {
+  bind (coalesce(st:get(st:title), "Tutorial") as ?title)
+}

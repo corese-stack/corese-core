@@ -1,0 +1,13 @@
+prefix rs: <http://www.w3.org/2001/sw/DataAccess/tests/result-set#>
+template st:table {
+    format {
+        us:format("table.html")  
+        st:number()
+        st:apply-templates(?s)
+    }
+}
+where {
+  ?x rs:solution ?s 
+  ?s rs:index ?i  
+}
+order by ?i

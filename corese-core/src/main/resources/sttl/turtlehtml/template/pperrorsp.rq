@@ -1,0 +1,7 @@
+template st:pperrorsp(?in) {
+
+    st:call-template-with(st:pperror, st:start, ?in)
+
+}
+where {
+}

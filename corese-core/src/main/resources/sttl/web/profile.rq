@@ -1,0 +1,13 @@
+template st:profile {
+   
+}
+where {}
+ 
+  function st:proto() {
+    coalesce(st:get(st:protocol), st:std)
+  }
+  
+function us:format(?name) {
+   st:getFormat("tutorial", ?name)
+}
+

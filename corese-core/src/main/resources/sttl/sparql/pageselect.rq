@@ -1,0 +1,9 @@
+template st:pageselect {
+    format {
+        us:format("select.html")
+        st:call-template(st:variable)
+        st:call-template(st:table)
+    }    
+}
+where {
+}

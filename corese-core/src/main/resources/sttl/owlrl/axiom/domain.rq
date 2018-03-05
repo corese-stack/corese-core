@@ -1,0 +1,16 @@
+template  {
+  ?suc  
+}
+where {
+  ?in rdfs:domain|rdfs:range ?y
+      
+  bind (
+    isURI(?y) ||
+    st:call-template-with(st:superexp, st:superClassExpression, ?y)  
+  as ?suc)
+  
+  filter(st:alreadyVisited(?in, "domain", ?suc))
+
+}
+
+

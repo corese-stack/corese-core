@@ -1,0 +1,15 @@
+prefix sh: <http://www.w3.org/ns/shacl#> 
+
+template (?shape, ?sh, ?vis, ?ls) {
+    st:call-template(?q, ?shape, ?sh, ?vis, ?s, ?m)
+}
+where {
+  graph ?shape {  
+    values ?q { sh:class sh:pattern sh:disjoint sh:equals sh:sparql }
+    ?sh ?q ?m            
+  }
+  
+  values ?s { unnest(?ls) }
+}
+
+

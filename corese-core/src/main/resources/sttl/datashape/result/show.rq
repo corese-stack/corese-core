@@ -1,0 +1,16 @@
+prefix sh:  <http://www.w3.org/ns/shacl#>
+prefix doc: <http://w3c.github.io/data-shapes/shacl/#>
+
+template st:show {
+format {
+    us:format("show.html")
+
+    st:apply-templates-with-graph(st:hturtle, st:shape)
+    st:apply-templates-with-graph(st:hturtle, st:visitor)
+    st:apply-templates-with(st:hturtle)
+}
+
+}
+where {
+
+}

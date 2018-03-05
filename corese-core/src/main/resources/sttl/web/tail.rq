@@ -1,0 +1,10 @@
+template st:tail {
+format {
+  us:format("tail.html")
+  
+  st:call-template(st:content)
+}
+}
+where {
+
+}

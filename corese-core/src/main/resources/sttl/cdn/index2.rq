@@ -1,0 +1,31 @@
+prefix cn: <http://cdn.fr/schema/>
+template cn:list {
+
+format {
+
+  us:format("listtable.html")
+  
+  st:plink(<http://fr.dbpedia.org/resource/Nice>, st:dbpedia)
+  
+  group {
+    format {
+      us:format("list.html")
+      
+      st:misc(?query)
+      str(?title)
+    }
+  }
+  
+}
+  
+}
+where {
+
+}
+values (?query ?title){
+  ("/data/query/cdnplace.rq" 	"Lieu")
+  ("/data/query/cdnperson.rq" 	"Personne")
+  ("/data/query/cdnfr.rq" 	"France")
+  ("/data/query/cdneds.rq" 	"Savoie")
+  ("/data/query/cdnmisc.rq" 	"Autre")
+}

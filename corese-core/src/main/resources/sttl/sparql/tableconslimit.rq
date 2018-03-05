@@ -1,0 +1,21 @@
+template st:tableconslimit {
+format {
+        us:format("triple.html")
+        
+        st:number()
+        st:call-template(st:show,    ?x)
+        st:display(?x) 
+        st:display(?p) 
+        st:display(?y) 
+        st:call-template(st:show,    ?y)
+    }
+}
+where {
+    select * where {
+        ?x ?p ?y
+    }
+    order by ?x ?p ?y
+    limit 100
+}
+
+

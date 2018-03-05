@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+SPARQL Template Transformation
+Olivier Corby - Wimmics - Inria UNS CNRS I3S
+Thu Oct 26 16:48:59 CEST 2017
+-->
+<rdf:RDF  xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  xmlns='http://ns.inria.fr/sparql-template/'>
+<rule>
+<body>
+<![CDATA[
+#
+# Hypertext link trigger Corese server 
+# Answer using SPARQL Template Transformation
+# st:get(st:profile) URI of the transformation, stored by Transformer
+#
+
+template st:link(?x) {
+
+      st:get(st:service) 
+      "?uri=" encode_for_uri(?x)          
+      "&profile=st:dbpedia"
+      
+}
+where {
+ 
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+template st:start {
+  
+  st:head()
+  
+  st:call-template(st:locate)
+  
+  st:tail()
+}
+where {
+
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Geolocate resource on a map given lat et long
+#
+prefix o:    <http://dbpedia.org/ontology/>
+prefix p:    <http://fr.dbpedia.org/property/>
+prefix r:    <http://fr.dbpedia.org/resource/>
+
+template st:locate {
+  """
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+  <script>
+  function initialize() {
+       var pos = new google.maps.LatLng("""      
+      str(?lat) "," str(?lon)     
+      """);
+        
+    var mapOptions = {zoom: 7, center: pos, mapTypeId: google.maps.MapTypeId.TERRAIN};
+            
+    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);  
+       
+   """
+
+  st:call-template(st:locateall)
+  
+  st:call-template(st:closelocate)
+}
+where {
+  bind(coalesce(st:get(st:uri), r:Nice) as ?uri)
+  
+  service <http://fr.dbpedia.org/sparql> {
+    ?uri p:longitude ?lon ; 
+         p:latitude  ?lat
+  }
+ 
+}
+pragma { kg:service kg:slice 10 }
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Geolocate resource on a map given lat et long
+#
+
+template st:closelocate {
+  """}
+
+  google.maps.event.addDomListener(window, 'load', initialize);
+
+  </script>
+      
+  <p id="map-canvas"></p>
+  """
+}
+where {
+  
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+
+template st:transform {
+     
+      coalesce(
+	concat("&profile=",   st:get(st:profile)), 
+	concat("&transform=", st:get(st:transform)), 
+	"")   
+      
+}
+where {
+ 
+}
+]]>
+</body>
+</rule>
+
+<rule>
+<body>
+<![CDATA[
+#
+# Geolocate  resources on a map (except resource given lat et long)
+#
+prefix p:    <http://fr.dbpedia.org/property/>
+prefix o:    <http://dbpedia.org/ontology/>
+prefix geo:  <http://www.w3.org/2003/01/geo/wgs84_pos#>
+
+template st:locateall {
+
+  "var pos" st:number()  " = new google.maps.LatLng("      
+      str(?lat) "," str(?lon) ");"
+                  
+  "var marker" st:number() "= new google.maps.Marker({ position: pos" st:number() ", map: map, icon: '/img/smarker.png' });"
+  
+  "google.maps.event.addListener(marker" st:number() 
+  ", 'click', function () {window.location.href = \"" 
+  st:call-template(st:link, ?in) 
+  "\";});"
+  
+}
+where {
+  ?in a o:Place .
+  service <http://fr.dbpedia.org/sparql> {
+    ?in  p:longitude  ?lon ; 
+      p:latitude  ?lat
+  }
+}
+pragma { kg:service kg:slice 50 }
+]]>
+</body>
+</rule>
+
+</rdf:RDF>

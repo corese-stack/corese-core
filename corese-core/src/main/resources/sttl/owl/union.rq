@@ -1,0 +1,20 @@
+template {
+    xsd:string(if (bound(?t), ?ld, ?lo))
+    "(" 
+     ?y  
+     ")" 
+}
+where {
+  ?in ?p ?y 
+  
+  # in case there is also subClassof, 
+  # this unionOf will be pprinted
+  filter not exists { 
+    { ?in rdfs:subClassOf | owl:equivalentClass |owl:disjointUnionOf ?z } 
+   }
+ 
+  optional { ?in a ?t filter(?t = rdfs:Datatype) }
+}
+values (?p ?lo ?ld) {
+  (owl:unionOf         "ObjectUnionOf" "DataUnionOf")
+}

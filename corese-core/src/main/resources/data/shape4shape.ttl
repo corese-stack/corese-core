@@ -1,0 +1,345 @@
+#
+# Shape for Data Shape
+# Olivier Corby - Inria I3S - 2017
+# olivier.corby at inria.fr
+#
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ds: <http://ns.inria.fr/shacl-shape/> .
+
+
+ds:shape a sh:NodeShape ;
+rdfs:comment "Main shape" ;
+sh:targetClass sh:NodeShape ;
+sh:closed true ; 
+sh:ignoredProperties (rdf:type rdfs:comment rdfs:label) ;
+
+sh:property [
+    sh:path sh:deactivated ;
+    sh:datatype xsd:boolean
+] ;
+sh:property [
+    sh:path sh:name ;
+] ;
+sh:property [
+    sh:path sh:message ;
+] ;
+sh:property [
+    sh:path sh:description ;
+] ;
+sh:property [
+    sh:path sh:order ;
+] ;
+sh:property [
+    sh:path sh:group ;
+] ;
+
+sh:property [
+    sh:path sh:closed ;
+    sh:datatype xsd:boolean
+] ;
+sh:property [
+    sh:path sh:ignoredProperties ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path (sh:ignoredProperties [sh:zeroOrMorePath rdf:rest] rdf:first) ;
+    sh:nodeKind sh:IRI 
+];
+
+sh:property [
+    sh:path sh:targetSubjectsOf ;
+    sh:nodeKind sh:IRI
+] ;
+sh:property [
+    sh:path sh:targetObjectsOf ;
+    sh:nodeKind sh:IRI
+] ;
+sh:property [
+    sh:path sh:targetClass ;
+    sh:nodeKind sh:IRI 
+] ;
+sh:property [
+    sh:path sh:targetNode ;
+    sh:nodeKind sh:IRIOrLiteral 
+] ;
+sh:property [
+    sh:path sh:property
+] ;
+sh:property [
+    sh:path sh:and ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path sh:or ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path sh:xone ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path ([sh:alternativePath (sh:xone sh:or sh:and)] [sh:zeroOrMorePath rdf:rest] rdf:first) ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:node ds:shape 
+];
+sh:property [
+    sh:path sh:not ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:node ds:shape
+] ;
+
+# node constraint
+
+sh:property [
+    sh:path sh:node ;
+    sh:node ds:shape
+] ;
+sh:property [
+    sh:path sh:severity ;
+    sh:in (sh:violation sh:Warning sh:Info)
+] ;
+sh:property [
+    sh:path sh:class ;
+    sh:nodeKind sh:IRI
+] ;
+sh:property [
+    sh:path sh:datatype ;
+    sh:nodeKind sh:IRI
+] ;
+sh:property [
+    sh:path sh:in ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path sh:pattern ;
+    sh:datatype xsd:string
+] ;
+sh:property [
+    sh:path sh:flags ;
+    sh:datatype xsd:string
+] ;
+sh:property [
+    sh:path sh:languageIn ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path (sh:languageIn [sh:zeroOrMorePath rdf:rest] rdf:first) ;
+    sh:datatype xsd:string
+] ;
+sh:property [
+    sh:path sh:minLength, sh:maxLength ;
+    sh:datatype xsd:integer    
+] ;
+sh:property [
+    sh:path sh:minInclusive, sh:minExclusive, sh:maxInclusive, sh:maxExclusive ;
+    sh:datatype xsd:integer
+] ;
+sh:property [
+    sh:path sh:nodeKind ;
+    sh:in (sh:IRI sh:BlankNodeOrIRI sh:IRIOrLiteral sh:Literal sh:BlankNodeOrLiteral sh:BlankNode)
+]
+
+.
+
+
+ds:list a sh:NodeShape ;
+rdfs:comment "Well formed RDF list" ;
+sh:closed true ; 
+sh:ignoredProperties (rdf:type rdfs:comment rdfs:label) ;
+
+sh:property [
+    sh:path rdf:first ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+] ;
+sh:property [
+    sh:path rdf:rest ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+    sh:or ([sh:node ds:list] [sh:hasValue rdf:nil])
+] ;
+.
+
+
+
+ds:property a sh:NodeShape ;
+rdfs:comment "Value of sh:property [ ]" ;
+sh:targetObjectsOf sh:property ;
+sh:property [
+    sh:path sh:path ; 
+    sh:minCount 1 ; sh:maxCount 1 ;
+] ;
+
+sh:node ds:shapecst
+.
+
+
+ds:shapecst a sh:NodeShape ;
+rdfs:comment "Constraint in sh:property [ ] or in sh:property [ sh:or( ) ]" ;
+sh:closed true ; 
+sh:ignoredProperties 
+(sh:path sh:deactivated 
+sh:name sh:message sh:description sh:order sh:group sh:defaultValue
+rdf:type rdfs:comment rdfs:label) ;
+
+sh:property [
+    sh:path sh:node ;
+    sh:node ds:shape
+] ;
+
+sh:property [
+    sh:path sh:qualifiedValueShape ;
+    sh:node ds:shapecst
+] ;
+sh:property [
+    sh:path sh:qualifiedValueShapesDisjoint ;
+    sh:datatype xsd:boolean
+] ;
+sh:property [
+    sh:path sh:qualifiedMinCount, sh:qualifiedMaxCount ;
+    sh:datatype xsd:integer
+] ;
+
+sh:property [
+    sh:path sh:and, sh:or, sh:xone ; 
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path ([sh:alternativePath (sh:and sh:or sh:xone)] [sh:zeroOrMorePath rdf:rest] rdf:first) ;
+    sh:node ds:shapecst
+];
+sh:property [
+    sh:path  sh:not ; 
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:node ds:shapecst
+] ;
+sh:property [
+    sh:path sh:severity ;
+    sh:in (sh:violation sh:Warning sh:Info)
+] ;
+sh:property [
+    sh:path sh:class ;
+    sh:nodeKind sh:IRI
+] ;
+sh:property [
+    sh:path sh:datatype ;
+    sh:nodeKind sh:IRI
+] ;
+sh:property [
+    sh:path sh:in ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path sh:pattern ;
+    sh:datatype xsd:string
+] ;
+sh:property [
+    sh:path sh:flags ;
+    sh:datatype xsd:string
+] ;
+sh:property [
+    sh:path sh:hasValue
+] ;
+sh:property [
+    sh:path sh:minLength, sh:maxLength ;
+    sh:datatype xsd:integer    
+] ;
+sh:property [
+    sh:path sh:minCount, sh:maxCount ;
+    sh:datatype xsd:integer
+] ;
+sh:property [
+    sh:path sh:minInclusive, sh:minExclusive, sh:maxInclusive, sh:maxExclusive ;
+    sh:datatype xsd:integer
+] ;
+sh:property [
+    sh:path sh:nodeKind ;
+    sh:in (sh:IRI sh:BlankNodeOrIRI sh:IRIOrLiteral sh:Literal sh:BlankNodeOrLiteral sh:BlankNode)
+] ;
+sh:property [
+    sh:path sh:uniqueLang ;
+    sh:datatype xsd:boolean
+] ;
+sh:property [
+    sh:path sh:languageIn ;
+    sh:node ds:list
+] ;
+sh:property [
+    sh:path (sh:languageIn [sh:zeroOrMorePath rdf:rest] rdf:first) ;
+    sh:datatype xsd:string
+] ;
+sh:property [
+    sh:path sh:lessThan, sh:lessThanOrEquals, sh:equals, sh:disjoint ;
+    sh:nodeKind sh:IRI
+] .
+
+
+
+
+
+ds:path a sh:NodeShape ;
+rdfs:comment "sh:path value: URI,  RDF list of path or well formed path " ;
+sh:targetObjectsOf sh:path ;
+
+sh:or (
+  [ sh:node ds:pathExp  ]
+  [ sh:node ds:pathList ]
+  [ sh:nodeKind sh:IRI   ]
+)
+.
+
+
+ds:pathExp a sh:NodeShape ;
+rdfs:comment "Well formed path expression" ;
+sh:closed true ; 
+sh:ignoredProperties (rdf:type) ;
+
+sh:property [
+    sh:path [ sh:alternativePath 
+        (sh:alternativePath sh:inversePath sh:zeroOrMorePath sh:oneOrMorePath sh:zeroOrOnePath)
+    ] ;
+    sh:minCount 1 ; sh:maxCount 1    
+] ;
+sh:property [
+    sh:path sh:alternativePath ;
+    sh:node ds:pathList
+] ;
+sh:property [
+    sh:path sh:inversePath ;
+    sh:node ds:path
+] ;
+sh:property [
+    sh:path sh:zeroOrMorePath ;
+    sh:node ds:path
+] ;
+sh:property [
+    sh:path sh:oneOrMorePath ;
+    sh:node ds:path
+] ;
+sh:property [
+    sh:path sh:zeroOrOnePath ;
+    sh:node ds:path
+] ;
+.
+
+
+ds:pathList a sh:NodeShape ;
+rdfs:comment "Well formed list of path expression" ;
+sh:closed true ; 
+sh:ignoredProperties (rdf:type) ;
+
+sh:property [
+    sh:path rdf:first ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+    sh:node ds:path
+];
+sh:property [
+    sh:path rdf:rest ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+    sh:or ([sh:node ds:pathList] [sh:hasValue rdf:nil])
+]
+.
+
+

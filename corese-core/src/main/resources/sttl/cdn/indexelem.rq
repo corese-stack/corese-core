@@ -1,0 +1,29 @@
+#
+# Generate Century Index
+# Hypertext link may trigger Corese server 
+# Answer using SPARQL Template Transformation
+#
+prefix cn: <http://cdn.fr/schema/>
+
+template cn:elem(?title) {
+  format {
+      us:format("index.html")
+  
+      st:plink(?century)
+      if (?show, "bold", "undefined")
+      ?date
+  } 
+}
+where {
+
+  bind (coalesce(st:get(st:min), -1000) as ?fst)
+  bind (coalesce(st:get(st:max),  3000) as ?rst)
+    
+  ?century cn:start ?min ; cn:finish ?max ; rdfs:label ?date
+  
+  filter (?min >= ?fst && ?max <= ?rst)
+  
+  bind (?date = ?title as ?show)
+     
+}
+order by ?min

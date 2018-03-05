@@ -1,0 +1,11 @@
+template st:link(?date) {
+
+  format {
+    "<a href='#%s'>%s</a>" 
+    str(?date) day(?date)
+  }
+  
+}
+where {
+   
+}

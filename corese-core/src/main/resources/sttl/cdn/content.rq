@@ -1,0 +1,16 @@
+#
+# Timeline SPARQL Template - Olivier Corby - 2014
+#
+prefix cn: <http://cdn.fr/schema/>
+template cn:content(?c) {
+  
+    st:call-template(cn:head, ?c, ?title)
+    
+    st:call-template(cn:body, ?c)
+   
+    st:call-template(cn:tail, ?c, ?title)
+
+}
+where {
+  ?c rdfs:label ?title
+}

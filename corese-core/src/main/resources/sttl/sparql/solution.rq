@@ -1,0 +1,20 @@
+prefix rs: <http://www.w3.org/2001/sw/DataAccess/tests/result-set#>
+template  {
+
+format { 
+    us:format("value.html")     
+    coalesce(st:display(?val), "&nbsp;")
+}  
+; separator = " "
+
+}
+where {
+  ?x rs:solution ?in
+  ?x rs:resultVariable ?var 
+  
+  optional {
+    ?in rs:binding [ rs:variable ?var ; rs:value ?val ]
+  }
+  
+}
+order by ?var
