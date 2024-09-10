@@ -1,16 +1,16 @@
-package fr.inria.corese.compiler.federate;
+package fr.inria.corese.core.compiler.federate;
 
-import static fr.inria.corese.compiler.federate.util.RewriteErrorMessage.FILTER_EXISTS;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.Service;
-import fr.inria.corese.sparql.triple.parser.Term;
-import fr.inria.corese.sparql.triple.parser.Triple;
-import fr.inria.corese.sparql.triple.parser.Variable;
-import fr.inria.corese.sparql.triple.parser.VariableScope;
+import static fr.inria.corese.core.compiler.federate.util.RewriteErrorMessage.FILTER_EXISTS;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.VariableScope;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

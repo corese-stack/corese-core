@@ -1,7 +1,7 @@
 package fr.inria.corese.core.transform;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.kgram.core.Query;
 import java.util.ArrayList;
 import java.util.HashMap;
 

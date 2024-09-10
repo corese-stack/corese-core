@@ -1,13 +1,13 @@
 package fr.inria.corese.core.transform;
 
-import fr.inria.corese.compiler.parser.NodeImpl;
+import fr.inria.corese.core.compiler.parser.NodeImpl;
 import fr.inria.corese.core.Graph;
 import static fr.inria.corese.core.transform.Transformer.IN;
 import static fr.inria.corese.core.transform.Transformer.IN2;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.List;
 
 /**

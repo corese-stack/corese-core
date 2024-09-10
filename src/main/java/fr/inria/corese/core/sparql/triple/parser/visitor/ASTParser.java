@@ -1,23 +1,23 @@
-package fr.inria.corese.sparql.triple.parser.visitor;
+package fr.inria.corese.core.sparql.triple.parser.visitor;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.api.Walker;
-import fr.inria.corese.sparql.triple.parser.Message;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.Service;
-import fr.inria.corese.sparql.triple.parser.Term;
-import fr.inria.corese.sparql.triple.parser.Triple;
-import fr.inria.corese.sparql.triple.parser.URLParam;
-import fr.inria.corese.sparql.triple.parser.URLServer;
-import fr.inria.corese.sparql.triple.parser.Values;
-import fr.inria.corese.sparql.triple.parser.Variable;
-import fr.inria.corese.sparql.triple.update.ASTUpdate;
-import fr.inria.corese.sparql.triple.update.Composite;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.api.Walker;
+import fr.inria.corese.core.sparql.triple.parser.Message;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.URLParam;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
+import fr.inria.corese.core.sparql.triple.parser.Values;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.update.ASTUpdate;
+import fr.inria.corese.core.sparql.triple.update.Composite;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -179,7 +179,7 @@ public class ASTParser implements Walker, URLParam {
         int count = Math.max(1, getNbService());
 
         for (int i = 0; i < count; i++) {
-            Variable var = new Variable(String.format(fr.inria.corese.sparql.triple.function.term.Binding.SERVICE_REPORT_FORMAT, i));
+            Variable var = new Variable(String.format(fr.inria.corese.core.sparql.triple.function.term.Binding.SERVICE_REPORT_FORMAT, i));
             varList.add(var);
 
             if (! ast.isSelectAll() && ! ast.hasMetadata(Metadata.SKIP)) {
@@ -253,7 +253,7 @@ public class ASTParser implements Walker, URLParam {
 
         for (Service service : ast.getServiceExpList()) {
             if (isLog() || (service.getURL() != null && service.getURL().hasParameter(MODE, REPORT))) {
-                Variable var = new Variable(String.format(fr.inria.corese.sparql.triple.function.term.Binding.SERVICE_REPORT_FORMAT, service.getNumber()));
+                Variable var = new Variable(String.format(fr.inria.corese.core.sparql.triple.function.term.Binding.SERVICE_REPORT_FORMAT, service.getNumber()));
                 varList.add(var);
 
                 for (ASTQuery aa : getStack()) {

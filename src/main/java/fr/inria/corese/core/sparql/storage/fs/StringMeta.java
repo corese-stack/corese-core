@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.storage.fs;
+package fr.inria.corese.core.sparql.storage.fs;
 
 /**
  * Store meta infor of string stored in file

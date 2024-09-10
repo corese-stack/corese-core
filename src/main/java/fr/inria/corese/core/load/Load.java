@@ -40,21 +40,21 @@ import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.workflow.SemanticWorkflow;
 import fr.inria.corese.core.workflow.WorkflowParser;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.exceptions.QueryLexicalException;
-import fr.inria.corese.sparql.exceptions.QuerySyntaxException;
-import fr.inria.corese.sparql.exceptions.SafetyException;
-import fr.inria.corese.sparql.triple.function.term.TermEval;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.Access.Feature;
-import fr.inria.corese.sparql.triple.parser.AccessRight;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.LoadTurtle;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.QueryLexicalException;
+import fr.inria.corese.core.sparql.exceptions.QuerySyntaxException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.triple.function.term.TermEval;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.LoadTurtle;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  * Translate an RDF/XML document into a Graph use ARP

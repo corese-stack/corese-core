@@ -1,6 +1,6 @@
 package fr.inria.corese.core.stats.data;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Simple average, number of all triples/number of distinct resources

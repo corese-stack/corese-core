@@ -1,4 +1,4 @@
-package fr.inria.corese.shex.shacl;
+package fr.inria.corese.core.shex.shacl;
 
 import fr.inria.lille.shexjava.schema.abstrsynt.NodeConstraint;
 import fr.inria.lille.shexjava.schema.abstrsynt.OneOf;

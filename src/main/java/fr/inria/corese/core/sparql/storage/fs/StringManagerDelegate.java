@@ -1,8 +1,8 @@
-package fr.inria.corese.sparql.storage.fs;
+package fr.inria.corese.core.sparql.storage.fs;
 
-import fr.inria.corese.sparql.storage.api.Parameters;
-import fr.inria.corese.sparql.storage.api.Parameters.type;
-import static fr.inria.corese.sparql.storage.fs.Constants.BEGIN;
+import fr.inria.corese.core.sparql.storage.api.Parameters;
+import fr.inria.corese.core.sparql.storage.api.Parameters.type;
+import static fr.inria.corese.core.sparql.storage.fs.Constants.BEGIN;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;

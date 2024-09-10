@@ -1,13 +1,13 @@
 package fr.inria.corese.core.workflow;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.LoadFormat;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.util.SPINProcess;
-import fr.inria.corese.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 

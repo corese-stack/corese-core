@@ -1,18 +1,18 @@
-package fr.inria.corese.sparql.triple.function.script;
+package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.core.SparqlException;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.exceptions.UndefinedExpressionException;
-import fr.inria.corese.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.SparqlException;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.UndefinedExpressionException;
+import fr.inria.corese.core.sparql.triple.parser.Access;
 
 /**
  * funcall(fun, exp) apply(fun, list)
@@ -87,8 +87,8 @@ public class Funcall extends LDScript {
         b.set(function, fun.getExpList(), param);
         IDatatype dt = null;
         if (function.isSystem()) {
-           // fr.inria.corese.kgram.core.Eval cc = eval.getComputerEval(env, p, function);
-            fr.inria.corese.kgram.core.Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
+           // fr.inria.corese.core.kgram.core.Eval cc = eval.getComputerEval(env, p, function);
+            fr.inria.corese.core.kgram.core.Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
             dt = function.getBody().eval(cc.getEvaluator(), b, cc.getEnvironment(), p);
         } else {
             dt = function.getBody().eval(eval, b, env, p);

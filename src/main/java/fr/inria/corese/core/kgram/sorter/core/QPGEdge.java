@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.sorter.core;
+package fr.inria.corese.core.kgram.sorter.core;
 
-import fr.inria.corese.kgram.sorter.impl.qpv1.QPGEdgeCostModel;
+import fr.inria.corese.core.kgram.sorter.impl.qpv1.QPGEdgeCostModel;
 import java.util.ArrayList;
 import java.util.List;
 

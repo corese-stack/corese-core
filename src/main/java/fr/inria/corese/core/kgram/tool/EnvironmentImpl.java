@@ -1,22 +1,22 @@
-package fr.inria.corese.kgram.tool;
+package fr.inria.corese.core.kgram.tool;
 
 import java.util.Map;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.event.EventManager;
-import fr.inria.corese.kgram.path.Path;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.event.EventManager;
+import fr.inria.corese.core.kgram.path.Path;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 public class EnvironmentImpl implements Environment {
 	Query query;

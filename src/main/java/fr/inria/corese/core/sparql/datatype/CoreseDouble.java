@@ -1,11 +1,11 @@
-package fr.inria.corese.sparql.datatype;
+package fr.inria.corese.core.sparql.datatype;
 
 import java.math.BigDecimal;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import static fr.inria.corese.sparql.datatype.CoreseBoolean.FALSE;
-import static fr.inria.corese.sparql.datatype.DatatypeMap.TRUE;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.FALSE;
+import static fr.inria.corese.core.sparql.datatype.DatatypeMap.TRUE;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
 /**
  * <p>Title: Corese</p>

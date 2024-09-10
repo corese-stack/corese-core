@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.datatype.function;
+package fr.inria.corese.core.sparql.datatype.function;
 
 /**
  * Extended functionalities on String objects like "containsIgnoreCase".

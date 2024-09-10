@@ -1,12 +1,12 @@
-package fr.inria.corese.sparql.datatype.function;
+package fr.inria.corese.core.sparql.datatype.function;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Text;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Environment;
 
 /**
  * Variable resolver for XPath 

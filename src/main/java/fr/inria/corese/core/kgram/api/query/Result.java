@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.api.query;
+package fr.inria.corese.core.kgram.api.query;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Interface to KGRAM elementary result (a mapping)

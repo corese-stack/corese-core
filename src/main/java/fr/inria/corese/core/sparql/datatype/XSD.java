@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.datatype;
+package fr.inria.corese.core.sparql.datatype;
 
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  *

@@ -2,10 +2,10 @@ package fr.inria.corese.core.query;
 
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.core.Sorter;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.Sorter;
 import fr.inria.corese.core.Graph;
 
 /**

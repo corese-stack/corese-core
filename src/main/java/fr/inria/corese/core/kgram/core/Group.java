@@ -1,11 +1,11 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import java.util.Map;
 
 /**

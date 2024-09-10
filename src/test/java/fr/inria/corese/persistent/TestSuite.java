@@ -1,7 +1,7 @@
 package fr.inria.corese.persistent;
 
-import static fr.inria.corese.sparql.storage.fs.Constants.KB;
-import static fr.inria.corese.sparql.storage.fs.Constants.MB;
+import static fr.inria.corese.core.sparql.storage.fs.Constants.KB;
+import static fr.inria.corese.core.sparql.storage.fs.Constants.MB;
 import java.io.IOException;
 import java.text.DecimalFormat;
 

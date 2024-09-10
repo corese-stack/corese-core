@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.sparql.exceptions.SafetyException;
-import static fr.inria.corese.sparql.triple.parser.Access.Feature.*;
-import static fr.inria.corese.sparql.triple.parser.Access.Level.*;
-import static fr.inria.corese.sparql.triple.parser.Access.Mode.SERVER;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
+import static fr.inria.corese.core.sparql.triple.parser.Access.Feature.*;
+import static fr.inria.corese.core.sparql.triple.parser.Access.Level.*;
+import static fr.inria.corese.core.sparql.triple.parser.Access.Mode.SERVER;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -521,7 +521,7 @@ public class Access {
         if (m == null || m.getBind() == null) {
             return level;
         }
-        return ((fr.inria.corese.sparql.triple.function.term.Binding)m.getBind()).getAccessLevel();
+        return ((fr.inria.corese.core.sparql.triple.function.term.Binding)m.getBind()).getAccessLevel();
     }
     
     

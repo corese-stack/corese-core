@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import static fr.inria.corese.kgram.api.core.PointerType.NSMANAGER;
+import static fr.inria.corese.core.kgram.api.core.PointerType.NSMANAGER;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -15,12 +15,12 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
 
 /**
  * <p>
@@ -59,7 +59,7 @@ public class NSManager extends ASTObject {
     public static final String XSD = RDFS.XSD;
     public static final String XSI = "http://www.w3.org/2001/XMLSchema-instance#";
     public static final String OWL_RL_PROFILE = "http://www.w3.org/ns/owl-profile/RL";
-    public static final String XML = fr.inria.corese.sparql.datatype.RDF.XML;
+    public static final String XML = fr.inria.corese.core.sparql.datatype.RDF.XML;
     public static final String RDF = RDFS.RDF;
     public static final String RDFS_NS = RDFS.RDFS;
     public static final String OWL = RDFS.OWL;
@@ -178,11 +178,11 @@ public class NSManager extends ASTObject {
 
     // for pretty printing without ^^datatype
     static void number() {
-        number.put(fr.inria.corese.sparql.datatype.RDF.xsdinteger, Boolean.TRUE);
-        // number.put(fr.inria.corese.sparql.datatype.RDF.xsdint, Boolean.TRUE);
-        // number.put(fr.inria.corese.sparql.datatype.RDF.xsdfloat, Boolean.TRUE);
-        // number.put(fr.inria.corese.sparql.datatype.RDF.xsddouble, Boolean.TRUE);
-        number.put(fr.inria.corese.sparql.datatype.RDF.xsddecimal, Boolean.TRUE);
+        number.put(fr.inria.corese.core.sparql.datatype.RDF.xsdinteger, Boolean.TRUE);
+        // number.put(fr.inria.corese.core.sparql.datatype.RDF.xsdint, Boolean.TRUE);
+        // number.put(fr.inria.corese.core.sparql.datatype.RDF.xsdfloat, Boolean.TRUE);
+        // number.put(fr.inria.corese.core.sparql.datatype.RDF.xsddouble, Boolean.TRUE);
+        number.put(fr.inria.corese.core.sparql.datatype.RDF.xsddecimal, Boolean.TRUE);
     }
 
     private NSManager() {
@@ -695,7 +695,7 @@ public class NSManager extends ASTObject {
             dt = DatatypeMap.newStringBuilder(uri);
         } else if (dt.isLiteral()) {
             if ((dt.getCode() == IDatatype.INTEGER
-                    && dt.getDatatypeURI().equals(fr.inria.corese.sparql.datatype.XSD.xsdinteger)
+                    && dt.getDatatypeURI().equals(fr.inria.corese.core.sparql.datatype.XSD.xsdinteger)
                     && (!(label.startsWith("0") && label.length() > 1)))
                     || (dt.getCode() == IDatatype.BOOLEAN && (label.equals("true") || label.equals("false")))) {
                 // print string value as is

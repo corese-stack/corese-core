@@ -1,8 +1,8 @@
 package fr.inria.corese.core.print;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
 
 public class TSVFormat extends CSVFormat {
 

@@ -1,8 +1,8 @@
-package fr.inria.corese.sparql.datatype.extension;
+package fr.inria.corese.core.sparql.datatype.extension;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.CoreseInteger;
-import fr.inria.corese.sparql.datatype.CoreseUndefLiteral;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseInteger;
+import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
 import java.util.Iterator;
 
 /**

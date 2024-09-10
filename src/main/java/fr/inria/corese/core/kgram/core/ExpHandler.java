@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import java.util.ArrayList;
 import java.util.List;
 

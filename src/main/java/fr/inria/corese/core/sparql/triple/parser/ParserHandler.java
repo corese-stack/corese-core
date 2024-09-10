@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.api.Creator;
-import fr.inria.corese.sparql.triple.javacc1.ParseException;
-import fr.inria.corese.sparql.triple.javacc1.SparqlCorese;
-import fr.inria.corese.sparql.triple.javacc1.Token;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.api.Creator;
+import fr.inria.corese.core.sparql.triple.javacc1.ParseException;
+import fr.inria.corese.core.sparql.triple.javacc1.SparqlCorese;
+import fr.inria.corese.core.sparql.triple.javacc1.Token;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;

@@ -1,11 +1,11 @@
-package fr.inria.corese.sparql.triple.api;
+package fr.inria.corese.core.sparql.triple.api;
 
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.function.script.Function;
-import fr.inria.corese.sparql.triple.parser.Term;
-import fr.inria.corese.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.function.script.Function;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 /**
  *

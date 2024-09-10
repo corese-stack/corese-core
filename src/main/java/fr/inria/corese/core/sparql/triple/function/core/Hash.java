@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.triple.function.core;
+package fr.inria.corese.core.sparql.triple.function.core;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

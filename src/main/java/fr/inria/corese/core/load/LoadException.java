@@ -1,7 +1,7 @@
 package fr.inria.corese.core.load;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
 
 public class LoadException extends Exception {
 

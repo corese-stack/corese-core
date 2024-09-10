@@ -1,10 +1,10 @@
 package fr.inria.corese.core.load;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.print.ResultFormat;
 import static fr.inria.corese.core.print.ResultFormat.RDF_XML;
@@ -14,14 +14,14 @@ import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.util.Property;
 import static fr.inria.corese.core.util.Property.Value.SERVICE_LIMIT;
 import static fr.inria.corese.core.util.Property.Value.SERVICE_SEND_PARAMETER;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.sparql.triple.parser.HashMapList;
-import fr.inria.corese.sparql.triple.parser.URLParam;
-import fr.inria.corese.sparql.triple.parser.URLServer;
-import fr.inria.corese.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.parser.HashMapList;
+import fr.inria.corese.core.sparql.triple.parser.URLParam;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
+import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import java.io.InputStream;
 
 import java.io.UnsupportedEncodingException;

@@ -1,4 +1,4 @@
-package fr.inria.corese.kgram.filter;
+package fr.inria.corese.core.kgram.filter;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -7,7 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.Expr;
 
 
 

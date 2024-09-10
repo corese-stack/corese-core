@@ -1,9 +1,9 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
 
 /**
  *

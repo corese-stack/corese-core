@@ -1,7 +1,7 @@
 package fr.inria.corese.core.transform;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.sparql.api.TransformVisitor;
+import fr.inria.corese.core.sparql.api.TransformVisitor;
 
 /**
  * Visitor that can be associated to a transformation

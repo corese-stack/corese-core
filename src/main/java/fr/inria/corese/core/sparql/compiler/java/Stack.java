@@ -1,11 +1,11 @@
-package fr.inria.corese.sparql.compiler.java;
+package fr.inria.corese.core.sparql.compiler.java;
 
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.function.script.ForLoop;
-import fr.inria.corese.sparql.triple.function.script.Function;
-import fr.inria.corese.sparql.triple.function.script.Let;
-import fr.inria.corese.sparql.triple.parser.Variable;
-import fr.inria.corese.kgram.api.core.ExprType;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.function.script.ForLoop;
+import fr.inria.corese.core.sparql.triple.function.script.Function;
+import fr.inria.corese.core.sparql.triple.function.script.Let;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.kgram.api.core.ExprType;
 import java.util.ArrayList;
 import java.util.List;
 

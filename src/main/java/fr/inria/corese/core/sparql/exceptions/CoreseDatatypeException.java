@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.exceptions;
+package fr.inria.corese.core.sparql.exceptions;
 
 /**
  * <p>Title: Corese</p>

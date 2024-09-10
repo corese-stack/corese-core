@@ -1,14 +1,14 @@
 package fr.inria.corese.core.transform;
 
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.LoadFormat;
-import fr.inria.corese.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

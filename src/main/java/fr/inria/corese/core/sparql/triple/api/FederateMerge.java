@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.api;
+package fr.inria.corese.core.sparql.triple.api;
 
-import fr.inria.corese.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
 
 /**
  * Criteria to merge several triple into one connected bgp

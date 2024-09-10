@@ -1,8 +1,8 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
 import java.util.ArrayList;
 
-import fr.inria.corese.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.ExpType;
 
 /**
  * 

@@ -1,8 +1,8 @@
-package fr.inria.corese.compiler.visitor;
+package fr.inria.corese.core.compiler.visitor;
 
-import fr.inria.corese.compiler.api.QueryVisitor;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 
 /**
  *

@@ -5,10 +5,10 @@
 
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.kgram.api.query.Graphable;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.kgram.api.query.Graphable;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;

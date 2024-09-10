@@ -6,8 +6,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  * This class provides functionality to convert a Graph object to a string

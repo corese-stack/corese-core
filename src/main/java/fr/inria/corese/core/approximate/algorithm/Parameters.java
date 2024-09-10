@@ -1,7 +1,7 @@
 package fr.inria.corese.core.approximate.algorithm;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.compiler.parser.Pragma;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.compiler.parser.Pragma;
 import java.net.URL;
 import java.util.List;
 

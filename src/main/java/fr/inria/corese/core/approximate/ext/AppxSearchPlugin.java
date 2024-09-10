@@ -1,13 +1,13 @@
 package fr.inria.corese.core.approximate.ext;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.CoreseStringLiteral;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.tool.ApproximateSearchEnv;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseStringLiteral;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.approximate.algorithm.ISimAlgorithm;
 import fr.inria.corese.core.approximate.algorithm.SimAlgorithmFactory;
 import static fr.inria.corese.core.approximate.algorithm.Utils.format;

@@ -1,6 +1,6 @@
-package fr.inria.corese.compiler.federate;
+package fr.inria.corese.core.compiler.federate;
 
-import fr.inria.corese.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;

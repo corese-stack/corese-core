@@ -1,24 +1,24 @@
-package fr.inria.corese.sparql.triple.function.proxy;
+package fr.inria.corese.core.sparql.triple.function.proxy;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_CONTEXT;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_FROM;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_MAPPINGS;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_METADATA;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NAME;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NAMED;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_QUERY;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.function.script.LDScript;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_CONTEXT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_FROM;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_MAPPINGS;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_METADATA;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NAME;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NAMED;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_QUERY;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.function.script.LDScript;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
 
 /**
  *

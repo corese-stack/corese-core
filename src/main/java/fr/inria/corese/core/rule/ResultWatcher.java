@@ -1,23 +1,23 @@
 package fr.inria.corese.core.rule;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.Regex;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.core.Distinct;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.event.ResultListener;
-import fr.inria.corese.kgram.path.Path;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.core.Distinct;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.event.ResultListener;
+import fr.inria.corese.core.kgram.path.Path;
 import fr.inria.corese.core.api.GraphListener;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.RDFS;
 import fr.inria.corese.core.query.Construct;
 import java.util.ArrayList;
 import java.util.List;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 
 /**
  * Watch kgram query solutions of rules for RuleEngine 1 Check that a solution

@@ -1,8 +1,8 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import java.util.Iterator;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 
 /**
  *

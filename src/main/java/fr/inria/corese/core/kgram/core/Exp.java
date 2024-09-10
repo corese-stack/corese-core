@@ -1,21 +1,21 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.ExpPattern;
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.core.Filter;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.PointerType;
-import static fr.inria.corese.kgram.api.core.PointerType.STATEMENT;
-import fr.inria.corese.kgram.api.core.Regex;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.sparql.triple.parser.Expression;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.ExpPattern;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Filter;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import static fr.inria.corese.core.kgram.api.core.PointerType.STATEMENT;
+import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
 import java.util.HashMap;
 
 /**

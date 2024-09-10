@@ -1,8 +1,8 @@
-package fr.inria.corese.kgram.api.query;
+package fr.inria.corese.core.kgram.api.query;
 
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Interface to KGRAM  results (mappings)

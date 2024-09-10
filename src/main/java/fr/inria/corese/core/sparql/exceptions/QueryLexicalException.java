@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.exceptions;
+package fr.inria.corese.core.sparql.exceptions;
 
 /**
  * This exception is used when errors are detected by the lexical analyser

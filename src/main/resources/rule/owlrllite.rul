@@ -9,7 +9,7 @@
 ]>
 <!--
   OWL RL construct-where Rule Base
-  Optimized for Corese/KGRAM
+  Optimized for Corese.Core.Kgram
   Added filters 
   ?c1 != ?c2 on classes and 
   ?p1 != ?p2 on properties 

@@ -1,4 +1,4 @@
-package fr.inria.corese.kgram.event;
+package fr.inria.corese.core.kgram.event;
 
 import java.util.Iterator;
 import java.util.List;

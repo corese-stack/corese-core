@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.datatype.extension;
+package fr.inria.corese.core.sparql.datatype.extension;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.CoreseDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.datatype.function.XPathFun;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.datatype.function.XPathFun;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

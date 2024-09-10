@@ -1,4 +1,4 @@
-package fr.inria.corese.compiler.parser;
+package fr.inria.corese.core.compiler.parser;
 
 public interface CompilerFactory {
 

@@ -1,8 +1,8 @@
-package fr.inria.corese.kgram.filter;
+package fr.inria.corese.core.kgram.filter;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.query.Hierarchy;
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.query.Hierarchy;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  * Manage extension functions 

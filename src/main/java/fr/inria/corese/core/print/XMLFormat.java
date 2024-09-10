@@ -9,14 +9,14 @@ import java.util.ArrayList;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  * SPARQL XML Result Format for KGRAM Mappings

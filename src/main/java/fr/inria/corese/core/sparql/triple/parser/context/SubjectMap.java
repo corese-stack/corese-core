@@ -1,11 +1,11 @@
-package fr.inria.corese.sparql.triple.parser.context;
+package fr.inria.corese.core.sparql.triple.parser.context;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import static fr.inria.corese.sparql.datatype.DatatypeMap.createObject;
-import static fr.inria.corese.sparql.datatype.DatatypeMap.newInstance;
-import static fr.inria.corese.sparql.datatype.DatatypeMap.newResource;
-import fr.inria.corese.sparql.triple.cst.LogKey;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import static fr.inria.corese.core.sparql.datatype.DatatypeMap.createObject;
+import static fr.inria.corese.core.sparql.datatype.DatatypeMap.newInstance;
+import static fr.inria.corese.core.sparql.datatype.DatatypeMap.newResource;
+import fr.inria.corese.core.sparql.triple.cst.LogKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

@@ -1,15 +1,15 @@
 package fr.inria.corese.core.transform;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.Graph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

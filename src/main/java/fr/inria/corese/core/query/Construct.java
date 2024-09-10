@@ -9,22 +9,22 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.query.update.GraphManager;
 import fr.inria.corese.core.rule.Rule;
 import fr.inria.corese.core.util.Duplicate;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 import java.util.TreeMap;
 
 /**

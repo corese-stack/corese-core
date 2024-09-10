@@ -2,13 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.corese.compiler.parser;
+package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.RDFList;
-import fr.inria.corese.compiler.api.QueryVisitor;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.RDFList;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.kgram.core.Query;
 
 /**
  * Replace RDF List by Property Path rdf:rest* / rdf:first in SPARQL Query

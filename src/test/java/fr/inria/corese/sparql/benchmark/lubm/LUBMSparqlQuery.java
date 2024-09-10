@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.benchmark.lubm;
+package fr.inria.corese.core.sparql.benchmark.lubm;
 
 /**
  * LUBMSparqlQuery.java

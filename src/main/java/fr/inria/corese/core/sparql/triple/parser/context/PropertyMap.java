@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.triple.parser.context;
+package fr.inria.corese.core.sparql.triple.parser.context;
 
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import static fr.inria.corese.sparql.triple.cst.LogKey.PREF;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import static fr.inria.corese.core.sparql.triple.cst.LogKey.PREF;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

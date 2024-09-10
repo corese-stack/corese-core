@@ -1,6 +1,6 @@
 package fr.inria.corese.core.load;
 
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Mappings;
 
 import org.junit.Before;
 import org.junit.Test;

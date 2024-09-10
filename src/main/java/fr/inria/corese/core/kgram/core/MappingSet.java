@@ -1,7 +1,7 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
-import fr.inria.corese.kgram.api.core.Node;
-import static fr.inria.corese.kgram.tool.Message.NL;
+import fr.inria.corese.core.kgram.api.core.Node;
+import static fr.inria.corese.core.kgram.tool.Message.NL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

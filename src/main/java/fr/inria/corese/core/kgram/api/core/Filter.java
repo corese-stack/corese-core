@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.api.core;
+package fr.inria.corese.core.kgram.api.core;
 
-import fr.inria.corese.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
 import java.util.List;
 
 

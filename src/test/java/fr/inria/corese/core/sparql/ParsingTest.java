@@ -2,12 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.corese.sparql;
+package fr.inria.corese.core.sparql;
 
-import fr.inria.corese.sparql.exceptions.QueryLexicalException;
-import fr.inria.corese.sparql.exceptions.QuerySyntaxException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.ParserSparql1;
+import fr.inria.corese.core.sparql.exceptions.QueryLexicalException;
+import fr.inria.corese.core.sparql.exceptions.QuerySyntaxException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.ParserSparql1;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

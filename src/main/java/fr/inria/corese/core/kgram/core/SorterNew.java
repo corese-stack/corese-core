@@ -1,15 +1,15 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
-import static fr.inria.corese.kgram.api.core.ExpType.BIND;
-import static fr.inria.corese.kgram.api.core.ExpType.GRAPH;
-import fr.inria.corese.kgram.api.query.Producer;
-import static fr.inria.corese.kgram.sorter.core.Const.plannable;
-import fr.inria.corese.kgram.sorter.core.QPGraph;
-import fr.inria.corese.kgram.sorter.core.IEstimate;
-import fr.inria.corese.kgram.sorter.core.ISort;
-import fr.inria.corese.kgram.sorter.core.QPGNode;
-import fr.inria.corese.kgram.sorter.impl.qpv1.DepthFirstBestSearch;
-import fr.inria.corese.kgram.sorter.impl.qpv1.HeuristicsBasedEstimation;
+import static fr.inria.corese.core.kgram.api.core.ExpType.BIND;
+import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import static fr.inria.corese.core.kgram.sorter.core.Const.plannable;
+import fr.inria.corese.core.kgram.sorter.core.QPGraph;
+import fr.inria.corese.core.kgram.sorter.core.IEstimate;
+import fr.inria.corese.core.kgram.sorter.core.ISort;
+import fr.inria.corese.core.kgram.sorter.core.QPGNode;
+import fr.inria.corese.core.kgram.sorter.impl.qpv1.DepthFirstBestSearch;
+import fr.inria.corese.core.kgram.sorter.impl.qpv1.HeuristicsBasedEstimation;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;

@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.api.query;
+package fr.inria.corese.core.kgram.api.query;
 
-import fr.inria.corese.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Exp;
 
 /**
  * Draft KGRAM Plugin for EXTERN expression.

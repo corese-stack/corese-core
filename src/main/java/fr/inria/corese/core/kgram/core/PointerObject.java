@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
-import fr.inria.corese.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
 
 /**
  *

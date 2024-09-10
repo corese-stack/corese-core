@@ -2,7 +2,7 @@ package fr.inria.corese.core.load;
 
 import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.util.HashMap;
 
 /**

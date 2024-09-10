@@ -1,38 +1,38 @@
-package fr.inria.corese.compiler.federate;
+package fr.inria.corese.core.compiler.federate;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.Service;
-import fr.inria.corese.sparql.triple.parser.Source;
-import fr.inria.corese.sparql.triple.parser.Triple;
-import fr.inria.corese.sparql.triple.parser.Variable;
-import fr.inria.corese.compiler.api.QueryVisitor;
-import fr.inria.corese.compiler.eval.QuerySolver;
-import fr.inria.corese.compiler.federate.util.RewriteError;
-import fr.inria.corese.compiler.federate.util.RewriteErrorManager;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.RDF;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTSelector;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import static fr.inria.corese.sparql.triple.parser.Metadata.FED_BGP;
-import static fr.inria.corese.sparql.triple.parser.Metadata.FED_COMPLETE;
-import static fr.inria.corese.sparql.triple.parser.Metadata.FED_JOIN;
-import static fr.inria.corese.sparql.triple.parser.Metadata.FED_OPTIONAL;
-import static fr.inria.corese.sparql.triple.parser.Metadata.FED_MINUS;
-import static fr.inria.corese.sparql.triple.parser.Metadata.FED_PARTITION;
-import static fr.inria.corese.sparql.triple.parser.Metadata.FED_UNDEFINED;
-import fr.inria.corese.sparql.triple.parser.Processor;
-import fr.inria.corese.sparql.triple.parser.Term;
-import fr.inria.corese.sparql.triple.parser.URLParam;
-import fr.inria.corese.sparql.triple.parser.URLServer;
-import fr.inria.corese.sparql.triple.parser.visitor.ASTParser;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Source;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.compiler.eval.QuerySolver;
+import fr.inria.corese.core.compiler.federate.util.RewriteError;
+import fr.inria.corese.core.compiler.federate.util.RewriteErrorManager;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.RDF;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTSelector;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import static fr.inria.corese.core.sparql.triple.parser.Metadata.FED_BGP;
+import static fr.inria.corese.core.sparql.triple.parser.Metadata.FED_COMPLETE;
+import static fr.inria.corese.core.sparql.triple.parser.Metadata.FED_JOIN;
+import static fr.inria.corese.core.sparql.triple.parser.Metadata.FED_OPTIONAL;
+import static fr.inria.corese.core.sparql.triple.parser.Metadata.FED_MINUS;
+import static fr.inria.corese.core.sparql.triple.parser.Metadata.FED_PARTITION;
+import static fr.inria.corese.core.sparql.triple.parser.Metadata.FED_UNDEFINED;
+import fr.inria.corese.core.sparql.triple.parser.Processor;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.parser.URLParam;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
+import fr.inria.corese.core.sparql.triple.parser.visitor.ASTParser;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -212,7 +212,7 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     }
     
     @Override
-    public void visit(fr.inria.corese.kgram.core.Query query) {
+    public void visit(fr.inria.corese.core.kgram.core.Query query) {
         query.setFederate(true);
         ASTQuery ast =  query.getAST();
         ast.getLog().setAST(ast);
@@ -223,7 +223,7 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     
     // before solver query exec
     @Override
-    public void before(fr.inria.corese.kgram.core.Query q) {
+    public void before(fr.inria.corese.core.kgram.core.Query q) {
        
     }
     

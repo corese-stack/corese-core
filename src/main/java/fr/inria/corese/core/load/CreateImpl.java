@@ -10,15 +10,15 @@ import org.slf4j.LoggerFactory;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.util.Property.Value;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.triple.api.Creator;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.sparql.triple.parser.RDFList;
-import fr.inria.corese.sparql.triple.parser.Triple;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.triple.api.Creator;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.RDFList;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
 
 /**
  *

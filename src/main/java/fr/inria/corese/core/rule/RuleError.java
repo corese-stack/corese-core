@@ -1,7 +1,7 @@
 package fr.inria.corese.core.rule;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.core.Mappings;
 import java.util.List;
 
 /**

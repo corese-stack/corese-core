@@ -1,21 +1,21 @@
-package fr.inria.corese.kgram.tool;
+package fr.inria.corese.core.kgram.tool;
 
-import fr.inria.corese.kgram.api.core.DatatypeValueFactory;
+import fr.inria.corese.core.kgram.api.core.DatatypeValueFactory;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Graph;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.Regex;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.core.SparqlException;
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.kgram.api.core.Graph;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.core.SparqlException;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  * Meta Producer that manages several Producer Uses a generic MetaIterator that

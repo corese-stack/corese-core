@@ -5,10 +5,10 @@
 
 package fr.inria.corese.core.workflow;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import static fr.inria.corese.core.workflow.WorkflowParser.DEBUG;
 import static fr.inria.corese.core.workflow.WorkflowParser.DISPLAY;
 import static fr.inria.corese.core.workflow.WorkflowParser.MODE;
@@ -18,8 +18,8 @@ import static fr.inria.corese.core.workflow.WorkflowParser.COLLECT;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;

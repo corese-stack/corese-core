@@ -1,9 +1,9 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Sort KGRAM edges in connected order before query process

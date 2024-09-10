@@ -1,9 +1,9 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.triple.function.script.Let;
-import fr.inria.corese.sparql.triple.function.script.Function;
-import fr.inria.corese.sparql.triple.function.script.ForLoop;
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.function.script.Let;
+import fr.inria.corese.core.sparql.triple.function.script.Function;
+import fr.inria.corese.core.sparql.triple.function.script.ForLoop;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,24 +12,24 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.api.ASTVisitable;
-import fr.inria.corese.sparql.triple.api.ASTVisitor;
-import fr.inria.corese.sparql.triple.cst.Keyword;
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.triple.printer.SPIN;
-import fr.inria.corese.sparql.triple.update.ASTUpdate;
-import fr.inria.corese.sparql.compiler.java.JavaCompiler;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.query.ASTQ;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.api.QueryVisitor;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.api.Walker;
-import fr.inria.corese.sparql.triple.function.script.TryCatch;
-import fr.inria.corese.sparql.triple.parser.Access.Level;
-import fr.inria.corese.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.api.ASTVisitable;
+import fr.inria.corese.core.sparql.triple.api.ASTVisitor;
+import fr.inria.corese.core.sparql.triple.cst.Keyword;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.printer.SPIN;
+import fr.inria.corese.core.sparql.triple.update.ASTUpdate;
+import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.query.ASTQ;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.api.QueryVisitor;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.api.Walker;
+import fr.inria.corese.core.sparql.triple.function.script.TryCatch;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -243,7 +243,7 @@ public class ASTQuery
     private List<Constant> predicateList;
     // triple without path, triple with path
     private List<Triple> tripleList, pathList;
-    private fr.inria.corese.kgram.core.Query updateQuery;
+    private fr.inria.corese.core.kgram.core.Query updateQuery;
     private AccessRight accessRight;
     private ASTSelector astSelector;
 
@@ -3567,11 +3567,11 @@ public class ASTQuery
         return t;
     }
    
-    public fr.inria.corese.kgram.core.Query getUpdateQuery() {
+    public fr.inria.corese.core.kgram.core.Query getUpdateQuery() {
         return updateQuery;
     }
    
-    public void setUpdateQuery(fr.inria.corese.kgram.core.Query updateQuery) {
+    public void setUpdateQuery(fr.inria.corese.core.kgram.core.Query updateQuery) {
         this.updateQuery = updateQuery;
     } 
     
@@ -3601,7 +3601,7 @@ public class ASTQuery
         return getContext();
     }
     
-    public Context getContext(fr.inria.corese.kgram.core.Query q) {
+    public Context getContext(fr.inria.corese.core.kgram.core.Query q) {
         if (getContext() != null) {
             return getContext();
         }

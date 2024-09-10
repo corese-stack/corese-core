@@ -5,9 +5,9 @@ import java.util.List;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.api.DataBroker;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Query;
 
 /**
  * Broker between ProducerImpl and corese graph

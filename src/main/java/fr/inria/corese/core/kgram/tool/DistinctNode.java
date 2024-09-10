@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.tool;
+package fr.inria.corese.core.kgram.tool;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import java.util.HashMap;
 import java.util.Iterator;
 

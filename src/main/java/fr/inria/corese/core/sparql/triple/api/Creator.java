@@ -1,9 +1,9 @@
-package fr.inria.corese.sparql.triple.api;
+package fr.inria.corese.core.sparql.triple.api;
 
 import java.util.List;
 
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.RDFList;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.RDFList;
 
 /**
 * 

@@ -1,12 +1,12 @@
 package fr.inria.corese.core.query;
 
-import static fr.inria.corese.kgram.sorter.core.Const.ALL;
-import static fr.inria.corese.kgram.sorter.core.Const.NA;
-import static fr.inria.corese.kgram.sorter.core.Const.OBJECT;
-import static fr.inria.corese.kgram.sorter.core.Const.PREDICATE;
-import static fr.inria.corese.kgram.sorter.core.Const.SUBJECT;
-import static fr.inria.corese.kgram.sorter.core.Const.TRIPLE;
-import static fr.inria.corese.sparql.triple.parser.Metadata.RDF_STAR_SELECT;
+import static fr.inria.corese.core.kgram.sorter.core.Const.ALL;
+import static fr.inria.corese.core.kgram.sorter.core.Const.NA;
+import static fr.inria.corese.core.kgram.sorter.core.Const.OBJECT;
+import static fr.inria.corese.core.kgram.sorter.core.Const.PREDICATE;
+import static fr.inria.corese.core.kgram.sorter.core.Const.SUBJECT;
+import static fr.inria.corese.core.kgram.sorter.core.Const.TRIPLE;
+import static fr.inria.corese.core.sparql.triple.parser.Metadata.RDF_STAR_SELECT;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,27 +24,27 @@ import fr.inria.corese.core.producer.DataBrokerExtern;
 import fr.inria.corese.core.producer.DataBrokerLocal;
 import fr.inria.corese.core.producer.DataProducer;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.kgram.api.core.DatatypeValueFactory;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Filter;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.Regex;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Matcher;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Memory;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.core.SparqlException;
-import fr.inria.corese.kgram.sorter.core.IProducerQP;
-import fr.inria.corese.kgram.sorter.core.QPGNode;
-import fr.inria.corese.kgram.tool.MetaIterator;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.kgram.api.core.DatatypeValueFactory;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Filter;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Memory;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.SparqlException;
+import fr.inria.corese.core.kgram.sorter.core.IProducerQP;
+import fr.inria.corese.core.kgram.sorter.core.QPGNode;
+import fr.inria.corese.core.kgram.tool.MetaIterator;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 
 /**
  * Producer Implement getEdges() for KGRAM interpreter rely on

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.load;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Interface that needs to be implemented when loading serialization(mainly 

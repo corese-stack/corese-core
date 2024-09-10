@@ -5,10 +5,10 @@ import java.util.Hashtable;
 import fr.com.hp.hpl.jena.rdf.arp.ALiteral;
 import fr.com.hp.hpl.jena.rdf.arp.AResource;
 import fr.com.hp.hpl.jena.rdf.arp.StatementHandler;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.Graph;
 import static fr.inria.corese.core.load.Load.IMPORTS;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 

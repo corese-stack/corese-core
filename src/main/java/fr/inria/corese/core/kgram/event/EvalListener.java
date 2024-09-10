@@ -1,10 +1,10 @@
-package fr.inria.corese.kgram.event;
+package fr.inria.corese.core.kgram.event;
 
 import java.util.Hashtable;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.core.Exp;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Exp;
 
 /**
  * Event Listener to trace KGRAM execution

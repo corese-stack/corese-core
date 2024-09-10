@@ -1,7 +1,7 @@
-package fr.inria.corese.kgram.filter;
+package fr.inria.corese.core.kgram.filter;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
 
 
 /**

@@ -1,16 +1,16 @@
-package fr.inria.corese.kgram.sorter.impl.qpv1;
+package fr.inria.corese.core.kgram.sorter.impl.qpv1;
 
-import static fr.inria.corese.kgram.api.core.ExpType.EDGE;
-import fr.inria.corese.kgram.sorter.core.AbstractCostModel;
-import fr.inria.corese.kgram.sorter.core.QPGEdge;
-import fr.inria.corese.kgram.sorter.core.QPGNode;
-import static fr.inria.corese.kgram.api.core.ExpType.GRAPH;
-import fr.inria.corese.kgram.sorter.core.Const;
-import static fr.inria.corese.kgram.sorter.core.Const.OBJECT;
-import static fr.inria.corese.kgram.sorter.core.Const.PREDICATE;
-import static fr.inria.corese.kgram.sorter.core.Const.SUBJECT;
-import fr.inria.corese.kgram.sorter.core.IEstimate;
-import static fr.inria.corese.kgram.sorter.core.IEstimate.MAX_COST;
+import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
+import fr.inria.corese.core.kgram.sorter.core.AbstractCostModel;
+import fr.inria.corese.core.kgram.sorter.core.QPGEdge;
+import fr.inria.corese.core.kgram.sorter.core.QPGNode;
+import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
+import fr.inria.corese.core.kgram.sorter.core.Const;
+import static fr.inria.corese.core.kgram.sorter.core.Const.OBJECT;
+import static fr.inria.corese.core.kgram.sorter.core.Const.PREDICATE;
+import static fr.inria.corese.core.kgram.sorter.core.Const.SUBJECT;
+import fr.inria.corese.core.kgram.sorter.core.IEstimate;
+import static fr.inria.corese.core.kgram.sorter.core.IEstimate.MAX_COST;
 import java.util.List;
 
 /**

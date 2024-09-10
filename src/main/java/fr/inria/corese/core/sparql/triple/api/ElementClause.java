@@ -1,9 +1,9 @@
-package fr.inria.corese.sparql.triple.api;
+package fr.inria.corese.core.sparql.triple.api;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 /**
  *  API of Atom for backward engine

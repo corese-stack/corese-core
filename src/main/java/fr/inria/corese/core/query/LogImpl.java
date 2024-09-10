@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import fr.inria.corese.core.api.Log;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 
 /**
  * Log activity (load, query, etc.)

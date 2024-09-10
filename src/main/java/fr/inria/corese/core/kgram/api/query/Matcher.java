@@ -1,7 +1,7 @@
-package fr.inria.corese.kgram.api.query;
+package fr.inria.corese.core.kgram.api.query;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Interface for the Matcher that checks conformity of candidate edges and nodes 

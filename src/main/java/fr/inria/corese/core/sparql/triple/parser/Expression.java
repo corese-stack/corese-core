@@ -1,36 +1,36 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.triple.function.script.Let;
-import fr.inria.corese.sparql.triple.function.script.ForLoop;
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.api.ASTVisitor;
-import fr.inria.corese.sparql.triple.api.ExpressionVisitor;
+import fr.inria.corese.core.sparql.triple.function.script.Let;
+import fr.inria.corese.core.sparql.triple.function.script.ForLoop;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.api.ASTVisitor;
+import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.sparql.triple.cst.Keyword;
-import fr.inria.corese.sparql.compiler.java.JavaCompiler;
-import fr.inria.corese.sparql.triple.function.script.Function;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.core.Filter;
-import fr.inria.corese.kgram.api.core.PointerType;
-import static fr.inria.corese.kgram.api.core.PointerType.EXPRESSION;
-import fr.inria.corese.kgram.api.core.Pointerable;
-import fr.inria.corese.kgram.api.core.Regex;
-import fr.inria.corese.kgram.api.core.TripleStore;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.api.Walker;
-import fr.inria.corese.sparql.triple.parser.visitor.ExpressionVisitorVariable;
+import fr.inria.corese.core.sparql.triple.cst.Keyword;
+import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
+import fr.inria.corese.core.sparql.triple.function.script.Function;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Filter;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import static fr.inria.corese.core.kgram.api.core.PointerType.EXPRESSION;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.api.Walker;
+import fr.inria.corese.core.sparql.triple.parser.visitor.ExpressionVisitorVariable;
 import java.util.Collection;
 
 /**
@@ -1035,7 +1035,7 @@ public class Expression extends TopExp
     /**
      * Top Level expression evaluator for SPARQL filter and LDScript exp
      * Computer eval is a proxy for statements on the RDF graph such as exists {}
-     * Computer is class fr.inria.corese.compiler.eval.Interpreter
+     * Computer is class fr.inria.corese.core.compiler.eval.Interpreter
      */
     public IDatatype eval(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
         return null;

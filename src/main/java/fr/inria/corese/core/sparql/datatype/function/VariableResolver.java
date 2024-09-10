@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.datatype.function;
+package fr.inria.corese.core.sparql.datatype.function;
 
 import javax.xml.xpath.XPathVariableResolver;
 

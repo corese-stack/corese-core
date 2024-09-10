@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.compiler.java;
+package fr.inria.corese.core.sparql.compiler.java;
 
 import java.util.Date;
 
@@ -11,9 +11,9 @@ public class Header {
     static final String NL = System.getProperty("line.separator");
     
  static final String importList = 
-              "import fr.inria.corese.sparql.api.IDatatype;\n"
-            + "import fr.inria.corese.sparql.datatype.DatatypeMap;\n"
-            + "import fr.inria.corese.sparql.triple.function.extension.*;\n" ; 
+              "import fr.inria.corese.core.sparql.api.IDatatype;\n"
+            + "import fr.inria.corese.core.sparql.datatype.DatatypeMap;\n"
+            + "import fr.inria.corese.core.sparql.triple.function.extension.*;\n" ;
             //+ "import fr.inria.corese.extension.core.Core;\n";
  
  static final String comment  = 

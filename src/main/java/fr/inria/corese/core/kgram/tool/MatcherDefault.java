@@ -1,9 +1,9 @@
-package fr.inria.corese.kgram.tool;
+package fr.inria.corese.core.kgram.tool;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Matcher;
 
 public class MatcherDefault implements Matcher {
 

@@ -1,4 +1,4 @@
-package fr.inria.corese.compiler.eval;
+package fr.inria.corese.core.compiler.eval;
 
 import static org.junit.Assert.*;
 
