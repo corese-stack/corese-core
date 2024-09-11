@@ -1,0 +1,21 @@
+## #################################################################
+## git ignore
+## #################################################################
+
+.DS_Store
+*~
+*.swp
+*.lock
+profile
+build
+_build
+*.jar
+build-*
+__pycache__
+*.jar
+.ipynb_checkpoints
+\#*
+.\#*
+.vscode
+*.class
+.conda
