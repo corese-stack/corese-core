@@ -1,8 +1,17 @@
 name: Continuous Integration process
-run-name: ${{ github.actor }} is testing out GitHub Actions
-on: [push]
+run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
+on:
+  push:
+    branches:
+      - "main"
+      - "develop"
+      - "feature/github-actions"
+  pull_request:
+    branches:
+      - "main"
+      - "develop"
 jobs:
-  Explore-GitHub-Actions:
+  Continuous-Integration-Actions:
     runs-on: self-hosted
     steps:
       - name: maven build
