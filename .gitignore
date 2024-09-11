@@ -19,3 +19,5 @@ __pycache__
 .vscode
 *.class
 .conda
+target/*
+.gradle
