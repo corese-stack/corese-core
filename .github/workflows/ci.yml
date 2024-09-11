@@ -14,11 +14,20 @@ jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
     steps:
+      - name: Checkout of head
+        id: ci-maven-build-checkout
+        uses: actions/checkout@v4
+
       - name: maven build
+        id: ci-maven-build
         run: |
           mamba env update -f conda-env/corese-core.yaml
           conda activate corese-core
           mvn clean install -DskipTests
         shell: bash -l {0}
 
-      - run: echo "This job's status is ${{ job.status }}."
+      - name: Final Step
+        id: ci-final-step
+        run: |
+          echo "This job's status is ${{ job.status }}."
+        shell: bash -l {0}
