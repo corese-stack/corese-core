@@ -1,15 +1,15 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.datatype.RDF;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.datatype.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.exceptions.QuerySemanticException;
-import fr.inria.corese.sparql.triple.api.ASTVisitor;
-import fr.inria.corese.sparql.triple.api.ExpressionVisitor;
-import fr.inria.corese.sparql.triple.api.FederateMerge;
-import fr.inria.corese.sparql.triple.api.Walker;
+import fr.inria.corese.core.sparql.exceptions.QuerySemanticException;
+import fr.inria.corese.core.sparql.triple.api.ASTVisitor;
+import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
+import fr.inria.corese.core.sparql.triple.api.FederateMerge;
+import fr.inria.corese.core.sparql.triple.api.Walker;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

@@ -1,18 +1,18 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.kgram.api.core.Pointerable;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.RDF;
-import static fr.inria.corese.sparql.datatype.RDF.OWL;
-import static fr.inria.corese.sparql.datatype.RDF.OWL_SAME_AS;
-import fr.inria.corese.sparql.triple.api.ExpressionVisitor;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.RDF;
+import static fr.inria.corese.core.sparql.datatype.RDF.OWL;
+import static fr.inria.corese.core.sparql.datatype.RDF.OWL_SAME_AS;
+import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static fr.inria.corese.sparql.triple.cst.KeywordPP.DOT;
-import fr.inria.corese.sparql.triple.cst.RDFS;
+import static fr.inria.corese.core.sparql.triple.cst.KeywordPP.DOT;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
 import java.util.ArrayList;
 
 /**

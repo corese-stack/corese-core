@@ -12,12 +12,12 @@ import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.util.Property;
-import fr.inria.corese.kgram.api.query.Evaluator;
-import fr.inria.corese.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.kgram.api.query.Evaluator;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
 /**
  * Remove redundant bnodes from an RDF/OWL graph

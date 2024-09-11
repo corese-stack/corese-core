@@ -2,15 +2,15 @@ package fr.inria.corese.core.extension;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.io.IOException;
 
 /**
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2019
  */
-public class JavaCompiler extends fr.inria.corese.sparql.compiler.java.JavaCompiler {
+public class JavaCompiler extends fr.inria.corese.core.sparql.compiler.java.JavaCompiler {
     
     public JavaCompiler(String name) {
         super(name);

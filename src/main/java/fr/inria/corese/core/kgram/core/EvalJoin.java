@@ -1,10 +1,10 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Producer;
-import static fr.inria.corese.kgram.core.Eval.STOP;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import static fr.inria.corese.core.kgram.core.Eval.STOP;
 import java.util.Date;
-import static fr.inria.corese.kgram.core.Eval.DISPLAY_RESULT_MAX;
+import static fr.inria.corese.core.kgram.core.Eval.DISPLAY_RESULT_MAX;
 
 /**
  *

@@ -1,8 +1,8 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import static fr.inria.corese.sparql.triple.parser.VariableScope.Scope.INSCOPE;
-import static fr.inria.corese.sparql.triple.parser.VariableScope.Scope.SUBSCOPE;
-import static fr.inria.corese.sparql.triple.parser.VariableScope.Scope.ALLSCOPE;
+import static fr.inria.corese.core.sparql.triple.parser.VariableScope.Scope.INSCOPE;
+import static fr.inria.corese.core.sparql.triple.parser.VariableScope.Scope.SUBSCOPE;
+import static fr.inria.corese.core.sparql.triple.parser.VariableScope.Scope.ALLSCOPE;
 
 /**
  * Used by  TopExp getVariables(scope)

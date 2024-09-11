@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.corese.sparql.triple.function.aggregate;
+package fr.inria.corese.core.sparql.triple.function.aggregate;
 
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.Comparator;
 import java.util.TreeMap;
 

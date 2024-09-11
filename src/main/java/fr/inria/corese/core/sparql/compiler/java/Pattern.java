@@ -1,11 +1,11 @@
-package fr.inria.corese.sparql.compiler.java;
+package fr.inria.corese.core.sparql.compiler.java;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.Term;
-import fr.inria.corese.sparql.triple.parser.Variable;
-import static fr.inria.corese.sparql.compiler.java.JavaCompiler.SPACE;
-import fr.inria.corese.sparql.triple.parser.ASTPrinter;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import static fr.inria.corese.core.sparql.compiler.java.JavaCompiler.SPACE;
+import fr.inria.corese.core.sparql.triple.parser.ASTPrinter;
 
 /**
  *

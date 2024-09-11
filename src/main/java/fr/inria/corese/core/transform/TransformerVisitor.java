@@ -1,12 +1,12 @@
 package fr.inria.corese.core.transform;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.compiler.api.QueryVisitor;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.core.ExpHandler;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.ExpHandler;
+import fr.inria.corese.core.kgram.core.Query;
 
 /**
  * QueryVisitor for Transformation templates
@@ -69,7 +69,7 @@ public class TransformerVisitor implements QueryVisitor {
      */
     void optimize(Query query, String graph, String var) {
         if (query.getBody().size() > 0) {
-            fr.inria.corese.kgram.core.Exp exp = query.getBody().get(0);
+            fr.inria.corese.core.kgram.core.Exp exp = query.getBody().get(0);
             if (exp.isGraph() && exp.getGraphName().getLabel().equals(graph)) {
                 Node n = query.getNode(var);
                 if (n != null) {

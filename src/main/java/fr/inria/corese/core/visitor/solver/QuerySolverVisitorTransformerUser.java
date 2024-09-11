@@ -1,9 +1,9 @@
 package fr.inria.corese.core.visitor.solver;
 
 import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  *

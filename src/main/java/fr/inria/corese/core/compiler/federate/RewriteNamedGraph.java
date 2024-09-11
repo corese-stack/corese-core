@@ -1,17 +1,17 @@
-package fr.inria.corese.compiler.federate;
+package fr.inria.corese.core.compiler.federate;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.Query;
-import fr.inria.corese.sparql.triple.parser.Service;
-import fr.inria.corese.sparql.triple.parser.Source;
-import fr.inria.corese.sparql.triple.parser.URLServer;
-import fr.inria.corese.sparql.triple.parser.Union;
-import fr.inria.corese.sparql.triple.parser.Values;
-import fr.inria.corese.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Query;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Source;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
+import fr.inria.corese.core.sparql.triple.parser.Union;
+import fr.inria.corese.core.sparql.triple.parser.Values;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 import java.util.ArrayList;
 import java.util.List;
 

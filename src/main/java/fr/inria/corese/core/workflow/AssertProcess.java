@@ -5,8 +5,8 @@
 
 package fr.inria.corese.core.workflow;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 /**
  *

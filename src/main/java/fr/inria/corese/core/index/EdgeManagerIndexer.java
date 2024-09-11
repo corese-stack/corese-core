@@ -8,16 +8,16 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.tool.MetaIterator;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.tool.MetaIterator;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.Index;
 import fr.inria.corese.core.Serializer;
 import fr.inria.corese.core.index.PredicateList.Cursor;
 import fr.inria.corese.core.util.Property;
 import java.util.HashMap;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 
 /**
  * Table property node -> List<Edge>

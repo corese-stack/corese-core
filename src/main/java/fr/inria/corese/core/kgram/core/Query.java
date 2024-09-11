@@ -1,26 +1,26 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.core.Filter;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.kgram.api.query.DQPFactory;
-import fr.inria.corese.kgram.api.query.Graphable;
-import fr.inria.corese.kgram.api.query.Matcher;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.filter.Compile;
-import fr.inria.corese.kgram.tool.Message;
-import fr.inria.corese.sparql.triple.parser.ASTExtension;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.Variable;
-import fr.inria.corese.sparql.triple.parser.VariableScope;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Filter;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.query.DQPFactory;
+import fr.inria.corese.core.kgram.api.query.Graphable;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.filter.Compile;
+import fr.inria.corese.core.kgram.tool.Message;
+import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.VariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

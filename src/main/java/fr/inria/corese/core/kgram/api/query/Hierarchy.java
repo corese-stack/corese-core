@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.api.query;
+package fr.inria.corese.core.kgram.api.query;
 
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.List;
 
 /**

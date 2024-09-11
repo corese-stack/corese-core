@@ -1,9 +1,9 @@
-package fr.inria.corese.kgram.event;
+package fr.inria.corese.core.kgram.event;
 
 import java.text.NumberFormat;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.ExpType;
 
 /**
  * Event Listener to trace KGRAM execution with statistics

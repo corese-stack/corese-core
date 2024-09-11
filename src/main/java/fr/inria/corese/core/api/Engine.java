@@ -1,8 +1,8 @@
 package fr.inria.corese.core.api;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 /**
  * 

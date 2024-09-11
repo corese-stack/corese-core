@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.parser.context;
+package fr.inria.corese.core.sparql.triple.parser.context;
 
-import fr.inria.corese.sparql.triple.parser.URLParam;
+import fr.inria.corese.core.sparql.triple.parser.URLParam;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

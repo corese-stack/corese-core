@@ -2,11 +2,11 @@ package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.api.DataBroker;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.Regex;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.tool.MetaIterator;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.tool.MetaIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

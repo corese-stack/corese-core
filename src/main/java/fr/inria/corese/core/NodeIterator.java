@@ -2,8 +2,8 @@ package fr.inria.corese.core;
 
 import java.util.Iterator;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
 
 public class NodeIterator implements Iterable<Node>, Iterator<Node> {
 	

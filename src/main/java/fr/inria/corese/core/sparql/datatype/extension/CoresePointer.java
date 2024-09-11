@@ -1,14 +1,14 @@
-package fr.inria.corese.sparql.datatype.extension;
+package fr.inria.corese.core.sparql.datatype.extension;
 
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.kgram.api.core.Pointerable;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.path.Path;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.CoreseUndefLiteral;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.sparql.triple.parser.Expression;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.path.Path;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

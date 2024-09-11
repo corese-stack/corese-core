@@ -1,8 +1,8 @@
 package fr.inria.corese.core.approximate.ext;
 
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Triple;
-import fr.inria.corese.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 import static fr.inria.corese.core.approximate.ext.ASTRewriter.O;
 import static fr.inria.corese.core.approximate.ext.ASTRewriter.P;
 import static fr.inria.corese.core.approximate.ext.ASTRewriter.S;

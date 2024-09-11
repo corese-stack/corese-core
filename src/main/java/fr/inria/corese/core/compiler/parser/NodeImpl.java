@@ -1,11 +1,11 @@
-package fr.inria.corese.compiler.parser;
+package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 
-public class NodeImpl extends fr.inria.corese.kgram.tool.NodeImpl {
+public class NodeImpl extends fr.inria.corese.core.kgram.tool.NodeImpl {
 
    
     public NodeImpl(Atom at) {

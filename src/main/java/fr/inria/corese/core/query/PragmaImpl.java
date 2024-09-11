@@ -1,12 +1,12 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.RDFList;
-import fr.inria.corese.sparql.triple.parser.Triple;
-import fr.inria.corese.compiler.parser.Pragma;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.RDFList;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.compiler.parser.Pragma;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.api.Engine;
 import fr.inria.corese.core.Event;
@@ -77,12 +77,12 @@ public class PragmaImpl extends Pragma {
 		}
 
 		
-		for (fr.inria.corese.sparql.triple.parser.Exp exp : list.getBody()){
+		for (fr.inria.corese.core.sparql.triple.parser.Exp exp : list.getBody()){
 			//System.out.println(exp);
 		}
 	}
 
-	public void triple(Atom g, Triple t, fr.inria.corese.sparql.triple.parser.Exp pragma){
+	public void triple(Atom g, Triple t, fr.inria.corese.core.sparql.triple.parser.Exp pragma){
 		//System.out.println(t);
 		String subject  = t.getSubject().getLabel();
 		String property = t.getProperty().getLabel();
@@ -168,7 +168,7 @@ public class PragmaImpl extends Pragma {
 	 * g = kg:listen
 	 * pragma = graph pattern
 	 */
-	public void listen(Atom g, Triple t, fr.inria.corese.sparql.triple.parser.Exp pragma){
+	public void listen(Atom g, Triple t, fr.inria.corese.core.sparql.triple.parser.Exp pragma){
 
 		String subject  = t.getSubject().getLabel();
 		String property = t.getProperty().getLabel();

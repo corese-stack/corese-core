@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.triple.javacc1;
+package fr.inria.corese.core.sparql.triple.javacc1;
 
 import java.util.Vector;
 

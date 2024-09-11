@@ -48,7 +48,7 @@ module fr.inria.corese.corese_core {
     exports fr.inria.corese.core.compiler.federate;
 
     // exports fr.inria.corese.core.shex;
-    exports fr.inria.corese.core.shex.shacl;
+    // exports fr.inria.corese.core.shex.shacl;
 
     // exports fr.inria.corese.core.kgram;
     exports fr.inria.corese.core.kgram.core;

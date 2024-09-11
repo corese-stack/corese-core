@@ -1,7 +1,7 @@
-package fr.inria.corese.kgram.api.core;
+package fr.inria.corese.core.kgram.api.core;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
 /**
  * Interface for Producer iterator that encapsulate Edge or Node with its Graph

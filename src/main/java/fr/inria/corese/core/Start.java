@@ -3,9 +3,9 @@ package fr.inria.corese.core;
 import java.util.Date;
 import java.util.ArrayList;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.load.Load;
@@ -14,10 +14,10 @@ import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.print.ResultFormat;
 import fr.inria.corese.core.shacl.Shacl;
 import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.Access;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

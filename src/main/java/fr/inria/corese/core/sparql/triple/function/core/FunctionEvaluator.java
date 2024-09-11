@@ -1,7 +1,7 @@
-package fr.inria.corese.sparql.triple.function.core;
+package fr.inria.corese.core.sparql.triple.function.core;
 
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
 
 /**
  *

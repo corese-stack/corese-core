@@ -1,12 +1,12 @@
-package fr.inria.corese.kgram.filter;
+package fr.inria.corese.core.kgram.filter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.tool.Message;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.tool.Message;
 
 
 /**

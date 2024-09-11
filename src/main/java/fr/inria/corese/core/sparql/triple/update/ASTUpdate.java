@@ -1,13 +1,13 @@
-package fr.inria.corese.sparql.triple.update;
+package fr.inria.corese.core.sparql.triple.update;
 
-import fr.inria.corese.sparql.triple.api.Walker;
-import fr.inria.corese.sparql.triple.parser.ASTBuffer;
+import fr.inria.corese.core.sparql.triple.api.Walker;
+import fr.inria.corese.core.sparql.triple.parser.ASTBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  *

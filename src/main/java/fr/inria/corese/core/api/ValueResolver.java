@@ -4,7 +4,7 @@
  */
 package fr.inria.corese.core.api;
 
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  *

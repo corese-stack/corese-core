@@ -1,8 +1,8 @@
-package fr.inria.corese.sparql.benchmark;
+package fr.inria.corese.core.sparql.benchmark;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.RDF;
 import fr.inria.corese.core.logic.RDFS;

@@ -1,7 +1,7 @@
-package fr.inria.corese.compiler.parser;
+package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.kgram.core.Query;
 
 /**
  * SPARQL Extension in Pragma
@@ -19,12 +19,12 @@ public class Extension extends Pragma {
 		return new Extension(q,  q.getAST());
 	}
 	
-	public void parse(fr.inria.corese.sparql.triple.parser.Exp exp){
+	public void parse(fr.inria.corese.core.sparql.triple.parser.Exp exp){
 		if (exp.isQuery()){
 			
 		}
 		else if (exp.isBGP()){
-			for (fr.inria.corese.sparql.triple.parser.Exp ee : exp.getBody()){
+			for (fr.inria.corese.core.sparql.triple.parser.Exp ee : exp.getBody()){
 				parse(ee);
 			}
 		}

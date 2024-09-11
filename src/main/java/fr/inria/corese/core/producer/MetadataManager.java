@@ -10,10 +10,10 @@ import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.logic.Distance;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 /**
  * Corese object associated to DataManager

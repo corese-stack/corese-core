@@ -1,18 +1,18 @@
-package fr.inria.corese.kgram.path;
+package fr.inria.corese.core.kgram.path;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.PointerType;
-import static fr.inria.corese.kgram.api.core.PointerType.PATH;
-import fr.inria.corese.kgram.api.core.Pointerable;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.tool.EdgeInv;
-import fr.inria.corese.kgram.tool.ProducerDefault;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import static fr.inria.corese.core.kgram.api.core.PointerType.PATH;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.tool.EdgeInv;
+import fr.inria.corese.core.kgram.tool.ProducerDefault;
 
 /**
  *

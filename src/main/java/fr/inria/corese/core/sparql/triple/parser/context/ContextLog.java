@@ -1,13 +1,13 @@
-package fr.inria.corese.sparql.triple.parser.context;
+package fr.inria.corese.core.sparql.triple.parser.context;
 
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.cst.LogKey;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.URLParam;
-import fr.inria.corese.sparql.triple.parser.URLServer;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.cst.LogKey;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.URLParam;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;

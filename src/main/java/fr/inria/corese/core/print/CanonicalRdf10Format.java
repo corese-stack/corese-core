@@ -6,8 +6,8 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.print.rdfc10.CanonicalRdf10;
 import fr.inria.corese.core.print.rdfc10.CanonicalizedDataset;
 import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
 
 /**
  * This class provides functionality to convert a Graph object to a string in

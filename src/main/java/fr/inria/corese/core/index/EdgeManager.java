@@ -1,6 +1,6 @@
 package fr.inria.corese.core.index;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.Graph;
 import static fr.inria.corese.core.index.EdgeManagerIndexer.IGRAPH;
 import static fr.inria.corese.core.index.EdgeManagerIndexer.ILIST;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 
 /**
  * Edge List of a predicate

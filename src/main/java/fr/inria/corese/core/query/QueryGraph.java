@@ -1,16 +1,16 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.compiler.parser.Transformer;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.compiler.parser.Transformer;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.api.QueryGraphVisitor;
 import fr.inria.corese.core.EdgeFactory;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
 
 /**
  * Translate a Graph into a Query Use case: let g = eval(construct {} where {})

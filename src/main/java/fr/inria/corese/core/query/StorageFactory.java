@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import fr.inria.corese.core.query.DatasetManager.TypeDataBase;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.sparql.triple.parser.URLServer;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
 
 /**
  *

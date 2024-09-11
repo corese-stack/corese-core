@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.storage.cache;
+package fr.inria.corese.core.sparql.storage.cache;
 
 /**
  * Interface for implementing cache ICache.java

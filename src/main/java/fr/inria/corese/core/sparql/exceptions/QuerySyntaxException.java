@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.exceptions;
+package fr.inria.corese.core.sparql.exceptions;
 
 /**
  * This exception is thrown when there is an error in the syntax of the query.

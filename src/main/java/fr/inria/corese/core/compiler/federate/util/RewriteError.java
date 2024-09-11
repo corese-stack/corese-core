@@ -1,6 +1,6 @@
-package fr.inria.corese.compiler.federate.util;
+package fr.inria.corese.core.compiler.federate.util;
 
-import fr.inria.corese.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
 
 /**
  *

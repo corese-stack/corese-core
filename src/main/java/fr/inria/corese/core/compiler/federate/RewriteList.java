@@ -1,15 +1,15 @@
-package fr.inria.corese.compiler.federate;
+package fr.inria.corese.core.compiler.federate;
 
-import static fr.inria.corese.compiler.federate.util.RewriteErrorMessage.NO_SERVICE;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.api.FederateMerge;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.Service;
-import fr.inria.corese.sparql.triple.parser.Triple;
-import fr.inria.corese.sparql.triple.parser.Union;
+import static fr.inria.corese.core.compiler.federate.util.RewriteErrorMessage.NO_SERVICE;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.api.FederateMerge;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Union;
 import java.util.ArrayList;
 import java.util.List;
 

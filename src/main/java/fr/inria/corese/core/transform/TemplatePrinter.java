@@ -3,9 +3,9 @@ package fr.inria.corese.core.transform;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.load.Load;

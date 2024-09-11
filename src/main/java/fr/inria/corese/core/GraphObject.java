@@ -5,7 +5,7 @@
 
 package fr.inria.corese.core;
 
-import fr.inria.corese.kgram.core.PointerObject;
+import fr.inria.corese.core.kgram.core.PointerObject;
 
 /**
  *

@@ -1,28 +1,28 @@
 package fr.inria.corese.core.print;
 
-import static fr.inria.corese.sparql.triple.parser.URLParam.LINK;
+import static fr.inria.corese.core.sparql.triple.parser.URLParam.LINK;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
-import fr.inria.corese.compiler.parser.Pragma;
+import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.util.MappingsGraph;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.api.ResultFormatDef;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.sparql.triple.parser.URLParam;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.URLParam;
 
 /**
  * Select Result format according to query form and @display annotation.,

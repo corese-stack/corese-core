@@ -1,6 +1,6 @@
 package fr.inria.corese.core.logic;
 
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 
 public interface SKOS {

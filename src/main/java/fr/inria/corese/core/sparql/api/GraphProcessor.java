@@ -1,15 +1,15 @@
-package fr.inria.corese.sparql.api;
+package fr.inria.corese.core.sparql.api;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 
 /**
  * interface of fr.inria.corese.core.query.PluginImpl
- * see fr.inria.corese.sparql.triple.function.proxy.GraphSpecificFunction
+ * see fr.inria.corese.core.sparql.triple.function.proxy.GraphSpecificFunction
  * 
  * @author Olivier Corby - INRIA - 2018
  */

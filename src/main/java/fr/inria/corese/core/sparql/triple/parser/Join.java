@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
 public class Join extends And {
 	

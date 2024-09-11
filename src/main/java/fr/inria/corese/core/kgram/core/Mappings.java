@@ -1,4 +1,4 @@
-package fr.inria.corese.kgram.core;
+package fr.inria.corese.core.kgram.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,27 +6,27 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Filter;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.TripleStore;
-import fr.inria.corese.kgram.api.query.Evaluator;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.event.Event;
-import fr.inria.corese.kgram.event.EventImpl;
-import fr.inria.corese.kgram.event.EventManager;
+import fr.inria.corese.core.kgram.api.core.Filter;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.api.query.Evaluator;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.event.Event;
+import fr.inria.corese.core.kgram.event.EventImpl;
+import fr.inria.corese.core.kgram.event.EventManager;
 import java.util.HashMap;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.PointerType;
-import static fr.inria.corese.kgram.api.core.PointerType.MAPPINGS;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import static fr.inria.corese.core.kgram.api.core.PointerType.MAPPINGS;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1105,7 +1105,7 @@ public class Mappings extends PointerObject
                 aggregateValue = memory.getNode(exp.getNode());
             } else {
                 // exp = aggregate(term)
-                // call fr.inria.corese.sparql.triple.function.aggregate.${AggregateFunction}
+                // call fr.inria.corese.core.sparql.triple.function.aggregate.${AggregateFunction}
                 aggregateValue = eval(exp.getFilter(), eval, memory, p);
                 if (ev != null) {
                     ev.getVisitor().aggregate(ev, exp.getFilter().getExp(),

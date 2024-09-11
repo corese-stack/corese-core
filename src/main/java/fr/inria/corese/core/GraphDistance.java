@@ -1,10 +1,10 @@
 package fr.inria.corese.core;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.json.JSONObject;
 

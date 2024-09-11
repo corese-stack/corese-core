@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.sorter.core;
+package fr.inria.corese.core.kgram.sorter.core;
 
-import fr.inria.corese.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.Producer;
 
 /**
  * Interface for estimating the cost of nodes and edges in QPGraph

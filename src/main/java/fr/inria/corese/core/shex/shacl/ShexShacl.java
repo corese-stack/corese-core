@@ -1,7 +1,7 @@
 package fr.inria.corese.shex.shacl;
 
 import static fr.inria.corese.shex.shacl.Constant.SH_INVERSEPATH;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.lille.shexjava.schema.concrsynt.LanguageConstraint;
 import java.math.BigDecimal;
 import java.util.Date;

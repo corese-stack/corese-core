@@ -1,6 +1,6 @@
 package fr.inria.corese.core.util;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.load.LoadException;

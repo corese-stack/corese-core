@@ -1,16 +1,16 @@
-package fr.inria.corese.kgram.tool;
+package fr.inria.corese.core.kgram.tool;
 
 import java.util.Objects;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.TripleStore;
-import fr.inria.corese.kgram.path.Path;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Variable;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.path.Path;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 public class NodeImpl implements Node {
 

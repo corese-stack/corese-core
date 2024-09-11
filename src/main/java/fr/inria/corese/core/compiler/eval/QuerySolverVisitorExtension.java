@@ -1,9 +1,9 @@
-package fr.inria.corese.compiler.eval;
+package fr.inria.corese.core.compiler.eval;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.List;
 
 /**
@@ -12,7 +12,7 @@ import java.util.List;
  * for one query: exec.query(q, new QuerySolverVisitorExtension())
  * for one query: exec.query(q, Mapping.create(vis));
  * 
- * for all query: QueryProcess.setSolverVisitorName("fr.inria.corese.compiler.eval.QuerySolverVisitorExtension");
+ * for all query: QueryProcess.setSolverVisitorName("fr.inria.corese.core.compiler.eval.QuerySolverVisitorExtension");
  * 
  * @author Olivier Corby, Wimmics INRIA I3S, 2020
  */

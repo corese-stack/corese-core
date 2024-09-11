@@ -1,7 +1,7 @@
 package fr.inria.corese.core.util;
 
-import fr.inria.corese.compiler.eval.QuerySolver;
-import fr.inria.corese.compiler.eval.QuerySolverVisitor;
+import fr.inria.corese.core.compiler.eval.QuerySolver;
+import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
@@ -11,17 +11,17 @@ import fr.inria.corese.core.visitor.solver.QuerySolverVisitorRuleUser;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformerUser;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorUser;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.AccessNamespace;
-import fr.inria.corese.sparql.triple.parser.AccessRight;
-import static fr.inria.corese.sparql.triple.parser.NSManager.COS;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.AccessNamespace;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import static fr.inria.corese.core.sparql.triple.parser.NSManager.COS;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

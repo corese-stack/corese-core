@@ -6,9 +6,9 @@ import java.util.Hashtable;
 import org.semarglproject.vocab.core.RDF;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  * Helper class to aid the parsers (ex.jsonld, rdfa) for adding triples to

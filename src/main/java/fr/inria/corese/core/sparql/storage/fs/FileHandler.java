@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.storage.fs;
+package fr.inria.corese.core.sparql.storage.fs;
 
-import fr.inria.corese.sparql.storage.api.Parameters;
-import fr.inria.corese.sparql.storage.api.Parameters.type;
-import static fr.inria.corese.sparql.storage.fs.Constants.BEGIN;
-import static fr.inria.corese.sparql.storage.fs.Constants.EXT_TXT;
-import static fr.inria.corese.sparql.storage.fs.Constants.FILE_NAME;
+import fr.inria.corese.core.sparql.storage.api.Parameters;
+import fr.inria.corese.core.sparql.storage.api.Parameters.type;
+import static fr.inria.corese.core.sparql.storage.fs.Constants.BEGIN;
+import static fr.inria.corese.core.sparql.storage.fs.Constants.EXT_TXT;
+import static fr.inria.corese.core.sparql.storage.fs.Constants.FILE_NAME;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;

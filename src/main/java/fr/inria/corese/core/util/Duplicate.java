@@ -1,7 +1,7 @@
 package fr.inria.corese.core.util;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Distinct;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Distinct;
 import java.util.HashMap;
 
 /**

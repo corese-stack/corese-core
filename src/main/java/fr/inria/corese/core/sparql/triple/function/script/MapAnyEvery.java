@@ -1,14 +1,14 @@
-package fr.inria.corese.sparql.triple.function.script;
+package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import static fr.inria.corese.kgram.api.core.ExprType.MAPANY;
-import static fr.inria.corese.kgram.api.core.ExprType.MAPEVERY;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import static fr.inria.corese.core.kgram.api.core.ExprType.MAPANY;
+import static fr.inria.corese.core.kgram.api.core.ExprType.MAPEVERY;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;

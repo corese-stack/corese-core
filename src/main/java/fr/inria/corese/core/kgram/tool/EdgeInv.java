@@ -1,10 +1,10 @@
-package fr.inria.corese.kgram.tool;
+package fr.inria.corese.core.kgram.tool;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.PointerType;
-import static fr.inria.corese.kgram.api.core.PointerType.TRIPLE;
-import fr.inria.corese.kgram.core.PointerObject;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import static fr.inria.corese.core.kgram.api.core.PointerType.TRIPLE;
+import fr.inria.corese.core.kgram.core.PointerObject;
 
 public class EdgeInv extends PointerObject implements Edge{
 

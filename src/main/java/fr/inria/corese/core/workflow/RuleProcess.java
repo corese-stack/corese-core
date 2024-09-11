@@ -1,7 +1,7 @@
 package fr.inria.corese.core.workflow;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.rule.Rule;

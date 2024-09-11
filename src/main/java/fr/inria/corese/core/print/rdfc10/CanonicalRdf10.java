@@ -9,10 +9,10 @@ import fr.inria.corese.core.EdgeFactory;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.print.NTriplesFormat;
 import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
 
 /**
  * The {@code CanonicalRdf10Format} class extends {@code RDFFormat} to provide

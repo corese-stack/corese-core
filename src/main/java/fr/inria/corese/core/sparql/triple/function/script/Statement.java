@@ -1,7 +1,7 @@
-package fr.inria.corese.sparql.triple.function.script;
+package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.compiler.java.JavaCompiler;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
 
 /**
  *

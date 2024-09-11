@@ -3,36 +3,36 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.corese.sparql.triple.function.extension;
+package fr.inria.corese.core.sparql.triple.function.extension;
 
-import static fr.inria.corese.kgram.api.core.ExprType.XT_ATTRIBUTE;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_ATTRIBUTES;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_BASE;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_CHILDREN;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_ELEMENTS;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_HAS_ATTRIBUTE;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NAMESPACE;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_DOCUMENT;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_ELEMENT;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_FIRST_CHILD;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_LOCAL_NAME;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_NAME;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_PARENT;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_PROPERTY;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_TYPE;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_NODE_VALUE;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_TEXT_CONTENT;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_XSLT;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.datatype.extension.CoreseXML;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.function.term.TermEval;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_ATTRIBUTE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_ATTRIBUTES;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_BASE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_CHILDREN;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_ELEMENTS;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_HAS_ATTRIBUTE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NAMESPACE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_DOCUMENT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_ELEMENT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_FIRST_CHILD;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_LOCAL_NAME;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_NAME;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_PARENT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_PROPERTY;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_TYPE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_NODE_VALUE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_TEXT_CONTENT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_XSLT;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.datatype.extension.CoreseXML;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.function.term.TermEval;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  *

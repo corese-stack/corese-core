@@ -1,13 +1,13 @@
-package fr.inria.corese.kgram.tool;
+package fr.inria.corese.core.kgram.tool;
 
 import java.util.Iterator;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Result;
-import fr.inria.corese.kgram.api.query.Results;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Result;
+import fr.inria.corese.core.kgram.api.query.Results;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
 
 public class ResultsImpl implements Results {
 

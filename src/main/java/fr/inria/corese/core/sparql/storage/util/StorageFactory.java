@@ -1,8 +1,8 @@
-package fr.inria.corese.sparql.storage.util;
+package fr.inria.corese.core.sparql.storage.util;
 
-import fr.inria.corese.sparql.storage.api.IStorage;
-import fr.inria.corese.sparql.storage.api.Parameters;
-import fr.inria.corese.sparql.storage.fs.StringManager;
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.storage.api.Parameters;
+import fr.inria.corese.core.sparql.storage.fs.StringManager;
 
 /**
  * Generate the persistent manager

@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.datatype;
+package fr.inria.corese.core.sparql.datatype;
 
-import static fr.inria.corese.sparql.datatype.CoreseBoolean.FALSE;
-import static fr.inria.corese.sparql.datatype.CoreseBoolean.TRUE;
-import static fr.inria.corese.sparql.datatype.Cst.jTypeGenericInteger;
-import static fr.inria.corese.sparql.datatype.Cst.jTypeInteger;
-import static fr.inria.corese.sparql.datatype.RDF.RDF_HTML;
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.FALSE;
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.TRUE;
+import static fr.inria.corese.core.sparql.datatype.Cst.jTypeGenericInteger;
+import static fr.inria.corese.core.sparql.datatype.Cst.jTypeInteger;
+import static fr.inria.corese.core.sparql.datatype.RDF.RDF_HTML;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,18 +16,18 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.kgram.api.core.Pointerable;
-import fr.inria.corese.kgram.api.core.TripleStore;
-import fr.inria.corese.kgram.path.Path;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.api.IDatatypeList;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.sparql.storage.api.IStorage;
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.path.Path;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatypeList;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  * <p>Title: Corese</p>

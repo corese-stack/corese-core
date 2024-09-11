@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.datatype.function;
+package fr.inria.corese.core.sparql.datatype.function;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 public class SQLFun {
 	

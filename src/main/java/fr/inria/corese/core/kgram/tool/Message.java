@@ -1,4 +1,4 @@
-package fr.inria.corese.kgram.tool;
+package fr.inria.corese.core.kgram.tool;
 
 import java.util.Hashtable;
 

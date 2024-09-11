@@ -1,10 +1,10 @@
 package fr.inria.corese.core.util;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.sparql.triple.printer.SPIN;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.printer.SPIN;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.load.Load;

@@ -1,49 +1,49 @@
-package fr.inria.corese.compiler.eval;
+package fr.inria.corese.core.compiler.eval;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.sparql.triple.parser.Triple;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.compiler.api.QueryVisitor;
-import fr.inria.corese.compiler.parser.Pragma;
-import fr.inria.corese.compiler.parser.Transformer;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Matcher;
-import fr.inria.corese.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.api.query.Provider;
-import fr.inria.corese.kgram.api.query.SPARQLEngine;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.core.Sorter;
-import fr.inria.corese.kgram.core.SparqlException;
-import fr.inria.corese.kgram.event.EventListener;
-import fr.inria.corese.kgram.event.EventManager;
-import fr.inria.corese.kgram.event.ResultListener;
-import fr.inria.corese.kgram.tool.MetaProducer;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.Access.Feature;
-import fr.inria.corese.sparql.triple.parser.Access.Level;
-import fr.inria.corese.sparql.triple.parser.AccessRight;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.compiler.parser.Pragma;
+import fr.inria.corese.core.compiler.parser.Transformer;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.Provider;
+import fr.inria.corese.core.kgram.api.query.SPARQLEngine;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.Sorter;
+import fr.inria.corese.core.kgram.core.SparqlException;
+import fr.inria.corese.core.kgram.event.EventListener;
+import fr.inria.corese.core.kgram.event.EventManager;
+import fr.inria.corese.core.kgram.event.ResultListener;
+import fr.inria.corese.core.kgram.tool.MetaProducer;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 
 /**
  * Evaluator of SPARQL query by KGRAM Ready to use Package with KGRAM and SPARQL
@@ -345,14 +345,14 @@ public class QuerySolver implements SPARQLEngine {
 
     void before(Query q) {
         ASTQuery ast =  q.getAST();
-        for (fr.inria.corese.sparql.api.QueryVisitor vis : ast.getVisitorList()) {
+        for (fr.inria.corese.core.sparql.api.QueryVisitor vis : ast.getVisitorList()) {
             vis.before(q);
         }
     }
 
     void after(Mappings map) {
         ASTQuery ast =  map.getQuery().getAST();
-        for (fr.inria.corese.sparql.api.QueryVisitor vis : ast.getVisitorList()) {
+        for (fr.inria.corese.core.sparql.api.QueryVisitor vis : ast.getVisitorList()) {
             vis.after(map);
         }
     }

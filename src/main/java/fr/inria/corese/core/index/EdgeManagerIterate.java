@@ -2,7 +2,7 @@ package fr.inria.corese.core.index;
 
 import fr.inria.corese.core.edge.EdgeGeneric;
 import java.util.Iterator;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 
 /**
  * Iterate internal Edge Index 

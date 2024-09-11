@@ -5,14 +5,14 @@
 
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.transform.TemplateVisitor;
@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
 /**
  * Manage extended named graph 
