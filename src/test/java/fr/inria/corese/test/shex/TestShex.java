@@ -1,6 +1,6 @@
 package fr.inria.corese.test.shex;
 
-import fr.inria.corese.shex.shacl.Shex;
+import fr.inria.corese.core.shex.shacl.Shex;
 
 
 /**

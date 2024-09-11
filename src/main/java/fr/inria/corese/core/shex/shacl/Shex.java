@@ -1,4 +1,4 @@
-package fr.inria.corese.shex.shacl;
+package fr.inria.corese.core.shex.shacl;
 
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.lille.shexjava.graph.TCProperty;
