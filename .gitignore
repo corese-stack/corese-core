@@ -19,3 +19,6 @@ __pycache__
 .vscode
 *.class
 .conda
+
+# maven stuff
+target
