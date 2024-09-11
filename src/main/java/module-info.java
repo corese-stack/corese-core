@@ -40,17 +40,14 @@ module fr.inria.corese.corese_core {
     exports fr.inria.corese.core.storage;
     exports fr.inria.corese.core.storage.api.dataManager;
 
-    // exports fr.inria.corese.core.compiler;
     exports fr.inria.corese.core.compiler.parser;
     exports fr.inria.corese.core.compiler.eval;
     exports fr.inria.corese.core.compiler.api;
     exports fr.inria.corese.core.compiler.result;
     exports fr.inria.corese.core.compiler.federate;
 
-    // exports fr.inria.corese.core.shex;
-    // exports fr.inria.corese.core.shex.shacl;
+    exports fr.inria.corese.core.shex.shacl;
 
-    // exports fr.inria.corese.core.kgram;
     exports fr.inria.corese.core.kgram.core;
     exports fr.inria.corese.core.kgram.api.core;
     exports fr.inria.corese.core.kgram.api.query;
@@ -61,7 +58,6 @@ module fr.inria.corese.corese_core {
     exports fr.inria.corese.core.kgram.path;
     exports fr.inria.corese.core.kgram.sorter.impl.qpv1;
 
-    // exports fr.inria.corese.core.sparql;
     exports fr.inria.corese.core.sparql.triple.parser;
     exports fr.inria.corese.core.sparql.triple.parser.visitor;
     exports fr.inria.corese.core.sparql.triple.parser.context;

@@ -1,6 +1,6 @@
-package fr.inria.corese.shex.shacl;
+package fr.inria.corese.core.shex.shacl;
 
-import static fr.inria.corese.shex.shacl.Constant.SH_INVERSEPATH;
+import static fr.inria.corese.core.shex.shacl.Constant.SH_INVERSEPATH;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.lille.shexjava.schema.concrsynt.LanguageConstraint;
 import java.math.BigDecimal;
