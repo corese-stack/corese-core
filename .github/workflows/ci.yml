@@ -7,8 +7,8 @@ jobs:
     steps:
       - name: maven build
         run: |
-          mamba env update -f conda-env/$CI_PROJECT_NAME.yaml
-          conda activate $CI_PROJECT_NAME
+          mamba env update -f conda-env/corese-core.yaml
+          conda activate corese-core
           mvn clean install -DskipTests
         shell: bash -l {0}
 
