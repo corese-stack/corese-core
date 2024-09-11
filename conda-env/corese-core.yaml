@@ -1,0 +1,5 @@
+name: corese-core
+channels:
+  - conda-forge
+dependencies:
+  - maven
