@@ -10,4 +10,6 @@ jobs:
           mamba env update -f conda-env/$CI_PROJECT_NAME.yaml
           conda activate $CI_PROJECT_NAME
           mvn clean install -DskipTests
+        shell: bash -l {0}
+
       - run: echo "This job's status is ${{ job.status }}."
