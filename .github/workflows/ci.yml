@@ -5,8 +5,9 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: self-hosted
     steps:
-      - run |
-      mamba env update -f conda-env/$CI_PROJECT_NAME.yaml
-      conda activate $CI_PROJECT_NAME
-      mvn clean install -DskipTests
+      - name: maven build
+        run: |
+          mamba env update -f conda-env/$CI_PROJECT_NAME.yaml
+          conda activate $CI_PROJECT_NAME
+          mvn clean install -DskipTests
       - run: echo "This job's status is ${{ job.status }}."
