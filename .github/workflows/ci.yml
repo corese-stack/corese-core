@@ -16,15 +16,15 @@ jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
     env:
-        JAVA_VERSION: '11'
+        JAVA_VERSION: '22'
 
     steps:
       - name: Checkout of head
-        id: ci-maven-build-checkout
+        id: ci-sources-checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK ${{env.JAVA_VERSION}}
-        id: ci-noconda-java-setup
+        id: ci-java-setup
         uses: actions/setup-java@v4
         with:
           java-version: ${{env.JAVA_VERSION}}
