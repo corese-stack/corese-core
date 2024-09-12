@@ -24,6 +24,7 @@ jobs:
         run: |
           mamba env update --prune -f conda-env/corese-core.yaml
           conda activate corese-core
+          ls -la
           ./gradlew clean publishToMavenLocal
         shell: bash -l {0}
 
