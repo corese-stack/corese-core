@@ -6,7 +6,6 @@ on:
 #      - "main"
 #      - "develop"
        - "feature/github-actions-gradle"
-       - "do_not_execute"
   pull_request:
     branches:
 #      - "main"
@@ -29,7 +28,6 @@ jobs:
         with:
           java-version: ${{env.JAVA_VERSION}}
           distribution: 'temurin'
-
       - name: Gradle build
         id: ci-gradle-build
         run: |
