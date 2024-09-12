@@ -7,12 +7,23 @@ plugins {
     `maven-publish`
     id("org.gradlex.extra-java-module-info") version "1.8"
     id("com.gradleup.shadow") version "8.3.1"
+    signing
 }
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+tasks.withType<Javadoc> { isFailOnError = false }
 
 repositories {
     mavenLocal()
     maven {
-        url = uri("https://repo.maven.apache.org/maven2/")
+        // change URLs to point to your repos, e.g. http://my.org/repo
+        val releasesRepoUrl = uri("https://repo.maven.apache.org/maven2/")
+        val snapshotsRepoUrl = uri(layout.buildDirectory.dir("repos/snapshots"))
+        url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
     }
 }
 
