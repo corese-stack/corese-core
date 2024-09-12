@@ -9,8 +9,8 @@ on:
   pull_request:
     branches:
 #      - "main"
-#      - "develop"
-       - "do_not_execute"
+      - "develop"
+#       - "do_not_execute"
 jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
