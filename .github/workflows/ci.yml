@@ -3,20 +3,16 @@ run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
 on:
   push:
     branches:
-#      - "main"
-#      - "develop"
-      - "feature/github-actions-gradle"
+      - "main"
+      - "develop"
   pull_request:
     branches:
-#      - "main"
-#      - "develop"
-      - "do_not_execute"
+      - "main"
+      - "develop"
 
 jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
-    # env:
-    #   JAVA_VERSION: 22
 
     steps:
       - name: Checkout of head
@@ -29,6 +25,7 @@ jobs:
         with:
           java-version: 22
           distribution: 'temurin'
+
       - name: Gradle build
         id: ci-gradle-build
         run: ./gradlew clean publishToMavenLocal
@@ -38,4 +35,3 @@ jobs:
         id: ci-final-step
         run: |
           echo "This job's status is ${{ job.status }}."
-#        shell: bash -l {0}
