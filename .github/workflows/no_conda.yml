@@ -13,20 +13,20 @@ jobs:
 
     steps:
       - name: Checkout of head
-        id: ci-maven-build-checkout
+        id: ci-noconda-maven-build-checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK ${{env.JAVA_VERSION}}
-        id: ci-maven-build-checkout
+        id: ci-noconda-maven-build-checkout
         uses: actions/setup-java@v3
         with:
           java-version: ${{env.JAVA_VERSION}}
           cache: maven
       - name: Maven build
-        id: ci-maven-build
+        id: ci-noconda-maven-build
         run: |
           mvn clean package
       - name: Final Step
-        id: ci-final-step
+        id: ci-noconda-final-step
         run: |
           echo "This job's status is ${{ job.status }}."
