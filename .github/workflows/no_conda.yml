@@ -24,7 +24,9 @@ jobs:
           distribution: 'temurin'
       - name: ci-noconda-maven-setup
         id: ci-noconda-maven-setup
-        uses: s4u/setup-maven-action@3.9.8
+        uses: s4u/setup-maven-action@v3
+        with:
+          maven-version: 3.9.8
       - name: Maven build
         id: ci-noconda-maven-build
         run: |
