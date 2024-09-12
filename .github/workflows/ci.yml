@@ -34,3 +34,4 @@ jobs:
         id: ci-final-step
         run: |
           echo "This job's status is ${{ job.status }}."
+          find ./build -name '*.jar'
