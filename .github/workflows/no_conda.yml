@@ -13,11 +13,11 @@ jobs:
 
     steps:
       - name: Checkout of head
-        id: ci-noconda-maven-build-checkout
+        id: ci-noconda-sources-checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK ${{env.JAVA_VERSION}}
-        id: ci-noconda-maven-build-checkout
+        id: ci-noconda-java-setup
         uses: actions/setup-java@v3
         with:
           java-version: ${{env.JAVA_VERSION}}
