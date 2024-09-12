@@ -1,5 +1,5 @@
-name: Continuous Integration process
-run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
+name: Continuous Integration process without conda
+run-name: ${{ github.actor }} has launched CI-noconda process on ${{ github.ref_name }}
 on:
   push:
     branches:
