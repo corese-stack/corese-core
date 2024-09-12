@@ -19,12 +19,12 @@ jobs:
         id: ci-maven-build-checkout
         uses: actions/checkout@v4
 
-      - name: maven build
-        id: ci-maven-build
+      - name: gradle build
+        id: ci-gradle-build
         run: |
-          mamba env update -f conda-env/corese-core.yaml
+          mamba env update --prune -f conda-env/corese-core.yaml
           conda activate corese-core
-          mvn clean package
+          ./gradlew clean publishToMavenLocal
         shell: bash -l {0}
 
       - name: Final Step
