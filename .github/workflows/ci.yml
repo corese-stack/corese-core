@@ -5,36 +5,33 @@ on:
     branches:
 #      - "main"
 #      - "develop"
-       - "feature/github-actions-gradle"
+      - "feature/github-actions-gradle"
   pull_request:
     branches:
 #      - "main"
 #      - "develop"
-       - "do_not_execute"
+      - "do_not_execute"
+
 jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
-    env:
-        JAVA_VERSION: '22'
+    # env:
+    #   JAVA_VERSION: 22
 
     steps:
       - name: Checkout of head
         id: ci-sources-checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK ${{env.JAVA_VERSION}}
+      - name: Set up JDK 22
         id: ci-java-setup
         uses: actions/setup-java@v4
         with:
-          java-version: ${{env.JAVA_VERSION}}
+          java-version: 22
           distribution: 'temurin'
       - name: Gradle build
         id: ci-gradle-build
-        run: |
-#          mamba env update --prune -f conda-env/corese-core.yaml
-#          conda activate corese-core
-#          ls -la
-          ./gradlew clean publishToMavenLocal
+        run: ./gradlew clean publishToMavenLocal
         shell: bash -l {0}
 
       - name: Final Step
