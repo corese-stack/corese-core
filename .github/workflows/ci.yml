@@ -14,6 +14,9 @@ jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
 
+    env:
+      PACKAGE_TOKEN: ${{ secrets.JLS_TOKEN }}
+
     steps:
       - name: Checkout of head
         id: ci-sources-checkout
@@ -29,6 +32,10 @@ jobs:
       - name: Gradle build
         id: ci-gradle-build
         run: ./gradlew clean publishToMavenLocal
+
+      - name: Jar publishing
+        id: ci-jar-publishing
+        run: echo "This is the secret token: ${{ env.PACKAGE_TOKEN }}"
 
       - name: Final Step
         id: ci-final-step
