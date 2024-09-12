@@ -14,9 +14,6 @@ jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
 
-    env:
-      PACKAGE_TOKEN: ${{ secrets.JLS_TOKEN }}
-
     steps:
       - name: Checkout of head
         id: ci-sources-checkout
@@ -35,7 +32,7 @@ jobs:
 
       - name: Jar publishing
         id: ci-jar-publishing
-        run: echo "This is the secret token: ${{ env.PACKAGE_TOKEN }}"
+        run: echo "This is the secret token: ${{ secrets.JLS_TOKEN }}"
 
       - name: Final Step
         id: ci-final-step
