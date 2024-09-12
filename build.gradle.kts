@@ -56,8 +56,8 @@ tasks.withType<Javadoc>() {
 }
 extraJavaModuleInfo {
     failOnMissingModuleInfo.set(false)
-    automaticModule("arp-2.2.b.jar", "arp")
-    automaticModule("jsonld-java-0.13.4.jar", "jsonld.java")
+    automaticModule("fr.com.hp.hpl.jena.rdf.arp:arp", "arp")
+    automaticModule("com.github.jsonld-java:jsonld-java", "jsonld.java")
     automaticModule("commons-lang:commons-lang", "commons.lang")
     automaticModule("fr.inria.lille.shexjava:shexjava-core", "shexjava.core")
     automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model")
