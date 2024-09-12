@@ -6,6 +6,7 @@ plugins {
     `java-library`
     `maven-publish`
     id("org.gradlex.extra-java-module-info") version "1.8"
+    id("com.gradleup.shadow") version "8.3.1"
 }
 
 repositories {
@@ -37,7 +38,7 @@ dependencies {
 }
 
 group = "fr.inria.corese"
-version = "4.5.1"
+version = "5.0.0-SNAPSHOT"
 description = "corese-core"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
@@ -53,6 +54,11 @@ tasks.withType<JavaCompile>() {
 
 tasks.withType<Javadoc>() {
     options.encoding = "UTF-8"
+}
+tasks {
+    shadowJar {
+        this.archiveClassifier = "jar-with-dependencies"
+    }
 }
 extraJavaModuleInfo {
     failOnMissingModuleInfo.set(false)
