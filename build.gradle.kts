@@ -12,10 +12,6 @@ plugins {
 repositories {
     mavenLocal()
     maven {
-        url = uri("file:///Users/edemairy/Developpement/corese-core/src/main/resources/repo/")
-    }
-
-    maven {
         url = uri("https://repo.maven.apache.org/maven2/")
     }
 }
