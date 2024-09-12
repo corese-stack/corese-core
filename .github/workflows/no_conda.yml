@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: ${{env.JAVA_VERSION}}
-          distribution: oracle
+          distribution: temurin
           cache: maven
       - name: Maven build
         id: ci-noconda-maven-build
