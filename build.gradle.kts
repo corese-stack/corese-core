@@ -37,7 +37,7 @@ dependencies {
 }
 
 group = "fr.inria.corese"
-version = "4.5.0"
+version = "4.5.1"
 description = "corese-core"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
