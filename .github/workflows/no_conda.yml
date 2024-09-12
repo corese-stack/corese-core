@@ -1,0 +1,32 @@
+name: Continuous Integration process
+run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
+on:
+  push:
+    branches:
+      - "feature/github-actions"
+
+jobs:
+  Continuous-Integration-Actions:
+    runs-on: self-hosted
+    env:
+        JAVA_VERSION: '22'
+
+    steps:
+      - name: Checkout of head
+        id: ci-maven-build-checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{env.JAVA_VERSION}}
+        id: ci-maven-build-checkout
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{env.JAVA_VERSION}}
+          cache: maven
+      - name: Maven build
+        id: ci-maven-build
+        run: |
+          mvn clean package
+      - name: Final Step
+        id: ci-final-step
+        run: |
+          echo "This job's status is ${{ job.status }}."
