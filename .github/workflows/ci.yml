@@ -3,12 +3,14 @@ run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
 on:
   push:
     branches:
-      - "main"
-      - "develop"
+#      - "main"
+#      - "develop"
+       - "do_not_execute"
   pull_request:
     branches:
-      - "main"
-      - "develop"
+#      - "main"
+#      - "develop"
+       - "do_not_execute"
 jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
