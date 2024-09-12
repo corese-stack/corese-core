@@ -1,15 +1,37 @@
 name: Continuous Integration process
-run-name: ${{ github.actor }} is testing out GitHub Actions
-on: [push]
-jobs:
-  Explore-GitHub-Actions:
-    runs-on: self-hosted
-    steps:
-      - name: maven build
-        run: |
-          mamba env update -f conda-env/corese-core.yaml
-          conda activate corese-core
-          mvn clean install -DskipTests
-        shell: bash -l {0}
+run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
+on:
+  push:
+    branches:
+      - "main"
+      - "develop"
+  pull_request:
+    branches:
+      - "main"
+      - "develop"
 
-      - run: echo "This job's status is ${{ job.status }}."
+jobs:
+  Continuous-Integration-Actions:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout of head
+        id: ci-sources-checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        id: ci-java-setup
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+
+      - name: Gradle build
+        id: ci-gradle-build
+        run: ./gradlew clean publishToMavenLocal
+
+      - name: Final Step
+        id: ci-final-step
+        run: |
+          echo "This job's status is ${{ job.status }}."
+          find ./build -name '*.jar'
