@@ -5,11 +5,11 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: self-hosted
     steps:
-      - name: maven build
+      - name: gradle build
         run: |
-          mamba env update -f conda-env/corese-core.yaml
+          mamba env update --prune -f conda-env/corese-core.yaml
           conda activate corese-core
-          mvn clean install -DskipTests
+          ./gradlew clean publishToMavenLocal
         shell: bash -l {0}
 
       - run: echo "This job's status is ${{ job.status }}."
