@@ -32,7 +32,8 @@ jobs:
 
       - name: Jar publishing
         id: ci-jar-publishing
-        run: echo "This is the secret token: ${{ secrets.JLS_TOKEN }}"
+        run: |
+          echo "This is the secret token:" ${{ secrets.JLS_TOKEN }}
 
       - name: Final Step
         id: ci-final-step
