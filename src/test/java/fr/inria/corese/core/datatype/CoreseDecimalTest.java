@@ -6,13 +6,13 @@ import java.math.BigDecimal;
 
 import org.junit.Test;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.CoreseDecimal;
-import fr.inria.corese.sparql.datatype.CoreseDouble;
-import fr.inria.corese.sparql.datatype.CoreseFloat;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.datatype.XSD;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseDecimal;
+import fr.inria.corese.core.sparql.datatype.CoreseDouble;
+import fr.inria.corese.core.sparql.datatype.CoreseFloat;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.datatype.XSD;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
 public class CoreseDecimalTest {
 

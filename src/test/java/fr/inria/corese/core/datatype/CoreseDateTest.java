@@ -6,12 +6,12 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.junit.Test;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.CoreseDate;
-import fr.inria.corese.sparql.datatype.CoreseDateTime;
-import fr.inria.corese.sparql.datatype.CoreseDecimal;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.datatype.XSD;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseDate;
+import fr.inria.corese.core.sparql.datatype.CoreseDateTime;
+import fr.inria.corese.core.sparql.datatype.CoreseDecimal;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.datatype.XSD;
 
 public class CoreseDateTest {
 

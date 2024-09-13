@@ -20,8 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import fr.inria.corese.compiler.eval.QuerySolver;
-import fr.inria.corese.compiler.result.XMLResult;
+import fr.inria.corese.core.compiler.eval.QuerySolver;
+import fr.inria.corese.core.compiler.result.XMLResult;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphStore;
 import fr.inria.corese.core.load.Load;
@@ -40,31 +40,31 @@ import fr.inria.corese.core.transform.Loader;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.util.SPINProcess;
-import fr.inria.corese.kgram.api.core.DatatypeValue;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.event.StatListener;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.datatype.RDF;
-import fr.inria.corese.sparql.datatype.extension.CoresePointer;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.exceptions.LDScriptException;
-import fr.inria.corese.sparql.exceptions.UndefinedExpressionException;
-import fr.inria.corese.sparql.storage.api.IStorage;
-import fr.inria.corese.sparql.storage.api.Parameters;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.Access.Feature;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.DatatypeValue;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.event.StatListener;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.datatype.RDF;
+import fr.inria.corese.core.sparql.datatype.extension.CoresePointer;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.LDScriptException;
+import fr.inria.corese.core.sparql.exceptions.UndefinedExpressionException;
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.storage.api.Parameters;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 public class TestQuery1 {
     // private static org.slf4j.Logger logger =
@@ -106,7 +106,7 @@ public class TestQuery1 {
         }
         // Option.isOption = false;
         // QueryProcess.setJoin(true);
-        // fr.inria.corese.compiler.parser.Transformer.ISBGP = !true;
+        // fr.inria.corese.core.compiler.parser.Transformer.ISBGP = !true;
         // QueryProcess.setPlanDefault(Query.QP_HEURISTICS_BASED);
 
         QueryProcess.testAlgebra(!true);
@@ -6040,8 +6040,7 @@ public class TestQuery1 {
 
         Transformer pp = Transformer.create(g, Transformer.TRIG);
         String str = pp.transform();
-        assertEquals(14923, str.length());
-
+        assertEquals(14928, str.length());
     }
 
     @Test
@@ -8142,7 +8141,7 @@ public class TestQuery1 {
                 + "</doc>'^^rdf:XMLLiteral   "
                 + "}";
 
-        String phrase = TestQuery1.class.getResource("/text/phrase.xml").getPath();
+        String phrase = TestQuery1.class.getResource("/data/text/phrase.xml").getPath();
 
         String query = ""
                 + "base      <http://www.example.org/schema/>"
