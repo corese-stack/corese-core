@@ -31,16 +31,18 @@ jobs:
 
       - name: Gradle build
         id: ci-gradle-build
-        run: ./gradlew clean build
+        run: ./gradlew clean assemble
 
-      - name: Upload build artifacts
+      - name: Gradle tests
         uses: actions/upload-artifact@v4
         with:
           name: Package
-          path: build/libs
+          path: build/reports/tests/test
+        run: ./gradlew test
 
       - name: Final Step
         id: ci-final-step
         run: |
           echo "This job's status is ${{ job.status }}."
+          echo "Created jar file(s):"
           find ./build -name '*.jar'
