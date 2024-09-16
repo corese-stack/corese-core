@@ -34,13 +34,16 @@ jobs:
         run: ./gradlew clean assemble
 
       - name: Gradle tests
-        run: ./gradlew test || /usr/bin/true
+        run: ./gradlew test
 
       - name: Get test artifacts
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: Package
-          path: build/reports/tests/test
+          path: |
+            **/build/reports/
+            **/build/test-results/
 
       - name: Final Step
         id: ci-final-step
