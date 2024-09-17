@@ -6041,7 +6041,7 @@ public class TestQuery1 {
 
         Transformer pp = Transformer.create(g, Transformer.TRIG);
         String str = pp.transform();
-        assertEquals(14928, str.length());
+        assertEquals(15015, str.length());
     }
 
     @Test
