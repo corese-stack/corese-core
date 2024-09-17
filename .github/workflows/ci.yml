@@ -10,6 +10,12 @@ on:
       - "main"
       - "develop"
 
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+
 jobs:
   Continuous-Integration-Actions:
     runs-on: self-hosted
@@ -35,6 +41,13 @@ jobs:
 
       - name: Gradle tests
         run: ./gradlew test
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
+        if: always()
+        with:
+          files: |
+            build/test-results/**/*.xml
 
       - name: Get test artifacts
         if: ${{ failure() }}
