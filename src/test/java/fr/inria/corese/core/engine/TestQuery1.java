@@ -110,6 +110,7 @@ public class TestQuery1 {
         // QueryProcess.setPlanDefault(Query.QP_HEURISTICS_BASED);
 
         QueryProcess.testAlgebra(!true);
+        Property.set(LOAD_IN_DEFAULT_GRAPH, false);
 
         // QueryProcess.setSolverVisitorName("fr.inria.corese.test.engine.MyVisitor");
         // QueryProcess.setVisitorable(true);
