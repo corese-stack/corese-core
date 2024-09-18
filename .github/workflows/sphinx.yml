@@ -31,6 +31,6 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/feature/retrieve_doc'
       with:
-        github_token: ${{ secrets.JLS_TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: docs/build/html
         
