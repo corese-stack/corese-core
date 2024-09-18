@@ -12,7 +12,7 @@ jobs:
     - name: Checkout development branch
       uses: actions/checkout@v4
       with:
-        ref: develop
+        ref: feature/retrieve_doc
 
     - name: Build Sphinx Docs
       uses: ammaraskar/sphinx-action@master
@@ -29,7 +29,7 @@ jobs:
         
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/feature/retrieve_doc'
       with:
         github_token: ${{ secrets.JLS_TOKEN }}
         publish_dir: docs/build/html
