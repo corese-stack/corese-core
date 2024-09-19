@@ -1,11 +1,12 @@
 name: "Sphinx: Render docs"
-
+run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
 on:
   push:
     branches:
       - "feature/retrieve_doc"  # TODO Should build from main branch
   pull_request:
-    - "develop"
+    branches:
+      - "develop"
 jobs:
   build:
     runs-on: ubuntu-latest
