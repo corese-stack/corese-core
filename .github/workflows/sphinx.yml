@@ -25,8 +25,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Build Sphinx documentation with multiversion
-        run: |
-          sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${sourcedir}/java_api'
+        run: sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${sourcedir}/java_api'
         
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
