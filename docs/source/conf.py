@@ -33,6 +33,7 @@ extensions = [
     #'sphinx.ext.autodoc', # to automatically generate documentation from docstrings
     #'sphinx.ext.autosummary', # this extension generates function/method/attribute summary lists
     #'sphinx.ext.autosectionlabel', # to automatically generate section labels
+    'sphinx_multiversion',
     'sphinx_design', # to render panels
     'myst_parser', # to parse markdown
     'sphinxcontrib.mermaid', # to render mermaid diagrams
@@ -193,3 +194,7 @@ highlight_language = 'cpp'
 
 # Set to false in the final version
 todo_include_todos = True
+
+# Optional: Exclude certain branches or tags from multi-versioning
+smv_branch_whitelist = r'main'  # Build documentation only for main
+smv_tag_whitelist = r'^v\d+\.\d+.*$'  # Only build tags that match version pattern like v1.0
