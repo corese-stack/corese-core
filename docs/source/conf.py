@@ -98,9 +98,9 @@ html_theme_options = {
     # TODO:  The versioning switch has to be review after the final version of the documentation is ready
     #https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/version-dropdown.html
     
-    "switcher": {"json_url": "http://127.0.0.1:3000/docs/source/_static/switcher.json",
+    "switcher": {"json_url": "https://corese-stack.github.io/corese-core/docs/source/_static/switcher.json",
                  "version_match": r"v\d+\.\d+\.\d+",
-                 },
+},
  }
 
 # since the markdown files don't have TOC 

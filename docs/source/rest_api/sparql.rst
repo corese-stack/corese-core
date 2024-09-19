@@ -102,7 +102,8 @@ The query is to find all the children who have a mother in the `Humans` dataset 
 
     .. tab-item:: POST url-encoded
 
-        .. code-block:: bash 
+        .. code-block:: bash
+
             # POST /sparql HTTP/1.1
             # Host: https://corese.inria.fr
             # Content-Type: application/x-www-form-urlencoded
