@@ -26,6 +26,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r docs/requirements.txt
+        apt-get install doxygen -y
 
     - name: Build Sphinx documentation with multiversion
       run: |
