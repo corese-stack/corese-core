@@ -7,17 +7,18 @@ on:
   pull_request:
     branches:
       - "develop"
+
+permissions:
+  contents: write
+
 jobs:
-  build:
+  Continuous-Integration-Actions:
     runs-on: self-hosted
 
     env:
       PACKAGE_TOKEN: ${{ secrets.JLS_TOKEN }}
 
-    permissions:
-      contents: write
     steps:
-       
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
