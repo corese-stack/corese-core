@@ -99,9 +99,8 @@ html_theme_options = {
     #https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/version-dropdown.html
     
     "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json",
-                 "version_match": r"v\d+\.\d+\.\d+",
-},
- }
+                 "version_match": r"v\d+\.\d+\.\d+"}
+}
 
 # since the markdown files don't have TOC 
 # we can either  hide the Section Navigation bar (left) by adding the dictionary entry
