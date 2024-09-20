@@ -1,0 +1,35 @@
+
+.. _file_src_main_java_fr_inria_corese_core_api_Loader.java:
+
+File Loader.java
+================
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+Definition (``src/main/java/fr/inria/corese/core/api/Loader.java``)
+-------------------------------------------------------------------
+
+
+
+
+
+
+Includes
+--------
+
+
+- ``fr.inria.corese.core.rule.RuleEngine``
+
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__api`
+
