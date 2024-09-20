@@ -51,7 +51,7 @@ jobs:
         with:
           paths: |
             /build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.JLS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
 
