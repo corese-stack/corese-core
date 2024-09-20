@@ -82,7 +82,7 @@ html_theme_options = {
      "logo": {
          "image_relative": "_static/corese.svg",
          "image_light": "_static/corese.svg",
-         "image_dark": "_static/corese.svg",
+         "image_dark": "_static/corese.svg"
      },
     "navbar_center": [ "navbar-nav" ],
     "navbar_end": ["navbar-icon-links", "version-switcher"],
@@ -90,16 +90,10 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/Wimmics/corese",
-            "icon": "fab fa-github-square",
+            "icon": "fab fa-github-square"
         }
     ],
-    #"navigation_depth": 0,
-    #"show_toc_level": 3,
-    # TODO:  The versioning switch has to be review after the final version of the documentation is ready
-    #https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/version-dropdown.html
-    
-    "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json",
-                 "version_match": r"v\d+\.\d+\.\d+"}
+    "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json", "version_match": r"v\d+\.\d+\.\d+"}
 }
 
 # since the markdown files don't have TOC 
@@ -177,7 +171,7 @@ exhale_args = {
 
     # Exclude certain entities from Full API
     # https://exhale.readthedocs.io/en/latest/reference/configs.html#root-api-document-customization
-    "unabridgedOrphanKinds": {'dir', 'file', 'page', 'namespace' },
+    "unabridgedOrphanKinds": {'dir', 'file', 'page', 'namespace' }
 }
 
 
