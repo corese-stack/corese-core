@@ -93,7 +93,7 @@ html_theme_options = {
             "icon": "fab fa-github-square"
         }
     ],
-    "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json", "version_match": r"v\d+\.\d+\.\d+"}
+    "switcher": {"json_url": "file:///Users/clebreto/programming/wimmics/corese-stack/corese-core/docs/source/_static/switcher.json", "version_match": r"v\d+\.\d+\.\d+"}
 }
 
 # since the markdown files don't have TOC 
