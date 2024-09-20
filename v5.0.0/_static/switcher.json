@@ -1,14 +1,14 @@
 [
     {
-        "name": "4.5 (stable)",
+        "Name": "v5.0.0 (latest)",
         "version": "stable",
-        "url": "https://wimmics.github.io/corese/",
+        "url": "https://wimmics.github.io/corese/v5.0.0",
         "preferred": true
-    },
-    {
-        "name": "4.6 (dev)",
-        "version": "dev",
-        "url": "https://annabobasheva.github.io/corese/"
     }
-    
+    {
+        "name": "v4.5.6 (stable)",
+        "version": "stable",
+        "url": "https://wimmics.github.io/corese/v4.5.6",
+        "preferred": true
+    }
 ]
