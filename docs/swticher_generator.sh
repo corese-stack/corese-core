@@ -24,7 +24,7 @@ for tag in $tags; do
     # Create a JSON object for the tag
     json_object=$(cat <<EOF
 {
-    "Name": "$name",
+    "name": "$name",
     "version": "stable",
     "url": "https://corese-stack.github.io/corese-core/$tag/",
     "preferred": $preferred
