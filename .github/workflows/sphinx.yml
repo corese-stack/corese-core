@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         source /builds/miniconda3/etc/profile.d/conda.sh
-        mamba activate corese-core
+        conda activate corese-core
         python -m pip install --upgrade pip
         pip install -r docs/requirements.txt
 
