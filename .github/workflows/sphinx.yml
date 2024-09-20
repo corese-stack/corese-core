@@ -40,7 +40,7 @@ jobs:
         conda activate corese-core-documentation
         sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${sourcedir}/java_api'
         chmod u+x docs/swticher_generator.sh
-        ./docs/swticher_generator.sh build/html/switcher.json
+        ./docs/swticher_generator.sh > build/html/switcher.json
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
