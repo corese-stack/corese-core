@@ -2,13 +2,12 @@
     {
         "Name": "v5.0.0 (latest)",
         "version": "stable",
-        "url": "https://wimmics.github.io/corese/v5.0.0",
+        "url": "https://corese-stack.github.io/corese-core/v5.0.0/",
         "preferred": true
     },
     {
         "name": "v4.5.6 (stable)",
         "version": "stable",
-        "url": "https://wimmics.github.io/corese/v4.5.6",
-        "preferred": true
+        "url": "https://corese-stack.github.io/corese-core/v4.5.6/",
     }
 ]
