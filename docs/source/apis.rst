@@ -3,19 +3,34 @@ CORESE APIs
 
 .. toctree::
    :hidden:
-
-   CLI <cli_ref/cli_root>
-   REST API <rest_api/api_root>
    Java API <java_api/library_root>
-   Python API <python_api/library_root>
-   
 
 .. grid:: 2
+
+    .. grid-item-card::
+      :shadow: sm
+      :class-card: sd-rounded-3
+      :link: java_api/library_root.html
+
+      Corese Java API
+      ^^^^^^^^^^^^^^^^^^^^^^^
+      Developers can use the Corese Java API to:
+
+      * load RDF data from files
+      * export RDF data to files
+      * build graphs programmatically
+      * run SPARQL queries (SELECT, CONSTRUCT, ASK, UPDATE)
+      * validate RDF data against SHACL shapes (SHACL)
+      * transform RDF data using STTL (SPARQL Template Transformation Language)
+      * apply SPARQL rules
+      * execute LDScript functionalities
+
+      and more...
 
     .. grid-item-card::  
       :shadow: sm
       :class-card: sd-rounded-3
-      :link: cli_ref/cli_root.html
+      :link: https://github.com/corese-stack/corese-command/
 
       Corese command-line interface 
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -31,7 +46,7 @@ CORESE APIs
     .. grid-item-card::  
       :shadow: sm
       :class-card: sd-rounded-3
-      :link: rest_api/api_root.html
+      :link: https://github.com/corese-stack/corese-server/
 
       Corese REST API
       ^^^^^^^^^^^^^^^^^^^^^^^
@@ -42,32 +57,11 @@ CORESE APIs
       * Graph Store HTTP Protocol endpoint
 
       and more...
-
-
-    .. grid-item-card::  
-      :shadow: sm
-      :class-card: sd-rounded-3
-      :link: java_api/library_root.html
-
-      Corese Java API
-      ^^^^^^^^^^^^^^^^^^^^^^^
-      Developers can use the Corese Java API to:
-
-      * load RDF data from files 
-      * export RDF data to files
-      * build graphs programmatically
-      * run SPARQL queries (SELECT, CONSTRUCT, ASK, UPDATE)
-      * validate RDF data against SHACL shapes (SHACL)
-      * transform RDF data using STTL (SPARQL Template Transformation Language)
-      * apply SPARQL rules 
-      * execute LDScript functionalities
-
-      and more...
-
       
     .. grid-item-card::  
       :shadow: sm
       :class-card: sd-rounded-3
+      :link: https://github.com/corese-stack/corese-python/
 
       Corese Python API
       ^^^^^^^^^^^^^^^^^^^^^^^

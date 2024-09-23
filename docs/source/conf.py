@@ -155,8 +155,7 @@ exhale_args = {
     # These arguments are required
     "containmentFolder":     "./java_api",
     "rootFileName":          "library_root.rst", # EXCLUDE - if we want to change the sections
-    "doxygenStripFromPath":  repo_root, # "..",
-
+    "doxygenStripFromPath": "..",
     # Heavily encouraged optional argument (see docs)
     "rootFileTitle":         "Java API",
 
