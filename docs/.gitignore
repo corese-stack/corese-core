@@ -4,8 +4,11 @@ bak/
 build/
 
 source/*
+!source/*.rst
 !source/**/*.rst
 !source/**/*.py
+
+!source/README.md
 !source/install.md
 !source/Doxyfile
 
@@ -20,4 +23,3 @@ source/*
 !source/federation/
 !source/getting_started/
 !source/storage/
-!source/README.md

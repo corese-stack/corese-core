@@ -25,7 +25,7 @@ jobs:
         ref: feature/retrieve_doc
 
     - name: Fetch tags
-      run: git fetch --prune --unshallow --tags
+      run: git fetch --prune --unshallow --tags --force
 
     - name: Install dependencies
       run: |
