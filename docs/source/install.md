@@ -1,8 +1,8 @@
-## Download and install
+## Download and install corese-core
 
-### Corese-library
+Download from [maven-central](https://central.sonatype.com/namespace/fr.inria.corese)
 
-- Download from [maven-central](https://central.sonatype.com/namespace/fr.inria.corese)
+### corese-core
 
 ```xml
 <dependency>
@@ -10,7 +10,11 @@
     <artifactId>corese-core</artifactId>
     <version>4.5.6</version>
 </dependency>
+```
 
+### corese-storage-plugin
+
+```xml
 <!-- jena storage -->
 <dependency>
     <groupId>fr.inria.corese</groupId>
@@ -25,5 +29,3 @@
     <version>4.5.6</version>
 </dependency>
 ```
-
-- Documentation: [Getting Started With Corese-library](getting_started/getting_started_with_corese-core.md)
