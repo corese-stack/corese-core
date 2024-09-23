@@ -194,7 +194,7 @@ To start the server with these configurations, run the following command:
 java -jar corese-server.jar -init "server.properties" -pp "profile.ttl"
 ```
 
-> You can learn more about profile files here: [Getting Started With Corese-server](https://github.com/Wimmics/corese/blob/master/docs/getting%20started/Getting%20Started%20With%20Corese-server.md#4-to-go-deeper)
+> You can learn more about profile files here: [Getting Started With corese-server](https://github.com/Wimmics/corese/blob/master/docs/getting%20started/Getting%20Started%20With%20Corese-server.md#4-to-go-deeper)
 
 ## 5. Use Storage Systems in Corese-Library
 

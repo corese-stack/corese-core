@@ -15,3 +15,9 @@ source/*
 
 !source/_templates/
 !source/_static/
+
+!source/advanced/
+!source/federation/
+!source/getting_started/
+!source/storage/
+!source/README.md
