@@ -31,31 +31,6 @@ Namespaces
 .. toctree::
    :maxdepth: 5
 
-   namespace_fr__inria__corese__core__api.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   namespace_fr__inria__corese__core__load.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   namespace_fr__inria__corese__core__print.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   namespace_fr__inria__corese__core__query.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   namespace_fr__inria__corese__core__shacl.rst
-
-.. toctree::
-   :maxdepth: 5
-
    namespace_fr__inria__corese__core__sparql.rst
 
 .. toctree::
@@ -63,14 +38,14 @@ Namespaces
 
    namespace_fr__inria__corese__core__sparql__api.rst
 
-.. toctree::
-   :maxdepth: 5
-
-   namespace_fr__inria__corese__core__transform.rst
-
 Directories
 ***********
 
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src.rst
 
 .. toctree::
    :maxdepth: 5
@@ -102,41 +77,6 @@ Directories
 
    dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core.rst
 
-.. toctree::
-   :maxdepth: 5
-
-   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shacl.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform.rst
-
-.. toctree::
-   :maxdepth: 5
-
-   dir_src.rst
-
 Files
 *****
 
@@ -144,37 +84,122 @@ Files
 .. toctree::
    :maxdepth: 5
 
-   file_src_main_java_fr_inria_corese_core_Graph.java.rst
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_CompareWithDatatypeEntailment.java.rst
 
 .. toctree::
    :maxdepth: 5
 
-   file_src_main_java_fr_inria_corese_core_load_Load.java.rst
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_CompareWithoutDatatypeEntailment.java.rst
 
 .. toctree::
    :maxdepth: 5
 
-   file_src_main_java_fr_inria_corese_core_api_Loader.java.rst
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Context.java.rst
 
 .. toctree::
    :maxdepth: 5
 
-   file_src_main_java_fr_inria_corese_core_query_QueryProcess.java.rst
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Corese.java.rst
 
 .. toctree::
    :maxdepth: 5
 
-   file_src_main_java_fr_inria_corese_core_print_ResultFormat.java.rst
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_DataStore.java.rst
 
 .. toctree::
    :maxdepth: 5
 
-   file_src_main_java_fr_inria_corese_core_shacl_Shacl.java.rst
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_EdgeFactory.java.rst
 
 .. toctree::
    :maxdepth: 5
 
-   file_src_main_java_fr_inria_corese_core_transform_Transformer.java.rst
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Event.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_EventHandler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_EventLogger.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_EventManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Graph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_GraphCompare.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_GraphDistance.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_GraphObject.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_GraphStore.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Index.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_NodeGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_NodeGraphIndex.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_NodeImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_NodeIterator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Serializer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Start.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_ValueResolverImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Workflow.java.rst
 
 Pages
 *****

@@ -1,0 +1,33 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1NodeImpl:
+
+Class NodeImpl
+==============
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_NodeImpl.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Types
+**********
+
+- ``public GraphObject`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphObject`)
+- ``public Node``
+
+
+Derived Type
+************
+
+- ``public NodeGraph`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1NodeGraph`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::NodeImpl
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

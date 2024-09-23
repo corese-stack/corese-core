@@ -5,7 +5,7 @@ Directory main
 ==============
 
 
-|exhale_lsh| :ref:`Parent directory <dir_src>` (``src``)
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src>` (``/builds/actions-runners/_work/corese-core/corese-core/src``)
 
 .. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
 
