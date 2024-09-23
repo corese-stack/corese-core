@@ -20,9 +20,9 @@ In addition, a server can send a message back to a client by means of a JSON obj
 #### Prefix used in this document.
 
 ```turtle
-prefix st:  <http://ns.inria.fr/sparql-template/>
-prefix stm: <http://ns.inria.fr/sparql-template/navlab#>
-prefix d3:  <http://ns.inria.fr/sparql-template/d3#>
+@prefix st:  <http://ns.inria.fr/sparql-template/> .
+@prefix stm: <http://ns.inria.fr/sparql-template/navlab#> .
+@prefix d3:  <http://ns.inria.fr/sparql-template/d3#> .
 ```
 
 
