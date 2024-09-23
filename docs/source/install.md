@@ -26,4 +26,4 @@
 </dependency>
 ```
 
-- Documentation: [Getting Started With Corese-library](/getting%20started/Getting%20Started%20With%20Corese-library.md)
+- Documentation: [Getting Started With Corese-library](getting_started/getting_started_with_corese-core.md)

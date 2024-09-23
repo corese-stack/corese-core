@@ -26,7 +26,7 @@ help:
 symbolic_links:
 	cd $(SOURCEDIR); \
 	echo "Creating a symbolic link to sub-dirs"; \
-	for dir in "getting started" "federation" "storage" "advanced"; do \
+	for dir in "getting_started" "federation" "storage" "advanced"; do \
 	if [ ! -d "$$dir" ]; then \
 		ln -sfv "../$$dir" "$$dir"; \
 		echo "--- $$dir created"; \

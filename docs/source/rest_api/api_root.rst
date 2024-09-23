@@ -5,7 +5,7 @@ REST API Reference
 
 This document provides a reference guide for the REST API of the Corese server. It outlines the available endpoints, their request and response formats, and any additional details that may be relevant.
 
-For the User Guide on how to setup a Corese server, please refer to the `User Guide <../getting%20started/Getting%20Started%20With%20Corese-server.html>`_.
+For the User Guide on how to setup a Corese server, please refer to the `User Guide <../getting_started/getting_started_with_corese-core.html>`_.
 
 Base URL
 --------
