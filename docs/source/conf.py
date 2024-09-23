@@ -96,29 +96,6 @@ html_theme_options = {
     "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json", "version_match": r"v\d+\.\d+\.\d+"}
 }
 
-# since the markdown files don't have TOC 
-# we can either  hide the Section Navigation bar (left) by adding the dictionary entry
-#  "install": [],
-#
-# or we can create a custom navigation bar in the _templates folder
-# <!-- user_guide_sidebar.html -->
-# <div class="custom-nav-links">
-#    <div class="sidebar-primary-items__start sidebar-primary__section">
-#        <div class="sidebar-primary-item">
-# <nav class="bd-docs-nav bd-links"  aria-label="Section Navigation">
-#   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-#   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-#     <li class="toctree-l1"><a class="reference internal" href="../getting%20started/Getting%20Started%20With%20Corese-library.html">   Corese-library</a></li>
-#     <li class="toctree-l1"><a class="reference internal" href="../docker/README.html">   Corese Docker</a></li>
-# </ul>
-# </div>
-# </nav></div>
-# </div></div>
-#  
-# and add the following lines
-# "user_guide": ["user_guide_sidebar.html"],
-# "getting started/**": ["user_guide_sidebar_subdir.html"],
-
 html_sidebars = {
   "install": [],
 }
