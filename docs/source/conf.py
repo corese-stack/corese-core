@@ -180,8 +180,7 @@ exhale_args = {
 primary_domain = 'cpp'
 
 # Tell sphinx what the pygments highlight language should be.
-# Java is not one of the available options. Keep it as cpp.
-highlight_language = 'cpp'
+highlight_language = 'java'
 
 # Setup the sphinx.ext.todo extension 
 
