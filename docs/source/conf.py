@@ -152,8 +152,7 @@ exhale_args = {
 
 
 # Tell sphinx what the primary language being documented is.
-# Java is not one of the available options. Keep it as cpp.
-primary_domain = 'cpp'
+primary_domain = 'java'
 
 # Tell sphinx what the pygments highlight language should be.
 highlight_language = 'java'
