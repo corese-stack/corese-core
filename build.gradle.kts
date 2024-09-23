@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
+    `jacoco`
     id("org.gradlex.extra-java-module-info") version "1.8"
     id("com.gradleup.shadow") version "8.3.1"
     signing
@@ -70,11 +71,25 @@ tasks.withType<JavaCompile>() {
 tasks.withType<Javadoc>() {
     options.encoding = "UTF-8"
 }
+
 tasks {
     shadowJar {
         this.archiveClassifier = "jar-with-dependencies"
     }
 }
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
 extraJavaModuleInfo {
     failOnMissingModuleInfo.set(false)
     automaticModule("fr.com.hp.hpl.jena.rdf.arp:arp", "arp")
