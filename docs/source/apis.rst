@@ -2,7 +2,8 @@ CORESE APIs
 ###########
 
 .. toctree::
-   :hidden:
+  :hidden:
+
    Java API <java_api/library_root>
 
 .. grid:: 2
