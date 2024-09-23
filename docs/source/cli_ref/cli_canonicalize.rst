@@ -41,7 +41,7 @@ To run this example you can download the sample data files :download:`beatles_bl
     corese-command canonicalize -i beatles_blank.ttl -r rdfc-1.0 
 
 
-.. code-block:: xml
+.. code-block:: turtle
 
     <http://example.com/George_Harrison> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/SoloArtist> .
     <http://example.com/Imagine> <http://example.com/artist> <http://example.com/John_Lennon> .
