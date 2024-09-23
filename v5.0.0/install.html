@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Download and install &#8212; CORESE</title>
+    <title>Download and install corese-core &#8212; CORESE</title>
   
   
   
@@ -406,7 +406,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">Download and install</li>
+    <li class="breadcrumb-item active" aria-current="page">Download...</li>
   </ul>
 </nav>
 </div>
@@ -423,138 +423,37 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="download-and-install">
-<h1>Download and install<a class="headerlink" href="#download-and-install" title="Link to this heading">#</a></h1>
-<section id="corese-library">
-<h2>Corese-library<a class="headerlink" href="#corese-library" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Download from <a class="reference external" href="https://central.sonatype.com/namespace/fr.inria.corese">maven-central</a></p></li>
-</ul>
+  <section id="download-and-install-corese-core">
+<h1>Download and install corese-core<a class="headerlink" href="#download-and-install-corese-core" title="Link to this heading">#</a></h1>
+<p>Download from <a class="reference external" href="https://central.sonatype.com/namespace/fr.inria.corese">maven-central</a></p>
+<section id="corese-core">
+<h2>corese-core<a class="headerlink" href="#corese-core" title="Link to this heading">#</a></h2>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;dependency&gt;</span>
 <span class="w">    </span><span class="nt">&lt;groupId&gt;</span>fr.inria.corese<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>corese-core<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.5.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.5.6<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
-
-<span class="cm">&lt;!-- jena storage --&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="corese-storage-plugin">
+<h2>corese-storage-plugin<a class="headerlink" href="#corese-storage-plugin" title="Link to this heading">#</a></h2>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- jena storage --&gt;</span>
 <span class="nt">&lt;dependency&gt;</span>
 <span class="w">    </span><span class="nt">&lt;groupId&gt;</span>fr.inria.corese<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>corese-jena<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.5.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.5.6<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 
 <span class="cm">&lt;!-- rdf4j storage --&gt;</span>
 <span class="nt">&lt;dependency&gt;</span>
 <span class="w">    </span><span class="nt">&lt;groupId&gt;</span>fr.inria.corese<span class="nt">&lt;/groupId&gt;</span>
 <span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>corese-rdf4j<span class="nt">&lt;/artifactId&gt;</span>
-<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.5.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>4.5.6<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </pre></div>
 </div>
-<ul class="simple">
-<li><p>Documentation: <a class="reference internal" href="#/getting%20started/Getting%20Started%20With%20Corese-library.md"><span class="xref myst">Getting Started With Corese-library</span></a></p></li>
-</ul>
 </section>
-<section id="corese-server">
-<h2>Corese-server<a class="headerlink" href="#corese-server" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Download from <a class="reference external" href="https://hub.docker.com/r/wimmics/corese">Docker-hub</a></p></li>
-</ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>my-corese<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-p<span class="w"> </span><span class="m">8080</span>:8080<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-d<span class="w"> </span>wimmics/corese
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Alternatively, download <a class="reference external" href="https://project.inria.fr/corese/jar/">Corese-server jar file</a>.</p></li>
-</ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span><span class="s2">&quot;https://github.com/Wimmics/corese/releases/download/release-4.5.0/corese-server-4.5.0.jar&quot;</span>
-java<span class="w"> </span>-jar<span class="w"> </span><span class="s2">&quot;-Dfile.encoding=UTF8&quot;</span><span class="w"> </span><span class="s2">&quot;corese-server-4.5.0.jar&quot;</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Documentation:</p>
-<ul>
-<li><p><a class="reference internal" href="#/getting%20started/Getting%20Started%20With%20Corese-server.md"><span class="xref myst">Getting Started With Corese-server</span></a></p></li>
-<li><p><a class="reference internal" href="#/corese-python/Corese-server%20with%20Python.md"><span class="xref myst">Use Corese-server with Python</span></a></p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="corese-gui">
-<h2>Corese-GUI<a class="headerlink" href="#corese-gui" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Download on Flathub</p></li>
-</ul>
-<!-- markdownlint-disable MD033 -->
-<a href='https://flathub.org/apps/fr.inria.corese.CoreseGui'>
-   <img src='https://dl.flathub.org/assets/badges/flathub-badge-en.png' alt='Download on Flathub' width='175'/>
-</a>
-<!-- markdownlint-enable MD033 -->
-<ul class="simple">
-<li><p>Or download <a class="reference external" href="https://project.inria.fr/corese/jar/">Corese-gui jar file</a>.</p></li>
-</ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span><span class="s2">&quot;https://github.com/Wimmics/corese/releases/download/release-4.5.0/corese-gui-4.5.0.jar&quot;</span>
-java<span class="w"> </span>-jar<span class="w"> </span><span class="s2">&quot;-Dfile.encoding=UTF8&quot;</span><span class="w"> </span><span class="s2">&quot;corese-gui-4.5.0.jar&quot;</span>
-</pre></div>
-</div>
-</section>
-<section id="corese-command">
-<h2>Corese-Command<a class="headerlink" href="#corese-command" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Download on Flathub</p></li>
-</ul>
-<!-- markdownlint-disable MD033 -->
-<a href='https://flathub.org/apps/fr.inria.corese.CoreseCommand'>
-   <img src='https://dl.flathub.org/assets/badges/flathub-badge-en.png' alt='Download on Flathub' width='175'/>
-</a>
-<!-- markdownlint-enable MD033 -->
-<ul class="simple">
-<li><p>Or download <a class="reference external" href="https://project.inria.fr/corese/jar/">Corese-command jar file</a>.</p></li>
-</ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span><span class="s2">&quot;https://github.com/Wimmics/corese/releases/download/release-4.5.0/corese-command-4.5.0.jar&quot;</span>
-java<span class="w"> </span>-jar<span class="w"> </span><span class="s2">&quot;-Dfile.encoding=UTF8&quot;</span><span class="w"> </span><span class="s2">&quot;corese-command-4.5.0.jar&quot;</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Alternatively, use the installation script for Linux and MacOS systems.</p></li>
-</ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-sSL<span class="w"> </span>https://files.inria.fr/corese/distrib/script/install-corese-command.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
-</pre></div>
-</div>
-<p>To uninstall:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-sSL<span class="w"> </span>https://files.inria.fr/corese/distrib/script/uninstall-corese-command.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
-</pre></div>
-</div>
-<blockquote>
-<div><p>If you’re using zsh, replace <code class="docutils literal notranslate"><span class="pre">bash</span></code> with <code class="docutils literal notranslate"><span class="pre">zsh</span></code>.</p>
-</div></blockquote>
-<ul class="simple">
-<li><p>Documentation: <a class="reference internal" href="#/getting%20started/Getting%20Started%20With%20Corese-command.md"><span class="xref myst">Getting Started With Corese-command</span></a></p></li>
-</ul>
-</section>
-<section id="corese-python-beta">
-<h2>Corese-Python (beta)<a class="headerlink" href="#corese-python-beta" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Download <a class="reference external" href="https://project.inria.fr/corese/jar/">Corese-python jar file</a>.</p></li>
-</ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span><span class="s2">&quot;https://github.com/Wimmics/corese/releases/download/release-4.5.0/corese-library-python-4.5.0.jar&quot;</span>
-java<span class="w"> </span>-jar<span class="w"> </span><span class="s2">&quot;-Dfile.encoding=UTF8&quot;</span><span class="w"> </span><span class="s2">&quot;corese-library-python-4.5.0.jar&quot;</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Documentation: <a class="reference internal" href="#/corese-python/Corese-library%20with%20Python.md"><span class="xref myst">Getting Started With Corese-python</span></a></p></li>
-</ul>
-</section>
-</section>
-<section id="compilation-from-source">
-<h1>Compilation from source<a class="headerlink" href="#compilation-from-source" title="Link to this heading">#</a></h1>
-<p>Download source code and compile.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span><span class="s2">&quot;https://github.com/Wimmics/corese.git&quot;</span>
-<span class="nb">cd</span><span class="w"> </span>corese
-mvn<span class="w"> </span>clean<span class="w"> </span>install<span class="w"> </span>-DskipTests
-</pre></div>
-</div>
 </section>
 
 
@@ -603,17 +502,9 @@ mvn<span class="w"> </span>clean<span class="w"> </span>install<span class="w"> 
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Download and install</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corese-library">Corese-library</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corese-server">Corese-server</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corese-gui">Corese-GUI</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corese-command">Corese-Command</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corese-python-beta">Corese-Python (beta)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corese-core">corese-core</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#corese-storage-plugin">corese-storage-plugin</a></li>
 </ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#compilation-from-source">Compilation from source</a></li>
-</ul>
-
   </nav></div>
 
   <div class="sidebar-secondary-item">

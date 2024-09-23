@@ -57,8 +57,8 @@
     <link rel="icon" href="_static/Corese-square-logo-transparent.svg"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Command Line Interface Reference" href="cli_ref/cli_root.html" />
-    <link rel="prev" title="User Guide" href="user_guide.html" />
+    <link rel="next" title="Java API" href="java_api/library_root.html" />
+    <link rel="prev" title="Federated Queries and Federation" href="federation/federated_and_distributed_queries.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -380,22 +380,7 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="cli_ref/cli_root.html">CLI</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli_ref/cli_sparql.html">sparql</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli_ref/cli_convert.html">convert</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli_ref/cli_shacl.html">shacl</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli_ref/cli_remote_sparql.html">remote-sparql</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli_ref/cli_canonicalize.html">canonicalize</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="rest_api/api_root.html">REST API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="rest_api/sparql.html">/sparql</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rest_api/sparql_load.html">/sparql/load</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rest_api/sparql_reset.html">/sparql/reset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="rest_api/sparql_d3.html">/sparql/d3</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="java_api/library_root.html">Java API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="java_api/library_root.html"> Java API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="java_api/classfr_1_1inria_1_1corese_1_1core_1_1CompareWithDatatypeEntailment.html">Class CompareWithDatatypeEntailment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="java_api/classfr_1_1inria_1_1corese_1_1core_1_1CompareWithoutDatatypeEntailment.html">Class CompareWithoutDatatypeEntailment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="java_api/classfr_1_1inria_1_1corese_1_1core_1_1Context.html">Class Context</a></li>
@@ -490,38 +475,6 @@ document.write(`
 <div class="sd-col sd-d-flex-row docutils">
 <div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover sd-rounded-3 docutils">
 <div class="sd-card-header docutils">
-<p class="sd-card-text">Corese command-line interface</p>
-</div>
-<div class="sd-card-body docutils">
-<p class="sd-card-text">Corese-Command is a command-line interface (CLI) for the Corese Semantic Web Factory. It facilitates:</p>
-<ul class="simple">
-<li><p class="sd-card-text">running SPARQL queries on the loaded RDF datasets and remote SPARQL endpoints</p></li>
-<li><p class="sd-card-text">converting RDF files between different serialization formats</p></li>
-<li><p class="sd-card-text">validating RDF data against SHACL shapes</p></li>
-</ul>
-<p class="sd-card-text">and more…</p>
-</div>
-<a class="sd-stretched-link reference external" href="cli_ref/cli_root.html"></a></div>
-</div>
-<div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover sd-rounded-3 docutils">
-<div class="sd-card-header docutils">
-<p class="sd-card-text">Corese REST API</p>
-</div>
-<div class="sd-card-body docutils">
-<p class="sd-card-text">The Corese server provides several functionalities available through a REST API:</p>
-<ul class="simple">
-<li><p class="sd-card-text">SPARQL endpoint</p></li>
-<li><p class="sd-card-text">SPARQL to SPIN conversion endpoint</p></li>
-<li><p class="sd-card-text">Graph Store HTTP Protocol endpoint</p></li>
-</ul>
-<p class="sd-card-text">and more…</p>
-</div>
-<a class="sd-stretched-link reference external" href="rest_api/api_root.html"></a></div>
-</div>
-<div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover sd-rounded-3 docutils">
-<div class="sd-card-header docutils">
 <p class="sd-card-text">Corese Java API</p>
 </div>
 <div class="sd-card-body docutils">
@@ -541,7 +494,39 @@ document.write(`
 <a class="sd-stretched-link reference external" href="java_api/library_root.html"></a></div>
 </div>
 <div class="sd-col sd-d-flex-row docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-rounded-3 docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover sd-rounded-3 docutils">
+<div class="sd-card-header docutils">
+<p class="sd-card-text">Corese command-line interface</p>
+</div>
+<div class="sd-card-body docutils">
+<p class="sd-card-text">Corese-Command is a command-line interface (CLI) for the Corese Semantic Web Factory. It facilitates:</p>
+<ul class="simple">
+<li><p class="sd-card-text">running SPARQL queries on the loaded RDF datasets and remote SPARQL endpoints</p></li>
+<li><p class="sd-card-text">converting RDF files between different serialization formats</p></li>
+<li><p class="sd-card-text">validating RDF data against SHACL shapes</p></li>
+</ul>
+<p class="sd-card-text">and more…</p>
+</div>
+<a class="sd-stretched-link reference external" href="https://github.com/corese-stack/corese-command/"></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover sd-rounded-3 docutils">
+<div class="sd-card-header docutils">
+<p class="sd-card-text">Corese REST API</p>
+</div>
+<div class="sd-card-body docutils">
+<p class="sd-card-text">The Corese server provides several functionalities available through a REST API:</p>
+<ul class="simple">
+<li><p class="sd-card-text">SPARQL endpoint</p></li>
+<li><p class="sd-card-text">SPARQL to SPIN conversion endpoint</p></li>
+<li><p class="sd-card-text">Graph Store HTTP Protocol endpoint</p></li>
+</ul>
+<p class="sd-card-text">and more…</p>
+</div>
+<a class="sd-stretched-link reference external" href="https://github.com/corese-stack/corese-server/"></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover sd-rounded-3 docutils">
 <div class="sd-card-header docutils">
 <p class="sd-card-text">Corese Python API</p>
 </div>
@@ -558,7 +543,7 @@ document.write(`
 </li>
 </ul>
 </div>
-</div>
+<a class="sd-stretched-link reference external" href="https://github.com/corese-stack/corese-python/"></a></div>
 </div>
 </div>
 </div>
@@ -575,20 +560,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="user_guide.html"
+       href="federation/federated_and_distributed_queries.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">User Guide</p>
+        <p class="prev-next-title">Federated Queries and Federation</p>
       </div>
     </a>
     <a class="right-next"
-       href="cli_ref/cli_root.html"
+       href="java_api/library_root.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Command Line Interface Reference</p>
+        <p class="prev-next-title">Java API</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
