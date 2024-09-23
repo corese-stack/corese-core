@@ -17,7 +17,7 @@ http://corese.inria.fr/sparql?mode=debug&query=select * {?s ?p ?o}
 
 In addition, a server can send a message back to a client by means of a JSON object returned as Linked Result. Hence, we design a communication model between sparql client-server back and forth. User writes SPARQL service or HTTP request with client/server URL parameters. Client parses and processes client parameters and sends HTTP request with server URL parameters to server. Server parses and process server parameters. Server responds to client with SPARQL Query Results augmented with a Linked Result message URL & document. Client reads server message and processes it. -->
 
-#### Prefix used in this document.
+### Prefix used in this document.
 
 ```turtle
 @prefix st:  <http://ns.inria.fr/sparql-template/> .

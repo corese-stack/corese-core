@@ -1,8 +1,8 @@
-## Download and install corese-core
+# Download and install corese-core
 
 Download from [maven-central](https://central.sonatype.com/namespace/fr.inria.corese)
 
-### corese-core
+## corese-core
 
 ```xml
 <dependency>
@@ -12,7 +12,7 @@ Download from [maven-central](https://central.sonatype.com/namespace/fr.inria.co
 </dependency>
 ```
 
-### corese-storage-plugin
+## corese-storage-plugin
 
 ```xml
 <!-- jena storage -->
