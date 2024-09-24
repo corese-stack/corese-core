@@ -20,7 +20,7 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 project = 'CORESE'
 copyright = '2024, WIMMICS'
 author = 'WIMMICS'
-release = '4.6.0'
+release = '5.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -111,13 +111,6 @@ myst_fence_as_directive = ["mermaid"]
 # items are expected / should be trimmed by.
 # https://breathe.readthedocs.io/en/latest/quickstart.html
 # https://exhale.readthedocs.io/en/latest/usage.html
-
-this_file_dir = os.path.abspath(os.path.dirname(__file__))
-repo_root = os.path.dirname(  # {repo_root}
-            os.path.dirname(  # {repo_root}/docs
-            this_file_dir     # {repo_root}/docs/source
-        )
-    ) # TODO: delete in a final version if not used
 
 # Setup the breathe extension 
 # https://breathe.readthedocs.io/en/latest/
