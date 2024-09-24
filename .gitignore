@@ -1,25 +1,81 @@
 ## #################################################################
-## git ignore
+## Generic ignores
 ## #################################################################
 
+# OS generated files
 .DS_Store
+Thumbs.db
+
+# Backup and temporary files
 *~
 *.swp
 *.lock
-profile
-build
-_build
-*.jar
-build-*
-__pycache__
-*.jar
-.ipynb_checkpoints
-\#*
-.\#*
-.vscode
-*.class
-.conda
+*.log
+*.bak
+*.tmp
+*.old
+*.#*
+.#*
 
-# maven stuff
-target
-.gradle
+# Editor specific files
+.vscode/
+.idea/
+*.iml
+
+## #################################################################
+## Java/Gradle related ignores
+## #################################################################
+
+# Gradle files
+.gradle/
+build/
+
+# Maven files
+.mvn/
+target/
+
+# Java class files
+*.class
+
+# JAR/WAR files
+*.jar
+*.war
+*.ear
+
+## #################################################################
+## IDE specific ignores
+## #################################################################
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# VSCode
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# NetBeans
+/nbproject/private/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Logs and coverage reports
+*.log
+*.out
+*.coverage
+*.reports
+
+## #################################################################
+## Miscellaneous ignores
+## #################################################################
+
+# Other build directories and generated files
+/bin/
