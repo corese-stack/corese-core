@@ -27,23 +27,27 @@ repositories {
 dependencies {
     val jersey_version = "3.0.4"
     val semargl_version = "0.7.1"
-    api("org.slf4j:slf4j-api:1.8.0-beta2")
+//    implementation("org.slf4j:slf4j-api:1.8.0-beta2")
 
 
-    api("org.apache.commons:commons-text:1.10.0")
+    implementation("org.apache.commons:commons-text:1.10.0")
     api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")
-    api("commons-lang:commons-lang:2.4")
-    api("org.slf4j:slf4j-api:1.8.0-beta2")
-    api("org.json:json:20240303")
-    api("fr.inria.lille.shexjava:shexjava-core:1.0")
-    api("org.glassfish.jersey.core:jersey-client:${jersey_version}")
-    api("org.glassfish.jersey.inject:jersey-hk2:${jersey_version}")
-    api("javax.xml.bind:jaxb-api:2.3.1")
-    api("fr.inria.corese.org.semarglproject:semargl-rdfa:${semargl_version}")
-    api("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}")
-    api("com.github.jsonld-java:jsonld-java:0.13.4")
-    runtimeOnly("org.apache.logging.log4j:log4j-slf4j18-impl:2.18.0")
-    testImplementation("junit:junit:4.13.2")
+    implementation("commons-lang:commons-lang:2.4")
+//    constraints {
+//        api("org.slf4j:slf4j-api:1.8.0-beta2")
+//    }
+    implementation("org.json:json:20240303")
+    implementation("fr.inria.lille.shexjava:shexjava-core:1.0")
+    implementation("org.glassfish.jersey.core:jersey-client:${jersey_version}")
+    implementation("org.glassfish.jersey.inject:jersey-hk2:${jersey_version}")
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
+    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:${semargl_version}")
+    implementation("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}")
+    implementation("com.github.jsonld-java:jsonld-java:0.13.4")
+//    constraints {
+//        api("org.apache.logging.log4j:log4j-slf4j18-impl:2.18.0")
+//    }
+    implementation("junit:junit:4.13.2")
 }
 
 group = "fr.inria.corese"
