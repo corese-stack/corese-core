@@ -1,0 +1,49 @@
+
+.. _namespace_fr__inria__corese__core__edge:
+
+Namespace fr::inria::corese::core::edge
+=======================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__edge__binary`
+
+- :ref:`namespace_fr__inria__corese__core__edge__internal`
+
+- :ref:`namespace_fr__inria__corese__core__edge__rule`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeBinary`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeDefault`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeEntail`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeGeneric`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeImpl`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeQuad`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTop`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTriple`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTripleNode`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1TripleNode`

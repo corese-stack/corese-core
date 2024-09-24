@@ -1,0 +1,27 @@
+.. _dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function:
+
+
+Directory function
+==================
+
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/sparql/triple``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+*Directory path:* ``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/sparql/triple/function``
+
+Subdirectories
+--------------
+
+- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate`
+- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core`
+- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension`
+- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_proxy`
+- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script`
+- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template`
+- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term`
+
+
+

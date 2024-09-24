@@ -1,0 +1,47 @@
+
+.. _file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl_JaroWinkler.java:
+
+File JaroWinkler.java
+=====================
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/approximate/algorithm/impl``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+Definition (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/approximate/algorithm/impl/JaroWinkler.java``)
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+Includes
+--------
+
+
+- ``fr.inria.corese.core.approximate.algorithm.Utils``
+
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__approximate__algorithm__impl`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1JaroWinkler`
+

@@ -1,0 +1,43 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeBinary:
+
+Class EdgeBinary
+================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeBinary.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Types
+**********
+
+- ``public EdgeTop`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTop`)
+- ``public Edge``
+
+
+Derived Types
+*************
+
+- ``public EdgeTriple`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTriple`)
+- ``public EdgeBinaryFirst`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryFirst`)
+- ``public EdgeBinaryLabel`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryLabel`)
+- ``public EdgeBinaryRest`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryRest`)
+- ``public EdgeBinarySubclass`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinarySubclass`)
+- ``public EdgeBinaryType`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryType`)
+- ``public EdgeInternal`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternal`)
+- ``public EdgeInternalDefault`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalDefault`)
+- ``public EdgeInternalEntail`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalEntail`)
+- ``public EdgeInternalRule`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalRule`)
+- ``public EdgeRuleTop`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleTop`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::edge::EdgeBinary
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

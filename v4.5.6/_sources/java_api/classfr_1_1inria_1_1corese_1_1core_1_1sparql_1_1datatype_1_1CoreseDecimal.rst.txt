@@ -1,0 +1,26 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDecimal:
+
+Class CoreseDecimal
+===================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDecimal.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public CoreseDouble`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDouble`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::datatype::CoreseDecimal
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

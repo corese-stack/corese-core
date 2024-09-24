@@ -1,0 +1,32 @@
+
+.. _namespace_fr__inria__corese__core__sparql__triple__function:
+
+Namespace fr::inria::corese::core::sparql::triple::function
+===========================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__function__aggregate`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__function__core`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__function__extension`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__function__proxy`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__function__script`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__function__template`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__function__term`

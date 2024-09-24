@@ -1,0 +1,34 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype:
+
+Class CoreseDatatype
+====================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDatatype.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public IDatatype``
+
+
+Derived Types
+*************
+
+- ``public CoreseDate`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDate`)
+- ``public CoreseNumber`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseNumber`)
+- ``public CoreseStringableImpl`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringableImpl`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::datatype::CoreseDatatype
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

@@ -1,0 +1,1377 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Class RDFResultFormat &#8212; CORESE</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+    <link rel="stylesheet" type="text/css" href="../_static/collapsible-lists/css/tree_view.css?v=a885cde7" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=0675bd48" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=cc8a4273"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/collapsible-lists/js/CollapsibleLists.compressed.js?v=73120307"></script>
+    <script src="../_static/collapsible-lists/js/apply-collapsible-lists.js?v=660e4f45"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'java_api/classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://corese-stack.github.io/corese-core/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v\d+\.\d+\.\d+';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../_static/Corese-square-logo-transparent.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Class ResultFormat" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1ResultFormat.html" />
+    <link rel="prev" title="Class RDFFormat" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFFormat.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/corese.svg" class="logo__image only-light" alt="CORESE - Home"/>
+    <script>document.write(`<img src="../_static/corese.svg" class="logo__image only-dark" alt="CORESE - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../apis.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://corese.inria.fr/">
+    Demo
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Wimmics/corese" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../apis.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://corese.inria.fr/">
+    Demo
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Wimmics/corese" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="library_root.html"> Java API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1BaseAlgorithm.html">Class BaseAlgorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1ClassHierarchy.html">Class ClassHierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1CombinedAlgorithm.html">Class CombinedAlgorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1Equality.html">Class Equality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1Jaro.html">Class Jaro</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1JaroWinkler.html">Class JaroWinkler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1NGram.html">Class NGram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1Parameters.html">Class Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1SimAlgorithmFactory.html">Class SimAlgorithmFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1Utils.html">Class Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1ext_1_1AppxSearchPlugin.html">Class AppxSearchPlugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1ext_1_1ASTRewriter.html">Class ASTRewriter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1ext_1_1TripleWrapper.html">Class TripleWrapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1strategy_1_1ApproximateStrategy.html">Class ApproximateStrategy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1strategy_1_1Priority.html">Class Priority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1CompareWithDatatypeEntailment.html">Class CompareWithDatatypeEntailment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1CompareWithoutDatatypeEntailment.html">Class CompareWithoutDatatypeEntailment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1Custom.html">Class Custom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1Hash.html">Class Hash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1Interpreter.html">Class Interpreter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1ProxyInterpreter.html">Class ProxyInterpreter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolver.html">Class QuerySolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolverOverload.html">Class QuerySolverOverload</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolverVisitor.html">Class QuerySolverVisitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolverVisitorBasic.html">Class QuerySolverVisitorBasic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolverVisitorExtension.html">Class QuerySolverVisitorExtension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1SQLFun.html">Class SQLFun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1SQLResult.html">Class SQLResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1BGP2URI.html">Class BGP2URI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1FederateVisitor.html">Class FederateVisitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1PrepareBGP.html">Class PrepareBGP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Provenance.html">Class Provenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteBGPList.html">Class RewriteBGPList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteList.html">Class RewriteList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteNamedGraph.html">Class RewriteNamedGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteService.html">Class RewriteService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteServiceGraph.html">Class RewriteServiceGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteServiceGraph_1_1ServiceGraph.html">Class RewriteServiceGraph::ServiceGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteServiceSelect.html">Class RewriteServiceSelect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteTriple.html">Class RewriteTriple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Selector.html">Class Selector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SelectorFilter.html">Class SelectorFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SelectorFilter_1_1JoinResult.html">Class SelectorFilter::JoinResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SelectorIndex.html">Class SelectorIndex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Simplify.html">Class Simplify</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Simplify_1_1ServiceList.html">Class Simplify::ServiceList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SimplifyService.html">Class SimplifyService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Sorter.html">Class Sorter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Sorter_1_1Table.html">Class Sorter::Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SorterResult.html">Class SorterResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Stack.html">Class Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1URI2BGPList.html">Class URI2BGPList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Util.html">Class Util</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1util_1_1ResourceReader.html">Class ResourceReader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1util_1_1RewriteError.html">Class RewriteError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1util_1_1RewriteErrorManager.html">Class RewriteErrorManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Checker.html">Class Checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1CompilerFacKgram.html">Class CompilerFacKgram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1CompilerKgram.html">Class CompilerKgram</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1EdgeImpl.html">Class EdgeImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1ExpandList.html">Class ExpandList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1ExpandPath.html">Class ExpandPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Extension.html">Class Extension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1FunctionCompiler.html">Class FunctionCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1NodeImpl.html">Class NodeImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Pragma.html">Class Pragma</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1QueryProfile.html">Class QueryProfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Transformer.html">Class Transformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1VisitQuery.html">Class VisitQuery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1result_1_1XMLResult.html">Class XMLResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1result_1_1XMLResult_1_1MyHandler.html">Class XMLResult::MyHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1result_1_1XMLResult_1_1VTable.html">Class XMLResult::VTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1visitor_1_1MetadataVisitor.html">Class MetadataVisitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1visitor_1_1TraceVisitor.html">Class TraceVisitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Context.html">Class Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Corese.html">Class Corese</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1DataStore.html">Class DataStore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryFirst.html">Class EdgeBinaryFirst</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryLabel.html">Class EdgeBinaryLabel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryRest.html">Class EdgeBinaryRest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinarySubclass.html">Class EdgeBinarySubclass</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryType.html">Class EdgeBinaryType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeBinary.html">Class EdgeBinary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeDefault.html">Class EdgeDefault</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeEntail.html">Class EdgeEntail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeGeneric.html">Class EdgeGeneric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeImpl.html">Class EdgeImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeQuad.html">Class EdgeQuad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTop.html">Class EdgeTop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTriple.html">Class EdgeTriple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTripleNode.html">Class EdgeTripleNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternal.html">Class EdgeInternal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalDefault.html">Class EdgeInternalDefault</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalEntail.html">Class EdgeInternalEntail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalRule.html">Class EdgeInternalRule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRule.html">Class EdgeRule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleGraph.html">Class EdgeRuleGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleSubclass.html">Class EdgeRuleSubclass</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleTop.html">Class EdgeRuleTop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleType.html">Class EdgeRuleType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1TripleNode.html">Class TripleNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1EdgeFactory.html">Class EdgeFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1EventLogger.html">Class EventLogger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1EventManager.html">Class EventManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Agent.html">Class Agent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Callback.html">Class Callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Core.html">Class Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1core_1_1Core.html">Class Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Extension.html">Class Extension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1JavaCompiler.html">Class JavaCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Report.html">Class Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Class Graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1CompareNode.html">Class Graph::CompareNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1GTable.html">Class Graph::GTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1TreeNode.html">Class Graph::TreeNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1GraphCompare.html">Class GraphCompare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1GraphCompare_1_1TBN.html">Class GraphCompare::TBN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1GraphDistance.html">Class GraphDistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1GraphObject.html">Class GraphObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1GraphStore.html">Class GraphStore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1index_1_1EdgeManager.html">Class EdgeManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1index_1_1EdgeManagerIndexer.html">Class EdgeManagerIndexer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1index_1_1EdgeManagerIterate.html">Class EdgeManagerIterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1index_1_1NodeManager.html">Class NodeManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1index_1_1NodeManager_1_1PredicateTable.html">Class NodeManager::PredicateTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1index_1_1NodeManagerBasic.html">Class NodeManagerBasic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1index_1_1PredicateList.html">Class PredicateList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1index_1_1PredicateList_1_1Cursor.html">Class PredicateList::Cursor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Checker.html">Class Checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1CompleteSPARQL.html">Class CompleteSPARQL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Distinct.html">Class Distinct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Distinct_1_1Compare.html">Class Distinct::Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Distinct_1_1TreeMapping.html">Class Distinct::TreeMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Eval.html">Class Eval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1EvalGraph.html">Class EvalGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1EvalJoin.html">Class EvalJoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1EvalOptional.html">Class EvalOptional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1EvalSPARQL.html">Class EvalSPARQL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Exp.html">Class Exp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Exp_1_1VExp.html">Class Exp::VExp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1ExpEdge.html">Class ExpEdge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1ExpHandler.html">Class ExpHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Group.html">Class Group</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Group_1_1Compare.html">Class Group::Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Group_1_1TreeMapping.html">Class Group::TreeMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1IterableEntity.html">Class IterableEntity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mapping.html">Class Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mappings.html">Class Mappings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mappings_1_1MappingSorter.html">Class Mappings::MappingSorter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mappings_1_1VariableSorter.html">Class Mappings::VariableSorter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1MappingSet.html">Class MappingSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1MappingSet_1_1Iterate.html">Class MappingSet::Iterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Memory.html">Class Memory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Merge.html">Class Merge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Merge_1_1ListMappings.html">Class Merge::ListMappings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1PointerObject.html">Class PointerObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1ProcessVisitorDefault.html">Class ProcessVisitorDefault</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Query.html">Class Query</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1QuerySorter.html">Class QuerySorter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1QuerySorter_1_1VString.html">Class QuerySorter::VString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Sorter.html">Class Sorter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1SorterNew.html">Class SorterNew</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1SparqlException.html">Class SparqlException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Stack.html">Class Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1EvalListener.html">Class EvalListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1EventImpl.html">Class EventImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1EventManager.html">Class EventManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1StatListener.html">Class StatListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1UserImpl.html">Class UserImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1filter_1_1Checker.html">Class Checker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1filter_1_1Compile.html">Class Compile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1filter_1_1MatchBind.html">Class MatchBind</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1filter_1_1Matcher.html">Class Matcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1filter_1_1Pattern.html">Class Pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Automaton.html">Class Automaton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Automaton_1_1StepList.html">Class Automaton::StepList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Automaton_1_1Table.html">Class Automaton::Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Buffer.html">Class Buffer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1GraphPath.html">Class GraphPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Path.html">Class Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1PathFinder.html">Class PathFinder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1PathFinder_1_1ITable.html">Class PathFinder::ITable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Record.html">Class Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Stack.html">Class Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1State.html">Class State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Step.html">Class Step</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Visit.html">Class Visit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Visit_1_1Compare.html">Class Visit::Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Visit_1_1DTable.html">Class Visit::DTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Visit_1_1ExpVisitedNode.html">Class Visit::ExpVisitedNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Visit_1_1LTable.html">Class Visit::LTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Visit_1_1NodeTable.html">Class Visit::NodeTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Visit_1_1Record.html">Class Visit::Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Visit_1_1VisitedNode.html">Class Visit::VisitedNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1AbstractCostModel.html">Class AbstractCostModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1Const.html">Class Const</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1QPGEdge.html">Class QPGEdge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1QPGNode.html">Class QPGNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1QPGraph.html">Class QPGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1BasicPatternGenerator.html">Class BasicPatternGenerator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1DepthFirstBestSearch.html">Class DepthFirstBestSearch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1DepthFirstSearch.html">Class DepthFirstSearch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1HeuristicsBasedEstimation.html">Class HeuristicsBasedEstimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1QPGEdgeCostModel.html">Class QPGEdgeCostModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1QPGNodeCostModel.html">Class QPGNodeCostModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1ApproximateSearchEnv.html">Class ApproximateSearchEnv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1ApproximateSearchEnv_1_1Key.html">Class ApproximateSearchEnv::Key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1ApproximateSearchEnv_1_1Value.html">Class ApproximateSearchEnv::Value</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1DistinctNode.html">Template Class DistinctNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1EdgeInv.html">Class EdgeInv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1EnvironmentImpl.html">Class EnvironmentImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1MatcherDefault.html">Class MatcherDefault</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1Message.html">Class Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1MetaIterator.html">Template Class MetaIterator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1MetaIteratorCast.html">Template Class MetaIteratorCast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1MetaProducer.html">Class MetaProducer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1NodeImpl.html">Class NodeImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1ProducerDefault.html">Class ProducerDefault</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1ResultsImpl.html">Class ResultsImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1AddTripleHelper.html">Class AddTripleHelper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1AddTripleHelper_1_1Stack.html">Class AddTripleHelper::Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1AddTripleHelperDataManager.html">Class AddTripleHelperDataManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1BuildImpl.html">Class BuildImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateImpl.html">Class CreateImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateImpl_1_1Stack.html">Class CreateImpl::Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateTriple.html">Class CreateTriple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ExtensionFilter.html">Class ExtensionFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1jsonld_1_1CoreseJsonTripleCallback.html">Class CoreseJsonTripleCallback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1jsonld_1_1JsonldLoader.html">Class JsonldLoader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load.html">Class Load</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1LoadException.html">Class LoadException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1LoadFormat.html">Class LoadFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1QueryLoad.html">Class QueryLoad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1rdfa_1_1CoreseRDFaTripleSink.html">Class CoreseRDFaTripleSink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1rdfa_1_1RDFaLoader.html">Class RDFaLoader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1SPARQLJSONResult.html">Class SPARQLJSONResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1SPARQLRDFResult.html">Class SPARQLRDFResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1SPARQLResult.html">Class SPARQLResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1SPARQLResultParser.html">Class SPARQLResultParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1XMLResult.html">Class XMLResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1XMLResult_1_1MyHandler.html">Class XMLResult::MyHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1XMLResult_1_1VTable.html">Class XMLResult::VTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1RuleLoad.html">Class RuleLoad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Service.html">Class Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ServiceParser.html">Class ServiceParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ServiceReport.html">Class ServiceReport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1BrokerDistance.html">Class BrokerDistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1BrokerDistanceDataManager.html">Class BrokerDistanceDataManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Closure.html">Class Closure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1ClosureDataManager.html">Class ClosureDataManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Distance.html">Class Distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Distance_1_1MyTable.html">Class Distance::MyTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Distance_1_1NodeList.html">Class Distance::NodeList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Distance_1_1Table.html">Class Distance::Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Entailment.html">Class Entailment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Entailment_1_1Signature.html">Class Entailment::Signature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Entailment_1_1Table.html">Class Entailment::Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1OWLProfile.html">Class OWLProfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1OWLRule.html">Class OWLRule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1NodeGraph.html">Class NodeGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1NodeGraphIndex.html">Class NodeGraphIndex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1NodeGraphIndex_1_1GraphTable.html">Class NodeGraphIndex::GraphTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1NodeGraphIndex_1_1NodeTable.html">Class NodeGraphIndex::NodeTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1NodeImpl.html">Class NodeImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1NodeIterator.html">Class NodeIterator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1CanonicalRdf10Format.html">Class CanonicalRdf10Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1CSVFormat.html">Class CSVFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1HTMLFormat.html">Class HTMLFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1JSOND3Format.html">Class JSOND3Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1JSONFormat.html">Class JSONFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1JSONLDFormat.html">Class JSONLDFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1JSONLDObject.html">Class JSONLDObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1LogManager.html">Class LogManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1Mapper.html">Class Mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1MarkdownFormat.html">Class MarkdownFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1NQuadsFormat.html">Class NQuadsFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1NTriplesFormat.html">Class NTriplesFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1QueryResultFormat.html">Class QueryResultFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1CanonicalIssuer.html">Class CanonicalIssuer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1CanonicalizationState.html">Class CanonicalizationState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1CanonicalizedDataset.html">Class CanonicalizedDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1CanonicalRdf10.html">Class CanonicalRdf10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1CanonicalRdf10_1_1CanonicalizationException.html">Class CanonicalRdf10::CanonicalizationException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1HashingUtility.html">Class HashingUtility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1ListMap.html">Template Class ListMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFFormat.html">Class RDFFormat</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Class RDFResultFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1ResultFormat.html">Class ResultFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1TemplateFormat.html">Class TemplateFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1TripleFormat.html">Class TripleFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1TSVFormat.html">Class TSVFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1XMLFormat.html">Class XMLFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1XSLTQuery.html">Class XSLTQuery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataBrokerConstructExtern.html">Class DataBrokerConstructExtern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataBrokerConstructLocal.html">Class DataBrokerConstructLocal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataBrokerExtern.html">Class DataBrokerExtern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataBrokerLocal.html">Class DataBrokerLocal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilter.html">Class DataFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterAnd.html">Class DataFilterAnd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterBoolean.html">Class DataFilterBoolean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterFactory.html">Class DataFilterFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterNot.html">Class DataFilterNot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterOr.html">Class DataFilterOr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFrom.html">Class DataFrom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataProducer.html">Class DataProducer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DFFactory.html">Class DFFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1MetadataManager.html">Class MetadataManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Cache.html">Class Cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Cache_1_1BTable.html">Class Cache::BTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Cache_1_1STable.html">Class Cache::STable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ClassHierarchy.html">Class ClassHierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1CompileService.html">Class CompileService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1CompileServiceResult.html">Class CompileServiceResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Construct.html">Class Construct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Construct_1_1CompareNode.html">Class Construct::CompareNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Construct_1_1TreeNode.html">Class Construct::TreeNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1DatasetManager.html">Class DatasetManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Describe.html">Class Describe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ExtendGraph.html">Class ExtendGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1FederatedQueryProcess.html">Class FederatedQueryProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1LogImpl.html">Class LogImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Mapper.html">Class Mapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MapperSQL.html">Class MapperSQL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatchBNode.html">Class MatchBNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatchBNode_1_1Compare.html">Class MatchBNode::Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatchBNode_1_1TreeNode.html">Class MatchBNode::TreeNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatcherImpl.html">Class MatcherImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatchIterator.html">Class MatchIterator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatchIterator_1_1GTable.html">Class MatchIterator::GTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatchIterator_1_1Table.html">Class MatchIterator::Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1PluginImpl.html">Class PluginImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1PluginTransform.html">Class PluginTransform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1PragmaImpl.html">Class PragmaImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ProducerImpl.html">Class ProducerImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ProducerImplNode.html">Class ProducerImplNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ProviderImpl.html">Class ProviderImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ProviderService.html">Class ProviderService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ProviderThread.html">Class ProviderThread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryCheck.html">Class QueryCheck</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryEngine.html">Class QueryEngine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryGraph.html">Class QueryGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html">Class QueryProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcessUpdate.html">Class QueryProcessUpdate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1RDFizer.html">Class RDFizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ResultMessage.html">Class ResultMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1SorterImpl.html">Class SorterImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1StorageFactory.html">Class StorageFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1TemplateIndex.html">Class TemplateIndex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1GraphManager.html">Class GraphManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1ManagerImpl.html">Class ManagerImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1UpdateProcess.html">Class UpdateProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Cleaner.html">Class Cleaner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Record.html">Class Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1ResultWatcher.html">Class ResultWatcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Rule.html">Class Rule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine.html">Class RuleEngine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine_1_1STable.html">Class RuleEngine::STable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleError.html">Class RuleError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Serializer.html">Class Serializer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1shacl_1_1Shacl.html">Class Shacl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1Context.html">Class Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1Qualified.html">Class Qualified</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1Shex.html">Class Shex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1ShexConstraint.html">Class ShexConstraint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1ShexShacl.html">Class ShexShacl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Datatype.html">Class Datatype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Datatype_1_1Compare.html">Class Datatype::Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Datatype_1_1TreeData.html">Class Datatype::TreeData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Header.html">Class Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1JavaCompiler.html">Class JavaCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Pattern.html">Class Pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Rewrite.html">Class Rewrite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Stack.html">Class Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseBlankNode.html">Class CoreseBlankNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseBoolean.html">Class CoreseBoolean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseCalendar.html">Class CoreseCalendar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html">Class CoreseDatatype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDate.html">Class CoreseDate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDateElement.html">Class CoreseDateElement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDateTime.html">Class CoreseDateTime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDay.html">Class CoreseDay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDecimal.html">Class CoreseDecimal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDouble.html">Class CoreseDouble</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseFloat.html">Class CoreseFloat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseGeneric.html">Class CoreseGeneric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseGenericInteger.html">Class CoreseGenericInteger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseInteger.html">Class CoreseInteger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseLiteral.html">Class CoreseLiteral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseMonth.html">Class CoreseMonth</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseNumber.html">Class CoreseNumber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseResource.html">Class CoreseResource</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseString.html">Class CoreseString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringableImpl.html">Class CoreseStringableImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringBuilder.html">Class CoreseStringBuilder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringLiteral.html">Class CoreseStringLiteral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseTriple.html">Class CoreseTriple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseUndefLiteral.html">Class CoreseUndefLiteral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseURI.html">Class CoreseURI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseURILiteral.html">Class CoreseURILiteral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseXMLLiteral.html">Class CoreseXMLLiteral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseYear.html">Class CoreseYear</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1DatatypeHierarchy.html">Class DatatypeHierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1DatatypeMap.html">Class DatatypeMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1DatatypeMap_1_1Mapping.html">Class DatatypeMap::Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseExtension.html">Class CoreseExtension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseIterate.html">Class CoreseIterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseJSON.html">Class CoreseJSON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseList.html">Class CoreseList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseMap.html">Class CoreseMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseMap_1_1TreeDatatype.html">Class CoreseMap::TreeDatatype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoresePointer.html">Class CoresePointer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseUndefFuture.html">Class CoreseUndefFuture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseXML.html">Class CoreseXML</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1function_1_1SQLFun.html">Class SQLFun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1function_1_1StringHelper.html">Class StringHelper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1function_1_1VariableResolverImpl.html">Class VariableResolverImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1function_1_1XPathFun.html">Class XPathFun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1PointerObject.html">Class PointerObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1CompileException.html">Class CompileException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1CoreseDatatypeException.html">Class CoreseDatatypeException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1CoreseException.html">Class CoreseException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1EngineException.html">Class EngineException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1LDScriptException.html">Class LDScriptException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1QueryLexicalException.html">Class QueryLexicalException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1QuerySemanticException.html">Class QuerySemanticException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1QuerySyntaxException.html">Class QuerySyntaxException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1SafetyException.html">Class SafetyException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1StopException.html">Class StopException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1UndefinedExpressionException.html">Class UndefinedExpressionException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1api_1_1Parameters.html">Class Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1cache_1_1LRUCache.html">Template Class LRUCache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1Constants.html">Class Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1FileHandler.html">Class FileHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1FileHandlersManager.html">Class FileHandlersManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1StringManager.html">Class StringManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1StringManagerDelegate.html">Class StringManagerDelegate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1StringMeta.html">Class StringMeta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1util_1_1StorageFactory.html">Class StorageFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1Aggregate.html">Class Aggregate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateAnd.html">Class AggregateAnd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateCount.html">Class AggregateCount</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateGroupConcat.html">Class AggregateGroupConcat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateList.html">Class AggregateList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateMinMax.html">Class AggregateMinMax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateSumAvg.html">Class AggregateSumAvg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateTemplate.html">Class AggregateTemplate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1Distinct.html">Class Distinct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1Distinct_1_1Compare.html">Class Distinct::Compare</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1Distinct_1_1TreeData.html">Class Distinct::TreeData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1BinaryFunction.html">Class BinaryFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1BiTriFunction.html">Class BiTriFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1BlankNode.html">Class BlankNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1Bound.html">Class Bound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1Coalesce.html">Class Coalesce</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1Concat.html">Class Concat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1DateFunction.html">Class DateFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1ExistFunction.html">Class ExistFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1Extern.html">Class Extern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1Hash.html">Class Hash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1HashFunction.html">Class HashFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1IfThenElseTerm.html">Class IfThenElseTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1StrPredicate.html">Class StrPredicate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1UnaryFunction.html">Class UnaryFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1UUIDFunction.html">Class UUIDFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1ZeroaryFunction.html">Class ZeroaryFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1BinaryExtension.html">Class BinaryExtension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Cast.html">Class Cast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Display.html">Class Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Focus.html">Class Focus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Get.html">Class Get</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1GetGen.html">Class GetGen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1IOFunction.html">Class IOFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Iterate.html">Class Iterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1JSONTerm.html">Class JSONTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1ListBinary.html">Class ListBinary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1ListNary.html">Class ListNary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1ListSort.html">Class ListSort</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1ListTerm.html">Class ListTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1ListUnary.html">Class ListUnary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1MapTerm.html">Class MapTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Namespace.html">Class Namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1PathLength.html">Class PathLength</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Rest.html">Class Rest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1ResultFormater.html">Class ResultFormater</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Size.html">Class Size</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1SPINFormater.html">Class SPINFormater</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Swap.html">Class Swap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1SystemFunction.html">Class SystemFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1TernaryExtension.html">Class TernaryExtension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1TripleAccess.html">Class TripleAccess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1UnaryExtension.html">Class UnaryExtension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1XML.html">Class XML</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1ZeroAry.html">Class ZeroAry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1proxy_1_1GraphFunction.html">Class GraphFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1proxy_1_1GraphSpecificFunction.html">Class GraphSpecificFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1proxy_1_1Introspection.html">Class Introspection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1ErrorFunction.html">Class ErrorFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Eval.html">Class Eval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1EventCall.html">Class EventCall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Extension.html">Class Extension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1ForLoop.html">Class ForLoop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Funcall.html">Class Funcall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Function.html">Class Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1FunctionDefined.html">Class FunctionDefined</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Javacall.html">Class Javacall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1JavaCast.html">Class JavaCast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1JavaDScall.html">Class JavaDScall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1JavaFunction.html">Class JavaFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1LDScript.html">Class LDScript</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Let.html">Class Let</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MapAnyEvery.html">Class MapAnyEvery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MapFunction.html">Class MapFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MethodCall.html">Class MethodCall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MethodTypeCall.html">Class MethodTypeCall</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Reduce.html">Class Reduce</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Return.html">Class Return</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Self.html">Class Self</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Sequence.html">Class Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1SetFunction.html">Class SetFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Statement.html">Class Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Throw.html">Class Throw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1TryCatch.html">Class TryCatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplates.html">Class ApplyTemplates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplatesWith.html">Class ApplyTemplatesWith</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplatesWithGraph.html">Class ApplyTemplatesWithGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CallTemplate.html">Class CallTemplate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CallTemplateWith.html">Class CallTemplateWith</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CGetSetContext.html">Class CGetSetContext</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1FocusNode.html">Class FocusNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1GetSetContext.html">Class GetSetContext</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1Prefix.html">Class Prefix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateAccess.html">Class TemplateAccess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFormat.html">Class TemplateFormat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFunction.html">Class TemplateFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFuture.html">Class TemplateFuture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateNumber.html">Class TemplateNumber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateProcess.html">Class TemplateProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateVisitor.html">Class TemplateVisitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1Turtle.html">Class Turtle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1AndTerm.html">Class AndTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1Binding.html">Class Binding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1Binding_1_1Share.html">Class Binding::Share</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1DivTerm.html">Class DivTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1EQ.html">Class EQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1GE.html">Class GE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1GT.html">Class GT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1In.html">Class In</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1LE.html">Class LE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1LT.html">Class LT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1MinusTerm.html">Class MinusTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1MultTerm.html">Class MultTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1NEQ.html">Class NEQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1NotTerm.html">Class NotTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1Operation.html">Class Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1OrTerm.html">Class OrTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1PlusTerm.html">Class PlusTerm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1TermEval.html">Class TermEval</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1JavaccParseException.html">Class JavaccParseException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1JavaCharStream.html">Class JavaCharStream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1ParseException.html">Class ParseException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SimpleCharStream.html">Class SimpleCharStream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCorese.html">Class SparqlCorese</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCorese_1_1JJCalls.html">Class SparqlCorese::JJCalls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCorese_1_1LookaheadSuccess.html">Class SparqlCorese::LookaheadSuccess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseTokenManager.html">Class SparqlCoreseTokenManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1Token.html">Class Token</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1TokenMgrError.html">Class TokenMgrError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access.html">Class Access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access_1_1FeatureLevel.html">Class Access::FeatureLevel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1AccessNamespace.html">Class AccessNamespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1AccessNamespace_1_1NSMap.html">Class AccessNamespace::NSMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1AccessRight.html">Class AccessRight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1AccessRightDefinition.html">Class AccessRightDefinition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1AccessRightDefinition_1_1AccessMap.html">Class AccessRightDefinition::AccessMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1And.html">Class And</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTBuffer.html">Class ASTBuffer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTExtension.html">Class ASTExtension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTExtension_1_1FunMap.html">Class ASTExtension::FunMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTFactory.html">Class ASTFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTObject.html">Class ASTObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTPrinter.html">Class ASTPrinter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTQuery.html">Class ASTQuery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTQuery_1_1ExprTable.html">Class ASTQuery::ExprTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTSelector.html">Class ASTSelector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTTemplate.html">Class ASTTemplate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Atom.html">Class Atom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1BasicGraphPattern.html">Class BasicGraphPattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1BasicGraphPattern_1_1Table.html">Class BasicGraphPattern::Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Binary.html">Class Binary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Bind.html">Class Bind</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Binding.html">Class Binding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Constant.html">Class Constant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Context.html">Class Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1context_1_1ContextLog.html">Class ContextLog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1context_1_1LinkedResultLog.html">Class LinkedResultLog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1context_1_1PropertyMap.html">Class PropertyMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1context_1_1SubjectMap.html">Class SubjectMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Dataset.html">Class Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exist.html">Class Exist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exp.html">Class Exp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Expression.html">Class Expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ExpressionList.html">Class ExpressionList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ExtractList.html">Class ExtractList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Filter.html">Class Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1HashMapList.html">Template Class HashMapList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Join.html">Class Join</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1LoadTurtle.html">Class LoadTurtle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Metadata.html">Class Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Minus.html">Class Minus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1NSManager.html">Class NSManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Optional.html">Class Optional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ParserHandler.html">Class ParserHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ParserSparql1.html">Class ParserSparql1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Processor.html">Class Processor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Query.html">Class Query</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1RDFList.html">Class RDFList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Scope.html">Class Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Score.html">Class Score</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Service.html">Class Service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Source.html">Class Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1SourceExp.html">Class SourceExp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Term.html">Class Term</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1TopExp.html">Class TopExp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Triple.html">Class Triple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Union.html">Class Union</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1URLServer.html">Class URLServer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Values.html">Class Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Variable.html">Class Variable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1VariableLocal.html">Class VariableLocal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1VariableScope.html">Class VariableScope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1visitor_1_1ASTParser.html">Class ASTParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1visitor_1_1ASTParser_1_1BNodeMap.html">Class ASTParser::BNodeMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1visitor_1_1ASTWalker.html">Class ASTWalker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1visitor_1_1ExpressionVisitorVariable.html">Class ExpressionVisitorVariable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1visitor_1_1Record.html">Class Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1printer_1_1SPIN.html">Class SPIN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1ASTUpdate.html">Class ASTUpdate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Basic.html">Class Basic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Composite.html">Class Composite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Update.html">Class Update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Start.html">Class Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1BaseMap.html">Class BaseMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1HashBucket.html">Class HashBucket</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1ReducedMap.html">Class ReducedMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1ReducedMap_1_1ValueComparator.html">Class ReducedMap::ValueComparator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1SimpleAverage.html">Class SimpleAverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1TripleHashTable.html">Class TripleHashTable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1TripleHashTable2.html">Class TripleHashTable2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1TripleHashTable2_1_1Tuple.html">Class TripleHashTable2::Tuple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1TripleHashTable_1_1Triple.html">Class TripleHashTable::Triple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1WrappedNode.html">Class WrappedNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1Options.html">Class Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1StatsBasedEstimation.html">Class StatsBasedEstimation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1storage_1_1CoreseGraphDataManager.html">Class CoreseGraphDataManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1storage_1_1CoreseGraphDataManagerBuilder.html">Class CoreseGraphDataManagerBuilder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1storage_1_1DataManagerJava.html">Class DataManagerJava</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1ContextBuilder.html">Class ContextBuilder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1DefaultVisitor.html">Class DefaultVisitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Loader.html">Class Loader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Stack.html">Class Stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Table.html">Class Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1TemplatePrinter.html">Class TemplatePrinter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Transformer.html">Class Transformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1TransformerMapping.html">Class TransformerMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1TransformerVisitor.html">Class TransformerVisitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1CompareMappings.html">Class CompareMappings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1CompareMappings_1_1TBN.html">Class CompareMappings::TBN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Duplicate.html">Class Duplicate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Example.html">Class Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Extension.html">Class Extension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1GraphListen.html">Class GraphListen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1GraphListenerImpl.html">Class GraphListenerImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1MappingComparator.html">Class MappingComparator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1MappingComparator_1_1TBN.html">Class MappingComparator::TBN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1MappingsGraph.html">Class MappingsGraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Parameter.html">Class Parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Property.html">Class Property</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Property_1_1Pair.html">Class Property::Pair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1QueryGraphVisitorImpl.html">Class QueryGraphVisitorImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1QueryGraphVisitorImpl_1_1Table.html">Class QueryGraphVisitorImpl::Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1SPINProcess.html">Class SPINProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Tool.html">Class Tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1ValueResolverImpl.html">Class ValueResolverImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1ldpath_1_1AST.html">Class AST</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1ldpath_1_1LinkedDataPath.html">Class LinkedDataPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1ldpath_1_1QueryProcessThread.html">Class QueryProcessThread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1ldpath_1_1Result.html">Class Result</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorRule.html">Class QuerySolverVisitorRule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorRuleUser.html">Class QuerySolverVisitorRuleUser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorTransformer.html">Class QuerySolverVisitorTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorTransformerUser.html">Class QuerySolverVisitorTransformerUser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorUser.html">Class QuerySolverVisitorUser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1Workflow.html">Class Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AssertProcess.html">Class AssertProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1CompositeProcess.html">Class CompositeProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1Data.html">Class Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1DatasetProcess.html">Class DatasetProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1FunctionProcess.html">Class FunctionProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1LoadProcess.html">Class LoadProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ParallelProcess.html">Class ParallelProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ProbeProcess.html">Class ProbeProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ResultProcess.html">Class ResultProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1RuleProcess.html">Class RuleProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticProcess.html">Class SemanticProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticWorkflow.html">Class SemanticWorkflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ShapeWorkflow.html">Class ShapeWorkflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SPARQLProcess.html">Class SPARQLProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TestProcess.html">Class TestProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TransformationProcess.html">Class TransformationProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowParser.html">Class WorkflowParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowParser_1_1SWMap.html">Class WorkflowParser::SWMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowProcess.html">Class WorkflowProcess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1strategy_1_1AlgType.html">Enum AlgType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1strategy_1_1StrategyType.html">Enum StrategyType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1Event.html">Enum Event</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1GraphDistance_1_1Mode.html">Enum Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1PointerType.html">Enum PointerType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1HashingUtility_1_1HashAlgorithm.html">Enum HashAlgorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1print_1_1XMLFormat_1_1Title.html">Enum Title</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1query_1_1DatasetManager_1_1TypeDataBase.html">Enum TypeDataBase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine_1_1Profile.html">Enum Profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1IDatatype_1_1NodeKind.html">Enum NodeKind</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1api_1_1Parameters_1_1type.html">Enum type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access_1_1Feature.html">Enum Feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access_1_1Level.html">Enum Level</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access_1_1Mode.html">Enum Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1VariableScope_1_1Scope.html">Enum Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumfr_1_1inria_1_1corese_1_1core_1_1util_1_1Property_1_1Value.html">Enum Value</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../apis.html" class="nav-link">CORESE APIs</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="library_root.html" class="nav-link">Java API</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Class...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="class-rdfresultformat">
+<span id="exhale-class-classfr-1-1inria-1-1corese-1-1core-1-1print-1-1rdfresultformat"></span><h1>Class RDFResultFormat<a class="headerlink" href="#class-rdfresultformat" title="Link to this heading">#</a></h1>
+<ul class="simple">
+<li><p>Defined in <a class="reference internal" href="file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_RDFResultFormat.java.html#file-builds-actions-runners-work-corese-core-corese-core-src-main-java-fr-inria-corese-core-print-rdfresultformat-java"><span class="std std-ref">File RDFResultFormat.java</span></a></p></li>
+</ul>
+<section id="inheritance-relationships">
+<h2>Inheritance Relationships<a class="headerlink" href="#inheritance-relationships" title="Link to this heading">#</a></h2>
+<section id="base-types">
+<h3>Base Types<a class="headerlink" href="#base-types" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">public</span> <span class="pre">QueryResultFormat</span></code> (<a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1QueryResultFormat.html#exhale-class-classfr-1-1inria-1-1corese-1-1core-1-1print-1-1queryresultformat"><span class="std std-ref">Class QueryResultFormat</span></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">public</span> <span class="pre">Graphable</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="class-documentation">
+<h2>Class Documentation<a class="headerlink" href="#class-documentation" title="Link to this heading">#</a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core5print15RDFResultFormatE">
+<span id="_CPPv3N2fr5inria6corese4core5print15RDFResultFormatE"></span><span id="_CPPv2N2fr5inria6corese4core5print15RDFResultFormatE"></span><span id="fr::inria::corese::core::print::RDFResultFormat"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RDFResultFormat</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1QueryResultFormat.html#_CPPv4N2fr5inria6corese4core5print17QueryResultFormatE" title="fr::inria::corese::core::print::QueryResultFormat"><span class="n"><span class="pre">QueryResultFormat</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">Graphable</span></span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormatE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Generate Turtle W3C RDF Format for Mappings (bindings in RDF) </p>
+<p><dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>Olivier Corby, Wimmics INRIA I3S, 2014 </p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8toStringEv">
+<span id="_CPPv3N2fr5inria6corese4core5print15RDFResultFormat8toStringEv"></span><span id="_CPPv2N2fr5inria6corese4core5print15RDFResultFormat8toStringEv"></span><span id="fr::inria::corese::core::print::RDFResultFormat::toString"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat_1ad146fa8579a5f8a876c4688cc5a68520"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">String</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">toString</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8toStringEv" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core5print15RDFResultFormat7toGraphEv">
+<span id="_CPPv3N2fr5inria6corese4core5print15RDFResultFormat7toGraphEv"></span><span id="_CPPv2N2fr5inria6corese4core5print15RDFResultFormat7toGraphEv"></span><span id="fr::inria::corese::core::print::RDFResultFormat::toGraph"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat_1a590dfce67c11600fb0b9af98981a7f17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">String</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">toGraph</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat7toGraphEv" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8setGraphE6Object">
+<span id="_CPPv3N2fr5inria6corese4core5print15RDFResultFormat8setGraphE6Object"></span><span id="_CPPv2N2fr5inria6corese4core5print15RDFResultFormat8setGraphE6Object"></span><span id="fr::inria::corese::core::print::RDFResultFormat::setGraph__Object"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat_1a767d4cfd778026c6f5d73fb262aef52a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setGraph</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Object</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">obj</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8setGraphE6Object" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8getGraphEv">
+<span id="_CPPv3N2fr5inria6corese4core5print15RDFResultFormat8getGraphEv"></span><span id="_CPPv2N2fr5inria6corese4core5print15RDFResultFormat8getGraphEv"></span><span id="fr::inria::corese::core::print::RDFResultFormat::getGraph"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat_1a121b2d1217b0cd725231fef150d69b43"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Object</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getGraph</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8getGraphEv" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core5print15RDFResultFormat11getMappingsEv">
+<span id="_CPPv3N2fr5inria6corese4core5print15RDFResultFormat11getMappingsEv"></span><span id="_CPPv2N2fr5inria6corese4core5print15RDFResultFormat11getMappingsEv"></span><span id="fr::inria::corese::core::print::RDFResultFormat::getMappings"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat_1a374758198d0d422a231659f267a85e0d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Mappings</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getMappings</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat11getMappingsEv" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core5print15RDFResultFormat11setMappingsE8Mappings">
+<span id="_CPPv3N2fr5inria6corese4core5print15RDFResultFormat11setMappingsE8Mappings"></span><span id="_CPPv2N2fr5inria6corese4core5print15RDFResultFormat11setMappingsE8Mappings"></span><span id="fr::inria::corese::core::print::RDFResultFormat::setMappings__Mappings"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat_1a2b79c61be0c85e7231e2f36129350637"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setMappings</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Mappings</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat11setMappingsE8Mappings" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core5print15RDFResultFormat6createE8Mappings">
+<span id="_CPPv3N2fr5inria6corese4core5print15RDFResultFormat6createE8Mappings"></span><span id="_CPPv2N2fr5inria6corese4core5print15RDFResultFormat6createE8Mappings"></span><span id="fr::inria::corese::core::print::RDFResultFormat::create__Mappings"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat_1a8dd15d5ad2f8b6c2cc3172de314d4353"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormatE" title="fr::inria::corese::core::print::RDFResultFormat"><span class="n"><span class="pre">RDFResultFormat</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">create</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Mappings</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">m</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat6createE8Mappings" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFFormat.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Class RDFFormat</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="classfr_1_1inria_1_1corese_1_1core_1_1print_1_1ResultFormat.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Class ResultFormat</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inheritance-relationships">Inheritance Relationships</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#base-types">Base Types</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#class-documentation">Class Documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormatE"><code class="docutils literal notranslate"><span class="pre">RDFResultFormat</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8toStringEv"><code class="docutils literal notranslate"><span class="pre">RDFResultFormat::toString()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat7toGraphEv"><code class="docutils literal notranslate"><span class="pre">RDFResultFormat::toGraph()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8setGraphE6Object"><code class="docutils literal notranslate"><span class="pre">RDFResultFormat::setGraph()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat8getGraphEv"><code class="docutils literal notranslate"><span class="pre">RDFResultFormat::getGraph()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat11getMappingsEv"><code class="docutils literal notranslate"><span class="pre">RDFResultFormat::getMappings()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat11setMappingsE8Mappings"><code class="docutils literal notranslate"><span class="pre">RDFResultFormat::setMappings()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core5print15RDFResultFormat6createE8Mappings"><code class="docutils literal notranslate"><span class="pre">RDFResultFormat::create()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/java_api/classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFResultFormat.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, WIMMICS.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

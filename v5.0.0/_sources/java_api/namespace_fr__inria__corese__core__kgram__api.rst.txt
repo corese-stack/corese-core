@@ -1,0 +1,22 @@
+
+.. _namespace_fr__inria__corese__core__kgram__api:
+
+Namespace fr::inria::corese::core::kgram::api
+=============================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__kgram__api__core`
+
+- :ref:`namespace_fr__inria__corese__core__kgram__api__query`

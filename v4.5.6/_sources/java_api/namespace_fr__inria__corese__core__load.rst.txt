@@ -1,0 +1,61 @@
+
+.. _namespace_fr__inria__corese__core__load:
+
+Namespace fr::inria::corese::core::load
+=======================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__load__jsonld`
+
+- :ref:`namespace_fr__inria__corese__core__load__rdfa`
+
+- :ref:`namespace_fr__inria__corese__core__load__result`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1AddTripleHelper`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1AddTripleHelper_1_1Stack`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1AddTripleHelperDataManager`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1BuildImpl`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateImpl`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateImpl_1_1Stack`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateTriple`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ExtensionFilter`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1LoadException`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1LoadFormat`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1QueryLoad`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1RuleLoad`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Service`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ServiceParser`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ServiceReport`

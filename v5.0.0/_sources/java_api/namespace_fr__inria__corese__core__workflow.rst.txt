@@ -1,0 +1,56 @@
+
+.. _namespace_fr__inria__corese__core__workflow:
+
+Namespace fr::inria::corese::core::workflow
+===========================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AssertProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1CompositeProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1Data`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1DatasetProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1FunctionProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1LoadProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ParallelProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ProbeProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ResultProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1RuleProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticWorkflow`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ShapeWorkflow`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SPARQLProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TestProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TransformationProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowParser`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowParser_1_1SWMap`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowProcess`

@@ -1,0 +1,32 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataBrokerLocal:
+
+Class DataBrokerLocal
+=====================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataBrokerLocal.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public DataBroker``
+
+
+Derived Type
+************
+
+- ``public DataBrokerConstructLocal`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataBrokerConstructLocal`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::producer::DataBrokerLocal
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

@@ -1,0 +1,24 @@
+
+.. _namespace_fr__inria__corese__core__approximate:
+
+Namespace fr::inria::corese::core::approximate
+==============================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__approximate__algorithm`
+
+- :ref:`namespace_fr__inria__corese__core__approximate__ext`
+
+- :ref:`namespace_fr__inria__corese__core__approximate__strategy`

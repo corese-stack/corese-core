@@ -1,0 +1,13 @@
+
+.. _namespace_fr__inria__corese__core__storage__api__dataManager:
+
+Namespace fr::inria::corese::core::storage::api::dataManager
+============================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+

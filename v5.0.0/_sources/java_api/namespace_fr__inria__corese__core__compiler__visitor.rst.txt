@@ -1,0 +1,22 @@
+
+.. _namespace_fr__inria__corese__core__compiler__visitor:
+
+Namespace fr::inria::corese::core::compiler::visitor
+====================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1visitor_1_1MetadataVisitor`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1visitor_1_1TraceVisitor`

@@ -1,0 +1,37 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateImpl:
+
+Class CreateImpl
+================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_CreateImpl.java`
+
+
+Nested Relationships
+--------------------
+
+
+Nested Types
+************
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateImpl_1_1Stack`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Types
+**********
+
+- ``public CreateTriple`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateTriple`)
+- ``public Creator``
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::load::CreateImpl
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

@@ -1,0 +1,34 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterBoolean:
+
+Class DataFilterBoolean
+=======================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataFilterBoolean.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public DataFilter`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilter`)
+
+
+Derived Types
+*************
+
+- ``public DataFilterAnd`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterAnd`)
+- ``public DataFilterNot`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterNot`)
+- ``public DataFilterOr`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilterOr`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::producer::DataFilterBoolean
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

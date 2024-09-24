@@ -1,0 +1,36 @@
+
+.. _namespace_fr__inria__corese__core__sparql__datatype__extension:
+
+Namespace fr::inria::corese::core::sparql::datatype::extension
+==============================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseExtension`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseIterate`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseJSON`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseList`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseMap`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseMap_1_1TreeDatatype`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoresePointer`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseUndefFuture`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseXML`

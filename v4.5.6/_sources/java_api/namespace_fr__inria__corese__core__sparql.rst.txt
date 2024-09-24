@@ -18,3 +18,13 @@ Namespaces
 
 
 - :ref:`namespace_fr__inria__corese__core__sparql__api`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__compiler`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__datatype`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__exceptions`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__storage`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple`

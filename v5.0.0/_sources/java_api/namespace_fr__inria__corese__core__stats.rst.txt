@@ -1,0 +1,29 @@
+
+.. _namespace_fr__inria__corese__core__stats:
+
+Namespace fr::inria::corese::core::stats
+========================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__stats__data`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1Options`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1StatsBasedEstimation`

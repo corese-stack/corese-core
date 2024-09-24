@@ -1,0 +1,38 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1Aggregate:
+
+Class Aggregate
+===============
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_Aggregate.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public LDScript``
+
+
+Derived Types
+*************
+
+- ``public AggregateAnd`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateAnd`)
+- ``public AggregateCount`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateCount`)
+- ``public AggregateGroupConcat`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateGroupConcat`)
+- ``public AggregateList`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateList`)
+- ``public AggregateMinMax`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateMinMax`)
+- ``public AggregateSumAvg`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateSumAvg`)
+- ``public AggregateTemplate`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1aggregate_1_1AggregateTemplate`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::function::aggregate::Aggregate
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

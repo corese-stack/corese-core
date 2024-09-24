@@ -1,0 +1,47 @@
+
+.. _file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1_DepthFirstBestSearch.java:
+
+File DepthFirstBestSearch.java
+==============================
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/kgram/sorter/impl/qpv1``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+Definition (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/kgram/sorter/impl/qpv1/DepthFirstBestSearch.java``)
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+Includes
+--------
+
+
+- ``static``
+
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__kgram__sorter__impl__qpv1`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1DepthFirstBestSearch`
+

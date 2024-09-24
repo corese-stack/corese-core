@@ -1,0 +1,20 @@
+
+.. _namespace_java:
+
+Namespace java
+==============
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_java__io`

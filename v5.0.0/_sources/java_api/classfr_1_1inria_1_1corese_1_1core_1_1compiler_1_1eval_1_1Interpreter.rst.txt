@@ -1,0 +1,28 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1Interpreter:
+
+Class Interpreter
+=================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_Interpreter.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Types
+**********
+
+- ``public Computer``
+- ``public Evaluator``
+- ``public ExprType``
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::compiler::eval::Interpreter
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

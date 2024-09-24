@@ -1,0 +1,23 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1Binding_1_1Share:
+
+Class Binding::Share
+====================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_Binding.java`
+
+
+Nested Relationships
+--------------------
+
+This class is a nested type of :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1Binding`.
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::function::term::Binding::Share
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

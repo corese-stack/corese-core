@@ -1,0 +1,36 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1ReducedMap:
+
+Class ReducedMap
+================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data_ReducedMap.java`
+
+
+Nested Relationships
+--------------------
+
+
+Nested Types
+************
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1ReducedMap_1_1ValueComparator`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public BaseMap`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1BaseMap`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::stats::data::ReducedMap
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

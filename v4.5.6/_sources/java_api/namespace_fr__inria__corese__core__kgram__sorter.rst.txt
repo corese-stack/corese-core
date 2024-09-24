@@ -1,0 +1,22 @@
+
+.. _namespace_fr__inria__corese__core__kgram__sorter:
+
+Namespace fr::inria::corese::core::kgram::sorter
+================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__kgram__sorter__core`
+
+- :ref:`namespace_fr__inria__corese__core__kgram__sorter__impl`

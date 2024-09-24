@@ -1,0 +1,32 @@
+
+.. _namespace_fr__inria__corese__core__sparql__triple:
+
+Namespace fr::inria::corese::core::sparql::triple
+=================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__api`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__cst`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__function`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__javacc1`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__parser`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__printer`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__triple__update`

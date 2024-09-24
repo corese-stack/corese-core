@@ -1,0 +1,34 @@
+
+.. _file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Graphable.java:
+
+File Graphable.java
+===================
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/kgram/api/query``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+Definition (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/kgram/api/query/Graphable.java``)
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__kgram__api__query`
+

@@ -1,0 +1,37 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1visitor_1_1ASTParser:
+
+Class ASTParser
+===============
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_visitor_ASTParser.java`
+
+
+Nested Relationships
+--------------------
+
+
+Nested Types
+************
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1visitor_1_1ASTParser_1_1BNodeMap`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Types
+**********
+
+- ``public Walker``
+- ``public URLParam`` (:ref:`exhale_interface_interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1URLParam`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::parser::visitor::ASTParser
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

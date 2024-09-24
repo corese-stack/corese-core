@@ -1,0 +1,46 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFunction:
+
+Class TemplateFunction
+======================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_TemplateFunction.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public LDScript``
+
+
+Derived Types
+*************
+
+- ``public ApplyTemplates`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplates`)
+- ``public ApplyTemplatesWith`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplatesWith`)
+- ``public ApplyTemplatesWithGraph`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplatesWithGraph`)
+- ``public CGetSetContext`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CGetSetContext`)
+- ``public CallTemplate`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CallTemplate`)
+- ``public CallTemplateWith`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CallTemplateWith`)
+- ``public FocusNode`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1FocusNode`)
+- ``public GetSetContext`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1GetSetContext`)
+- ``public Prefix`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1Prefix`)
+- ``public TemplateAccess`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateAccess`)
+- ``public TemplateFormat`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFormat`)
+- ``public TemplateFuture`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFuture`)
+- ``public TemplateNumber`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateNumber`)
+- ``public TemplateVisitor`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateVisitor`)
+- ``public Turtle`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1Turtle`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::function::template::TemplateFunction
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

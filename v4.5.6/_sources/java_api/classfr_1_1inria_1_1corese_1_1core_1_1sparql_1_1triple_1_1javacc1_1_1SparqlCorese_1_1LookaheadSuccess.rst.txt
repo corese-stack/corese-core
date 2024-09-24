@@ -1,0 +1,32 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCorese_1_1LookaheadSuccess:
+
+Class SparqlCorese::LookaheadSuccess
+====================================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_SparqlCorese.java`
+
+
+Nested Relationships
+--------------------
+
+This class is a nested type of :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCorese`.
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public Error``
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::javacc1::SparqlCorese::LookaheadSuccess
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

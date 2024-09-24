@@ -1,0 +1,91 @@
+
+.. _namespace_fr__inria__corese__core__sparql__datatype:
+
+Namespace fr::inria::corese::core::sparql::datatype
+===================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__sparql__datatype__extension`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__datatype__function`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseBlankNode`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseBoolean`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseCalendar`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDate`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDateElement`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDateTime`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDay`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDecimal`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDouble`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseFloat`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseGeneric`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseGenericInteger`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseInteger`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseLiteral`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseMonth`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseNumber`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseResource`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseString`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringableImpl`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringBuilder`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringLiteral`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseTriple`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseUndefLiteral`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseURI`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseURILiteral`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseXMLLiteral`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseYear`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1DatatypeHierarchy`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1DatatypeMap`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1DatatypeMap_1_1Mapping`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1PointerObject`

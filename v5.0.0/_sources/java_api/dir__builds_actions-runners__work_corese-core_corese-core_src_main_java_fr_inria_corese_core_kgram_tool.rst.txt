@@ -1,0 +1,33 @@
+.. _dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool:
+
+
+Directory tool
+==============
+
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/kgram``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+*Directory path:* ``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/kgram/tool``
+
+
+Files
+-----
+
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_ApproximateSearchEnv.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_DistinctNode.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_EdgeInv.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_EntityImpl.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_EnvironmentImpl.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_MatcherDefault.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_Message.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_MetaIterator.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_MetaIteratorCast.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_MetaProducer.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_NodeImpl.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_ProducerDefault.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_ResultsImpl.java`
+
+

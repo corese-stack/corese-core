@@ -1,0 +1,28 @@
+.. _dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension:
+
+
+Directory extension
+===================
+
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/sparql/datatype``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+*Directory path:* ``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/sparql/datatype/extension``
+
+
+Files
+-----
+
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseExtension.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseIterate.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseJSON.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseList.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseMap.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoresePointer.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseUndefFuture.java`
+- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseXML.java`
+
+

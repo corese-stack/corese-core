@@ -1,0 +1,34 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Core:
+
+Class Core
+==========
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_Core.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Types
+**********
+
+- ``public PluginImpl``
+- ``public FunctionEvaluator``
+
+
+Derived Types
+*************
+
+- ``public Callback`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Callback`)
+- ``public Extension`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Extension`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::extension::Core
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

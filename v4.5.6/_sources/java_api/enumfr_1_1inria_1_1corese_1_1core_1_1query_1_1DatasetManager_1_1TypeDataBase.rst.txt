@@ -1,0 +1,14 @@
+.. _exhale_enum_enumfr_1_1inria_1_1corese_1_1core_1_1query_1_1DatasetManager_1_1TypeDataBase:
+
+Enum TypeDataBase
+=================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_DatasetManager.java`
+
+
+Enum Documentation
+------------------
+
+
+.. doxygenenum:: fr::inria::corese::core::query::DatasetManager::TypeDataBase
+   :project: corese

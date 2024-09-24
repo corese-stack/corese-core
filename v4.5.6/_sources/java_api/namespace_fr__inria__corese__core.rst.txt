@@ -17,7 +17,49 @@ Namespaces
 ----------
 
 
+- :ref:`namespace_fr__inria__corese__core__api`
+
+- :ref:`namespace_fr__inria__corese__core__approximate`
+
+- :ref:`namespace_fr__inria__corese__core__compiler`
+
+- :ref:`namespace_fr__inria__corese__core__edge`
+
+- :ref:`namespace_fr__inria__corese__core__extension`
+
+- :ref:`namespace_fr__inria__corese__core__index`
+
+- :ref:`namespace_fr__inria__corese__core__kgram`
+
+- :ref:`namespace_fr__inria__corese__core__load`
+
+- :ref:`namespace_fr__inria__corese__core__logic`
+
+- :ref:`namespace_fr__inria__corese__core__print`
+
+- :ref:`namespace_fr__inria__corese__core__producer`
+
+- :ref:`namespace_fr__inria__corese__core__query`
+
+- :ref:`namespace_fr__inria__corese__core__rule`
+
+- :ref:`namespace_fr__inria__corese__core__shacl`
+
+- :ref:`namespace_fr__inria__corese__core__shex`
+
 - :ref:`namespace_fr__inria__corese__core__sparql`
+
+- :ref:`namespace_fr__inria__corese__core__stats`
+
+- :ref:`namespace_fr__inria__corese__core__storage`
+
+- :ref:`namespace_fr__inria__corese__core__transform`
+
+- :ref:`namespace_fr__inria__corese__core__util`
+
+- :ref:`namespace_fr__inria__corese__core__visitor`
+
+- :ref:`namespace_fr__inria__corese__core__workflow`
 
 
 Classes

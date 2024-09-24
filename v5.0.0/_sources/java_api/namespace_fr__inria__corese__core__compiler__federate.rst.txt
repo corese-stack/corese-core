@@ -1,0 +1,75 @@
+
+.. _namespace_fr__inria__corese__core__compiler__federate:
+
+Namespace fr::inria::corese::core::compiler::federate
+=====================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__compiler__federate__util`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1BGP2URI`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1FederateVisitor`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1PrepareBGP`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Provenance`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteBGPList`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteList`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteNamedGraph`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteService`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteServiceGraph`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteServiceGraph_1_1ServiceGraph`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteServiceSelect`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteTriple`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Selector`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SelectorFilter`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SelectorFilter_1_1JoinResult`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SelectorIndex`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Simplify`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Simplify_1_1ServiceList`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SimplifyService`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Sorter`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Sorter_1_1Table`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SorterResult`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Stack`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1URI2BGPList`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Util`

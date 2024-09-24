@@ -26,7 +26,7 @@ Base Types
 
 - ``public GraphObject`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphObject`)
 - ``public Iterable< Edge >``
-- ``public Graph``
+- ``public Graph`` (:ref:`exhale_interface_interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1Graph`)
 - ``public Graphable``
 - ``public TripleStore``
 

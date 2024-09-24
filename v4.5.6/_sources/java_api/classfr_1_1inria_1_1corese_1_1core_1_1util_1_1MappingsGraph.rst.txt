@@ -1,0 +1,26 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1util_1_1MappingsGraph:
+
+Class MappingsGraph
+===================
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_MappingsGraph.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public Graphable``
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::util::MappingsGraph
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

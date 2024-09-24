@@ -31,12 +31,472 @@ Namespaces
 .. toctree::
    :maxdepth: 5
 
+   namespace_fr__inria__corese__core__api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__approximate.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__approximate__algorithm.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__approximate__algorithm__impl.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__approximate__ext.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__approximate__strategy.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__compiler.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__compiler__api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__compiler__eval.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__compiler__federate.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__compiler__federate__util.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__compiler__parser.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__compiler__result.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__compiler__visitor.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__edge.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__edge__binary.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__edge__internal.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__edge__rule.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__extension.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__extension__core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__index.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__api__core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__api__query.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__event.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__filter.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__path.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__sorter.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__sorter__core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__sorter__impl.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__sorter__impl__qpv1.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__kgram__tool.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__load.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__load__jsonld.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__load__rdfa.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__load__result.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__logic.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__print.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__print__rdfc10.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__producer.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__query.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__query__update.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__rule.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__shacl.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__shex.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__shex__shacl.rst
+
+.. toctree::
+   :maxdepth: 5
+
    namespace_fr__inria__corese__core__sparql.rst
 
 .. toctree::
    :maxdepth: 5
 
    namespace_fr__inria__corese__core__sparql__api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__compiler.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__compiler__java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__datatype.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__datatype__extension.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__datatype__function.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__exceptions.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__storage.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__storage__api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__storage__cache.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__storage__fs.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__storage__util.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__cst.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__function.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__function__aggregate.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__function__core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__function__extension.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__function__proxy.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__function__script.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__function__template.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__function__term.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__javacc1.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__parser.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__parser__context.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__parser__visitor.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__printer.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__sparql__triple__update.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__stats.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__stats__data.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__storage.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__storage__api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__storage__api__dataManager.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__transform.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__util.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__visitor.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__visitor__ldpath.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__visitor__solver.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_fr__inria__corese__core__workflow.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_java__io.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_org.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_org__xml.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   namespace_org__xml__sax.rst
 
 Directories
 ***********
@@ -77,9 +537,904 @@ Directories
 
    dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core.rst
 
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_ext.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_strategy.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_util.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_result.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_visitor.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_binary.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_internal.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_rule.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_index.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_filter.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_jsonld.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_rdfa.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_result.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_rdfc10.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_update.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_rule.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shacl.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shex.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shex_shacl.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_compiler.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_compiler_java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_function.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_cache.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_fs.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_util.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_cst.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_proxy.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_context.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_visitor.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_printer.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_update.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_api.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_api_dataManager.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_ldpath.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_solver.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow.rst
+
 Files
 *****
 
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core_AbstractCostModel.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_AbstractProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Access.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_AccessNamespace.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_AccessRight.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_AccessRightDefinition.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_AddTripleHelper.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_AddTripleHelperDataManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_Agent.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_Aggregate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_AggregateAnd.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_AggregateCount.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_AggregateGroupConcat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_AggregateList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_AggregateMinMax.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_AggregateSumAvg.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_AggregateTemplate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_strategy_AlgType.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_And.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_AndTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_ApplyTemplates.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_ApplyTemplatesWith.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_ApplyTemplatesWithGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_ApproximateSearchEnv.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_strategy_ApproximateStrategy.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_ext_AppxSearchPlugin.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_AssertProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_AST.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_ldpath_AST.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ASTBuffer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ASTExtension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ASTFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ASTObject.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_visitor_ASTParser.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ASTPrinter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_ASTQ.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ASTQuery.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_ext_ASTRewriter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ASTSelector.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ASTTemplate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_update_ASTUpdate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_api_ASTVisitable.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_api_ASTVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_visitor_ASTWalker.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Atom.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_Automaton.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl_BaseAlgorithm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data_BaseMap.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_update_Basic.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_BasicGraphPattern.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1_BasicPatternGenerator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_BGP2URI.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_BgpGenerator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Binary.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_BinaryExtension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_BinaryFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Bind.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Binder.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_Binding.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Binding.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_BiTriFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_BlankNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_Bound.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_BrokerDistance.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_BrokerDistanceDataManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_Buffer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_Build.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_BuildImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_Cache.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_Callback.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_CallTemplate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_CallTemplateWith.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_rdfc10_CanonicalIssuer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_rdfc10_CanonicalizationState.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_rdfc10_CanonicalizedDataset.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_rdfc10_CanonicalRdf10.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_CanonicalRdf10Format.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Cast.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_CGetSetContext.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_Checker.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Checker.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_filter_Checker.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl_ClassHierarchy.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_ClassHierarchy.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_rule_Cleaner.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_Closure.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_ClosureDataManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_Coalesce.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl_CombinedAlgorithm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_CompareMappings.java.rst
 
 .. toctree::
    :maxdepth: 5
@@ -94,7 +1449,132 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_filter_Compile.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_CompileException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_Compiler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_CompilerFacKgram.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_CompilerFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_CompilerKgram.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_CompileService.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_CompileServiceResult.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_CompleteSPARQL.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_update_Composite.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_CompositeProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_Computer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_ComputerProxy.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_Concat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core_Const.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shex_shacl_Constant.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Constant.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_fs_Constants.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_Construct.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Context.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shex_shacl_Context.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Context.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_ContextBuilder.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_context_ContextLog.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_Core.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_core_Core.java.rst
 
 .. toctree::
    :maxdepth: 5
@@ -104,7 +1584,502 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseBlankNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseBoolean.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseCalendar.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDatatype.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_CoreseDatatypeException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDateElement.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDateTime.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDay.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDecimal.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseDouble.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_CoreseException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseExtension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseFloat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseGeneric.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseGenericInteger.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_CoreseGraphDataManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_CoreseGraphDataManagerBuilder.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseInteger.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseIterate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseJSON.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_jsonld_CoreseJsonTripleCallback.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseLiteral.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseMap.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseMonth.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseNumber.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoresePointer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_rdfa_CoreseRDFaTripleSink.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseResource.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseString.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseStringableImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseStringBuilder.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseStringLiteral.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseTriple.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseUndefFuture.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseUndefLiteral.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseURI.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseURILiteral.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_extension_CoreseXML.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseXMLLiteral.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_CoreseYear.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_CreateImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_CreateTriple.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_api_Creator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_Cst.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_CSVFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_Custom.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_Data.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_DataBroker.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_DataBrokerConstruct.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataBrokerConstructExtern.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataBrokerConstructLocal.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataBrokerExtern.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataBrokerLocal.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataFilter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataFilterAnd.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataFilterBoolean.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataFilterFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataFilterNot.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataFilterOr.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataFrom.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_api_dataManager_DataManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_api_dataManager_DataManagerBuilder.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_DataManagerJava.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_api_dataManager_DataManagerRead.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_storage_api_dataManager_DataManagerUpdate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DataProducer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Dataset.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_DatasetManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_DatasetProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_DataStore.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_compiler_java_Datatype.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_DatatypeHierarchy.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_DatatypeMap.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_DatatypeValue.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_DatatypeValueFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_DateFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_DefaultVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1_DepthFirstBestSearch.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1_DepthFirstSearch.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_Describe.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_DFFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Display.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_Distance.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Distinct.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_aggregate_Distinct.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_DistinctNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_DivTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_DQPFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_Duplicate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_Edge.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeBinary.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_binary_EdgeBinaryFirst.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_binary_EdgeBinaryLabel.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_binary_EdgeBinaryRest.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_binary_EdgeBinarySubclass.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_binary_EdgeBinaryType.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeDefault.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeEntail.java.rst
 
 .. toctree::
    :maxdepth: 5
@@ -114,12 +2089,222 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeGeneric.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_EdgeImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_internal_EdgeInternal.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_internal_EdgeInternalDefault.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_internal_EdgeInternalEntail.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_internal_EdgeInternalRule.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_EdgeInv.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_index_EdgeManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_index_EdgeManagerIndexer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_index_EdgeManagerIterate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeQuad.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_rule_EdgeRule.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_rule_EdgeRuleGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_rule_EdgeRuleSubclass.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_rule_EdgeRuleTop.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_rule_EdgeRuleType.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeTop.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeTriple.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_EdgeTripleNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_api_ElementClause.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_Engine.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_EngineException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_Entailment.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_EntityImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Environment.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_EnvironmentImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_EQ.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl_Equality.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_ErrorFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Eval.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Eval.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_EvalGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_EvalJoin.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_EvalListener.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_EvalOptional.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_EvalSPARQL.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Evaluator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Event.java.rst
 
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_Event.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_EventCall.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_EventHandler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_EventImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_EventListener.java.rst
 
 .. toctree::
    :maxdepth: 5
@@ -134,7 +2319,262 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_EventManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_Example.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Exist.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_ExistFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Exp.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Exp.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_ExpandList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_ExpandPath.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_ExpEdge.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_ExpHandler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_ExpPattern.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_Expr.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Expression.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ExpressionList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_api_ExpressionVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_visitor_ExpressionVisitorVariable.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_ExprLabel.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_ExprType.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_ExpType.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_ExtendGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_Extension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_Extension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_filter_Extension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Extension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_Extension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_ExtensionFilter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_Extern.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ExtractList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_FederatedQueryProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_api_FederateMerge.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_FederateVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_fs_FileHandler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_fs_FileHandlersManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_Filter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Filter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Focus.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_FocusNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_ForLoop.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Funcall.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Function.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_FunctionCompiler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_FunctionDefined.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_FunctionEvaluator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_FunctionProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_GE.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Get.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_GetGen.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_GetSetContext.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Graph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_Graph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_Graph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Graphable.java.rst
 
 .. toctree::
    :maxdepth: 5
@@ -149,7 +2589,47 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_proxy_GraphFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_GraphListen.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_GraphListener.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_GraphListenerImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_update_GraphManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_GraphObject.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_GraphPath.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_GraphProcessor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_proxy_GraphSpecificFunction.java.rst
 
 .. toctree::
    :maxdepth: 5
@@ -159,7 +2639,587 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Group.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_GT.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_Hash.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_Hash.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data_HashBucket.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_HashFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_rdfc10_HashingUtility.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_HashMapList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_compiler_java_Header.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1_HeuristicsBasedEstimation.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Hierarchy.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_HTMLFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_cache_ICache.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_IDatatype.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_IDatatypeList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core_IEstimate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_IfThenElseTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_IGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_ILoadSerialization.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_IModel.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_In.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Index.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_Interpreter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_proxy_Introspection.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_IOFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core_IProducerQP.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_ISimAlgorithm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core_ISort.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_IStats.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_api_IStorage.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_IterableEntity.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Iterate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl_Jaro.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl_JaroWinkler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Javacall.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_JavaCast.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_JavaccParseException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_JavaCharStream.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_JavaCompiler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_compiler_java_JavaCompiler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_JavaDScall.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_JavaFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Join.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_JSOND3Format.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_JSONFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_JSONLDFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_jsonld_JsonldLoader.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_JSONLDObject.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_JSONTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_cst_Keyword.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_cst_KeywordPP.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_LDScript.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_LDScriptException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_LE.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Let.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_ldpath_LinkedDataPath.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_context_LinkedResultLog.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_ListBinary.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_rdfc10_ListMap.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_ListNary.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_ListSort.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_ListTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_ListUnary.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_Load.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_Loader.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_Loader.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_LoadException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_LoadFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_LoadProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_LoadTurtle.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_Log.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_LogImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_cst_LogKey.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_LogManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_Loopable.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_cache_LRUCache.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_LT.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_update_Manager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_update_ManagerImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_MapAnyEvery.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_MapFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_Mapper.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_Mapper.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_MapperSQL.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Mapping.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_MappingComparator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Mappings.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_MappingSet.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_MappingsGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_MapTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_MarkdownFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_filter_MatchBind.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_MatchBNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Matcher.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_filter_Matcher.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_MatcherDefault.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_MatcherImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_MatchIterator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Memory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Merge.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_Message.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Message.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Metadata.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_producer_MetadataManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_visitor_MetadataVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_MetaIterator.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_MetaIteratorCast.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_MetaProducer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_MethodCall.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_MethodTypeCall.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Minus.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_MinusTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_MultTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Namespace.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_NEQ.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_impl_NGram.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_Node.java.rst
 
 .. toctree::
    :maxdepth: 5
@@ -174,6 +3234,16 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_NodeImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_NodeImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_NodeImpl.java.rst
 
 .. toctree::
@@ -184,7 +3254,967 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_index_NodeManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_index_NodeManagerBasic.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_NotTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_NQuadsFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_NSManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_NTriplesFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_Operation.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Optional.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_Options.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_OrTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_OWL.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_OWLProfile.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_OWLRule.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_ParallelProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_Parameter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_Parameters.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_api_Parameters.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_ParseException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ParserHandler.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_ParserSparql1.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_Path.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_PathFinder.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_PathLength.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_filter_Pattern.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_compiler_java_Pattern.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Plugin.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_PluginImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_PluginTransform.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_PlusTerm.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_Pointerable.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_PointerObject.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_PointerObject.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_PointerType.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_Pragma.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_PragmaImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_index_PredicateList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_Prefix.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_PrepareBGP.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_PreProcessor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_strategy_Priority.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_ProbeProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Processor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_ProcessVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_ProcessVisitorDefault.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Producer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_ProducerDefault.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_ProducerImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_ProducerImplNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_Property.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_context_PropertyMap.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_Provenance.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Provider.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_ProviderImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_ProviderService.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_ProviderThread.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_ProxyInterpreter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core_QPGEdge.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1_QPGEdgeCostModel.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core_QPGNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_impl_qpv1_QPGNodeCostModel.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_sorter_core_QPGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shex_shacl_Qualified.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Query.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Query.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_QueryCheck.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_QueryEngine.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_QueryGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_QueryGraphVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_QueryGraphVisitorImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_QueryLexicalException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_QueryLoad.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_QueryProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_ldpath_QueryProcessThread.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_QueryProcessUpdate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_QueryProfile.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_QueryResultFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_QuerySemanticException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_QuerySolver.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_QuerySolverOverload.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_QuerySolverVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_QuerySolverVisitorBasic.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_QuerySolverVisitorExtension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_solver_QuerySolverVisitorRule.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_solver_QuerySolverVisitorRuleUser.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_solver_QuerySolverVisitorTransformer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_solver_QuerySolverVisitorTransformerUser.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_solver_QuerySolverVisitorUser.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_QuerySorter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_QuerySyntaxException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_api_QueryVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_QueryVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_RDF.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_RDF.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_rdfa_RDFaLoader.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_RDFFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_RDFizer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_RDFList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_RDFResultFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_RDFS.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_cst_RDFS.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_Record.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_rule_Record.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_visitor_Record.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Reduce.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data_ReducedMap.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_Regex.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_extension_Report.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_util_ResourceReader.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Rest.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Result.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_visitor_ldpath_Result.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_ResultFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_ResultFormatDef.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_ResultFormater.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_ResultListener.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_ResultMessage.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_ResultProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_Results.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_tool_ResultsImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_rule_ResultWatcher.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Return.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_compiler_java_Rewrite.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_RewriteBGPList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_util_RewriteError.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_util_RewriteErrorManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_util_RewriteErrorMessage.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_RewriteList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_RewriteNamedGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_RewriteService.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_RewriteServiceGraph.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_RewriteServiceSelect.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_RewriteTriple.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_rule_Rule.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_rule_RuleEngine.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_rule_RuleError.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_RuleLoad.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_RuleProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_SafetyException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Scope.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Score.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_Selector.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_SelectorFilter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_SelectorIndex.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Self.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_SemanticProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_SemanticWorkflow.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Sequence.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Serializer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_Service.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Service.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_ServiceParser.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_ServiceReport.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_SetFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shacl_Shacl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_ShapeWorkflow.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shex_shacl_Shex.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shex_shacl_ShexConstraint.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shex_shacl_ShexShacl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_SimAlgorithmFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data_SimpleAverage.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_SimpleCharStream.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_Simplify.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_SimplifyService.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Size.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_logic_SKOS.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_Sorter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Sorter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_SorterImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_SorterNew.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_SorterResult.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Source.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_SourceExp.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_SparqlCorese.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_SparqlCoreseConstants.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_SparqlCoreseTokenManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_query_SPARQLEngine.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_SparqlException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_result_SPARQLJSONResult.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_SPARQLProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_result_SPARQLRDFResult.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_result_SPARQLResult.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_result_SPARQLResultParser.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_printer_SPIN.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_SPINFormater.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_SPINProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_SQLFun.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_function_SQLFun.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_eval_SQLResult.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_Stack.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_core_Stack.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_Stack.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_compiler_java_Stack.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_Stack.java.rst
 
 .. toctree::
    :maxdepth: 5
@@ -194,16 +4224,496 @@ Files
 .. toctree::
    :maxdepth: 5
 
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_State.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Statement.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_StatListener.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_StatsBasedEstimation.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_Step.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_StopException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_StorageFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_util_StorageFactory.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_strategy_StrategyType.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_function_StringHelper.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_fs_StringManager.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_fs_StringManagerDelegate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_storage_fs_StringMeta.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_StrPredicate.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_context_SubjectMap.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_Swap.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_SystemFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_Table.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_Tagger.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_TemplateAccess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_TemplateFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_TemplateFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_TemplateFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_TemplateFuture.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_TemplateIndex.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_TemplateNumber.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_TemplatePrinter.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_TemplateProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_TemplateVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_TemplateVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Term.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_term_TermEval.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_TernaryExtension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_TestProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_Throw.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_Token.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_javacc1_TokenMgrError.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_util_Tool.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_TopExp.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_visitor_TraceVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_TransformationProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_Transformer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_Transformer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_TransformerMapping.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_transform_TransformerVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_TransformProcessor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_api_TransformVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Triple.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_TripleAccess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_TripleFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data_TripleHashTable.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data_TripleHashTable2.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_edge_TripleNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_api_core_TripleStore.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_ext_TripleWrapper.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_TryCatch.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_TSVFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_template_Turtle.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_UnaryExtension.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_UnaryFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_exceptions_UndefinedExpressionException.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Union.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_update_Update.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_query_update_UpdateProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_URI2BGPList.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_URLParam.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_URLServer.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_User.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_event_UserImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_federate_Util.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_approximate_algorithm_Utils.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_UUIDFunction.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_ValueResolver.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_ValueResolverImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Values.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Variable.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_VariableLocal.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_function_VariableResolver.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_function_VariableResolverImpl.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_VariableScope.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_kgram_path_Visit.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_parser_VisitQuery.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_api_Walker.java.rst
 
 .. toctree::
    :maxdepth: 5
 
    file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_Workflow.java.rst
 
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_WorkflowParser.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_WorkflowProcess.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_WorkflowVisitor.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_stats_data_WrappedNode.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_XML.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_XMLFormat.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_compiler_result_XMLResult.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_result_XMLResult.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_function_XPathFun.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_datatype_XSD.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_XSLTQuery.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_extension_ZeroAry.java.rst
+
+.. toctree::
+   :maxdepth: 5
+
+   file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_ZeroaryFunction.java.rst
+
 Pages
 *****
 
+
+.. toctree::
+   :maxdepth: 5
+
+   page_todo.rst
 
 .. toctree::
    :maxdepth: 5

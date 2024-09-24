@@ -1,0 +1,37 @@
+
+.. _namespace_fr__inria__corese__core__extension:
+
+Namespace fr::inria::corese::core::extension
+============================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__extension__core`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Agent`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Callback`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Core`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Extension`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1JavaCompiler`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Report`

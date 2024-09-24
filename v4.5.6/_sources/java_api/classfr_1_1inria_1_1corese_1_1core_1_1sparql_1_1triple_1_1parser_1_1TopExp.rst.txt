@@ -1,0 +1,33 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1TopExp:
+
+Class TopExp
+============
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_TopExp.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public ASTVisitable``
+
+
+Derived Types
+*************
+
+- ``public Exp`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exp`)
+- ``public Expression`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Expression`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::parser::TopExp
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

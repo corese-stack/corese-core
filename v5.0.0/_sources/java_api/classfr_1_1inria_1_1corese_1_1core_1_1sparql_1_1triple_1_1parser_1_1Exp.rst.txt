@@ -1,0 +1,39 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exp:
+
+Class Exp
+=========
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_parser_Exp.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Types
+**********
+
+- ``public TopExp`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1TopExp`)
+- ``public Iterable< Exp >``
+
+
+Derived Types
+*************
+
+- ``public And`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1And`)
+- ``public Binary`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Binary`)
+- ``public Binding`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Binding`)
+- ``public Filter`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Filter`)
+- ``public Query`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Query`)
+- ``public Triple`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Triple`)
+- ``public Values`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Values`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::parser::Exp
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

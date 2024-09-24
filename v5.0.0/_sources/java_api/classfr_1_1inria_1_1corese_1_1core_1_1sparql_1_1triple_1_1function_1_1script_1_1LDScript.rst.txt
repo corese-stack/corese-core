@@ -1,0 +1,44 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1LDScript:
+
+Class LDScript
+==============
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_script_LDScript.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public TermEval``
+
+
+Derived Types
+*************
+
+- ``public ErrorFunction`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1ErrorFunction`)
+- ``public Eval`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Eval`)
+- ``public Extension`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Extension`)
+- ``public Funcall`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Funcall`)
+- ``public FunctionDefined`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1FunctionDefined`)
+- ``public JavaCast`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1JavaCast`)
+- ``public JavaFunction`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1JavaFunction`)
+- ``public Return`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Return`)
+- ``public Self`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Self`)
+- ``public Sequence`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Sequence`)
+- ``public SetFunction`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1SetFunction`)
+- ``public Statement`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Statement`)
+- ``public Throw`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Throw`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::function::script::LDScript
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

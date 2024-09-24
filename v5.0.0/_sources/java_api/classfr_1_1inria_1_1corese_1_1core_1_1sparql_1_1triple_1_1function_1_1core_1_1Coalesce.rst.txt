@@ -1,0 +1,26 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1Coalesce:
+
+Class Coalesce
+==============
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_sparql_triple_function_core_Coalesce.java`
+
+
+Inheritance Relationships
+-------------------------
+
+Base Type
+*********
+
+- ``public TermEval``
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::sparql::triple::function::core::Coalesce
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

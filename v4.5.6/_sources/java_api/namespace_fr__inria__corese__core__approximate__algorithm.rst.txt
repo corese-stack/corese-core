@@ -1,0 +1,31 @@
+
+.. _namespace_fr__inria__corese__core__approximate__algorithm:
+
+Namespace fr::inria::corese::core::approximate::algorithm
+=========================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__approximate__algorithm__impl`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1Parameters`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1SimAlgorithmFactory`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1Utils`

@@ -1,0 +1,20 @@
+
+.. _namespace_org:
+
+Namespace org
+=============
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_org__xml`

@@ -1,0 +1,38 @@
+
+.. _namespace_fr__inria__corese__core__stats__data:
+
+Namespace fr::inria::corese::core::stats::data
+==============================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1BaseMap`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1HashBucket`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1ReducedMap`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1ReducedMap_1_1ValueComparator`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1SimpleAverage`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1TripleHashTable`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1TripleHashTable2`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1TripleHashTable2_1_1Tuple`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1TripleHashTable_1_1Triple`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1WrappedNode`

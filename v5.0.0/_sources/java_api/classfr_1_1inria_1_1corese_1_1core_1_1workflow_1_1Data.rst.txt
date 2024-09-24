@@ -1,0 +1,17 @@
+.. _exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1Data:
+
+Class Data
+==========
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_workflow_Data.java`
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: fr::inria::corese::core::workflow::Data
+   :project: corese
+   :members:
+   :protected-members:
+   :undoc-members:

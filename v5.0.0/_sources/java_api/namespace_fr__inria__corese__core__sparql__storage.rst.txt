@@ -1,0 +1,26 @@
+
+.. _namespace_fr__inria__corese__core__sparql__storage:
+
+Namespace fr::inria::corese::core::sparql::storage
+==================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__sparql__storage__api`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__storage__cache`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__storage__fs`
+
+- :ref:`namespace_fr__inria__corese__core__sparql__storage__util`

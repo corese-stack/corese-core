@@ -1,0 +1,52 @@
+
+.. _namespace_fr__inria__corese__core__sparql__triple__function__template:
+
+Namespace fr::inria::corese::core::sparql::triple::function::template
+=====================================================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplates`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplatesWith`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1ApplyTemplatesWithGraph`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CallTemplate`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CallTemplateWith`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1CGetSetContext`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1FocusNode`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1GetSetContext`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1Prefix`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateAccess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFormat`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFunction`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateFuture`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateNumber`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateProcess`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1TemplateVisitor`
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1Turtle`
