@@ -39,7 +39,7 @@ jobs:
         source /builds/miniconda3/etc/profile.d/conda.sh
         conda activate corese-core-documentation
         sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${sourcedir}/java_api'
-        chmod u+x docs/swticher_generator.sh
+        chmod u+x docs/switcher_generator.sh
         ./docs/switcher_generator.sh build/html/switcher.json build/html/index.html
 
     - name: Deploy to GitHub Pages
