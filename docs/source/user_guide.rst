@@ -7,7 +7,7 @@ User Guide
    Getting started <getting_started/getting_started_with_corese-core.md>
    Storage systems <storage/configuring_and_connecting_to_different_storage_systems_in_corese.md>
    Federated and distributed queries <federation/federated_and_distributed_queries.md>
-   SPARQL service extension <advanced/SPARQL_service_extension.md>
+   SPARQL service extension <advanced/SPARQL_Service_Extension.md>
 
 `Getting started with corese-core <getting_started/getting_started_with_corese-core.html>`_
 --------------
