@@ -30,3 +30,10 @@ To this end a script must be executed and write the output to the output html di
 ```
 
 Both sphinx-multiversion and switcher_generator work on tags following the ```^v[0-9]+\.[0-9]+\.[0-9]+$``` syntax and ordered by refname.
+
+## Alternatives
+
+Alternatively, one may want to build the raw doxygen documentation:
+
+- Update the Doxyfile to set GENERATE_HTML variable to YES
+- Run doxygen in the docs/source directory
