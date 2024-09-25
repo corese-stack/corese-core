@@ -12,7 +12,7 @@ Finally, the sixth part describes how to define and use functions with the [LDSc
 
 ## 1. Installation
 
-Installations instructions are available on the [Corese-Command GitHub repository](https://github.com/Wimmics/corese).
+Installations instructions are available on the [installation page](../install.md).
 
 ## 2. Graph
 
