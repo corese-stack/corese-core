@@ -16,12 +16,6 @@ Base Types
 - ``public Loader``
 
 
-Derived Type
-************
-
-- ``public QueryLoad`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1load_1_1QueryLoad`)
-
-
 Class Documentation
 -------------------
 

@@ -19,68 +19,22 @@ Namespaces
 
 - :ref:`namespace_fr__inria__corese__core__api`
 
-- :ref:`namespace_fr__inria__corese__core__approximate`
-
-- :ref:`namespace_fr__inria__corese__core__compiler`
-
-- :ref:`namespace_fr__inria__corese__core__edge`
-
-- :ref:`namespace_fr__inria__corese__core__extension`
-
-- :ref:`namespace_fr__inria__corese__core__index`
-
-- :ref:`namespace_fr__inria__corese__core__kgram`
-
 - :ref:`namespace_fr__inria__corese__core__load`
-
-- :ref:`namespace_fr__inria__corese__core__logic`
 
 - :ref:`namespace_fr__inria__corese__core__print`
 
-- :ref:`namespace_fr__inria__corese__core__producer`
-
 - :ref:`namespace_fr__inria__corese__core__query`
-
-- :ref:`namespace_fr__inria__corese__core__rule`
 
 - :ref:`namespace_fr__inria__corese__core__shacl`
 
-- :ref:`namespace_fr__inria__corese__core__shex`
-
 - :ref:`namespace_fr__inria__corese__core__sparql`
 
-- :ref:`namespace_fr__inria__corese__core__stats`
-
-- :ref:`namespace_fr__inria__corese__core__storage`
-
 - :ref:`namespace_fr__inria__corese__core__transform`
-
-- :ref:`namespace_fr__inria__corese__core__util`
-
-- :ref:`namespace_fr__inria__corese__core__visitor`
-
-- :ref:`namespace_fr__inria__corese__core__workflow`
 
 
 Classes
 -------
 
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1CompareWithDatatypeEntailment`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1CompareWithoutDatatypeEntailment`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Context`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Corese`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1DataStore`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1EdgeFactory`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1EventLogger`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1EventManager`
 
 - :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Graph`
 
@@ -89,40 +43,3 @@ Classes
 - :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1GTable`
 
 - :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1TreeNode`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphCompare`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphCompare_1_1TBN`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphDistance`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphObject`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphStore`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1NodeGraph`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1NodeGraphIndex`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1NodeGraphIndex_1_1GraphTable`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1NodeGraphIndex_1_1NodeTable`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1NodeImpl`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1NodeIterator`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Serializer`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Start`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1ValueResolverImpl`
-
-- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Workflow`
-
-
-Enums
------
-
-
-- :ref:`exhale_enum_enumfr_1_1inria_1_1corese_1_1core_1_1Event`

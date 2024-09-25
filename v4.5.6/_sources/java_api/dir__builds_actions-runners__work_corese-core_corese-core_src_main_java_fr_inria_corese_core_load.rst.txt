@@ -12,32 +12,10 @@ Directory load
 
 *Directory path:* ``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/load``
 
-Subdirectories
---------------
-
-- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_jsonld`
-- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_rdfa`
-- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_result`
-
 
 Files
 -----
 
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_AddTripleHelper.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_AddTripleHelperDataManager.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_Build.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_BuildImpl.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_CreateImpl.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_CreateTriple.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_ExtensionFilter.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_ILoadSerialization.java`
 - :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_Load.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_LoadException.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_LoadFormat.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_QueryLoad.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_RuleLoad.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_Service.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_ServiceParser.java`
-- :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_load_ServiceReport.java`
 
 

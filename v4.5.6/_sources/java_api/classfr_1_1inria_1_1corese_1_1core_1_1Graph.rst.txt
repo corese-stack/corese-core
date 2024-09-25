@@ -24,17 +24,11 @@ Inheritance Relationships
 Base Types
 **********
 
-- ``public GraphObject`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphObject`)
+- ``public GraphObject``
 - ``public Iterable< Edge >``
-- ``public Graph`` (:ref:`exhale_interface_interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1Graph`)
+- ``public Graph``
 - ``public Graphable``
 - ``public TripleStore``
-
-
-Derived Type
-************
-
-- ``public GraphStore`` (:ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1GraphStore`)
 
 
 Class Documentation
