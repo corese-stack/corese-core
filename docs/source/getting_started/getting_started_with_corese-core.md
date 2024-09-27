@@ -1,6 +1,6 @@
-# Getting Started With corese-core
+# Getting started with corese-core
 
-This tutorial show how to use the corese-core framework through simple examples of the main features.
+This tutorial show how to use the corese-core library through simple examples of the main features.
 We assume a basic knowledge in Java programming and in semantic web.
 
 The first part describes how to create, load and export a Graph.

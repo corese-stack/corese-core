@@ -59,18 +59,18 @@ Corese is a software platform implementing and extending the standards of the Se
    
       Corese offers several interfaces
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      * `corese-core <user_guide.html#corese-core>`_: Java library to process RDF data and use Corese features via an API.
-      * `corese-server  <user_guide.html#corese-server>`_: Tool to easily create, configure and manage SPARQL endpoints.
-      * `corese-gui <install.html#corese-gui>`_: Graphical interface that allows an easy and visual use of Corese features.
-      * `corese-python (beta) <user_guide.html#corese-python>`_: Python wrapper for accessing and manipulating RDF data with Corese features using py4j.
-      * `corese-command (beta)  <user_guide.html#corese-command>`_: Command Line Interface for Corese that allows users to interact with Corese features from the terminal.
+      * `corese-core <https://corese-stack.github.io/corese-core/>`_: Java library to process RDF data and use Corese features via an API.
+      * `corese-server  <https://corese-stack.github.io/corese-server/>`_: Tool to easily create, configure and manage SPARQL endpoints.
+      * `corese-gui <https://corese-stack.github.io/corese-gui/>`_: Graphical interface that allows an easy and visual use of Corese features.
+      * `corese-python (beta) <https://corese-stack.github.io/corese-python/>`_: Python wrapper for accessing and manipulating RDF data with Corese features using py4j.
+      * `corese-command (beta)  <https://corese-stack.github.io/corese-command/>`_: Command Line Interface for Corese that allows users to interact with Corese features from the terminal.
 
 .. raw:: html
 
    <h3>Contributions and discussions</h3>
 
-.. _discussion forum: https://github.com/Wimmics/corese/discussions/
-.. _issue reports: https://github.com/Wimmics/corese/issues/
+.. _discussion forum: https://github.com/orgs/corese-stack/discussions
+.. _issue reports: https://github.com/corese-stack/corese-core/issues
 .. _pull requests: https://github.com/Wimmics/corese/pulls/
 
 For support questions, comments, and any ideas for improvements you’d like to discuss, please use our `discussion forum`_. We welcome everyone to contribute to `issue reports`_, suggest new features, and create `pull requests`_.
