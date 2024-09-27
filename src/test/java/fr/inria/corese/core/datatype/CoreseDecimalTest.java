@@ -1,4 +1,4 @@
-package fr.inria.corese.datatype;
+package fr.inria.corese.core.datatype;
 
 import static org.junit.Assert.assertEquals;
 

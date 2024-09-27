@@ -1,4 +1,4 @@
-package fr.inria.corese.core.sparql.benchmark.lubm;
+package fr.inria.corese.sparql.benchmark.lubm;
 
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.Graph;

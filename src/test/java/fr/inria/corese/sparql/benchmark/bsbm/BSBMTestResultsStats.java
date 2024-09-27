@@ -1,4 +1,4 @@
-package fr.inria.corese.core.sparql.benchmark.bsbm;
+package fr.inria.corese.sparql.benchmark.bsbm;
 
 import java.io.File;
 import java.io.IOException;

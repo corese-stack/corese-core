@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.corese.core.sparql;
+package fr.inria.corese.sparql;
 
 import fr.inria.corese.core.sparql.exceptions.QueryLexicalException;
 import fr.inria.corese.core.sparql.exceptions.QuerySyntaxException;

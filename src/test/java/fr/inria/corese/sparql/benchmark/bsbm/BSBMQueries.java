@@ -1,4 +1,4 @@
-package fr.inria.corese.core.sparql.benchmark.bsbm;
+package fr.inria.corese.sparql.benchmark.bsbm;
 
 /**
  * Concrete BSBM queries (replace the variables to constants)

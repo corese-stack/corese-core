@@ -1,4 +1,4 @@
-package fr.inria.corese.core.sparql.benchmark.dbpsb;
+package fr.inria.corese.sparql.benchmark.dbpsb;
 
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.Graph;

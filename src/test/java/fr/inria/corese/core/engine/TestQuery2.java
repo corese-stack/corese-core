@@ -1,4 +1,4 @@
-package fr.inria.corese.engine;
+package fr.inria.corese.core.engine;
 
 import static org.junit.Assert.assertEquals;
 

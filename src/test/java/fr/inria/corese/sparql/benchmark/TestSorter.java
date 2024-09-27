@@ -1,4 +1,4 @@
-package fr.inria.corese.core.sparql.benchmark;
+package fr.inria.corese.sparql.benchmark;
 
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.kgram.core.Mappings;

@@ -1,22 +1,19 @@
 module fr.inria.corese.corese_core {
-    requires org.slf4j;
     requires org.apache.commons.text;
     requires java.xml;
-    requires jsonld.java;
     requires semargl.core;
-    requires arp;
+    requires arp; //
     requires java.logging;
     requires java.sql;
     requires jakarta.ws.rs;
     requires java.management;
     requires java.desktop;
-    requires commons.lang;
-    requires semargl.rdfa;
+    requires semargl.rdfa; //
     requires jdk.management;
-    requires org.json;
+    requires org.json; //
     requires org.apache.commons.lang3;
     requires shexjava.core;
-    requires rdf4j.model;
+    requires junit; //
 
     exports fr.inria.corese.core.load;
     exports fr.inria.corese.core.load.result;
