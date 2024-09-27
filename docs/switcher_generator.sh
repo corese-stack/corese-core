@@ -66,6 +66,17 @@ EOF
     fi
 done
 
+json_object=$(cat <<EOF
+{
+    "name": "dev",
+    "version": "unstable",
+    "url": "https://corese-stack.github.io/corese-core/dev/",
+    "preferred": false
+}
+EOF
+)
+json_array+=("$json_object")
+
 # Close the HTML content
 html_content="$html_content
   </ul>
