@@ -42,7 +42,7 @@ jobs:
         chmod u+x docs/switcher_generator.sh
         ./docs/switcher_generator.sh build/html/switcher.json build/html/index.html
         cd docs/source
-        doxygen
+        doxygen DoxyfileFull
         cd ../..
         mkdir build/html/dev/
         mv docs/build/doxygen_html/* build/html/dev/
