@@ -1,0 +1,7 @@
+<map id="Buffer" name="Buffer">
+<area shape="rect" id="Node000001" title="Synchronized buffer to put/get path edges Edges are consumed by an iterator." alt="" coords="145,79,206,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,164,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,37,162,76,159,81,109,41"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="188,5,344,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="242,41,192,81,189,76,239,37"/>
+</map>

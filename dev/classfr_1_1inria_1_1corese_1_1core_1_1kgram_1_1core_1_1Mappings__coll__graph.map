@@ -1,0 +1,18 @@
+<map id="Mappings" name="Mappings">
+<area shape="rect" id="Node000001" title=" " alt="" coords="289,168,374,193"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1PointerObject.html" title=" " alt="" coords="5,80,116,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,107,296,165,294,170,109,112"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="13,5,109,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="63,45,63,80,58,80,58,45"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="140,80,325,105"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="258,112,319,165,316,169,255,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="349,80,508,105"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="407,116,347,169,343,165,404,112"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventManager.html" title="Event Manager for consistency and trace Update and Inference are tracked Debug mode traces events Sho..." alt="" coords="532,80,648,105"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="543,112,367,170,365,165,541,107"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventLogger.html" title=" " alt="" coords="563,168,665,193"/>
+<area shape="poly" id="edge8_Node000008_Node000006" title=" " alt="" coords="582,119,580,131,582,143,590,155,600,166,596,170,585,159,577,145,574,131,576,118"/>
+<area shape="rect" id="Node000007" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1EventHandler.html" title=" " alt="" coords="535,5,645,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="593,45,593,80,587,80,587,45"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="615,155,613,130,599,107,603,104,618,128,621,154"/>
+</map>

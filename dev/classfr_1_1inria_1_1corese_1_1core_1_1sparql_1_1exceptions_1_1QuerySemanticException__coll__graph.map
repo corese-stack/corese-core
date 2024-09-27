@@ -1,0 +1,7 @@
+<map id="QuerySemanticException" name="QuerySemanticException">
+<area shape="rect" id="Node000001" title="This exception is used for semantic errors: (one exception is raised for all the semantic errors that..." alt="" coords="5,152,192,177"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1EngineException.html" title="This class gathers all the exceptions that can be thrown in Corese." alt="" coords="33,79,164,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,118,101,152,96,152,96,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="35,5,162,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,44,101,79,96,79,96,44"/>
+</map>

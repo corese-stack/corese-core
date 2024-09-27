@@ -1,0 +1,5 @@
+<map id="Computer" name="Computer">
+<area shape="rect" id="Node000001" title="Interface for Interpreter." alt="" coords="23,79,110,104"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1ComputerProxy.html" title="implemented by fr.inria.corese.core.query.PluginTransform" alt="" coords="5,5,128,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,44,69,79,64,79,64,44"/>
+</map>

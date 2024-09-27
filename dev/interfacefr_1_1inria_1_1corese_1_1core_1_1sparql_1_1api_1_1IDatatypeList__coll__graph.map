@@ -1,0 +1,15 @@
+<map id="IDatatypeList" name="IDatatypeList">
+<area shape="rect" id="Node000001" title=" " alt="" coords="263,152,373,177"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1IDatatype.html" title="Interface for Corese XSD datatypes." alt="" coords="275,79,361,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="321,118,321,152,315,152,315,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,172,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="140,32,282,76,280,81,138,37"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="197,5,253,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="252,37,304,76,301,81,249,41"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="277,5,359,31"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="321,44,321,79,315,79,315,44"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="383,5,501,31"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="412,40,340,81,337,76,409,35"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="526,5,627,31"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="523,37,361,81,359,76,521,32"/>
+</map>

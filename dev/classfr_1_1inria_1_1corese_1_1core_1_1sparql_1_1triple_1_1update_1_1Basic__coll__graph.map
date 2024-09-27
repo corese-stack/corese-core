@@ -1,0 +1,12 @@
+<map id="Basic" name="Basic">
+<area shape="rect" id="Node000001" title="load clear drop create add move copy" alt="" coords="5,155,63,180"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Update.html" title=" " alt="" coords="81,80,150,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,117,49,156,46,152,90,113"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Basic.html" title="load clear drop create add move copy" alt="" coords="87,155,144,180"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="118,120,118,154,113,154,113,120"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="81,5,149,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="118,45,118,80,113,80,113,45"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1ASTUpdate.html" title=" " alt="" coords="107,243,201,268"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="167,229,171,218,171,204,163,176,150,149,123,107,127,104,155,146,168,174,177,204,177,219,172,231"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="123,193,131,218,146,241,142,244,126,220,118,195"/>
+</map>

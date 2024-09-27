@@ -1,0 +1,11 @@
+<map id="EventManager" name="EventManager">
+<area shape="rect" id="Node000001" title="Event Manager for consistency and trace Update and Inference are tracked Debug mode traces events Sho..." alt="" coords="8,256,124,281"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1EventHandler.html" title=" " alt="" coords="5,5,116,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,45,68,255,63,256,59,45"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventManager.html" title="Event Manager for consistency and trace Update and Inference are tracked Debug mode traces events Sho..." alt="" coords="83,80,199,105"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="85,38,129,78,126,82,82,42"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventLogger.html" title=" " alt="" coords="83,168,185,193"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,206,78,257,73,254,114,203"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="139,154,141,144,140,106,145,106,146,144,144,155"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="122,117,115,130,114,140,116,149,126,167,122,169,111,151,109,140,110,129,117,115"/>
+</map>

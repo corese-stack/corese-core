@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['qnameuri_0',['qnameURI',['../classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Transformer.html#ac20540da20be8c74d00a810094ef20ba',1,'fr::inria::corese::core::transform::Transformer']]],
-  ['query_1',['query',['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html#a5b2c3ed3718066bac2549a08fa5003d3',1,'fr.inria.corese.core.query.QueryProcess.query(String squery, Mapping map, Dataset ds)'],['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html#a92c55a0d3fc0f64b11bb007f771276f2',1,'fr.inria.corese.core.query.QueryProcess.query(Query q)']]],
-  ['querygraph_2',['queryGraph',['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html#aa75d8c09534dac11759685b35ed2827d',1,'fr::inria::corese::core::query::QueryProcess']]],
-  ['queryold_3',['queryOld',['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html#a64ed0832d830d4b8a66553fbae4c467c',1,'fr::inria::corese::core::query::QueryProcess']]],
-  ['queryprocess_4',['QueryProcess',['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html',1,'fr::inria::corese::core::query']]]
+  ['keyset_0',['keySet',['../classfr_1_1inria_1_1corese_1_1core_1_1print_1_1rdfc10_1_1ListMap.html#a28d8c1c2c8ce05522ccd3b9a7dce4c3d',1,'fr::inria::corese::core::print::rdfc10::ListMap']]],
+  ['keyword_1',['Keyword',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1cst_1_1Keyword.html',1,'fr::inria::corese::core::sparql::triple::cst']]],
+  ['keywordpp_2',['KeywordPP',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1cst_1_1KeywordPP.html',1,'fr::inria::corese::core::sparql::triple::cst']]],
+  ['kgram_3',['kgram',['../classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1core_1_1Core.html#a7bba7a5dc03109934836acc786c1a141',1,'fr::inria::corese::core::extension::core::Core']]],
+  ['kind_4',['kind',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1Token.html#ab961f0bab26537f6671c9c1add6e6725',1,'fr::inria::corese::core::sparql::triple::javacc1::Token']]],
+  ['kw_5fa_5',['KW_A',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html#a576114e1f0fcb8fba7e42371abde1aea',1,'fr::inria::corese::core::sparql::triple::javacc1::SparqlCoreseConstants']]]
 ];

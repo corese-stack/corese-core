@@ -1,0 +1,9 @@
+<map id="Pointerable" name="Pointerable">
+<area shape="rect" id="Node000001" title="Interface for objects that can be object of a CoresePointer." alt="" coords="25,79,121,104"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Edge.html" title="Interface for Producer iterator that encapsulate Edge or Node with its Graph Node." alt="" coords="5,152,60,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="62,118,41,153,37,151,57,115"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Node.html" title="Interface of Node provided by graph implementation and also by KGRAM query Node." alt="" coords="85,152,141,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="88,115,109,151,104,153,84,118"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Loopable.html" title="Interface for (var in exp) {}." alt="" coords="13,5,132,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,44,75,79,70,79,70,44"/>
+</map>

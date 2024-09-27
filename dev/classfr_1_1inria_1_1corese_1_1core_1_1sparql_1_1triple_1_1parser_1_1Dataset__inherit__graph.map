@@ -1,0 +1,7 @@
+<map id="Dataset" name="Dataset">
+<area shape="rect" id="Node000001" title="SPARQL Dataset from or named may be null." alt="" coords="24,152,97,177"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTObject.html" title=" " alt="" coords="16,79,105,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,118,63,152,58,152,58,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,116,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="63,44,63,79,58,79,58,44"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="CoreseUndefFuture" name="CoreseUndefFuture">
+<area shape="rect" id="Node000001" title="Encapsulate an expression Expr to be evaluated later such as concat(str, st:number(),..." alt="" coords="13,372,160,397"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseUndefLiteral.html" title=" " alt="" coords="13,299,160,324"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,338,89,372,84,372,84,338"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringLiteral.html" title=" " alt="" coords="13,225,160,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="89,264,89,299,84,299,84,264"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringableImpl.html" title=" " alt="" coords="5,152,168,177"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="89,191,89,225,84,225,84,191"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html" title=" " alt="" coords="23,79,150,104"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="89,118,89,152,84,152,84,118"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="43,5,130,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="89,44,89,79,84,79,84,44"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="SelectorIndex" name="SelectorIndex">
+<area shape="rect" id="Node000001" title="Given federate query, create query to graph index to retrieve candidate endpoint uri list who know fe..." alt="" coords="5,93,116,119"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Selector.html" title="Ask remote endpoints if they contain predicates of the federated query Build a table: triple | predic..." alt="" coords="23,5,98,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,45,63,93,58,93,58,45"/>
+</map>

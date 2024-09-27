@@ -1,0 +1,9 @@
+<map id="MethodCall" name="MethodCall">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,225,101,251"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Funcall.html" title="funcall(fun, exp) apply(fun, list)" alt="" coords="19,152,87,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="56,191,56,225,51,225,51,191"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1LDScript.html" title=" " alt="" coords="15,79,91,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="56,118,56,152,51,152,51,118"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="12,5,95,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="56,44,56,79,51,79,51,44"/>
+</map>

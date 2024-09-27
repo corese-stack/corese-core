@@ -1,0 +1,9 @@
+<map id="XMLResult.MyHandler" name="XMLResult.MyHandler">
+<area shape="rect" id="Node000001" title="SAX Handler." alt="" coords="5,168,172,193"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="7,80,128,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,118,88,167,83,168,71,119"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1XMLResult_1_1VTable.html" title=" " alt="" coords="153,80,291,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,115,108,170,105,165,191,111"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="116,5,328,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="225,45,225,80,219,80,219,45"/>
+</map>

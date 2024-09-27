@@ -1,0 +1,6 @@
+<map id="Access.Level" name="Access.Level">
+<area shape="rect" id="Node000001" title="Protection Level Access Right: feature has access level, user action (query) has access level action ..." alt="" coords="5,171,112,196"/>
+<area shape="rect" id="Node000002" href="$enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access_1_1Level.html" title="Protection Level Access Right: feature has access level, user action (query) has access level action ..." alt="" coords="5,22,112,47"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,61,61,171,56,171,56,61"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="100,17,126,19,135,25,139,35,133,46,120,51,86,50,86,45,119,46,130,42,133,35,131,29,124,24,99,22"/>
+</map>

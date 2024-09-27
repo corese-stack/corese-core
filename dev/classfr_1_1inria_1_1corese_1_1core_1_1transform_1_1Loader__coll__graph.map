@@ -1,0 +1,58 @@
+<map id="Loader" name="Loader">
+<area shape="rect" id="Node000001" title="Manage load, import, profile TODO: level()" alt="" coords="1653,209,1720,235"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1Graph.html" title="Graph Manager Edges are stored in an index An index is a table: predicate &#45;&gt; List&lt;Edge&gt; Edge List are..." alt="" coords="933,299,995,324"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1008,303,1653,223,1653,229,1009,309"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1Workflow.html" title="Manage a set of inference engines Loop until no inference is performed It is automatically called whe..." alt="" coords="1215,441,1298,467"/>
+<area shape="poly" id="edge14_Node000013_Node000002" title=" " alt="" coords="983,334,1026,386,1055,412,1088,433,1120,445,1153,451,1215,454,1215,460,1152,457,1118,450,1085,438,1052,416,1022,390,979,337"/>
+<area shape="rect" id="Node000018" href="$classfr_1_1inria_1_1corese_1_1core_1_1EdgeFactory.html" title=" " alt="" coords="1206,155,1307,180"/>
+<area shape="poly" id="edge20_Node000018_Node000002" title=" " alt="" coords="994,288,1085,233,1222,178,1224,183,1088,238,997,293"/>
+<area shape="rect" id="Node000019" href="$classfr_1_1inria_1_1corese_1_1core_1_1DataStore.html" title="Simple DataStore to define what is the default graph By default it is the union of named graphs It ca..." alt="" coords="1213,336,1300,361"/>
+<area shape="poly" id="edge22_Node000019_Node000002" title=" " alt="" coords="1009,314,1214,341,1213,346,1008,319"/>
+<area shape="rect" id="Node000020" href="$classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Transformer.html" title="SPARQL Template Transformation Engine." alt="" coords="1424,104,1524,129"/>
+<area shape="poly" id="edge27_Node000020_Node000002" title=" " alt="" coords="1007,293,1086,266,1156,249,1212,239,1267,228,1334,204,1403,165,1455,127,1458,132,1406,169,1336,208,1268,233,1213,245,1157,254,1087,271,1009,298"/>
+<area shape="rect" id="Node000022" href="$classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1TransformerMapping.html" title=" " alt="" coords="1179,104,1335,129"/>
+<area shape="poly" id="edge26_Node000022_Node000002" title=" " alt="" coords="975,285,992,253,1017,216,1048,180,1085,149,1130,129,1178,118,1179,123,1132,134,1088,154,1052,183,1021,219,997,256,979,288"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1GraphObject.html" title=" " alt="" coords="587,356,689,381"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="702,355,933,314,934,319,703,360"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="326,356,437,381"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="451,366,587,366,587,371,451,371"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="571,405,705,431"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="698,399,840,355,932,321,934,326,842,361,700,404"/>
+<area shape="rect" id="Node000006" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1Graph.html" title=" " alt="" coords="607,159,669,184"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="683,180,758,203,842,236,900,267,946,296,943,301,897,271,840,240,757,208,681,185"/>
+<area shape="rect" id="Node000007" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Graph.html" title=" " alt="" coords="351,159,412,184"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="426,169,607,169,607,174,426,174"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="593,208,683,233"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="697,231,842,267,934,298,932,303,841,273,695,236"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="593,257,683,283"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="697,275,842,293,934,305,933,310,841,298,697,280"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1NodeGraphIndex.html" title="Manage Nodes of a graph, for each graph name." alt="" coords="573,307,703,332"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="717,315,933,309,933,315,717,320"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="277,307,485,332"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="499,317,573,317,573,322,499,322"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="5,307,228,332"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="242,317,277,317,277,322,242,322"/>
+<area shape="poly" id="edge12_Node000002_Node000013" title=" " alt="" coords="1203,439,1146,417,1085,390,1028,357,982,326,985,322,1031,352,1088,385,1148,412,1205,434"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="931,485,997,511"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="1010,493,1079,487,1154,477,1214,463,1216,468,1155,482,1079,492,1011,498"/>
+<area shape="rect" id="Node000015" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventManager.html" title="Event Manager for consistency and trace Update and Inference are tracked Debug mode traces events Sho..." alt="" coords="580,489,696,515"/>
+<area shape="poly" id="edge15_Node000002_Node000015" title=" " alt="" coords="688,482,762,452,840,410,902,364,948,322,952,326,905,368,843,415,764,456,690,487"/>
+<area shape="rect" id="Node000017" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventLogger.html" title=" " alt="" coords="913,535,1015,560"/>
+<area shape="poly" id="edge18_Node000017_Node000015" title=" " alt="" coords="710,509,913,538,912,543,709,514"/>
+<area shape="rect" id="Node000016" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1EventHandler.html" title=" " alt="" coords="326,489,437,515"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="451,499,580,499,580,505,451,505"/>
+<area shape="poly" id="edge17_Node000015_Node000017" title=" " alt="" coords="899,557,817,559,773,556,729,549,690,535,657,517,660,512,692,530,730,543,773,551,817,554,899,552"/>
+<area shape="poly" id="edge19_Node000002_Node000018" title=" " alt="" coords="1192,169,1140,175,1088,192,1051,216,1019,246,976,300,972,297,1015,242,1048,212,1086,188,1139,170,1192,164"/>
+<area shape="poly" id="edge21_Node000002_Node000019" title=" " alt="" coords="1200,363,1145,369,1086,365,1032,348,987,327,989,322,1034,343,1087,359,1145,363,1199,358"/>
+<area shape="poly" id="edge23_Node000001_Node000020" title=" " alt="" coords="1507,135,1549,160,1654,207,1652,212,1547,164,1504,139"/>
+<area shape="rect" id="Node000023" href="$classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Stack.html" title="Keep track of nodes already printed to prevent loop Variant: check the pair (dt, template) do not to ..." alt="" coords="1657,104,1716,129"/>
+<area shape="poly" id="edge29_Node000023_Node000020" title=" " alt="" coords="1528,130,1548,134,1589,138,1629,134,1656,126,1657,132,1630,139,1589,143,1548,139,1527,135"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="1181,5,1332,31"/>
+<area shape="poly" id="edge24_Node000020_Node000021" title=" " alt="" coords="1315,32,1336,40,1401,68,1456,102,1453,106,1399,72,1334,44,1313,37"/>
+<area shape="poly" id="edge25_Node000020_Node000022" title=" " alt="" coords="1348,114,1424,114,1424,119,1348,119"/>
+<area shape="poly" id="edge28_Node000020_Node000023" title=" " alt="" coords="1644,119,1524,119,1524,114,1644,114"/>
+<area shape="rect" id="Node000024" href="$classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Table.html" title="Map pprinter name to pprinter resource path." alt="" coords="1229,55,1285,80"/>
+<area shape="poly" id="edge30_Node000020_Node000024" title=" " alt="" coords="1298,73,1401,95,1425,101,1424,107,1399,101,1297,78"/>
+<area shape="rect" id="Node000025" title=" " alt="" coords="865,53,1063,79"/>
+<area shape="poly" id="edge31_Node000024_Node000025" title=" " alt="" coords="1076,64,1228,65,1228,70,1076,69"/>
+</map>

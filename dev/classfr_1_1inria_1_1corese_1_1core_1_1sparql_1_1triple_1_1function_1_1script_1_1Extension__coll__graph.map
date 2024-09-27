@@ -1,0 +1,12 @@
+<map id="Extension" name="Extension">
+<area shape="rect" id="Node000001" title="LDScript function call." alt="" coords="9,317,95,343"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1LDScript.html" title=" " alt="" coords="9,80,85,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,119,54,317,49,317,45,120"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Statement.html" title="Toplevel of extended statements: Function Let Loop IfElse." alt="" coords="68,155,159,180"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="69,114,104,153,101,156,65,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,88,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="49,45,49,80,44,80,44,45"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Function.html" title="Function definition function xt:fun(x) { exp }." alt="" coords="71,229,148,255"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="96,268,62,318,58,315,92,265"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="115,194,113,229,107,229,109,194"/>
+</map>

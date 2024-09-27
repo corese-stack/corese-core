@@ -1,0 +1,14 @@
+<map id="EdgeRuleTop" name="EdgeRuleTop">
+<area shape="rect" id="Node000001" title="Edge entailed by a Rule index and provenance." alt="" coords="72,299,177,324"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeBinary.html" title="Graph Edge for the defaultGraph." alt="" coords="77,225,173,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,264,127,299,122,299,122,264"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTop.html" title=" " alt="" coords="49,152,125,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,188,121,224,116,226,97,191"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1GraphObject.html" title=" " alt="" coords="9,79,112,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="72,116,86,151,81,153,67,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,5,116,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="63,44,63,79,58,79,58,44"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="136,79,191,104"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="159,118,130,226,125,224,154,117"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="143,115,102,154,98,150,139,111"/>
+</map>

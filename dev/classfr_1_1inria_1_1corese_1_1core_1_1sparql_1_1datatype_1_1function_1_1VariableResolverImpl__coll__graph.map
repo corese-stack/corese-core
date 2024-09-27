@@ -1,0 +1,7 @@
+<map id="VariableResolverImpl" name="VariableResolverImpl">
+<area shape="rect" id="Node000001" title="Variable resolver for XPath see Processor and XPathFunction." alt="" coords="9,152,171,177"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1function_1_1VariableResolver.html" title=" " alt="" coords="24,79,156,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,118,93,152,87,152,87,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,175,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,44,93,79,87,79,87,44"/>
+</map>

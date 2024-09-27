@@ -1,0 +1,55 @@
+<map id="LDScript" name="LDScript">
+<area shape="rect" id="Node000001" title=" " alt="" coords="136,301,212,327"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1ErrorFunction.html" title=" " alt="" coords="269,5,377,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,288,179,237,192,171,217,102,235,69,258,40,273,29,277,33,262,44,240,72,222,104,197,172,184,237,179,288"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Eval.html" title=" " alt="" coords="298,55,349,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="176,287,184,245,199,192,223,138,239,112,258,89,277,77,297,69,299,74,279,81,262,93,243,115,227,140,204,194,189,246,181,288"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Extension.html" title="LDScript function call." alt="" coords="280,104,367,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="179,287,189,254,206,214,228,174,258,139,278,126,281,130,262,143,233,177,210,217,194,256,184,289"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Funcall.html" title="funcall(fun, exp) apply(fun, list)" alt="" coords="289,153,357,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="184,288,213,238,234,211,258,188,288,172,290,177,262,192,238,215,218,241,189,290"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1FunctionDefined.html" title=" " alt="" coords="260,203,387,228"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="195,289,224,262,259,237,282,226,284,230,261,242,227,267,199,293"/>
+<area shape="rect" id="Node000014" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1JavaCast.html" title="cast:node(exp) return eval(exp)" alt="" coords="284,252,363,277"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="224,295,283,275,285,280,226,300"/>
+<area shape="rect" id="Node000015" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1JavaFunction.html" title=" " alt="" coords="271,301,376,327"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="226,311,271,311,271,317,226,317"/>
+<area shape="rect" id="Node000018" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Return.html" title=" " alt="" coords="291,351,356,376"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="226,328,291,350,290,355,224,333"/>
+<area shape="rect" id="Node000019" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Self.html" title=" " alt="" coords="300,400,347,425"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="199,335,227,361,261,386,301,404,299,409,259,391,224,366,195,339"/>
+<area shape="rect" id="Node000020" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Sequence.html" title=" " alt="" coords="281,449,366,475"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="189,338,218,387,238,413,262,436,281,447,279,452,258,440,234,417,213,390,184,340"/>
+<area shape="rect" id="Node000021" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1SetFunction.html" title=" " alt="" coords="274,499,373,524"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="184,339,194,372,210,411,233,451,262,485,278,496,275,501,258,489,228,454,206,414,189,374,179,341"/>
+<area shape="rect" id="Node000022" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Statement.html" title="Toplevel of extended statements: Function Let Loop IfElse." alt="" coords="278,548,369,573"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="181,340,189,382,204,434,227,488,243,513,262,535,279,547,276,551,258,539,239,516,223,490,199,436,184,383,176,341"/>
+<area shape="rect" id="Node000027" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Throw.html" title=" " alt="" coords="292,597,355,623"/>
+<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="179,340,184,391,197,456,222,524,240,556,262,584,276,595,293,602,291,607,273,599,258,588,235,559,217,526,192,457,179,391,174,340"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,301,88,327"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,311,136,311,136,317,101,317"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1EventCall.html" title=" " alt="" coords="456,5,540,31"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="369,150,385,139,402,115,408,91,415,66,433,40,454,27,457,31,436,44,419,68,413,92,407,117,389,143,372,154"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MapAnyEvery.html" title=" " alt="" coords="442,55,554,80"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="369,148,385,138,399,126,408,114,418,102,433,89,455,78,457,83,436,94,422,106,413,118,403,130,388,143,371,152"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MapFunction.html" title=" " alt="" coords="445,104,551,129"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="370,150,452,127,453,132,371,155"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MethodCall.html" title=" " alt="" coords="450,153,546,179"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="371,163,450,163,450,169,371,169"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MethodTypeCall.html" title=" " alt="" coords="435,203,561,228"/>
+<area shape="poly" id="edge10_Node000006_Node000011" title=" " alt="" coords="371,177,453,200,452,205,370,182"/>
+<area shape="rect" id="Node000012" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Reduce.html" title="reduce(rq:plus, list) get a binary function, apply it on elements two by two a kind of aggregate" alt="" coords="463,252,533,277"/>
+<area shape="poly" id="edge11_Node000006_Node000012" title=" " alt="" coords="371,179,388,188,403,201,413,213,422,225,436,237,464,251,461,256,433,242,418,229,409,216,399,204,385,192,369,183"/>
+<area shape="rect" id="Node000016" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1JavaDScall.html" title="Call Corese Java function with parameters as IDatatype values and this object possibly as getObject()" alt="" coords="453,301,543,327"/>
+<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="390,311,453,311,453,317,390,317"/>
+<area shape="rect" id="Node000017" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Javacall.html" title="Call Corese Java function with parameters as getObject() or Java values of IDatatype parameters and t..." alt="" coords="461,351,535,376"/>
+<area shape="poly" id="edge16_Node000015_Node000017" title=" " alt="" coords="383,328,462,351,460,356,381,333"/>
+<area shape="rect" id="Node000023" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1ForLoop.html" title=" " alt="" coords="461,473,535,499"/>
+<area shape="poly" id="edge22_Node000022_Node000023" title=" " alt="" coords="371,540,386,534,434,509,463,496,465,501,436,514,388,539,373,545"/>
+<area shape="rect" id="Node000024" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Function.html" title="Function definition function xt:fun(x) { exp }." alt="" coords="459,523,537,548"/>
+<area shape="poly" id="edge23_Node000022_Node000024" title=" " alt="" coords="382,550,459,538,459,544,383,555"/>
+<area shape="rect" id="Node000025" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Let.html" title=" " alt="" coords="477,572,519,597"/>
+<area shape="poly" id="edge24_Node000022_Node000025" title=" " alt="" coords="383,566,477,579,476,584,382,571"/>
+<area shape="rect" id="Node000026" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1TryCatch.html" title=" " alt="" coords="459,621,537,647"/>
+<area shape="poly" id="edge25_Node000022_Node000026" title=" " alt="" coords="371,576,388,584,436,608,463,619,461,624,434,612,386,588,368,581"/>
+</map>

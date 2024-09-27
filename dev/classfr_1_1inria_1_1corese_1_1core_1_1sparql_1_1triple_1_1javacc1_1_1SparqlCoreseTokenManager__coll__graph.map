@@ -1,0 +1,7 @@
+<map id="SparqlCoreseTokenManager" name="SparqlCoreseTokenManager">
+<area shape="rect" id="Node000001" title="Token Manager." alt="" coords="81,93,284,119"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html" title="Token literal values and constants." alt="" coords="5,5,179,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,38,172,91,168,95,112,42"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SimpleCharStream.html" title="An implementation of interface CharStream, where the stream is assumed to contain only ASCII characte..." alt="" coords="203,5,347,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="254,42,197,95,194,91,250,38"/>
+</map>

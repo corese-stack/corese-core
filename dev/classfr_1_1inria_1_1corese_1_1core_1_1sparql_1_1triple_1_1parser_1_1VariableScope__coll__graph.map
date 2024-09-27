@@ -1,0 +1,6 @@
+<map id="VariableScope" name="VariableScope">
+<area shape="rect" id="Node000001" title="Used by TopExp getVariables(scope)" alt="" coords="5,171,120,196"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1VariableScope.html" title="Used by TopExp getVariables(scope)" alt="" coords="5,22,120,47"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,61,65,171,60,171,60,61"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="104,17,133,19,143,25,147,35,141,46,128,51,91,50,91,45,127,46,138,42,141,35,139,29,131,24,104,22"/>
+</map>

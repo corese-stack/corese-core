@@ -1,0 +1,15 @@
+<map id="PointerObject" name="PointerObject">
+<area shape="rect" id="Node000001" title=" " alt="" coords="127,79,237,104"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Exp.html" title="KGRAM/SPARQL expressions: bgp, union, optional, etc." alt="" coords="68,152,115,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,115,108,154,105,150,155,110"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mappings.html" title=" " alt="" coords="139,152,225,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="185,118,185,152,179,152,179,118"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Memory.html" title="Node and Edge binding stacks for KGRAM evaluator." alt="" coords="249,152,325,177"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="212,110,272,150,269,154,209,114"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="134,5,230,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,44,185,79,179,79,179,44"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1ExpEdge.html" title=" " alt="" coords="5,225,84,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="78,190,54,227,50,224,74,187"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Query.html" title="KGRAM Query also used for subquery." alt="" coords="109,225,170,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="109,187,134,224,129,227,105,190"/>
+</map>

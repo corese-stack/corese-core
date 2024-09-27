@@ -1,0 +1,7 @@
+<map id="DataFrom" name="DataFrom">
+<area shape="rect" id="Node000001" title="from, from named dataset for edge iteration getNamed().from|minus(list|node).iterate() getDefault()...." alt="" coords="5,152,92,177"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataFilter.html" title="Simple filter applied to object or subject of current edge during iteration iterate()...." alt="" coords="5,79,92,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="51,118,51,152,46,152,46,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="8,5,89,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="51,44,51,79,46,79,46,44"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="AddTripleHelper" name="AddTripleHelper">
+<area shape="rect" id="Node000001" title="Helper class to aid the parsers (ex.jsonld, rdfa) for adding triples to corese graph." alt="" coords="49,79,175,104"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1AddTripleHelperDataManager.html" title=" " alt="" coords="5,152,219,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="115,118,115,152,109,152,109,118"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1load_1_1ILoadSerialization.html" title="Interface that needs to be implemented when loading serialization(mainly &#160;for adding triples) (ex." alt="" coords="43,5,181,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,44,115,79,109,79,109,44"/>
+</map>

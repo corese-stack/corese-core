@@ -1,0 +1,9 @@
+<map id="BaseMap" name="BaseMap">
+<area shape="rect" id="Node000001" title="The statistics data in fact is a map, this base class implements the basic map between distinct node ..." alt="" coords="140,5,223,31"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1HashBucket.html" title="Save map between nodes ( convert to hash code) and their count." alt="" coords="5,79,104,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,40,77,81,74,76,148,35"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1ReducedMap.html" title="Save part of the map between nodes and their count, in order to reduce the size of mapping." alt="" coords="128,79,235,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,44,184,79,179,79,179,44"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1SimpleAverage.html" title="Simple average, number of all triples/number of distinct resources." alt="" coords="259,79,379,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="217,34,297,76,295,81,214,39"/>
+</map>

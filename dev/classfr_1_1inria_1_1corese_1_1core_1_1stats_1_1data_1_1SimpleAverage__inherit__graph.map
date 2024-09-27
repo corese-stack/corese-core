@@ -1,0 +1,5 @@
+<map id="SimpleAverage" name="SimpleAverage">
+<area shape="rect" id="Node000001" title="Simple average, number of all triples/number of distinct resources." alt="" coords="5,79,125,104"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1BaseMap.html" title="The statistics data in fact is a map, this base class implements the basic map between distinct node ..." alt="" coords="24,5,107,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,44,68,79,63,79,63,44"/>
+</map>

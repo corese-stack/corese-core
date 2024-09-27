@@ -1,0 +1,9 @@
+<map id="Token" name="Token">
+<area shape="rect" id="Node000001" title="Describes the input token stream." alt="" coords="31,187,89,212"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,45,62,186,57,187,53,45"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1Token.html" title="Describes the input token stream." alt="" coords="76,82,135,107"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="73,41,100,80,95,83,68,44"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="97,121,68,188,63,185,92,119"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="149,86,157,89,161,95,153,103,135,104,135,99,151,98,156,94,154,93,148,91"/>
+</map>

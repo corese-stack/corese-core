@@ -1,0 +1,7 @@
+<map id="ASTQ" name="ASTQ">
+<area shape="rect" id="Node000001" title="Olivier Corby &#45; Wimmics INRIA I3S &#45; 2020." alt="" coords="45,79,103,104"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1AST.html" title="Olivier Corby &#45; Wimmics INRIA I3S &#45; 2020." alt="" coords="5,5,52,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="46,41,69,77,64,80,41,44"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Graphable.html" title="Olivier Corby &#45; Wimmics INRIA I3S &#45; 2014." alt="" coords="76,5,165,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="108,44,84,80,79,77,103,41"/>
+</map>

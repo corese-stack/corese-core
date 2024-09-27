@@ -1,0 +1,9 @@
+<map id="Memory" name="Memory">
+<area shape="rect" id="Node000001" title="Node and Edge binding stacks for KGRAM evaluator." alt="" coords="88,152,164,177"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1PointerObject.html" title=" " alt="" coords="5,79,116,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,113,117,150,113,154,79,116"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="13,5,109,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="63,44,63,79,58,79,58,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="140,79,245,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,116,139,154,135,150,170,113"/>
+</map>

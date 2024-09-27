@@ -1,0 +1,29 @@
+<map id="And" name="And">
+<area shape="rect" id="Node000001" title=" " alt="" coords="256,225,303,251"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1BasicGraphPattern.html" title=" " alt="" coords="5,299,148,324"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="244,255,110,301,108,296,242,250"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Join.html" title=" " alt="" coords="172,299,219,324"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="257,262,211,300,207,296,254,258"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1RDFList.html" title=" " alt="" coords="243,299,315,324"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="282,264,282,299,277,299,277,264"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Score.html" title=" " alt="" coords="339,299,398,324"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="306,257,356,296,352,301,303,261"/>
+<area shape="rect" id="Node000012" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1SourceExp.html" title=" " alt="" coords="422,299,513,324"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="316,250,438,296,436,301,314,255"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exp.html" title=" " alt="" coords="256,152,303,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="282,191,282,225,277,225,277,191"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1TopExp.html" title="Root of SPARQL Expression (filter) and Exp (triple, option, ...)" alt="" coords="185,79,253,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="240,113,272,150,268,154,236,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="167,5,271,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="222,44,222,79,217,79,217,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="277,79,404,104"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="324,116,291,154,287,150,320,113"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exist.html" title=" " alt="" coords="8,372,63,397"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="65,337,44,373,40,371,61,335"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Scope.html" title=" " alt="" coords="87,372,149,397"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="93,335,114,371,109,373,88,337"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Service.html" title="SPARQL 1.1 Service." alt="" coords="385,372,456,397"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="454,337,430,373,426,370,450,334"/>
+<area shape="rect" id="Node000014" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Source.html" title=" " alt="" coords="481,372,547,397"/>
+<area shape="poly" id="edge13_Node000012_Node000014" title=" " alt="" coords="485,334,509,370,504,373,480,337"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="AccessNamespace" name="AccessNamespace">
+<area shape="rect" id="Node000001" title="Accept/reject namespace for @import and LinkedFunction define(ns, true|false) if there are accept ns,..." alt="" coords="39,304,183,329"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="14,80,209,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,119,105,175,105,241,112,304,107,304,99,241,100,175,105,118"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1AccessNamespace.html" title="Accept/reject namespace for @import and LinkedFunction define(ns, true|false) if there are accept ns,..." alt="" coords="162,207,306,232"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="134,113,225,205,221,208,130,117"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,217,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,45,114,80,109,80,109,45"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="210,243,128,306,124,302,207,239"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="320,209,329,213,333,220,324,228,306,232,306,226,322,223,327,219,325,217,318,214"/>
+</map>

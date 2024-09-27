@@ -1,0 +1,17 @@
+<map id="Binary" name="Binary">
+<area shape="rect" id="Node000001" title=" " alt="" coords="97,225,161,251"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Minus.html" title=" " alt="" coords="5,299,67,324"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="105,261,53,301,50,296,102,257"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Optional.html" title=" " alt="" coords="91,299,168,324"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="132,264,132,299,127,299,127,264"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Union.html" title=" " alt="" coords="193,299,253,324"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="157,257,209,296,206,301,153,261"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exp.html" title=" " alt="" coords="106,152,153,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,191,132,225,127,225,127,191"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1TopExp.html" title="Root of SPARQL Expression (filter) and Exp (triple, option, ...)" alt="" coords="35,79,103,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,113,122,150,118,154,86,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="17,5,121,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="72,44,72,79,67,79,67,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="127,79,254,104"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="174,116,141,154,137,150,170,113"/>
+</map>

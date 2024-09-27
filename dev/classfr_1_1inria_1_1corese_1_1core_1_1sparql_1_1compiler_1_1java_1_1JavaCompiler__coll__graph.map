@@ -1,0 +1,18 @@
+<map id="JavaCompiler" name="JavaCompiler">
+<area shape="rect" id="Node000001" title="Java Compiler for LDScript Take an AST as input and compile the LDScript function definitions in Java..." alt="" coords="181,271,291,296"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Header.html" title=" " alt="" coords="16,183,85,208"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,211,140,230,216,268,214,273,137,234,93,216"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1JavaCompiler.html" title="Java Compiler for LDScript Take an AST as input and compile the LDScript function definitions in Java..." alt="" coords="19,271,128,296"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="21,218,9,232,8,238,10,245,22,259,38,268,35,273,19,263,6,248,3,239,5,229,17,214"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="55,260,49,247,46,227,47,208,52,208,52,226,54,246,59,258"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Datatype.html" title="Generate IDatatype constant and IDatatype variable." alt="" coords="293,183,376,208"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="342,222,341,235,335,248,316,266,292,277,290,272,313,262,331,245,336,234,337,221"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="314,219,293,235,269,249,208,265,129,278,128,272,207,260,267,244,290,231,311,215"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="263,95,407,120"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="337,134,337,182,332,182,332,134"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="255,5,415,45"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="337,59,337,94,332,94,332,59"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Stack.html" title="Stack record bound variables for parameter passing to exists and subquery Bound variables are functio..." alt="" coords="175,183,233,208"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="215,220,234,269,229,271,210,222"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="162,206,130,216,100,234,87,252,79,271,74,269,82,249,97,230,128,211,161,201"/>
+</map>

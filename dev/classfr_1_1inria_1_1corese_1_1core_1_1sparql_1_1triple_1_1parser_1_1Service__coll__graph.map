@@ -1,0 +1,33 @@
+<map id="Service" name="Service">
+<area shape="rect" id="Node000001" title="SPARQL 1.1 Service." alt="" coords="385,565,455,591"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1SourceExp.html" title=" " alt="" coords="375,491,465,516"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="423,530,423,565,417,565,417,530"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1And.html" title=" " alt="" coords="446,279,493,304"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="474,318,472,387,466,428,453,468,436,492,431,489,448,465,461,427,467,386,469,318"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exp.html" title=" " alt="" coords="127,155,174,180"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="188,169,328,189,398,205,426,216,446,227,463,252,470,278,465,279,458,254,442,231,424,220,397,210,327,194,188,175"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Filter.html" title=" " alt="" coords="95,229,150,255"/>
+<area shape="poly" id="edge12_Node000011_Node000004" title=" " alt="" coords="144,194,130,230,125,228,139,192"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1TopExp.html" title="Root of SPARQL Expression (filter) and Exp (triple, option, ...)" alt="" coords="23,80,91,105"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="85,112,137,152,134,156,81,116"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Expression.html" title=" " alt="" coords="141,328,235,353"/>
+<area shape="poly" id="edge9_Node000009_Node000005" title=" " alt="" coords="60,119,66,182,74,218,85,254,98,281,119,302,158,326,156,330,116,306,94,284,80,256,69,220,61,182,55,119"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,5,109,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="60,45,60,80,55,80,55,45"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="115,80,242,105"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="172,119,158,155,153,153,167,117"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Atom.html" title=" " alt="" coords="343,403,401,428"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="387,439,416,489,411,491,383,441"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="231,356,344,400,342,405,229,361"/>
+<area shape="poly" id="edge16_Node000009_Node000009" title=" " alt="" coords="250,333,261,341,253,348,235,350,235,345,251,343,256,341,247,337"/>
+<area shape="poly" id="edge13_Node000011_Node000009" title=" " alt="" coords="167,319,156,306,127,256,131,253,161,302,171,316"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="174,229,237,255"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="204,268,193,328,187,327,198,267"/>
+<area shape="poly" id="edge11_Node000009_Node000011" title=" " alt="" coords="124,268,126,286,133,303,145,316,160,326,158,330,142,320,128,305,121,287,119,269"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="261,229,312,255"/>
+<area shape="poly" id="edge14_Node000009_Node000012" title=" " alt="" coords="267,266,202,330,198,326,263,263"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="336,229,432,255"/>
+<area shape="poly" id="edge15_Node000009_Node000013" title=" " alt="" coords="350,263,212,330,210,326,348,258"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="312,328,432,353"/>
+<area shape="poly" id="edge17_Node000008_Node000014" title=" " alt="" coords="375,368,375,402,369,402,369,368"/>
+</map>

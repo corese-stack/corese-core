@@ -1,5 +1,20 @@
 var searchData=
 [
-  ['transformer_0',['Transformer',['../classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Transformer.html',1,'fr::inria::corese::core::transform']]],
-  ['treenode_1',['TreeNode',['../classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1TreeNode.html',1,'fr::inria::corese::core::Graph']]]
+  ['feature_0',['Feature',['../enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access_1_1Feature.html',1,'fr::inria::corese::core::sparql::triple::parser::Access']]],
+  ['federatedqueryprocess_1',['FederatedQueryProcess',['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1FederatedQueryProcess.html',1,'fr::inria::corese::core::query']]],
+  ['federatemerge_2',['FederateMerge',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1api_1_1FederateMerge.html',1,'fr::inria::corese::core::sparql::triple::api']]],
+  ['federatevisitor_3',['FederateVisitor',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1FederateVisitor.html',1,'fr::inria::corese::core::compiler::federate']]],
+  ['filehandler_4',['FileHandler',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1FileHandler.html',1,'fr::inria::corese::core::sparql::storage::fs']]],
+  ['filehandlersmanager_5',['FileHandlersManager',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1FileHandlersManager.html',1,'fr::inria::corese::core::sparql::storage::fs']]],
+  ['filter_6',['filter',['../interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Filter.html',1,'Filter'],['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Filter.html',1,'Filter']]],
+  ['focus_7',['Focus',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Focus.html',1,'fr::inria::corese::core::sparql::triple::function::extension']]],
+  ['focusnode_8',['FocusNode',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1FocusNode.html',1,'fr::inria::corese::core::sparql::triple::function::template']]],
+  ['forloop_9',['ForLoop',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1ForLoop.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
+  ['funcall_10',['Funcall',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Funcall.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
+  ['function_11',['Function',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Function.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
+  ['functioncompiler_12',['FunctionCompiler',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1FunctionCompiler.html',1,'fr::inria::corese::core::compiler::parser']]],
+  ['functiondefined_13',['FunctionDefined',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1FunctionDefined.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
+  ['functionevaluator_14',['FunctionEvaluator',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1FunctionEvaluator.html',1,'fr::inria::corese::core::sparql::triple::function::core']]],
+  ['functionprocess_15',['FunctionProcess',['../classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1FunctionProcess.html',1,'fr::inria::corese::core::workflow']]],
+  ['funmap_16',['FunMap',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTExtension_1_1FunMap.html',1,'fr::inria::corese::core::sparql::triple::parser::ASTExtension']]]
 ];

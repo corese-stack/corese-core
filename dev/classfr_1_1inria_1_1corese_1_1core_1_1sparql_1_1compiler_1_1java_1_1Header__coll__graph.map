@@ -1,0 +1,16 @@
+<map id="Header" name="Header">
+<area shape="rect" id="Node000001" title=" " alt="" coords="69,359,139,384"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1JavaCompiler.html" title="Java Compiler for LDScript Take an AST as input and compile the LDScript function definitions in Java..." alt="" coords="96,271,205,296"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,306,108,321,103,340,104,358,99,359,98,340,103,319,116,303"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Header.html" title=" " alt="" coords="163,359,232,384"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="148,309,152,334,162,346,175,356,172,361,158,350,147,336,143,310"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="182,348,155,297,159,295,187,345"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Datatype.html" title="Generate IDatatype constant and IDatatype variable." alt="" coords="44,183,127,208"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="105,217,144,269,139,272,100,221"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="13,95,157,120"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="88,134,88,182,83,182,83,134"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,5,165,45"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="88,59,88,94,83,94,83,59"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Stack.html" title="Stack record bound variables for parameter passing to exists and subquery Bound variables are functio..." alt="" coords="151,183,209,208"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="174,222,157,271,152,269,169,220"/>
+</map>

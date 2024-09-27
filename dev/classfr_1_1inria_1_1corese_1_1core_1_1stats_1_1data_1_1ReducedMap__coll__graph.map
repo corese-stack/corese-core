@@ -1,0 +1,5 @@
+<map id="ReducedMap" name="ReducedMap">
+<area shape="rect" id="Node000001" title="Save part of the map between nodes and their count, in order to reduce the size of mapping." alt="" coords="5,79,112,104"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1BaseMap.html" title="The statistics data in fact is a map, this base class implements the basic map between distinct node ..." alt="" coords="17,5,100,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,44,61,79,56,79,56,44"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="URLServer" name="URLServer">
+<area shape="rect" id="Node000001" title="Manage service URL with parameters." alt="" coords="5,79,96,104"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1URLParam.html" title=" " alt="" coords="6,5,95,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="53,44,53,79,48,79,48,44"/>
+</map>

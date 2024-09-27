@@ -1,0 +1,44 @@
+<map id="MappingSet" name="MappingSet">
+<area shape="rect" id="Node000001" title="Utilitary class for Join Minus Optional Compute common variables in left and right expression and whe..." alt="" coords="1032,340,1131,365"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mappings.html" title=" " alt="" coords="482,347,567,372"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="581,364,747,377,848,379,950,374,1031,361,1032,366,951,379,849,384,746,382,581,369"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Exp.html" title="KGRAM/SPARQL expressions: bgp, union, optional, etc." alt="" coords="724,205,771,231"/>
+<area shape="poly" id="edge21_Node000010_Node000002" title=" " alt="" coords="580,348,649,332,679,322,698,312,715,293,727,271,741,230,746,232,732,273,719,296,702,316,681,327,651,337,581,353"/>
+<area shape="rect" id="Node000017" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1MappingSet.html" title="Utilitary class for Join Minus Optional Compute common variables in left and right expression and whe..." alt="" coords="852,340,951,365"/>
+<area shape="poly" id="edge23_Node000017_Node000002" title=" " alt="" coords="581,356,852,351,852,356,581,361"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1PointerObject.html" title=" " alt="" coords="203,261,313,287"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="316,288,438,326,490,344,488,349,436,331,315,293"/>
+<area shape="poly" id="edge11_Node000010_Node000003" title=" " alt="" coords="327,266,588,239,723,219,724,224,588,245,327,271"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="13,261,109,287"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="122,271,202,271,202,277,122,277"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="165,319,351,344"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="365,340,482,352,481,358,364,345"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="179,368,337,393"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="351,371,482,360,482,365,351,376"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventManager.html" title="Event Manager for consistency and trace Update and Inference are tracked Debug mode traces events Sho..." alt="" coords="200,444,316,469"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="306,437,436,389,488,370,490,375,438,394,308,442"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventLogger.html" title=" " alt="" coords="473,467,576,492"/>
+<area shape="poly" id="edge9_Node000009_Node000007" title=" " alt="" coords="306,471,375,489,406,491,437,489,473,485,473,490,438,494,406,496,374,494,305,477"/>
+<area shape="rect" id="Node000008" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1EventHandler.html" title=" " alt="" coords="5,444,116,469"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="130,454,200,454,200,459,130,459"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="459,477,316,464,317,459,460,471"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="785,222,863,241,952,272,1015,305,1064,338,1061,342,1012,310,950,276,861,246,784,227"/>
+<area shape="poly" id="edge15_Node000010_Node000010" title=" " alt="" coords="733,190,738,182,747,179,756,181,761,188,760,205,755,205,756,190,753,186,747,184,741,186,738,193"/>
+<area shape="poly" id="edge24_Node000017_Node000010" title=" " alt="" coords="775,238,888,338,884,342,772,242"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="220,123,296,148"/>
+<area shape="poly" id="edge12_Node000010_Node000011" title=" " alt="" coords="309,122,389,111,490,108,545,112,599,121,652,137,701,160,725,181,741,203,737,207,721,184,699,164,650,142,598,126,544,117,490,113,390,117,310,127"/>
+<area shape="rect" id="Node000016" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Stack.html" title="KGRAM stack of expressions." alt="" coords="495,156,554,181"/>
+<area shape="poly" id="edge20_Node000016_Node000011" title=" " alt="" coords="310,139,495,162,495,168,309,144"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="479,5,571,31"/>
+<area shape="poly" id="edge13_Node000010_Node000012" title=" " alt="" coords="585,17,646,30,676,43,702,63,726,98,740,138,747,176,749,205,743,205,742,177,735,139,722,100,698,67,673,48,644,35,584,22"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="461,55,588,80"/>
+<area shape="poly" id="edge14_Node000010_Node000013" title=" " alt="" coords="602,63,654,72,679,83,702,97,723,123,736,153,748,205,742,206,731,154,718,125,698,101,677,87,652,78,601,68"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="483,205,566,231"/>
+<area shape="poly" id="edge16_Node000010_Node000014" title=" " alt="" coords="580,215,724,215,724,221,580,221"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="191,189,325,215"/>
+<area shape="poly" id="edge17_Node000014_Node000015" title=" " alt="" coords="339,204,483,213,483,218,339,210"/>
+<area shape="poly" id="edge19_Node000016_Node000015" title=" " alt="" coords="339,189,495,170,496,175,339,195"/>
+<area shape="poly" id="edge18_Node000010_Node000016" title=" " alt="" coords="568,171,631,181,701,197,725,205,723,210,699,202,630,186,567,176"/>
+<area shape="poly" id="edge22_Node000001_Node000017" title=" " alt="" coords="965,350,1032,350,1032,355,965,355"/>
+<area shape="poly" id="edge25_Node000017_Node000017" title=" " alt="" coords="883,325,889,317,901,313,912,316,919,322,920,331,917,341,912,339,915,331,914,325,910,320,901,319,892,321,887,328"/>
+</map>

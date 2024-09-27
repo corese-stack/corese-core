@@ -1,0 +1,12 @@
+<map id="Compile" name="Compile">
+<area shape="rect" id="Node000001" title="Filter Exp Compiler for Optimizations If Filter leads to optimization, we tag the Filter Exp with e...." alt="" coords="5,256,81,281"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="31,5,112,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,42,36,60,24,81,18,105,16,130,20,180,31,224,41,255,36,257,25,226,15,181,11,130,13,104,20,79,31,57,46,39"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1filter_1_1Matcher.html" title="Filter Exp Matcher." alt="" coords="34,80,109,105"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="74,45,74,80,69,80,69,45"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1filter_1_1Checker.html" title="Filter Exp Checker." alt="" coords="126,168,201,193"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="93,39,123,79,150,128,163,167,158,169,145,130,118,81,89,43"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="68,119,58,168,47,256,42,255,53,168,63,118"/>
+<area shape="poly" id="edge6_Node000004_Node000003" title=" " alt="" coords="78,118,91,142,107,156,127,166,125,171,104,160,87,146,73,120"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="137,204,61,258,58,254,134,199"/>
+</map>

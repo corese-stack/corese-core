@@ -1,0 +1,5 @@
+<map id="QueryGraph" name="QueryGraph">
+<area shape="rect" id="Node000001" title="Translate a Graph into a Query Use case: let g = eval(construct {} where {}) let q = query(g) eval(q)" alt="" coords="27,79,127,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,148,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,44,79,79,74,79,74,44"/>
+</map>

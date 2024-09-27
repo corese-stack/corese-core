@@ -1,0 +1,52 @@
+<map id="CanonicalRdf10Format" name="CanonicalRdf10Format">
+<area shape="rect" id="Node000001" title="This class provides functionality to convert a Graph object to a string in Canonical RDF 1...." alt="" coords="1572,319,1743,344"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1NQuadsFormat.html" title=" " alt="" coords="1404,319,1523,344"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1537,329,1572,329,1572,334,1537,334"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1NTriplesFormat.html" title="This class provides functionality to convert a Graph object to a string in N&#45;Triples format." alt="" coords="1235,319,1355,344"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1369,329,1404,329,1404,334,1369,334"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1RDFFormat.html" title="RDF Format for Graph construct&#45;where result RDF Format for Mapping edges." alt="" coords="1087,88,1182,113"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1181,119,1187,124,1227,175,1258,230,1280,281,1292,318,1287,319,1275,283,1253,232,1223,178,1183,128,1178,123"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1Graph.html" title="Graph Manager Edges are stored in an index An index is a table: predicate &#45;&gt; List&lt;Edge&gt; Edge List are..." alt="" coords="886,248,947,273"/>
+<area shape="poly" id="edge27_Node000003_Node000005" title=" " alt="" coords="932,284,957,322,974,340,993,356,1016,368,1036,373,1084,377,1135,382,1185,377,1232,361,1271,342,1273,346,1234,366,1186,382,1135,387,1084,382,1035,378,1014,373,991,360,971,344,953,325,928,287"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="924,234,948,182,967,155,990,132,1013,119,1038,109,1086,100,1087,105,1039,114,1015,123,994,136,971,158,952,185,928,236"/>
+<area shape="rect" id="Node000016" href="$classfr_1_1inria_1_1corese_1_1core_1_1Workflow.html" title="Manage a set of inference engines Loop until no inference is performed It is automatically called whe..." alt="" coords="1093,137,1176,163"/>
+<area shape="poly" id="edge17_Node000016_Node000005" title=" " alt="" coords="931,234,956,203,991,174,1016,163,1043,155,1093,148,1094,153,1044,160,1018,168,993,179,960,206,935,238"/>
+<area shape="rect" id="Node000021" href="$classfr_1_1inria_1_1corese_1_1core_1_1EdgeFactory.html" title=" " alt="" coords="1084,261,1185,287"/>
+<area shape="poly" id="edge23_Node000021_Node000005" title=" " alt="" coords="961,260,1060,265,1084,267,1083,272,1060,270,961,265"/>
+<area shape="rect" id="Node000022" href="$classfr_1_1inria_1_1corese_1_1core_1_1DataStore.html" title="Simple DataStore to define what is the default graph By default it is the union of named graphs It ca..." alt="" coords="1091,327,1178,352"/>
+<area shape="poly" id="edge25_Node000022_Node000005" title=" " alt="" coords="934,284,959,316,975,330,993,341,1017,348,1042,351,1091,347,1091,352,1042,356,1016,354,991,346,972,334,955,319,930,287"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1GraphObject.html" title=" " alt="" coords="587,248,689,273"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="704,258,886,258,886,263,704,263"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="326,248,437,273"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="451,258,587,258,587,263,451,263"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="571,297,705,323"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="718,293,885,263,886,269,719,298"/>
+<area shape="rect" id="Node000009" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1Graph.html" title=" " alt="" coords="607,347,669,372"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="681,346,756,324,840,294,890,271,892,276,842,299,758,329,683,351"/>
+<area shape="rect" id="Node000010" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Graph.html" title=" " alt="" coords="351,347,412,372"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="426,357,607,357,607,362,426,362"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="593,100,683,125"/>
+<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="697,116,769,133,807,147,843,166,865,185,885,207,911,246,906,249,880,210,862,189,840,171,805,152,767,138,695,121"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="593,149,683,175"/>
+<area shape="poly" id="edge11_Node000005_Node000012" title=" " alt="" coords="698,164,768,176,806,187,843,201,877,222,904,246,901,250,874,227,840,206,804,192,767,182,697,169"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1NodeGraphIndex.html" title="Manage Nodes of a graph, for each graph name." alt="" coords="573,199,703,224"/>
+<area shape="poly" id="edge12_Node000005_Node000013" title=" " alt="" coords="718,220,842,241,886,251,885,256,841,246,717,225"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="277,199,485,224"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="499,209,573,209,573,214,499,214"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="5,199,228,224"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="242,209,277,209,277,214,242,214"/>
+<area shape="poly" id="edge15_Node000005_Node000016" title=" " alt="" coords="1101,172,1061,194,947,250,944,245,1059,189,1098,167"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="883,55,950,80"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="964,61,1013,65,1038,72,1062,84,1071,94,1075,104,1079,114,1086,124,1102,135,1099,139,1082,128,1074,117,1070,106,1067,97,1058,88,1036,77,1012,70,963,66"/>
+<area shape="rect" id="Node000018" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventManager.html" title="Event Manager for consistency and trace Update and Inference are tracked Debug mode traces events Sho..." alt="" coords="580,403,696,428"/>
+<area shape="poly" id="edge18_Node000005_Node000018" title=" " alt="" coords="709,402,775,383,809,368,840,350,862,332,880,311,906,272,911,275,884,314,865,336,843,355,811,373,777,388,711,407"/>
+<area shape="rect" id="Node000020" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventLogger.html" title=" " alt="" coords="865,425,968,451"/>
+<area shape="poly" id="edge21_Node000020_Node000018" title=" " alt="" coords="677,431,730,449,765,453,800,453,865,446,865,451,800,458,764,458,729,454,675,436"/>
+<area shape="rect" id="Node000019" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1EventHandler.html" title=" " alt="" coords="326,403,437,428"/>
+<area shape="poly" id="edge19_Node000018_Node000019" title=" " alt="" coords="451,413,580,413,580,418,451,418"/>
+<area shape="poly" id="edge20_Node000018_Node000020" title=" " alt="" coords="851,435,696,423,696,417,852,430"/>
+<area shape="poly" id="edge22_Node000005_Node000021" title=" " alt="" coords="1070,286,1031,287,992,285,947,274,948,269,992,279,1031,282,1070,280"/>
+<area shape="poly" id="edge24_Node000005_Node000022" title=" " alt="" coords="1077,331,1034,321,991,306,935,276,938,271,993,301,1036,315,1078,326"/>
+<area shape="rect" id="Node000023" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1Mapper.html" title=" " alt="" coords="881,5,952,31"/>
+<area shape="poly" id="edge26_Node000004_Node000023" title=" " alt="" coords="966,25,1013,37,1061,54,1117,86,1114,90,1059,59,1011,42,965,30"/>
+</map>

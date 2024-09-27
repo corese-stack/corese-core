@@ -1,0 +1,7 @@
+<map id="ContextLog" name="ContextLog">
+<area shape="rect" id="Node000001" title="Service logger Used by corese core ProviderService and Service Stored in Binding and federated query ..." alt="" coords="54,79,150,104"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1URLParam.html" title=" " alt="" coords="5,5,95,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="69,40,96,77,91,80,64,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="119,5,189,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="140,43,113,80,108,77,135,40"/>
+</map>

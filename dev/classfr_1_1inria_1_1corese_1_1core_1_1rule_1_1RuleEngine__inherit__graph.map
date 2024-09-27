@@ -1,0 +1,7 @@
+<map id="RuleEngine" name="RuleEngine">
+<area shape="rect" id="Node000001" title="Forward Rule Engine Use construct {} where {} SPARQL Query as Rule Optimizations: Do not create Mappi..." alt="" coords="42,79,137,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,72,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,41,83,77,79,80,53,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="97,5,186,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="127,43,100,80,96,77,123,40"/>
+</map>

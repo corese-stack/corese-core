@@ -1,0 +1,7 @@
+<map id="MetaProducer" name="MetaProducer">
+<area shape="rect" id="Node000001" title="Meta Producer that manages several Producer Uses a generic MetaIterator that iterates over Producer i..." alt="" coords="59,79,171,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,84,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,39,106,77,102,80,64,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="108,5,267,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="167,43,129,80,125,77,164,39"/>
+</map>
