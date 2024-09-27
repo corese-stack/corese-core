@@ -45,7 +45,7 @@ jobs:
         doxygen
         cd ../..
         mkdir build/html/dev/
-        mv docs/build/html/* build/html/dev/
+        mv docs/build/doxygen_html/* build/html/dev/
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
