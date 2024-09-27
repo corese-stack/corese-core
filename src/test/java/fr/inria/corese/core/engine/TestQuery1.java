@@ -1,4 +1,4 @@
-package fr.inria.corese.engine;
+package fr.inria.corese.core.engine;
 
 import static fr.inria.corese.core.util.Property.Value.LOAD_IN_DEFAULT_GRAPH;
 import static fr.inria.corese.core.util.Property.Value.SPARQL_COMPLIANT;
