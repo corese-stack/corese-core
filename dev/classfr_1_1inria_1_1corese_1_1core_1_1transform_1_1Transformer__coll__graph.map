@@ -1,0 +1,17 @@
+<map id="Transformer" name="Transformer">
+<area shape="rect" id="Node000001" title="SPARQL Template Transformation Engine." alt="" coords="163,168,263,193"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="116,80,267,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,118,212,167,207,168,195,119"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1Graph.html" title="Graph Manager Edges are stored in an index An index is a table: predicate &#45;&gt; List&lt;Edge&gt; Edge List are..." alt="" coords="291,80,353,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="298,116,229,170,226,166,295,112"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,5,108,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="112,32,292,80,291,86,111,37"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="132,5,267,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="232,35,304,77,301,82,229,40"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="291,5,353,31"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="325,45,325,80,319,80,319,45"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="377,5,467,31"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="396,41,340,82,337,77,393,37"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="491,5,582,31"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="491,38,354,84,352,78,489,33"/>
+</map>

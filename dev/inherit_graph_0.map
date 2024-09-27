@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="26,5,87,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1Graph.html" title="Graph Manager Edges are stored in an index An index is a table: predicate &#45;&gt; List&lt;Edge&gt; Edge List are..." alt="" coords="156,104,217,129"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="101,34,110,40,148,72,176,102,172,106,144,76,106,44,98,39"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="12,55,101,80"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="105,83,157,103,155,108,103,87"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,104,108,129"/>
+<area shape="poly" id="edge3_Node000003_Node000001" title=" " alt="" coords="122,114,156,114,156,119,122,119"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="21,153,93,179"/>
+<area shape="poly" id="edge4_Node000004_Node000001" title=" " alt="" coords="103,146,155,126,157,131,105,151"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="11,203,102,228"/>
+<area shape="poly" id="edge5_Node000005_Node000001" title=" " alt="" coords="97,194,106,188,143,157,172,128,176,132,147,161,110,192,100,198"/>
+</map>

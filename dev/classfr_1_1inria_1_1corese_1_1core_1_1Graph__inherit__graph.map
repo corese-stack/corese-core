@@ -1,0 +1,13 @@
+<map id="Graph" name="Graph">
+<area shape="rect" id="Node000001" title="Graph Manager Edges are stored in an index An index is a table: predicate &#45;&gt; List&lt;Edge&gt; Edge List are..." alt="" coords="291,79,353,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,108,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,32,292,79,290,84,112,37"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="132,5,267,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,35,303,76,301,81,229,40"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="291,5,353,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="325,44,325,79,319,79,319,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="377,5,467,31"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="396,41,340,81,337,76,393,36"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="491,5,582,31"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="490,37,354,82,352,77,489,32"/>
+</map>
