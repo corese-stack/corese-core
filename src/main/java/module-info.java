@@ -13,6 +13,7 @@ module fr.inria.corese.corese_core {
     requires org.json; //
     requires org.apache.commons.lang3;
     requires shexjava.core;
+    requires org.slf4j;
     requires junit; //
 
     exports fr.inria.corese.core.load;
