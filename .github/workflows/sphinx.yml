@@ -30,7 +30,8 @@ jobs:
     - name: Install dependencies
       run: |
         source /builds/miniconda3/etc/profile.d/conda.sh
-        conda env update -f conda-env/corese-core-documentation.yml
+        ls -la
+        conda env update -f ./conda-env/corese-core-documentation.yml
         conda activate corese-core-documentation
 
     - name: Build Sphinx documentation with multiversion
