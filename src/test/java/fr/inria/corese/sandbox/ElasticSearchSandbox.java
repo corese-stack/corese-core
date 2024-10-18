@@ -94,7 +94,7 @@ public class ElasticSearchSandbox extends ProcessVisitorDefault {
 
     @Override
     public IDatatype update(Query q, List<Edge> delete, List<Edge> insert) {
-        System.out.println(String.format("Update delete:{} insert:{}", delete.size(), insert.size()));
+        System.out.println("Update delete:" + delete.size() + " insert:" + insert.size());
         return defaultValue();
     }
 }

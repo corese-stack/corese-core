@@ -180,7 +180,7 @@ public class Query extends Exp implements Graphable {
             // join service send Mappings from first pattern to service
             isMap = true,
             // construct where as a rule
-            isRule = false, isDetail = false;
+            isRule = false, isDetail = true;
     private boolean algebra = false;
     private boolean isMatch = false;
     private boolean initMode = false;
