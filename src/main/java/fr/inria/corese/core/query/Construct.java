@@ -270,11 +270,11 @@ public class Construct
             gNode = null;
         }
 
-        if (lInsert != null) {
-            map.setInsert(lInsert);
+        if (getInsertList() != null) {
+            map.setInsert(getInsertList());
         }
-        if (lDelete != null) {
-            map.setDelete(lDelete);
+        if (getDeleteList() != null) {
+            map.setDelete(getDeleteList());
         }
                 
         if (env != null) {
@@ -392,9 +392,7 @@ public class Construct
                                     // isBuffer() == true
                                     // store edges for RuleEngine process() cons.getInsertList()
                                     lInsert.add(edge);
-                                    for (Edge nestedEdge : insertEdgeList) {
-                                        lInsert.add(nestedEdge);
-                                    }
+                                    lInsert.addAll(insertEdgeList);
                                 }
 
                                 if (isInsert()) {

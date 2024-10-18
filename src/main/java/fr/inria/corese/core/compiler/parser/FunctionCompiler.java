@@ -249,10 +249,8 @@ public class FunctionCompiler {
             if (pub || exp.isPublic()) {
                 definePublic(exp, q);
             }
-            if (exp.hasMetadata(Metadata.UPDATE)) {
-                // @update event function => detail mode for Construct insert/delete
-                q.setDetail(true);
-            }
+            // Detail mode for Construct insert/delete
+            q.setDetail(true);
         }
     }
 
