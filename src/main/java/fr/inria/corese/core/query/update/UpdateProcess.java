@@ -48,7 +48,7 @@ public class UpdateProcess {
     private QueryProcess exec;
     Query query;
     private Dataset dataset;
-    private ProcessVisitor visitor;
+    private List<ProcessVisitor> visitorList;
 
     boolean isDebug = false;
 
@@ -56,6 +56,7 @@ public class UpdateProcess {
         manager = man;
         exec = e;
         this.dataset = ds;
+        this.visitorList = new ArrayList<>();
     }
 
     public static UpdateProcess create(QueryProcess e, ManagerImpl man, Dataset ds) {
@@ -76,7 +77,7 @@ public class UpdateProcess {
         getManager().setAccessRight(bind == null ? null : bind.getAccessRight());
         NSManager nsm = null;
         // Visitor was setup by QueryProcessUpdate init(q, m)
-        setVisitor(getQueryProcess().getVisitor());
+        addVisitor(getQueryProcess().getVisitor());
         
         for (Update u : astu.getUpdates()) {
             if (isDebug) {
@@ -180,7 +181,7 @@ public class UpdateProcess {
      */
     Mapping getMapping(Query q, Mapping m, Binding b) {
         Mapping mm = m;
-        if (m != null && m.size() == 0 && m.getBind() != null) {
+        if (mm != null && mm.size() == 0 && mm.getBind() != null) {
             // m contains LDScript binding stack
             // generate appropriate Mapping for query q from this stack.
             // use case: query(insert where))
@@ -194,8 +195,14 @@ public class UpdateProcess {
         if (b != null) {            
             mm = setBind(mm, b);
         }
-        
-        mm = setVisitor(mm, getVisitor());
+
+        if (mm == null) {
+            mm = new Mapping();
+        }
+        if (mm.getBind() == null) {
+            mm.setBind(Binding.create());
+        }
+        mm.getBind().setVisitor(mm.getBind().getVisitor());
         return mm;
     }
     
@@ -204,17 +211,6 @@ public class UpdateProcess {
             m = new Mapping();
         }
         m.setBind(b);
-        return m;
-    }
-    
-    Mapping setVisitor(Mapping m, ProcessVisitor vis) {
-        if (m == null) {
-            m = new Mapping();
-        }
-        if (m.getBind() == null) {
-            m.setBind(Binding.create());
-        }
-        m.getBind().setVisitor(m.getBind().getVisitor());
         return m;
     }
 
@@ -250,7 +246,9 @@ public class UpdateProcess {
             getManager().insert(q, map, getDataset());
         }
 
-        visitor(getVisitor(), q, map);
+        for(ProcessVisitor visitor : getVisitorList()) {
+            visitor(visitor, q, map);
+        }
         getQueryProcess().logFinish(query, map);
 
         return map;
@@ -446,15 +444,15 @@ public class UpdateProcess {
     /**
      * @return the visitor
      */
-    public ProcessVisitor getVisitor() {
-        return visitor;
+    public List<ProcessVisitor> getVisitorList() {
+        return visitorList;
     }
 
     /**
      * @param visitor the visitor to set
      */
-    public void setVisitor(ProcessVisitor visitor) {
-        this.visitor = visitor;
+    public void addVisitor(ProcessVisitor visitor) {
+        this.visitorList.add(visitor);
     }
 
     public QueryProcess getQueryProcess() {
