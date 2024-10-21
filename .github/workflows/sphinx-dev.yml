@@ -35,4 +35,10 @@ jobs:
         mkdir build/html/
         mkdir build/html/dev/
         mv docs/build/doxygen_html/* build/html/dev/
-        ghp-import build/html/dev/ -p -x dev
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build/html
+        keep_files: true
