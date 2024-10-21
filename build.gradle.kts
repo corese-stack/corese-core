@@ -51,7 +51,7 @@ dependencies {
 }
 
 group = "fr.inria.corese"
-version = "5.0.0-SNAPSHOT"
+version = "4.6.0-SNAPSHOT"
 description = "corese-core"
 
 publishing {
