@@ -1,12 +1,9 @@
-name: "Sphinx: Render docs"
+name: "Sphinx: Render production docs"
 run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
 on:
   push:
     branches:
-      - "feature/retrieve_doc"  # TODO Should build from main branch
-  pull_request:
-    branches:
-      - "develop"
+      - "main"
 
 permissions:
   contents: write
@@ -22,17 +19,20 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        ref: feature/retrieve_doc
+        ref: main
 
     - name: Fetch tags
       run: git fetch --prune --unshallow --tags --force
 
+<<<<<<< HEAD:.github/workflows/sphinx.yml
     - name: Install dependencies
       run: |
         source /builds/miniconda3/etc/profile.d/conda.sh
         conda env update -f ./conda-env/corese-core-documentation.yaml
         conda activate corese-core-documentation
 
+=======
+>>>>>>> a04ede39 (Prepare for release.):.github/workflows/sphinx-prod.yml
     - name: Build Sphinx documentation with multiversion
       run: |
         source /builds/miniconda3/etc/profile.d/conda.sh
@@ -40,11 +40,6 @@ jobs:
         sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${sourcedir}/java_api'
         chmod u+x docs/switcher_generator.sh
         ./docs/switcher_generator.sh build/html/switcher.json build/html/index.html
-        cd docs/source
-        doxygen DoxyfileFull
-        cd ../..
-        mkdir build/html/dev/
-        mv docs/build/doxygen_html/* build/html/dev/
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
