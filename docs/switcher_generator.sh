@@ -10,6 +10,9 @@ fi
 json_output_file="$1"
 html_output_file="$2"
 
+# Set minimal version  (before which no documentation would be generated in a compatible way)
+minimal_version="4.6.0"
+
 # Get all Git tags and filter by the form vX.Y.Z (semantic versioning)
 tags=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$')
 
@@ -26,25 +29,35 @@ html_content="<html>
   <h1>Documentation Versions</h1>
   <ul>"
 
+# Function to compare versions to minimal version
+version_greater_equal() {
+    # Use sort -V for natural version comparison
+    test "$(echo -e "$1\n$2" | sort -V | head -n 1)" = $2
+}
+
 # Initialize the first flag to identify the latest tag
 is_first=true
 latest_version=""
 
 # Loop through each tag
 for tag in $tags; do
-    # Determine if this is the latest version
-    if $is_first; then
-        preferred="true"
-        name="$tag (latest)"
-        latest_version="$tag"
-        is_first=false
-    else
-        preferred="false"
-        name="$tag (stable)"
-    fi
+    version=${tag#v}
 
-    # Create a JSON object for the tag
-    json_object=$(cat <<EOF
+    # Check if the version is greater than or equal to the minimal version
+    if version_greater_equal "$version" "$minimal_version"; then
+        # Determine if this is the latest version
+        if $is_first; then
+            preferred="true"
+            name="$tag (latest)"
+            latest_version="$tag"
+            is_first=false
+        else
+            preferred="false"
+            name="$tag (stable)"
+        fi
+
+        # Create a JSON object for the tag
+        json_object=$(cat <<EOF
 {
     "name": "$name",
     "version": "stable",
@@ -52,17 +65,18 @@ for tag in $tags; do
     "preferred": $preferred
 }
 EOF
-)
-    # Add the JSON object to the array
-    json_array+=("$json_object")
+                   )
+        # Add the JSON object to the array
+        json_array+=("$json_object")
 
-    # Add HTML list item for the version
-    if [ "$preferred" == "true" ]; then
-        html_content="$html_content
+        # Add HTML list item for the version
+        if [ "$preferred" == "true" ]; then
+            html_content="$html_content
     <li><a href=\"https://corese-stack.github.io/corese-core/$tag/\">$tag (latest)</a></li>"
-    else
-        html_content="$html_content
+        else
+            html_content="$html_content
     <li><a href=\"https://corese-stack.github.io/corese-core/$tag/\">$tag</a></li>"
+        fi
     fi
 done
 
