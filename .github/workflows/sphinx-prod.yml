@@ -24,15 +24,6 @@ jobs:
     - name: Fetch tags
       run: git fetch --prune --unshallow --tags --force
 
-<<<<<<< HEAD:.github/workflows/sphinx.yml
-    - name: Install dependencies
-      run: |
-        source /builds/miniconda3/etc/profile.d/conda.sh
-        conda env update -f ./conda-env/corese-core-documentation.yaml
-        conda activate corese-core-documentation
-
-=======
->>>>>>> a04ede39 (Prepare for release.):.github/workflows/sphinx-prod.yml
     - name: Build Sphinx documentation with multiversion
       run: |
         source /builds/miniconda3/etc/profile.d/conda.sh
