@@ -751,7 +751,7 @@ public class TestQuery1 {
 
     @Test
     public void testREM() throws EngineException, LoadException {
-        String q = "prefix ex: <function://fr.inria.corese.engine.TestQuery1> "
+        String q = "prefix ex: <function://fr.inria.corese.core.engine.TestQuery1> "
                 + "select * where {bind (ex:mytest(xt:graph()) as ?t) } limit 10";
         Graph g = Graph.create();
         QueryProcess exec = QueryProcess.create(g);
@@ -7514,7 +7514,7 @@ public class TestQuery1 {
     @Test
     public void test20() {
         String query = "prefix c: <http://www.inria.fr/acacia/comma#>" +
-                "prefix ext: <function://fr.inria.corese.engine.TestQuery1> "
+                "prefix ext: <function://fr.inria.corese.core.engine.TestQuery1> "
                 + "select (ext:fun(?fn, ?ln) as ?res) where {"
                 + "?x c:FirstName ?fn ; c:FamilyName ?ln"
                 + "}";
