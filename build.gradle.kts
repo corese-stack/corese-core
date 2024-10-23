@@ -4,8 +4,13 @@ plugins {
     `jacoco`
     id("org.gradlex.extra-java-module-info") version "1.8"
     id("com.gradleup.shadow") version "8.3.1"
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     signing
 }
+
+group = "fr.inria.corese"
+version = "4.6.0-SNAPSHOT"
+description = "corese-core"
 
 java {
     withJavadocJar()
@@ -22,6 +27,127 @@ repositories {
         val snapshotsRepoUrl = uri(layout.buildDirectory.dir("repos/snapshots"))
         url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
     }
+}
+
+signing {
+    val signingKey = providers
+        .environmentVariable("GPG_SIGNING_KEY")
+        .forUseAtConfigurationTime()
+
+    val signingPassphrase = providers
+        .environmentVariable("GPG_SIGNING_PASSPHRASE")
+        .forUseAtConfigurationTime()
+    
+    if (signingKey.isPresent && signingPassphrase.isPresent) {
+        useInMemoryPgpKeys(signingKey.get(), signingPassphrase.get())
+        val extension = extensions.getByName("publishing") as PublishingExtension
+        sign(extension.publications)
+    }
+}
+
+object Meta {
+  const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
+  const val license = "CeCILL-C License"
+  const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
+  const val githubRepo = "corese-stack/corese-core"
+  const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+  const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
+}
+
+
+
+publishing {
+
+  publications {
+    create<MavenPublication>("maven") {
+
+      groupId = project.group.toString()
+      artifactId = project.name
+      version = project.version.toString()
+
+      from(components["java"])
+      versionMapping {
+          usage("java-api") {
+              fromResolutionOf("runtimeClasspath")
+          }
+          usage("java-runtime") {
+              fromResolutionResult()
+          }
+      }
+      artifact(tasks["sourcesJar"])
+      artifact(tasks["javadocJar"])
+      pom {
+        name.set(project.name)
+        description.set(Meta.desc)
+        url.set("https://github.com/${Meta.githubRepo}")
+        licenses {
+          license {
+            name.set(Meta.license)
+            url.set(Meta.licenseUrl)
+          }
+        }
+        developers {
+          developer {
+            id.set("OlivierCorby")
+            name.set("Olivier Corby")
+            email.set("olivier.corby@inria.fr")
+            url.set("http://www-sop.inria.fr/members/Olivier.Corby")
+            organization.set("Inria")
+            organizationUrl.set("http://www.inria.fr/")
+          }
+        developer {
+            id.set("remiceres")
+            name.set("Rémi Cérès")
+            email.set("remi.ceres@inria.fr")
+            url.set("http://www-sop.inria.fr/members/Remi.Ceres")
+            organization.set("Inria")
+            organizationUrl.set("http://www.inria.fr/")
+          }
+        developer {
+            id.set("pierremaillot")
+            name.set("Pierre Maillot")
+            email.set("pierre.maillot@inria.fr")
+            url.set("http://www-sop.inria.fr/members/Pierre.Maillot")
+            organization.set("Inria")
+            organizationUrl.set("http://www.inria.fr/")
+          }
+        }
+        scm {
+          url.set(
+            "https://github.com/${Meta.githubRepo}.git"
+          )
+          connection.set(
+            "scm:git:git://github.com/${Meta.githubRepo}.git"
+          )
+          developerConnection.set(
+            "scm:git:git://github.com/${Meta.githubRepo}.git"
+          )
+        }
+        issueManagement {
+          url.set("https://github.com/${Meta.githubRepo}/issues")
+        }
+      }
+    }
+  }
+}
+
+nexusPublishing {
+  repositories {
+    sonatype {
+      nexusUrl.set(uri(Meta.release))
+      snapshotRepositoryUrl.set(uri(Meta.snapshot))
+      val ossrhUsername = providers
+        .environmentVariable("OSSRH_USERNAME")
+        .forUseAtConfigurationTime()
+      val ossrhPassword = providers
+        .environmentVariable("OSSRH_PASSWORD")
+        .forUseAtConfigurationTime()
+      if (ossrhUsername.isPresent && ossrhPassword.isPresent) {
+        username.set(ossrhUsername.get())
+        password.set(ossrhPassword.get())
+      }
+    }
+  }
 }
 
 dependencies {
@@ -50,23 +176,21 @@ dependencies {
     implementation("junit:junit:4.13.2")
 }
 
-group = "fr.inria.corese"
-version = "4.6.0-SNAPSHOT"
-description = "corese-core"
 
-publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
-        versionMapping {
-            usage("java-api") {
-                fromResolutionOf("runtimeClasspath")
-            }
-            usage("java-runtime") {
-                fromResolutionResult()
-            }
-        }
-    }
-}
+
+// publishing {
+//     publications.create<MavenPublication>("maven") {
+//         from(components["java"])
+//         versionMapping {
+//             usage("java-api") {
+//                 fromResolutionOf("runtimeClasspath")
+//             }
+//             usage("java-runtime") {
+//                 fromResolutionResult()
+//             }
+//         }
+//     }
+// }
 
 tasks.withType<JavaCompile>() {
     options.encoding = "UTF-8"
