@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
     `jacoco`
     id("org.gradlex.extra-java-module-info") version "1.8"
-    id("com.gradleup.shadow") version "8.3.1"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     signing
 }
@@ -17,16 +17,10 @@ java {
     withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_11
 }
-tasks.withType<Javadoc> { isFailOnError = false }
 
 repositories {
     mavenLocal()
-    maven {
-        // change URLs to point to your repos, e.g. http://my.org/repo
-        val releasesRepoUrl = uri("https://repo.maven.apache.org/maven2/")
-        val snapshotsRepoUrl = uri(layout.buildDirectory.dir("repos/snapshots"))
-        url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
-    }
+    mavenCentral()
 }
 
 signing {
@@ -54,18 +48,13 @@ object Meta {
   const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
-
-
 publishing {
 
   publications {
     create<MavenPublication>("maven") {
 
-      groupId = project.group.toString()
-      artifactId = project.name
-      version = project.version.toString()
-
       from(components["java"])
+
       versionMapping {
           usage("java-api") {
               fromResolutionOf("runtimeClasspath")
@@ -74,8 +63,17 @@ publishing {
               fromResolutionResult()
           }
       }
-      artifact(tasks["sourcesJar"])
-      artifact(tasks["javadocJar"])
+
+      artifact(tasks["sourcesJar"]) {
+        classifier = "sources"
+      }
+      artifact(tasks["javadocJar"]) {
+        classifier = "javadoc"
+      }
+      artifact(tasks["shadowJar"]) {
+        classifier = "jar-with-dependencies"
+      }
+      
       pom {
         name.set(project.name)
         description.set(Meta.desc)
@@ -178,19 +176,6 @@ dependencies {
 
 
 
-// publishing {
-//     publications.create<MavenPublication>("maven") {
-//         from(components["java"])
-//         versionMapping {
-//             usage("java-api") {
-//                 fromResolutionOf("runtimeClasspath")
-//             }
-//             usage("java-runtime") {
-//                 fromResolutionResult()
-//             }
-//         }
-//     }
-// }
 
 tasks.withType<JavaCompile>() {
     options.encoding = "UTF-8"
@@ -198,6 +183,7 @@ tasks.withType<JavaCompile>() {
 
 tasks.withType<Javadoc>() {
     options.encoding = "UTF-8"
+    isFailOnError = false
 }
 
 tasks {
