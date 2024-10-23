@@ -53,81 +53,116 @@ publishing {
   publications {
     create<MavenPublication>("maven") {
 
-      from(components["java"])
+        from(components["java"])
 
-      versionMapping {
-          usage("java-api") {
-              fromResolutionOf("runtimeClasspath")
-          }
-          usage("java-runtime") {
-              fromResolutionResult()
-          }
-      }
+        versionMapping {
+            usage("java-api") {
+                fromResolutionOf("runtimeClasspath")
+            }
+            usage("java-runtime") {
+                fromResolutionResult()
+            }
+        }
 
-      artifact(tasks["sourcesJar"]) {
-        classifier = "sources"
-      }
-      artifact(tasks["javadocJar"]) {
-        classifier = "javadoc"
-      }
-      artifact(tasks["shadowJar"]) {
-        classifier = "jar-with-dependencies"
-      }
-      
-      pom {
-        name.set(project.name)
-        description.set(Meta.desc)
-        url.set("https://github.com/${Meta.githubRepo}")
-        licenses {
-          license {
-            name.set(Meta.license)
-            url.set(Meta.licenseUrl)
-          }
+        pom {
+            name.set(project.name)
+            description.set(Meta.desc)
+            url.set("https://github.com/${Meta.githubRepo}")
+            licenses {
+                license {
+                    name.set(Meta.license)
+                    url.set(Meta.licenseUrl)
+                }
+            }
+            developers {
+                developer {
+                    id.set("OlivierCorby")
+                    name.set("Olivier Corby")
+                    email.set("olivier.corby@inria.fr")
+                    url.set("http://www-sop.inria.fr/members/Olivier.Corby")
+                    organization.set("Inria")
+                    organizationUrl.set("http://www.inria.fr/")
+                }
+                developer {
+                    id.set("remiceres")
+                    name.set("Rémi Cérès")
+                    email.set("remi.ceres@inria.fr")
+                    url.set("http://www-sop.inria.fr/members/Remi.Ceres")
+                    organization.set("Inria")
+                    organizationUrl.set("http://www.inria.fr/")
+                }
+                developer {
+                    id.set("pierremaillot")
+                    name.set("Pierre Maillot")
+                    email.set("pierre.maillot@inria.fr")
+                    url.set("http://www-sop.inria.fr/members/Pierre.Maillot")
+                    organization.set("Inria")
+                    organizationUrl.set("http://www.inria.fr/")
+                }
+            }
+            scm {
+                url.set(
+                        "https://github.com/${Meta.githubRepo}.git"
+                )
+                connection.set(
+                        "scm:git:git://github.com/${Meta.githubRepo}.git"
+                )
+                developerConnection.set(
+                        "scm:git:git://github.com/${Meta.githubRepo}.git"
+                )
+            }
+            issueManagement {
+                url.set("https://github.com/${Meta.githubRepo}/issues")
+            }
         }
-        developers {
-          developer {
-            id.set("OlivierCorby")
-            name.set("Olivier Corby")
-            email.set("olivier.corby@inria.fr")
-            url.set("http://www-sop.inria.fr/members/Olivier.Corby")
-            organization.set("Inria")
-            organizationUrl.set("http://www.inria.fr/")
-          }
-        developer {
-            id.set("remiceres")
-            name.set("Rémi Cérès")
-            email.set("remi.ceres@inria.fr")
-            url.set("http://www-sop.inria.fr/members/Remi.Ceres")
-            organization.set("Inria")
-            organizationUrl.set("http://www.inria.fr/")
-          }
-        developer {
-            id.set("pierremaillot")
-            name.set("Pierre Maillot")
-            email.set("pierre.maillot@inria.fr")
-            url.set("http://www-sop.inria.fr/members/Pierre.Maillot")
-            organization.set("Inria")
-            organizationUrl.set("http://www.inria.fr/")
-          }
+    }
+    create<MavenPublication>("mavensources") {
+        artifact(tasks["sourcesJar"]) {
+            classifier = "sources"
         }
-        scm {
-          url.set(
-            "https://github.com/${Meta.githubRepo}.git"
-          )
-          connection.set(
-            "scm:git:git://github.com/${Meta.githubRepo}.git"
-          )
-          developerConnection.set(
-            "scm:git:git://github.com/${Meta.githubRepo}.git"
-          )
+
+        versionMapping {
+            usage("java-api") {
+                fromResolutionOf("runtimeClasspath")
+            }
+            usage("java-runtime") {
+                fromResolutionResult()
+            }
         }
-        issueManagement {
-          url.set("https://github.com/${Meta.githubRepo}/issues")
+    }
+    create<MavenPublication>("mavendoc") {
+        artifact(tasks["javadocJar"]) {
+            classifier = "javadoc"
         }
-      }
+
+        versionMapping {
+            usage("java-api") {
+                fromResolutionOf("runtimeClasspath")
+            }
+            usage("java-runtime") {
+                fromResolutionResult()
+            }
+        }
+    }
+    create<MavenPublication>("mavenshadow") {
+        artifact(tasks["shadowJar"]) {
+            classifier = "jar-with-dependencies"
+        }
+
+        versionMapping {
+            usage("java-api") {
+                fromResolutionOf("runtimeClasspath")
+            }
+            usage("java-runtime") {
+                fromResolutionResult()
+            }
+        }
     }
   }
-}
+
+    }
+  
+
 
 nexusPublishing {
   repositories {
