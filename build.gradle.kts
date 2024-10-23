@@ -8,9 +8,6 @@ plugins {
     signing
 }
 
-group = "fr.inria.corese"
-version = "4.6.0-SNAPSHOT"
-description = "corese-core"
 
 java {
     withJavadocJar()
@@ -40,6 +37,9 @@ signing {
 }
 
 object Meta {
+  const val groupId = "fr.inria.corese"
+  const val artifactId = "corese-core"
+  const val version = "4.6.0"
   const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
   const val license = "CeCILL-C License"
   const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
@@ -50,6 +50,9 @@ object Meta {
 
 // Common POM and Version Mapping Configuration for the different publications
 fun MavenPublication.configurePomAndVersionMapping() {
+    groupId = Meta.groupId
+    artifactId = Meta.artifactId
+    version = Meta.version
     versionMapping {
         usage("java-api") {
             fromResolutionOf("runtimeClasspath")
@@ -60,7 +63,7 @@ fun MavenPublication.configurePomAndVersionMapping() {
     }
 
     pom {
-        name.set(project.name)
+        name.set(Meta.artifactId)
         description.set(Meta.desc)
         url.set("https://github.com/${Meta.githubRepo}")
         licenses {
@@ -133,8 +136,6 @@ publishing {
     }
   }
 }
-  
-
 
 nexusPublishing {
   repositories {
@@ -209,6 +210,14 @@ tasks.jacocoTestReport {
 
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.withType<PublishToMavenLocal>().configureEach {
+    dependsOn(tasks.withType<Sign>())
+}
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+    dependsOn(tasks.withType<Sign>())
 }
 
 extraJavaModuleInfo {
