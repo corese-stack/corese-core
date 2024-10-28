@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.exceptions;
+package fr.inria.corese.core.sparql.exceptions;
 
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  *

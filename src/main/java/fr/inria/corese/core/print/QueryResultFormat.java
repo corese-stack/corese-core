@@ -1,6 +1,6 @@
 package fr.inria.corese.core.print;
 
-import fr.inria.corese.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Context;
 
 /**
  * Root class for Result Format

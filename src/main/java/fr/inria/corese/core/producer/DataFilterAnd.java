@@ -5,7 +5,7 @@
 
 package fr.inria.corese.core.producer;
 
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 
 /**
  *

@@ -6,16 +6,16 @@ package fr.inria.corese;
  * and open the template in the editor.
  */
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.storage.api.IStorage;
-import fr.inria.corese.sparql.storage.api.Parameters;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.storage.api.Parameters;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.print.ResultFormat;
 import fr.inria.corese.core.print.TripleFormat;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Mappings;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 

@@ -1,17 +1,17 @@
-package fr.inria.corese.sparql.api;
+package fr.inria.corese.core.sparql.api;
 
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.kgram.api.core.DatatypeValue;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.Pointerable;
-import fr.inria.corese.kgram.api.core.Loopable;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.kgram.api.core.TripleStore;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.storage.api.IStorage;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.kgram.api.core.DatatypeValue;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.api.core.Loopable;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -388,6 +388,7 @@ public interface IDatatype
     
     String toSparql(boolean prefix, boolean xsd, NSManager nsm);
 
+    String toSparql(boolean prefix, boolean xsd, boolean skipUndefPrefix, NSManager nsm);
     
     default String trace() {
         return String.format("trace: %s code: %s datatype: %s label: %s", 

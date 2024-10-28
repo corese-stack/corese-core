@@ -1,18 +1,18 @@
-package fr.inria.corese.compiler.parser;
+package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.kgram.api.core.Edge;
-import static fr.inria.corese.kgram.api.core.ExpType.BIND;
-import static fr.inria.corese.kgram.api.core.ExpType.EDGE;
-import static fr.inria.corese.kgram.api.core.ExpType.FILTER;
-import static fr.inria.corese.kgram.api.core.ExpType.PATH;
-import static fr.inria.corese.kgram.api.core.ExpType.QUERY;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import static fr.inria.corese.core.kgram.api.core.ExpType.BIND;
+import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
+import static fr.inria.corese.core.kgram.api.core.ExpType.FILTER;
+import static fr.inria.corese.core.kgram.api.core.ExpType.PATH;
+import static fr.inria.corese.core.kgram.api.core.ExpType.QUERY;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Query;
 import java.util.ArrayList;
 import java.util.List;
 

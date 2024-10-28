@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.api;
+package fr.inria.corese.core.sparql.api;
 
 import java.util.Collection;
 

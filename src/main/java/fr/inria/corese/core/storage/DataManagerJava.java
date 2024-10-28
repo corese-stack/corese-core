@@ -11,19 +11,19 @@ import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.function.proxy.GraphSpecificFunction;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.Access.Feature;
-import fr.inria.corese.sparql.triple.parser.Access.Level;
-import fr.inria.corese.sparql.triple.parser.HashMapList;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.sparql.triple.parser.URLServer;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.proxy.GraphSpecificFunction;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.HashMapList;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
 
 /**
  * DataManager on top of json (or xml) document
@@ -128,7 +128,7 @@ public class DataManagerJava extends CoreseGraphDataManager {
         return str.replace("%20", " ");
     }
 
-    @Override
+    //@Override
     void init() {
         if (isLdscript()) {
             initldscript();
@@ -149,9 +149,10 @@ public class DataManagerJava extends CoreseGraphDataManager {
         Load ld = Load.create(getGraph());
         ld.setDataManager(this);
         // temporary authorize xt:read file to read e.g. json document 
-        Level read     = Access.setValue(Feature.READ, Level.DEFAULT);
-        Level readFile = Access.setValue(Feature.READ_FILE, Level.DEFAULT);
-
+        //Level read     = Access.setValue(Feature.READ, Level.DEFAULT);
+        // Level readFile = Access.setValue(Feature.READ_FILE, Level.DEFAULT);
+        // authorize xt:read() because accept list is empty during this initialization
+        Access.setDefaultResultWhenEmptyAccept(true);
         try {
             if (getLoad()!=null) {
                 for (String name : getLoad()) {
@@ -186,8 +187,9 @@ public class DataManagerJava extends CoreseGraphDataManager {
             logger.error(ex.getMessage());
         }
         finally {
-            Access.set(Feature.READ, read);
-            Access.set(Feature.READ_FILE, readFile);
+            //Access.set(Feature.READ, read);
+            //Access.set(Feature.READ_FILE, readFile);
+            Access.setDefaultResultWhenEmptyAccept(false);
         }
     }
 

@@ -1,15 +1,15 @@
-package fr.inria.corese.kgram.sorter.impl.qpv1;
+package fr.inria.corese.core.kgram.sorter.impl.qpv1;
 
-import fr.inria.corese.kgram.sorter.core.QPGraph;
-import fr.inria.corese.kgram.sorter.core.QPGNode;
-import fr.inria.corese.kgram.sorter.core.ISort;
-import static fr.inria.corese.kgram.api.core.ExpType.EDGE;
-import static fr.inria.corese.kgram.api.core.ExpType.FILTER;
-import static fr.inria.corese.kgram.api.core.ExpType.GRAPH;
-import static fr.inria.corese.kgram.api.core.ExpType.VALUES;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.sorter.core.QPGEdge;
-import fr.inria.corese.kgram.sorter.core.IEstimate;
+import fr.inria.corese.core.kgram.sorter.core.QPGraph;
+import fr.inria.corese.core.kgram.sorter.core.QPGNode;
+import fr.inria.corese.core.kgram.sorter.core.ISort;
+import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
+import static fr.inria.corese.core.kgram.api.core.ExpType.FILTER;
+import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
+import static fr.inria.corese.core.kgram.api.core.ExpType.VALUES;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.sorter.core.QPGEdge;
+import fr.inria.corese.core.kgram.sorter.core.IEstimate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

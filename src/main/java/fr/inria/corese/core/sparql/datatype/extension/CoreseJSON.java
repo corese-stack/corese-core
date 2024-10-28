@@ -1,12 +1,14 @@
-package fr.inria.corese.sparql.datatype.extension;
+package fr.inria.corese.core.sparql.datatype.extension;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.api.IDatatypeList;
-import static fr.inria.corese.sparql.datatype.CoreseBoolean.FALSE;
-import static fr.inria.corese.sparql.datatype.CoreseBoolean.TRUE;
-import fr.inria.corese.sparql.datatype.CoreseDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatypeList;
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.FALSE;
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.TRUE;
+import fr.inria.corese.core.sparql.datatype.CoreseDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -315,7 +317,7 @@ public class CoreseJSON extends CoreseExtension {
             return new CoreseJSON((JSONObject) obj);
         } else if (obj instanceof String) {
             String str = (String) obj;
-            if (NSManager.isURI(str)) {
+            if (isURI(str)) {
                 return DatatypeMap.newResource(str);
             }
             else {
@@ -323,6 +325,15 @@ public class CoreseJSON extends CoreseExtension {
             }
         }
         return DatatypeMap.castObject(obj);
+    }
+    
+    boolean isURI(String str) {
+        try {
+            URI uri = new URI(str);
+            return uri.isAbsolute();
+        } catch (URISyntaxException ex) {
+            return false;
+        }
     }
     
     IDatatype cast(JSONArray ar) {

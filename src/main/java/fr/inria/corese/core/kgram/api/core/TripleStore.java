@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.api.core;
+package fr.inria.corese.core.kgram.api.core;
 
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  *

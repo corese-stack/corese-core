@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.triple.cst;
+package fr.inria.corese.core.sparql.triple.cst;
 
 /**
  *

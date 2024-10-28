@@ -4,9 +4,9 @@ package fr.inria.corese.core;
 
 import fr.inria.corese.core.index.NodeManager;
 import fr.inria.corese.core.index.PredicateList;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import java.util.List;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 
 /**
  * Interface for Index for Graph 

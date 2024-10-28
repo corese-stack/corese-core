@@ -1,4 +1,4 @@
-package fr.inria.corese.kgram.path;
+package fr.inria.corese.core.kgram.path;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -6,23 +6,23 @@ import java.util.Iterator;
 import java.util.List;
 
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Filter;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.Regex;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Evaluator;
-import fr.inria.corese.kgram.api.query.Matcher;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Memory;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.core.SparqlException;
-import fr.inria.corese.kgram.event.EventManager;
-import fr.inria.corese.kgram.event.ResultListener;
-import fr.inria.corese.kgram.tool.EdgeInv;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Filter;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Evaluator;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Memory;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.SparqlException;
+import fr.inria.corese.core.kgram.event.EventManager;
+import fr.inria.corese.core.kgram.event.ResultListener;
+import fr.inria.corese.core.kgram.tool.EdgeInv;
 import java.util.HashMap;
 
 import org.slf4j.Logger;

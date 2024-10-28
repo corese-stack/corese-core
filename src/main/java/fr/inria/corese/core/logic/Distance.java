@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Semantic distance & similarity with Corese 2.4 Algorithm Extended to property

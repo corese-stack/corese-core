@@ -1,18 +1,18 @@
 package fr.inria.corese.core.util;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.sparql.triple.parser.Term;
-import fr.inria.corese.compiler.parser.NodeImpl;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.compiler.parser.NodeImpl;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.api.QueryGraphVisitor;
 import fr.inria.corese.core.edge.EdgeImpl;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -183,8 +183,8 @@ public class QueryGraphVisitorImpl implements QueryGraphVisitor {
      */
     private Exp create(Node node, Node elem) {
        Node var = NodeImpl.createVariable(variable());
-        fr.inria.corese.compiler.parser.EdgeImpl edge = 
-               fr.inria.corese.compiler.parser.EdgeImpl.create(var, node, elem);
+        fr.inria.corese.core.compiler.parser.EdgeImpl edge =
+               fr.inria.corese.core.compiler.parser.EdgeImpl.create(var, node, elem);
        Term re = list();
         try {
             re.compile(ast);

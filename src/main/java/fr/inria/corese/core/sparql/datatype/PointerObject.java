@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.datatype;
+package fr.inria.corese.core.sparql.datatype;
 
-import fr.inria.corese.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
 
 /**
  * Encapsulate an Object which is not a Pointerable

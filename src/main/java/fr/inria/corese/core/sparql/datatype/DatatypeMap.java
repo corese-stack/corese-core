@@ -1,28 +1,28 @@
-package fr.inria.corese.sparql.datatype;
+package fr.inria.corese.core.sparql.datatype;
 
-import fr.inria.corese.sparql.datatype.extension.CoreseIterate;
-import fr.inria.corese.sparql.datatype.extension.CoreseUndefFuture;
-import fr.inria.corese.kgram.api.core.DatatypeValueFactory;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.datatype.extension.CoreseIterate;
+import fr.inria.corese.core.sparql.datatype.extension.CoreseUndefFuture;
+import fr.inria.corese.core.kgram.api.core.DatatypeValueFactory;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import java.util.Hashtable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.Pointerable;
-import static fr.inria.corese.sparql.api.IDatatype.JSON_DATATYPE;
-import static fr.inria.corese.sparql.api.IDatatype.LITERAL;
-import fr.inria.corese.sparql.datatype.extension.CoreseMap;
-import fr.inria.corese.sparql.datatype.extension.CoreseList;
-import fr.inria.corese.sparql.datatype.extension.CoreseJSON;
-import fr.inria.corese.sparql.datatype.extension.CoreseXML;
-import fr.inria.corese.sparql.datatype.extension.CoresePointer;
-import fr.inria.corese.sparql.triple.parser.HashMapList;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
+import static fr.inria.corese.core.sparql.api.IDatatype.JSON_DATATYPE;
+import static fr.inria.corese.core.sparql.api.IDatatype.LITERAL;
+import fr.inria.corese.core.sparql.datatype.extension.CoreseMap;
+import fr.inria.corese.core.sparql.datatype.extension.CoreseList;
+import fr.inria.corese.core.sparql.datatype.extension.CoreseJSON;
+import fr.inria.corese.core.sparql.datatype.extension.CoreseXML;
+import fr.inria.corese.core.sparql.datatype.extension.CoresePointer;
+import fr.inria.corese.core.sparql.triple.parser.HashMapList;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -1113,7 +1113,7 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
     }
 
     public static boolean isLong(IDatatype dt) {
-        return dt.getCode() == IDatatype.INTEGER && dt.getDatatypeURI().equals(fr.inria.corese.sparql.datatype.XSD.xsdlong);
+        return dt.getCode() == IDatatype.INTEGER && dt.getDatatypeURI().equals(fr.inria.corese.core.sparql.datatype.XSD.xsdlong);
     }
 
     public static boolean isFloat(IDatatype dt) {
@@ -1556,9 +1556,9 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         String label = type.getLabel();
         return label.startsWith(NSManager.DT)
                 || label.startsWith(NSManager.XSD)
-                || label.equals(fr.inria.corese.sparql.datatype.RDF.XMLLITERAL)
-                || label.equals(fr.inria.corese.sparql.datatype.RDF.LANGSTRING)
-                || label.equals(fr.inria.corese.sparql.datatype.RDF.HTML);
+                || label.equals(fr.inria.corese.core.sparql.datatype.RDF.XMLLITERAL)
+                || label.equals(fr.inria.corese.core.sparql.datatype.RDF.LANGSTRING)
+                || label.equals(fr.inria.corese.core.sparql.datatype.RDF.HTML);
     }
     
     public static IDatatype URIDomain(IDatatype dt) {

@@ -1,21 +1,21 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.Computer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.datatype.RDF;
-import fr.inria.corese.sparql.triple.api.ExpressionVisitor;
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.compiler.java.JavaCompiler;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.datatype.RDF;
+import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.List;
 
 /**

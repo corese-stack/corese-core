@@ -1,9 +1,9 @@
-package fr.inria.corese.kgram.api.query;
+package fr.inria.corese.core.kgram.api.query;
 
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.event.ResultListener;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.api.Computer;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.event.ResultListener;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.api.Computer;
 
 /**
  * Interface for the connector that evaluates filters

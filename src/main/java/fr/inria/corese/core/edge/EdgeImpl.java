@@ -1,13 +1,13 @@
 package fr.inria.corese.core.edge;
 
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.Entailment;
 import java.util.Arrays;
 import java.util.List;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.ArrayList;
 
 /**

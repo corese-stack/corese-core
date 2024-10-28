@@ -1,30 +1,30 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.triple.function.template.*;
-import fr.inria.corese.sparql.triple.function.core.*;
-import fr.inria.corese.sparql.triple.function.aggregate.*;
-import fr.inria.corese.sparql.triple.function.term.*;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.function.extension.*;
-import fr.inria.corese.sparql.triple.function.script.*;
-import fr.inria.corese.sparql.triple.function.proxy.*;
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.api.ExpressionVisitor;
+import fr.inria.corese.core.sparql.triple.function.template.*;
+import fr.inria.corese.core.sparql.triple.function.core.*;
+import fr.inria.corese.core.sparql.triple.function.aggregate.*;
+import fr.inria.corese.core.sparql.triple.function.term.*;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.function.extension.*;
+import fr.inria.corese.core.sparql.triple.function.script.*;
+import fr.inria.corese.core.sparql.triple.function.proxy.*;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
 import java.util.ArrayList;
 import java.util.List;
-import fr.inria.corese.sparql.triple.cst.Keyword;
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.sparql.compiler.java.JavaCompiler;
-import fr.inria.corese.kgram.api.core.ExpPattern;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import static fr.inria.corese.kgram.api.core.ExprType.XT_CREATE;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.exceptions.SafetyException;
-import fr.inria.corese.sparql.triple.parser.Access.Feature;
+import fr.inria.corese.core.sparql.triple.cst.Keyword;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
+import fr.inria.corese.core.kgram.api.core.ExpPattern;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_CREATE;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -298,6 +298,14 @@ public class Term extends Expression {
             case ExprType.ISUNDEFINED:
             case ExprType.ISSKOLEM:
             case ExprType.ISEXTENSION:
+                
+            case ExprType.SQRT:
+            case ExprType.COS:
+            case ExprType.SIN:
+            case ExprType.TAN:
+            case ExprType.ARC_COS:
+            case ExprType.ARC_SIN:
+            case ExprType.ARC_TAN: 
                 return new UnaryFunction(name);
 
             case ExprType.CONCAT:

@@ -1,15 +1,15 @@
-package fr.inria.corese.sparql.triple.function.script;
+package fr.inria.corese.core.sparql.triple.function.script;
 
-import static fr.inria.corese.kgram.api.core.ExprType.SET;
-import static fr.inria.corese.kgram.api.core.ExprType.STATIC;
-import static fr.inria.corese.kgram.api.core.ExprType.STATIC_UNSET;
-import static fr.inria.corese.kgram.api.core.ExprType.UNSET;
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.kgram.api.query.Producer;
+import static fr.inria.corese.core.kgram.api.core.ExprType.SET;
+import static fr.inria.corese.core.kgram.api.core.ExprType.STATIC;
+import static fr.inria.corese.core.kgram.api.core.ExprType.STATIC_UNSET;
+import static fr.inria.corese.core.kgram.api.core.ExprType.UNSET;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.query.Producer;
 
 /**
  *

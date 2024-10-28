@@ -4,16 +4,16 @@
  */
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Environment;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.transform.Transformer;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

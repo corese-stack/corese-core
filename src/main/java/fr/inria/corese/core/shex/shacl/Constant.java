@@ -1,4 +1,4 @@
-package fr.inria.corese.shex.shacl;
+package fr.inria.corese.core.shex.shacl;
 
 /**
  *

@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.triple.api.FederateMerge;
+import fr.inria.corese.core.sparql.triple.api.FederateMerge;
 import java.util.List;
 
 /**

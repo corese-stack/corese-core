@@ -1,23 +1,23 @@
 package fr.inria.corese.core.rule;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.printer.SPIN;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.printer.SPIN;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import java.util.List;
 
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.Closure;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.util.SPINProcess;
-import fr.inria.corese.sparql.triple.function.core.UUIDFunction;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.function.core.UUIDFunction;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import org.slf4j.LoggerFactory;
 
 public class Rule {

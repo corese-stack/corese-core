@@ -1,12 +1,12 @@
-package fr.inria.corese.sparql.compiler.java;
+package fr.inria.corese.core.sparql.compiler.java;
 
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.Processor;
-import fr.inria.corese.sparql.triple.parser.Term;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.function.script.Let;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Processor;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.script.Let;
 
 /**
  * Add return statement if needed

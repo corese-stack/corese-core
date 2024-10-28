@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.datatype;
+package fr.inria.corese.core.sparql.datatype;
 
-import static fr.inria.corese.sparql.datatype.CoreseBoolean.FALSE;
-import static fr.inria.corese.sparql.datatype.CoreseBoolean.TRUE;
-import static fr.inria.corese.sparql.datatype.Cst.jTypeGenericInteger;
-import static fr.inria.corese.sparql.datatype.Cst.jTypeInteger;
-import static fr.inria.corese.sparql.datatype.RDF.RDF_HTML;
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.FALSE;
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.TRUE;
+import static fr.inria.corese.core.sparql.datatype.Cst.jTypeGenericInteger;
+import static fr.inria.corese.core.sparql.datatype.Cst.jTypeInteger;
+import static fr.inria.corese.core.sparql.datatype.RDF.RDF_HTML;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,18 +16,18 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.kgram.api.core.Pointerable;
-import fr.inria.corese.kgram.api.core.TripleStore;
-import fr.inria.corese.kgram.path.Path;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.api.IDatatypeList;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.sparql.storage.api.IStorage;
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.path.Path;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatypeList;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  * <p>Title: Corese</p>
@@ -146,20 +146,27 @@ public class CoreseDatatype
         return toSparql(prefix, xsd, nsm());
     }
     
+    @Override
+    public String toSparql(boolean prefixDatatype, boolean displayDatatype, NSManager nsm) {
+        return toSparql(prefixDatatype, displayDatatype, true, nsm);
+    }
+    
     /**
      * Overloaded by CoreseExtension
+     * prefixDatatype:  display XSD Datatype with xsd: (default is true)
+     * displayDatatype: display datatype for boolean and integer (default is false)
      */
     @Override
-    public String toSparql(boolean prefix, boolean xsd, NSManager nsm) {
+    public String toSparql(boolean prefixDatatype, boolean displayDatatype, boolean skipUndefPrefix, NSManager nsm) {
         String value = getLabel();        
         if (isPointer() && getPointerObject() != null){
             value = getPointerObject().getDatatypeLabel();
         }
-        if (getCode() == INTEGER && !xsd && getDatatypeURI().equals(XSD.xsdinteger)
+        if (getCode() == INTEGER && !displayDatatype && getDatatypeURI().equals(XSD.xsdinteger)
                 && (! (value.startsWith("0") && value.length() > 1))) {
             // display integer value as is (without datatype)
         } 
-        else if (getCode() == BOOLEAN && !xsd && 
+        else if (getCode() == BOOLEAN && !displayDatatype && 
                 (getLabel().equals(CoreseBoolean.STRUE) || getLabel().equals(CoreseBoolean.SFALSE))) {
         } 
         else if (getCode() == STRING || (getCode() == LITERAL && !hasLang())) {
@@ -167,7 +174,7 @@ public class CoreseDatatype
         } else if (getDatatype() != null && !getDatatype().getLabel().equals(RDFS.rdflangString)) {
             String datatype = getDatatype().getLabel();
 
-            if (prefix && (datatype.startsWith(RDF.XSD))
+            if (prefixDatatype && (datatype.startsWith(RDF.XSD))
                     || datatype.startsWith(RDF.RDF)
                     || datatype.startsWith(NSManager.DT)) {
                 datatype = nsm.toPrefix(datatype);
@@ -185,7 +192,7 @@ public class CoreseDatatype
             value = protect(value);
         } else if (isURI()) {
             if (DISPLAY_AS_PREFIX) {
-                String str = nsm.toPrefix(value, true);
+                String str = nsm.toPrefix(value, skipUndefPrefix);
                 if (str == value) {
                     value = String.format("<%s>", value);
                 } else {

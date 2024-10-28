@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.triple.function.script.Let;
+import fr.inria.corese.core.sparql.triple.function.script.Let;
 import java.util.ArrayList;
 import java.util.List;
 

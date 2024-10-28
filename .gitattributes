@@ -1,0 +1,2 @@
+# to prevent batch files to be converted.
+*.bat text eol=crlf

@@ -1,7 +1,7 @@
 package fr.inria.corese.core;
 
 import fr.inria.corese.core.producer.DataProducer;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import java.util.ArrayList;
 import java.util.List;
 

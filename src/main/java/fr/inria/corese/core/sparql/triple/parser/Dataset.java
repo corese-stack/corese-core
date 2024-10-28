@@ -1,19 +1,19 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.PointerType;
-import static fr.inria.corese.kgram.api.core.PointerType.DATASET;
-import fr.inria.corese.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.sparql.triple.parser.Access.Level;
-import static fr.inria.corese.sparql.triple.parser.URLParam.INDEX;
-import static fr.inria.corese.sparql.triple.parser.URLServer.STORE;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import static fr.inria.corese.core.kgram.api.core.PointerType.DATASET;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
+import static fr.inria.corese.core.sparql.triple.parser.URLParam.INDEX;
+import static fr.inria.corese.core.sparql.triple.parser.URLServer.STORE;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 

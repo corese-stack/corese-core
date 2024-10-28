@@ -1,8 +1,8 @@
-package fr.inria.corese.sparql.storage.fs;
+package fr.inria.corese.core.sparql.storage.fs;
 
-import fr.inria.corese.sparql.storage.api.Parameters;
-import fr.inria.corese.sparql.storage.api.Parameters.type;
-import fr.inria.corese.sparql.storage.cache.LRUCache;
+import fr.inria.corese.core.sparql.storage.api.Parameters;
+import fr.inria.corese.core.sparql.storage.api.Parameters.type;
+import fr.inria.corese.core.sparql.storage.cache.LRUCache;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;

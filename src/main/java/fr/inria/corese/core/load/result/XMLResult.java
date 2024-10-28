@@ -21,20 +21,20 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.sparql.triple.parser.Variable;
-import fr.inria.corese.compiler.eval.QuerySolver;
-import fr.inria.corese.compiler.parser.CompilerFacKgram;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.compiler.eval.QuerySolver;
+import fr.inria.corese.core.compiler.parser.CompilerFacKgram;
 import fr.inria.corese.core.NodeImpl;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.Collection;
@@ -56,7 +56,7 @@ public class XMLResult {
     // create target Node
     Producer producer;
     // create query Node
-    private fr.inria.corese.compiler.parser.Compiler compiler;
+    private fr.inria.corese.core.compiler.parser.Compiler compiler;
     HashMap<String, Integer> table;
     ArrayList<Node> varList;
     private static final int UNKNOWN = -1;
@@ -598,12 +598,12 @@ public class XMLResult {
     }
 
     
-    public fr.inria.corese.compiler.parser.Compiler getCompiler() {
+    public fr.inria.corese.core.compiler.parser.Compiler getCompiler() {
         return compiler;
     }
 
     
-    public void setCompiler(fr.inria.corese.compiler.parser.Compiler compiler) {
+    public void setCompiler(fr.inria.corese.core.compiler.parser.Compiler compiler) {
         this.compiler = compiler;
     }
 

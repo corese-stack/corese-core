@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import fr.inria.corese.core.edge.EdgeImpl;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  * Interface to adapt an external storage system to Corese.

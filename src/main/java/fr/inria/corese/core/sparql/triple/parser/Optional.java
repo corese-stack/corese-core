@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.exceptions.QuerySemanticException;
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.exceptions.QuerySemanticException;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
 import java.util.List;
 
 /**

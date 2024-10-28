@@ -1,10 +1,10 @@
 package fr.inria.corese.similarity;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.approximate.ext.ASTRewriter;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Mappings;
 
 /**
  * Tests.java

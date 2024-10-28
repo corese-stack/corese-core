@@ -1,8 +1,8 @@
 package fr.inria.corese.core;
 
 import fr.inria.corese.core.logic.Entailment;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;

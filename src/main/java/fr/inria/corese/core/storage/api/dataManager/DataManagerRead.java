@@ -3,8 +3,8 @@ package fr.inria.corese.core.storage.api.dataManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Interface to adapt an external storage system to Corese.
@@ -60,7 +60,7 @@ public interface DataManagerRead {
      * 
      * If the size of the contexts in parameter is not equal to 1, then the value of
      * Graph of Edges returned does not matter. It can be for example
-     * {@code http://ns.inria.fr/corese/kgram/default}. Be careful, the value of
+     * {@code http://ns.inria.fr/corese.core.kgram/default}. Be careful, the value of
      * Graph of Edges cannot be {@code null}.
      * 
      * All {@code null} in context list are ignored. E.g. If the list contains only

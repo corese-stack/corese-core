@@ -1,4 +1,4 @@
-package fr.inria.corese.compiler.parser;
+package fr.inria.corese.core.compiler.parser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,34 +8,34 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.triple.parser.*;
-import fr.inria.corese.compiler.api.QueryVisitor;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.sparql.triple.parser.visitor.ASTWalker;
-import fr.inria.corese.sparql.compiler.java.JavaCompiler;
-import fr.inria.corese.kgram.api.core.*;
-import static fr.inria.corese.kgram.api.core.ExpType.NODE;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.core.Sorter;
-import fr.inria.corese.compiler.federate.FederateVisitor;
-import fr.inria.corese.compiler.eval.QuerySolver;
-import static fr.inria.corese.compiler.eval.QuerySolver.SPARQL_COMPLIANT_DEFAULT;
-import fr.inria.corese.compiler.eval.QuerySolverVisitor;
-import fr.inria.corese.compiler.visitor.MetadataVisitor;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.exceptions.SafetyException;
-import fr.inria.corese.sparql.triple.parser.visitor.ASTParser;
-import fr.inria.corese.sparql.triple.parser.visitor.Record;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.parser.visitor.ASTWalker;
+import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
+import fr.inria.corese.core.kgram.api.core.*;
+import static fr.inria.corese.core.kgram.api.core.ExpType.NODE;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.Sorter;
+import fr.inria.corese.core.compiler.federate.FederateVisitor;
+import fr.inria.corese.core.compiler.eval.QuerySolver;
+import static fr.inria.corese.core.compiler.eval.QuerySolver.SPARQL_COMPLIANT_DEFAULT;
+import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
+import fr.inria.corese.core.compiler.visitor.MetadataVisitor;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.triple.parser.visitor.ASTParser;
+import fr.inria.corese.core.sparql.triple.parser.visitor.Record;
 import java.io.IOException;
 import java.util.HashMap;
 
 /**
- * Compiler of SPARQL AST to KGRAM Exp Query Use Corese SPARQL parser Use an
+ * Compiler of SPARQL AST to KGRAM Exp Query Use Corese.Core.Sparql parser Use an
  * abstract compiler to generate target edge/node/filter implementations
  *
  * sub query compiled as distinct edge/node to avoid inappropriate type
@@ -534,7 +534,7 @@ public class Transformer implements ExpType {
         if (!ast.isTemplate()) {
             return;
         }
-        fr.inria.corese.sparql.triple.parser.Exp body = ast.getBody();
+        fr.inria.corese.core.sparql.triple.parser.Exp body = ast.getBody();
         if (ast.getValues() != null
                 && body.size() > 0
                 && body instanceof BasicGraphPattern
@@ -708,11 +708,11 @@ public class Transformer implements ExpType {
      * Compile AST statements into KGRAM statements Compile triple into Edge,
      * filter into Filter
      */
-    Exp compile(fr.inria.corese.sparql.triple.parser.Exp query, boolean opt) throws EngineException {
+    Exp compile(fr.inria.corese.core.sparql.triple.parser.Exp query, boolean opt) throws EngineException {
         return compile(query, opt, 0);
     }
 
-    Exp compile(fr.inria.corese.sparql.triple.parser.Exp query, boolean opt, int level) throws EngineException {
+    Exp compile(fr.inria.corese.core.sparql.triple.parser.Exp query, boolean opt, int level) throws EngineException {
         Exp exp = null;
         int type = getType(query);
         opt = opt || isOption(type);
@@ -770,7 +770,7 @@ public class Transformer implements ExpType {
                  */
                 exp = Exp.create(cpType(type));
 
-                for (fr.inria.corese.sparql.triple.parser.Exp ee : query.getBody()) {
+                for (fr.inria.corese.core.sparql.triple.parser.Exp ee : query.getBody()) {
                     Exp cpl = compile(ee, opt, level + 1);
 
                     if (cpl != null) {
@@ -813,7 +813,7 @@ public class Transformer implements ExpType {
     }
 
     Exp compileBind(ASTQuery ast, Expression e, Variable var) throws EngineException {
-        fr.inria.corese.kgram.api.core.Filter f = compileSelect(e, ast);
+        fr.inria.corese.core.kgram.api.core.Filter f = compileSelect(e, ast);
         Node node = compiler.createNode(var);
         Exp exp = Exp.create(BIND);
         exp.setFilter(f);
@@ -827,7 +827,7 @@ public class Transformer implements ExpType {
     /**
      * Delete/Insert/Construct
      */
-    Exp compile(ASTQuery ast, fr.inria.corese.sparql.triple.parser.Exp exp) throws EngineException {
+    Exp compile(ASTQuery ast, fr.inria.corese.core.sparql.triple.parser.Exp exp) throws EngineException {
         Compiler save = compiler;
         compiler = fac.newInstance();
         compiler.setAST(ast);
@@ -847,7 +847,7 @@ public class Transformer implements ExpType {
         Node src = compile(service.getServiceName());
         Exp node = Exp.create(NODE, src);
               
-        fr.inria.corese.sparql.triple.parser.Exp body = service.get(0);
+        fr.inria.corese.core.sparql.triple.parser.Exp body = service.get(0);
         ASTQuery aa;
 
         if (body.isBGP() && body.size() == 1 && body.get(0).isQuery()) {
@@ -1068,14 +1068,14 @@ public class Transformer implements ExpType {
         }
         for (Expression test : ast.getRegexTest()) {
             // ?x c:isMemberOf[?this != <inria>] + ?y
-            fr.inria.corese.kgram.api.core.Filter f = compile(test);
+            fr.inria.corese.core.kgram.api.core.Filter f = compile(test);
             q.addPathFilter(f);
         }
     }
 
     void having(Query q, ASTQuery ast) throws EngineException {
         if (ast.getHaving() != null) {
-            fr.inria.corese.kgram.api.core.Filter having = compileSelect(ast.getHaving(), ast);
+            fr.inria.corese.core.kgram.api.core.Filter having = compileSelect(ast.getHaving(), ast);
             q.setHaving(Exp.create(FILTER, having));
         }
     }
@@ -1111,7 +1111,7 @@ public class Transformer implements ExpType {
 
             if (ee != null) {
                 // select fun() as var
-                fr.inria.corese.kgram.api.core.Filter f = compileSelect(ee, ast);
+                fr.inria.corese.core.kgram.api.core.Filter f = compileSelect(ee, ast);
 
                 if (f != null) {
                     // select fun() as var
@@ -1278,7 +1278,7 @@ public class Transformer implements ExpType {
      * @param query
      * @param f
      */
-    void checkFilterVariables(Query query, fr.inria.corese.kgram.api.core.Filter f, List<Exp> select, List<Node> lNodes) {
+    void checkFilterVariables(Query query, fr.inria.corese.core.kgram.api.core.Filter f, List<Exp> select, List<Node> lNodes) {
         switch (f.getExp().oper()) {
             // do not create Node for local variables
             case ExprType.PACKAGE:
@@ -1364,7 +1364,7 @@ public class Transformer implements ExpType {
             } else {
                 // order by fun(?x)
                 // TODO: check rewrite fun() as var
-                fr.inria.corese.kgram.api.core.Filter f = compile(ee);
+                fr.inria.corese.core.kgram.api.core.Filter f = compile(ee);
                 Node node = createNode();
                 Exp exp = Exp.create(NODE, node);
                 exp.setFilter(f);
@@ -1451,7 +1451,7 @@ public class Transformer implements ExpType {
         if (t.isXPath()) {
             // deprecated ?x xpath() ?y
             exp.setType(EVAL);
-            fr.inria.corese.kgram.api.core.Filter xpath = compiler.compile(t.getXPath());
+            fr.inria.corese.core.kgram.api.core.Filter xpath = compiler.compile(t.getXPath());
             exp.setFilter(xpath);
         } else if (t.isPath()) {
             path(t, exp);
@@ -1491,7 +1491,7 @@ public class Transformer implements ExpType {
     /**
      * Complete compilation
      */
-    Exp complete(Exp exp, fr.inria.corese.sparql.triple.parser.Exp srcexp, boolean opt) throws EngineException {
+    Exp complete(Exp exp, fr.inria.corese.core.sparql.triple.parser.Exp srcexp, boolean opt) throws EngineException {
         // complete path (deprecated)
         path(exp);
 
@@ -1555,7 +1555,7 @@ public class Transformer implements ExpType {
     }
 
     Exp compileFilter(Expression ee, boolean opt) throws EngineException {
-        List<fr.inria.corese.kgram.api.core.Filter> qvec = compiler.compileFilter(ee);
+        List<fr.inria.corese.core.kgram.api.core.Filter> qvec = compiler.compileFilter(ee);
         Exp exp;
 
         if (qvec.size() == 1) {
@@ -1563,7 +1563,7 @@ public class Transformer implements ExpType {
             compileExist(qvec.get(0).getExp(), opt);
         } else {
             exp = Exp.create(AND);
-            for (fr.inria.corese.kgram.api.core.Filter qm : qvec) {
+            for (fr.inria.corese.core.kgram.api.core.Filter qm : qvec) {
                 Exp f = Exp.create(FILTER, qm);
                 compileExist(qm.getExp(), opt);
                 exp.add(f);
@@ -1579,8 +1579,8 @@ public class Transformer implements ExpType {
     /**
      * Rewrite fun() as ?var in exp Compile exists {}
      */
-    fr.inria.corese.kgram.api.core.Filter compile(Expression exp) throws EngineException {
-        fr.inria.corese.kgram.api.core.Filter f = compiler.compile(exp);
+    fr.inria.corese.core.kgram.api.core.Filter compile(Expression exp) throws EngineException {
+        fr.inria.corese.core.kgram.api.core.Filter f = compiler.compile(exp);
         compileExist(f.getExp(), false);
         return f;
     }
@@ -1588,8 +1588,8 @@ public class Transformer implements ExpType {
     /**
      * Do not rewrite fun() as var
      */
-    fr.inria.corese.kgram.api.core.Filter compileSelect(Expression exp, ASTQuery ast) throws EngineException {
-        fr.inria.corese.kgram.api.core.Filter f = exp.compile(ast);
+    fr.inria.corese.core.kgram.api.core.Filter compileSelect(Expression exp, ASTQuery ast) throws EngineException {
+        fr.inria.corese.core.kgram.api.core.Filter f = exp.compile(ast);
         compileExist(f.getExp(), false);
         return f;
     }
@@ -1637,7 +1637,7 @@ public class Transformer implements ExpType {
      * Exp e
      */
     void processPath(Exp exp, Exp ef) throws EngineException {
-        fr.inria.corese.kgram.api.core.Filter f = ef.getFilter();
+        fr.inria.corese.core.kgram.api.core.Filter f = ef.getFilter();
         Edge e = exp.getEdge();
         Node n = e.getEdgeVariable();
 
@@ -1688,7 +1688,7 @@ public class Transformer implements ExpType {
         }
     }
 
-    int getType(fr.inria.corese.sparql.triple.parser.Exp query) {
+    int getType(fr.inria.corese.core.sparql.triple.parser.Exp query) {
         if (query.isFilter()) {
             return FILTER;
         } else if (query.isTriple()) {
@@ -1780,10 +1780,10 @@ public class Transformer implements ExpType {
     /**
      * check unbound variable in construct/insert/delete
      */
-    boolean validate(fr.inria.corese.sparql.triple.parser.Exp exp, ASTQuery ast) {
+    boolean validate(fr.inria.corese.core.sparql.triple.parser.Exp exp, ASTQuery ast) {
         boolean suc = true;
 
-        for (fr.inria.corese.sparql.triple.parser.Exp ee : exp.getBody()) {
+        for (fr.inria.corese.core.sparql.triple.parser.Exp ee : exp.getBody()) {
             boolean b = true;
             
             if (ee.isTriple()) {
@@ -1803,7 +1803,7 @@ public class Transformer implements ExpType {
     boolean validate(Source exp, ASTQuery ast) {
         boolean suc = validate(exp.getSource(), ast);
 
-        for (fr.inria.corese.sparql.triple.parser.Exp ee : exp.getBody()) {
+        for (fr.inria.corese.core.sparql.triple.parser.Exp ee : exp.getBody()) {
             suc = validate(ee, ast) && suc;
         }
 
@@ -1845,15 +1845,15 @@ public class Transformer implements ExpType {
     /**
      * Must exp ee be joined with preceding statements ?
      */
-    private boolean isJoinable(Exp exp, fr.inria.corese.sparql.triple.parser.Exp ee) {
+    private boolean isJoinable(Exp exp, fr.inria.corese.core.sparql.triple.parser.Exp ee) {
         return (isAlgebra()) ? isJoinableAlgebra(exp, ee) : isJoinableBasic(ee) ;        
     }
     
-    private boolean isJoinableBasic(fr.inria.corese.sparql.triple.parser.Exp ee) {
+    private boolean isJoinableBasic(fr.inria.corese.core.sparql.triple.parser.Exp ee) {
         return ee.isBGP() || ee.isUnion() || ee.isGraph();
     }
     
-    private boolean isJoinableAlgebra(Exp exp, fr.inria.corese.sparql.triple.parser.Exp ee) {
+    private boolean isJoinableAlgebra(Exp exp, fr.inria.corese.core.sparql.triple.parser.Exp ee) {
         return ee.isBGP() || ee.isUnion();
     }
 

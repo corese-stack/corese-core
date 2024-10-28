@@ -1,9 +1,9 @@
-package fr.inria.corese.sparql.api;
+package fr.inria.corese.core.sparql.api;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 /**
  * Transformer API

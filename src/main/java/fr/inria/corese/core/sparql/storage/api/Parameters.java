@@ -1,7 +1,7 @@
-package fr.inria.corese.sparql.storage.api;
+package fr.inria.corese.core.sparql.storage.api;
 
-import static fr.inria.corese.sparql.storage.fs.Constants.GB;
-import static fr.inria.corese.sparql.storage.fs.Constants.MB;
+import static fr.inria.corese.core.sparql.storage.fs.Constants.GB;
+import static fr.inria.corese.core.sparql.storage.fs.Constants.MB;
 import java.util.EnumMap;
 import java.util.Map;
 

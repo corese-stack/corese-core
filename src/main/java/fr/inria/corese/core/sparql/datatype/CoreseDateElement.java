@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.datatype;
+package fr.inria.corese.core.sparql.datatype;
 
 public abstract class CoreseDateElement extends CoreseInteger {
 

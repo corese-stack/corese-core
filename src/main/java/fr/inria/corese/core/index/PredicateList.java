@@ -2,7 +2,7 @@ package fr.inria.corese.core.index;
 
 import static fr.inria.corese.core.index.EdgeManagerIndexer.ITERATE_SUBLIST;
 import static fr.inria.corese.core.index.EdgeManagerIndexer.RECORD_END;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import java.util.ArrayList;
 import java.util.List;
 

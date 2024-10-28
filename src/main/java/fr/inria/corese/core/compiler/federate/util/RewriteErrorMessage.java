@@ -1,4 +1,4 @@
-package fr.inria.corese.compiler.federate.util;
+package fr.inria.corese.core.compiler.federate.util;
 
 /**
  *

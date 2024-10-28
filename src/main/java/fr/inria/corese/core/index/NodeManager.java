@@ -1,9 +1,9 @@
 package fr.inria.corese.core.index;
 
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.sparql.api.IDatatype.NodeKind;
+import fr.inria.corese.core.sparql.api.IDatatype.NodeKind;
 import java.util.ArrayList;
 import java.util.HashMap;
 

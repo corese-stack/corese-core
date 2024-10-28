@@ -1,25 +1,27 @@
-package fr.inria.corese.sparql.triple.function.term;
+package fr.inria.corese.core.sparql.triple.function.term;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.function.script.Function;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Binder;
-import fr.inria.corese.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.AccessRight;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.HashMapList;
-import fr.inria.corese.sparql.triple.parser.context.ContextLog;
-import fr.inria.corese.sparql.triple.parser.Variable;
-import fr.inria.corese.sparql.triple.parser.VariableLocal;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.function.script.Function;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Binder;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.HashMapList;
+import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.VariableLocal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -112,12 +114,23 @@ public class Binding implements Binder {
         // transformer also records its Binding and hence its Visitor
         private Object transformerVisitor;
 
+        // Enables function now() to return the same value during processing
+        private Optional<IDatatype> savNowValue = Optional.empty();
+
         public Object getTransformerVisitor() {
             return transformerVisitor;
         }
 
         public void setTransformerVisitor(Object transformerVisitor) {
             this.transformerVisitor = transformerVisitor;
+        }
+
+        public Optional<IDatatype> getSavNowValue() {
+            return savNowValue;
+        }
+
+        public void setNowValue(IDatatype nowValue) {
+            this.savNowValue = Optional.ofNullable(nowValue);
         }
 
     }
@@ -661,6 +674,14 @@ public class Binding implements Binder {
     void shareGlobalVariable(Binding b) {
         setGlobalVariableNames(b.getGlobalVariableNames());
         setGlobalVariableValues(b.getGlobalVariableValues());
+    }
+
+    public Optional<IDatatype> getNowValue() {
+        return getShare().getSavNowValue();
+    }
+
+    public void setNowValue(IDatatype nowValue) {
+        getShare().setNowValue(nowValue);
     }
     
     public HashMap<String, Variable> getGlobalVariableNames() {

@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.datatype.extension;
+package fr.inria.corese.core.sparql.datatype.extension;
 
-import fr.inria.corese.sparql.datatype.CoreseUndefLiteral;
+import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
 
 /**
  * Encapsulate an expression Expr to be evaluated later such as concat(str, st:number(), str)

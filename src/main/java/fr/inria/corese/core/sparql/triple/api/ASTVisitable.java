@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.corese.sparql.triple.api;
+package fr.inria.corese.core.sparql.triple.api;
 
 /**
  *

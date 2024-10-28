@@ -1,19 +1,19 @@
 package fr.inria.corese.core.visitor.ldpath;
 
-import fr.inria.corese.compiler.api.QueryVisitor;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.ProcessVisitorDefault;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.ProcessVisitorDefault;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public class LinkedDataPath implements QueryVisitor {
     }
 
     @Override
-    public void visit(Query q, fr.inria.corese.sparql.api.Graph g) {
+    public void visit(Query q, fr.inria.corese.core.sparql.api.Graph g) {
     }
 
     Result ldp(ASTQuery ast) throws IOException, EngineException, InterruptedException {

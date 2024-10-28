@@ -1,14 +1,14 @@
-package fr.inria.corese.sparql.triple.function.script;
+package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.Term;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.kgram.api.query.Producer;
 import java.util.List;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -136,8 +136,8 @@ public class Extension extends LDScript {
             }
             IDatatype dt = null;
             if (isSystem) {
-                //fr.inria.corese.kgram.core.Eval cc = eval.getComputerEval(env, p, function);
-                fr.inria.corese.kgram.core.Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
+                //fr.inria.corese.core.kgram.core.Eval cc = eval.getComputerEval(env, p, function);
+                fr.inria.corese.core.kgram.core.Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
                 // PRAGMA: b = cc.getEnvironment().getBind()
                 dt = body.eval(cc.getEvaluator(), b, cc.getEnvironment(), p);
             } else {
@@ -188,8 +188,8 @@ public class Extension extends LDScript {
         IDatatype dt;
         b.set(function, fun.getExpList(), param);
         if (function.isSystem()) {
-            //fr.inria.corese.kgram.core.Eval cc = eval.getComputerEval(env, p, function);
-            fr.inria.corese.kgram.core.Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
+            //fr.inria.corese.core.kgram.core.Eval cc = eval.getComputerEval(env, p, function);
+            fr.inria.corese.core.kgram.core.Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
             // PRAGMA: b = cc.getEnvironment().getBind()
             dt = function.getBody().eval(cc.getEvaluator(), b, cc.getEnvironment(), p);
         } else {

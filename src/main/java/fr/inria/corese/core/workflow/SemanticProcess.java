@@ -1,7 +1,7 @@
 package fr.inria.corese.core.workflow;
 
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import java.util.List;
 
 

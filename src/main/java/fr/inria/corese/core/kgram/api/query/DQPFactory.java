@@ -1,6 +1,6 @@
-package fr.inria.corese.kgram.api.query;
+package fr.inria.corese.core.kgram.api.query;
 
-import fr.inria.corese.kgram.core.BgpGenerator;
+import fr.inria.corese.core.kgram.core.BgpGenerator;
 
 /**
  *

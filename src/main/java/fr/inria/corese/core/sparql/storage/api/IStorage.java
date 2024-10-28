@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.storage.api;
+package fr.inria.corese.core.sparql.storage.api;
 
 /**
  *

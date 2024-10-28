@@ -1,12 +1,12 @@
-package fr.inria.corese.sparql.triple.update;
+package fr.inria.corese.core.sparql.triple.update;
 
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.sparql.triple.parser.ASTBuffer;
-import fr.inria.corese.sparql.triple.parser.ASTPrinter;
-import fr.inria.corese.sparql.triple.parser.And;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Exp;
-import fr.inria.corese.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.triple.parser.ASTBuffer;
+import fr.inria.corese.core.sparql.triple.parser.ASTPrinter;
+import fr.inria.corese.core.sparql.triple.parser.And;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
 
 /**
  * load clear drop create add move copy

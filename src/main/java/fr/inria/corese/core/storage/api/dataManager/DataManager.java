@@ -1,7 +1,7 @@
 package fr.inria.corese.core.storage.api.dataManager;
 
 import fr.inria.corese.core.producer.MetadataManager;
-import fr.inria.corese.sparql.triple.parser.HashMapList;
+import fr.inria.corese.core.sparql.triple.parser.HashMapList;
 
 /**
  * Interface to adapt an external storage system to Corese.

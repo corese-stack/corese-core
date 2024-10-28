@@ -1,7 +1,7 @@
 package fr.inria.corese.core.stats;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Interface for calling Producer from kgraph to do statistics

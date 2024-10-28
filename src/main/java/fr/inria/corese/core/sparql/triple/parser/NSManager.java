@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import static fr.inria.corese.kgram.api.core.PointerType.NSMANAGER;
+import static fr.inria.corese.core.kgram.api.core.PointerType.NSMANAGER;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -15,12 +15,12 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
 
 /**
  * <p>
@@ -59,7 +59,7 @@ public class NSManager extends ASTObject {
     public static final String XSD = RDFS.XSD;
     public static final String XSI = "http://www.w3.org/2001/XMLSchema-instance#";
     public static final String OWL_RL_PROFILE = "http://www.w3.org/ns/owl-profile/RL";
-    public static final String XML = fr.inria.corese.sparql.datatype.RDF.XML;
+    public static final String XML = fr.inria.corese.core.sparql.datatype.RDF.XML;
     public static final String RDF = RDFS.RDF;
     public static final String RDFS_NS = RDFS.RDFS;
     public static final String OWL = RDFS.OWL;
@@ -147,7 +147,7 @@ public class NSManager extends ASTObject {
     static final String NL = System.getProperty("line.separator");
     static final char[] END_CHAR = { '#', '/', '?' }; // , ':'}; // may end an URI ...
     static final String[] PB_CHAR_NAME = { ".", "\u2013", ":", "#", "(", ")", "'", "\"", ",", ";", "[", "]", "{", "}",
-            "?", "&" };
+            "?", "&", "=" };
     static final String[] PB_CHAR_URI = { "(", ")", "'", "\"", ",", ";", "[", "]", "{", "}", "?", "&" };
     static final String pchar = ":";
     int count = 0;
@@ -178,11 +178,11 @@ public class NSManager extends ASTObject {
 
     // for pretty printing without ^^datatype
     static void number() {
-        number.put(fr.inria.corese.sparql.datatype.RDF.xsdinteger, Boolean.TRUE);
-        // number.put(fr.inria.corese.sparql.datatype.RDF.xsdint, Boolean.TRUE);
-        // number.put(fr.inria.corese.sparql.datatype.RDF.xsdfloat, Boolean.TRUE);
-        // number.put(fr.inria.corese.sparql.datatype.RDF.xsddouble, Boolean.TRUE);
-        number.put(fr.inria.corese.sparql.datatype.RDF.xsddecimal, Boolean.TRUE);
+        number.put(fr.inria.corese.core.sparql.datatype.RDF.xsdinteger, Boolean.TRUE);
+        // number.put(fr.inria.corese.core.sparql.datatype.RDF.xsdint, Boolean.TRUE);
+        // number.put(fr.inria.corese.core.sparql.datatype.RDF.xsdfloat, Boolean.TRUE);
+        // number.put(fr.inria.corese.core.sparql.datatype.RDF.xsddouble, Boolean.TRUE);
+        number.put(fr.inria.corese.core.sparql.datatype.RDF.xsddecimal, Boolean.TRUE);
     }
 
     private NSManager() {
@@ -519,6 +519,11 @@ public class NSManager extends ASTObject {
             return nsname;
         }
 
+        String name = extractLocalName(nsname, namespace);
+        if (containsForbiddenCharacters(name)) {
+            return nsname;
+        }
+        
         String prefix = getPrefix(namespace);
         if (prefix == null) {
             if (skip) {
@@ -527,10 +532,6 @@ public class NSManager extends ASTObject {
             prefix = defineDefaultNamespace(namespace);
         }
 
-        String name = extractLocalName(nsname, namespace);
-        if (containsForbiddenCharacters(name)) {
-            return nsname;
-        }
 
         String result = assembleResult(prefix, name, xml);
         record(namespace);
@@ -695,7 +696,7 @@ public class NSManager extends ASTObject {
             dt = DatatypeMap.newStringBuilder(uri);
         } else if (dt.isLiteral()) {
             if ((dt.getCode() == IDatatype.INTEGER
-                    && dt.getDatatypeURI().equals(fr.inria.corese.sparql.datatype.XSD.xsdinteger)
+                    && dt.getDatatypeURI().equals(fr.inria.corese.core.sparql.datatype.XSD.xsdinteger)
                     && (!(label.startsWith("0") && label.length() > 1)))
                     || (dt.getCode() == IDatatype.BOOLEAN && (label.equals("true") || label.equals("false")))) {
                 // print string value as is
@@ -926,20 +927,40 @@ public class NSManager extends ASTObject {
         return "/" + strip(uri, ns);
     }
 
-    public static String namespace(String type) { // retourne le namespace d'un type
+    /**
+     * Create a namespace from a URI
+     * 
+     * @param type URI
+     * @return namespace
+     */
+    public static String namespace(String type) {
+        if (type == null || type.isEmpty()) {
+            return "";
+        }
+
+        // Return empty string if type starts with HASH
         if (type.startsWith(HASH)) {
             return "";
         }
-        int index;
-        for (int i = 0; i < END_CHAR.length; i++) {
-            index = type.lastIndexOf(END_CHAR[i]);
-            if (index != -1) {
-                String str = type.substring(0, index + 1);
-                if (!str.equals("http://")) {
-                    return str;
-                }
+
+        // Iterate through END_CHAR array to find the last occurrence of any char in it
+        int lastIndex = -1;
+        for (char endChar : END_CHAR) {
+            int currentIndex = type.lastIndexOf(endChar);
+            if (currentIndex > lastIndex) {
+                lastIndex = currentIndex;
             }
         }
+
+        // Check if a valid index is found and the substring is not a specific unwanted
+        // string
+        if (lastIndex != -1) {
+            String namespace = type.substring(0, lastIndex + 1);
+            if (!"http://".equals(namespace)) {
+                return namespace;
+            }
+        }
+
         return "";
     }
 

@@ -1,11 +1,11 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.query.Hierarchy;
-import fr.inria.corese.kgram.filter.Extension;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.function.script.Function;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.query.Hierarchy;
+import fr.inria.corese.core.kgram.filter.Extension;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.function.script.Function;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class ASTExtension implements Extension {
 
     private static ASTExtension singleton;
-    public static int FUNCTION_PARAMETER_MAX = 15;
+    public static int FUNCTION_PARAMETER_MAX = 20;
     private static Logger logger = LoggerFactory.getLogger(ASTExtension.class);
     static final String NL = System.getProperty("line.separator");
     public static final String TYPE = ExpType.TYPE_METADATA;

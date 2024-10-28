@@ -1,7 +1,7 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.triple.api.ExpressionVisitor;
-import fr.inria.corese.sparql.triple.api.Walker;
+import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
+import fr.inria.corese.core.sparql.triple.api.Walker;
 import java.util.List;
 
 public class Query extends Exp {

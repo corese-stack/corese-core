@@ -1,13 +1,13 @@
-package fr.inria.corese.sparql.datatype.extension;
+package fr.inria.corese.core.sparql.datatype.extension;
 
 import java.util.List;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.api.IDatatypeList;
-import static fr.inria.corese.sparql.datatype.CoreseBoolean.FALSE;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import static fr.inria.corese.sparql.datatype.DatatypeMap.TRUE;
-import fr.inria.corese.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatypeList;
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.FALSE;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import static fr.inria.corese.core.sparql.datatype.DatatypeMap.TRUE;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

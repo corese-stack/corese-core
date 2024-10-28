@@ -11,13 +11,13 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.parser.AccessRight;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.Constant;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
 
 /**
  *
@@ -124,8 +124,12 @@ public class CreateTriple {
         return graph.addGraph(src);
     }
     
+    Node addGraph(String src, boolean bnode) {
+        return graph.addGraph(src, bnode);
+    }
+    
     Node addGraph(Atom src) {
-        return graph.addGraph(src.getLabel(), src.isBlank());
+        return graph.addGraph(src.getLabel(), src.isBlankOrBlankNode());
     }
 
     Node addDefaultGraphNode() {

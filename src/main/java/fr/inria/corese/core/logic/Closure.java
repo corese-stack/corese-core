@@ -1,13 +1,13 @@
 package fr.inria.corese.core.logic;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Distinct;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Distinct;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.util.Property;
 import static fr.inria.corese.core.util.Property.Value.RULE_DATAMANAGER_FILTER_INDEX;
 import java.util.ArrayList;
-import fr.inria.corese.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import java.util.List;
 
 /**

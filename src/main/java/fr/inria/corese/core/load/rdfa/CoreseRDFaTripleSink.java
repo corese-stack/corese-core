@@ -1,7 +1,7 @@
 package fr.inria.corese.core.load.rdfa;
 
 import fr.inria.corese.core.load.ILoadSerialization;
-import fr.inria.corese.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.AddTripleHelper;
 import org.semarglproject.rdf.core.ParseException;

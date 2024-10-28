@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.PointerType;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  *
@@ -98,14 +98,13 @@ public class Metadata extends ASTObject
     public static final int FOCUS = 75;
 
     static final String PREF = NSManager.KGRAM;
+    public static final String DISPLAY_RDF_XML = PREF + "rdfxml";
     public static final String DISPLAY_TURTLE = PREF + "turtle";
     public static final String DISPLAY_JSON_LD = PREF + "jsonld";
-    public static final String DISPLAY_RDF_XML = PREF + "rdfxml";
 
     public static final String DISPLAY_JSON = PREF + "json";
     public static final String DISPLAY_XML = PREF + "xml";
     public static final String DISPLAY_RDF = PREF + "rdf";
-    public static final String DISPLAY_MARKDOWN = PREF + "markdown";
 
     public static final String RELAX_URI = PREF + "uri";
     public static final String RELAX_PROPERTY = PREF + "property";

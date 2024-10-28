@@ -1,10 +1,10 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.sparql.triple.cst.Keyword;
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.triple.cst.Keyword;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
 
 /**
  * <p>

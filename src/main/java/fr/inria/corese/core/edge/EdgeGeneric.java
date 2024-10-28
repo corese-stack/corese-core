@@ -1,9 +1,9 @@
 package fr.inria.corese.core.edge;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  * Buffer Edge as Quad to deliver complete edge for Producer

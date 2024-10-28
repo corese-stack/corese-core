@@ -1,5 +1,5 @@
 
-package fr.inria.corese.kgram.api.core;
+package fr.inria.corese.core.kgram.api.core;
 
 import java.math.BigDecimal;
 import java.util.List;

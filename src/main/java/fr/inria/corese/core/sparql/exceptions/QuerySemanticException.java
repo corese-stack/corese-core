@@ -1,4 +1,4 @@
-package fr.inria.corese.sparql.exceptions;
+package fr.inria.corese.core.sparql.exceptions;
 
 /**
  * This exception is used for semantic errors: (one exception is raised for

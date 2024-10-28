@@ -1,10 +1,10 @@
-package fr.inria.corese.kgram.api.query;
+package fr.inria.corese.core.kgram.api.query;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.SparqlException;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.SparqlException;
 
 /**
  * Service Provider
@@ -26,7 +26,7 @@ public interface Provider {
 	/**
 	 * @param map Pre-existing mappings.
 	 * @return 
-	 * @see #service(fr.inria.corese.kgram.api.core.Node, fr.inria.corese.kgram.core.Exp, fr.inria.corese.kgram.api.query.Environment) 
+	 * @see #service(fr.inria.corese.core.kgram.api.core.Node, fr.inria.corese.core.kgram.core.Exp, fr.inria.corese.core.kgram.api.query.Environment)
 	 */
 	//Mappings service(Node serv, Exp exp, Mappings map, Environment env);
         

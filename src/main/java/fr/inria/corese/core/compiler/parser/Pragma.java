@@ -1,25 +1,25 @@
-package fr.inria.corese.compiler.parser;
+package fr.inria.corese.core.compiler.parser;
 
 import java.lang.reflect.InvocationTargetException;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Atom;
-import fr.inria.corese.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.RDFList;
-import fr.inria.corese.sparql.triple.parser.Source;
-import fr.inria.corese.sparql.triple.parser.Triple;
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.query.Matcher;
-import fr.inria.corese.kgram.core.Eval;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.event.EvalListener;
-import fr.inria.corese.kgram.event.EventListener;
-import fr.inria.corese.kgram.tool.Message;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.RDFList;
+import fr.inria.corese.core.sparql.triple.parser.Source;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.event.EvalListener;
+import fr.inria.corese.core.kgram.event.EventListener;
+import fr.inria.corese.core.kgram.tool.Message;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,13 +133,13 @@ public class Pragma {
         parse(null, ast.getPragma());
     }
 
-    public void parse(fr.inria.corese.sparql.triple.parser.Exp pragma) {
+    public void parse(fr.inria.corese.core.sparql.triple.parser.Exp pragma) {
         parse(null, pragma);
     }
 
-    public void parse(Atom g, fr.inria.corese.sparql.triple.parser.Exp exp) {
+    public void parse(Atom g, fr.inria.corese.core.sparql.triple.parser.Exp exp) {
 
-        for (fr.inria.corese.sparql.triple.parser.Exp pragma : exp.getBody()) {
+        for (fr.inria.corese.core.sparql.triple.parser.Exp pragma : exp.getBody()) {
 
             if (query != null && query.isDebug()) {
                 Message.log(Message.PRAGMA, pragma);
@@ -176,9 +176,9 @@ public class Pragma {
         compile(null, p);
     }
 
-    public void compile(Atom g, fr.inria.corese.sparql.triple.parser.Exp exp) throws EngineException {
+    public void compile(Atom g, fr.inria.corese.core.sparql.triple.parser.Exp exp) throws EngineException {
 
-        for (fr.inria.corese.sparql.triple.parser.Exp pragma : exp.getBody()) {
+        for (fr.inria.corese.core.sparql.triple.parser.Exp pragma : exp.getBody()) {
 
             if (ast.isDebug()) {
                 Message.log(Message.PRAGMA, pragma);
@@ -199,7 +199,7 @@ public class Pragma {
         exp.compile(ast);
     }
 
-    public void compile(Atom g, Triple t, fr.inria.corese.sparql.triple.parser.Exp pragma) {
+    public void compile(Atom g, Triple t, fr.inria.corese.core.sparql.triple.parser.Exp pragma) {
 
         String subject = t.getSubject().getLabel();
         String property = t.getProperty().getLabel();
@@ -272,7 +272,7 @@ public class Pragma {
         return query;
     }
 
-    public void triple(Atom g, Triple t, fr.inria.corese.sparql.triple.parser.Exp pragma) {
+    public void triple(Atom g, Triple t, fr.inria.corese.core.sparql.triple.parser.Exp pragma) {
 
         String subject = t.getSubject().getLabel();
         String property = t.getProperty().getLabel();
@@ -300,7 +300,7 @@ public class Pragma {
                 int mode = getMode(object);
                 query.setMode(mode);
             } else if (property.equals(RDFS.RDFTYPE)) {
-                // kg:match rdf:type <fr.inria.corese.kgramenv.util.MatcherImpl> 
+                // kg:match rdf:type <fr.inria.corese.core.kgramenv.util.MatcherImpl>
                 Matcher match = (Matcher) create(object);
                 if (match != null) {
                     kgram.setMatcher(match);
@@ -308,7 +308,7 @@ public class Pragma {
             }
         } else if (subject.equals(LISTEN)) {
             if (property.equals(RDFS.RDFTYPE)) {
-                // kg:listen rdf:type <fr.inria.corese.kgram.event.StatListener> 
+                // kg:listen rdf:type <fr.inria.corese.core.kgram.event.StatListener>
                 EventListener el = (EventListener) create(object);
                 if (el != null) {
                     kgram.addEventListener(el);
@@ -364,8 +364,8 @@ public class Pragma {
     /**
      *
      */
-    RDFList getList(Atom head, fr.inria.corese.sparql.triple.parser.Exp pragma) {
-        for (fr.inria.corese.sparql.triple.parser.Exp exp : pragma.getBody()) {
+    RDFList getList(Atom head, fr.inria.corese.core.sparql.triple.parser.Exp pragma) {
+        for (fr.inria.corese.core.sparql.triple.parser.Exp exp : pragma.getBody()) {
             if (exp.isRDFList()) {
                 RDFList list = (RDFList) exp;
                 if (list.head().getName().equals(head.getName())) {

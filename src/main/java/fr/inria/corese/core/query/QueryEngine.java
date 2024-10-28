@@ -1,6 +1,6 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,21 +9,21 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.compiler.api.QueryVisitor;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Exp;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.api.Engine;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.transform.Transformer;
 import static fr.inria.corese.core.transform.Transformer.STL_PROFILE;
-import fr.inria.corese.sparql.triple.parser.ASTExtension;
-import fr.inria.corese.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 
 /**
  * Equivalent of RuleEngine for Query and Template Run a set of query
@@ -170,7 +170,7 @@ public class QueryEngine implements Engine {
 
             if (profile.getExtension() != null) {
                 // share profile function definitions in templates
-                fr.inria.corese.compiler.parser.Transformer tr = fr.inria.corese.compiler.parser.Transformer.create();
+                fr.inria.corese.core.compiler.parser.Transformer tr = fr.inria.corese.core.compiler.parser.Transformer.create();
                 ASTExtension ext = profile.getExtension();
                 tr.definePublic(ext, profile, false);
                 

@@ -3,10 +3,10 @@ package fr.inria.corese.core.print;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 
 public class CSVFormat extends QueryResultFormat {
     // The end-of-line in CSV is CRLF i.e. Unicode codepoints 13 (0x0D) and 10

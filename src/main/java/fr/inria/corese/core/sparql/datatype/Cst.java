@@ -1,11 +1,11 @@
-package fr.inria.corese.sparql.datatype;
+package fr.inria.corese.core.sparql.datatype;
 
 public interface Cst {
 	/**
 	 * implementation Class name for datatypes
 	 */
-	static final String pack      = "fr.inria.corese.sparql.datatype.";
-	static final String extension = "fr.inria.corese.sparql.datatype.extension.";
+	static final String pack      = "fr.inria.corese.core.sparql.datatype.";
+	static final String extension = "fr.inria.corese.core.sparql.datatype.extension.";
 	
 	static final String jDatatype		= pack + "CoreseDatatype";
 	static final String jTypeString		= pack + "CoreseString";

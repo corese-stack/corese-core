@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -9,12 +9,12 @@ import java.io.Reader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.exceptions.QueryLexicalException;
-import fr.inria.corese.sparql.exceptions.QuerySyntaxException;
-import fr.inria.corese.sparql.triple.api.Creator;
-import fr.inria.corese.sparql.triple.javacc1.JavaccParseException;
-import fr.inria.corese.sparql.triple.javacc1.SparqlCorese;
-import fr.inria.corese.sparql.triple.javacc1.TokenMgrError;
+import fr.inria.corese.core.sparql.exceptions.QueryLexicalException;
+import fr.inria.corese.core.sparql.exceptions.QuerySyntaxException;
+import fr.inria.corese.core.sparql.triple.api.Creator;
+import fr.inria.corese.core.sparql.triple.javacc1.JavaccParseException;
+import fr.inria.corese.core.sparql.triple.javacc1.SparqlCorese;
+import fr.inria.corese.core.sparql.triple.javacc1.TokenMgrError;
 
 /**
  * <p>

@@ -18,10 +18,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import org.w3c.dom.Attr;
 
 /**

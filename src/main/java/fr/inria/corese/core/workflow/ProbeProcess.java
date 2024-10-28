@@ -1,6 +1,6 @@
 package fr.inria.corese.core.workflow;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.transform.DefaultVisitor;
 
 /**

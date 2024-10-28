@@ -1,6 +1,6 @@
 package fr.inria.corese.core;
 
-import fr.inria.corese.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.Comparator;
 
 

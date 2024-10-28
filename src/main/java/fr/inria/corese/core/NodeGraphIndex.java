@@ -3,10 +3,10 @@ package fr.inria.corese.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.tool.DistinctNode;
-import fr.inria.corese.kgram.tool.MetaIterator;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.tool.DistinctNode;
+import fr.inria.corese.core.kgram.tool.MetaIterator;
 
 /**
  *

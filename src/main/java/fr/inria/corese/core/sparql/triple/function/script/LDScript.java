@@ -1,19 +1,19 @@
-package fr.inria.corese.sparql.triple.function.script;
+package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import fr.inria.corese.kgram.api.query.Environment;
-import fr.inria.corese.kgram.api.query.Evaluator;
-import fr.inria.corese.kgram.api.query.Producer;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.api.Computer;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.function.term.TermEval;
-import fr.inria.corese.sparql.triple.parser.ASTExtension;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.Processor;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Evaluator;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.term.TermEval;
+import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Processor;
 
 /**
  *
@@ -159,10 +159,10 @@ public class LDScript extends TermEval {
      * public query q1 which may be different from the query q2 where public
      * function call occur
      */
-    fr.inria.corese.kgram.core.Eval getComputerEval(Evaluator evaluator, Environment env, Producer p, Expr function) {
+    fr.inria.corese.core.kgram.core.Eval getComputerEval(Evaluator evaluator, Environment env, Producer p, Expr function) {
         Query q = getQuery(env, function);
-        fr.inria.corese.kgram.core.Eval currentEval = env.getEval();
-        fr.inria.corese.kgram.core.Eval eval = new fr.inria.corese.kgram.core.Eval(p, evaluator, currentEval.getMatcher());
+        fr.inria.corese.core.kgram.core.Eval currentEval = env.getEval();
+        fr.inria.corese.core.kgram.core.Eval eval = new fr.inria.corese.core.kgram.core.Eval(p, evaluator, currentEval.getMatcher());
         eval.setSPARQLEngine(currentEval.getSPARQLEngine());
         eval.set(currentEval.getProvider());
         eval.init(q);

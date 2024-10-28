@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.parser.visitor;
+package fr.inria.corese.core.sparql.triple.parser.visitor;
 
-import fr.inria.corese.sparql.triple.parser.TopExp;
+import fr.inria.corese.core.sparql.triple.parser.TopExp;
 
 public class Record {
 

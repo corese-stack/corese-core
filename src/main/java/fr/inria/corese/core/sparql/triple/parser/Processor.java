@@ -1,7 +1,7 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.sparql.triple.function.script.Let;
-import fr.inria.corese.sparql.triple.function.script.Function;
+import fr.inria.corese.core.sparql.triple.function.script.Let;
+import fr.inria.corese.core.sparql.triple.function.script.Function;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
@@ -11,21 +11,21 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.function.SQLFun;
-import fr.inria.corese.sparql.datatype.function.VariableResolver;
-import fr.inria.corese.sparql.datatype.function.XPathFun;
-import fr.inria.corese.sparql.triple.cst.RDFS;
-import fr.inria.corese.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.kgram.api.core.ExpPattern;
-import fr.inria.corese.kgram.api.core.Expr;
-import fr.inria.corese.kgram.api.core.ExprType;
-import static fr.inria.corese.kgram.api.core.ExprType.IS_TRIPLE;
-import static fr.inria.corese.kgram.api.core.ExprType.OBJECT;
-import static fr.inria.corese.kgram.api.core.ExprType.PREDICATE;
-import static fr.inria.corese.kgram.api.core.ExprType.SUBJECT;
-import static fr.inria.corese.kgram.api.core.ExprType.TRIPLE;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.function.SQLFun;
+import fr.inria.corese.core.sparql.datatype.function.VariableResolver;
+import fr.inria.corese.core.sparql.datatype.function.XPathFun;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.kgram.api.core.ExpPattern;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import static fr.inria.corese.core.kgram.api.core.ExprType.IS_TRIPLE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.OBJECT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.PREDICATE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.SUBJECT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.TRIPLE;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -1072,7 +1072,15 @@ public class Processor {
 		defoper(UUID, ExprType.FUUID);
 		defoper(STRUUID, ExprType.STRUUID);
 
-		
+		defoper(EXT+"power",  ExprType.POWER);
+		defoper(EXT+"sqrt",  ExprType.SQRT);
+		defoper(EXT+"sin",  ExprType.SIN);
+		defoper(EXT+"cos",  ExprType.COS);
+		defoper(EXT+"tan",  ExprType.TAN);
+		defoper(EXT+"asin",  ExprType.ARC_SIN);
+		defoper(EXT+"acos",  ExprType.ARC_COS);
+		defoper(EXT+"atan",  ExprType.ARC_TAN);
+                
 		defoper(POWER,  ExprType.POWER);
 		defoper(RANDOM, ExprType.RANDOM);
 		defoper(ABS, 	ExprType.ABS);

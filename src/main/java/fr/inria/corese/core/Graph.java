@@ -23,21 +23,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.api.query.Graphable;
-import fr.inria.corese.kgram.core.Distinct;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.sparql.storage.api.IStorage;
-import fr.inria.corese.sparql.storage.api.Parameters;
-import fr.inria.corese.sparql.storage.util.StorageFactory;
-import fr.inria.corese.kgram.api.core.TripleStore;
-import fr.inria.corese.kgram.tool.MetaIterator;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Graphable;
+import fr.inria.corese.core.kgram.core.Distinct;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.storage.api.Parameters;
+import fr.inria.corese.core.sparql.storage.util.StorageFactory;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.tool.MetaIterator;
 import fr.inria.corese.core.api.Engine;
 import fr.inria.corese.core.api.GraphListener;
 import fr.inria.corese.core.api.Log;
@@ -48,12 +48,12 @@ import fr.inria.corese.core.edge.TripleNode;
 import fr.inria.corese.core.query.QueryCheck;
 import fr.inria.corese.core.util.Property;
 import java.util.Map;
-import fr.inria.corese.kgram.api.core.Edge;
-import fr.inria.corese.kgram.api.core.PointerType;
-import static fr.inria.corese.kgram.api.core.PointerType.GRAPH;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import static fr.inria.corese.core.kgram.api.core.PointerType.GRAPH;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.util.Arrays;
 import java.util.Collection;
 import org.json.JSONObject;
@@ -71,7 +71,7 @@ import org.json.JSONObject;
  */
 public class Graph extends GraphObject implements
         Iterable<Edge>,
-        fr.inria.corese.sparql.api.Graph,
+        fr.inria.corese.core.sparql.api.Graph,
         Graphable, TripleStore {
 
     static {
@@ -81,7 +81,7 @@ public class Graph extends GraphObject implements
     private static final String SHAPE_CONFORM = NSManager.SHAPE + "conforms";
     public static final String SYSTEM = ExpType.KGRAM + "system";
     public static final String TOPREL
-            = fr.inria.corese.sparql.triple.cst.RDFS.RootPropertyURI;
+            = fr.inria.corese.core.sparql.triple.cst.RDFS.RootPropertyURI;
     static final ArrayList<Edge> EMPTY = new ArrayList<Edge>(0);
     public static boolean valueOut = !true;
     public static final int IGRAPH = -1;
@@ -573,7 +573,7 @@ public class Graph extends GraphObject implements
         // 1, 01, 1.0 have same index, 1 double has different index
         // same index means that SPARQL perform a join on nodes with same index
         // when DatatypeMap.SPARQLCompliant = false (true), 1 and 1.0 have same (different) index
-        // corese default is false, which means that corese sparql perform a join on 1 and 1.0 (which is not standard)
+        // corese default is false, which means that corese.core.sparql perform a join on 1 and 1.0 (which is not standard)
         setLiteralIndexManager(Collections.synchronizedSortedMap(new TreeNode(DatatypeMap.DATATYPE_ENTAILMENT)));
         // deprecated:
         vliteral = Collections.synchronizedMap(new HashMap<>());

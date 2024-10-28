@@ -1,6 +1,6 @@
-package fr.inria.corese.sparql.triple.cst;
+package fr.inria.corese.core.sparql.triple.cst;
 
-import fr.inria.corese.sparql.datatype.RDF;
+import fr.inria.corese.core.sparql.datatype.RDF;
 
  public interface RDFS extends RDF {
 

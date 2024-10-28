@@ -1,7 +1,7 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.kgram.api.core.Node;
-import fr.inria.corese.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Query;
 import java.util.HashMap;
 
 /**

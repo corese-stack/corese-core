@@ -1,7 +1,7 @@
-package fr.inria.corese.sparql.triple.parser;
+package fr.inria.corese.core.sparql.triple.parser;
 
-import static fr.inria.corese.sparql.triple.parser.ASTQuery.KGRAMVAR;
-import static fr.inria.corese.sparql.triple.parser.ASTQuery.OUT;
+import static fr.inria.corese.core.sparql.triple.parser.ASTQuery.KGRAMVAR;
+import static fr.inria.corese.core.sparql.triple.parser.ASTQuery.OUT;
 import java.util.ArrayList;
 
 /**
