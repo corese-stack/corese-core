@@ -1,0 +1,20 @@
+
+.. _namespace_fr__inria__corese__core__sparql:
+
+Namespace fr::inria::corese::core::sparql
+=========================================
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__sparql__api`
