@@ -1,6 +1,6 @@
 # Corese Changelog
 
-## Version 4.6.0 – 2024-10-23
+## Version 4.6.0 – 2024-10-28
 
 ### Corese-Core
 
