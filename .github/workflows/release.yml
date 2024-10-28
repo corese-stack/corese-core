@@ -32,7 +32,7 @@ jobs:
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
         run: |
-          echo "$GPG_SIGNING_KEY" | base64 --decode | gpg --import
+          echo "$GPG_SIGNING_KEY" | base64 --decode | gpg --batch --yes --pinentry-mode loopback --import
           gpg --list-keys
 
       - name: Build and publish to Sonatype (staging only)
