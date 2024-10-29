@@ -1299,29 +1299,27 @@ public class Exp extends PointerObject
   /**
    * complete handler selectList with this query selectList 
    */
-  void queryNodeList(ExpHandler h) {
-    List<Node> selectList    = h.getSelectNodeList();
-    List<Node> subSelectList = getQuery().getSelect(); //getSelectNodeList();
-   
-    if (h.isInSubScope()) {
-        // focus on left optional etc. in query body
-        // because select * includes right optional etc.
-        List<Node> scopeList = getQuery().getBody().getTheNodes(h.copy());
-        for (Node node : scopeList) {
-            if (subSelectList.contains(node)) {
-               if (! contain(getQuery().getGroupBy(), node)) {
+    void queryNodeList(ExpHandler h) {
+        List<Node> selectList    = h.getSelectNodeList();
+        List<Node> subSelectList = getQuery().getSelect(); //getSelectNodeList();
+        
+        if (h.isInSubScope()) {
+            // focus on left optional etc. in query body 
+            // because select * includes right optional etc.
+            //List<Node> scopeList = getQuery().getBody().getInScopeNodes(h.isBind());
+            List<Node> scopeList = getQuery().getBody().getTheNodes(h.copy());
+            
+            for (Node node : scopeList) {
+                if (subSelectList.contains(node)) {
                     add(selectList, node);
-               }
+                }
             }
-        }
-    } else {
-        for (Node node : subSelectList) {
-            if (! contain(getQuery().getGroupBy(), node)) {
+        } else {
+            for (Node node : subSelectList) {
                 add(selectList, node);
             }
         }
     }
-}
 
     /**
      * For modularity reasons, Pattern is stored as ExpPattern interface

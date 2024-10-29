@@ -1,0 +1,25 @@
+# Generated files for docs
+generated/
+bak/
+build/
+
+source/*
+!source/*.rst
+!source/**/*.rst
+!source/**/*.py
+
+!source/README.md
+!source/install.md
+!source/Doxyfile
+
+
+!source/rest_api/
+!source/cli_ref/
+
+!source/_templates/
+!source/_static/
+
+!source/advanced/
+!source/federation/
+!source/getting_started/
+!source/storage/
