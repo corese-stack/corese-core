@@ -50,8 +50,6 @@ public class UpdateProcess {
     private Dataset dataset;
     private List<ProcessVisitor> visitorList;
 
-    boolean isDebug = false;
-
     UpdateProcess(QueryProcess e, ManagerImpl man, Dataset ds) {
         manager = man;
         exec = e;
@@ -80,9 +78,8 @@ public class UpdateProcess {
         addVisitor(getQueryProcess().getVisitor());
         
         for (Update u : astu.getUpdates()) {
-            if (isDebug) {
-                logger.debug("** Update: " + u);
-            }
+
+            logger.debug("** Update: " + u);
             boolean suc = true;
 
             switch (u.type()) {
@@ -120,9 +117,7 @@ public class UpdateProcess {
 
             if (!suc) {
                 q.setCorrect(false);
-                if (isDebug) {
-                    logger.debug("** Failure: " + u);
-                }
+                logger.debug("** Failure: " + u);
                 break;
             }
         }
@@ -139,11 +134,6 @@ public class UpdateProcess {
         }
         return b.getAccessLevel();
     } 
-    
-
-    public void setDebug(boolean b) {
-        isDebug = b;
-    }
 
     Mappings process(Query q, Composite ope, Mapping m, Binding b) throws EngineException {
         ASTQuery ast = null;
@@ -325,9 +315,7 @@ public class UpdateProcess {
 
         Exp exp = ope.getData();
         if (!exp.validateData(ast)) {
-            if (isDebug) {
-                logger.debug("** Update: insert not valid: " + exp);
-            }
+            logger.debug("** Update: insert not valid: " + exp);
             q.setCorrect(false);
             return null; 
         }

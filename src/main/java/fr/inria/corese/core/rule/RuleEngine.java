@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
+import fr.inria.corese.core.api.Loader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -301,14 +302,14 @@ public class RuleEngine implements Engine, Graphable {
         ld.setEngine(this);
         ld.setQueryProcess(getQueryProcess());
         InputStream stream = RuleEngine.class.getResourceAsStream(name);
-        ld.parse(stream, NSManager.RESOURCE + name, Load.RULE_FORMAT);
+        ld.parse(stream, NSManager.RESOURCE + name, Loader.format.RULE_FORMAT);
     }
 
     void loadPath(String name) throws LoadException {
         Load ld = Load.create(graph);
         ld.setEngine(this);
         ld.setQueryProcess(getQueryProcess());
-        ld.parse(name, Load.RULE_FORMAT);
+        ld.parse(name, Loader.format.RULE_FORMAT);
     }
 
     /**

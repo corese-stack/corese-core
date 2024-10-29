@@ -637,30 +637,6 @@ public class QueryProcess extends QuerySolver {
     }
 
     /**
-     * RDF Graph g considered as a Query Graph Build a SPARQL BGP with g
-     * Generate and eval q KGRAM Query
-     */
-    public Mappings queryOld(Graph g) throws EngineException {
-        QueryGraph qg = QueryGraph.create(g);
-        return query(qg);
-    }
-
-    public Mappings query(QueryGraph qg) throws EngineException {
-        Query q = qg.getQuery();
-        return query(q);
-    }
-
-    /**
-     * q is construct {} where {} eval the construct consider the result as a
-     * query graph execute the query graph
-     */
-    public Mappings queryGraph(String q) throws EngineException {
-        Mappings m = query(q);
-        Graph g = getGraph(m);
-        return query(g);
-    }
-
-    /**
      * KGRAM + full SPARQL compliance : - type of arguments of functions (e.g.
      * sparql regex require string) - variable in select with group by - specify
      * the dataset

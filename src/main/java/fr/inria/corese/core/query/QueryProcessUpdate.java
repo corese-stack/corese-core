@@ -114,7 +114,6 @@ public class QueryProcessUpdate {
             getQueryProcess().complete(ds);
         }
         UpdateProcess up = UpdateProcess.create(getQueryProcess(), createUpdateManager(), ds);
-        up.setDebug(isDebug());
         Mappings map = up.update(query, m, getBinding(m));
 
         afterUpdate(vis, map, isSynchronized());

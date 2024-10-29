@@ -255,10 +255,10 @@ public class WorkflowParser {
        * path may be .sw .ttl .rdf
        * load graph as .ttl .rdf (not .sw)
        */
-    int getFormat(Load ld, String path){
-          int format = ld.getFormat(path);
-          if (format == Load.WORKFLOW_FORMAT || format == Load.UNDEF_FORMAT){
-              format = Load.TURTLE_FORMAT;
+    protected Loader.format getFormat(Load ld, String path){
+        Loader.format format = ld.getFormat(path);
+          if (format == Loader.format.WORKFLOW_FORMAT || format == Loader.format.UNDEF_FORMAT){
+              format = Loader.format.TURTLE_FORMAT;
           }
           return format;
       }
@@ -543,7 +543,7 @@ public class WorkflowParser {
         String shacl = getParam(dt, SHAPE, MODE_PARAM, isURL, isURL);
         String result = getParam(dt, PATH, PATH);
 
-        int format = (isURL) ? Load.UNDEF_FORMAT : getFormat(sformat) ;
+        Loader.format format = (isURL) ? Loader.format.UNDEF_FORMAT : getFormat(sformat) ;
 
         ShapeWorkflow ap = null;
         ap = new ShapeWorkflow().setShex(shex);
@@ -554,17 +554,17 @@ public class WorkflowParser {
         return ap;
     }
     
-    int getFormat(String format){
+    Loader.format getFormat(String format){
         if (format.equals(Transformer.TURTLE)){
-            return Load.TURTLE_FORMAT;
+            return Loader.format.TURTLE_FORMAT;
         }
         else if (format.equals(Transformer.RDFXML)){
-            return Load.RDFXML_FORMAT;
+            return Loader.format.RDFXML_FORMAT;
         }
         else if (format.equals(Transformer.JSON)){
-            return Load.JSONLD_FORMAT;
+            return Loader.format.JSONLD_FORMAT;
         }
-        return Load.UNDEF_FORMAT;
+        return Loader.format.UNDEF_FORMAT;
     }
     
     
@@ -755,7 +755,7 @@ public class WorkflowParser {
         String text = getStringParam(TEXT_PARAM);
         if (text != null) {
             //check(text);
-            LoadProcess load = new LoadProcess(text, Loader.UNDEF_FORMAT);           
+            LoadProcess load = new LoadProcess(text, Loader.format.UNDEF_FORMAT);
             w.add(load);
         }
         

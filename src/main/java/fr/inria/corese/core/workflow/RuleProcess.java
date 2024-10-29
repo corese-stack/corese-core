@@ -106,7 +106,7 @@ public class RuleProcess extends  WorkflowProcess {
     
     RuleEngine create(Graph g, String p) throws LoadException{
         Load ld = Load.create(g);
-        ld.parse(p, Loader.RULE_FORMAT);
+        ld.parse(p, Loader.format.RULE_FORMAT);
         return ld.getRuleEngine();
     }
 

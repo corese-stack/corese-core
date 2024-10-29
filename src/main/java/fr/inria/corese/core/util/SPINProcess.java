@@ -1,5 +1,6 @@
 package fr.inria.corese.core.util;
 
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
@@ -138,7 +139,7 @@ public class SPINProcess {
         Load ld = Load.create(g);
         ld.setEvent(false);
         try {
-            ld.parse(new ByteArrayInputStream(spin.getBytes("UTF-8")), Load.TURTLE_FORMAT);
+            ld.parse(new ByteArrayInputStream(spin.getBytes("UTF-8")), Loader.format.TURTLE_FORMAT);
         } catch (LoadException ex) {
             LoggerFactory.getLogger(SPINProcess.class.getName()).error("", ex);
         } catch (UnsupportedEncodingException ex) {

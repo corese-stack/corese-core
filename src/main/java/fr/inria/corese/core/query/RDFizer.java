@@ -5,6 +5,7 @@
 
 package fr.inria.corese.core.query;
 
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.kgram.api.query.Graphable;
@@ -60,7 +61,7 @@ public class RDFizer {
         Load ld = Load.create(g);
         ld.setEvent(false);
         try {
-            ld.loadString(rdf, Load.TURTLE_FORMAT);
+            ld.loadString(rdf, Loader.format.TURTLE_FORMAT);
         } catch (LoadException ex) {
             System.out.println(rdf);
             LoggerFactory.getLogger(SPINProcess.class.getName()).error("", ex);

@@ -5,7 +5,23 @@ import fr.inria.corese.core.load.LoadException;
 import java.io.InputStream;
 
 public interface Loader {
-    static final int RDFXML_FORMAT = 0;
+    public enum format {
+        RDFXML_FORMAT,
+        RDFA_FORMAT,
+        TURTLE_FORMAT,
+        NT_FORMAT,
+        JSONLD_FORMAT,
+        RULE_FORMAT,
+        QUERY_FORMAT,
+        UNDEF_FORMAT,
+        TRIG_FORMAT,
+        NQUADS_FORMAT,
+        WORKFLOW_FORMAT,
+        OWL_FORMAT,
+        XML_FORMAT,
+        JSON_FORMAT
+    }
+/*    static final int RDFXML_FORMAT = 0;
     static final int RDFA_FORMAT   = 1;
     static final int TURTLE_FORMAT = 2;
     static final int NT_FORMAT     = 3;
@@ -18,7 +34,7 @@ public interface Loader {
     static final int WORKFLOW_FORMAT = 10;
     static final int OWL_FORMAT     = 11;
     static final int XML_FORMAT     = 12;
-    static final int JSON_FORMAT    = 13;
+    static final int JSON_FORMAT    = 13;*/
     
     static final String ACCEPT = "Accept";
     static final String JSONLD_FORMAT_STR = "application/ld+json";
@@ -40,7 +56,7 @@ public interface Loader {
        
         void parse(String path, String source) throws LoadException;
        
-        void parse(String path, String source, String base, int format) throws LoadException;
+        void parse(String path, String source, String base, Loader.format format) throws LoadException;
 		        
 	
 	@Deprecated
@@ -50,7 +66,7 @@ public interface Loader {
         void load(String path, String source);
         
 	@Deprecated
-        void load(String path, String base, String source, int format) throws LoadException;
+        void load(String path, String base, String source, Loader.format format) throws LoadException;
 
 	@Deprecated
         void load(InputStream stream, String str) throws LoadException;
@@ -62,8 +78,8 @@ public interface Loader {
 	void loadWE(String path, String source) throws LoadException;
 	
 	RuleEngine getRuleEngine();
-        
-        int getFormat(String path);
+
+    format getFormat(String path);
 
 
 }

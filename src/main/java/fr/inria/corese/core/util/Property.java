@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import fr.inria.corese.core.elasticsearch.AbstractElasticsearchVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +93,7 @@ public class Property {
     final static String LOCAL = "./";
     final static String SEP = ";";
     final static String EQ = "=";
-    private static Property singleton;
+    private static Property singleton = null;
     private static final String STD = "std";
     public static final String RDF_XML = "rdf+xml";
     public static final String TURTLE = "turtle";
@@ -114,7 +115,6 @@ public class Property {
     private Properties properties;
 
     private String path, parent;
-    private boolean debug = false;
 
     public enum Value {
         // VARIABLE = home=/home/name/dir
@@ -296,17 +296,10 @@ public class Property {
 
         // parser configuration
         STRICT_MODE,
+
+        // Elasticsearch parameters
+        ELASTICSEARCH_API_KEY
     };
-
-    static {
-        start();
-    }
-
-    static void start() {
-        singleton = new Property();
-        set(SERVICE_SEND_PARAMETER, true);
-        set(DATATYPE_ENTAILMENT, true);
-    }
 
     Property() {
         booleanProperty = new HashMap<>();
@@ -319,11 +312,15 @@ public class Property {
     }
 
     public static Property getSingleton() {
+        if(singleton == null) {
+            singleton = new Property();
+            set(SERVICE_SEND_PARAMETER, true);
+            set(DATATYPE_ENTAILMENT, true);
+        }
         return singleton;
     }
 
     public static void load(String path) throws FileNotFoundException, IOException {
-        start();
         getSingleton().basicLoad(path);
     }
 
@@ -464,9 +461,7 @@ public class Property {
     }
 
     void basicSet(Value value, boolean b) {
-        if (isDebug()) {
-            logger.info(value + " = " + b);
-        }
+        logger.debug("{} = {}", value, b);
         getBooleanProperty().put(value, b);
 
         switch (value) {
@@ -678,9 +673,7 @@ public class Property {
     }
 
     void basicSet(Value value, String... str) {
-        if (isDebug()) {
-            logger.info(value + " = " + str);
-        }
+            logger.debug("{} = {}", value, str);
         switch (value) {
             case FEDERATE_BLACKLIST:
                 blacklist(str);
@@ -692,9 +685,7 @@ public class Property {
     }
 
     void basicSet(Value value, String str) {
-        if (isDebug()) {
-            logger.info(value + " = " + str);
-        }
+        logger.debug("{} = {}", value, str);
         getStringProperty().put(value, str);
         switch (value) {
 
@@ -798,6 +789,9 @@ public class Property {
                 loadFunction(str);
                 break;
 
+            case ELASTICSEARCH_API_KEY:
+                AbstractElasticsearchVisitor.setElasticsearchApiKey(str);
+                break;
         }
     }
 
@@ -883,9 +877,7 @@ public class Property {
     }
 
     void basicSet(Value value, int n) {
-        if (isDebug()) {
-            logger.info(value + " = " + n);
-        }
+        logger.debug("{} = {}", value, n);
         getIntegerProperty().put(value, n);
 
         switch (value) {
@@ -1131,7 +1123,6 @@ public class Property {
 
     void prefix() {
         for (Pair pair : getValueListBasic(PREFIX)) {
-            logger.info(String.format("prefix %s: <%s>", pair.getKey().strip(), pair.getValue().strip()));
             NSManager.defineDefaultPrefix(pair.getKey().strip(), pair.getValue().strip());
         }
     }
@@ -1141,7 +1132,7 @@ public class Property {
             Level level = Level.valueOf(str);
             Access.setDefaultUserLevel(level);
         } catch (Exception e) {
-            logger.error("Undefined Access Level: " + str);
+            logger.error("Undefined Access Level: {}", str);
         }
     }
 
@@ -1230,14 +1221,6 @@ public class Property {
 
     public void setParent(String parent) {
         this.parent = parent;
-    }
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     public HashMap<String, String> getImports() {

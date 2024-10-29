@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import fr.inria.corese.core.api.Loader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -526,8 +527,8 @@ public class PluginImpl
     }
 
     // st:turtle st:rdfxml st:json
-    int getFormat(IDatatype dt) {
-        return (dt == null) ? Load.UNDEF_FORMAT : LoadFormat.getDTFormat(dt.getLabel());
+    Loader.format getFormat(IDatatype dt) {
+        return (dt == null) ? Loader.format.UNDEF_FORMAT : LoadFormat.getDTFormat(dt.getLabel());
     }
 
     // function xt:write
@@ -633,7 +634,7 @@ public class PluginImpl
         try {
             Load ld = Load.create(g);
             ld.setLevel(level);
-            ld.parse(uri, Load.RULE_FORMAT);
+            ld.parse(uri, Loader.format.RULE_FORMAT);
             return ld.getRuleEngine();
         } catch (LoadException ex) {
             throw ex.getCreateEngineException();

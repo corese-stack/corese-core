@@ -2,6 +2,7 @@ package fr.inria.corese.core.util;
 
 import java.io.IOException;
 
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.kgram.core.Mapping;
@@ -40,8 +41,8 @@ public class Example {
 		// create a loader
 		Load ld = Load.create(g);
 		
-		ld.load(RDF.RDFS, Load.TURTLE_FORMAT);
-		ld.load(RDF.RDF, Load.TURTLE_FORMAT);
+		ld.load(RDF.RDFS, Loader.format.TURTLE_FORMAT);
+		ld.load(RDF.RDF, Loader.format.TURTLE_FORMAT);
 
 		// create a query solver
 		QueryProcess exec = QueryProcess.create(g);

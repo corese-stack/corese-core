@@ -1184,7 +1184,7 @@ public class TestQuery1 {
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
-        ld.loadString(str, Load.TURTLE_FORMAT);
+        ld.loadString(str, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         QueryProcess ex = QueryProcess.create(gg);
         String qq = "select * where {"
@@ -1212,7 +1212,7 @@ public class TestQuery1 {
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
-        ld.loadString(str, Load.TURTLE_FORMAT);
+        ld.loadString(str, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         QueryProcess ex = QueryProcess.create(gg);
         String qq = "select * where {"
@@ -1240,7 +1240,7 @@ public class TestQuery1 {
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
-        ld.loadString(str, Load.TURTLE_FORMAT);
+        ld.loadString(str, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         QueryProcess ex = QueryProcess.create(gg);
         String qq = "select * where {"
@@ -1271,7 +1271,7 @@ public class TestQuery1 {
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
-        ld.loadString(str, Load.TURTLE_FORMAT);
+        ld.loadString(str, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         QueryProcess ex = QueryProcess.create(gg);
         String qq = "select * where {"
@@ -2260,36 +2260,6 @@ public class TestQuery1 {
 
         exec.query(i);
 
-        // Mappings m1 = exec.query(q1);
-        // assertEquals(3, m1.size());
-        //
-        // Mappings m2 = exec.query(q2);
-        // assertEquals(8, m2.size());
-        //
-        // Mappings m3 = exec.query(q3);
-        // assertEquals(4, m3.size());
-        //
-        // Mappings m4 = exec.query(q4);
-        // assertEquals(8, m4.size());
-        //
-        // Mappings m5 = exec.query(q5);
-        // assertEquals(4, m5.size());
-        //
-        // Mappings m6 = exec.query(q6);
-        // assertEquals(3, m6.size());
-        //
-        // Mappings m7 = exec.query(q7);
-        // assertEquals(2, m7.size());
-        //
-        // Mappings m8 = exec.query(q8);
-        // assertEquals(3, m8.size());
-        //
-        // Mappings m9 = exec.query(q9);
-        // assertEquals(2, m9.size());
-        //
-        // Mappings m10 = exec.query(q10);
-        // assertEquals(4, m10.size());
-
         Mappings m11 = exec.query(q11);
         // System.out.println(m11);
         // 1 is a bug, it should be 0 !!!
@@ -2364,7 +2334,7 @@ public class TestQuery1 {
 
         Graph gg = Graph.create();
         Load ll = Load.create(gg);
-        ll.loadString(json, Load.JSONLD_FORMAT);
+        ll.loadString(json, fr.inria.corese.core.api.Loader.format.JSONLD_FORMAT);
         // System.out.println(g.size() + " " + gg.size());
         assertEquals(g.size(), gg.size());
 
@@ -3922,7 +3892,7 @@ public class TestQuery1 {
             ld.parse(data + "junit/data/test.rdf");
             ld.parse(data + "junit/data/test.rdf", "http://example.org/");
 
-            ld.parse(data + "junit/data/test.xml", Load.RDFXML_FORMAT);
+            ld.parse(data + "junit/data/test.xml", fr.inria.corese.core.api.Loader.format.RDFXML_FORMAT);
 
         } catch (LoadException ex) {
         }
@@ -5952,8 +5922,8 @@ public class TestQuery1 {
 
         Graph g = createGraph();
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, Load.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, Load.TURTLE_FORMAT);
+        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         Transformer t = Transformer.createWE(g, Transformer.TURTLE, RDF.RDF);
         String str = t.transform();
@@ -5975,8 +5945,8 @@ public class TestQuery1 {
     public void testGT() throws LoadException, EngineException {
         Graph g = createGraph();
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, Load.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, Load.TURTLE_FORMAT);
+        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         String t1 = "template { st:apply-templates-with-graph(st:turtle, rdf:)} where {}";
         String t2 = "template { st:apply-templates-with-graph(st:turtle, rdfs:)} where {}";
@@ -6036,8 +6006,8 @@ public class TestQuery1 {
     public void testTrig() throws LoadException, EngineException {
         Graph g = Graph.create(true);
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, Load.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, Load.TURTLE_FORMAT);
+        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         Transformer pp = Transformer.create(g, Transformer.TRIG);
         String str = pp.transform();
@@ -6550,44 +6520,6 @@ public class TestQuery1 {
         }
 
     }
-
-    // @Test
-    // public void testQM() {
-    // Graph g = createGraph();
-    // QueryManager man = QueryManager.create(g);
-    // QueryProcess exec = QueryProcess.create(g);
-    // String init = "prefix foaf: <http://xmlns.com/foaf/0.1/> "
-    // + "insert data {"
-    // + "<John> foaf:name 'John' ; foaf:age 18 ."
-    // + "<Jim> foaf:name 'Jim' ; foaf:knows <John> ."
-    // + "}";
-    //
-    // String query = "prefix sp: <http://spinrdf.org/sp#>"
-    // + "prefix foaf: <http://xmlns.com/foaf/0.1/> "
-    // + "select * where {"
-    // + "?x foaf:name ?n "
-    // + "?x foaf:knows ?p "
-    // + "minus { ?x foaf:age ?a } "
-    // + "<James> foaf:fake ?f "
-    // + "?f a foaf:Person "
-    // + "?f sp:elements ?e "
-    // + "?f sp:test ?t "
-    // + "filter(?b >= 20)"
-    // + "}";
-    // try {
-    // exec.query(init);
-    // Mappings map = man.query(query);
-    // assertEquals("result", 1, map.size());
-    // ////System.out.println(map.getQuery().getAST());
-    // ////System.out.println(map);
-    // ////System.out.println("size: " + map.size());
-    //
-    //
-    // } catch (EngineException ex) {
-    // assertEquals("result", true, ex);
-    // }
-    //
-    // }
 
     @Test
     public void testPPSPINwdfgdwfgd() throws EngineException, LoadException {

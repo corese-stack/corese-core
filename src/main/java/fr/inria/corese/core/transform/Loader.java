@@ -122,7 +122,7 @@ public class Loader {
             // loaded from Corese resource
             name = nsm.strip(pp, STL);
         }  else {
-            ld.parseDir(toFile(pp), Load.QUERY_FORMAT);
+            ld.parseDir(toFile(pp), fr.inria.corese.core.api.Loader.format.QUERY_FORMAT);
             return;
         }           
         String src = PPLIB + name;

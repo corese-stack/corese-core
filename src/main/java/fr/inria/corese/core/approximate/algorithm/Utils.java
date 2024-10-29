@@ -17,7 +17,7 @@ public class Utils {
      * @return
      */
     public static String format(double d) {
-        return String.format("%2.4f", d);
+        return String.format("%2.4f", d).replace(',', '.'); // Had to add the replace to force replace the ","
     }
 
     /**
