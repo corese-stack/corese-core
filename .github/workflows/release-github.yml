@@ -38,7 +38,7 @@ jobs:
         run: |
           TAG_NAME="${GITHUB_REF##*/}"
           VERSION="${TAG_NAME#v}"
-          sed -n "/## Version $VERSION/,/## Version/p" CHANGELOG.md | sed '$d' > release_notes.md
+          sed -n "/## Version $VERSION/,/## Version/p" CHANGELOG.md | sed '1d;$d' | awk 'NF || p {print} {p = NF}' > release_notes.md
         env:
           GITHUB_REF: ${{ github.ref }}
 
