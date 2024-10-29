@@ -3,11 +3,13 @@ name: Publish GitHub Release
 on:
   push:
     tags:
-      - "v*.*.*"  # Déclenche le workflow pour les tags de version, ex. v4.6.0
+      - "v*.*.*"
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -28,11 +30,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Build les artefacts .jar
       - name: Build project
         run: ./gradlew build
 
-      # Extraire le changelog correspondant à la version
       - name: Extract Changelog for Release
         id: changelog
         run: |
@@ -42,7 +42,6 @@ jobs:
         env:
           GITHUB_REF: ${{ github.ref }}
 
-      # Créer une release GitHub avec le changelog et ajouter les artefacts .jar
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
@@ -54,14 +53,3 @@ jobs:
           body_path: release_notes.md
           draft: true
           prerelease: false
-
-      # Ajouter les fichiers .jar à la release
-      - name: Upload JAR Files to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.create_release.outputs.id }}
-          asset_path: build/libs/*.jar
-          asset_name: corese-core-${{ github.ref_name }}.jar
-          asset_content_type: application/java-archive
