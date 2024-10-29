@@ -48,12 +48,8 @@ jobs:
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}                 # Sonatype OSSRH username
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}                 # Sonatype OSSRH password
-          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}               # GPG signing key
           GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }} # GPG signing passphrase
-        run: |
-          export GPG_SIGNING_KEY="${{ secrets.GPG_SIGNING_KEY }}"
-          export GPG_SIGNING_PASSPHRASE="${{ secrets.GPG_SIGNING_PASSPHRASE }}"
-          ./gradlew publishToSonatype
+        run: ./gradlew publishToSonatype
 
       - name: Manual Release Reminder
         run: echo "The artifacts have been staged on Sonatype. Please log in to Sonatype Nexus to close and release the staging repository manually."
