@@ -51,8 +51,8 @@ jobs:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}               # GPG signing key
           GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }} # GPG signing passphrase
         run: |
-          export ORG_GRADLE_PROJECT_signingKey="${{ secrets.GPG_SIGNING_KEY }}"
-          export ORG_GRADLE_PROJECT_signingPassword="${{ secrets.GPG_SIGNING_PASSPHRASE }}"
+          export GPG_SIGNING_KEY="${{ secrets.GPG_SIGNING_KEY }}"
+          export GPG_SIGNING_PASSPHRASE="${{ secrets.GPG_SIGNING_PASSPHRASE }}"
           ./gradlew publishToSonatype
 
       - name: Manual Release Reminder
