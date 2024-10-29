@@ -53,3 +53,17 @@ jobs:
           body_path: release_notes.md
           draft: true
           prerelease: false
+
+      - name: Upload Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in ./build/libs/*.jar; do
+            if [[ -f "$file" ]]; then
+              curl -s -X POST \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Content-Type: $(file --mime-type -b "$file")" \
+                --data-binary @"$file" \
+                "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
+            fi
+          done
