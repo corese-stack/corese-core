@@ -46,11 +46,14 @@ jobs:
       # Step 5: Build the project and publish artifacts to Sonatype in "staging" mode (not yet released)
       - name: Build and publish to Sonatype (staging only)
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}          # Sonatype OSSRH username
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}          # Sonatype OSSRH password
-          GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }}  # Passphrase for the GPG key
-        run: ./gradlew publishToSonatype  # Publish artifacts to Sonatype in staging mode
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}                 # Sonatype OSSRH username
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}                 # Sonatype OSSRH password
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}               # GPG signing key
+          GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }} # GPG signing passphrase
+        run: |
+          export ORG_GRADLE_PROJECT_signingKey=${{ secrets.GPG_SIGNING_KEY }}
+          export ORG_GRADLE_PROJECT_signingPassword=${{ secrets.GPG_SIGNING_PASSPHRASE }}
+          ./gradlew publishToSonatype
 
-      # Step 6: Reminder to manually close and release the staging repository on Sonatype
       - name: Manual Release Reminder
         run: echo "The artifacts have been staged on Sonatype. Please log in to Sonatype Nexus to close and release the staging repository manually."
