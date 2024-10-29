@@ -228,6 +228,12 @@ tasks {
     }
 }
 
+// Configure the build task to depend on the shadow JAR task.
+// This ensures that the shadow JAR is built when the project is built.
+tasks.build {
+    dependsOn(tasks.shadowJar)
+}
+
 // Configure Jacoco test report task to depend on the test task,
 // so reports are generated after tests run successfully.
 tasks.jacocoTestReport {
