@@ -1,4 +1,5 @@
-# Trigger the workflow when a tag matching the version pattern (e.g., v4.6.0) is pushed
+name: Publish Maven Central
+
 on:
   push:
     tags:
