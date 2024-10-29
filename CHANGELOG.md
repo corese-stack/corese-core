@@ -2,13 +2,11 @@
 
 ## Version 4.6.0 – 2024-10-28
 
-### Corese-Core
-
-#### Added
+### Added
 
 - Added support for the RDFC-1.0 algorithm for canonicalizing RDF datasets (see W3C Standard [RDF Canonicalization](https://www.w3.org/TR/rdf-canon/)).
 
-#### Fixed
+### Fixed
 
 - Removed repeated `println` statements during reasoning (see [issue #174](https://github.com/Wimmics/corese/issues/174)).
 - Fixed a bug where `NOW()` returned multiple values in a single query (see [issue #168](https://github.com/Wimmics/corese/issues/168)).
@@ -16,22 +14,18 @@
 
 ## Version 4.5.0 – 2023-12-14
 
-### Corese-Core
-
-#### Added
+### Added
 
 - Improved RDF serializers (see [issue #142](https://github.com/Wimmics/corese/issues/142)).
 
-#### Fixed
+### Fixed
 
 - Fixed Trig serialization to escape special characters (see [issue #151](https://github.com/Wimmics/corese/issues/151)).
 - Fixed federated queries with `PREFIX` statements failing under certain conditions (see [issue #140](https://github.com/Wimmics/corese/issues/140)).
 
 ## Version 4.4.0 – 2023-03-30
 
-### Corese-Core
-
-#### Added
+### Added
 
 - Integrated storage systems:
   - Jena TDB1.
@@ -40,12 +34,12 @@
   - [More information available here](https://github.com/Wimmics/corese/blob/master/docs/storage/Configuring%20and%20Connecting%20to%20Different%20Storage%20Systems%20in%20Corese.md).
 - Beta support for RDF\* and SPARQL\* ([Community Group Report 17 December 2021](https://w3c.github.io/rdf-star/cg-spec/2021-12-17.html)).
 
-#### Changed
+### Changed
 
 - Updated Jetty server library to version `11.0.8`.
 - Performed code clean-up, corrections, and added comments for improved readability and maintenance.
 
-#### Fixed
+### Fixed
 
 - Fixed an encoding error when loading a file whose path contains a space in Corese-GUI.
 - Fixed encoding error on Windows when exporting graphs from Corese-GUI.
