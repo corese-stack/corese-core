@@ -26,9 +26,7 @@ public class TemplateFormat {
     private NSManager nsm;
     Transformer pp;
     boolean isTurtle = false;
-    private boolean isDebug = false;
     private boolean isCheck = false;
-    private boolean isHide = false;
     private String start;
 
     TemplateFormat(Mappings m) {
@@ -86,14 +84,6 @@ public class TemplateFormat {
         isTurtle = b;
     }
 
-    public void setDebug(boolean b) {
-        isDebug = b;
-    }
-
-    void init() {
-
-    }
-
     @Override
     public String toString() {
         if (query != null && query.isTemplate()) {
@@ -110,20 +100,12 @@ public class TemplateFormat {
         return p.toString();
     }
 
-    String template() {
-        Transformer p = (Transformer) query.getTransformer();
-        IDatatype dt = p.getResult(map);
-        return dt.getLabel();
-    }
-
     Transformer createPP() {
         pp = Transformer.create(graph, printer);
         if (isCheck) {
             pp.check();
         }
-        pp.setDebug(isDebug);
         pp.setTurtle(isTurtle);
-        pp.setHide(isHide);
 
         if (nsm != null) {
             pp.setNSM(nsm);
@@ -160,14 +142,6 @@ public class TemplateFormat {
 
     public void setCheck(boolean isCheck) {
         this.isCheck = isCheck;
-    }
-
-    public boolean isHide() {
-        return isHide;
-    }
-
-    public void setHide(boolean isHide) {
-        this.isHide = isHide;
     }
 
     public void setStart(String str) {

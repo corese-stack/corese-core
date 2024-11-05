@@ -21,14 +21,12 @@ import org.xml.sax.SAXParseException;
 public class BuildImpl extends CreateTriple 
         implements Build, StatementHandler, org.xml.sax.ErrorHandler {
 
-
-    Graph graph;
     private Node graphNode;
     Hashtable<String, String> blank;
 
-    private String resource, namedGraphURI;
+    private String resource;
+    private String namedGraphURI;
     private Node node;
-    private Load load;
 
     public BuildImpl() {
     }
@@ -37,7 +35,6 @@ public class BuildImpl extends CreateTriple
         super(g, ld);
         graph = g;
         blank = new Hashtable<>();
-        load = ld;
     }
 
     public static BuildImpl create(Graph g, Load ld) {

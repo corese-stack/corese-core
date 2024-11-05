@@ -26,8 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Manage Turtle Property file to tune corese behavior Authorized namespace for
- * @import and LinkedFunction
+ * Manage Turtle Property file to tune corese behavior,
+ * Authorized namespace for @import and LinkedFunction
  *
  * @author Olivier Corby, INRIA, I3S 2020
  */

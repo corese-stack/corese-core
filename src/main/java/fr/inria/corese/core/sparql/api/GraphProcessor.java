@@ -30,7 +30,7 @@ public interface GraphProcessor {
     
     IDatatype format(IDatatype[] ldt);
     
-    IDatatype format(Mappings map, int format);
+    IDatatype format(Mappings map, ResultFormatDef.format format);
     
     IDatatype spin(IDatatype dt);
     

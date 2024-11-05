@@ -1005,7 +1005,6 @@ public class RuleEngine implements Engine, Graphable {
         cons.setAccessRight(bind.getAccessRight());
         cons.setRule(rule, rule.getIndex(), rule.getProvenance());
         cons.setLoopIndex(timestamp);
-        cons.setDebug(isDebug());
         if (isEvent())
             cons.setVisitor(getVisitor());
 

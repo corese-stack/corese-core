@@ -306,13 +306,6 @@ public class QueryProcess extends QuerySolver {
         return exec;
     }
 
-    /**
-     * To Be Used by implementation other than Graph
-     */
-    // public static QueryProcess create(Producer prod, Matcher match) {
-    // return new QueryProcess(prod, createInterpreter(prod, match), match);
-    // }
-
     public static QueryProcess create(Producer prod, Interpreter eval, Matcher match) {
         return new QueryProcess(prod, eval, match);
     }
@@ -452,7 +445,7 @@ public class QueryProcess extends QuerySolver {
         return this;
     }
 
-    /**
+    /*
      * *************************************************************
      *
      * API for query
@@ -682,7 +675,7 @@ public class QueryProcess extends QuerySolver {
         return query(query);
     }
 
-    /**
+    /*
      * ****************************************
      *
      * Secure Query OR Update
@@ -721,7 +714,7 @@ public class QueryProcess extends QuerySolver {
         return query(squery);
     }
 
-    /**
+    /*
      * *************************************************************************
      * 
      * Main query function
@@ -781,7 +774,7 @@ public class QueryProcess extends QuerySolver {
                 map = synQuery(gNode, q, m);
                 if (q.isConstruct()) {
                     // construct where
-                    construct(map, null, getAccessRight(m));
+                    construct(map, getAccessRight(m));
                 }
                 log(Log.QUERY, q, map);
             }
@@ -821,9 +814,9 @@ public class QueryProcess extends QuerySolver {
     }
 
     void finish(Query q, Mappings map) {
-        Eval eval = map.getEval();
-        if (eval != null) {
-            eval.finish(q, map);
+        Eval finishEval = map.getEval();
+        if (finishEval != null) {
+            finishEval.finish(q, map);
             map.setEval(null);
         }
         if (q.getAST().hasMetadata(Metadata.LOG)) {
@@ -833,7 +826,6 @@ public class QueryProcess extends QuerySolver {
             map.setLinkList(getLog().getLinkList());
         }
         traceLog(map);
-        processMessage(map);
     }
 
     // display service http header log
@@ -878,15 +870,11 @@ public class QueryProcess extends QuerySolver {
         LogManager man = getLogManager(map);
         String fileName = q.getAST().getMetadata().getValue(Metadata.LOG);
 
-        if (fileName == null) {
-            System.out.println(man);
-        } else {
             try {
                 man.toFile(fileName);
             } catch (IOException ex) {
                 logger.error(ex.getMessage());
             }
-        }
     }
 
     // translate log header into Mappings
@@ -921,29 +909,6 @@ public class QueryProcess extends QuerySolver {
         }
 
         return map;
-    }
-
-    /**
-     * When query has service clause, endpoint may have sent a message to client
-     * Message is a json object sent as Linked Result (link url in query result)
-     * Here we get the message if any
-     * By default, corese message is server Context as json object.
-     */
-    void processMessage(Mappings map) {
-        JSONObject json = getMessage(map);
-
-        if (json != null) {
-            System.out.println("QP: message");
-
-            for (var key : json.keySet()) {
-                System.out.println(key + " = " + json.get(key));
-            }
-
-            if (json.has(URLParam.TEST)) {
-                System.out.println();
-                System.out.println(getStringMessage(map));
-            }
-        }
     }
 
     Mappings synQuery(Node gNode, Query query, Mapping m) throws EngineException {
@@ -1110,13 +1075,12 @@ public class QueryProcess extends QuerySolver {
     /**
      * construct {} where {} *
      */
-    void construct(Mappings map, Dataset ds, AccessRight access) {
+    void construct(Mappings map, AccessRight access) {
         Query query = map.getQuery();
         Graph gg = getGraph().construct();
         // can be required to skolemize
         gg.setSkolem(isSkolem());
         Construct cons = Construct.createConstruct(query, getConstructGraphManager(gg));
-        cons.setDebug(isDebug() || query.isDebug());
         cons.construct(map);
         cons.setAccessRight(access);
         map.setGraph(gg);
@@ -1138,9 +1102,6 @@ public class QueryProcess extends QuerySolver {
         }
     }
 
-    /**
-     * **********************************************
-     */
     private Lock getReadLock() {
         return lock.readLock();
     }
@@ -1150,15 +1111,13 @@ public class QueryProcess extends QuerySolver {
     }
 
     private void syncReadLock(Query q) {
-        if (isSynchronized()) {
-        } else {
+        if (! isSynchronized()) {
             readLock(q);
         }
     }
 
     private void syncReadUnlock(Query q) {
-        if (isSynchronized()) {
-        } else {
+        if (! isSynchronized()) {
             readUnlock(q);
         }
     }
@@ -1168,15 +1127,13 @@ public class QueryProcess extends QuerySolver {
     // and it already has a lock by synQuery/synUpdate
     // hence do nothing
     void syncWriteLock(Query q) {
-        if (isSynchronized()) {
-        } else {
+        if (! isSynchronized()) {
             writeLock(q);
         }
     }
 
     void syncWriteUnlock(Query q) {
-        if (isSynchronized()) {
-        } else {
+        if (! isSynchronized()) {
             writeUnlock(q);
         }
     }
@@ -1214,9 +1171,6 @@ public class QueryProcess extends QuerySolver {
     }
 
     /**
-     * ***************************************************
-     */
-    /**
      * skolemize the blank nodes of the result Mappings
      */
     public Mappings skolem(Mappings map) {
@@ -1250,9 +1204,6 @@ public class QueryProcess extends QuerySolver {
         }
     }
 
-    /**
-     * ****************************************
-     */
     public void close() {
         if (dbProducer != null) {
             dbProducer.close();
@@ -1260,11 +1211,13 @@ public class QueryProcess extends QuerySolver {
         }
     }
 
-    /***************************************************************************
+    /*
+     **************************************************************************
      * 
      * Function call and event function
      * 
-     *************************************************************************/
+     ************************************************************************
+     */
 
     /**
      * Logger xt:method(us:start, us:Event, event, obj)
@@ -1272,14 +1225,12 @@ public class QueryProcess extends QuerySolver {
      * 
      * @deprecated
      */
+    @Deprecated
     public void event(Event name, Event e, Object o) throws EngineException {
         IDatatype[] param = (o == null) ? param(DatatypeMap.createObject(e))
                 : param(DatatypeMap.createObject(e), DatatypeMap.createObject(o));
         EventManager mgr = getGraph().getEventManager();
-        boolean b = mgr.isVerbose();
-        mgr.setVerbose(false);
         method(NSManager.USER + name.toString().toLowerCase(), NSManager.USER + e.toString(), param);
-        mgr.setVerbose(b);
     }
 
     IDatatype[] param(IDatatype... ldt) {
@@ -1327,7 +1278,7 @@ public class QueryProcess extends QuerySolver {
         eval.getEnvironment().getQuery().setContext(c);
         Binding bind = eval.getBinding();
         bind.share(b, c);
-        return new Funcall(name).callWE((Interpreter) eval.getEvaluator(),
+        return new Funcall(name).callWE(eval.getEvaluator(),
                 bind, eval.getEnvironment(), eval.getProducer(), function, param);
     }
 
@@ -1414,11 +1365,11 @@ public class QueryProcess extends QuerySolver {
             if (obj instanceof ProcessVisitor) {
                 return (ProcessVisitor) obj;
             } else {
-                logger.error("Uncorrect QuerySolverVisitor: " + name);
+                logger.error("Incorrect QuerySolverVisitor: ", name);
             }
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            logger.error("Undefined QuerySolverVisitor: " + name);
+            logger.error("Undefined QuerySolverVisitor: ", name);
         }
 
         return null;
@@ -1476,8 +1427,7 @@ public class QueryProcess extends QuerySolver {
         String str = QueryLoad.create().basicParse(path);
         Dataset ds = Dataset.create().setBase(path);
         ds.setContext(new Context(level));
-        Query q = compile(str, ds);
-        return q;
+        return compile(str, ds);
     }
 
     // import function definition as public function
@@ -1521,11 +1471,9 @@ public class QueryProcess extends QuerySolver {
             IDatatype dt = m.getValue("?uri");
             IDatatype list = m.getValue("?list");
             if (dt != null) {
-                System.out.println("federation: " + dt + " : " + list);
                 FederateVisitor.declareFederation(dt.getLabel(), list.getValueList());
 
                 for (IDatatype serv : list.getValueList()) {
-                    System.out.println("access: " + serv.getLabel());
                     Access.define(serv.getLabel(), true);
                 }
             }
@@ -1587,7 +1535,7 @@ public class QueryProcess extends QuerySolver {
         return new Service().getString(url);
     }
 
-    /***********************************************************************/
+    //***********************************************************************
 
     public QueryProcessUpdate getQueryProcessUpdate() {
         return queryProcessUpdate;

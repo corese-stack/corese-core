@@ -58,8 +58,7 @@ public class UpdateProcess {
     }
 
     public static UpdateProcess create(QueryProcess e, ManagerImpl man, Dataset ds) {
-        UpdateProcess u = new UpdateProcess(e, man, ds);
-        return u;
+        return new UpdateProcess(e, man, ds);
     }
 
     /**
@@ -78,8 +77,6 @@ public class UpdateProcess {
         addVisitor(getQueryProcess().getVisitor());
         
         for (Update u : astu.getUpdates()) {
-
-            logger.debug("** Update: " + u);
             boolean suc = true;
 
             switch (u.type()) {
@@ -117,7 +114,6 @@ public class UpdateProcess {
 
             if (!suc) {
                 q.setCorrect(false);
-                logger.debug("** Failure: " + u);
                 break;
             }
         }
@@ -210,14 +206,11 @@ public class UpdateProcess {
      * where and process as a where update.
      */
     Mappings update(Query query, ASTQuery ast, Mapping m, Binding b) throws EngineException {
-
-        //System.out.println("** QP:\n" + m.getBind());
         getQueryProcess().logStart(query);
         Query q = compile(ast);
         inherit(q, query);
         Mapping mm = getMapping(q, m, b);  
-        
-        //System.out.println("UP: " + vis);
+
         // execute where part in delete insert where
         Mappings map = getQueryProcess().basicQuery(null, q, mm);
         
@@ -315,7 +308,6 @@ public class UpdateProcess {
 
         Exp exp = ope.getData();
         if (!exp.validateData(ast)) {
-            logger.debug("** Update: insert not valid: " + exp);
             q.setCorrect(false);
             return null; 
         }

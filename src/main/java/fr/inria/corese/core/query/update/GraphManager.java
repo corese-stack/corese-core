@@ -74,10 +74,10 @@ public class GraphManager {
     }
 
     
-    /***********************************************************
-     * Construct Graph Manager
-     *     
-     **********************************************************/
+    //***********************************************************
+    // Construct Graph Manager
+    //
+    //**********************************************************
     
     public void startRuleEngine() {
         getDataBroker().startRuleEngine();
@@ -281,11 +281,11 @@ public class GraphManager {
     }
     
     
-    /*****************************************************************************
-     * 
-     *   SPARQL Update Manager
-     * 
-     ****************************************************************************/
+    //*****************************************************************************
+    //
+    //SPARQL Update Manager
+    //
+    //***************************************************************************/
     
     /**
      * Delete occurrences of edge in named graphs of from list
@@ -465,10 +465,8 @@ public class GraphManager {
             case Update.CLEAR:
 
                 if (isEntailment(uri)) {
-                    //graph.setEntailment(false);
                     getGraph().getEventManager().finish(Event.ActivateRDFSEntailment);
                 } else if (isRule(uri)) {
-                   // wf.setActivate(Engine.RULE_ENGINE, false);
                     getGraph().getEventManager().finish(Event.ActivateRuleEngine);
                 }
                 break;
@@ -477,12 +475,8 @@ public class GraphManager {
             case Update.CREATE:
 
                 if (isEntailment(uri)) {
-                    //graph.setEntailment(true);
-                    //graph.setEntail(true);
                     getGraph().getEventManager().start(Event.ActivateRDFSEntailment);
                 } else if (isRule(uri)) {
-//                    wf.setActivate(Engine.RULE_ENGINE, true);
-//                    graph.setEntail(true);
                     getGraph().getEventManager().start(Event.ActivateRuleEngine);
                 }
                 break;

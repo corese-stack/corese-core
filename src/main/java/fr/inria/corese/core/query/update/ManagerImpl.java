@@ -30,10 +30,15 @@ public class ManagerImpl implements Manager {
    
     static Logger logger = LoggerFactory.getLogger(ManagerImpl.class);
     private GraphManager graphManager;
-    static final int COPY = 0;
+    enum mode {
+        COPY,
+        MOVE,
+        ADD
+    }
+/*    static final int COPY = 0;
     static final int MOVE = 1;
     static final int ADD = 2;
-    
+*/
     private Level level = Level.USER_DEFAULT;
     private AccessRight accessRight;
 
@@ -159,7 +164,7 @@ public class ManagerImpl implements Manager {
      *
      * copy graph | default to target | default
      */
-    private boolean update(Basic ope, Dataset ds, int mode) {
+    private boolean update(Basic ope, Dataset ds, mode mode) {
         String source = ope.getGraph();
         String target = ope.getTarget();
 
@@ -187,7 +192,7 @@ public class ManagerImpl implements Manager {
         return true;
     }
 
-    private boolean update(Basic ope, int mode, String source, String target) {
+    private boolean update(Basic ope, mode mode, String source, String target) {
         if (target != null && source.equals(target)) {
             return true;
         }
@@ -204,15 +209,15 @@ public class ManagerImpl implements Manager {
     }
 
     private boolean copy(Basic ope, Dataset ds) {
-        return update(ope, ds, COPY);
+        return update(ope, ds, mode.COPY);
     }
 
     private boolean move(Basic ope, Dataset ds) {
-        return update(ope, ds, MOVE);
+        return update(ope, ds, mode.MOVE);
     }
 
     private boolean add(Basic ope, Dataset ds) {
-        return update(ope, ds, ADD);
+        return update(ope, ds, mode.ADD);
     }
 
     private boolean create(Basic ope) {
@@ -226,7 +231,6 @@ public class ManagerImpl implements Manager {
     public void insert(Query query, Mappings lMap, Dataset ds) {
         Construct cons = Construct.createInsert(query, getGraphManager());
         cons.setAccessRight(getAccessRight());
-        cons.setDebug(query.isDebug());
         cons.insert(lMap, ds);
     }
 
@@ -234,7 +238,6 @@ public class ManagerImpl implements Manager {
     public void delete(Query query, Mappings lMap, Dataset ds) {
         Construct cons = Construct.createDelete(query, getGraphManager());
         cons.setAccessRight(getAccessRight());
-        cons.setDebug(query.isDebug());
         cons.delete(lMap, ds);
     }
 

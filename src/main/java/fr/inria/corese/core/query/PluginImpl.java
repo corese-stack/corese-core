@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 
 import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -250,7 +251,7 @@ public class PluginImpl
 
     // function xt:xml xt:json xt:rdf
     @Override
-    public IDatatype format(Mappings map, int format) {
+    public IDatatype format(Mappings map, ResultFormatDef.format format) {
         ResultFormat ft = ResultFormat.create(map, format);
         return DatatypeMap.newInstance(ft.toString());
     }
@@ -899,7 +900,6 @@ public class PluginImpl
                 }
                 break;
             case VERBOSE:
-                getEventManager(p).setVerbose(dt2.booleanValue());
                 break;
             case DEBUG:
                 switch (dt2.getLabel()) {
@@ -918,11 +918,9 @@ public class PluginImpl
                 break;
 
             case EVENT_HIGH:
-                getEventManager(p).setVerbose(dt2.booleanValue());
                 getGraph(p).setDebugMode(dt2.booleanValue());
                 break;
             case EVENT_LOW:
-                getEventManager(p).setVerbose(dt2.booleanValue());
                 getEventManager(p).hide(Event.Insert);
                 getEventManager(p).hide(Event.Construct);
                 getGraph(p).setDebugMode(dt2.booleanValue());
@@ -931,14 +929,12 @@ public class PluginImpl
                 getEventManager(p).setMethod(dt2.booleanValue());
                 break;
             case SHOW:
-                getEventManager(p).setVerbose(true);
                 Event e = Event.valueOf(dt2.stringValue().substring(NSManager.EXT.length()));
                 if (e != null) {
                     getEventManager(p).show(e);
                 }
                 break;
             case HIDE:
-                getEventManager(p).setVerbose(true);
                 e = Event.valueOf(dt2.stringValue().substring(NSManager.EXT.length()));
                 if (e != null) {
                     getEventManager(p).hide(e);
@@ -1043,7 +1039,6 @@ public class PluginImpl
 
     IDatatype kgram(Environment env, Producer p, String query, Mapping m) throws EngineException {
         Graph g = getGraph(p);
-        // QueryProcess exec = QueryProcess.create(g, true);
         QueryProcess exec = QueryProcess.copy(p, true);
         // sub query process, if transaction was needed, it is already done
         exec.setProcessTransaction(false);
@@ -1062,10 +1057,6 @@ public class PluginImpl
             // outer query processing inherits it
             env.getBind().subShare(exec.getEnvironmentBinding());
 
-            if (map.getQuery().isDebug()) {
-                System.out.println("result:");
-                System.out.println(map);
-            }
             if (map.getGraph() == null) {
                 // draft: service evaluation detail report
                 env.setReport(map.getReport());
