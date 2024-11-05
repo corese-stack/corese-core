@@ -15,7 +15,8 @@ module fr.inria.corese.corese_core {
     requires shexjava.core;
     requires org.slf4j;
     requires junit;
-    requires jsonld.java; //
+    requires jsonld.java;
+    requires commons.lang; //
 
     exports fr.inria.corese.core.load;
     exports fr.inria.corese.core.load.result;

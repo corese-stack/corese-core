@@ -1,5 +1,6 @@
 package fr.inria.corese.core.workflow;
 
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.Graph;
@@ -128,7 +129,7 @@ public class SemanticWorkflow extends  CompositeProcess {
        return add(new RuleProcess(type));
     }
     
-     public SemanticWorkflow addResult(int type){
+     public SemanticWorkflow addResult(ResultFormatDef.format type){
        return add(new ResultProcess(type));
     }
     

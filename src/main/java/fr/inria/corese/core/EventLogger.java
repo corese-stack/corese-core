@@ -142,8 +142,6 @@ public class EventLogger {
      * Call delete with query edge because target edge has null predicate in the graph Index
      */
     void funcall(Event type, Event e, Object o, Object o2) {
-        boolean b = getEventManager().isVerbose();
-        getEventManager().setVerbose(false);
         try {
             switch (type) {
                 case Process:
@@ -160,9 +158,6 @@ public class EventLogger {
             }
         } catch (EngineException ex) {
             java.util.logging.Logger.getLogger(EventLogger.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally {
-            getEventManager().setVerbose(b);
         }
     }
     
@@ -238,9 +233,6 @@ public class EventLogger {
         nm.getIndex(), nm.size() , nm.count(), 
         (nm.size() > 0) ? ((float) nm.count()) /  nm.size() : 0, 
         mgr.getGraph().size()));
-//        if (nm.getIndex()==-1) {
-//            logger.info(nm.toString());
-//        }
     }
     
     NodeManager getNodeMgr() {

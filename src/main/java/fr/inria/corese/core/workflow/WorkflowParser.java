@@ -1,6 +1,7 @@
 package fr.inria.corese.core.workflow;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
@@ -521,10 +522,10 @@ public class WorkflowParser {
         return r;
     }
     
-    int getResultFormat(String format) {
+    ResultFormatDef.format getResultFormat(String format) {
         switch (format) {
-              case JSON_FORMAT: return ResultFormat.JSON_FORMAT;
-              default: return ResultFormat.UNDEF_FORMAT;
+              case JSON_FORMAT: return ResultFormatDef.format.JSON_FORMAT;
+              default: return ResultFormatDef.format.UNDEF_FORMAT;
         }
     }
 

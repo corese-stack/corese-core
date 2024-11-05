@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 
+import fr.inria.corese.core.util.HTTPHeaders;
 import org.semarglproject.rdf.core.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -487,7 +488,7 @@ public class Load
 
                 if (url.getProtocol().equals(FILE)) {
                     URLConnection c = url.openConnection();
-                    c.setRequestProperty(ACCEPT, getActualFormat(myFormat));
+                    c.setRequestProperty(HTTPHeaders.ACCEPT, getActualFormat(myFormat));
                     stream = c.getInputStream();
                     contentType = c.getContentType();
                 } else {

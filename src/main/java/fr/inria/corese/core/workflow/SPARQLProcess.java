@@ -345,9 +345,6 @@ public class SPARQLProcess extends  WorkflowProcess {
     }
     
     Graph inherit(Graph output, Graph input) {
-       if (input.isVerbose()) {
-            output.setVerbose(true); 
-       }
        return output;
     }
 

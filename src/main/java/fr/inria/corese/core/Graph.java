@@ -74,9 +74,6 @@ public class Graph extends GraphObject implements
         fr.inria.corese.core.sparql.api.Graph,
         Graphable, TripleStore {
 
-    static {
-        Corese.init();
-    }
     private static Logger logger = LoggerFactory.getLogger(Graph.class);
     private static final String SHAPE_CONFORM = NSManager.SHAPE + "conforms";
     public static final String SYSTEM = ExpType.KGRAM + "system";
@@ -601,7 +598,6 @@ public class Graph extends GraphObject implements
         // default and named graph manager for sparql edge iterator 
         dataStore = new DataStore(this);
         eventManager = new EventManager(this);
-        eventManager.setVerbose(VERBOSE);
         emptyEdgeList = new ArrayList<>(0);
     }
 
@@ -693,10 +689,7 @@ public class Graph extends GraphObject implements
      */
     public static void setCompareIndex(boolean b) {
         byIndexDefault = b;
-        //EdgeIndex.setCompareIndex(b);
         Distinct.setCompareIndex(b);
-        //Group.setCompareIndex(b);
-        //MatcherImpl.setCompareIndex(b);
     }
 
     /**
@@ -890,13 +883,6 @@ public class Graph extends GraphObject implements
         }
     }
 
-//    public void setDefault(boolean b) {
-//        hasDefault = b;
-//    }
-//
-//    public boolean hasDefault() {
-//        return hasDefault;
-//    }
     @Override
     public String toString() {
         return toRDF();
@@ -1054,16 +1040,11 @@ public class Graph extends GraphObject implements
     }
 
     public void setVerbose(boolean b) {
-        getEventManager().setVerbose(b);
         if (b) {
             // hide to logger
             getEventManager().hide(Event.Insert);
             getEventManager().hide(Event.Construct);
         }
-    }
-
-    public boolean isVerbose() {
-        return getEventManager().isVerbose();
     }
 
     // RDF Star
@@ -1508,8 +1489,8 @@ public class Graph extends GraphObject implements
 
     /**
      * PRAGMA: there is no duplicate in list, all edges are inserted predicate
-     * is declared in graph TODO: if same predicate, perform ensureCapacity on
-     * Index list
+     * is declared in graph
+     * TODO: if same predicate, perform ensureCapacity on Index list
      */
     void add(Node p, List<Edge> list) {
         for (EdgeManagerIndexer ei : getIndexList()) {
@@ -1523,8 +1504,8 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * Use cas: RuleEngine PRAGMA: edges in list do not exists in graph (no
-     * duplicate)
+     * Use case: RuleEngine
+     * PRAGMA: edges in list do not exists in graph (no duplicate)
      */
     public void addOpt(List<Edge> list) {
         if (list.isEmpty()) {
