@@ -100,7 +100,6 @@ public class Parameter {
     public void process() {
         init();
         Mappings map = getMap(q);
-        System.out.println(map);
         process(map);
         start();
     }
@@ -123,15 +122,12 @@ public class Parameter {
                 if (value != null) {
                     switch (var.getLabel()) {
                         case FUNCTION_IMPORT:
-                            System.out.println("param: " + var + " " + value);
                             importFunction(value);
                             break;
                     }
                 }
             }
         }
-        
-        //test(map);
 
         for (Mapping m : map) {
             for (Node var : map.getSelect()) {
@@ -142,7 +138,7 @@ public class Parameter {
                     switch (var.getLabel()) {
                         case FUNCTION_IMPORT: // already processed above: skip
                             break;
-                        default: System.out.println("param: " + var + " " + value);
+                        default:
                     }
                     
                     switch (var.getLabel()) {
@@ -207,7 +203,6 @@ public class Parameter {
     
     void namespace(IDatatype dt, boolean b) {
         for (IDatatype ns : dt.getList()) {
-            System.out.println("lf: " + ns + " " + b);
             AccessNamespace.define(ns.getLabel(), b);
         }
     }

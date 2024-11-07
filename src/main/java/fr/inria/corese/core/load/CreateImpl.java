@@ -3,7 +3,9 @@ package fr.inria.corese.core.load;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,46 +36,25 @@ public class CreateImpl extends CreateTriple implements Creator {
     HashMap<String, String> blank;
     HashMap<String, Node> reference;
     NSManager nsm;
-    Graph graph;
     Node source;
-    Stack stack;
+    Stack<Node> stack;
     String base;
     private boolean renameBlankNode = true;
     private String resource;
     private Node node;
     Load load;
-    int count = 1;
-
-    class Stack extends ArrayList<Node> {
-
-        Node pop() {
-            if (size() > 0) {
-                return remove(size() - 1);
-            }
-            return null;
-        }
-
-    }
 
     CreateImpl(Graph g, Load ld) {
         super(g, ld);
-        graph = g;
-        load = ld;
         blank = new HashMap<>();
         reference = new HashMap<>();
         nsm = NSManager.create();
-        stack = new Stack();
+        stack = new Stack<>();
     }
 
     public static CreateImpl create(Graph g, Load ld) {
         return new CreateImpl(g, ld);
     }
-
-    // init
-    // TODO: check
-    // public void graph(String src) {
-    // source = addGraph(src);
-    // }
 
     @Override
     public void graph(Atom src) {
@@ -102,7 +83,6 @@ public class CreateImpl extends CreateTriple implements Creator {
     }
 
     Node getGraph(Atom graph) {
-        //return graph == null ? addDefaultGraphNode() : addGraph(graph);
         if (graph == null) {
             return addDefaultGraphNode();
         }

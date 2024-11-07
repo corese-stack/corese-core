@@ -334,7 +334,6 @@ public class EdgeManagerIndexer
         if (isSort(edge)) {
             // edges are sorted, check presence by dichotomy
             int i = el.getPlace(edge);
-            trace("insert: %s at %s", edge, i);
             
             if (getIndex() == 0) {
                 if (getGraph().isFormerMetadata()) {
@@ -352,7 +351,6 @@ public class EdgeManagerIndexer
             }
             
             if (i == -1) {
-                trace("skip insert edge: ", edge);
                 count++;
                 return null;
             }       
@@ -393,7 +391,6 @@ public class EdgeManagerIndexer
      * 
     */ 
     Edge addWithMetadata(EdgeManager el, Edge edge, Edge internal, int i) {
-        trace("insert: %s at %s", edge, i);
         if (el.getEdgeList().isEmpty()) {
             el.add(i, edge);
             logInsert(edge);
@@ -406,11 +403,8 @@ public class EdgeManagerIndexer
             }
             else {
                 Edge current = el.get(i); 
-                trace("current: %s", current);
                 if (el.equalWithoutConsideringMetadata(current, edge)) {
-                    trace("they are equal");
                     if (!current.hasReferenceNode()) {
-                        trace("set edge at: %s", i);
                         // g s p o t replace g s p o
                         el.set(i, edge);
                         if (current.isAsserted()) {
@@ -424,10 +418,8 @@ public class EdgeManagerIndexer
                     }
                     return null;
                 } else {
-                    trace("insert at: %s", i);
                     el.add(i, edge);
                     share(el, edge, i);
-                    logInsert(edge);
                 }
             }
         }
@@ -460,18 +452,11 @@ public class EdgeManagerIndexer
         return edge;
     }
     
-    void trace(String mes, Object... obj) {
-        if (TRACE_INSERT) {
-            System.out.println(String.format(mes, obj));
-        }
-    }
-    
     /**
      * edge with reference inserted at index i
      * share its reference with equal edge before and after i
      */
     void share(EdgeManager el, Edge edge, int n) {
-        trace("share: %s at %s", edge, n);
         boolean loop = true;        
         for (int i = n + 1; i < el.size() && loop; i++) {
             loop = shareReference(el, edge, i);
@@ -489,19 +474,13 @@ public class EdgeManagerIndexer
      */
     boolean shareReference(EdgeManager el, Edge edge, int i) {
         Edge e = el.get(i);
-        trace("share test: %s", e);
         if (el.compare2(e, edge) == 0) {
             // same s p o, g may differ
-            trace("they are equal");
             if (!e.hasReferenceNode()) {
-                trace("copy reference node");
                 Edge copy = getGraph().getEdgeFactory().name(e, el.getPredicate(), edge.getReferenceNode());
                 el.set(i, copy);
                 return true;
             }
-        }
-        else {
-            trace("thay are not equal");
         }
         return false;
     }
@@ -519,7 +498,6 @@ public class EdgeManagerIndexer
             Edge copy = getGraph().getEdgeFactory().name(edge, el.getPredicate(), ref);
             el.add(i, copy);
         }
-        logInsert(edge);
     }
     
     /**
@@ -576,7 +554,6 @@ public class EdgeManagerIndexer
     public Edge find(Edge edge) {
         EdgeManager list = getListByLabel(edge);
         if (list == null) {
-            getGraph().trace("Find edge: undefined property %s", edge);
             return null;
         }
         return list.findEdge(edge);
@@ -897,7 +874,7 @@ public class EdgeManagerIndexer
 
    
 
-    /**
+    /*
      * **********************************************************************
      *
      * Update
@@ -923,19 +900,19 @@ public class EdgeManagerIndexer
             // never happens for subject object and graph
             return null;
         }
-        EdgeManager list = get(pred);
+        EdgeManager edgeManager = get(pred);
         
-        if (list == null) {
+        if (edgeManager == null) {
             return null;
         }
 
-        int i = list.findEdgeEqualWithoutMetadata(edge);
+        int i = edgeManager.findEdgeEqualWithoutMetadata(edge);
 
         if (i == -1) {
             return null;
         }
         
-        Edge target = list.get(i);
+        Edge target = edgeManager.get(i);
         
         if (AccessRight.acceptDelete(edge, target)
                 && accept(edge, target)) {
@@ -943,7 +920,7 @@ public class EdgeManagerIndexer
             if (getGraph().isRDFStar() && target.hasReferenceNode()) {  
                 // delete tuple(s p o t)
                 if (superUser(edge)) {
-                    remove(list, i);
+                    remove(edgeManager, i);
                 }
                 else {
                     // target = tuple(s p o t) with possibly t q v
@@ -954,10 +931,9 @@ public class EdgeManagerIndexer
                 }               
             } 
             else {
-                remove(list, i);
+                remove(edgeManager, i);
             }
-            
-            logDelete(target);
+
             return target;
         } 
         
@@ -1046,27 +1022,27 @@ public class EdgeManagerIndexer
      */
     @Override
     public void clear(Node gNode) {
-        update(gNode, null, Graph.CLEAR);
+        update(gNode, null, Graph.GRAPH_OPERATION.CLEAR);
     }
 
     @Override
     public void copy(Node g1, Node g2) {
-        update(g2, null, Graph.CLEAR);
-        update(g1, g2, Graph.COPY);
+        update(g2, null, Graph.GRAPH_OPERATION.CLEAR);
+        update(g1, g2, Graph.GRAPH_OPERATION.COPY);
     }
 
     @Override
     public void move(Node g1, Node g2) {
-        update(g2, null, Graph.CLEAR);
-        update(g1, g2, Graph.MOVE);
+        update(g2, null, Graph.GRAPH_OPERATION.CLEAR);
+        update(g1, g2, Graph.GRAPH_OPERATION.MOVE);
     }
 
     @Override
     public void add(Node g1, Node g2) {
-        update(g1, g2, Graph.COPY);
+        update(g1, g2, Graph.GRAPH_OPERATION.COPY);
     }
 
-    private void update(Node g1, Node g2, int mode) {
+    private void update(Node g1, Node g2, Graph.GRAPH_OPERATION mode) {
         for (Node pred : getProperties()) {
 
             EdgeManager list = checkGet(pred);
@@ -1074,16 +1050,7 @@ public class EdgeManagerIndexer
                 continue;
             }
 
-            if (isDebug) {
-                for (Edge ee : list) {
-                    logger.debug("** EI: " + ee);
-                }
-            }
-
             int n = list.findIndex(g1);
-            if (isDebug) {
-                logger.debug("** EI find: " + g1 + " " + (n != -1));
-            }
 
             if (n == -1) {
                 continue;
@@ -1094,7 +1061,7 @@ public class EdgeManagerIndexer
         }
     }
 
-    private void update(Node g1, Node g2, Node pred, EdgeManager list, int n, int mode) {
+    private void update(Node g1, Node g2, Node pred, EdgeManager list, int n, Graph.GRAPH_OPERATION mode) {
         boolean isBefore = false;
         
         if (g2 != null && nodeCompare(g1, g2) < 0) {
@@ -1108,12 +1075,12 @@ public class EdgeManagerIndexer
 
                 switch (mode) {
 
-                    case Graph.CLEAR:
+                    case CLEAR:
                         clear(pred, ent);
                         list.remove(i);
                         break;
 
-                    case Graph.MOVE:
+                    case MOVE:
                         clear(pred, ent);
                         list.remove(i);
                         ee = copy(g2, pred, ent);
@@ -1123,7 +1090,7 @@ public class EdgeManagerIndexer
                         }
                         break;
 
-                    case Graph.COPY:
+                    case COPY:
                         ee = copy(g2, pred, ent);
                         // get next ent
                         i++;

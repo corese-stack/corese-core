@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +13,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
@@ -66,7 +66,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 public class Load
         implements RDFListener, Loader {
 
-    public static Logger logger = LoggerFactory.getLogger(Load.class);
+    public static final Logger logger = LoggerFactory.getLogger(Load.class);
     private static Loader.format DEFAULT_FORMAT = Loader.format.RDFXML_FORMAT;
     public static String LOAD_FORMAT = ALL_FORMAT_STR;
     // URL file protocol
@@ -96,7 +96,7 @@ public class Load
     BuildImpl build;
     // named graph URI for RDF/XML parser extension
     private String namedGraphURI;
-    boolean debug = !true;
+    private String source;
     // when false: keep bnode ID from parser
     private boolean renameBlankNode = true;
     private boolean defaultGraph = DEFAULT_GRAPH;
@@ -106,7 +106,6 @@ public class Load
     private boolean transformer = false;
     // when sparql update load statement
     private boolean sparqlUpdate = false;
-    int nb = 0;
     // max number of triples to load
     private int limit = LIMIT_DEFAULT;
     // authorize access right for load (e.g. LinkedFunction)
@@ -174,9 +173,6 @@ public class Load
         loaded = new HashMap<>();
     }
 
-    public void reset() {
-    }
-
     public void exclude(String ns) {
         getExclude().add(ns);
     }
@@ -208,10 +204,6 @@ public class Load
 
     public QueryEngine getQueryEngine() {
         return qengine;
-    }
-
-    public void setDebug(boolean b) {
-        debug = b;
     }
 
     String uri(String name) {
@@ -361,9 +353,6 @@ public class Load
     }
 
     void parseDoc(String path, String name) throws LoadException {
-        if (debug) {
-            logger.info("** Load: " + nb++ + " " + getGraph().size() + " " + path);
-        }
         parse(path, name, path, Loader.format.UNDEF_FORMAT);
     }
 
@@ -528,7 +517,7 @@ public class Load
 
     @Deprecated
     public InputStream getStream(String path, String... formats)
-            throws LoadException, MalformedURLException, FileNotFoundException, IOException {
+            throws LoadException, IOException {
         String format = "*";
         if (formats.length > 0) {
             format = formats[0];
@@ -607,11 +596,7 @@ public class Load
     }
 
     public void loadString(String str, String path, String name, String base, Loader.format format) throws LoadException {
-        try {
-            parse(new ByteArrayInputStream(str.getBytes("UTF-8")), path, name, base, format);
-        } catch (UnsupportedEncodingException ex) {
-            throw new LoadException(ex);
-        }
+        parse(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), path, name, base, format);
     }
 
     public void loadResource(String path, Loader.format format) throws LoadException {
@@ -674,16 +659,13 @@ public class Load
     public void parse(Reader stream, String path, String base, String name, Loader.format format) throws LoadException {
         switch (format) {
             case TURTLE_FORMAT:
+            case TRIG_FORMAT:
             case NT_FORMAT:
                 loadTurtle(stream, path, base, name);
                 break;
 
             case NQUADS_FORMAT:
                 loadTurtle(stream, path, base, name, true);
-                break;
-
-            case TRIG_FORMAT:
-                loadTurtle(stream, path, base, name);
                 break;
 
             case RULE_FORMAT:
@@ -759,37 +741,36 @@ public class Load
 
     // @name: named graph URI
     void loadRDFXML(Reader stream, String path, String base, String name) throws LoadException {
-        // logger.info("Load RDF/XML: " + path);
         String save = getNamedGraphURI();
         setNamedGraphURI(name);
 
-        build = BuildImpl.create(getGraph(), this);
-        build.setSource(name);
-        build.setPath(path);
-        build.setLimit(getLimit());
-        build.exclude(getExclude());
-        build.setDataManager(getDataManager());
+        BuildImpl buildRDFXML = BuildImpl.create(getGraph(), this);
+        buildRDFXML.setSource(name);
+        if(name == null) {
+            buildRDFXML.setSource(namedGraphURI);
+        }
+        buildRDFXML.setPath(path);
+        buildRDFXML.setLimit(getLimit());
+        buildRDFXML.exclude(getExclude());
+        buildRDFXML.setDataManager(getDataManager());
 
         IDatatype dt = DatatypeMap.newResource(path);
-        boolean b = true;
-        if (isEvent()) {
-            b = getCreateQueryProcess().isSynchronized();
-        }
+        boolean b = getCreateQueryProcess().isSynchronized();
         before(dt, b);
-        build.start();
+        buildRDFXML.start();
         ARP arp = new ARP();
         try {
             arp.setRDFListener(this);
-        } catch (java.lang.NoSuchMethodError e) {
+        } catch (java.lang.NoSuchMethodError ignored) {
         }
-        arp.setStatementHandler(build);
-        arp.setErrorHandler(build);
+        arp.setStatementHandler(buildRDFXML);
+        arp.setErrorHandler(buildRDFXML);
         try {
             arp.load(stream, base);
         } catch (SAXException | IOException e) {
             throw LoadException.create(e, arp.getLocator(), path);
         } finally {
-            build.finish();
+            buildRDFXML.finish();
             after(dt, b);
             setNamedGraphURI(save);
             try {
@@ -807,10 +788,8 @@ public class Load
      */
     @Override
     public void setSource(String s) {
-        if (s == null) {
-            getBuild().setSource(getNamedGraphURI());
-        } else {
-            getBuild().setSource(s);
+        if (s != null) {
+            source = s;
         }
     }
 
@@ -824,7 +803,6 @@ public class Load
     }
 
     void loadTurtle(Reader stream, String path, String base, String name, boolean nquad) throws LoadException {
-        // logger.info("Load Turtle: " + path);
         CreateImpl cr = CreateImpl.create(getGraph(), this);
         cr.graph(Constant.create(name));
         cr.setRenameBlankNode(renameBlankNode);
@@ -832,6 +810,7 @@ public class Load
         cr.exclude(getExclude());
         cr.setDataManager(getDataManager());
         cr.start();
+
         IDatatype dt = DatatypeMap.newResource(path);
         boolean b = true;
         if (isEvent()) {
@@ -853,7 +832,6 @@ public class Load
 
     // load RDFa
     void loadRDFa(Reader stream, String path, String base, String name) throws LoadException {
-        // logger.info("Load RDFa: " + path);
         CoreseRDFaTripleSink sink = new CoreseRDFaTripleSink(getGraph(), null);
         sink.setHelper(renameBlankNode, getLimit());
 
@@ -913,8 +891,6 @@ public class Load
             stream = getResourceStream(path);
             Reader read = new InputStreamReader(stream);
             loadRule(read, name);
-        } catch (LoadException ex) {
-            throw ex;
         } finally {
             close(stream);
         }
@@ -973,9 +949,6 @@ public class Load
     void imports(String uri) {
         if (!loaded.containsKey(uri)) {
             loaded.put(uri, uri);
-            if (debug) {
-                logger.info("Import: " + uri);
-            }
 
             BuildImpl save = build;
             try {
@@ -991,9 +964,6 @@ public class Load
     void parseImport(String uri) throws LoadException {
         if (!loaded.containsKey(uri)) {
             loaded.put(uri, uri);
-            if (debug) {
-                logger.info("Import: " + uri);
-            }
             // in case of rdf/xml->turtle->rdf/xml
             BuildImpl save = build;
             basicImport(uri);
@@ -1045,7 +1015,7 @@ public class Load
         this.renameBlankNode = renameBlankNode;
     }
 
-    /**
+    /*
      * *******************************************************
      */
     @Deprecated
@@ -1060,6 +1030,7 @@ public class Load
      *
      * @deprecated
      */
+    @Deprecated
     public void load(InputStream stream, String source, String path) throws LoadException {
         if (source == null) {
             source = defaultGraph();
@@ -1106,9 +1077,6 @@ public class Load
                 load(name, src);
             }
         } else {
-            if (debug) {
-                logger.info("** Load: " + nb++ + " " + getGraph().size() + " " + path);
-            }
             try {
                 load(path, src, null);
             } catch (LoadException e) {
@@ -1130,7 +1098,7 @@ public class Load
             path += File.separator;
             int i = 0;
             for (String f : file.list()) {
-                if (!hasFormat(f)) { // (!suffix(f)) {
+                if (!hasFormat(f)) {
                     continue;
                 }
                 if (i++ >= maxFile) {
@@ -1140,9 +1108,6 @@ public class Load
                 loadWE(name, source, format);
             }
         } else {
-            if (debug) {
-                logger.info("** Load: " + nb++ + " " + getGraph().size() + " " + path);
-            }
             load(path, source, null, format);
         }
     }

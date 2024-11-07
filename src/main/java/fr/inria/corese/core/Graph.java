@@ -1,5 +1,7 @@
 package fr.inria.corese.core;
 
+import fr.inria.corese.core.api.*;
+import fr.inria.corese.core.elasticsearch.EdgeChangeListener;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.logic.RDFS;
 import fr.inria.corese.core.logic.RDF;
@@ -38,11 +40,6 @@ import fr.inria.corese.core.sparql.storage.api.Parameters;
 import fr.inria.corese.core.sparql.storage.util.StorageFactory;
 import fr.inria.corese.core.kgram.api.core.TripleStore;
 import fr.inria.corese.core.kgram.tool.MetaIterator;
-import fr.inria.corese.core.api.Engine;
-import fr.inria.corese.core.api.GraphListener;
-import fr.inria.corese.core.api.Log;
-import fr.inria.corese.core.api.Tagger;
-import fr.inria.corese.core.api.ValueResolver;
 import fr.inria.corese.core.edge.EdgeTripleNode;
 import fr.inria.corese.core.edge.TripleNode;
 import fr.inria.corese.core.query.QueryCheck;
@@ -75,10 +72,14 @@ public class Graph extends GraphObject implements
         Graphable, TripleStore {
 
     private static Logger logger = LoggerFactory.getLogger(Graph.class);
+
+    public enum GRAPH_OPERATION {
+        COPY, MOVE, ADD, CLEAR
+    }
+
     private static final String SHAPE_CONFORM = NSManager.SHAPE + "conforms";
     public static final String SYSTEM = ExpType.KGRAM + "system";
-    public static final String TOPREL
-            = fr.inria.corese.core.sparql.triple.cst.RDFS.RootPropertyURI;
+    public static final String TOPREL = fr.inria.corese.core.sparql.triple.cst.RDFS.RootPropertyURI;
     static final ArrayList<Edge> EMPTY = new ArrayList<Edge>(0);
     public static boolean valueOut = !true;
     public static final int IGRAPH = -1;
@@ -90,10 +91,6 @@ public class Graph extends GraphObject implements
     public static final int DEFAULT = 0;
     public static final int EXTENSION = 1;
 
-    public static final int COPY = 0;
-    public static final int MOVE = 1;
-    public static final int ADD = 2;
-    public static final int CLEAR = 3;
     static long blankid = 0;
     static long triplerefid = 0;
     public static String BLANK = "_:b";
@@ -103,7 +100,6 @@ public class Graph extends GraphObject implements
     static final int TAGINDEX = 2;
     static boolean byIndexDefault = true;
     public static boolean VERBOSE = false;
-    public static boolean DEBUG_SPARQL = false;
     public static boolean SKOLEM_DEFAULT = false;
     // graph ?g { } iterate std and external named graph when true
     public static boolean EXTERNAL_NAMED_GRAPH = false;
@@ -136,13 +132,6 @@ public class Graph extends GraphObject implements
     public static final int TYPE_INDEX = 6;
     public static final int FIRST_INDEX = 7;
     public static final int REST_INDEX = 8;
-
-    // @todo: currently useless
-    public static final int DEFAULT_UNION = 0;
-    public static final int DEFAULT_GRAPH = 1;
-    public static int DEFAULT_GRAPH_MODE = DEFAULT_UNION;
-
-    private int defaultGraphMode = DEFAULT_GRAPH_MODE;
 
     /**
      * Synchronization:
@@ -185,7 +174,7 @@ public class Graph extends GraphObject implements
     private SortedMap<IDatatype, Node> literalNodeManager;
     // allocate index (1 and 01 have same index)
     private SortedMap<IDatatype, Node> literalIndexManager;
-    // @todo
+
     // key -> Node for value management in external memory
     Map<String, Node> vliteral;
     ValueResolver values;
@@ -205,9 +194,8 @@ public class Graph extends GraphObject implements
     // semantic distance in class/property Hierarchy
     private Distance classDistance, propertyDistance;
     private boolean isSkolem = SKOLEM_DEFAULT;
-    boolean isIndexable = true,
-            isDebug = !true;
-    private boolean debugSparql = DEBUG_SPARQL;
+    boolean isIndexable = true;
+
     // edge index sorted by index
     boolean byIndex = byIndexDefault;
     // number of edges
@@ -249,6 +237,8 @@ public class Graph extends GraphObject implements
     DataStore dataStore;
     // @todo external memory literal value manager
     private IStorage storageMgr;
+
+    List<EdgeChangeListener> listeners = new ArrayList<>();
 
     static {
         setCompareIndex(true);
@@ -362,6 +352,10 @@ public class Graph extends GraphObject implements
         return String.format("[Graph: size=%s]", size());
     }
 
+    public void addEdgeChangeListener(EdgeChangeListener el) {
+        listeners.add(el);
+    }
+
     /**
      * Return copy edges in specific objects
      *
@@ -463,14 +457,6 @@ public class Graph extends GraphObject implements
     @Override
     public PointerType pointerType() {
         return GRAPH;
-    }
-
-    public int getDefaultGraphMode() {
-        return defaultGraphMode;
-    }
-
-    public void setDefaultGraphMode(int defaultGraph) {
-        this.defaultGraphMode = defaultGraph;
     }
     
     public TreeNode treeNode() {
@@ -929,43 +915,6 @@ public class Graph extends GraphObject implements
     public Graphable describe() {
         return getContext();
     }
-
-    public String toString2() {
-        String str = "";
-        int uri = 0, blank = 0, string = 0, lit = 0, date = 0, num = 0;
-
-        for (Node e : getNodes()) {
-            uri++;
-        }
-
-        for (Node e : getBlankNodes()) {
-            blank++;
-        }
-
-        for (Node e : getLiteralNodes()) {
-            IDatatype dt =  e.getValue();
-            if (dt.isNumber()) {
-                num++;
-            } else if (dt.getCode() == IDatatype.STRING) {
-                string++;
-            } else if (dt.getCode() == IDatatype.LITERAL) {
-                lit++;
-            } else if (dt.isDate()) {
-                date++;
-            }
-
-        }
-
-        str += "uri: " + uri;
-        str += "\nblank: " + blank;
-
-        str += "\nnum: " + num;
-        str += "\nstring: " + string;
-        str += "\nliteral: " + lit;
-        str += "\ndate: " + date;
-
-        return str;
-    }
     
     public String display(int max) {
         return display(0, max);
@@ -1024,7 +973,7 @@ public class Graph extends GraphObject implements
         return getProxy().isSubClassOf(node, sup);
     }
 
-    /**
+    /*
      * ************************************************************
      *
      * Consistency Management
@@ -1098,9 +1047,6 @@ public class Graph extends GraphObject implements
                 logger.error(ex.getMessage());
             }
             getEventManager().setEntail(false);
-            if (isDebug && getEventManager().isUpdate()) {
-                logger.info("Graph modified after entailment");
-            }
         }
 
         // when entailment has modified the graph
@@ -1162,16 +1108,7 @@ public class Graph extends GraphObject implements
         isIndexable = !b;
     }
 
-    /**
-     * Property Path start a new shortest path Only with one user (no thread
-     * here)
-     *
-     * @deprecated
-     */
-    public void initPath() {
-    }
-
-    /**
+    /*
      * **********************************************************************
      */
     public ValueResolver getValueResolver() {
@@ -1352,9 +1289,6 @@ public class Graph extends GraphObject implements
         Edge ent = getSubjectIndex().add(edge, duplicate);
         // tell other index that predicate has instances
         if (ent != null) {
-            if (edge.getGraph() == null) {
-                System.out.println("Graph: " + edge);
-            }
             addGraphNode(edge.getGraph());
             addPropertyNode(edge.getEdgeNode());
             declare(edge, duplicate);
@@ -1471,6 +1405,10 @@ public class Graph extends GraphObject implements
             getEventManager().process(Event.Insert, ent);
             manager.onInsert(ent.getGraph(), edge);
         }
+
+        for(EdgeChangeListener listener : listeners) {
+            listener.onEdgeInsert(edge);
+        }
         return ent;
     }
 
@@ -1541,10 +1479,6 @@ public class Graph extends GraphObject implements
             if (id.getIndex() != 0) {
                 id.clearCache();
             }
-        }
-
-        if (isDebug) {
-            logger.info("Copy: " + list.size());
         }
 
         // fake Index not sorted to add edges at the end of the Index
@@ -1759,11 +1693,8 @@ public class Graph extends GraphObject implements
 
     public List<Node> getTopProperties() {
         List<Node> nl = new ArrayList<>();
-        Node n;
-        if (nl.isEmpty()) {
-            n = getTopProperty();
-            nl.add(n);
-        }
+        Node n = getTopProperty();
+        nl.add(n);
 
         return nl;
     }
@@ -1843,20 +1774,6 @@ public class Graph extends GraphObject implements
         node = getResource(key, dt.getLabel());
         if (node == null && create) {
             node = createNode(key, dt);
-        }
-        if (add) {
-            add(dt, node);
-        }
-        return node;
-    }
-    
-    public Node getBlankNode1(IDatatype dt, boolean create, boolean add) {
-        Node node = getBlankNode(dt.getLabel());
-        if (node != null) {
-            return node;
-        }
-        if (node == null && create) {
-            node = buildNode(dt);
         }
         if (add) {
             add(dt, node);
@@ -2018,22 +1935,6 @@ public class Graph extends GraphObject implements
     
     Node basicAddGraph(String label) {
         return basicAddGraph(label, false);
-    }
-    
-    Node basicAddGraph1(String label, boolean bnode) {
-        String key = getID(label);
-        Node node = getGraphNode(key, label);
-        if (node != null) {
-            return node;
-        }
-        node = getResource(key, label);
-        if (node == null) {
-            IDatatype dt = DatatypeMap.createResource(label);
-            node = createNode(key, dt);
-            indexNode(dt, node);
-        }
-        graph.put(key, node);
-        return node;
     }
     
     Node basicAddGraph(String label, boolean bnode) {
@@ -2435,18 +2336,10 @@ public class Graph extends GraphObject implements
         int index = (n == 0) ? 1 : 0;
         return NodeIterator.create(it, index);
     }
-    
-    public void trace(String format, Object... obj) {
-        if (isDebugSparql()) {
-            logger.info(String.format(format, obj));
-        }
-    }
 
     public Iterable<Edge> properGetEdges(Node predicate, Node node, Node node2, int n) {
-        trace("Edge iterator for: p=%s n=%s n2=%s", predicate, node, node2);
         Iterable<Edge> it = getEdges(predicate, node, node2, n);
         if (it == null) {
-            trace("Edge iterator fail for: p=%s n=%s",predicate, node);
             return EMPTY;
         }
         return it;
@@ -3106,17 +2999,17 @@ public class Graph extends GraphObject implements
      ***************************************************************
      */
     public boolean compare(Graph g) {
-        return compare(g, false, false, isDebug);
+        return compare(g, false, false);
     }
 
     public boolean compare(Graph g, boolean isGraph) {
-        return compare(g, isGraph, false, isDebug);
+        return compare(g, isGraph, false);
     }
 
-    public boolean compare(Graph g2, boolean isGraph, boolean detail, boolean isDebug) {
+    public boolean compare(Graph g2, boolean isGraph, boolean detail) {
         prepare();
         g2.prepare();
-        return new GraphCompare(this, g2).compare(isGraph, detail, isDebug);
+        return new GraphCompare(this, g2).compare(isGraph, detail);
     }
 
     /**
@@ -3249,13 +3142,13 @@ public class Graph extends GraphObject implements
 
         for (EdgeManagerIndexer ie : getIndexList()) {
             Edge ent = ie.delete(edge);
-            if (isDebug) {
-                logger.debug("delete: " + ie.getIndex() + " " + edge);
-                logger.debug("delete: " + ie.getIndex() + " " + ent);
-            }
             if (ent != null) {
                 res = ent;
             }
+        }
+
+        for (EdgeChangeListener el : this.listeners) {
+            el.onEdgeDelete(edge);
         }
         return res;
     }
@@ -3267,7 +3160,6 @@ public class Graph extends GraphObject implements
         ArrayList<Edge> res = null;
         Node graphName = null;
         for (Node graph : getGraphNodes()) {
-            //fac.setGraph(edge, graph);
             edge.setGraph(graph);
             Edge ent = basicDelete(edge);
             if (ent != null) {
@@ -3276,7 +3168,6 @@ public class Graph extends GraphObject implements
                 }
                 res.add(ent);
                 graphName = ent.getGraph();
-                //setDelete(true);
                 getEventManager().process(Event.Delete, ent, edge);
             }
         }
@@ -3364,7 +3255,7 @@ public class Graph extends GraphObject implements
         return true;
     }
 
-    public boolean update(String source, String target, boolean isSilent, int mode) {
+    public boolean update(String source, String target, boolean isSilent, GRAPH_OPERATION mode) {
         Node g1 = getGraphNode(source);
         Node g2 = getGraphNode(target);
 
@@ -3393,15 +3284,15 @@ public class Graph extends GraphObject implements
     }
 
     public boolean add(String source, String target, boolean isSilent) {
-        return update(source, target, isSilent, ADD);
+        return update(source, target, isSilent, GRAPH_OPERATION.ADD);
     }
 
     public boolean move(String source, String target, boolean isSilent) {
-        return update(source, target, isSilent, MOVE);
+        return update(source, target, isSilent, GRAPH_OPERATION.MOVE);
     }
 
     public boolean copy(String source, String target, boolean isSilent) {
-        return update(source, target, isSilent, COPY);
+        return update(source, target, isSilent, GRAPH_OPERATION.COPY);
     }
 
     /**
@@ -3844,21 +3735,6 @@ public class Graph extends GraphObject implements
         return addNode(DatatypeMap.newInstance(n));
     }
 
-    public void setDebug(boolean b) {
-        isDebug = b;
-    }
-
-    public void setDebugMode(boolean b) {
-        setDebug(b);
-        manager.setDebug(b);
-        for (EdgeManagerIndexer id : getIndexList()) {
-            id.getNodeManager().setDebug(b);
-        }
-        if (getEntailment() != null) {
-            getEntailment().setDebug(b);
-        }
-    }
-
     /**
      * *******************************************************
      */
@@ -4089,14 +3965,6 @@ public class Graph extends GraphObject implements
 
     public void setIndexList(ArrayList<EdgeManagerIndexer> tables) {
         this.tables = tables;
-    }
-
-    public boolean isDebugSparql() {
-        return debugSparql;
-    }
-
-    public void setDebugSparql(boolean debugSparql) {
-        this.debugSparql = debugSparql;
     }
 
     public List<GraphListener> getListenerList() {

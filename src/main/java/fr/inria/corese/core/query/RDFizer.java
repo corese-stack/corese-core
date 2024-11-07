@@ -14,6 +14,7 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.util.SPINProcess;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class RDFizer {
-    
+    private static Logger logger = LoggerFactory.getLogger(RDFizer.class);
     
      public boolean isGraphAble(Object obj) {
         if (obj instanceof Graphable) {
@@ -63,8 +64,7 @@ public class RDFizer {
         try {
             ld.loadString(rdf, Loader.format.TURTLE_FORMAT);
         } catch (LoadException ex) {
-            System.out.println(rdf);
-            LoggerFactory.getLogger(SPINProcess.class.getName()).error("", ex);
+            logger.error("", ex);
         } 
         g.prepare();
         return g;

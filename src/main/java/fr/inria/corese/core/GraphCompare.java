@@ -23,7 +23,7 @@ public class GraphCompare {
     }
     
     
-       public boolean compare(boolean isGraph, boolean detail, boolean isDebug) {
+       public boolean compare(boolean isGraph, boolean detail) {
         g1.prepare();
         g2.prepare();
 
@@ -64,9 +64,6 @@ public class GraphCompare {
 
             if (pred2 == null) {
                 if (l1.iterator().hasNext()) {
-                    if (isDebug) {
-                        logger.error("Missing in g2: " + pred1);
-                    }
                     return false;
                 }
             } else {
@@ -80,9 +77,6 @@ public class GraphCompare {
                         // node index
                         boolean b = compare(g2, pred2, t, ent1, isGraph);
                         if (!b) {
-                            if (isDebug) {
-                                logger.error("Missing in g2: " + ent1);
-                            }
                             return false;
                         }
                     } else {
@@ -93,10 +87,6 @@ public class GraphCompare {
 
                         Edge ent2 = it.next();
                         if (!compare(ent1, ent2, t, isGraph)) {
-                            if (isDebug) {
-                                logger.error(ent1.toString());
-                                logger.error(ent2.toString());
-                            }
                             return false;
                         }
                     }

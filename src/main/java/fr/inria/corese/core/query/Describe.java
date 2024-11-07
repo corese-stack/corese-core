@@ -6,7 +6,6 @@ import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.tool.MetaProducer;
-import fr.inria.corese.core.api.Log;
 import fr.inria.corese.core.Graph;
 
 /**
@@ -135,21 +134,8 @@ public class Describe {
 			info("", g.getIndex());
 
 			if (detail){
-				log(g);
 				query(g);
 			}
-		}
-	}
-
-	
-	void log(Graph g){
-		Log man = g.getLog();
-		if (g.isLog() && man.get(Log.LOAD).size()>0){
-			StringBuffer sb = new StringBuffer();
-			for (Object name : man.get(Log.LOAD)){
-				sb.append(name + "\n");
-			}
-			info("Load: \n", sb.toString());
 		}
 	}
 	

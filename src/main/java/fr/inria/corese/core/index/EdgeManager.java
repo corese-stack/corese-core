@@ -350,9 +350,6 @@ public class EdgeManager implements Iterable<Edge> {
             // iterate edges with node and node2
            return new EdgeManagerIterate(this, beginIndex, object.getIndex());
         }
-        else if (getGraph().isDebugSparql()) {
-            traceEdgeList();
-        }
         
         return null;
     }
@@ -360,14 +357,9 @@ public class EdgeManager implements Iterable<Edge> {
     // node is bound, enumerate edges where node = edge.getNode(index)
     Iterable<Edge> getEdgesBasic(Node node) {
         int beginIndex = findNodeIndex(node);
-        getGraph().trace("Get edges: node=%s label=%s index=%s place=%s", 
-                node, node.getLabel(), node.getIndex(), beginIndex);
         
         if (beginIndex >= 0 && beginIndex < getEdgeList().size()) {
            return new EdgeManagerIterate(this, beginIndex);
-        }
-        else if (getGraph().isDebugSparql()) {
-            traceEdgeList();
         }
         
         return null;
@@ -419,11 +411,7 @@ public class EdgeManager implements Iterable<Edge> {
      */
     Edge findEdge(Edge edge) {
         int i = findEdgeEqualWithoutMetadata(edge);
-        getGraph().trace("Find edge: %s place=%s", edge, i);
         if (i == -1) {
-            if (getGraph().isDebugSparql()) {
-                traceEdgeList();
-            }
             return null;
         }
         return getEdgeList().get(i);

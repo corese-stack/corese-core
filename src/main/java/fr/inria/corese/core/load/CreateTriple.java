@@ -3,6 +3,7 @@ package fr.inria.corese.core.load;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.corese.core.elasticsearch.EdgeChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,7 @@ import fr.inria.corese.core.sparql.triple.parser.Constant;
  * @author Olivier Corby, INRIA 2020
  */
 public class CreateTriple {
-    public static Logger logger = LoggerFactory.getLogger(CreateTriple.class);
+    public static final Logger logger = LoggerFactory.getLogger(CreateTriple.class);
     static final String STAR = "*";
 
     private QueryProcess queryProcess;
@@ -66,10 +67,8 @@ public class CreateTriple {
     }
 
     void add(Edge e) {
-        if (AccessRight.isActive()) {
-            if (!getAccessRight().setInsert(e)) {
-                return;
-            }
+        if (AccessRight.isActive() && !getAccessRight().setInsert(e)) {
+            return;
         }
         Edge edge = addEdge(e);
         if (edge != null) {
@@ -97,11 +96,10 @@ public class CreateTriple {
     }
 
     Edge create(Node g, Node p, List<Node> list, boolean nested) {
-        Edge e = graph.create(g, p, list, nested);
-        return e;
+        return graph.create(g, p, list, nested);
     }
 
-    /**
+    /*
      * Graph api
      */
 
@@ -109,12 +107,11 @@ public class CreateTriple {
         if (hasDataManager()) {
             return getDataManager().insert(e);
         } else {
-            // System.out.println("CT: add " + e);
             return graph.addEdge(e);
         }
     }
 
-    /**
+    /*
      * We can keep Node creation functions on the graph
      * or we could provide NodeImpl() with a DataBroker
      * All we need is to have a broker for addEdge above.
@@ -165,7 +162,7 @@ public class CreateTriple {
     }
 
     void declare(Edge edge) {
-        if (load.isEvent() && getQueryProcess() != null) {
+        if (getQueryProcess() != null) {
             getQueryProcess().getVisitor().insert(dtpath, edge);
         }
     }
