@@ -89,8 +89,6 @@ public class TestQuery1 {
         // Property.set(GRAPH_NODE_AS_DATATYPE, true);
         Property.set(LOAD_IN_DEFAULT_GRAPH, true);
         // Property.set(INTERPRETER_TEST, true);
-        QueryProcess.DISPLAY_QUERY = true;
-        System.out.println("Property: " + Property.display());
         // Graph.DEFAULT_GRAPH_MODE = Graph.DEFAULT_GRAPH;
 
         QueryProcess.definePrefix("c", "http://www.inria.fr/acacia/comma#");

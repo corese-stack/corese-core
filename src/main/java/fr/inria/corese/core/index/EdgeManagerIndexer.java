@@ -1,23 +1,18 @@
 package fr.inria.corese.core.index;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.tool.MetaIterator;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.Index;
 import fr.inria.corese.core.Serializer;
 import fr.inria.corese.core.index.PredicateList.Cursor;
-import fr.inria.corese.core.util.Property;
-import java.util.HashMap;
 import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.tool.MetaIterator;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.util.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Table property node -> List<Edge>
@@ -330,27 +325,26 @@ public class EdgeManagerIndexer
         }
         Edge internal = internal(edge); 
         EdgeManager el = define(edge.getEdgeNode());
-        //System.out.println("add issort: " + isSort(edge) + " " + edge);
         if (isSort(edge)) {
             // edges are sorted, check presence by dichotomy
-            int i = el.getPlace(edge);
+            int edgePlace = el.getPlace(edge);
             
             if (getIndex() == 0) {
                 if (getGraph().isFormerMetadata()) {
                     // add edge with metadata take care of it
                     // ok
                 }
-                else if (i < el.size() &&
-                        el.equalWithoutConsideringMetadata(el.get(i), edge)) {
+                else if (edgePlace < el.size() &&
+                        el.equalWithoutConsideringMetadata(el.get(edgePlace), edge)) {
                     // eliminate duplicate at insertion time for index 0 
-                    if (edge.isAsserted() && el.get(i).isNested()) {
-                        el.get(i).setAsserted(true);
+                    if (edge.isAsserted() && el.get(edgePlace).isNested()) {
+                        el.get(edgePlace).setAsserted(true);
                     }
-                    i = -1;
+                    edgePlace = -1;
                 }
             }
             
-            if (i == -1) {
+            if (edgePlace == -1) {
                 count++;
                 return null;
             }       
@@ -358,10 +352,10 @@ public class EdgeManagerIndexer
             if (onInsert(edge)) {
                 if (getGraph().isFormerMetadata()) {
                     // rdf star edge with reference node: g s p o t
-                     return addWithMetadata(el, edge, internal, i);
+                     return addWithMetadata(el, edge, internal, edgePlace);
                 }
                 else {
-                    el.add(i, internal);
+                    el.add(edgePlace, internal);
                     logInsert(edge);
                 }
             } else {
@@ -922,19 +916,12 @@ public class EdgeManagerIndexer
                 if (superUser(edge)) {
                     remove(edgeManager, i);
                 }
-                else {
-                    // target = tuple(s p o t) with possibly t q v
-                    // set target as nested triple instead of deleting target
-                    // @todo: we may also delete t q v in the same delete operation 
-                    // in this case we should delete target ...
-                    target.setNested(true);
-                }               
             } 
             else {
                 remove(edgeManager, i);
             }
 
-            return target;
+            return edge;
         } 
         
         return null;

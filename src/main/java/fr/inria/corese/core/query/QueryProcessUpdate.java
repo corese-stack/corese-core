@@ -190,8 +190,7 @@ public class QueryProcessUpdate {
             exec = QueryProcess.create(gg);
         }
         else {
-            // eval where bgp on std graph or DataManager 
-            // exec = QueryProcess.create(g);
+            // eval where bgp on std graph or DataManager
             exec = getQueryProcess().copy();
         }
         // bypass lock if any

@@ -18,17 +18,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author Olivier Corby, Wimmics INRIA I3S, 2014
- *
  */
 public class RDFizer {
     private static Logger logger = LoggerFactory.getLogger(RDFizer.class);
-    
-     public boolean isGraphAble(Object obj) {
+
+    public boolean isGraphAble(Object obj) {
         if (obj instanceof Graphable) {
-                return true;
-        }  
+            return true;
+        }
         return false;
     }
 
@@ -38,10 +36,10 @@ public class RDFizer {
         }
         return null;
     }
-    
+
     Graph getGraph(Graphable gg) {
         Graph g = (Graph) gg.getGraph();
-        if (g != null){
+        if (g != null) {
             return g;
         }
         String rdf = gg.toGraph();
@@ -49,15 +47,12 @@ public class RDFizer {
             g = getGraph(rdf);
             gg.setGraph(g);
         } catch (EngineException ex) {
-           
+
         }
         return g;
     }
-    
- 
-    
-    
-      Graph getGraph(String rdf) throws EngineException {
+
+    Graph getGraph(String rdf) throws EngineException {
         Graph g = Graph.create();
         Load ld = Load.create(g);
         ld.setEvent(false);
@@ -65,22 +60,21 @@ public class RDFizer {
             ld.loadString(rdf, Loader.format.TURTLE_FORMAT);
         } catch (LoadException ex) {
             logger.error("", ex);
-        } 
+        }
         g.prepare();
         return g;
-     }
-     
-     
-     
-       Graph getGraph(Query q) {
+    }
+
+
+    Graph getGraph(Query q) {
         try {
             Graph g = (Graph) q.getGraph();
-            if (g == null){
-                ASTQuery ast =  q.getAST();
+            if (g == null) {
+                ASTQuery ast = q.getAST();
                 SPINProcess sp = SPINProcess.create();
                 g = sp.toSpinGraph(ast);
                 q.setGraph(g);
-            } 
+            }
             g.prepare();
             return g;
         } catch (EngineException ex) {

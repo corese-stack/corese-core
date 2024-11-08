@@ -1,15 +1,39 @@
 package fr.inria.corese.core.load;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import com.github.jsonldjava.core.JsonLdError;
+import fr.com.hp.hpl.jena.rdf.arp.ARP;
+import fr.com.hp.hpl.jena.rdf.arp.RDFListener;
+import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.api.Log;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.load.jsonld.CoreseJsonTripleCallback;
+import fr.inria.corese.core.load.jsonld.JsonldLoader;
+import fr.inria.corese.core.load.rdfa.CoreseRDFaTripleSink;
+import fr.inria.corese.core.load.rdfa.RDFaLoader;
+import fr.inria.corese.core.query.QueryEngine;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.rule.RuleEngine;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.QueryLexicalException;
+import fr.inria.corese.core.sparql.exceptions.QuerySyntaxException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.triple.function.term.TermEval;
+import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.util.HTTPHeaders;
+import fr.inria.corese.core.workflow.SemanticWorkflow;
+import fr.inria.corese.core.workflow.WorkflowParser;
+import org.semarglproject.rdf.core.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,82 +42,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 
-import fr.inria.corese.core.util.HTTPHeaders;
-import org.semarglproject.rdf.core.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
-import com.github.jsonldjava.core.JsonLdError;
-
-import fr.com.hp.hpl.jena.rdf.arp.ARP;
-import fr.com.hp.hpl.jena.rdf.arp.RDFListener;
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.api.Loader;
-import fr.inria.corese.core.api.Log;
-import fr.inria.corese.core.load.jsonld.CoreseJsonTripleCallback;
-import fr.inria.corese.core.load.jsonld.JsonldLoader;
-import fr.inria.corese.core.load.rdfa.CoreseRDFaTripleSink;
-import fr.inria.corese.core.load.rdfa.RDFaLoader;
-import fr.inria.corese.core.query.QueryEngine;
-import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.workflow.SemanticWorkflow;
-import fr.inria.corese.core.workflow.WorkflowParser;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.exceptions.QueryLexicalException;
-import fr.inria.corese.core.sparql.exceptions.QuerySyntaxException;
-import fr.inria.corese.core.sparql.exceptions.SafetyException;
-import fr.inria.corese.core.sparql.triple.function.term.TermEval;
-import fr.inria.corese.core.sparql.triple.parser.Access;
-import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
-import fr.inria.corese.core.sparql.triple.parser.AccessRight;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.LoadTurtle;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
-
 /**
  * Translate an RDF/XML document into a Graph use ARP
  *
  * @author Olivier Corby, Edelweiss INRIA 2010
- *
  */
 public class Load
         implements RDFListener, Loader {
 
     public static final Logger logger = LoggerFactory.getLogger(Load.class);
-    private static Loader.format DEFAULT_FORMAT = Loader.format.RDFXML_FORMAT;
-    public static String LOAD_FORMAT = ALL_FORMAT_STR;
     // URL file protocol
     static final String FILE = "file";
     static final String IMPORTS = NSManager.OWL + "imports";
+    public static String LOAD_FORMAT = ALL_FORMAT_STR;
+    private static Loader.format DEFAULT_FORMAT = Loader.format.RDFXML_FORMAT;
     // true: load files into kg:default graph when no named graph is given
     // false: load files into named graphs where name = URI of file
     private static boolean DEFAULT_GRAPH = false;
     // max number of triples to load
     private static int LIMIT_DEFAULT = Integer.MAX_VALUE;
     int maxFile = Integer.MAX_VALUE;
-    // RDF graph
-    private Graph graph;
-    // External graph implementation
-    private DataManager dataManager;
     Log log;
     RuleEngine engine;
     // load transformation
     QueryEngine qengine;
-    // For lock, event, import LinkedFunction
-    private QueryProcess queryProcess;
-    // Workflow with .sw extension
-    private SemanticWorkflow workflow;
     // prevent loop in owl:import
     HashMap<String, String> loaded;
     // RDF/XML triple builder
     BuildImpl build;
+    // list of namespace of predicate to exclude from load
+    ArrayList<String> exclude;
+    // RDF graph
+    private Graph graph;
+    // External graph implementation
+    private DataManager dataManager;
+    // For lock, event, import LinkedFunction
+    private QueryProcess queryProcess;
+    // Workflow with .sw extension
+    private SemanticWorkflow workflow;
     // named graph URI for RDF/XML parser extension
     private String namedGraphURI;
     private String source;
@@ -112,19 +98,6 @@ public class Load
     private Access.Level level = Access.Level.USER_DEFAULT;
     // authorize specific namespaces for load
     private AccessRight accessRight;
-    // list of namespace of predicate to exclude from load
-    ArrayList<String> exclude;
-
-    /**
-     * true means load in default graph when no named graph is given
-     */
-    public static void setDefaultGraphValue(boolean b) {
-        DEFAULT_GRAPH = b;
-    }
-
-    public static boolean isDefaultGraphValue() {
-        return DEFAULT_GRAPH;
-    }
 
     protected Load(Graph g) {
         this();
@@ -134,6 +107,17 @@ public class Load
     protected Load() {
         exclude = new ArrayList<>();
         setAccessRight(new AccessRight());
+    }
+
+    public static boolean isDefaultGraphValue() {
+        return DEFAULT_GRAPH;
+    }
+
+    /**
+     * true means load in default graph when no named graph is given
+     */
+    public static void setDefaultGraphValue(boolean b) {
+        DEFAULT_GRAPH = b;
     }
 
     public static Load create(Graph g) {
@@ -154,17 +138,13 @@ public class Load
         DEFAULT_FORMAT = f;
     }
 
-    @Override
-    public void init(Object o) {
-        set((Graph) o);
-    }
-
     public static void setLimitDefault(int max) {
         LIMIT_DEFAULT = max;
     }
 
-    public void setLimit(int max) {
-        limit = max;
+    @Override
+    public void init(Object o) {
+        set((Graph) o);
     }
 
     void set(Graph g) {
@@ -407,7 +387,7 @@ public class Load
     }
 
     /**
-     * 
+     *
      */
     String target(String name, String path) {
         if (name == null) {
@@ -746,7 +726,7 @@ public class Load
 
         BuildImpl buildRDFXML = BuildImpl.create(getGraph(), this);
         buildRDFXML.setSource(name);
-        if(name == null) {
+        if (name == null) {
             buildRDFXML.setSource(namedGraphURI);
         }
         buildRDFXML.setPath(path);
@@ -781,6 +761,11 @@ public class Load
         }
     }
 
+    @Override
+    public String getSource() {
+        return getNamedGraphURI();
+    }
+
     /**
      * interface RDFListener, extension of ARP RDF/XML parser
      * Process cos:graph named graph statement extension
@@ -791,11 +776,6 @@ public class Load
         if (s != null) {
             source = s;
         }
-    }
-
-    @Override
-    public String getSource() {
-        return getNamedGraphURI();
     }
 
     void loadTurtle(Reader stream, String path, String base, String name) throws LoadException {
@@ -982,7 +962,7 @@ public class Load
                     throw LoadException.create(ex, uri);
                 }
             }
-                break;
+            break;
 
             default:
                 parse(uri);
@@ -1045,13 +1025,13 @@ public class Load
     @Override
     @Deprecated
     public void load(String path) {
-        load(path, (String)null);
+        load(path, (String) null);
     }
 
     @Override
     @Deprecated
     public void loadWE(String path) throws LoadException {
-        loadWE(path, (String)null);
+        loadWE(path, (String) null);
     }
 
     @Deprecated
@@ -1228,6 +1208,10 @@ public class Load
 
     public int getLimit() {
         return limit;
+    }
+
+    public void setLimit(int max) {
+        limit = max;
     }
 
     public String getNamedGraphURI() {

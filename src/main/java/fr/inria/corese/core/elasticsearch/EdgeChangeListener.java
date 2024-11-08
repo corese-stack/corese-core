@@ -14,8 +14,16 @@ public abstract class EdgeChangeListener {
         onBulkEdgeChange(List.of(), List.of(edge));
     }
 
+    public void onBulkEdgeInsert(List<Edge> edgeList) {
+        onBulkEdgeChange(List.of(), edgeList);
+    }
+
     public void onEdgeDelete(Edge edge) {
         onBulkEdgeChange(List.of(edge), List.of());
+    }
+
+    public void onBulkEdgeDelete(List<Edge> edgeList) {
+        onBulkEdgeChange(edgeList, List.of());
     }
 
     public abstract void onBulkEdgeChange(List<Edge> delete, List<Edge> insert);

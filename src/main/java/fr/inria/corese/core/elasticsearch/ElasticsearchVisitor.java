@@ -51,7 +51,9 @@ public class ElasticsearchVisitor extends ProcessVisitorDefault {
     @Override
     public IDatatype update(Query q, List<Edge> delete, List<Edge> insert) {
         super.update(q, delete, insert);
-        logger.debug("Update delete:{} triples, insert:{} triples" , delete.size(), insert.size());
+        if(delete.isEmpty() && insert.isEmpty()) {
+            return defaultValue();
+        }
         for (EdgeChangeListener listener : listeners) {
             listener.onBulkEdgeChange(delete, insert);
         }
