@@ -21,7 +21,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import fr.inria.corese.core.elasticsearch.ElasticsearchVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -787,10 +786,6 @@ public class Property {
 
             case LOAD_FUNCTION:
                 loadFunction(str);
-                break;
-
-            case ELASTICSEARCH_API_KEY:
-                ElasticsearchVisitor.setElasticsearchApiKey(str);
                 break;
         }
     }

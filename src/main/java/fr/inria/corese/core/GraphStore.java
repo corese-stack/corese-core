@@ -1,5 +1,6 @@
 package fr.inria.corese.core;
 
+import fr.inria.corese.core.elasticsearch.EdgeChangeListener;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
@@ -27,7 +28,7 @@ public class GraphStore extends Graph {
     }
 
     public static GraphStore create(boolean b) {
-        GraphStore gs = new GraphStore();
+        GraphStore gs = create();
         if (b) {
             gs.setEntailment();
         }
@@ -150,6 +151,17 @@ public class GraphStore extends Graph {
      */
     public void setStore(HashMap<String, Graph> store) {
         this.store = store;
+    }
+
+    /**
+     * Adds listener to default graph and named graphs
+     */
+    @Override
+    public void addEdgeChangeListener(EdgeChangeListener listener) {
+        super.addEdgeChangeListener(listener);
+        for(Graph g : getNamedGraphs()) {
+            g.addEdgeChangeListener(listener);
+        }
     }
 
 }
