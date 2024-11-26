@@ -103,12 +103,12 @@ public class Property {
     static final String EQ = "=";
     private static final String STD = "std";
 
-    private HashMap<Value, Boolean> booleanProperty;
-    private HashMap<Value, String> stringProperty;
-    private HashMap<Value, Integer> integerProperty;
-    private HashMap<Value, List<String>> listProperty;
-    private HashMap<String, String> variableMap;
-    private HashMap<String, String> imports;
+    private Map<Value, Boolean> booleanProperty;
+    private Map<Value, String> stringProperty;
+    private Map<Value, Integer> integerProperty;
+    private Map<Value, List<String>> listProperty;
+    private Map<String, String> variableMap;
+    private Map<String, String> imports;
 
     // Java Properties manage property file (at user option)
     private Properties properties;
@@ -298,20 +298,22 @@ public class Property {
         STRICT_MODE,
 
         // Elasticsearch parameters
-        ELASTICSEARCH_API_KEY
+        // TODO Change class to be able to define application-specific properties
+        ELASTICSEARCH_API_KEY,
+        ELASTICSEARCH_API_ADDRESS,
     }
 
     Property() {
-        booleanProperty = new HashMap<>();
-        stringProperty = new HashMap<>();
-        integerProperty = new HashMap<>();
-        listProperty = new HashMap<>();
+        booleanProperty = new EnumMap<>(Value.class);
+        stringProperty = new EnumMap<>(Value.class);
+        integerProperty = new EnumMap<>(Value.class);
+        listProperty = new EnumMap<>(Value.class);
         properties = new Properties();
         variableMap = new HashMap<>();
         imports = new HashMap<>();
     }
 
-    public static Property getSingleton() {
+    protected static Property getSingleton() {
         if(singleton == null) {
             singleton = new Property();
             set(SERVICE_SEND_PARAMETER, true);
@@ -417,7 +419,12 @@ public class Property {
     }
 
     public static Set<Value> getPropertySet() {
-        return getSingleton().getBooleanProperty().keySet();
+        HashSet<Value> result = new HashSet<>();
+        result.addAll(getSingleton().getBooleanProperty().keySet());
+        result.addAll(getSingleton().getStringProperty().keySet());
+        result.addAll(getSingleton().getIntegerProperty().keySet());
+        result.addAll(getSingleton().getListProperty().keySet());
+        return result;
     }
 
     public static String display() {
@@ -428,9 +435,9 @@ public class Property {
      * Implementation for singleton
      */
 
-    public String basicDisplay() {
+    public static String basicDisplay() {
         return String.format("Property:\n%s\n%s",
-                getBooleanProperty().toString(), getStringProperty().toString());
+                getSingleton().getBooleanProperty().toString(), getSingleton().getStringProperty().toString());
     }
 
     void basicLoad(String path) throws IOException {
@@ -458,7 +465,7 @@ public class Property {
     private void imports() throws IOException {
         if (getProperties().containsKey(IMPORT.toString())) {
 
-            for (String name : getPropertiesValue(IMPORT).split(SEP)) {
+            for (String name : ((String) get(IMPORT)).split(SEP)) {
                 String importPath = expand(name);
 
                 if (getImports().containsKey(importPath)) {
@@ -498,13 +505,13 @@ public class Property {
      */
     void defineVariable() {
         if (getProperties().containsKey(VARIABLE.toString())) {
-            basicSet(VARIABLE, getPropertiesValue(VARIABLE));
+            basicSet(VARIABLE, (String) get(VARIABLE));
             // variable definitions in a hashmap
             defineVariableMap();
         }
     }
 
-    public void define(String name, String value) {
+    public static void define(String name, String value) {
         Value pname = Value.valueOf(name);
         if (value.equals("true") || value.equals("false")) {
             boolean b = Boolean.parseBoolean(value);
@@ -734,10 +741,10 @@ public class Property {
             logger.debug("{} = {}", value, str);
         switch (value) {
             case FEDERATE_BLACKLIST:
-                blacklist(str);
+                getSingleton().blacklist(str);
                 break;
             case FEDERATE_BLACKLIST_EXCEPT:
-                blacklistExcept(str);
+                getSingleton().blacklistExcept(str);
                 break;
         }
     }
@@ -788,7 +795,7 @@ public class Property {
                 break;
 
             case FEDERATE_INDEX_SUCCESS:
-                FederateVisitor.NB_SUCCESS = Double.valueOf(str);
+                FederateVisitor.NB_SUCCESS = Double.parseDouble(str);
                 break;
 
             case LOAD_FORMAT:
@@ -902,19 +909,19 @@ public class Property {
         return new ArrayList<>(Arrays.asList(list.split(SEP)));
     }
 
-    static void blacklist(String list) {
+    void blacklist(String list) {
         FederateVisitor.BLACKLIST = getSingleton().getList(list);
     }
 
-    static void blacklistExcept(String list) {
+    void blacklistExcept(String list) {
         FederateVisitor.BLACKLIST_EXCEPT = getSingleton().getList(list);
     }
 
-    static void blacklist(String... list) {
+    void blacklist(String... list) {
         FederateVisitor.BLACKLIST = new ArrayList<>(Arrays.asList(list));
     }
 
-    static void blacklistExcept(String... list) {
+    void blacklistExcept(String... list) {
         ArrayList<String> alist = new ArrayList<>();
         Collections.addAll(alist, list);
         FederateVisitor.BLACKLIST_EXCEPT = alist;
@@ -988,7 +995,7 @@ public class Property {
         return getParent().concat(value.substring(1));
     }
 
-    static void queryPlan(String str) {
+    void queryPlan(String str) {
         switch (str) {
             case STD:
                 QuerySolver.QUERY_PLAN = Query.QP_DEFAULT;
@@ -1097,12 +1104,12 @@ public class Property {
         }
     }
 
-    public static List<Pair> getValueList(Value val) {
-        return getSingleton().getValueListBasic(val);
+    public List<Pair> getValueList(Value val) {
+        return getValueListBasic(val);
     }
 
     public List<Pair> getValueListBasic(Value val) {
-        String str = Property.stringValue(val);
+        String str = stringValue(val);
         ArrayList<Pair> list = new ArrayList<>();
         if (str == null) {
             return list;
@@ -1148,9 +1155,9 @@ public class Property {
 
     }
 
-    public List<List<String>> getStorageparameters() {
+    public static List<List<String>> getStorageparameters() {
 
-        String storages = Property.stringValue(STORAGE);
+        String storages = stringValue(STORAGE);
 
         List<List<String>> storageList = new ArrayList<>();
         if (storages == null) {
@@ -1160,7 +1167,7 @@ public class Property {
         for (String storageStr : storages.split(SEP)) {
 
             String[] storageLst = storageStr.split(",", 3);
-            storageList.add(List.of(storageLst).stream().map(this::expand).collect(Collectors.toList()));
+            storageList.add(List.of(storageLst).stream().map( str -> getSingleton().expand(str)).collect(Collectors.toList()));
         }
         return storageList;
     }
@@ -1180,35 +1187,35 @@ public class Property {
         }
     }
 
-    public HashMap<Value, Boolean> getBooleanProperty() {
+    protected Map<Value, Boolean> getBooleanProperty() {
         return booleanProperty;
     }
 
-    public void setBooleanProperty(HashMap<Value, Boolean> booleanProperty) {
+    protected void setBooleanProperty(Map<Value, Boolean> booleanProperty) {
         this.booleanProperty = booleanProperty;
     }
 
-    public HashMap<Value, String> getStringProperty() {
+    protected Map<Value, String> getStringProperty() {
         return stringProperty;
     }
 
-    public void setStringProperty(HashMap<Value, String> stringProperty) {
+    protected void setStringProperty(Map<Value, String> stringProperty) {
         this.stringProperty = stringProperty;
     }
 
-    public void setProperties(Properties properties) {
+    protected void setProperties(Properties properties) {
         this.properties = properties;
     }
 
-    public Properties getProperties() {
+    protected Properties getProperties() {
         return properties;
     }
 
-    public HashMap<Value, Integer> getIntegerProperty() {
+    protected Map<Value, Integer> getIntegerProperty() {
         return integerProperty;
     }
 
-    public void setIntegerProperty(HashMap<Value, Integer> integerProperty) {
+    protected void setIntegerProperty(Map<Value, Integer> integerProperty) {
         this.integerProperty = integerProperty;
     }
 
@@ -1220,19 +1227,12 @@ public class Property {
         return getSingleton().getListProperty().get(value);
     }
 
-    String getPropertiesValue(Value value) {
-        if (getProperties().containsKey(value.toString())) {
-            return (String) getProperties().get(value.toString());
-        }
-        return null;
-    }
-
     public static String stringValue(Value val) {
         return getSingleton().getStringProperty().get(val);
     }
 
-    public static String pathValue(Value val) {
-        return getSingleton().expand(stringValue(val));
+    protected String pathValue(Value val) {
+        return expand(stringValue(val));
     }
 
     public static String[] stringValueList(Value val) {
@@ -1243,43 +1243,43 @@ public class Property {
         return str.split(SEP);
     }
 
-    public HashMap<String, String> getVariableMap() {
+    protected Map<String, String> getVariableMap() {
         return variableMap;
     }
 
-    public void setVariableMap(HashMap<String, String> variableMap) {
+    protected void setVariableMap(Map<String, String> variableMap) {
         this.variableMap = variableMap;
     }
 
-    public String getPath() {
+    protected String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
+    protected void setPath(String path) {
         this.path = path;
     }
 
-    public String getParent() {
+    protected String getParent() {
         return parent;
     }
 
-    public void setParent(String parent) {
+    protected void setParent(String parent) {
         this.parent = parent;
     }
 
-    public HashMap<String, String> getImports() {
+    protected Map<String, String> getImports() {
         return imports;
     }
 
-    public void setImports(HashMap<String, String> imports) {
+    protected void setImports(Map<String, String> imports) {
         this.imports = imports;
     }
 
-    public HashMap<Value, List<String>> getListProperty() {
+    protected Map<Value, List<String>> getListProperty() {
         return listProperty;
     }
 
-    public void setListProperty(HashMap<Value, List<String>> listProperty) {
+    protected void setListProperty(Map<Value, List<String>> listProperty) {
         this.listProperty = listProperty;
     }
 
@@ -1305,10 +1305,10 @@ public class Property {
     // consider all db
     public static boolean isStorageAll() {
         return isStorage() &&
-                protectEquals(stringValue(STORAGE_MODE), DB_ALL);
+                getSingleton().protectEquals(stringValue(STORAGE_MODE), DB_ALL);
     }
 
-    static boolean protectEquals(String variable, String value) {
+    boolean protectEquals(String variable, String value) {
         return variable != null && variable.equals(value);
     }
 

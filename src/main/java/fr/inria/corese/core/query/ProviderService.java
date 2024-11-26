@@ -1091,7 +1091,6 @@ public class ProviderService implements URLParam {
                     } else {
                         String res = report.getResponse().getHeaderString(header);
                         if (res != null) {
-                            // logger.info(String.format("%s %s=%s", url.toString(), header, res));
                             getLog().defLabel(url.getLogURLNumber(), header, res);
                         }
                     }

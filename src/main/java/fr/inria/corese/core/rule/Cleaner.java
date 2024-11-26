@@ -77,9 +77,7 @@ public class Cleaner {
             exec.setProcessTransaction(false);
         }
         for (String q : lq) {
-            //RuleEngine.logger.info("clean: " + q);
             String qq = (resource) ? ql.getResource(data + q) : ql.readWE(q);
-            // RuleEngine.logger.info("clean: " + qq);
              try {
            Mappings map = exec.query(qq, createMapping(getVisitor()));
              
