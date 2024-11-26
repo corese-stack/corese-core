@@ -935,7 +935,7 @@ public class EdgeManagerIndexer
     }
     
     boolean superUser(Edge edge) {
-        return Property.booleanValue(Property.Value.RDF_STAR_DELETE);
+        return Property.getBooleanValue(Property.Value.RDF_STAR_DELETE);
     }
     
     /**

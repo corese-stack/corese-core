@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,7 +145,7 @@ public class CreateImpl extends CreateTriple implements Creator {
 
     void parseImport(Atom property, Atom object) {
         if (property.getLongName() != null && property.getLongName().equals(Load.IMPORTS)
-                && !Property.booleanValue(Value.DISABLE_OWL_AUTO_IMPORT)) {
+                && !Property.getBooleanValue(Value.DISABLE_OWL_AUTO_IMPORT)) {
             try {
                 load.parseImport(object.getLongName());
             } catch (LoadException ex) {

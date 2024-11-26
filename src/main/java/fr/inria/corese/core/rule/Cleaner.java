@@ -83,7 +83,7 @@ public class Cleaner {
              try {
            Mappings map = exec.query(qq, createMapping(getVisitor()));
              
-             if (Property.booleanValue(LOG_RULE_CLEAN) && map.size() > 0) {
+             if (Property.getBooleanValue(LOG_RULE_CLEAN) && map.size() > 0) {
                 RuleEngine.logger.info(
                         String.format("Clean: %s solutions\n%s", map.size(), qq));
             }

@@ -517,10 +517,10 @@ public class RuleEngine implements Engine, Graphable {
             logger.info("Graph size: " + protectGraphSize());
         }
         if (Property.get(Property.Value.RULE_TRANSITIVE_FUNCTION) != null) {
-            setFunTransitive(Property.booleanValue(Property.Value.RULE_TRANSITIVE_FUNCTION));
+            setFunTransitive(Property.getBooleanValue(Property.Value.RULE_TRANSITIVE_FUNCTION));
         }
         if (Property.get(Property.Value.RULE_TRANSITIVE_OPTIMIZE) != null) {
-            setOptTransitive(Property.booleanValue(Property.Value.RULE_TRANSITIVE_OPTIMIZE));
+            setOptTransitive(Property.getBooleanValue(Property.Value.RULE_TRANSITIVE_OPTIMIZE));
         }
         if (Property.hasValue(Property.Value.RULE_TRACE, true)) {
             setSimpleTrace(true);
@@ -547,7 +547,7 @@ public class RuleEngine implements Engine, Graphable {
     }
 
     boolean isTraceMemory() {
-        return Property.booleanValue(Property.Value.TRACE_MEMORY);
+        return Property.getBooleanValue(Property.Value.TRACE_MEMORY);
     }
 
     public Graph getRDFGraph() {

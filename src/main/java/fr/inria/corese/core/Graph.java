@@ -1049,7 +1049,7 @@ public class Graph extends GraphObject implements
     }
 
     public void startLoad() {
-        if (size() == 0 || Property.booleanValue(Property.Value.GRAPH_INDEX_LOAD_SKIP)) {
+        if (size() == 0 || Property.getBooleanValue(Property.Value.GRAPH_INDEX_LOAD_SKIP)) {
             // graph is empty, optimize loading as if the graph were not indexed
             // because in this case, edges are added directly
             //logger.info("Set graph as not indexed");
@@ -3490,7 +3490,7 @@ public class Graph extends GraphObject implements
     }
 
     public Node addTripleReference(Node s, Node p, Node o) {
-        if (Property.booleanValue(Property.Value.RDF_STAR_TRIPLE)) {
+        if (Property.getBooleanValue(Property.Value.RDF_STAR_TRIPLE)) {
             return basicAddTripleReference(s, p, o);
         }
         return basicAddTripleReference(reference(s, p, o));
@@ -3777,7 +3777,7 @@ public class Graph extends GraphObject implements
     }
 
     public boolean isFormerMetadata() {
-        return isMetadataNode() && !Property.booleanValue(Property.Value.RDF_STAR_TRIPLE);
+        return isMetadataNode() && !Property.getBooleanValue(Property.Value.RDF_STAR_TRIPLE);
     }
 
     /**

@@ -1,5 +1,18 @@
 # Corese Changelog
 
+## Version 4.6.1 – Elasticsearch
+
+### Added
+- Code cleanup and refactoring to improve readability and maintainability.
+  - Reworking of the Property class as an proper singleton
+  - HTTPHeaders class created to centralize repeated definitions of HTTP headers.
+  
+- Elasticsearch integration:
+  - EdgeChangeListener class created to listen to edge changes and deletion.
+  
+### Fixed
+- Fixed possibility of apparition of XML comment into JSON results
+
 ## Version 4.6.0 – 2024-10-28
 
 ### Added

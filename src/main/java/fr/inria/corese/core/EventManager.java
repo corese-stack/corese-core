@@ -1,11 +1,7 @@
 package fr.inria.corese.core;
 
-import fr.inria.corese.core.compiler.eval.Interpreter;
 import fr.inria.corese.core.compiler.parser.Transformer;
 import fr.inria.corese.core.api.Engine;
-import static fr.inria.corese.core.Event.Finish;
-import static fr.inria.corese.core.Event.Process;
-import static fr.inria.corese.core.Event.Start;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.util.Property;
 import static fr.inria.corese.core.util.Property.Value.LOG_NODE_INDEX;
@@ -301,7 +297,7 @@ public class EventManager implements EventHandler {
     }
 
     void log(Property.Value prop, Event type, Event e, Object o) {
-        if (Property.booleanValue(prop)) {
+        if (Property.getBooleanValue(prop)) {
             getLog().log(type, e, o);
         }
     }

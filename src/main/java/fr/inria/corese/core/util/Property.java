@@ -14,13 +14,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import fr.inria.corese.core.kgram.core.Exp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,14 +83,11 @@ import fr.inria.corese.core.sparql.triple.parser.visitor.ASTParser;
  */
 public class Property {
 
-    private static Logger logger = LoggerFactory.getLogger(Property.class);
-    final static String VAR_CHAR = "$";
-    public static final String STAR = "*";
-    final static String LOCAL = "./";
-    final static String SEP = ";";
-    final static String EQ = "=";
+    private static final Logger logger = LoggerFactory.getLogger(Property.class);
+
     private static Property singleton = null;
-    private static final String STD = "std";
+
+    public static final String STAR = "*";
     public static final String RDF_XML = "rdf+xml";
     public static final String TURTLE = "turtle";
     public static final String TRIG = "trig";
@@ -102,6 +96,12 @@ public class Property {
     public static final String DATASET = "dataset";
     public static final String DB = "db";
     public static final String DB_ALL = "db_all";
+
+    static final String VAR_CHAR = "$";
+    static final String LOCAL = "./";
+    static final String SEP = ";";
+    static final String EQ = "=";
+    private static final String STD = "std";
 
     private HashMap<Value, Boolean> booleanProperty;
     private HashMap<Value, String> stringProperty;
@@ -113,7 +113,8 @@ public class Property {
     // Java Properties manage property file (at user option)
     private Properties properties;
 
-    private String path, parent;
+    private String path;
+    private String parent;
 
     public enum Value {
         // VARIABLE = home=/home/name/dir
@@ -298,7 +299,7 @@ public class Property {
 
         // Elasticsearch parameters
         ELASTICSEARCH_API_KEY
-    };
+    }
 
     Property() {
         booleanProperty = new HashMap<>();
@@ -319,7 +320,7 @@ public class Property {
         return singleton;
     }
 
-    public static void load(String path) throws FileNotFoundException, IOException {
+    public static void load(String path) throws IOException {
         getSingleton().basicLoad(path);
     }
 
@@ -331,36 +332,88 @@ public class Property {
     }
 
     public static void set(Value value, boolean b) {
-        getSingleton().basicSet(value, b);
+        basicSet(value, b);
     }
 
     public static void set(Value value, String str) {
-        getSingleton().basicSet(value, str);
+        basicSet(value, str);
     }
 
     public static void set(Value value, String... str) {
-        getSingleton().basicSet(value, str);
+        basicSet(value, str);
     }
 
     public static void set(Value value, double d) {
-        getSingleton().basicSet(value, Double.toString(d));
+        basicSet(value, Double.toString(d));
     }
 
     public static void set(Value value, int n) {
-        getSingleton().basicSet(value, n);
+        basicSet(value, n);
     }
 
-    public static Boolean get(Value value) {
-        return getSingleton().getBooleanProperty().get(value);
+    public static boolean hasProperty(Value value) {
+        return getSingleton().getBooleanProperty().containsKey(value) || getSingleton().getStringProperty().containsKey(value) || getSingleton().getIntegerProperty().containsKey(value) || getSingleton().getListProperty().containsKey(value);
     }
 
-    public static boolean booleanValue(Value value) {
-        Boolean b = get(value);
+    private boolean hasBooleanProperty(Value value) {
+        return getBooleanProperty().containsKey(value);
+    }
+
+    private boolean hasStringProperty(Value value) {
+        return getStringProperty().containsKey(value);
+    }
+
+    private boolean hasIntegerProperty(Value value) {
+        return getIntegerProperty().containsKey(value);
+    }
+
+    private boolean hasListProperty(Value value) {
+        return getListProperty().containsKey(value);
+    }
+
+    public static Object get(Value value) {
+        if(getSingleton().hasBooleanProperty(value))
+            return getBooleanValue(value);
+        if(getSingleton().hasStringProperty(value))
+            return getStringValue(value);
+        if(getSingleton().hasIntegerProperty(value))
+            return getIntegerValue(value);
+        if(getSingleton().hasListProperty(value))
+            return getListValue(value);
+        return null;
+    }
+
+    public static boolean getBooleanValue(Value value) {
+        Boolean b = getSingleton().getBooleanProperty().get(value);
         return b != null && b;
     }
 
+    public static String getStringValue(Value value) {
+        return getSingleton().getStringProperty().get(value);
+    }
+
+    public static int getIntegerValue(Value value) {
+        return getSingleton().getIntegerProperty().get(value);
+    }
+
+    public static List<String> getListValue(Value value) {
+        return getSingleton().getListProperty().get(value);
+    }
+
     public static boolean hasValue(Value value, boolean b) {
-        return get(value) != null && get(value) == b;
+        return get(value) != null && getBooleanValue(value) == b;
+    }
+
+    public static boolean hasValue(Value value, String str) {
+        return get(value) != null && getStringValue(value).equals(str);
+    }
+
+    public static boolean hasValue(Value value, int n) {
+        return get(value) != null && getIntegerValue(value) == n;
+    }
+
+    public static boolean hasValue(Value value, String... str) {
+        return get(value) != null && getListValue(value).containsAll(Arrays.asList(str));
     }
 
     public static Set<Value> getPropertySet() {
@@ -380,12 +433,17 @@ public class Property {
                 getBooleanProperty().toString(), getStringProperty().toString());
     }
 
-    void basicLoad(String path) throws FileNotFoundException, IOException {
+    void basicLoad(String path) throws IOException {
         setPath(path);
         File file = new File(path);
         setParent(file.getParent());
         getImports().put(path, path);
-        getProperties().load(new FileReader(path));
+        try (FileReader loadPathReader = new FileReader(path)) {
+            getProperties().load(loadPathReader);
+        } catch (IOException e) {
+            logger.error("Error loading: " + path);
+            throw e;
+        }
         // start with variable because import may use variable,
         // as well as other properties
         defineVariable();
@@ -401,14 +459,16 @@ public class Property {
         if (getProperties().containsKey(IMPORT.toString())) {
 
             for (String name : getPropertiesValue(IMPORT).split(SEP)) {
-                String path = expand(name);
+                String importPath = expand(name);
 
-                if (getImports().containsKey(path)) {
-                    logger.info("Skip import: " + path);
+                if (getImports().containsKey(importPath)) {
+                    logger.info("Skip import: " + importPath);
                 } else {
-                    getImports().put(path, path);
-                    logger.info("Import: " + path);
-                    getProperties().load(new FileReader(path));
+                    getImports().put(importPath, importPath);
+                    logger.info("Import: " + importPath);
+                    try (FileReader importReader = new FileReader(importPath)) {
+                        getProperties().load(importReader);
+                    }
                     // @note: imported variable overload Properties and Property variable property
                     // but complete variable hashmap properly
                     defineVariable();
@@ -444,14 +504,14 @@ public class Property {
         }
     }
 
-    public void define(String name, String value) throws IOException {
+    public void define(String name, String value) {
         Value pname = Value.valueOf(name);
-        if (value.equals("true") | value.equals("false")) {
-            Boolean b = Boolean.valueOf(value);
+        if (value.equals("true") || value.equals("false")) {
+            boolean b = Boolean.parseBoolean(value);
             basicSet(pname, b);
         } else {
             try {
-                int n = Integer.valueOf(value);
+                int n = Integer.parseInt(value);
                 basicSet(pname, n);
             } catch (Exception e) {
                 basicSet(pname, value);
@@ -459,9 +519,9 @@ public class Property {
         }
     }
 
-    void basicSet(Value value, boolean b) {
+    static void basicSet(Value value, boolean b) {
         logger.debug("{} = {}", value, b);
-        getBooleanProperty().put(value, b);
+        getSingleton().getBooleanProperty().put(value, b);
 
         switch (value) {
 
@@ -517,7 +577,6 @@ public class Property {
             case RDF_STAR_TRIPLE:
                 EdgeFactory.EDGE_TRIPLE_NODE = b;
                 EdgeFactory.OPTIMIZE_EDGE = !b;
-                // continue;
 
             case RDF_STAR:
                 Graph.setRDFStar(b);
@@ -583,7 +642,7 @@ public class Property {
                 break;
 
             case SOLVER_DEBUG:
-                Query.DEBUG_DEFAULT = b;
+                Exp.DEBUG_DEFAULT = b;
                 break;
 
             case LDSCRIPT_DEBUG:
@@ -671,7 +730,7 @@ public class Property {
         }
     }
 
-    void basicSet(Value value, String... str) {
+    static void basicSet(Value value, String... str) {
             logger.debug("{} = {}", value, str);
         switch (value) {
             case FEDERATE_BLACKLIST:
@@ -683,13 +742,13 @@ public class Property {
         }
     }
 
-    void basicSet(Value value, String str) {
+    static void basicSet(Value value, String str) {
         logger.debug("{} = {}", value, str);
-        getStringProperty().put(value, str);
+        getSingleton().getStringProperty().put(value, str);
         switch (value) {
 
             case FEDERATION:
-                defineFederation(str);
+                getSingleton().defineFederation(str);
                 break;
 
             case FEDERATE_INDEX_PATTERN:
@@ -697,35 +756,35 @@ public class Property {
                 break;
 
             case FEDERATE_QUERY_PATTERN:
-                setQueryPattern(str);
+                getSingleton().setQueryPattern(str);
                 break;
 
             case FEDERATE_PREDICATE_PATTERN:
-                setPredicatePattern(str);
+                getSingleton().setPredicatePattern(str);
                 break;
 
             case FEDERATE_FILTER_ACCEPT:
-                setFilterAccept(str);
+                getSingleton().setFilterAccept(str);
                 break;
 
             case FEDERATE_FILTER_REJECT:
-                setFilterReject(str);
+                getSingleton().setFilterReject(str);
                 break;
 
             case FEDERATE_INDEX_SKIP:
-                setIndexSkip(str);
+                getSingleton().setIndexSkip(str);
                 break;
 
             case FEDERATE_BLACKLIST:
-                blacklist(str);
+                getSingleton().blacklist(str);
                 break;
 
             case FEDERATE_BLACKLIST_EXCEPT:
-                blacklistExcept(str);
+                getSingleton().blacklistExcept(str);
                 break;
 
             case FEDERATE_SPLIT:
-                split(str);
+                getSingleton().split(str);
                 break;
 
             case FEDERATE_INDEX_SUCCESS:
@@ -745,11 +804,11 @@ public class Property {
                 break;
 
             case SERVICE_HEADER:
-                getListProperty().put(SERVICE_HEADER, getList(str));
+                getSingleton().getListProperty().put(SERVICE_HEADER, getSingleton().getList(str));
                 break;
 
             case LDSCRIPT_VARIABLE:
-                variable();
+                getSingleton().variable();
                 break;
 
             case BLANK_NODE:
@@ -757,35 +816,35 @@ public class Property {
                 break;
 
             case SOLVER_QUERY_PLAN:
-                queryPlan(str);
+                getSingleton().queryPlan(str);
                 break;
 
             case SOLVER_VISITOR:
-                QueryProcess.setVisitorName(expand(str));
+                QueryProcess.setVisitorName(getSingleton().expand(str));
                 break;
 
             case RULE_VISITOR:
-                QuerySolverVisitorRule.setVisitorName(expand(str));
+                QuerySolverVisitorRule.setVisitorName(getSingleton().expand(str));
                 break;
 
             case TRANSFORMER_VISITOR:
-                QuerySolverVisitorTransformer.setVisitorName(expand(str));
+                QuerySolverVisitorTransformer.setVisitorName(getSingleton().expand(str));
                 break;
 
             case SERVER_VISITOR:
-                QueryProcess.setServerVisitorName(expand(str));
+                QueryProcess.setServerVisitorName(getSingleton().expand(str));
                 break;
 
             case ACCESS_LEVEL:
-                accessLevel(str);
+                getSingleton().accessLevel(str);
                 break;
 
             case PREFIX:
-                prefix();
+                getSingleton().prefix();
                 break;
 
             case LOAD_FUNCTION:
-                loadFunction(str);
+                getSingleton().loadFunction(str);
                 break;
         }
     }
@@ -840,40 +899,30 @@ public class Property {
     }
 
     List<String> getList(String list) {
+        return new ArrayList<>(Arrays.asList(list.split(SEP)));
+    }
+
+    static void blacklist(String list) {
+        FederateVisitor.BLACKLIST = getSingleton().getList(list);
+    }
+
+    static void blacklistExcept(String list) {
+        FederateVisitor.BLACKLIST_EXCEPT = getSingleton().getList(list);
+    }
+
+    static void blacklist(String... list) {
+        FederateVisitor.BLACKLIST = new ArrayList<>(Arrays.asList(list));
+    }
+
+    static void blacklistExcept(String... list) {
         ArrayList<String> alist = new ArrayList<>();
-        for (String str : list.split(SEP)) {
-            alist.add(str);
-        }
-        return alist;
-    }
-
-    void blacklist(String list) {
-        FederateVisitor.BLACKLIST = getList(list);
-    }
-
-    void blacklistExcept(String list) {
-        FederateVisitor.BLACKLIST_EXCEPT = getList(list);
-    }
-
-    void blacklist(String... list) {
-        ArrayList<String> alist = new ArrayList<>();
-        for (String str : list) {
-            alist.add(str);
-        }
-        FederateVisitor.BLACKLIST = alist;
-    }
-
-    void blacklistExcept(String... list) {
-        ArrayList<String> alist = new ArrayList<>();
-        for (String str : list) {
-            alist.add(str);
-        }
+        Collections.addAll(alist, list);
         FederateVisitor.BLACKLIST_EXCEPT = alist;
     }
 
-    void basicSet(Value value, int n) {
+    static void basicSet(Value value, int n) {
         logger.debug("{} = {}", value, n);
-        getIntegerProperty().put(value, n);
+        getSingleton().getIntegerProperty().put(value, n);
 
         switch (value) {
 
@@ -906,14 +955,14 @@ public class Property {
     // variable definition may use preceding variables
     private void defineVariableMap() {
         for (Pair pair : getValueListBasic(Value.VARIABLE)) {
-            String var = varName(pair.getKey());
+            String variable = varName(pair.getKey());
 
-            if (getVariableMap().containsKey(var)) {
-                logger.info("Overload variable: " + var);
+            if (getVariableMap().containsKey(variable)) {
+                logger.info("Overload variable: " + variable);
             }
-            logger.info(String.format("variable: %s=%s", var, expand(pair.getValue())));
+            logger.info(String.format("variable: %s=%s", variable, expand(pair.getValue())));
 
-            getVariableMap().put(var, expand(pair.getValue()));
+            getVariableMap().put(variable, expand(pair.getValue()));
         }
     }
 
@@ -923,9 +972,9 @@ public class Property {
 
     String expand(String value) {
         if (value.startsWith(VAR_CHAR)) {
-            for (String var : getVariableMap().keySet()) {
-                if (value.startsWith(var)) {
-                    return value.replace(var, getVariableMap().get(var));
+            for (String variable : getVariableMap().keySet()) {
+                if (value.startsWith(variable)) {
+                    return value.replace(variable, getVariableMap().get(variable));
                 }
             }
         } else if (value.startsWith("./")) {
@@ -939,7 +988,7 @@ public class Property {
         return getParent().concat(value.substring(1));
     }
 
-    void queryPlan(String str) {
+    static void queryPlan(String str) {
         switch (str) {
             case STD:
                 QuerySolver.QUERY_PLAN = Query.QP_DEFAULT;
@@ -995,7 +1044,7 @@ public class Property {
         try {
             Value pname = Value.valueOf(name);
             define(pname, value, g);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -1040,11 +1089,11 @@ public class Property {
      */
     void variable() {
         for (Pair pair : getValueListBasic(Value.LDSCRIPT_VARIABLE)) {
-            String var = pair.getKey().strip();
+            String variable = pair.getKey().strip();
             String val = pair.getValue().strip();
-            logger.info(String.format("ldscript variable: %s=%s", var, val));
+            logger.info(String.format("ldscript variable: %s=%s", variable, val));
             IDatatype dt = DatatypeMap.newValue(val);
-            Binding.setStaticVariable(var, dt);
+            Binding.setStaticVariable(variable, dt);
         }
     }
 
@@ -1111,7 +1160,7 @@ public class Property {
         for (String storageStr : storages.split(SEP)) {
 
             String[] storageLst = storageStr.split(",", 3);
-            storageList.add(List.of(storageLst).stream().map(str -> this.expand(str)).collect(Collectors.toList()));
+            storageList.add(List.of(storageLst).stream().map(this::expand).collect(Collectors.toList()));
         }
         return storageList;
     }
@@ -1259,8 +1308,8 @@ public class Property {
                 protectEquals(stringValue(STORAGE_MODE), DB_ALL);
     }
 
-    static boolean protectEquals(String var, String val) {
-        return var != null && var.equals(val);
+    static boolean protectEquals(String variable, String value) {
+        return variable != null && variable.equals(value);
     }
 
 }
