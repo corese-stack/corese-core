@@ -11,7 +11,7 @@
 <!-- Node0 -->
 <g id="Node000000" class="node">
 <title>Node0</title>
-<g id="a_Node000000"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1Hash.html" target="_top" xlink:title="Use cryptographic library from saphir2 project.">
+<g id="a_Node000000"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1Hash.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="41,-19 0,-19 0,0 41,0 41,-19"/>
 <text text-anchor="middle" x="20.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">Hash</text>
 </a>
