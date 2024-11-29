@@ -74,9 +74,6 @@ public class Graph extends GraphObject implements
         fr.inria.corese.core.sparql.api.Graph,
         Graphable, TripleStore {
 
-    static {
-        Corese.init();
-    }
     private static Logger logger = LoggerFactory.getLogger(Graph.class);
     private static final String SHAPE_CONFORM = NSManager.SHAPE + "conforms";
     public static final String SYSTEM = ExpType.KGRAM + "system";
