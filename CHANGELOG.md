@@ -4,10 +4,10 @@
 
 ### Added
 - Code cleanup and refactoring to improve readability and maintainability.
-  - Reworking of the Property class as an proper singleton
+  - Reworking of the Property class as a proper singleton
   - HTTPHeaders class created to centralize repeated definitions of HTTP headers.
   
-- Elasticsearch integration:
+- Elasticsearch's integration:
   - EdgeChangeListener class created to listen to edge changes and deletion.
   
 ### Fixed

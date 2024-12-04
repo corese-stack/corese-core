@@ -269,7 +269,6 @@ public class UpdateProcess {
         if(delete.isEmpty() && insert.isEmpty()) {
             return;
         }
-        logger.info("Update delete:{} triples, insert:{} triples" , delete, insert);
         vis.update(q, delete, insert);
     }
     
