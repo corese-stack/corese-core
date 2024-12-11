@@ -10,5 +10,6 @@ var searchData=
   ['header_7',['Header',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Header.html',1,'fr::inria::corese::core::sparql::compiler::java']]],
   ['heuristicsbasedestimation_8',['HeuristicsBasedEstimation',['../classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1HeuristicsBasedEstimation.html',1,'fr::inria::corese::core::kgram::sorter::impl::qpv1']]],
   ['hierarchy_9',['Hierarchy',['../interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Hierarchy.html',1,'fr::inria::corese::core::kgram::api::query']]],
-  ['htmlformat_10',['HTMLFormat',['../classfr_1_1inria_1_1corese_1_1core_1_1print_1_1HTMLFormat.html',1,'fr::inria::corese::core::print']]]
+  ['htmlformat_10',['HTMLFormat',['../classfr_1_1inria_1_1corese_1_1core_1_1print_1_1HTMLFormat.html',1,'fr::inria::corese::core::print']]],
+  ['httpheaders_11',['HTTPHeaders',['../interfacefr_1_1inria_1_1corese_1_1core_1_1util_1_1HTTPHeaders.html',1,'fr::inria::corese::core::util']]]
 ];

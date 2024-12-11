@@ -16,5 +16,6 @@ var searchData=
   ['hex_13',['HEX',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html#ab7924171ea30aee388112fcccb9f352a',1,'fr::inria::corese::core::sparql::triple::javacc1::SparqlCoreseConstants']]],
   ['hierarchy_14',['Hierarchy',['../interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Hierarchy.html',1,'fr::inria::corese::core::kgram::api::query']]],
   ['hours_15',['HOURS',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html#ae416ca9e8c5507e9506b77d251352fc7',1,'fr::inria::corese::core::sparql::triple::javacc1::SparqlCoreseConstants']]],
-  ['htmlformat_16',['HTMLFormat',['../classfr_1_1inria_1_1corese_1_1core_1_1print_1_1HTMLFormat.html',1,'fr::inria::corese::core::print']]]
+  ['htmlformat_16',['HTMLFormat',['../classfr_1_1inria_1_1corese_1_1core_1_1print_1_1HTMLFormat.html',1,'fr::inria::corese::core::print']]],
+  ['httpheaders_17',['HTTPHeaders',['../interfacefr_1_1inria_1_1corese_1_1core_1_1util_1_1HTTPHeaders.html',1,'fr::inria::corese::core::util']]]
 ];

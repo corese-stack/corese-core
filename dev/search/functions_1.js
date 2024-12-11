@@ -2,7 +2,7 @@ var searchData=
 [
   ['backup_0',['backup',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1JavaCharStream.html#a081093776da7401835b9b6064a800ba0',1,'fr.inria.corese.core.sparql.triple.javacc1.JavaCharStream.backup()'],['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SimpleCharStream.html#a081093776da7401835b9b6064a800ba0',1,'fr.inria.corese.core.sparql.triple.javacc1.SimpleCharStream.backup()']]],
   ['basealgorithm_1',['BaseAlgorithm',['../classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1BaseAlgorithm.html#a834fd75d1c4c774a9d2a9688173f215e',1,'fr::inria::corese::core::approximate::algorithm::impl::BaseAlgorithm']]],
-  ['basicdisplay_2',['basicDisplay',['../classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Property.html#ae99f277b75a0a04703dc736624ecf1ab',1,'fr::inria::corese::core::util::Property']]],
+  ['basicdisplay_2',['basicDisplay',['../classfr_1_1inria_1_1corese_1_1core_1_1util_1_1Property.html#a2a56ba3b2cdbbf6c34d830ba639fddd6',1,'fr::inria::corese::core::util::Property']]],
   ['basicgraphpattern_3',['BasicGraphPattern',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1BasicGraphPattern.html#a6804cdcb095baffe788a40735aed8145',1,'fr::inria::corese::core::sparql::triple::parser::BasicGraphPattern']]],
   ['basicmatch_4',['basicMatch',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html#aa4bb75b37de83440c547716a8dfabfc1',1,'fr::inria::corese::core::sparql::datatype::CoreseDatatype']]],
   ['basicquery_5',['basicQuery',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolver.html#a7d0caec4a5cd871046715a55ca0690ec',1,'fr::inria::corese::core::compiler::eval::QuerySolver']]],

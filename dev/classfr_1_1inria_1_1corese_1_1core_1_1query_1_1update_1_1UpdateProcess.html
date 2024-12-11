@@ -90,17 +90,14 @@ Public Member Functions</h2></td></tr>
 Mappings&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (Query q, Mapping m, Binding bind)  throws EngineException </td></tr>
 <tr class="memdesc:a3c98a36285127f7a34648721dbc16127"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process an update sparql query There may be a list of queries return the Mappings of the last update ... <br /></td></tr>
 <tr class="separator:a3c98a36285127f7a34648721dbc16127"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1ed3db5ffd42df3fdf5c2efb42ac004" id="r_aa1ed3db5ffd42df3fdf5c2efb42ac004"><td class="memItemLeft" align="right" valign="top"><a id="aa1ed3db5ffd42df3fdf5c2efb42ac004" name="aa1ed3db5ffd42df3fdf5c2efb42ac004"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setDebug</b> (boolean b)</td></tr>
-<tr class="separator:aa1ed3db5ffd42df3fdf5c2efb42ac004"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a081e74dba9668769c2833413403c4511" id="r_a081e74dba9668769c2833413403c4511"><td class="memItemLeft" align="right" valign="top"><a id="a081e74dba9668769c2833413403c4511" name="a081e74dba9668769c2833413403c4511"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>visitor</b> (ProcessVisitor vis, Query q, Mappings map)</td></tr>
 <tr class="memdesc:a081e74dba9668769c2833413403c4511"><td class="mdescLeft">&#160;</td><td class="mdescRight">@update function To get delete &amp; insert list requires q.isDetail() = true It is done when there is a local @update function if @update function is, annotate query with: @event @update <br /></td></tr>
 <tr class="separator:a081e74dba9668769c2833413403c4511"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76a408d93369ddb825fdbd40b90d0560" id="r_a76a408d93369ddb825fdbd40b90d0560"><td class="memItemLeft" align="right" valign="top">ProcessVisitor&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1UpdateProcess.html#a76a408d93369ddb825fdbd40b90d0560">getVisitor</a> ()</td></tr>
-<tr class="separator:a76a408d93369ddb825fdbd40b90d0560"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27367244583e36d4661383c8639dd31e" id="r_a27367244583e36d4661383c8639dd31e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1UpdateProcess.html#a27367244583e36d4661383c8639dd31e">setVisitor</a> (ProcessVisitor visitor)</td></tr>
-<tr class="separator:a27367244583e36d4661383c8639dd31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa278812feb1482b88b961cc94039c561" id="r_aa278812feb1482b88b961cc94039c561"><td class="memItemLeft" align="right" valign="top">List&lt; ProcessVisitor &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1UpdateProcess.html#aa278812feb1482b88b961cc94039c561">getVisitorList</a> ()</td></tr>
+<tr class="separator:aa278812feb1482b88b961cc94039c561"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a593e292622ae54ceea3837f06e9c200c" id="r_a593e292622ae54ceea3837f06e9c200c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1UpdateProcess.html#a593e292622ae54ceea3837f06e9c200c">addVisitor</a> (ProcessVisitor <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1UpdateProcess.html#a081e74dba9668769c2833413403c4511">visitor</a>)</td></tr>
+<tr class="separator:a593e292622ae54ceea3837f06e9c200c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49ad7c8814c7ee3f1210594f43020b91" id="r_a49ad7c8814c7ee3f1210594f43020b91"><td class="memItemLeft" align="right" valign="top"><a id="a49ad7c8814c7ee3f1210594f43020b91" name="a49ad7c8814c7ee3f1210594f43020b91"></a>
 <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html">QueryProcess</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getQueryProcess</b> ()</td></tr>
 <tr class="separator:a49ad7c8814c7ee3f1210594f43020b91"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,32 +128,14 @@ static <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update
 <p>Called by QueryProcess.query() to handle update query Compile update query into specific AST which is executed by ManagerImpl</p>
 <dl class="section author"><dt>Author</dt><dd>Olivier Corby, Edelweiss, INRIA 2011 </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a76a408d93369ddb825fdbd40b90d0560" name="a76a408d93369ddb825fdbd40b90d0560"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76a408d93369ddb825fdbd40b90d0560">&#9670;&#160;</a></span>getVisitor()</h2>
+<a id="a593e292622ae54ceea3837f06e9c200c" name="a593e292622ae54ceea3837f06e9c200c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a593e292622ae54ceea3837f06e9c200c">&#9670;&#160;</a></span>addVisitor()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ProcessVisitor getVisitor </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>the visitor </dd></dl>
-
-</div>
-</div>
-<a id="a27367244583e36d4661383c8639dd31e" name="a27367244583e36d4661383c8639dd31e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27367244583e36d4661383c8639dd31e">&#9670;&#160;</a></span>setVisitor()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void setVisitor </td>
+          <td class="memname">void addVisitor </td>
           <td>(</td>
           <td class="paramtype">ProcessVisitor&#160;</td>
           <td class="paramname"><em>visitor</em></td><td>)</td>
@@ -170,6 +149,24 @@ static <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="aa278812feb1482b88b961cc94039c561" name="aa278812feb1482b88b961cc94039c561"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa278812feb1482b88b961cc94039c561">&#9670;&#160;</a></span>getVisitorList()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">List&lt; ProcessVisitor &gt; getVisitorList </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the visitor </dd></dl>
 
 </div>
 </div>

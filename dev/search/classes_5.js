@@ -10,11 +10,12 @@ var searchData=
   ['focus_7',['Focus',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Focus.html',1,'fr::inria::corese::core::sparql::triple::function::extension']]],
   ['focusnode_8',['FocusNode',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1template_1_1FocusNode.html',1,'fr::inria::corese::core::sparql::triple::function::template']]],
   ['forloop_9',['ForLoop',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1ForLoop.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
-  ['funcall_10',['Funcall',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Funcall.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
-  ['function_11',['Function',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Function.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
-  ['functioncompiler_12',['FunctionCompiler',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1FunctionCompiler.html',1,'fr::inria::corese::core::compiler::parser']]],
-  ['functiondefined_13',['FunctionDefined',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1FunctionDefined.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
-  ['functionevaluator_14',['FunctionEvaluator',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1FunctionEvaluator.html',1,'fr::inria::corese::core::sparql::triple::function::core']]],
-  ['functionprocess_15',['FunctionProcess',['../classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1FunctionProcess.html',1,'fr::inria::corese::core::workflow']]],
-  ['funmap_16',['FunMap',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTExtension_1_1FunMap.html',1,'fr::inria::corese::core::sparql::triple::parser::ASTExtension']]]
+  ['format_10',['format',['../enumfr_1_1inria_1_1corese_1_1core_1_1api_1_1Loader_1_1format.html',1,'Loader.format'],['../enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1ResultFormatDef_1_1format.html',1,'ResultFormatDef.format']]],
+  ['funcall_11',['Funcall',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Funcall.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
+  ['function_12',['Function',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1Function.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
+  ['functioncompiler_13',['FunctionCompiler',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1FunctionCompiler.html',1,'fr::inria::corese::core::compiler::parser']]],
+  ['functiondefined_14',['FunctionDefined',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1FunctionDefined.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
+  ['functionevaluator_15',['FunctionEvaluator',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1FunctionEvaluator.html',1,'fr::inria::corese::core::sparql::triple::function::core']]],
+  ['functionprocess_16',['FunctionProcess',['../classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1FunctionProcess.html',1,'fr::inria::corese::core::workflow']]],
+  ['funmap_17',['FunMap',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTExtension_1_1FunMap.html',1,'fr::inria::corese::core::sparql::triple::parser::ASTExtension']]]
 ];

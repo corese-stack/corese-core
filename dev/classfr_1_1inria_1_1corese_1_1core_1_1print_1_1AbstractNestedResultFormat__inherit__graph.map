@@ -1,0 +1,9 @@
+<map id="AbstractNestedResultFormat" name="AbstractNestedResultFormat">
+<area shape="rect" id="Node000001" title="Mother class for the query result formats such as XML and JSON." alt="" coords="12,79,221,104"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1JSONFormat.html" title="SPARQL JSON Result Format for KGRAM Mappings." alt="" coords="5,152,105,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="100,116,67,154,63,150,96,113"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1XMLFormat.html" title="SPARQL XML Result Format for KGRAM Mappings." alt="" coords="130,152,226,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="138,113,170,150,166,154,134,116"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1QueryResultFormat.html" title="Root class for Result Format." alt="" coords="43,5,191,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,44,119,79,114,79,114,44"/>
+</map>

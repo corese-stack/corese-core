@@ -1,5 +1,5 @@
 <map id="Parameter" name="Parameter">
-<area shape="rect" id="Node000001" title="Manage Turtle Property file to tune corese behavior Authorized namespace for @import and LinkedFuncti..." alt="" coords="1090,131,1179,156"/>
+<area shape="rect" id="Node000001" title="Manage Turtle Property file to tune corese behavior, Authorized namespace for @import and LinkedFunct..." alt="" coords="1090,131,1179,156"/>
 <area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1Graph.html" title="Graph Manager Edges are stored in an index An index is a table: predicate &#45;&gt; List&lt;Edge&gt; Edge List are..." alt="" coords="886,176,947,201"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="960,177,1089,150,1090,155,961,182"/>
 <area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1Workflow.html" title="Manage a set of inference engines Loop until no inference is performed It is automatically called whe..." alt="" coords="1093,40,1176,65"/>
