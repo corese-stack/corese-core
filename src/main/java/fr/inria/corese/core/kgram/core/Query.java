@@ -82,17 +82,17 @@ public class Query extends Exp implements Graphable {
     private int edgeIndex = -1;
     List<Node> from, named, selectNode;
     // all nodes (on demand)
-    List<Node> 
-            // std pattern but minus/exists (without select)
-            patternNodes,
-            // std pattern but minus/exists select nodes  
-            patternSelectNodes,
-            // minus/exists (without select)
-            queryNodes,
-            // minus/exists select nodes  
-            querySelectNodes,
-            // final query bindings nodes
-            bindingNodes;
+
+    // std pattern but minus/exists (without select)
+    List<Node> patternNodes;
+    // std pattern but minus/exists select nodes
+    List<Node> patternSelectNodes;
+    // minus/exists (without select)
+    List<Node> queryNodes;
+    // minus/exists select nodes
+    List<Node> querySelectNodes;
+    // final query bindings nodes
+    List<Node> bindingNodes;
     private List<Node> constructNodes;
     List<Node> relaxEdges;
     List<Exp> selectExp, 
@@ -180,7 +180,7 @@ public class Query extends Exp implements Graphable {
             // join service send Mappings from first pattern to service
             isMap = true,
             // construct where as a rule
-            isRule = false, isDetail = false;
+            isRule = false, isDetail = true;
     private boolean algebra = false;
     private boolean isMatch = false;
     private boolean initMode = false;

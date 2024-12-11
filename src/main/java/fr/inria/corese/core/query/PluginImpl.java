@@ -8,6 +8,9 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
+import fr.inria.corese.core.util.GraphListen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -37,7 +40,6 @@ import fr.inria.corese.core.shacl.Shacl;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.transform.TemplateVisitor;
 import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.core.util.GraphListen;
 import fr.inria.corese.core.util.MappingsGraph;
 import fr.inria.corese.core.util.SPINProcess;
 import fr.inria.corese.core.kgram.api.core.Edge;
@@ -144,6 +146,7 @@ public class PluginImpl
 
     @Override
     public void setMode(int mode) {
+        // TODO document why this method is empty
     }
 
     @Override
@@ -249,7 +252,7 @@ public class PluginImpl
 
     // function xt:xml xt:json xt:rdf
     @Override
-    public IDatatype format(Mappings map, int format) {
+    public IDatatype format(Mappings map, ResultFormatDef.format format) {
         ResultFormat ft = ResultFormat.create(map, format);
         return DatatypeMap.newInstance(ft.toString());
     }
@@ -381,7 +384,7 @@ public class PluginImpl
         if (memory.getQueryEdges() == null) {
             return getValue(0);
         }
-        // Hashtable<Node, Boolean> visit = new Hashtable<>();
+
         TreeNode tree = g.treeNode();
         Distance distance = man == null ? g.setClassDistance() : man.getCreateMetadataManager().getCreateDistance();
 
@@ -400,10 +403,8 @@ public class PluginImpl
                     for (int i = 0; i < edge.nbNode(); i++) {
                         // count nodes only once
                         Node n = edge.getNode(i);
-                        // if (!visit.containsKey(n)) {
                         if (!tree.containsKey(n.getDatatypeValue())) {
                             count += 1;
-                            // visit.put(n, true);
                             tree.put(n.getDatatypeValue(), n);
                         }
                     }
@@ -521,13 +522,12 @@ public class PluginImpl
                     ((requiredFormat == null) ? "" : requiredFormat)));
             logger.error(ex.getMessage());
         }
-        IDatatype res = DatatypeMap.createObject(g);
-        return res;
+        return DatatypeMap.createObject(g);
     }
 
     // st:turtle st:rdfxml st:json
-    int getFormat(IDatatype dt) {
-        return (dt == null) ? Load.UNDEF_FORMAT : LoadFormat.getDTFormat(dt.getLabel());
+    Loader.format getFormat(IDatatype dt) {
+        return (dt == null) ? Loader.format.UNDEF_FORMAT : LoadFormat.getDTFormat(dt.getLabel());
     }
 
     // function xt:write
@@ -633,7 +633,7 @@ public class PluginImpl
         try {
             Load ld = Load.create(g);
             ld.setLevel(level);
-            ld.parse(uri, Load.RULE_FORMAT);
+            ld.parse(uri, Loader.format.RULE_FORMAT);
             return ld.getRuleEngine();
         } catch (LoadException ex) {
             throw ex.getCreateEngineException();
@@ -898,7 +898,6 @@ public class PluginImpl
                 }
                 break;
             case VERBOSE:
-                getEventManager(p).setVerbose(dt2.booleanValue());
                 break;
             case DEBUG:
                 switch (dt2.getLabel()) {
@@ -917,27 +916,21 @@ public class PluginImpl
                 break;
 
             case EVENT_HIGH:
-                getEventManager(p).setVerbose(dt2.booleanValue());
-                getGraph(p).setDebugMode(dt2.booleanValue());
                 break;
             case EVENT_LOW:
-                getEventManager(p).setVerbose(dt2.booleanValue());
                 getEventManager(p).hide(Event.Insert);
                 getEventManager(p).hide(Event.Construct);
-                getGraph(p).setDebugMode(dt2.booleanValue());
                 break;
             case METHOD:
                 getEventManager(p).setMethod(dt2.booleanValue());
                 break;
             case SHOW:
-                getEventManager(p).setVerbose(true);
                 Event e = Event.valueOf(dt2.stringValue().substring(NSManager.EXT.length()));
                 if (e != null) {
                     getEventManager(p).show(e);
                 }
                 break;
             case HIDE:
-                getEventManager(p).setVerbose(true);
                 e = Event.valueOf(dt2.stringValue().substring(NSManager.EXT.length()));
                 if (e != null) {
                     getEventManager(p).hide(e);
@@ -956,20 +949,16 @@ public class PluginImpl
             case RDF_STAR:
                 if (dt2.getLabel().equals(VARIABLE)) {
                     ASTQuery.REFERENCE_QUERY_BNODE = !ASTQuery.REFERENCE_QUERY_BNODE;
-                    System.out.println("rdf* query variable: " + ASTQuery.REFERENCE_QUERY_BNODE);
                 } else if (dt2.getLabel().equals(URI)) {
                     ASTQuery.REFERENCE_DEFINITION_BNODE = !ASTQuery.REFERENCE_DEFINITION_BNODE;
-                    System.out.println("rdf* id uri: " + ASTQuery.REFERENCE_DEFINITION_BNODE);
                 }
                 break;
 
             case TYPECHECK:
                 Function.typecheck = dt2.booleanValue();
-                System.out.println("typecheck: " + Function.typecheck);
                 break;
             case RDF_TYPECHECK:
                 Function.rdftypecheck = dt2.booleanValue();
-                System.out.println("rdftypecheck: " + Function.rdftypecheck);
                 break;
 
         }
@@ -1042,7 +1031,6 @@ public class PluginImpl
 
     IDatatype kgram(Environment env, Producer p, String query, Mapping m) throws EngineException {
         Graph g = getGraph(p);
-        // QueryProcess exec = QueryProcess.create(g, true);
         QueryProcess exec = QueryProcess.copy(p, true);
         // sub query process, if transaction was needed, it is already done
         exec.setProcessTransaction(false);
@@ -1061,10 +1049,6 @@ public class PluginImpl
             // outer query processing inherits it
             env.getBind().subShare(exec.getEnvironmentBinding());
 
-            if (map.getQuery().isDebug()) {
-                System.out.println("result:");
-                System.out.println(map);
-            }
             if (map.getGraph() == null) {
                 // draft: service evaluation detail report
                 env.setReport(map.getReport());

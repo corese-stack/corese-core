@@ -218,6 +218,7 @@ public class NSManager extends ASTObject {
      *
      * @deprecated
      */
+    @Deprecated
     public static NSManager create(String defaultNamespaces) {
         NSManager nsm = new NSManager(defaultNamespaces);
         nsm.init();

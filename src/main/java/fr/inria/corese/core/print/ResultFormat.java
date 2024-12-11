@@ -32,10 +32,9 @@ public class ResultFormat implements ResultFormatDef {
 
     public static final String SPARQL_RESULTS_XML = "application/sparql-results+xml";
     public static final String SPARQL_RESULTS_JSON = "application/sparql-results+json";
-    public static final String SPARQL_RESULTS_CSV = "text/csv"; // application/sparql-results+csv";
-    public static final String SPARQL_RESULTS_TSV = "text/tab-separated-values"; // application/sparql-results+tsv";
+    public static final String SPARQL_RESULTS_CSV = "text/csv";
+    public static final String SPARQL_RESULTS_TSV = "text/tab-separated-values";
     public static final String SPARQL_RESULTS_MD = "text/markdown";
-    public static final String SPARQL_RESULTS_HTML = "application/n-quads";
 
     static final String HEADER = "<html>\n"
             + "<head>\n"
@@ -62,27 +61,29 @@ public class ResultFormat implements ResultFormatDef {
     public static final String N_TRIPLES = "application/n-triples";
     public static final String N_QUADS = "application/n-quads";
 
-    public static int DEFAULT_SELECT_FORMAT = XML_FORMAT;
-    public static int DEFAULT_CONSTRUCT_FORMAT = RDF_XML_FORMAT;
+    public static ResultFormatDef.format DEFAULT_SELECT_FORMAT = ResultFormatDef.format.XML_FORMAT;
+    public static ResultFormatDef.format DEFAULT_CONSTRUCT_FORMAT = ResultFormatDef.format.RDF_XML_FORMAT;
 
     private Mappings map;
     private Graph graph;
     private Binding bind;
     private Context context;
     private NSManager nsmanager;
-    int type = UNDEF_FORMAT;
-    private int transformType = UNDEF_FORMAT;
-    private int construct_format = DEFAULT_CONSTRUCT_FORMAT;
-    private int select_format = DEFAULT_SELECT_FORMAT;
+    ResultFormatDef.format type = ResultFormatDef.format.UNDEF_FORMAT;
+    private ResultFormatDef.format transformType = ResultFormatDef.format.UNDEF_FORMAT;
+    private ResultFormatDef.format construct_format = DEFAULT_CONSTRUCT_FORMAT;
+    private ResultFormatDef.format select_format = DEFAULT_SELECT_FORMAT;
     private long nbResult = Long.MAX_VALUE;
     private int nbTriple = Integer.MAX_VALUE;
-    private String contentType;
     private boolean selectAll = false;
     private boolean transformer;
     private String transformation;
+    private String contentType;
 
-    static HashMap<String, Integer> table, format;
-    static HashMap<Integer, String> content;
+
+    static HashMap<String, ResultFormatDef.format> table;
+    static HashMap<String, ResultFormatDef.format> format;
+    static HashMap<ResultFormatDef.format, String> content;
 
     static {
         init();
@@ -90,14 +91,14 @@ public class ResultFormat implements ResultFormatDef {
     }
 
     static void init() {
-        table = new HashMap();
-        table.put(Metadata.DISPLAY_TURTLE, TURTLE_FORMAT);
-        table.put(Metadata.DISPLAY_RDF_XML, RDF_XML_FORMAT);
-        table.put(Metadata.DISPLAY_JSON_LD, JSONLD_FORMAT);
+        table = new HashMap<>();
+        table.put(Metadata.DISPLAY_TURTLE, ResultFormatDef.format.TURTLE_FORMAT);
+        table.put(Metadata.DISPLAY_RDF_XML, ResultFormatDef.format.RDF_XML_FORMAT);
+        table.put(Metadata.DISPLAY_JSON_LD, ResultFormatDef.format.JSONLD_FORMAT);
 
-        table.put(Metadata.DISPLAY_RDF, RDF_FORMAT);
-        table.put(Metadata.DISPLAY_XML, XML_FORMAT);
-        table.put(Metadata.DISPLAY_JSON, JSON_FORMAT);
+        table.put(Metadata.DISPLAY_RDF, ResultFormatDef.format.RDF_FORMAT);
+        table.put(Metadata.DISPLAY_XML, ResultFormatDef.format.XML_FORMAT);
+        table.put(Metadata.DISPLAY_JSON, ResultFormatDef.format.JSON_FORMAT);
 
     }
 
@@ -106,50 +107,49 @@ public class ResultFormat implements ResultFormatDef {
         content = new HashMap<>();
 
         // use case: template without format
-        defContent(TEXT, TEXT_FORMAT);
+        defContent(TEXT, ResultFormatDef.format.TEXT_FORMAT);
 
         // Mappings
-        defContent(SPARQL_RESULTS_JSON, JSON_FORMAT);
-        defContent(SPARQL_RESULTS_XML, XML_FORMAT);
-        defContent(SPARQL_RESULTS_CSV, CSV_FORMAT);
-        defContent(SPARQL_RESULTS_TSV, TSV_FORMAT);
-        defContent(SPARQL_RESULTS_MD, MARKDOWN_FORMAT);
+        defContent(SPARQL_RESULTS_JSON, ResultFormatDef.format.JSON_FORMAT);
+        defContent(SPARQL_RESULTS_XML, ResultFormatDef.format.XML_FORMAT);
+        defContent(SPARQL_RESULTS_CSV, ResultFormatDef.format.CSV_FORMAT);
+        defContent(SPARQL_RESULTS_TSV, ResultFormatDef.format.TSV_FORMAT);
+        defContent(SPARQL_RESULTS_MD, ResultFormatDef.format.MARKDOWN_FORMAT);
 
         // Graph
-        defContent(RDF_XML, RDF_XML_FORMAT);
-        defContent(TURTLE_TEXT, TURTLE_FORMAT);
-        defContent(TRIG, TRIG_FORMAT);
-        defContent(JSON_LD, JSONLD_FORMAT);
-        defContent(N_TRIPLES, NTRIPLES_FORMAT);
-        defContent(N_QUADS, NQUADS_FORMAT);
-        // defContent(JSON, JSON_LD_FORMAT);
+        defContent(RDF_XML, ResultFormatDef.format.RDF_XML_FORMAT);
+        defContent(TURTLE_TEXT, ResultFormatDef.format.TURTLE_FORMAT);
+        defContent(TRIG, ResultFormatDef.format.TRIG_FORMAT);
+        defContent(JSON_LD, ResultFormatDef.format.JSONLD_FORMAT);
+        defContent(N_TRIPLES, ResultFormatDef.format.NTRIPLES_FORMAT);
+        defContent(N_QUADS, ResultFormatDef.format.NQUADS_FORMAT);
 
-        format.put(TRIG_TEXT, TRIG_FORMAT);
-        format.put(NT_TEXT, TURTLE_FORMAT);
-        format.put(TURTLE, TURTLE_FORMAT);
-        format.put(XML, XML_FORMAT);
-        format.put(HTML, HTML_FORMAT);
+        format.put(TRIG_TEXT, ResultFormatDef.format.TRIG_FORMAT);
+        format.put(NT_TEXT, ResultFormatDef.format.TURTLE_FORMAT);
+        format.put(TURTLE, ResultFormatDef.format.TURTLE_FORMAT);
+        format.put(XML, ResultFormatDef.format.XML_FORMAT);
+        format.put(HTML, ResultFormatDef.format.HTML_FORMAT);
 
         // shortcut for HTTP parameter format=
-        format.put("text", TEXT_FORMAT);
-        format.put("html", HTML_FORMAT);
+        format.put("text", ResultFormatDef.format.TEXT_FORMAT);
+        format.put("html", ResultFormatDef.format.HTML_FORMAT);
 
-        format.put("json", JSON_FORMAT);
-        format.put("xml", XML_FORMAT);
-        format.put("csv", CSV_FORMAT);
-        format.put("tsv", TSV_FORMAT);
-        format.put("markdown", MARKDOWN_FORMAT);
+        format.put("json", ResultFormatDef.format.JSON_FORMAT);
+        format.put("xml", ResultFormatDef.format.XML_FORMAT);
+        format.put("csv", ResultFormatDef.format.CSV_FORMAT);
+        format.put("tsv", ResultFormatDef.format.TSV_FORMAT);
+        format.put("markdown", ResultFormatDef.format.MARKDOWN_FORMAT);
 
-        format.put("jsonld", JSONLD_FORMAT);
-        format.put("rdf", TURTLE_FORMAT);
-        format.put("turtle", TURTLE_FORMAT);
-        format.put("trig", TRIG_FORMAT);
-        format.put("rdfxml", RDF_XML_FORMAT);
-        format.put("nt", NTRIPLES_FORMAT);
-        format.put("nq", NQUADS_FORMAT);
+        format.put("jsonld", ResultFormatDef.format.JSONLD_FORMAT);
+        format.put("rdf", ResultFormatDef.format.TURTLE_FORMAT);
+        format.put("turtle", ResultFormatDef.format.TURTLE_FORMAT);
+        format.put("trig", ResultFormatDef.format.TRIG_FORMAT);
+        format.put("rdfxml", ResultFormatDef.format.RDF_XML_FORMAT);
+        format.put("nt", ResultFormatDef.format.NTRIPLES_FORMAT);
+        format.put("nq", ResultFormatDef.format.NQUADS_FORMAT);
     }
 
-    static void defContent(String f, int t) {
+    static void defContent(String f, ResultFormatDef.format t) {
         format.put(f, t);
         content.put(t, f);
     }
@@ -162,29 +162,29 @@ public class ResultFormat implements ResultFormatDef {
         graph = g;
     }
 
-    ResultFormat(Mappings m, int type) {
+    ResultFormat(Mappings m, ResultFormatDef.format type) {
         this(m);
         this.type = type;
     }
 
-    ResultFormat(Mappings m, int sel, int cons) {
+    ResultFormat(Mappings m, ResultFormatDef.format sel, ResultFormatDef.format cons) {
         this(m);
         this.select_format = sel;
         this.construct_format = cons;
     }
 
-    ResultFormat(Graph g, int type) {
+    ResultFormat(Graph g, ResultFormatDef.format type) {
         this(g);
         this.type = type;
     }
     
-    ResultFormat(Graph g, NSManager nsm, int type) {
+    ResultFormat(Graph g, NSManager nsm, ResultFormatDef.format type) {
         this(g);
         setNsmanager(nsm);
         this.type = type;
     }
 
-    static public ResultFormat create(Mappings m) {
+    public static ResultFormat create(Mappings m) {
         return new ResultFormat(m, type(m));
     }
 
@@ -192,16 +192,16 @@ public class ResultFormat implements ResultFormatDef {
      * format: application/sparql-results+xml
      * format may be null
      */
-    static public ResultFormat create(Mappings m, String format) {
+    public static ResultFormat create(Mappings m, String format) {
         String myFormat = tuneFormat(m, format);
         if (myFormat == null) {
             return create(m);
         }
-        int type = getType(myFormat);
+        ResultFormatDef.format type = getType(myFormat);
         return new ResultFormat(m, type);
     }
 
-    static public ResultFormat create(Mappings m, String format, String trans) {
+    public static ResultFormat create(Mappings m, String format, String trans) {
         ResultFormat rf = createFromTrans(m, trans);
         if (rf != null) {
             return rf;
@@ -209,7 +209,7 @@ public class ResultFormat implements ResultFormatDef {
         return create(m, format).transform(trans);
     }
 
-    static public ResultFormat create(Mappings m, int type, String trans) {
+    public static ResultFormat create(Mappings m, ResultFormatDef.format type, String trans) {
         ResultFormat rf = createFromTrans(m, trans);
         if (rf != null) {
             // remember the type in case it is html asked by bowser
@@ -225,17 +225,15 @@ public class ResultFormat implements ResultFormatDef {
         }
         switch (NSManager.nsm().toNamespace(trans)) {
             case Transformer.XML:
-                return create(m, ResultFormat.XML_FORMAT);
+                return create(m, ResultFormatDef.format.XML_FORMAT);
             case Transformer.JSON:
-                return create(m, ResultFormat.JSON_FORMAT);
+                return create(m, ResultFormatDef.format.JSON_FORMAT);
             case Transformer.JSON_LD:
-                return create(m, ResultFormat.JSONLD_FORMAT);
+                return create(m, ResultFormatDef.format.JSONLD_FORMAT);
             case Transformer.RDF:
-                return create(m, ResultFormat.RDF_FORMAT);
+                return create(m, ResultFormatDef.format.RDF_FORMAT);
             case Transformer.RDFXML:
-                return create(m, ResultFormat.RDF_XML_FORMAT);
-            // case Transformer.TURTLE:
-            // return create(m, ResultFormat.TURTLE_FORMAT);
+                return create(m, ResultFormatDef.format.RDF_XML_FORMAT);
             default:
                 return null;
         }
@@ -263,23 +261,19 @@ public class ResultFormat implements ResultFormatDef {
     }
 
     // in case where type = text
-    static int defaultType(Mappings map) {
-        return map.getGraph() == null ? DEFAULT_SELECT_FORMAT : TURTLE_FORMAT;
-    }
-
-    static String defaultFormat(Mappings map) {
-        return getFormat(defaultType(map));
+    static ResultFormatDef.format defaultType(Mappings map) {
+        return map.getGraph() == null ? DEFAULT_SELECT_FORMAT : ResultFormatDef.format.TURTLE_FORMAT;
     }
 
     static public ResultFormat format(Mappings m) {
-        return new ResultFormat(m, DEFAULT_SELECT_FORMAT, TURTLE_FORMAT);
+        return new ResultFormat(m, DEFAULT_SELECT_FORMAT, ResultFormatDef.format.TURTLE_FORMAT);
     }
 
-    static public ResultFormat create(Mappings m, int type) {
+    static public ResultFormat create(Mappings m, ResultFormatDef.format type) {
         return new ResultFormat(m, type);
     }
 
-    static public ResultFormat create(Mappings m, int sel, int cons) {
+    static public ResultFormat create(Mappings m, ResultFormatDef.format sel, ResultFormatDef.format cons) {
         return new ResultFormat(m, sel, cons);
     }
 
@@ -287,11 +281,11 @@ public class ResultFormat implements ResultFormatDef {
         return new ResultFormat(g);
     }
 
-    static public ResultFormat create(Graph g, int type) {
+    static public ResultFormat create(Graph g, ResultFormatDef.format type) {
         return new ResultFormat(g, type);
     }
     
-    static public ResultFormat create(Graph g, NSManager nsm, int type) {
+    static public ResultFormat create(Graph g, NSManager nsm, ResultFormatDef.format type) {
         return new ResultFormat(g, nsm, type);
     }
 
@@ -299,47 +293,39 @@ public class ResultFormat implements ResultFormatDef {
         return new ResultFormat(g, getSyntax(type));
     }
 
-    public static void setDefaultSelectFormat(int i) {
-        DEFAULT_SELECT_FORMAT = i;
-    }
-
-    public static void setDefaultConstructFormat(int i) {
-        DEFAULT_CONSTRUCT_FORMAT = i;
-    }
-
     // no type was given at creation
-    static int type(Mappings m) {
-        Integer type = UNDEF_FORMAT;
+    static ResultFormatDef.format type(Mappings m) {
+        ResultFormatDef.format type = ResultFormatDef.format.UNDEF_FORMAT;
         if (m.getQuery().isTemplate()) {
-            return TEXT_FORMAT;
+            return ResultFormatDef.format.TEXT_FORMAT;
         }
         ASTQuery ast = (ASTQuery) m.getAST();
         if (ast != null && ast.hasMetadata(Metadata.DISPLAY)) {
             String val = ast.getMetadata().getValue(Metadata.DISPLAY);
             type = table.get(val);
             if (type == null) {
-                type = UNDEF_FORMAT;
+                type = ResultFormatDef.format.UNDEF_FORMAT;
             }
         }
         return type;
     }
 
     // str = application/sparql-results+json OR json
-    public static int getFormat(String str) {
+    public static ResultFormatDef.format getFormat(String str) {
         if (str != null && format.containsKey(str)) {
             return format.get(str);
         }
         return DEFAULT_SELECT_FORMAT;
     }
 
-    public static int getFormatUndef(String str) {
+    public static ResultFormatDef.format getFormatUndef(String str) {
         if (str != null && format.containsKey(str)) {
             return format.get(str);
         }
-        return UNDEF_FORMAT;
+        return ResultFormatDef.format.UNDEF_FORMAT;
     }
 
-    public static String getFormat(int type) {
+    public static String getFormat(ResultFormatDef.format type) {
         String ft = content.get(type);
         if (ft == null) {
             return getFormat(DEFAULT_SELECT_FORMAT);
@@ -356,21 +342,21 @@ public class ResultFormat implements ResultFormatDef {
     // rdfxml -> application/rdf+xml
     public static String decodeLoadFormat(String ft) {
         if (format.containsKey(ft)) {
-            int type = format.get(ft);
+            ResultFormatDef.format type = format.get(ft);
             return content.get(type);
         }
         return null;
     }
 
     public static String decodeOrText(String ft) {
-        int type = getFormatUndef(ft);
-        if (type == UNDEF_FORMAT) {
+        ResultFormatDef.format type = getFormatUndef(ft);
+        if (type == ResultFormatDef.format.UNDEF_FORMAT) {
             return TEXT;
         }
         return getFormat(type);
     }
 
-    static int getType(String ft) {
+    static ResultFormatDef.format getType(String ft) {
         return getFormat(ft);
     }
 
@@ -396,17 +382,7 @@ public class ResultFormat implements ResultFormatDef {
         if (getBind() != null) {
             t.setBinding(getBind());
         }
-        String str = t.toString();
-        // if (isHTML()) {
-        // // transform is for display HTML in browser
-        // str = html(str);
-        // }
-        return str;
-    }
-
-    boolean isHTML() {
-        return ((type() == HTML_FORMAT || getTransformType() == HTML_FORMAT) &&
-                (getContext() == null || !getContext().hasValue(LINK)));
+        return t.toString();
     }
 
     public ResultFormat init(Dataset ds) {
@@ -433,11 +409,11 @@ public class ResultFormat implements ResultFormatDef {
         return graphToString(node);
     }
 
-    static int getSyntax(String syntax) {
+    static ResultFormatDef.format getSyntax(String syntax) {
         if (syntax.equals(Transformer.RDFXML)) {
-            return ResultFormat.RDF_XML_FORMAT;
+            return ResultFormatDef.format.RDF_XML_FORMAT;
         }
-        return ResultFormat.TURTLE_FORMAT;
+        return ResultFormatDef.format.TURTLE_FORMAT;
     }
 
     String graphToString() {
@@ -445,7 +421,7 @@ public class ResultFormat implements ResultFormatDef {
     }
 
     String graphToString(Node node) {
-        if (type() == UNDEF_FORMAT) {
+        if (type() == ResultFormatDef.format.UNDEF_FORMAT) {
             setType(getConstructFormat());
         }
         switch (type) {
@@ -469,7 +445,7 @@ public class ResultFormat implements ResultFormatDef {
                 // e.g. HTML
                 TripleFormat tf = TripleFormat.create(getGraph(), getNsmanager());
                 String str = tf.setNbTriple(getNbTriple()).toString(node);
-                if (type() == HTML_FORMAT) {
+                if (type() == ResultFormatDef.format.HTML_FORMAT) {
                     return html(str);
                 }
                 return str;
@@ -487,7 +463,7 @@ public class ResultFormat implements ResultFormatDef {
         } else if (q.hasPragma(Pragma.TEMPLATE) && getMappings().getGraph() != null) {
             return TemplateFormat.create(getMappings()).toString();
         } else {
-            if (type() == UNDEF_FORMAT) {
+            if (type() == ResultFormatDef.format.UNDEF_FORMAT) {
                 if (q.isConstruct()) {
                     setType(getConstructFormat());
                 } else {
@@ -499,7 +475,7 @@ public class ResultFormat implements ResultFormatDef {
         }
     }
 
-    boolean isGraphFormat(int type) {
+    boolean isGraphFormat(ResultFormatDef.format type) {
         switch (type) {
             case RDF_XML_FORMAT:
             case TURTLE_FORMAT:
@@ -509,7 +485,6 @@ public class ResultFormat implements ResultFormatDef {
             case NQUADS_FORMAT:
             case RDFC10_FORMAT:
             case RDFC10_SHA384_FORMAT:
-                // case RDF_FORMAT:
                 return true;
             default:
                 return false;
@@ -520,12 +495,12 @@ public class ResultFormat implements ResultFormatDef {
      * Tune the format
      */
     String process(Mappings map) {
-        int mytype = type();
+        ResultFormatDef.format mytype = type();
         if (isGraphFormat(mytype) && map.getGraph() == null) {
             // return Mappings as W3C RDF Graph Mappings
             // map.
             map.setGraph(MappingsGraph.create(map).getGraph());
-        } else if (mytype == TEXT_FORMAT || mytype == HTML_FORMAT) {
+        } else if (mytype == ResultFormatDef.format.TEXT_FORMAT || mytype == ResultFormatDef.format.HTML_FORMAT) {
             // Chose appropriate format
             // Content-Type remains the same, do not setType()
             mytype = defaultType(map);
@@ -533,14 +508,11 @@ public class ResultFormat implements ResultFormatDef {
 
         String res = processBasic(map, mytype);
 
-        if (type() == HTML_FORMAT) {
+        if ((type() == ResultFormatDef.format.HTML_FORMAT) || (getTransformType() == ResultFormatDef.format.HTML_FORMAT && (getContext() == null || !getContext().hasValue(LINK)))) {
             // browser need html
-            return html(res);
-        } else if (getTransformType() == HTML_FORMAT && (getContext() == null || !getContext().hasValue(LINK))) {
             // transform=st:xml and no mode=link : browser nee html
             return html(res);
         }
-        // System.out.println("result format: " + res);
         return res;
     }
 
@@ -548,7 +520,7 @@ public class ResultFormat implements ResultFormatDef {
      * Main function
      * map may contain a graph (construct OR W3C RDF graph format for Mappings)
      */
-    String processBasic(Mappings map, int type) {
+    String processBasic(Mappings map, ResultFormatDef.format type) {
         switch (type) {
             // map is graph
             case RDF_XML_FORMAT:
@@ -614,28 +586,28 @@ public class ResultFormat implements ResultFormatDef {
     /**
      * @return the construct_format
      */
-    public int getConstructFormat() {
+    public ResultFormatDef.format getConstructFormat() {
         return construct_format;
     }
 
     /**
      * @param construct_format the construct_format to set
      */
-    public void setConstructFormat(int construct_format) {
+    public void setConstructFormat(ResultFormatDef.format construct_format) {
         this.construct_format = construct_format;
     }
 
     /**
      * @return the select_format
      */
-    public int getSelectFormat() {
+    public ResultFormatDef.format getSelectFormat() {
         return select_format;
     }
 
     /**
      * @param select_format the select_format to set
      */
-    public void setSelectFormat(int select_format) {
+    public void setSelectFormat(ResultFormatDef.format select_format) {
         this.select_format = select_format;
     }
 
@@ -648,11 +620,11 @@ public class ResultFormat implements ResultFormatDef {
         return this;
     }
 
-    public int type() {
+    public ResultFormatDef.format type() {
         return type;
     }
 
-    int setType(int t) {
+    ResultFormatDef.format setType(ResultFormatDef.format t) {
         type = t;
         return t;
     }
@@ -770,11 +742,11 @@ public class ResultFormat implements ResultFormatDef {
         this.context = context;
     }
 
-    public int getTransformType() {
+    public ResultFormatDef.format getTransformType() {
         return transformType;
     }
 
-    public void setTransformType(int transformType) {
+    public void setTransformType(ResultFormatDef.format transformType) {
         this.transformType = transformType;
     }
 

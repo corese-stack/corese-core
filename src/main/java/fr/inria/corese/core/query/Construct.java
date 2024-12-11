@@ -42,7 +42,9 @@ public class Construct
     private static boolean allEntailment = false;
     static final String BLANK = "_:b_";
     static final String DOT = ".";
-    int count = 0, ruleIndex = 0, index = 0;
+    int count = 0;
+    int ruleIndex = 0;
+    int index = 0;
     String root;
     private Query query;
     private ASTQuery ast;
@@ -51,8 +53,7 @@ public class Construct
     List<Edge> lInsert, lDelete, globalDeleteList;
     private Dataset ds;
     private boolean detail = false;
-    boolean isDebug = false,
-            isDelete = false;
+    boolean isDelete = false;
     private boolean construct = false;
     private boolean isRule = false;
     private boolean isInsert = false;
@@ -110,10 +111,6 @@ public class Construct
         return create(q, g).setDelete(true);
     }
 
-//    public static Construct create(Query q, Dataset ds) {
-//        return new Construct(q, ds);
-//    }
-
     public void setDefaultGraph(Node n) {
         defaultGraph = n;
     }
@@ -150,14 +147,9 @@ public class Construct
     }
 
     public void setRule(Rule r, int n, Node prov) {
-        //setRule(true);
         rule = r;
         root = BLANK + n + DOT;
         setProvenance(prov);
-    }
-
-    public void setDebug(boolean b) {
-        isDebug = b;
     }
 
     public void setInsertList(List<Edge> l) {
@@ -270,11 +262,11 @@ public class Construct
             gNode = null;
         }
 
-        if (lInsert != null) {
-            map.setInsert(lInsert);
+        if (getInsertList() != null) {
+            map.setInsert(getInsertList());
         }
-        if (lDelete != null) {
-            map.setDelete(lDelete);
+        if (getDeleteList() != null) {
+            map.setDelete(getDeleteList());
         }
                 
         if (env != null) {
@@ -357,9 +349,6 @@ public class Construct
                             deleteList.add(edge);                                                        
                         }
                     } else { // insert/construt
-                        if (isDebug) {
-                            logger.debug("** Construct: " + edge);
-                        }
                         boolean accept = true;
                         if (AccessRight.isActive()&&getAccessRight() != null) {
                             accept = getAccessRight().setInsert(edge);
@@ -392,9 +381,7 @@ public class Construct
                                     // isBuffer() == true
                                     // store edges for RuleEngine process() cons.getInsertList()
                                     lInsert.add(edge);
-                                    for (Edge nestedEdge : insertEdgeList) {
-                                        lInsert.add(nestedEdge);
-                                    }
+                                    lInsert.addAll(insertEdgeList);
                                 }
 
                                 if (isInsert()) {
@@ -428,9 +415,6 @@ public class Construct
     // @todo: check access right
     void delete(Node gNode, Mappings map, List<Edge> deleteList) {
         for (Edge edge : deleteList) {
-            if (isDebug) {
-                logger.debug("** Delete: " + edge);
-            }
             List<Edge> list = null;
 
             if (gNode == null && getDataset() != null && getDataset().hasFrom()) {

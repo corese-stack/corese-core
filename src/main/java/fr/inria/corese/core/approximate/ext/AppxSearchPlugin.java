@@ -11,7 +11,6 @@ import fr.inria.corese.core.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.approximate.algorithm.ISimAlgorithm;
 import fr.inria.corese.core.approximate.algorithm.SimAlgorithmFactory;
 import static fr.inria.corese.core.approximate.algorithm.Utils.format;
-import static fr.inria.corese.core.approximate.algorithm.Utils.msg;
 import fr.inria.corese.core.approximate.algorithm.impl.BaseAlgorithm;
 import fr.inria.corese.core.query.PluginImpl;
 
@@ -37,7 +36,6 @@ public class AppxSearchPlugin implements ExprType {
                 ApproximateSearchEnv appxEnv = env.getAppxSearchEnv();
                 double d = appxEnv.aggregate(env);
                 IDatatype sim = plugin.getValue(d);
-                msg("[Eval sim() ]: " + sim);
                 return sim;
             default:
                 return null;
@@ -49,7 +47,6 @@ public class AppxSearchPlugin implements ExprType {
         switch (exp.oper()) {
             
             case APPROXIMATE:
-                msg("[Eval appx ... ]: " + exp);
                 //0. check parameters
                 return eval(exp, env, param);
                 
@@ -105,7 +102,6 @@ public class AppxSearchPlugin implements ExprType {
 
         //3 finalize
         boolean filtered = combinedSim > threshold;
-        msg("\t [Similarity,\t " + dt1 + ",\t" + dt2 + "]: c:" + format(singleSim) + ", all:" + format(combinedSim) + ", " + filtered);
 
         if (notExisted) {
             appxEnv.add(var, dt2, dt1, algs, singleSim);

@@ -36,7 +36,6 @@ public class QueryProcessUpdate {
     private static Logger logger = LoggerFactory.getLogger(QueryProcessUpdate.class);
     
     static boolean reentrant = false;
-    private boolean debug = false;
     private QueryProcess exec;
     
     QueryProcessUpdate(QueryProcess e) {
@@ -114,7 +113,6 @@ public class QueryProcessUpdate {
             getQueryProcess().complete(ds);
         }
         UpdateProcess up = UpdateProcess.create(getQueryProcess(), createUpdateManager(), ds);
-        up.setDebug(isDebug());
         Mappings map = up.update(query, m, getBinding(m));
 
         afterUpdate(vis, map, isSynchronized());
@@ -181,9 +179,6 @@ public class QueryProcessUpdate {
                 g.setNamedGraph(name, gg);
             }
             gg.setNamedGraph(Context.STL_DATASET, g);
-            if (g.isVerbose()) {
-                gg.setVerbose(true);
-            }
         }
 
         synchronized (g) {
@@ -195,17 +190,11 @@ public class QueryProcessUpdate {
             exec = QueryProcess.create(gg);
         }
         else {
-            // eval where bgp on std graph or DataManager 
-            // exec = QueryProcess.create(g);
+            // eval where bgp on std graph or DataManager
             exec = getQueryProcess().copy();
         }
         // bypass lock if any
         Mappings map = exec.getQueryProcessUpdate().update(query, m, ds);
-        if (gg.isVerbose()) {
-            System.out.println("reentrant named graph: " + name + " " + toName);
-            System.out.println(gg.getNames());
-            System.out.println(gg);
-        }
         complete(exec.getAST(query).getUpdate(), g);
         return map;
     }
@@ -240,19 +229,11 @@ public class QueryProcessUpdate {
     }
     
     String getWithName(Query query) {
-        String name = getAST(query).getUpdate().getGraphName();
-        if (isDebug()) {
-            System.out.println("QP: update reentrant with graph name: " + name);
-        }
-        return name;
+        return getAST(query).getUpdate().getGraphName();
     }
 
     String getDeleteInsertName(Query query) {
-        String name = getAST(query).getUpdate().getGraphNameDeleteInsert();
-        if (isDebug()) {
-            System.out.println("QP: update reentrant del/ins graph name: " + name);
-        }
-        return name;
+        return getAST(query).getUpdate().getGraphNameDeleteInsert();
     }
 
     // place holder to have specific external URI
@@ -266,12 +247,11 @@ public class QueryProcessUpdate {
      */
     Mappings rule(Query q) {
         RuleEngine re = RuleEngine.create(getGraph());
-        re.setDebug(isDebug());
         re.defRule(q);
         try {
             getGraph().process(re);
         } catch (EngineException ex) {
-            logger.error(ex.getMessage());
+            logger.error("", ex);
         }
         return Mappings.create(q);
     }
@@ -328,16 +308,6 @@ public class QueryProcessUpdate {
 
     static boolean isReentrant() {
         return QueryProcess.isReentrant();
-    }
-
-   
-    public boolean isDebug() {
-        return debug;
-    }
-
-   
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
    

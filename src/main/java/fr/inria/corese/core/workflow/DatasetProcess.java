@@ -126,7 +126,7 @@ public class DatasetProcess extends WorkflowProcess {
         if (data.getDataList() != null && data.getDataList().size() >= 2) {
             Graph g1 = data.getDataList().get(0).getGraph();
             Graph g2 = data.getDataList().get(1).getGraph();
-            boolean b = g1.compare(g2, true, true, isDebug());
+            boolean b = g1.compare(g2, true, true);
             data.setSuccess(b);
             data.setDatatypeValue(DatatypeMap.newInstance(b));
         }

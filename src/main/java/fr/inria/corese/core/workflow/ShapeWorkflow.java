@@ -1,6 +1,7 @@
 package fr.inria.corese.core.workflow;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.Context;
@@ -50,22 +51,22 @@ public class ShapeWorkflow extends SemanticWorkflow {
     public ShapeWorkflow() {}
     
     public ShapeWorkflow(String shape, String data){
-        create(shape, data, resultFormat, false, -1, false);
+        create(shape, data, resultFormat, false, Loader.format.UNDEF_FORMAT, false);
     }
     
     public ShapeWorkflow(String shape, String data, String trans){
-        create(shape, data, trans, false, -1, false);
+        create(shape, data, trans, false, Loader.format.UNDEF_FORMAT, false);
     }
     
     public ShapeWorkflow(String shape, String data, boolean test){
-        create(shape, data, resultFormat, false, -1, test);
+        create(shape, data, resultFormat, false, Loader.format.UNDEF_FORMAT, test);
     }
     
     public ShapeWorkflow(String shape, String data, boolean test, boolean lds){
-        create(shape, data, resultFormat, false, -1, test, lds);
+        create(shape, data, resultFormat, false, Loader.format.UNDEF_FORMAT, test, lds);
     }
     
-    public ShapeWorkflow(String shape, String data, String trans, boolean text, int format, boolean test){
+    public ShapeWorkflow(String shape, String data, String trans, boolean text, Loader.format format, boolean test){
         create(shape, data, trans, text, format, test);
     }
     
@@ -89,7 +90,7 @@ public class ShapeWorkflow extends SemanticWorkflow {
         }
     }
     
-        private void create(String shape, String data, String trans, boolean text, int format, boolean test){
+        private void create(String shape, String data, String trans, boolean text, Loader.format format, boolean test){
             create(shape, data, trans, text, format, test, false);
         }
         
@@ -102,7 +103,7 @@ public class ShapeWorkflow extends SemanticWorkflow {
      * @param format : possible RDF input format (may be UNDEF_FORMAT)
      * @param test : false: use compiled datashape sttl, otherwise use uncompiled sttl
      */
-    public ShapeWorkflow create(String shape, String data, String trans, boolean text, int format, boolean test, boolean lds){
+    public ShapeWorkflow create(String shape, String data, String trans, boolean text, Loader.format format, boolean test, boolean lds){
         this.setShape(shape);
         if (trans != null){
             resultFormat = trans;
@@ -141,7 +142,7 @@ public class ShapeWorkflow extends SemanticWorkflow {
         return this;
     }
     
-    LoadProcess loadShape(String shape, boolean text, int format) {
+    LoadProcess loadShape(String shape, boolean text, Loader.format format) {
         LoadProcess shapeLoader = (text) ? LoadProcess.createStringLoader(shape, format) : new LoadProcess(shape);
         shapeLoader.setProcessor(getProcessor());
         return shapeLoader;
@@ -264,11 +265,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
         }
     }
     
-//    @Override
-//    public Data run(Data data) throws EngineException {
-//        return super.run(data);
-//    }
-    
     public TransformationProcess getTransformer(){
         return transformer;
     }
@@ -284,8 +280,7 @@ public class ShapeWorkflow extends SemanticWorkflow {
         super.finish(data);
         data.setProcess(this);
     }
-    
-    
+
     @Override
     public String stringValue(Data data){
         String res ;

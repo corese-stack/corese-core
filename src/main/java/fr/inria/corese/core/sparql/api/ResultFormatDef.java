@@ -5,26 +5,28 @@ package fr.inria.corese.core.sparql.api;
  * @author corby
  */
 public interface ResultFormatDef {
-    public static final int UNDEF_FORMAT = -1;
+    enum format {
+        UNDEF_FORMAT,
 
-    public static final int TEXT_FORMAT = 0;
+        TEXT_FORMAT,
 
-    public static final int RDF_XML_FORMAT = 1;
-    public static final int TURTLE_FORMAT = 2;
-    public static final int TRIG_FORMAT = 3;
-    public static final int JSONLD_FORMAT = 4;
-    public static final int NTRIPLES_FORMAT = 6;
-    public static final int NQUADS_FORMAT = 7;
-    public static final int RDFC10_FORMAT = 8;
-    public static final int RDFC10_SHA384_FORMAT = 9;
+        RDF_XML_FORMAT,
+        TURTLE_FORMAT,
+        TRIG_FORMAT,
+        JSONLD_FORMAT,
+        NTRIPLES_FORMAT,
+        NQUADS_FORMAT,
+        RDFC10_FORMAT,
+        RDFC10_SHA384_FORMAT,
 
-    public static final int XML_FORMAT = 11;
-    public static final int RDF_FORMAT = 12;
-    public static final int JSON_FORMAT = 13;
-    public static final int CSV_FORMAT = 14;
-    public static final int TSV_FORMAT = 15;
-    public static final int MARKDOWN_FORMAT = 16;
+        XML_FORMAT,
+        RDF_FORMAT,
+        JSON_FORMAT,
+        CSV_FORMAT,
+        TSV_FORMAT,
+        MARKDOWN_FORMAT,
 
-    public static final int HTML_FORMAT = 20;
+        HTML_FORMAT
+    }
 
 }

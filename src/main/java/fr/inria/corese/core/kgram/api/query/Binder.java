@@ -11,6 +11,7 @@ import java.util.List;
  * @author corby
  * @deprecated
  */
+@Deprecated
 public interface Binder {
     
     void clear();

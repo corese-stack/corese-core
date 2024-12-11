@@ -1,6 +1,7 @@
 package fr.inria.corese.core.load;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.load.result.SPARQLJSONResult;
 import fr.inria.corese.core.load.result.SPARQLResult;
 import fr.inria.corese.core.print.ResultFormat;
@@ -130,21 +131,21 @@ public class ServiceParser implements URLParam {
             if (getFormat() != null) {
                 switch (getFormat()) {
                     case ResultFormat.RDF_XML:
-                        ld.loadString(str, Load.RDFXML_FORMAT);
+                        ld.loadString(str, Loader.format.RDFXML_FORMAT);
                         break;
                     case ResultFormat.JSON_LD:
-                        ld.loadString(str, Load.JSONLD_FORMAT);
+                        ld.loadString(str, Loader.format.JSONLD_FORMAT);
                         break;
                     case ResultFormat.TURTLE:
                     case ResultFormat.TURTLE_TEXT:
-                        ld.loadString(str, Load.TURTLE_FORMAT);
+                        ld.loadString(str, Loader.format.TURTLE_FORMAT);
                         break;
                     default:
                         Service.logger.warn(
                           "Format not handled by local parser: " + getFormat());
                 }
             } else {
-                ld.loadString(str, Load.RDFXML_FORMAT);
+                ld.loadString(str, Loader.format.RDFXML_FORMAT);
             }
             return g;
         } catch (LoadException e) {

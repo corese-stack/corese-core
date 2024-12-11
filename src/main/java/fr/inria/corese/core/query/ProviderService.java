@@ -643,7 +643,7 @@ public class ProviderService implements URLParam {
         if (serv.isUndefined()) {
             return null;
         }
-        if (Property.booleanValue(SERVICE_GRAPH)) {
+        if (Property.getBooleanValue(SERVICE_GRAPH)) {
             return sendWithGraph(serv, ast, map, start, limit, timeout, count);
         } else {
             return sendBasic(serv, ast, map, start, limit, timeout, count);
@@ -1091,7 +1091,6 @@ public class ProviderService implements URLParam {
                     } else {
                         String res = report.getResponse().getHeaderString(header);
                         if (res != null) {
-                            // logger.info(String.format("%s %s=%s", url.toString(), header, res));
                             getLog().defLabel(url.getLogURLNumber(), header, res);
                         }
                     }
