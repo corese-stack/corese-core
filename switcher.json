@@ -1,15 +1,9 @@
 [
 {
-    "name": "v5.0.0 (latest)",
-    "version": "stable",
-    "url": "https://corese-stack.github.io/corese-core/v5.0.0/",
-    "preferred": true
-},
-{
-    "name": "v4.6.1 (stable)",
+    "name": "v4.6.1 (latest)",
     "version": "stable",
     "url": "https://corese-stack.github.io/corese-core/v4.6.1/",
-    "preferred": false
+    "preferred": true
 },
 {
     "name": "v4.6.0 (stable)",
