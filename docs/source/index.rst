@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 
-.. image:: _static/corese.svg
+.. image:: _static/logo/corese-core_doc_light.svg
    :align: center
    :width: 400px
 
