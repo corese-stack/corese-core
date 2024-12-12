@@ -2,13 +2,7 @@
 
 ## Corese Core
 
-<a href="https://central.sonatype.com/artifact/fr.inria.corese/corese-core">
-    <img src="_static/logo/badge_maven.svg" alt="Badge Maven Central" width="150">
-</a>
-
-<a href="https://github.com/corese-stack/corese-core/releases">
-    <img src="_static/logo/badge_github.svg" alt="Badge Github Release" width="150">
-</a>
+[![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-core) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-core/releases)
 
 ```xml
 <dependency>
@@ -26,13 +20,7 @@ implementation 'fr.inria.corese:corese-core:X.Y.Z' // replace X.Y.Z with the ver
 
 **Jena storage:**
 
-<a href="https://central.sonatype.com/artifact/fr.inria.corese/corese-jena">
-    <img src="_static/logo/badge_maven.svg" alt="Badge Maven Central" width="150">
-</a>
-
-<a href="https://github.com/corese-stack/corese-plugin-storage-jena/releases">
-    <img src="_static/logo/badge_github.svg" alt="Badge Github Release" width="150">
-</a>
+[![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-jena) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-plugin-storage-jena/releases)
 
 ```xml
 <!-- jena storage -->
@@ -49,13 +37,7 @@ implementation 'fr.inria.corese:corese-jena:X.Y.Z' // replace X.Y.Z with the ver
 
 **RDF4J storage:**
 
-<a href="https://central.sonatype.com/artifact/fr.inria.corese/corese-rdf4j">
-    <img src="_static/logo/badge_maven.svg" alt="Badge Maven Central" width="150">
-</a>
-
-<a href="https://github.com/corese-stack/corese-plugin-storage-rdf4j/releases">
-    <img src="_static/logo/badge_github.svg" alt="Badge Github Release" width="150">
-</a>
+[![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-rdf4j) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-plugin-storage-rdf4j/releases)
 
 ```xml
 <!-- rdf4j storage -->
