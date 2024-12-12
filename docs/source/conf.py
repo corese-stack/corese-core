@@ -70,8 +70,8 @@ html_logo = "_static/logo/corese-core_doc_light.svg"
 html_favicon = "_static/logo/corese-core_doc_fav.svg"
 
 # Modify the title to get good social-media links
-html_title = "CORESE"
-html_short_title = "CORESE"
+html_title = "Corese"
+html_short_title = "Corese"
 
 # -- Theme Options -----------------------------------------------------------
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -88,7 +88,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/Wimmics/corese",
+            "url": "https://github.com/corese-stack/corese-core",
             "icon": "fab fa-github-square"
         }
     ],

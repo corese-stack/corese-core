@@ -8,11 +8,9 @@
    :align: center
    :width: 400px
 
-.. centered:: Software platform for the Semantic Web of Linked Data
+Corese is a software platform that implements and extends the standards of the Semantic Web. It enables users to create, manipulate, parse, serialize, query, reason about, and validate RDF data.
 
-Corese is a software platform implementing and extending the standards of the Semantic Web. It allows to create, manipulate, parse, serialize, query, reason and validate RDF data.
-
-
+Corese-Core is a Java library that provides the core functionalities of Corese. It allows developers to build applications that process RDF data and programmatically leverage Corese's features via its API.
 
 .. Define named hyperlinks for the references of W3C standards
 .. _RDF: https://www.w3.org/RDF/
@@ -67,13 +65,13 @@ Corese is a software platform implementing and extending the standards of the Se
 
 .. raw:: html
 
-   <h3>Contributions and discussions</h3>
+   <h3>Contributions and discussions about Corese-Core</h3>
 
 .. _discussion forum: https://github.com/orgs/corese-stack/discussions
 .. _issue reports: https://github.com/corese-stack/corese-core/issues
-.. _pull requests: https://github.com/Wimmics/corese/pulls/
+.. _pull requests: https://github.com/corese-stack/corese-core/pulls
 
-For support questions, comments, and any ideas for improvements you’d like to discuss, please use our `discussion forum`_. We welcome everyone to contribute to `issue reports`_, suggest new features, and create `pull requests`_.
+For support questions, comments, and any ideas for improvements you`d like to discuss, please use our `discussion forum`_. We welcome everyone to contribute to `issue reports`_, suggest new features, and create `pull requests`_.
 
 
 .. #############################################################################
@@ -86,7 +84,7 @@ For support questions, comments, and any ideas for improvements you’d like to 
 
    <div style="visibility: hidden;">
 
-CORESE documentation
+Home Page
 ===================================
 
 .. raw:: html
@@ -99,5 +97,3 @@ CORESE documentation
    Installation <install.md>
    User Guide <user_guide>
    API Reference <apis>
-   Demo <https://corese.inria.fr/>
-
