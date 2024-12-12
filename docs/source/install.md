@@ -5,6 +5,7 @@
 [![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-core) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-core/releases)
 
 ```xml
+<!-- Maven -->
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-core</artifactId>
@@ -13,6 +14,7 @@
 ```
 
 ```Groovy
+// Gradle
 implementation 'fr.inria.corese:corese-core:X.Y.Z' // replace X.Y.Z with the version number
 ```
 
@@ -23,7 +25,7 @@ implementation 'fr.inria.corese:corese-core:X.Y.Z' // replace X.Y.Z with the ver
 [![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-jena) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-plugin-storage-jena/releases)
 
 ```xml
-<!-- jena storage -->
+<!-- Maven -->
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-jena</artifactId>
@@ -32,6 +34,7 @@ implementation 'fr.inria.corese:corese-core:X.Y.Z' // replace X.Y.Z with the ver
 ```
 
 ```Groovy
+// Gradle
 implementation 'fr.inria.corese:corese-jena:X.Y.Z' // replace X.Y.Z with the version number
 ```
 
@@ -40,7 +43,7 @@ implementation 'fr.inria.corese:corese-jena:X.Y.Z' // replace X.Y.Z with the ver
 [![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-rdf4j) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-plugin-storage-rdf4j/releases)
 
 ```xml
-<!-- rdf4j storage -->
+<!-- Maven -->
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-rdf4j</artifactId>
@@ -49,5 +52,6 @@ implementation 'fr.inria.corese:corese-jena:X.Y.Z' // replace X.Y.Z with the ver
 ```
 
 ```Groovy
+// Gradle
 implementation 'fr.inria.corese:corese-rdf4j:X.Y.Z' // replace X.Y.Z with the version number
 ```
