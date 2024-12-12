@@ -64,14 +64,14 @@ html_css_files = [
 html_js_files = []
 
 # Project logo, to place at the top of the sidebar.
-html_logo = "_static/corese.svg"
+html_logo = "_static/logo/corese-core_doc_light.svg"
 
 # Icon to put in the browser tab.
-html_favicon = "_static/Corese-square-logo-transparent.svg"
+html_favicon = "_static/logo/corese-core_doc_fav.svg"
 
 # Modify the title to get good social-media links
-html_title = "CORESE"
-html_short_title = "CORESE"
+html_title = "Corese"
+html_short_title = "Corese"
 
 # -- Theme Options -----------------------------------------------------------
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -79,16 +79,16 @@ html_short_title = "CORESE"
 # documentation.
 html_theme_options = {
      "logo": {
-         "image_relative": "_static/corese.svg",
-         "image_light": "_static/corese.svg",
-         "image_dark": "_static/corese.svg"
+         "image_relative": "_static/logo/corese-core_doc_light.svg",
+         "image_light": "_static/logo/corese-core_doc_light.svg",
+         "image_dark": "_static/logo/corese-core_doc_dark.svg"
      },
     "navbar_center": [ "navbar-nav" ],
     "navbar_end": ["navbar-icon-links", "version-switcher"],
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/Wimmics/corese",
+            "url": "https://github.com/corese-stack/corese-core",
             "icon": "fab fa-github-square"
         }
     ],

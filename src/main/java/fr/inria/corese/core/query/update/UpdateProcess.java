@@ -48,19 +48,17 @@ public class UpdateProcess {
     private QueryProcess exec;
     Query query;
     private Dataset dataset;
-    private ProcessVisitor visitor;
-
-    boolean isDebug = false;
+    private List<ProcessVisitor> visitorList;
 
     UpdateProcess(QueryProcess e, ManagerImpl man, Dataset ds) {
         manager = man;
         exec = e;
         this.dataset = ds;
+        this.visitorList = new ArrayList<>();
     }
 
     public static UpdateProcess create(QueryProcess e, ManagerImpl man, Dataset ds) {
-        UpdateProcess u = new UpdateProcess(e, man, ds);
-        return u;
+        return new UpdateProcess(e, man, ds);
     }
 
     /**
@@ -76,12 +74,9 @@ public class UpdateProcess {
         getManager().setAccessRight(bind == null ? null : bind.getAccessRight());
         NSManager nsm = null;
         // Visitor was setup by QueryProcessUpdate init(q, m)
-        setVisitor(getQueryProcess().getVisitor());
+        addVisitor(getQueryProcess().getVisitor());
         
         for (Update u : astu.getUpdates()) {
-            if (isDebug) {
-                logger.debug("** Update: " + u);
-            }
             boolean suc = true;
 
             switch (u.type()) {
@@ -119,9 +114,6 @@ public class UpdateProcess {
 
             if (!suc) {
                 q.setCorrect(false);
-                if (isDebug) {
-                    logger.debug("** Failure: " + u);
-                }
                 break;
             }
         }
@@ -138,11 +130,6 @@ public class UpdateProcess {
         }
         return b.getAccessLevel();
     } 
-    
-
-    public void setDebug(boolean b) {
-        isDebug = b;
-    }
 
     Mappings process(Query q, Composite ope, Mapping m, Binding b) throws EngineException {
         ASTQuery ast = null;
@@ -180,7 +167,7 @@ public class UpdateProcess {
      */
     Mapping getMapping(Query q, Mapping m, Binding b) {
         Mapping mm = m;
-        if (m != null && m.size() == 0 && m.getBind() != null) {
+        if (mm != null && mm.size() == 0 && mm.getBind() != null) {
             // m contains LDScript binding stack
             // generate appropriate Mapping for query q from this stack.
             // use case: query(insert where))
@@ -194,8 +181,14 @@ public class UpdateProcess {
         if (b != null) {            
             mm = setBind(mm, b);
         }
-        
-        mm = setVisitor(mm, getVisitor());
+
+        if (mm == null) {
+            mm = new Mapping();
+        }
+        if (mm.getBind() == null) {
+            mm.setBind(Binding.create());
+        }
+        mm.getBind().setVisitor(mm.getBind().getVisitor());
         return mm;
     }
     
@@ -206,17 +199,6 @@ public class UpdateProcess {
         m.setBind(b);
         return m;
     }
-    
-    Mapping setVisitor(Mapping m, ProcessVisitor vis) {
-        if (m == null) {
-            m = new Mapping();
-        }
-        if (m.getBind() == null) {
-            m.setBind(Binding.create());
-        }
-        m.getBind().setVisitor(m.getBind().getVisitor());
-        return m;
-    }
 
     /**
      * query is the global Query ast is the current update action use case:
@@ -224,14 +206,11 @@ public class UpdateProcess {
      * where and process as a where update.
      */
     Mappings update(Query query, ASTQuery ast, Mapping m, Binding b) throws EngineException {
-
-        //System.out.println("** QP:\n" + m.getBind());
         getQueryProcess().logStart(query);
         Query q = compile(ast);
         inherit(q, query);
         Mapping mm = getMapping(q, m, b);  
-        
-        //System.out.println("UP: " + vis);
+
         // execute where part in delete insert where
         Mappings map = getQueryProcess().basicQuery(null, q, mm);
         
@@ -250,7 +229,9 @@ public class UpdateProcess {
             getManager().insert(q, map, getDataset());
         }
 
-        visitor(getVisitor(), q, map);
+        for(ProcessVisitor visitor : getVisitorList()) {
+            visitor(visitor, q, map);
+        }
         getQueryProcess().logFinish(query, map);
 
         return map;
@@ -284,6 +265,9 @@ public class UpdateProcess {
         }
         if (insert == null) {
             insert = new ArrayList<>();
+        }
+        if(delete.isEmpty() && insert.isEmpty()) {
+            return;
         }
         vis.update(q, delete, insert);
     }
@@ -327,9 +311,6 @@ public class UpdateProcess {
 
         Exp exp = ope.getData();
         if (!exp.validateData(ast)) {
-            if (isDebug) {
-                logger.debug("** Update: insert not valid: " + exp);
-            }
             q.setCorrect(false);
             return null; 
         }
@@ -446,15 +427,15 @@ public class UpdateProcess {
     /**
      * @return the visitor
      */
-    public ProcessVisitor getVisitor() {
-        return visitor;
+    public List<ProcessVisitor> getVisitorList() {
+        return visitorList;
     }
 
     /**
      * @param visitor the visitor to set
      */
-    public void setVisitor(ProcessVisitor visitor) {
-        this.visitor = visitor;
+    public void addVisitor(ProcessVisitor visitor) {
+        this.visitorList.add(visitor);
     }
 
     public QueryProcess getQueryProcess() {

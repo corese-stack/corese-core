@@ -28,7 +28,6 @@ public class NGram extends BaseAlgorithm {
     @Override
     public double calculate(String s1, String s2, String parameter) {
         double sim = this.calculate(s1, s2);
-        Utils.msg("N-Gram" + NG, s1, s2, parameter, sim);
         return sim;
     }
 

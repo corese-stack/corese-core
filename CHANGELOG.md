@@ -1,5 +1,25 @@
 # Corese Changelog
 
+## Version 4.6.1 – 2024-12-12
+
+### Added
+
+- Code cleanup and refactoring to improve readability and maintainability.
+  - Reworking of the Property class as a proper singleton.
+  - HTTPHeaders class created to centralize repeated definitions of HTTP headers.
+- Elasticsearch's integration.
+  - EdgeChangeListener class created to listen to edge changes and deletion.
+- Add SLF4J dependency to the project.
+  
+### Fixed
+
+- Fixed possibility of apparition of XML comment into JSON results.
+- Fixed missing SLF4J dependency.
+
+### Changed
+
+- Cleaned documentation website.
+
 ## Version 4.6.0 – 2024-10-28
 
 ### Added

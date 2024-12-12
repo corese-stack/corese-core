@@ -446,7 +446,8 @@ public class QuerySolver implements SPARQLEngine {
 
     void tune(Eval kgram, Query q, Mapping m) {
         ASTQuery ast =  q.getAST();
-        boolean event = ast.hasMetadata(Metadata.EVENT);
+//        boolean event = ast.hasMetadata(Metadata.EVENT);
+        boolean event = true;
         // Dataset ds parameter in QueryProcess is set as ast defaultDataset
         tune(kgram, ast.getDefaultDataset(), m, event);
         if (q.isInitMode()) {

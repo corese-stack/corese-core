@@ -341,7 +341,7 @@ public class Transformer implements TransformProcessor {
             if (n == null) {
                 gg = Graph.create();
                 Load load = Load.create(gg);
-                load.parse(name, Load.TURTLE_FORMAT);
+                load.parse(name, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
             } else {
                 gg = g;
                 if (with) {
@@ -390,10 +390,10 @@ public class Transformer implements TransformProcessor {
     }
 
     public void transform(InputStream in, OutputStream out) throws LoadException, IOException, EngineException {
-        transform(in, out, Load.TURTLE_FORMAT);
+        transform(in, out, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
     }
 
-    public void transform(InputStream in, OutputStream out, int format)
+    public void transform(InputStream in, OutputStream out, fr.inria.corese.core.api.Loader.format format)
             throws LoadException, IOException, EngineException {
         Graph g = Graph.create();
         Load ld = Load.create(g);

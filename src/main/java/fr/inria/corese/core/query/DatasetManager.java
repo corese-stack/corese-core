@@ -30,7 +30,7 @@ public class DatasetManager {
     }
 
     public DatasetManager init() {
-        List<List<String>> storages = Property.getSingleton().getStorageparameters();
+        List<List<String>> storages = Property.getStorageparameters();
 
         if (storages != null && storages.size() > 0) {
             defineDataManager(storages);

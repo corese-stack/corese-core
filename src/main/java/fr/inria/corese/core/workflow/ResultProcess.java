@@ -1,5 +1,6 @@
 package fr.inria.corese.core.workflow;
 
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.print.ResultFormat;
@@ -10,12 +11,12 @@ import fr.inria.corese.core.print.ResultFormat;
  *
  */
 public class ResultProcess extends WorkflowProcess {
-    private int format = ResultFormat.UNDEF_FORMAT;
+    private ResultFormatDef.format format = ResultFormatDef.format.UNDEF_FORMAT;
     
     public ResultProcess() {
     }
 
-    public ResultProcess(int type) {
+    public ResultProcess(ResultFormatDef.format type) {
         format = type;
     }
     
@@ -47,14 +48,14 @@ public class ResultProcess extends WorkflowProcess {
        /**
      * @return the format
      */
-    public int getFormat() {
+    public ResultFormatDef.format getFormat() {
         return format;
     }
 
     /**
      * @param format the format to set
      */
-    public void setFormat(int format) {
+    public void setFormat(ResultFormatDef.format format) {
         this.format = format;
     }
     

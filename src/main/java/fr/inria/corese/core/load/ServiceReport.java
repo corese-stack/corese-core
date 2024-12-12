@@ -45,7 +45,7 @@ public class ServiceReport implements URLParam {
     
     
     boolean isReport() {
-        return Property.booleanValue(SERVICE_REPORT) || 
+        return Property.getBooleanValue(SERVICE_REPORT) ||
                 getURL().hasParameter(MODE, REPORT) ||
                 (getQuery()!=null &&
                 (getQuery().getAST().hasMetadata(Metadata.REPORT)

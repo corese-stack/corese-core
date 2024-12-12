@@ -14,7 +14,6 @@ import fr.inria.corese.core.sparql.triple.parser.Triple;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
 import fr.inria.corese.core.compiler.api.QueryVisitor;
 import fr.inria.corese.core.kgram.core.Query;
-import static fr.inria.corese.core.approximate.algorithm.Utils.msg;
 import fr.inria.corese.core.approximate.algorithm.Parameters;
 import static fr.inria.corese.core.approximate.ext.ASTRewriter.S;
 import fr.inria.corese.core.approximate.strategy.ApproximateStrategy;
@@ -109,8 +108,6 @@ public class ASTRewriter implements QueryVisitor {
     }
 
     private void process(Exp exp, Triple t) {
-        //for(Exp exp: ast.gets)
-        msg("------ BEFORE -----\n" + exp, false);
 
         //1 pre process, choose strategies for each atom
         Map<Integer, TripleWrapper> map = new HashMap<Integer, TripleWrapper>();
@@ -118,11 +115,6 @@ public class ASTRewriter implements QueryVisitor {
         init(t, t.getSubject(), S, map);
         init(t, t.getPredicate(), P, map);
         init(t, t.getObject(), O, map);
-
-        msg("\n------ pre-process lsit-----");
-        for (TripleWrapper value : map.values()) {
-            msg(value.toString());
-        }
 
         //2 rewrite triples in AST
         List<Exp> filters = new ArrayList<>();
@@ -141,8 +133,6 @@ public class ASTRewriter implements QueryVisitor {
         for (Optional option : options) {
             exp.add(option);
         }
-
-        msg("\n------ AFTER -----\n" + exp, false);
     }
 
     //choose the Strategy for the URI and put them into a list
@@ -174,12 +164,6 @@ public class ASTRewriter implements QueryVisitor {
                 if (dt.getCode() == IDatatype.STRING ||
                     dt.getCode() == IDatatype.LITERAL ){ //(dt.getDatatypeURI().equals(xsdstring) ) {       
                     add(lst, LITERAL_LEX);
-
-                //@lang=en ??
-//                if (atom.getLang() == null || 
-//                        (atom.getLang() != null && atom.getLang().equalsIgnoreCase("en"))) {
-//                    add(lst, LITERAL_WN);
-//                }
             }
         }
 

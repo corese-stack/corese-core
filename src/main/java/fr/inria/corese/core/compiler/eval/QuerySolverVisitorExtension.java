@@ -26,14 +26,11 @@ public class QuerySolverVisitorExtension extends QuerySolverVisitor {
     
     @Override
     public IDatatype update(Query q, List<Edge> delete, List<Edge> insert) {
-        System.out.println("My Visitor update");
         return super.update(q, delete, insert);
     }
     
     @Override
     public IDatatype insert(IDatatype path, Edge triple) {
-        System.out.println("My Visitor insert: " + triple);
         return  path;
-        //return super.insert(path, triple);
     }
 }

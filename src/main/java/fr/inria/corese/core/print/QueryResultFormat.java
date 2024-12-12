@@ -9,7 +9,7 @@ public class QueryResultFormat {
 
     private Context context;
     
-    public QueryResultFormat() {}
+    QueryResultFormat() {}
     
     public QueryResultFormat init(Context c) {
         setContext(c);
@@ -21,14 +21,14 @@ public class QueryResultFormat {
      * context manage unselect variable list
      * if var is unselect, do not pprint var value in result
      */
-    public boolean accept(String var) {
-        if (var.startsWith("?") || var.startsWith("$")) {
-            var = var.substring(1);
+    public boolean accept(String variable) {
+        if (variable.startsWith("?") || variable.startsWith("$")) {
+            variable = variable.substring(1);
         }
         if (getContext() == null) {
             return true;
         }        
-        return getContext().acceptVariable(var);
+        return getContext().acceptVariable(variable);
     }
 
     public Context getContext() {

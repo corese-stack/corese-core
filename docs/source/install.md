@@ -1,31 +1,57 @@
-# Download and install corese-core
+# Installation
 
-Download from [maven-central](https://central.sonatype.com/namespace/fr.inria.corese)
+## Corese Core
 
-## corese-core
+[![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-core) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-core/releases)
 
 ```xml
+<!-- Maven -->
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-core</artifactId>
-    <version>4.5.6</version>
+    <version>X.Y.Z</version> <!-- replace X.Y.Z with the version number -->
 </dependency>
 ```
 
-## corese-storage-plugin
+```Groovy
+// Gradle
+implementation 'fr.inria.corese:corese-core:X.Y.Z' // replace X.Y.Z with the version number
+```
+
+## Storage Modules
+
+**Jena storage:**
+
+[![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-jena) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-plugin-storage-jena/releases)
 
 ```xml
-<!-- jena storage -->
+<!-- Maven -->
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-jena</artifactId>
-    <version>4.5.6</version>
+    <version>X.Y.Z</version> <!-- replace X.Y.Z with the version number -->
 </dependency>
+```
 
-<!-- rdf4j storage -->
+```Groovy
+// Gradle
+implementation 'fr.inria.corese:corese-jena:X.Y.Z' // replace X.Y.Z with the version number
+```
+
+**RDF4J storage:**
+
+[![Badge Maven Central](./_static/logo/badge_maven.svg)](https://central.sonatype.com/artifact/fr.inria.corese/corese-rdf4j) [![Badge Github Release](./_static/logo/badge_github.svg)](https://github.com/corese-stack/corese-plugin-storage-rdf4j/releases)
+
+```xml
+<!-- Maven -->
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-rdf4j</artifactId>
-    <version>4.5.6</version>
+    <version>X.Y.Z</version> <!-- replace X.Y.Z with the version number -->
 </dependency>
+```
+
+```Groovy
+// Gradle
+implementation 'fr.inria.corese:corese-rdf4j:X.Y.Z' // replace X.Y.Z with the version number
 ```

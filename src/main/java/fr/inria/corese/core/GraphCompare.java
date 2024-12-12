@@ -1,34 +1,33 @@
 package fr.inria.corese.core;
 
+import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import java.util.HashMap;
-import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import fr.inria.corese.core.kgram.api.core.Edge;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
- *
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
- *
  */
 public class GraphCompare {
     private static Logger logger = LoggerFactory.getLogger(GraphCompare.class);
-    
+
     Graph g1, g2;
-    
-    GraphCompare(Graph g1, Graph g2){
+
+    GraphCompare(Graph g1, Graph g2) {
         this.g1 = g1;
         this.g2 = g2;
     }
-    
-    
-       public boolean compare(boolean isGraph, boolean detail, boolean isDebug) {
+
+
+    public boolean compare(boolean isGraph, boolean detail) {
         g1.prepare();
         g2.prepare();
 
         boolean ok = true;
-        
+
         if (g1.size() != g2.size()) {
             logger.error("** Graph Size: " + g1.size() + " != " + g2.size());
             ok = false;
@@ -36,11 +35,10 @@ public class GraphCompare {
 
         for (Node pred1 : g1.getProperties()) {
             Node pred2 = g2.getPropertyNode(pred1.getLabel());
-            if (pred2 == null){
-               ok = false;
-               logger.error("** Graph Pred: " + pred1 + " undefined in G2 " );
-            }
-            else {
+            if (pred2 == null) {
+                ok = false;
+                logger.error("** Graph Pred: " + pred1 + " undefined in G2 ");
+            } else {
                 int s1 = g1.size(pred1);
                 int s2 = g2.size(pred2);
                 if (s1 != s2) {
@@ -64,9 +62,6 @@ public class GraphCompare {
 
             if (pred2 == null) {
                 if (l1.iterator().hasNext()) {
-                    if (isDebug) {
-                        logger.error("Missing in g2: " + pred1);
-                    }
                     return false;
                 }
             } else {
@@ -80,9 +75,6 @@ public class GraphCompare {
                         // node index
                         boolean b = compare(g2, pred2, t, ent1, isGraph);
                         if (!b) {
-                            if (isDebug) {
-                                logger.error("Missing in g2: " + ent1);
-                            }
                             return false;
                         }
                     } else {
@@ -93,10 +85,6 @@ public class GraphCompare {
 
                         Edge ent2 = it.next();
                         if (!compare(ent1, ent2, t, isGraph)) {
-                            if (isDebug) {
-                                logger.error(ent1.toString());
-                                logger.error(ent2.toString());
-                            }
                             return false;
                         }
                     }
@@ -107,10 +95,10 @@ public class GraphCompare {
         return true;
     }
 
-       /**
-        * TODO: may return false negative because it does not backtrack
-        * It should be a projection ...
-        */
+    /**
+     * TODO: may return false negative because it does not backtrack
+     * It should be a projection ...
+     */
     boolean compare(Graph g2, Node pred2, TBN t, Edge ent1, boolean isGraph) {
         Iterable<Edge> l2 = g2.getEdges(pred2);
         Iterator<Edge> it = l2.iterator();
@@ -136,8 +124,8 @@ public class GraphCompare {
                 return false;
             }
         }
-        
-        if (isGraph){
+
+        if (isGraph) {
             return ent1.getGraph().equals(ent2.getGraph());
         }
         return true;
@@ -163,37 +151,37 @@ public class GraphCompare {
     }
 
     class TBN extends HashMap<Node, Node> {
-        
-        HashMap<Node, Integer> count ;
-        
-        TBN(){
+
+        HashMap<Node, Integer> count;
+
+        TBN() {
             count = new HashMap<Node, Integer>();
         }
 
         boolean same(Node n1, Node n2) {
             if (containsKey(n1)) {
                 boolean b = get(n1).equals(n2);
-                if (b){
+                if (b) {
                     count.put(n1, count.get(n1) + 1);
                 }
                 return b;
             } else {
                 put(n1, n2);
                 count.put(n1, 1);
-               return true;
+                return true;
             }
         }
-        
-        void pop(Node n){
-            if (n.isBlank()){
+
+        void pop(Node n) {
+            if (n.isBlank()) {
                 if (count.containsKey(n)) {
-                    count.put(n, count.get(n) - 1); 
-                    if (count.get(n) == 0){
+                    count.put(n, count.get(n) - 1);
+                    if (count.get(n) == 0) {
                         remove(n);
                     }
                 }
             }
-            
+
         }
     }
 

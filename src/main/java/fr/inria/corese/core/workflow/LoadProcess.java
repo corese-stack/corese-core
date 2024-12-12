@@ -1,5 +1,6 @@
 package fr.inria.corese.core.workflow;
 
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
@@ -24,9 +25,9 @@ public class LoadProcess extends WorkflowProcess {
     boolean rec = false;
     private boolean named = false;
     String text;
-    int format = Load.UNDEF_FORMAT;
-    int requiredFormat = Load.UNDEF_FORMAT;
-    private int[] FORMATS =  { Load.TURTLE_FORMAT, Load.RDFXML_FORMAT, Load.JSONLD_FORMAT };
+    Loader.format format = Loader.format.UNDEF_FORMAT;
+    Loader.format requiredFormat = Loader.format.UNDEF_FORMAT;
+    private Loader.format[] FORMATS =  { Loader.format.TURTLE_FORMAT, Loader.format.RDFXML_FORMAT, Loader.format.JSONLD_FORMAT };
     private PreProcessor processor;
     private boolean protectMode = false;
     
@@ -34,7 +35,7 @@ public class LoadProcess extends WorkflowProcess {
         this.path = path;
     }
     
-    public LoadProcess(String str, int format){
+    public LoadProcess(String str, Loader.format format){
         this.text = str;
         this.format = format;
         if (path == null) {
@@ -54,15 +55,15 @@ public class LoadProcess extends WorkflowProcess {
     }
     
     public static LoadProcess createStringLoader(String str){
-        return new LoadProcess(str, Load.UNDEF_FORMAT);
+        return new LoadProcess(str, Loader.format.UNDEF_FORMAT);
     }
     
-    public static LoadProcess createStringLoader(String str, int format){
+    public static LoadProcess createStringLoader(String str, Loader.format format){
         return new LoadProcess(str, format);
     }
     
     void setRequiredFormat(String format) {
-        int ft = LoadFormat.getDTFormat(format);
+        Loader.format ft = LoadFormat.getDTFormat(format);
         requiredFormat = ft;
     }
     
@@ -133,8 +134,8 @@ public class LoadProcess extends WorkflowProcess {
      * Try Turtle RDF/XML JSON-LD formats
      */
     void loadString(Load ld) throws LoadException {
-        if (format == Load.UNDEF_FORMAT) {
-            for (int ft : FORMATS) {
+        if (format == Loader.format.UNDEF_FORMAT) {
+            for (Loader.format ft : FORMATS) {
                 try {
                     ld.loadString(text, ft);
                     return;

@@ -1,7 +1,9 @@
 package fr.inria.corese.core.print;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.core.Mappings;
@@ -16,7 +18,7 @@ import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
  * Olivier Corby, Edelweiss INRIA 2011
  *
  */
-public class JSONFormat extends XMLFormat {
+public class JSONFormat extends AbstractNestedResultFormat {
 
     private static final String OHEADER = "{";
     private static final String CHEADER = "}";
@@ -41,9 +43,6 @@ public class JSONFormat extends XMLFormat {
         super(lm);
     }
 
-    JSONFormat() {
-    }
-
     public static JSONFormat create(Mappings lm) {
         Query q = lm.getQuery();
         return JSONFormat.create(q, q.getAST(), lm);
@@ -52,48 +51,52 @@ public class JSONFormat extends XMLFormat {
     public static JSONFormat create(Query q, ASTQuery ast, Mappings lm) {
         JSONFormat res;
         res = new JSONFormat(lm);
-        res.setQuery(q, lm);
+        res.setQuery(q);
         res.setAST(ast);
         return res;
     }
 
-    @Override
-    public String getTitle(Title t) {
-        switch (t) {
-            case OHEADER:
-                return OHEADER;
-            case CHEADER:
-                return CHEADER;
-            case OHEAD:
-                if (ast.isAsk()) {
-                    return OHEADASK;
-                }
-                return OHEAD;
-            case CHEAD:
-                if (ast.isAsk()) {
-                    return CHEADASK;
-                }
-                return CHEAD;
-            case OVAR:
-                return OVAR;
-            case CVAR:
-                return CVAR;
-            case ORESULTS:
-                return ORESULTS;
-            case CRESULTS:
-                return CRESULTS;
-            case ORESULT:
-                return ORESULT;
-            case CRESULT:
-                return CRESULT;
-            default:
-                return "";
-        }
+    void setQuery(Query q) {
+        query = q;
     }
 
-    @Override
+    public void setAST(ASTQuery q) {
+        ast = q;
+    }
+
+    public String getTitle(Title t) {
+        if (AbstractTitle.OHEADER.equals(t)) {
+            return OHEADER;
+        } else if (AbstractTitle.CHEADER.equals(t)) {
+            return CHEADER;
+        } else if (AbstractTitle.OHEAD.equals(t)) {
+            if (ast.isAsk()) {
+                return OHEADASK;
+            }
+            return OHEAD;
+        } else if (AbstractTitle.CHEAD.equals(t)) {
+            if (ast.isAsk()) {
+                return CHEADASK;
+            }
+            return CHEAD;
+        } else if (AbstractTitle.OVAR.equals(t)) {
+            return OVAR;
+        } else if (AbstractTitle.CVAR.equals(t)) {
+            return CVAR;
+        } else if (AbstractTitle.ORESULTS.equals(t)) {
+            return ORESULTS;
+        } else if (AbstractTitle.CRESULTS.equals(t)) {
+            return CRESULTS;
+        } else if (AbstractTitle.ORESULT.equals(t)) {
+            return ORESULT;
+        } else if (AbstractTitle.CRESULT.equals(t)) {
+            return CRESULT;
+        }
+        return "";
+    }
+
     public void printHead() {
-        println(getTitle(Title.OHEAD));
+        println(getTitle(AbstractTitle.OHEAD));
         if (!ast.isAsk()) {
             // print variable or functions selected in the header
             println(OPEN_VAR);
@@ -101,7 +104,7 @@ public class JSONFormat extends XMLFormat {
             println(CLOSE_VAR);
         }
         printLnk(getMappings().getLinkList());
-        println(getTitle(Title.CHEAD));
+        println(getTitle(AbstractTitle.CHEAD));
     }
 
     void printVar(ArrayList<String> select) {
@@ -111,12 +114,6 @@ public class JSONFormat extends XMLFormat {
             if (n++ < select.size()) {
                 print(", ");
             }
-        }
-    }
-
-    void printLnk2(List<String> list) {
-        for (String name : list) {
-            print(", \n\"link\": [\"" + name + "\"]");
         }
     }
 
@@ -324,6 +321,11 @@ public class JSONFormat extends XMLFormat {
 
             println("\"error\" : \"" + escape(errorString) + "\",");
         }
+    }
+
+    @Override
+    String protect(String msg) {
+        return msg;
     }
 
     private String escape(String raw) {

@@ -21,7 +21,6 @@ public class JaroWinkler extends Jaro {
             sim = jaroSim + prefix * (0.1 * (1.0 - jaroSim));
         }
 
-        Utils.msg("Jaro-Winkler", s1, s2, parameter, sim);
         return sim;
     }
 

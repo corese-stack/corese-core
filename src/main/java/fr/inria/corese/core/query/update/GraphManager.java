@@ -66,7 +66,7 @@ public class GraphManager {
     }
     
     public static Load getLoader() {
-        return new Load();
+        return Load.create();
     }
     
     public boolean isRDFStar(){
@@ -74,10 +74,10 @@ public class GraphManager {
     }
 
     
-    /***********************************************************
-     * Construct Graph Manager
-     *     
-     **********************************************************/
+    //***********************************************************
+    // Construct Graph Manager
+    //
+    //**********************************************************
     
     public void startRuleEngine() {
         getDataBroker().startRuleEngine();
@@ -281,11 +281,11 @@ public class GraphManager {
     }
     
     
-    /*****************************************************************************
-     * 
-     *   SPARQL Update Manager
-     * 
-     ****************************************************************************/
+    //*****************************************************************************
+    //
+    //SPARQL Update Manager
+    //
+    //***************************************************************************/
     
     /**
      * Delete occurrences of edge in named graphs of from list
@@ -358,7 +358,7 @@ public class GraphManager {
         String uri = ope.getURI();
         IDatatype dt = DatatypeMap.newResource(uri);
         String src = ope.getTarget();
-        int format = getFormat(q);
+       Loader.format format = getFormat(q);
         getGraph().logStart(q);
         getGraph().getEventManager().start(Event.LoadUpdate);
         if (ope.isSilent()) {
@@ -409,8 +409,8 @@ public class GraphManager {
     }
    
    // format from query metadata @format st:rdfxml
-    void load(Load load, String src, String uri, int format) throws LoadException {
-        if (format == Loader.UNDEF_FORMAT) {
+    void load(Load load, String src, String uri, Loader.format format) throws LoadException {
+        if (format == Loader.format.UNDEF_FORMAT) {
             load(load, src, uri);
         }
         else {
@@ -423,19 +423,19 @@ public class GraphManager {
         try {
             load.parse(uri, src);
         } catch (LoadException e) {
-            if (load.getFormat(uri) == Loader.UNDEF_FORMAT
+            if (load.getFormat(uri) == Loader.format.UNDEF_FORMAT
                     && e.getException() != null
                     && e.getException().getMessage().contains("{E301}")) {
-                load.parse(uri, src, uri, Loader.TURTLE_FORMAT);
+                load.parse(uri, src, uri, Loader.format.TURTLE_FORMAT);
             }
         }
     }
     
     // @format st:rdfxml st:json st:turtle
-    int getFormat(Query q) {
+    Loader.format getFormat(Query q) {
         String ft = q.getAST().getMetadataValue(Metadata.FORMAT);
         if (ft == null) {
-            return Loader.UNDEF_FORMAT;
+            return Loader.format.UNDEF_FORMAT;
         }
         return LoadFormat.getDTFormat(ft);
     }
@@ -465,10 +465,8 @@ public class GraphManager {
             case Update.CLEAR:
 
                 if (isEntailment(uri)) {
-                    //graph.setEntailment(false);
                     getGraph().getEventManager().finish(Event.ActivateRDFSEntailment);
                 } else if (isRule(uri)) {
-                   // wf.setActivate(Engine.RULE_ENGINE, false);
                     getGraph().getEventManager().finish(Event.ActivateRuleEngine);
                 }
                 break;
@@ -477,12 +475,8 @@ public class GraphManager {
             case Update.CREATE:
 
                 if (isEntailment(uri)) {
-                    //graph.setEntailment(true);
-                    //graph.setEntail(true);
                     getGraph().getEventManager().start(Event.ActivateRDFSEntailment);
                 } else if (isRule(uri)) {
-//                    wf.setActivate(Engine.RULE_ENGINE, true);
-//                    graph.setEntail(true);
                     getGraph().getEventManager().start(Event.ActivateRuleEngine);
                 }
                 break;

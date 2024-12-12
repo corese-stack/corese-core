@@ -9,8 +9,8 @@ plugins {
     
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
-    id("org.gradlex.extra-java-module-info") version "1.8"      // Module metadata for JARs without module info
-    id("com.github.johnrengelman.shadow") version "8.1.1"       // Bundles dependencies into a single JAR
+    id("org.gradlex.extra-java-module-info") version "1.9"      // Module metadata for JARs without module info
+    id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
 }
 
 /////////////////////////
@@ -21,7 +21,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-core"
-    const val version = "4.6.0"
+    const val version = "4.6.1"
 
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
@@ -74,17 +74,22 @@ dependencies {
     implementation("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}") // Semargl core for RDF parsing and transformation
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                          // JSON-LD processing for Linked Data in JSON format
     implementation("junit:junit:4.13.2")                                                 // JUnit framework for unit testing in Java
+    api("org.slf4j:slf4j-api:2.0.9")                                                     // Simple Logging Facade for Java (SLF4J)
 }
 
 // Configure extra Java module information for dependencies without module-info
 extraJavaModuleInfo {
+    // If a library is missing module info, the build process will not fail.
     failOnMissingModuleInfo.set(false)
-    automaticModule("fr.com.hp.hpl.jena.rdf.arp:arp", "arp")
-    automaticModule("com.github.jsonld-java:jsonld-java", "jsonld.java")
-    automaticModule("commons-lang:commons-lang", "commons.lang")
+
+    // Map automatic module names for non-modular libraries.
+    automaticModule("fr.com.hp.hpl.jena.rdf.arp:arp", "arp") // Module for Jena RDF ARP
+    automaticModule("com.github.jsonld-java:jsonld-java", "jsonld.java") // Module for JSON-LD Java
+    automaticModule("commons-lang:commons-lang", "commons.lang") // Module for Commons Lang
     automaticModule("fr.inria.lille.shexjava:shexjava-core", "shexjava.core")
     automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model")
 }
+
 
 /////////////////////////
 // Publishing settings //
@@ -171,8 +176,8 @@ publishing {
 // Configure artifact signing
 signing {
     // Retrieve the GPG signing key and passphrase from environment variables for secure access.
-    val signingKey = providers.environmentVariable("GPG_SIGNING_KEY").forUseAtConfigurationTime()
-    val signingPassphrase = providers.environmentVariable("GPG_SIGNING_PASSPHRASE").forUseAtConfigurationTime()
+    val signingKey = providers.environmentVariable("GPG_SIGNING_KEY")
+    val signingPassphrase = providers.environmentVariable("GPG_SIGNING_PASSPHRASE")
 
     // Sign the publications if the GPG signing key and passphrase are available.
     if (signingKey.isPresent && signingPassphrase.isPresent) {
@@ -187,9 +192,9 @@ nexusPublishing {
         // Configure Sonatype OSSRH repository for publishing.
         sonatype {
             // Retrieve Sonatype OSSRH credentials from environment variables.
-            val ossrhUsername = providers.environmentVariable("OSSRH_USERNAME").forUseAtConfigurationTime()
-            val ossrhPassword = providers.environmentVariable("OSSRH_PASSWORD").forUseAtConfigurationTime()
-            
+            val ossrhUsername = providers.environmentVariable("OSSRH_USERNAME")
+            val ossrhPassword = providers.environmentVariable("OSSRH_PASSWORD")
+
             // Set the credentials for Sonatype OSSRH if they are available.
             if (ossrhUsername.isPresent && ossrhPassword.isPresent) {
                 username.set(ossrhUsername.get())
@@ -206,10 +211,10 @@ nexusPublishing {
 // Task configuration  //
 /////////////////////////
 
-
 // Set UTF-8 encoding for Java compilation tasks
 tasks.withType<JavaCompile>() {
     options.encoding = "UTF-8"
+    options.compilerArgs.add("-Xlint:none")
 }
 
 // Configure Javadoc tasks with UTF-8 encoding and disable failure on error.
@@ -225,6 +230,15 @@ tasks.withType<Javadoc>() {
 tasks {
     shadowJar {
         this.archiveClassifier = "jar-with-dependencies"
+            }
+}
+
+// Configure Javadoc tasks to disable doclint warnings.
+tasks {
+    javadoc {
+        options {
+            (this as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
+        }
     }
 }
 
@@ -248,6 +262,10 @@ tasks.jacocoTestReport {
 // Set the test task to be followed by Jacoco report generation.
 // This ensures that test coverage reports are always generated after tests.
 tasks.test {
+    // testLogging {
+    //     events("passed", "skipped", "failed") // Affiche les résultats des tests
+    //     showStandardStreams = true           // Affiche les sorties console des tests
+    // }
     finalizedBy(tasks.jacocoTestReport)
 }
 

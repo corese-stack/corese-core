@@ -19,18 +19,18 @@ public class SPARQLResultParser {
     
     public Mappings parse(String path, String... format)
             throws ParserConfigurationException, SAXException, IOException {
-        int ft = LoadFormat.getFormat(path);
+        Loader.format ft = LoadFormat.getFormat(path);
         
         if (format.length > 0) {
             switch (format[0]) {
-                case JSON: ft = Loader.JSON_FORMAT;
+                case JSON: ft = Loader.format.JSON_FORMAT;
                 break;
-                case XML: ft = Loader.XML_FORMAT;
+                case XML: ft = Loader.format.XML_FORMAT;
                 break; 
             }
         }
         switch (ft) {
-            case Loader.JSON_FORMAT:
+            case JSON_FORMAT:
                 return SPARQLJSONResult.create().parse(path);
             default:
                 return SPARQLResult.create().parse(path);

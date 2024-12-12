@@ -14,11 +14,14 @@ module fr.inria.corese.corese_core {
     requires org.apache.commons.lang3;
     requires shexjava.core;
     requires org.slf4j;
-    requires junit; //
+    requires junit;
+    requires jsonld.java;
+    requires commons.lang; //
 
     exports fr.inria.corese.core.load;
     exports fr.inria.corese.core.load.result;
     exports fr.inria.corese.core;
+    exports fr.inria.corese.core.elasticsearch;
     exports fr.inria.corese.core.query;
     exports fr.inria.corese.core.rule;
     exports fr.inria.corese.core.workflow;

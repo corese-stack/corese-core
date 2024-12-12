@@ -490,7 +490,7 @@ public class Service implements URLParam {
     }
     
     boolean sendParameter() {
-       return Property.booleanValue(SERVICE_SEND_PARAMETER) && ! getURL().hasParameter(MODE, LOCAL);
+       return Property.getBooleanValue(SERVICE_SEND_PARAMETER) && ! getURL().hasParameter(MODE, LOCAL);
     }
     
     /**

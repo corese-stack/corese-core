@@ -27,7 +27,7 @@ Add this dependency to your `pom.xml` file:
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-core</artifactId>
-    <version>4.6.0</version>
+    <version>4.6.1</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ Add this dependency to your `pom.xml` file:
 Include the following in your `build.gradle` file:
 
 ``` gradle
-implementation 'fr.inria.corese:corese-core:4.6.0'
+implementation 'fr.inria.corese:corese-core:4.6.1'
 ```
 
 **JAR:**
@@ -45,10 +45,7 @@ You can download the latest version of the **Corese-Core** JAR from the [release
 
 ## Documentation
 
-Explore the available documentation to help you get started with Corese-Core:
-
-- [Getting Started Guide](https://corese-stack.github.io/corese-core/v4.6.0/getting_started/getting_started_with_corese-core.html)
-- [API Documentation](https://corese-stack.github.io/corese-core/v4.6.0/java_api/library_root.html)
+Explore the available documentation on Corese-Core pages: [Corese-Core Documentation](https://corese-stack.github.io/corese-core/).
 
 ## Contributions and Community
 
@@ -60,6 +57,5 @@ We value contributions and feedback from the community! Here’s how you can eng
 
 ## Useful Links
 
-- [Corese Official Website](https://corese-stack.github.io/corese-core/v4.6.0/)
 - **Mailing List:** <corese-users@inria.fr>
 - **Join the Mailing List:** Send an email to <corese-users-request@inria.fr> with the subject: `subscribe`

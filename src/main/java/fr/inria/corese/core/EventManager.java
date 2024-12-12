@@ -1,11 +1,7 @@
 package fr.inria.corese.core;
 
-import fr.inria.corese.core.compiler.eval.Interpreter;
 import fr.inria.corese.core.compiler.parser.Transformer;
 import fr.inria.corese.core.api.Engine;
-import static fr.inria.corese.core.Event.Finish;
-import static fr.inria.corese.core.Event.Process;
-import static fr.inria.corese.core.Event.Start;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.util.Property;
 import static fr.inria.corese.core.util.Property.Value.LOG_NODE_INDEX;
@@ -26,10 +22,8 @@ import org.slf4j.Logger;
 public class EventManager implements EventHandler {
 
     private static Logger logger = LoggerFactory.getLogger(EventManager.class);
-    public static boolean DEFAULT_VERBOSE = false;
 
     private Graph graph;
-    private boolean verbose    = DEFAULT_VERBOSE;
     private boolean isEntail = true;
     private boolean isUpdate = false;
     private boolean isDelete = false;
@@ -75,7 +69,6 @@ public class EventManager implements EventHandler {
     }
     
     void send(Event type, Event e, Object o) {
-        trace(type, e, o);
         switch (type) {
             case Start:
                 start(e);
@@ -102,7 +95,7 @@ public class EventManager implements EventHandler {
     }
     
     public void process(Event e, Object o1, Object o2) {
-        //trace(Process, e, o1, o2);        
+        //trace(Process, e, o1, o2);
         switch(e) {
             case Insert: 
                 setUpdate(true); break;
@@ -144,7 +137,6 @@ public class EventManager implements EventHandler {
     
      
     public void start(Event e, Object o) {
-        trace(Start, e, o);
         switch (e) {
             case Query:
                 // sparql query 
@@ -227,7 +219,6 @@ public class EventManager implements EventHandler {
    
 
     public void finish(Event e, Object o) {
-        trace(Finish, e, o);
          switch (e) {
              // insert after delete may require up to date NodeIndex
              // we must compute node index after delete
@@ -304,9 +295,9 @@ public class EventManager implements EventHandler {
             getEntailment().setActivate(b);
         }
     }
-    
+
     void log(Property.Value prop, Event type, Event e, Object o) {
-        if (Property.booleanValue(prop)) {
+        if (Property.getBooleanValue(prop)) {
             getLog().log(type, e, o);
         }
     }
@@ -370,45 +361,12 @@ public class EventManager implements EventHandler {
     public boolean isEntail() {
         return isEntail;
     }
-    
-    
-    void trace(Event type, Event e) {
-        trace(type, e, null);
-    }
 
-    void trace(Event type, Event e, Object o) {
-        trace(type, e, o, null);
-    }
-    void trace(Event type, Event e, Object o, Object o2) {
-        if (verbose) {
-            getLog().trace(type, e, o, o2);
-        }
-    }
-    
     EventLogger getLog() {
         if (log == null) {
             log = new EventLogger(this);
         }
         return log;
-    }
-    
-    /**
-     * @return the debug
-     */
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    /**
-     * @param debug the debug to set
-     */
-    public void setVerbose(boolean debug) {
-        this.verbose = debug;
-    }
-    
-    public void setTrackUpdate(boolean track) {
-        setVerbose(track);
-        getLog().setMethod(track);
     }
 
     public void setDeletion(boolean deletion) {
