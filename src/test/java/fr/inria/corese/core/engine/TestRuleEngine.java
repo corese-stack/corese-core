@@ -38,10 +38,7 @@ public class TestRuleEngine {
 
     @BeforeClass
     public static void init() throws EngineException {
-        // Graph.setCompareIndex(true);
         QuerySolver.definePrefix("c", "http://www.inria.fr/acacia/comma#");
-        // Load.setDefaultGraphValue(true);
-        // EdgeIndexer.test = false;
 
         graph = createGraph(true);
         Load load = Load.create(graph);
@@ -64,10 +61,6 @@ public class TestRuleEngine {
         fengine.setSpeedUp(true);
 
         QueryProcess.create(graph);
-        // rengine = Engine.create(exec);
-        //
-        // rengine.load(data + "engine/rule/test2.brul");
-        // rengine.load(data + "engine/rule/meta.brul");
     }
 
     @AfterClass
@@ -83,7 +76,6 @@ public class TestRuleEngine {
         GraphStore g = GraphStore.create(b);
         Parameters p = Parameters.create();
         p.add(Parameters.type.MAX_LIT_LEN, 2);
-        // g.setStorage(IStorage.STORAGE_FILE, p);
         return g;
     }
 
@@ -102,7 +94,7 @@ public class TestRuleEngine {
     @Test
     public void test57() {
         Graph graph = createGraph();
-        // QueryProcess.definePrefix("e", "htp://example.org/");
+
         QueryProcess exec = QueryProcess.create(graph);
 
         RuleEngine re = RuleEngine.create(graph);
@@ -114,14 +106,6 @@ public class TestRuleEngine {
         String rule2 = "prefix e: <htp://example.org/>" +
                 "construct {[a e:Father;   e:term(?x ?y)]}"
                 + "where     {[a e:Parent;   e:term(?x ?y)]}";
-
-        // String rule3 = "prefix e: <htp://example.org/>" +
-        //         "construct {[a e:Parent]}"
-        //         + "where     {[a e:Father]}";
-
-        // String rule4 = "prefix e: <htp://example.org/>" +
-        //         "construct {[a e:Father]}"
-        //         + "where     {[a e:Parent]}";
 
         try {
             re.defRule(rule);

@@ -1,5 +1,6 @@
 package fr.inria.corese.core.load.result;
 
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.compiler.parser.NodeImpl;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
@@ -17,10 +18,10 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 public class SPARQLRDFResult {
     
     public Mappings parse(String result) throws LoadException {
-        return parse(result, Load.TURTLE_FORMAT);
+        return parse(result, Loader.format.TURTLE_FORMAT);
     }
     
-    public Mappings parse(String result, int format) throws LoadException {
+    public Mappings parse(String result, Loader.format format) throws LoadException {
         String query
                 = "prefix rs: <http://www.w3.org/2001/sw/DataAccess/tests/result-set#>"
                 + "select ?var ?val where { "

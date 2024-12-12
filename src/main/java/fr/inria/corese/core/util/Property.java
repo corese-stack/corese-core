@@ -14,13 +14,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import fr.inria.corese.core.kgram.core.Exp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,14 +83,11 @@ import fr.inria.corese.core.sparql.triple.parser.visitor.ASTParser;
  */
 public class Property {
 
-    private static Logger logger = LoggerFactory.getLogger(Property.class);
-    final static String VAR_CHAR = "$";
+    private static final Logger logger = LoggerFactory.getLogger(Property.class);
+
+    private static Property singleton = null;
+
     public static final String STAR = "*";
-    final static String LOCAL = "./";
-    final static String SEP = ";";
-    final static String EQ = "=";
-    private static Property singleton;
-    private static final String STD = "std";
     public static final String RDF_XML = "rdf+xml";
     public static final String TURTLE = "turtle";
     public static final String TRIG = "trig";
@@ -103,18 +97,24 @@ public class Property {
     public static final String DB = "db";
     public static final String DB_ALL = "db_all";
 
-    private HashMap<Value, Boolean> booleanProperty;
-    private HashMap<Value, String> stringProperty;
-    private HashMap<Value, Integer> integerProperty;
-    private HashMap<Value, List<String>> listProperty;
-    private HashMap<String, String> variableMap;
-    private HashMap<String, String> imports;
+    static final String VAR_CHAR = "$";
+    static final String LOCAL = "./";
+    static final String SEP = ";";
+    static final String EQ = "=";
+    private static final String STD = "std";
+
+    private Map<Value, Boolean> booleanProperty;
+    private Map<Value, String> stringProperty;
+    private Map<Value, Integer> integerProperty;
+    private Map<Value, List<String>> listProperty;
+    private Map<String, String> variableMap;
+    private Map<String, String> imports;
 
     // Java Properties manage property file (at user option)
     private Properties properties;
 
-    private String path, parent;
-    private boolean debug = false;
+    private String path;
+    private String parent;
 
     public enum Value {
         // VARIABLE = home=/home/name/dir
@@ -296,34 +296,33 @@ public class Property {
 
         // parser configuration
         STRICT_MODE,
-    };
 
-    static {
-        start();
-    }
-
-    static void start() {
-        singleton = new Property();
-        set(SERVICE_SEND_PARAMETER, true);
-        set(DATATYPE_ENTAILMENT, true);
+        // Elasticsearch parameters
+        // TODO Change class to be able to define application-specific properties
+        ELASTICSEARCH_API_KEY,
+        ELASTICSEARCH_API_ADDRESS,
     }
 
     Property() {
-        booleanProperty = new HashMap<>();
-        stringProperty = new HashMap<>();
-        integerProperty = new HashMap<>();
-        listProperty = new HashMap<>();
+        booleanProperty = new EnumMap<>(Value.class);
+        stringProperty = new EnumMap<>(Value.class);
+        integerProperty = new EnumMap<>(Value.class);
+        listProperty = new EnumMap<>(Value.class);
         properties = new Properties();
         variableMap = new HashMap<>();
         imports = new HashMap<>();
     }
 
-    public static Property getSingleton() {
+    protected static Property getSingleton() {
+        if(singleton == null) {
+            singleton = new Property();
+            set(SERVICE_SEND_PARAMETER, true);
+            set(DATATYPE_ENTAILMENT, true);
+        }
         return singleton;
     }
 
-    public static void load(String path) throws FileNotFoundException, IOException {
-        start();
+    public static void load(String path) throws IOException {
         getSingleton().basicLoad(path);
     }
 
@@ -335,40 +334,97 @@ public class Property {
     }
 
     public static void set(Value value, boolean b) {
-        getSingleton().basicSet(value, b);
+        basicSet(value, b);
     }
 
     public static void set(Value value, String str) {
-        getSingleton().basicSet(value, str);
+        basicSet(value, str);
     }
 
     public static void set(Value value, String... str) {
-        getSingleton().basicSet(value, str);
+        basicSet(value, str);
     }
 
     public static void set(Value value, double d) {
-        getSingleton().basicSet(value, Double.toString(d));
+        basicSet(value, Double.toString(d));
     }
 
     public static void set(Value value, int n) {
-        getSingleton().basicSet(value, n);
+        basicSet(value, n);
     }
 
-    public static Boolean get(Value value) {
-        return getSingleton().getBooleanProperty().get(value);
+    public static boolean hasProperty(Value value) {
+        return getSingleton().getBooleanProperty().containsKey(value) || getSingleton().getStringProperty().containsKey(value) || getSingleton().getIntegerProperty().containsKey(value) || getSingleton().getListProperty().containsKey(value);
     }
 
-    public static boolean booleanValue(Value value) {
-        Boolean b = get(value);
+    private boolean hasBooleanProperty(Value value) {
+        return getBooleanProperty().containsKey(value);
+    }
+
+    private boolean hasStringProperty(Value value) {
+        return getStringProperty().containsKey(value);
+    }
+
+    private boolean hasIntegerProperty(Value value) {
+        return getIntegerProperty().containsKey(value);
+    }
+
+    private boolean hasListProperty(Value value) {
+        return getListProperty().containsKey(value);
+    }
+
+    public static Object get(Value value) {
+        if(getSingleton().hasBooleanProperty(value))
+            return getBooleanValue(value);
+        if(getSingleton().hasStringProperty(value))
+            return getStringValue(value);
+        if(getSingleton().hasIntegerProperty(value))
+            return getIntegerValue(value);
+        if(getSingleton().hasListProperty(value))
+            return getListValue(value);
+        return null;
+    }
+
+    public static boolean getBooleanValue(Value value) {
+        Boolean b = getSingleton().getBooleanProperty().get(value);
         return b != null && b;
     }
 
+    public static String getStringValue(Value value) {
+        return getSingleton().getStringProperty().get(value);
+    }
+
+    public static int getIntegerValue(Value value) {
+        return getSingleton().getIntegerProperty().get(value);
+    }
+
+    public static List<String> getListValue(Value value) {
+        return getSingleton().getListProperty().get(value);
+    }
+
     public static boolean hasValue(Value value, boolean b) {
-        return get(value) != null && get(value) == b;
+        return get(value) != null && getBooleanValue(value) == b;
+    }
+
+    public static boolean hasValue(Value value, String str) {
+        return get(value) != null && getStringValue(value).equals(str);
+    }
+
+    public static boolean hasValue(Value value, int n) {
+        return get(value) != null && getIntegerValue(value) == n;
+    }
+
+    public static boolean hasValue(Value value, String... str) {
+        return get(value) != null && getListValue(value).containsAll(Arrays.asList(str));
     }
 
     public static Set<Value> getPropertySet() {
-        return getSingleton().getBooleanProperty().keySet();
+        HashSet<Value> result = new HashSet<>();
+        result.addAll(getSingleton().getBooleanProperty().keySet());
+        result.addAll(getSingleton().getStringProperty().keySet());
+        result.addAll(getSingleton().getIntegerProperty().keySet());
+        result.addAll(getSingleton().getListProperty().keySet());
+        return result;
     }
 
     public static String display() {
@@ -379,17 +435,22 @@ public class Property {
      * Implementation for singleton
      */
 
-    public String basicDisplay() {
+    public static String basicDisplay() {
         return String.format("Property:\n%s\n%s",
-                getBooleanProperty().toString(), getStringProperty().toString());
+                getSingleton().getBooleanProperty().toString(), getSingleton().getStringProperty().toString());
     }
 
-    void basicLoad(String path) throws FileNotFoundException, IOException {
+    void basicLoad(String path) throws IOException {
         setPath(path);
         File file = new File(path);
         setParent(file.getParent());
         getImports().put(path, path);
-        getProperties().load(new FileReader(path));
+        try (FileReader loadPathReader = new FileReader(path)) {
+            getProperties().load(loadPathReader);
+        } catch (IOException e) {
+            logger.error("Error loading: " + path);
+            throw e;
+        }
         // start with variable because import may use variable,
         // as well as other properties
         defineVariable();
@@ -404,15 +465,17 @@ public class Property {
     private void imports() throws IOException {
         if (getProperties().containsKey(IMPORT.toString())) {
 
-            for (String name : getPropertiesValue(IMPORT).split(SEP)) {
-                String path = expand(name);
+            for (String name : ((String) get(IMPORT)).split(SEP)) {
+                String importPath = expand(name);
 
-                if (getImports().containsKey(path)) {
-                    logger.info("Skip import: " + path);
+                if (getImports().containsKey(importPath)) {
+                    logger.info("Skip import: " + importPath);
                 } else {
-                    getImports().put(path, path);
-                    logger.info("Import: " + path);
-                    getProperties().load(new FileReader(path));
+                    getImports().put(importPath, importPath);
+                    logger.info("Import: " + importPath);
+                    try (FileReader importReader = new FileReader(importPath)) {
+                        getProperties().load(importReader);
+                    }
                     // @note: imported variable overload Properties and Property variable property
                     // but complete variable hashmap properly
                     defineVariable();
@@ -442,20 +505,20 @@ public class Property {
      */
     void defineVariable() {
         if (getProperties().containsKey(VARIABLE.toString())) {
-            basicSet(VARIABLE, getPropertiesValue(VARIABLE));
+            basicSet(VARIABLE, (String) get(VARIABLE));
             // variable definitions in a hashmap
             defineVariableMap();
         }
     }
 
-    public void define(String name, String value) throws IOException {
+    public static void define(String name, String value) {
         Value pname = Value.valueOf(name);
-        if (value.equals("true") | value.equals("false")) {
-            Boolean b = Boolean.valueOf(value);
+        if (value.equals("true") || value.equals("false")) {
+            boolean b = Boolean.parseBoolean(value);
             basicSet(pname, b);
         } else {
             try {
-                int n = Integer.valueOf(value);
+                int n = Integer.parseInt(value);
                 basicSet(pname, n);
             } catch (Exception e) {
                 basicSet(pname, value);
@@ -463,11 +526,9 @@ public class Property {
         }
     }
 
-    void basicSet(Value value, boolean b) {
-        if (isDebug()) {
-            logger.info(value + " = " + b);
-        }
-        getBooleanProperty().put(value, b);
+    static void basicSet(Value value, boolean b) {
+        logger.debug("{} = {}", value, b);
+        getSingleton().getBooleanProperty().put(value, b);
 
         switch (value) {
 
@@ -523,7 +584,6 @@ public class Property {
             case RDF_STAR_TRIPLE:
                 EdgeFactory.EDGE_TRIPLE_NODE = b;
                 EdgeFactory.OPTIMIZE_EDGE = !b;
-                // continue;
 
             case RDF_STAR:
                 Graph.setRDFStar(b);
@@ -589,7 +649,7 @@ public class Property {
                 break;
 
             case SOLVER_DEBUG:
-                Query.DEBUG_DEFAULT = b;
+                Exp.DEBUG_DEFAULT = b;
                 break;
 
             case LDSCRIPT_DEBUG:
@@ -677,29 +737,25 @@ public class Property {
         }
     }
 
-    void basicSet(Value value, String... str) {
-        if (isDebug()) {
-            logger.info(value + " = " + str);
-        }
+    static void basicSet(Value value, String... str) {
+            logger.debug("{} = {}", value, str);
         switch (value) {
             case FEDERATE_BLACKLIST:
-                blacklist(str);
+                getSingleton().blacklist(str);
                 break;
             case FEDERATE_BLACKLIST_EXCEPT:
-                blacklistExcept(str);
+                getSingleton().blacklistExcept(str);
                 break;
         }
     }
 
-    void basicSet(Value value, String str) {
-        if (isDebug()) {
-            logger.info(value + " = " + str);
-        }
-        getStringProperty().put(value, str);
+    static void basicSet(Value value, String str) {
+        logger.debug("{} = {}", value, str);
+        getSingleton().getStringProperty().put(value, str);
         switch (value) {
 
             case FEDERATION:
-                defineFederation(str);
+                getSingleton().defineFederation(str);
                 break;
 
             case FEDERATE_INDEX_PATTERN:
@@ -707,39 +763,39 @@ public class Property {
                 break;
 
             case FEDERATE_QUERY_PATTERN:
-                setQueryPattern(str);
+                getSingleton().setQueryPattern(str);
                 break;
 
             case FEDERATE_PREDICATE_PATTERN:
-                setPredicatePattern(str);
+                getSingleton().setPredicatePattern(str);
                 break;
 
             case FEDERATE_FILTER_ACCEPT:
-                setFilterAccept(str);
+                getSingleton().setFilterAccept(str);
                 break;
 
             case FEDERATE_FILTER_REJECT:
-                setFilterReject(str);
+                getSingleton().setFilterReject(str);
                 break;
 
             case FEDERATE_INDEX_SKIP:
-                setIndexSkip(str);
+                getSingleton().setIndexSkip(str);
                 break;
 
             case FEDERATE_BLACKLIST:
-                blacklist(str);
+                getSingleton().blacklist(str);
                 break;
 
             case FEDERATE_BLACKLIST_EXCEPT:
-                blacklistExcept(str);
+                getSingleton().blacklistExcept(str);
                 break;
 
             case FEDERATE_SPLIT:
-                split(str);
+                getSingleton().split(str);
                 break;
 
             case FEDERATE_INDEX_SUCCESS:
-                FederateVisitor.NB_SUCCESS = Double.valueOf(str);
+                FederateVisitor.NB_SUCCESS = Double.parseDouble(str);
                 break;
 
             case LOAD_FORMAT:
@@ -755,11 +811,11 @@ public class Property {
                 break;
 
             case SERVICE_HEADER:
-                getListProperty().put(SERVICE_HEADER, getList(str));
+                getSingleton().getListProperty().put(SERVICE_HEADER, getSingleton().getList(str));
                 break;
 
             case LDSCRIPT_VARIABLE:
-                variable();
+                getSingleton().variable();
                 break;
 
             case BLANK_NODE:
@@ -767,37 +823,36 @@ public class Property {
                 break;
 
             case SOLVER_QUERY_PLAN:
-                queryPlan(str);
+                getSingleton().queryPlan(str);
                 break;
 
             case SOLVER_VISITOR:
-                QueryProcess.setVisitorName(expand(str));
+                QueryProcess.setVisitorName(getSingleton().expand(str));
                 break;
 
             case RULE_VISITOR:
-                QuerySolverVisitorRule.setVisitorName(expand(str));
+                QuerySolverVisitorRule.setVisitorName(getSingleton().expand(str));
                 break;
 
             case TRANSFORMER_VISITOR:
-                QuerySolverVisitorTransformer.setVisitorName(expand(str));
+                QuerySolverVisitorTransformer.setVisitorName(getSingleton().expand(str));
                 break;
 
             case SERVER_VISITOR:
-                QueryProcess.setServerVisitorName(expand(str));
+                QueryProcess.setServerVisitorName(getSingleton().expand(str));
                 break;
 
             case ACCESS_LEVEL:
-                accessLevel(str);
+                getSingleton().accessLevel(str);
                 break;
 
             case PREFIX:
-                prefix();
+                getSingleton().prefix();
                 break;
 
             case LOAD_FUNCTION:
-                loadFunction(str);
+                getSingleton().loadFunction(str);
                 break;
-
         }
     }
 
@@ -851,42 +906,30 @@ public class Property {
     }
 
     List<String> getList(String list) {
-        ArrayList<String> alist = new ArrayList<>();
-        for (String str : list.split(SEP)) {
-            alist.add(str);
-        }
-        return alist;
+        return new ArrayList<>(Arrays.asList(list.split(SEP)));
     }
 
     void blacklist(String list) {
-        FederateVisitor.BLACKLIST = getList(list);
+        FederateVisitor.BLACKLIST = getSingleton().getList(list);
     }
 
     void blacklistExcept(String list) {
-        FederateVisitor.BLACKLIST_EXCEPT = getList(list);
+        FederateVisitor.BLACKLIST_EXCEPT = getSingleton().getList(list);
     }
 
     void blacklist(String... list) {
-        ArrayList<String> alist = new ArrayList<>();
-        for (String str : list) {
-            alist.add(str);
-        }
-        FederateVisitor.BLACKLIST = alist;
+        FederateVisitor.BLACKLIST = new ArrayList<>(Arrays.asList(list));
     }
 
     void blacklistExcept(String... list) {
         ArrayList<String> alist = new ArrayList<>();
-        for (String str : list) {
-            alist.add(str);
-        }
+        Collections.addAll(alist, list);
         FederateVisitor.BLACKLIST_EXCEPT = alist;
     }
 
-    void basicSet(Value value, int n) {
-        if (isDebug()) {
-            logger.info(value + " = " + n);
-        }
-        getIntegerProperty().put(value, n);
+    static void basicSet(Value value, int n) {
+        logger.debug("{} = {}", value, n);
+        getSingleton().getIntegerProperty().put(value, n);
 
         switch (value) {
 
@@ -919,14 +962,14 @@ public class Property {
     // variable definition may use preceding variables
     private void defineVariableMap() {
         for (Pair pair : getValueListBasic(Value.VARIABLE)) {
-            String var = varName(pair.getKey());
+            String variable = varName(pair.getKey());
 
-            if (getVariableMap().containsKey(var)) {
-                logger.info("Overload variable: " + var);
+            if (getVariableMap().containsKey(variable)) {
+                logger.info("Overload variable: " + variable);
             }
-            logger.info(String.format("variable: %s=%s", var, expand(pair.getValue())));
+            logger.info(String.format("variable: %s=%s", variable, expand(pair.getValue())));
 
-            getVariableMap().put(var, expand(pair.getValue()));
+            getVariableMap().put(variable, expand(pair.getValue()));
         }
     }
 
@@ -936,9 +979,9 @@ public class Property {
 
     String expand(String value) {
         if (value.startsWith(VAR_CHAR)) {
-            for (String var : getVariableMap().keySet()) {
-                if (value.startsWith(var)) {
-                    return value.replace(var, getVariableMap().get(var));
+            for (String variable : getVariableMap().keySet()) {
+                if (value.startsWith(variable)) {
+                    return value.replace(variable, getVariableMap().get(variable));
                 }
             }
         } else if (value.startsWith("./")) {
@@ -1008,7 +1051,7 @@ public class Property {
         try {
             Value pname = Value.valueOf(name);
             define(pname, value, g);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -1053,20 +1096,20 @@ public class Property {
      */
     void variable() {
         for (Pair pair : getValueListBasic(Value.LDSCRIPT_VARIABLE)) {
-            String var = pair.getKey().strip();
+            String variable = pair.getKey().strip();
             String val = pair.getValue().strip();
-            logger.info(String.format("ldscript variable: %s=%s", var, val));
+            logger.info(String.format("ldscript variable: %s=%s", variable, val));
             IDatatype dt = DatatypeMap.newValue(val);
-            Binding.setStaticVariable(var, dt);
+            Binding.setStaticVariable(variable, dt);
         }
     }
 
-    public static List<Pair> getValueList(Value val) {
-        return getSingleton().getValueListBasic(val);
+    public List<Pair> getValueList(Value val) {
+        return getValueListBasic(val);
     }
 
     public List<Pair> getValueListBasic(Value val) {
-        String str = Property.stringValue(val);
+        String str = stringValue(val);
         ArrayList<Pair> list = new ArrayList<>();
         if (str == null) {
             return list;
@@ -1112,9 +1155,9 @@ public class Property {
 
     }
 
-    public List<List<String>> getStorageparameters() {
+    public static List<List<String>> getStorageparameters() {
 
-        String storages = Property.stringValue(STORAGE);
+        String storages = stringValue(STORAGE);
 
         List<List<String>> storageList = new ArrayList<>();
         if (storages == null) {
@@ -1124,14 +1167,13 @@ public class Property {
         for (String storageStr : storages.split(SEP)) {
 
             String[] storageLst = storageStr.split(",", 3);
-            storageList.add(List.of(storageLst).stream().map(str -> this.expand(str)).collect(Collectors.toList()));
+            storageList.add(List.of(storageLst).stream().map( str -> getSingleton().expand(str)).collect(Collectors.toList()));
         }
         return storageList;
     }
 
     void prefix() {
         for (Pair pair : getValueListBasic(PREFIX)) {
-            logger.info(String.format("prefix %s: <%s>", pair.getKey().strip(), pair.getValue().strip()));
             NSManager.defineDefaultPrefix(pair.getKey().strip(), pair.getValue().strip());
         }
     }
@@ -1141,39 +1183,39 @@ public class Property {
             Level level = Level.valueOf(str);
             Access.setDefaultUserLevel(level);
         } catch (Exception e) {
-            logger.error("Undefined Access Level: " + str);
+            logger.error("Undefined Access Level: {}", str);
         }
     }
 
-    public HashMap<Value, Boolean> getBooleanProperty() {
+    protected Map<Value, Boolean> getBooleanProperty() {
         return booleanProperty;
     }
 
-    public void setBooleanProperty(HashMap<Value, Boolean> booleanProperty) {
+    protected void setBooleanProperty(Map<Value, Boolean> booleanProperty) {
         this.booleanProperty = booleanProperty;
     }
 
-    public HashMap<Value, String> getStringProperty() {
+    protected Map<Value, String> getStringProperty() {
         return stringProperty;
     }
 
-    public void setStringProperty(HashMap<Value, String> stringProperty) {
+    protected void setStringProperty(Map<Value, String> stringProperty) {
         this.stringProperty = stringProperty;
     }
 
-    public void setProperties(Properties properties) {
+    protected void setProperties(Properties properties) {
         this.properties = properties;
     }
 
-    public Properties getProperties() {
+    protected Properties getProperties() {
         return properties;
     }
 
-    public HashMap<Value, Integer> getIntegerProperty() {
+    protected Map<Value, Integer> getIntegerProperty() {
         return integerProperty;
     }
 
-    public void setIntegerProperty(HashMap<Value, Integer> integerProperty) {
+    protected void setIntegerProperty(Map<Value, Integer> integerProperty) {
         this.integerProperty = integerProperty;
     }
 
@@ -1185,19 +1227,12 @@ public class Property {
         return getSingleton().getListProperty().get(value);
     }
 
-    String getPropertiesValue(Value value) {
-        if (getProperties().containsKey(value.toString())) {
-            return (String) getProperties().get(value.toString());
-        }
-        return null;
-    }
-
     public static String stringValue(Value val) {
         return getSingleton().getStringProperty().get(val);
     }
 
-    public static String pathValue(Value val) {
-        return getSingleton().expand(stringValue(val));
+    protected String pathValue(Value val) {
+        return expand(stringValue(val));
     }
 
     public static String[] stringValueList(Value val) {
@@ -1208,51 +1243,43 @@ public class Property {
         return str.split(SEP);
     }
 
-    public HashMap<String, String> getVariableMap() {
+    protected Map<String, String> getVariableMap() {
         return variableMap;
     }
 
-    public void setVariableMap(HashMap<String, String> variableMap) {
+    protected void setVariableMap(Map<String, String> variableMap) {
         this.variableMap = variableMap;
     }
 
-    public String getPath() {
+    protected String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
+    protected void setPath(String path) {
         this.path = path;
     }
 
-    public String getParent() {
+    protected String getParent() {
         return parent;
     }
 
-    public void setParent(String parent) {
+    protected void setParent(String parent) {
         this.parent = parent;
     }
 
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
-    public HashMap<String, String> getImports() {
+    protected Map<String, String> getImports() {
         return imports;
     }
 
-    public void setImports(HashMap<String, String> imports) {
+    protected void setImports(Map<String, String> imports) {
         this.imports = imports;
     }
 
-    public HashMap<Value, List<String>> getListProperty() {
+    protected Map<Value, List<String>> getListProperty() {
         return listProperty;
     }
 
-    public void setListProperty(HashMap<Value, List<String>> listProperty) {
+    protected void setListProperty(Map<Value, List<String>> listProperty) {
         this.listProperty = listProperty;
     }
 
@@ -1278,11 +1305,11 @@ public class Property {
     // consider all db
     public static boolean isStorageAll() {
         return isStorage() &&
-                protectEquals(stringValue(STORAGE_MODE), DB_ALL);
+                getSingleton().protectEquals(stringValue(STORAGE_MODE), DB_ALL);
     }
 
-    static boolean protectEquals(String var, String val) {
-        return var != null && var.equals(val);
+    boolean protectEquals(String variable, String value) {
+        return variable != null && variable.equals(value);
     }
 
 }

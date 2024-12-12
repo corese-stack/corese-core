@@ -49,12 +49,14 @@ public class QueryLoad extends Load {
     public static QueryLoad create(QueryEngine e) {
         return new QueryLoad(e);
     }
-    
+
+    @Override
     @Deprecated
     public void loadWE(String name) throws LoadException {
         parse(name);
     }
-        
+
+    @Override
     public void parse(String name) throws LoadException {
         String q = readWE(name);
         if (q != null) {
@@ -69,23 +71,6 @@ public class QueryLoad extends Load {
             }
         }
     }
-     
-    @Deprecated
-    public void load(String name) {
-        String q = read(name);
-        if (q != null) {
-            try {
-                Query qq = engine.defQuery(q);
-                if (qq != null) {
-                    qq.setPragma(Pragma.FILE, name);
-                }
-            } catch (EngineException e) {
-                logger.error("Loading: " + name);
-                e.printStackTrace();
-            }
-        }
-    }
-    
     
     @Deprecated
     public void load(Reader read) throws LoadException {
@@ -98,13 +83,12 @@ public class QueryLoad extends Load {
             if (q != null) {
                 engine.defQuery(q);
             }
-        } catch (IOException ex) {
+        } catch (IOException | EngineException ex) {
             throw new LoadException(ex);
-        } catch (EngineException ex) {
-            throw new LoadException(ex);        
         }
     }
 
+    @Override
      boolean isURL(String path) {
         try {
             new URL(path);

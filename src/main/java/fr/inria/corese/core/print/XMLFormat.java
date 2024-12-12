@@ -24,20 +24,13 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  * Olivier Corby, Edelweiss INRIA 2011
  *
  */
-public class XMLFormat extends QueryResultFormat {
+public class XMLFormat extends AbstractNestedResultFormat {
 
     /**
      * Use to keep the class version, to be consistent with the interface
      * Serializable.java
      */
     private static final long serialVersionUID = 1L;
-    static final String VAR1 = "?";
-    static final String VAR2 = "$";
-    Query query;
-    ASTQuery ast;
-    private Mappings lMap;
-    ArrayList<String> select;
-    PrintWriter pw;
 
     public static final String SPARQLRES = NSManager.XMLRESULT;
     private static final String XMLDEC = "<?xml version=\"1.0\" ?>";
@@ -58,18 +51,11 @@ public class XMLFormat extends QueryResultFormat {
     private static final String CDATA = "]]>";
     private static final String OCOM = "<!--";
     private static final String CCOM = "-->";
-    private long nbResult = Long.MAX_VALUE;
 
     boolean displaySort = false;
-    NumberFormat nf = NumberFormat.getInstance(Locale.FRENCH);
-    private boolean selectAll = false;
 
     XMLFormat(Mappings lm) {
-        lMap = lm;
-        nf.setMaximumFractionDigits(4);
-    }
-
-    XMLFormat() {
+        super(lm);
     }
 
     public static XMLFormat create(Mappings lm) {
@@ -84,196 +70,52 @@ public class XMLFormat extends QueryResultFormat {
         return res;
     }
 
-    void setQuery(Query q, Mappings map) {
-        query = q;
-    }
-    
-    /**
-     * perform init() just before printing because we need to wait
-     * a possible setSelectAll(true) 
-     * So we cannot do it at creation time
-     */
-    void init() {
-        setSelect();
-    }
-    
-    void setSelect() {
-        select = new ArrayList<>();
-        
-        for (Node node : query.getSelect()) {
-            defSelect(node.getLabel());
-        }
-        
-        if (isSelectAll()) {
-            // additional select nodes such as ?_server_0 in federate mode
-            for (Node node : getMappings().getQueryNodeList()) {
-                defSelect(node.getLabel());
-            }
-        }
-    }
-    
-    void defSelect(String var) {
-        if (! select.contains(var) && accept(var)) {
-            select.add(var);
-        }
-    }
-
-    ASTQuery getAST() {
-        return ast;
-    }
-
-    @Override
-    public String toString() {
-        StringBuffer sb = toStringBuffer();
-        return sb.toString();
-    }
-
-    public StringBuffer toStringBuffer() {
-        StringWriter sw = new StringWriter();
-        pw = new PrintWriter(sw);
-        print();
-        return sw.getBuffer();
-    }
-
     public void setAST(ASTQuery q) {
         ast = q;
     }
 
-    ArrayList<String> getSelect() {
-        return select;
-    }
 
     void setWriter(PrintWriter p) {
         pw = p;
     }
 
-    /**
-     * The main printer
-     */
-    /**
-     * Print the vector of CG results, grouped and sorted and counted, as an
-     * HTML table Print it in the print writer, prints the concepts using cg2rdf
-     * pprinter The table is/can be processed by a stylesheet
-     */
-    public void print() {
-        print(false, "");
-    }
-
-    /**
-     * @return the nbResult
-     */
-    public long getNbResult() {
-        return nbResult;
-    }
-
-    /**
-     * @param nbResult the nbResult to set
-     */
-    public void setNbResult(long nbResult) {
-        this.nbResult = nbResult;
-    }
-
-    enum Title {
-        XMLDEC, OHEADER, CHEADER, OHEAD, CHEAD, OVAR, CVAR,
-        ORESULT, CRESULT, ORESULTS, CRESULTS
+    enum XMLTitle implements Title {
+        XMLDEC, OCOM, CCOM
     };
 
-    public String getTitle(Title t) {
-        switch (t) {
-            case XMLDEC:
-                return XMLDEC;
-            case OHEADER:
-                return OHEADER;
-            case CHEADER:
-                return CHEADER;
-            case OHEAD:
-                return OHEAD;
-            case CHEAD:
-                return CHEAD;
-            case OVAR:
-                return OVAR;
-            case CVAR:
-                return CVAR;
-            case ORESULT:
-                return ORESULT;
-            case CRESULT:
-                return CRESULT;
-            case ORESULTS:
-                return ORESULTS;
-            case CRESULTS:
-                return CRESULTS;
-            default:
-                return "";
+    public <T extends AbstractNestedResultFormat.Title> String getTitle(T t) {
+        if (XMLTitle.XMLDEC.equals(t)) {
+            return XMLDEC;
+        } else if (AbstractTitle.OHEADER.equals(t)) {
+            return OHEADER;
+        } else if (AbstractTitle.CHEADER.equals(t)) {
+            return CHEADER;
+        } else if (AbstractTitle.OHEAD.equals(t)) {
+            return OHEAD;
+        } else if (AbstractTitle.CHEAD.equals(t)) {
+            return CHEAD;
+        } else if (AbstractTitle.OVAR.equals(t)) {
+            return OVAR;
+        } else if (AbstractTitle.CVAR.equals(t)) {
+            return CVAR;
+        } else if (AbstractTitle.ORESULT.equals(t)) {
+            return ORESULT;
+        } else if (AbstractTitle.CRESULT.equals(t)) {
+            return CRESULT;
+        } else if (AbstractTitle.ORESULTS.equals(t)) {
+            return ORESULTS;
+        } else if (AbstractTitle.CRESULTS.equals(t)) {
+            return CRESULTS;
+        } else if(XMLTitle.OCOM.equals(t)) {
+            return OCOM;
+        } else if(XMLTitle.CCOM.equals(t)) {
+            return CCOM;
         }
+        return "";
     }
 
     boolean isMore() {
         return ast.isMore();
-    }
-
-    boolean isQTAsk() {
-        return ast.isAsk();
-    }
-
-    public void print(boolean printInfoInFile, String fileName) {
-        init();
-        println(getTitle(Title.XMLDEC));
-        if (getMappings().size() > getNbResult()) {
-            println(String.format("<!-- Display %s results out of %s -->", getNbResult(), getMappings().size()));
-        }
-        println(getTitle(Title.OHEADER));
-        error();
-        detail();
-        
-        printHead();
-        
-        if (isQTAsk()) {
-            printAsk();
-        } else {
-            println(getTitle(Title.ORESULTS));
-            if (getMappings() != null) {
-                long n = 1;
-                for (Mapping map : getMappings()) {
-                    if (n > getNbResult()) {
-                        break;
-                    }
-                    print(map, n++);
-                }
-            }
-            println(getTitle(Title.CRESULTS));
-        }
-
-        println(getTitle(Title.CHEADER));
-    }
-    
-    
-    public void printHead() {
-        println(getTitle(Title.OHEAD));
-        // print variable or functions selected in the header
-        printVariables(getSelect());
-        printLink(getMappings().getLinkList());
-        println(getTitle(Title.CHEAD));
-    }
-
-    void detail() {
-
-        if (getMappings().getInsert() != null) {
-            println(OCOM);
-            println("Insert:");
-            for (Edge ent : getMappings().getInsert()) {
-                println(ent);
-            }
-            println(CCOM);
-        }
-
-        if (getMappings().getDelete() != null) {
-            println(OCOM);
-            println("Delete:");
-            for (Edge ent : getMappings().getDelete()) {
-                println(ent);
-            }
-            println(CCOM);
-        }
     }
 
     void error() {
@@ -307,53 +149,13 @@ public class XMLFormat extends QueryResultFormat {
             println(CCOM);
         }
     }
-    
+
     String protect(String mes) {
-        return mes.replace("<!--", "").replace("-->", "");
-    }
-
-    /**
-     * Print a cg result as a line of the table each column is one of the select
-     * variables of the query
-     */
-    void print(Mapping map, long n) {
-        newResult();
-        if (isDebug()) {
-            println("<!-- number = '" + n + "' -->");
-        }
-        println(getTitle(Title.ORESULT));
-        for (String var : getSelect()) {
-            // for each select variable, get its binding and print it	
-            if (map.getMappings() != null) {
-                List<Node> list = map.getNodes(var, true);
-                for (Node node : list) {
-                    print(var, node);
-                }
-            } else {
-                Node value = map.getNode(var);
-                print(var, value);
-            }
-        }
-        println(getTitle(Title.CRESULT));
-    }
-
-    boolean isDebug() {
-        return ast.isDebug();
+        return mes.replace(OCOM, "").replace(CCOM, "");
     }
 
     // for JSON subclass
     void newResult() {
-    }
-
-    /**
-     * Print one value using the SPARQL XML markup
-     */
-    void print(String var, Node c) {
-        if (c == null) {
-            // do nothing 
-            return;
-        }
-        display(var,  c.getDatatypeValue());
     }
 
     void display(String var, IDatatype dt) {
@@ -376,11 +178,6 @@ public class XMLFormat extends QueryResultFormat {
             if (dt.hasLang()) {
                 printf("<literal xml:lang='%s'>%s</literal>", dt.getLang(), str);
             } else if (dt.getDatatype() != null && dt.getCode() != IDatatype.LITERAL) {
-//                if (DatatypeMap.isDouble(dt)) {
-//                    //str =  nf.format(dt.doubleValue());
-//                    str = String.format("%g", dt.doubleValue());
-//                }
-//                else 
                 if (dt.isExtension()) {
                     str = toXML(dt.getContent());
                 }
@@ -424,38 +221,6 @@ public class XMLFormat extends QueryResultFormat {
         println("</triple>");
     }
 
-    String display(Object o) {
-        if (o instanceof Query) {
-            o = ((Query) o).getAST();
-        }
-        return o.toString();
-    }
-
-    void printVariables(ArrayList<String> select) {
-        for (String var : select) {
-            printVar(var);
-        }
-    }
-
-//	variable in header (<th>)
-    private void printVar(String var) {
-        println(getTitle(Title.OVAR) + getName(var) + getTitle(Title.CVAR));
-    }
-
-    void printLink(List<String> list) {
-        for (String name : list) {
-            print("<link href=\"" + name + "\"/>\n");
-        }
-    }
-
-    protected String getName(String var) {
-        if (var.indexOf(VAR1) == 0) {
-            return var.substring(1);
-        } else {
-            return var;
-        }
-    }
-
     // protect & <
     String toXML(String str) {
         for (String p : XML) {
@@ -465,26 +230,6 @@ public class XMLFormat extends QueryResultFormat {
             }
         }
         return str;
-    }
-
-    protected void println(String str) {
-        pw.println(str);
-    }
-    
-    protected void println() {
-        pw.println();
-    }
-
-    protected void println(Object obj) {
-        pw.println(obj.toString());
-    }
-
-    protected void print(String str) {
-        pw.print(str);
-    }
-        
-    protected void printf(String format, Object... str) {
-        pw.print(String.format(format, str));
     }
 
     public void printAsk() {
@@ -507,28 +252,6 @@ public class XMLFormat extends QueryResultFormat {
             println(CRESULTS);
         }
         println(CHEADER);
-    }
-
-    /**
-     * @return the selectAll
-     */
-    public boolean isSelectAll() {
-        return selectAll;
-    }
-
-    /**
-     * @param selectAll the selectAll to set
-     */
-    public void setSelectAll(boolean selectAll) {
-        this.selectAll = selectAll;
-    }
-
-    public Mappings getMappings() {
-        return lMap;
-    }
-
-    public void setMappings(Mappings lMap) {
-        this.lMap = lMap;
     }
 
 }

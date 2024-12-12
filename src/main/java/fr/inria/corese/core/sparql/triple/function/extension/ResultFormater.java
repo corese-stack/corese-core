@@ -83,11 +83,11 @@ public class ResultFormater extends TermEval {
             Mappings map = dt.getPointerObject().getMappings();
             switch (oper()) {
                 case XT_XML:
-                    return eval.getGraphProcessor().format(map, ResultFormatDef.XML_FORMAT);
+                    return eval.getGraphProcessor().format(map, ResultFormatDef.format.XML_FORMAT);
                 case XT_JSON:
-                    return eval.getGraphProcessor().format(map, ResultFormatDef.JSON_FORMAT);
+                    return eval.getGraphProcessor().format(map, ResultFormatDef.format.JSON_FORMAT);
                 case XT_RDF:
-                    return eval.getGraphProcessor().format(map, ResultFormatDef.RDF_FORMAT);
+                    return eval.getGraphProcessor().format(map, ResultFormatDef.format.RDF_FORMAT);
 
                 default:
                     return dt;

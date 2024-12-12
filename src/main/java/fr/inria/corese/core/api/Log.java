@@ -4,18 +4,18 @@ import java.util.List;
 
 
 public interface Log {
-	
-	public static final int LOAD 	= 0;
-	public static final int QUERY 	= 1;
-	public static final int UPDATE  = 2;	
+
+	enum Operation {
+		LOAD, QUERY, UPDATE
+	}
 	
 	void reset();	
 	
-	void log(int type, Object obj);
+	void log(Log.Operation type, Object obj);
 	
-	void log(int type, Object obj1, Object obj2);
+	void log(Log.Operation type, Object obj1, Object obj2);
 
-	List<Object> get(int type);
+	List<Object> get(Log.Operation type);
 	
 	
 }

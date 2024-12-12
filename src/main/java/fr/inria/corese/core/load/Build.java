@@ -25,7 +25,7 @@ public interface Build {
 	 
 	 void finish();
 
-         void setLimit(int limit);
+	 void setLimit(int limit);
          
-         int getLimit();
+     int getLimit();
 }

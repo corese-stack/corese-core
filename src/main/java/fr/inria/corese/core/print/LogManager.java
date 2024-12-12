@@ -1,6 +1,7 @@
 package fr.inria.corese.core.print;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
@@ -68,7 +69,7 @@ public class LogManager implements LogKey {
     public Graph parse() throws LoadException {
         Graph g = Graph.create();
         Load ld = Load.create(g);
-        ld.loadString(process(), Load.TURTLE_FORMAT);
+        ld.loadString(process(), Loader.format.TURTLE_FORMAT);
         return g;
     }
 

@@ -42,9 +42,8 @@ public class QueryEngine implements Engine {
     HashMap<String, Query> table;
     HashMap<String, ArrayList<Query>> tableList;
     TemplateIndex index;
-    boolean isDebug = false,
-            isActivate = true,
-            isWorkflow = false;
+    boolean isActivate = true;
+    boolean isWorkflow = false;
     private boolean transformation = false;
     private String base;
     private Level level = Level.USER_DEFAULT;
@@ -61,10 +60,6 @@ public class QueryEngine implements Engine {
 
     public static QueryEngine create(Graph g) {
         return new QueryEngine(g);
-    }
-
-    public void setDebug(boolean b) {
-        isDebug = b;
     }
 
     public void addQuery(String q) {
@@ -277,16 +272,8 @@ public class QueryEngine implements Engine {
             getQueryProcess().setSynchronized(true);
         }
         for (Query q : list) {
-
-            if (isDebug) {
-                q.setDebug(isDebug);
-                System.out.println(q.getAST());
-            }
             Mappings map = getQueryProcess().query(q);
             b = map.nbUpdate() > 0 || b;
-            if (isDebug) {
-                logger.debug(map + "\n");
-            }
         }
         return b;
     }

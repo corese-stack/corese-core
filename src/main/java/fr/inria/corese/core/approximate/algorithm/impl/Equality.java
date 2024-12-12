@@ -18,7 +18,6 @@ public class Equality extends BaseAlgorithm {
     @Override
     public double calculate(String s1, String s2, String paramter) {
         double sim = MAX;
-        Utils.msg("Eq", s1, s2, paramter, sim);
         return sim;
     }
 }
