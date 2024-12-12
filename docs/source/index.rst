@@ -96,4 +96,4 @@ Home Page
 
    Installation <install.md>
    User Guide <user_guide>
-   API Reference <apis>
+   Java API <java_api/library_root>
