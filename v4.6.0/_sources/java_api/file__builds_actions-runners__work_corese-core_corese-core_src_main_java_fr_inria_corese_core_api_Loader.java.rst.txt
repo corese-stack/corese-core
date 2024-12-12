@@ -38,3 +38,10 @@ Namespaces
 
 - :ref:`namespace_fr__inria__corese__core__api`
 
+
+Enums
+-----
+
+
+- :ref:`exhale_enum_enumfr_1_1inria_1_1corese_1_1core_1_1api_1_1Loader_1_1format`
+

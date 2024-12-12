@@ -25,7 +25,7 @@ Includes
 --------
 
 
-- ``static``
+- ``fr.inria.corese.core.Event``
 
 
 

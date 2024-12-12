@@ -1,0 +1,14 @@
+.. _exhale_enum_enumfr_1_1inria_1_1corese_1_1core_1_1api_1_1Loader_1_1format:
+
+Enum format
+===========
+
+- Defined in :ref:`file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_Loader.java`
+
+
+Enum Documentation
+------------------
+
+
+.. doxygenenum:: fr::inria::corese::core::api::Loader::format
+   :project: corese

@@ -25,7 +25,7 @@ Includes
 --------
 
 
-- ``fr.inria.corese.core.logic.Entailment``
+- ``fr.inria.corese.core.api``
 
 
 
@@ -50,4 +50,11 @@ Classes
 - :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1GTable`
 
 - :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1TreeNode`
+
+
+Enums
+-----
+
+
+- :ref:`exhale_enum_enumfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1GRAPH__OPERATION`
 

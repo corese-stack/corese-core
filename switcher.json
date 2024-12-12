@@ -6,6 +6,12 @@
     "preferred": true
 },
 {
+    "name": "v4.6.1 (stable)",
+    "version": "stable",
+    "url": "https://corese-stack.github.io/corese-core/v4.6.1/",
+    "preferred": false
+},
+{
     "name": "v4.6.0 (stable)",
     "version": "stable",
     "url": "https://corese-stack.github.io/corese-core/v4.6.0/",
