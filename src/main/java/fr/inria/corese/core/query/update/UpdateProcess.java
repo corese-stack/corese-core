@@ -81,7 +81,7 @@ public class UpdateProcess {
 
             switch (u.type()) {
 
-                case Update.PROLOG:
+                case PROLOG:
                     // local prolog, get the local NSManager
                     // for next operations
                     nsm = u.getLocalNSM();
@@ -135,17 +135,17 @@ public class UpdateProcess {
         ASTQuery ast = null;
         switch (ope.type()) {
 
-            case Update.INSERT:
+            case INSERT:
                 // insert data
                 ast = getInsertData(q, ope);
                 break;
 
-            case Update.DELETE:
+            case DELETE:
                 // delete data
                 ast = getDeleteData(q, ope);
                 break;
 
-            case Update.COMPOSITE:
+            case COMPOSITE:
                 // delete insert where
                 ast = getDeleteInsert(q, ope);
                 break;
@@ -373,7 +373,7 @@ public class UpdateProcess {
                 exp = BasicGraphPattern.create(exp);
             }
 
-            if (cc.type() == Update.INSERT) {
+            if (cc.type() == Update.Keyword.INSERT) {
                 // insert {exp}
                 ast.setInsert(true);
                 ast.setInsert(exp);

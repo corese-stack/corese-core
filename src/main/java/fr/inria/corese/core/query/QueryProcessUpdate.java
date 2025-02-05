@@ -24,6 +24,7 @@ import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import fr.inria.corese.core.sparql.triple.update.ASTUpdate;
 import fr.inria.corese.core.sparql.triple.update.Basic;
 import fr.inria.corese.core.sparql.triple.update.Update;
+import fr.inria.corese.core.sparql.triple.update.Update.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,12 +203,11 @@ public class QueryProcessUpdate {
     void complete(ASTUpdate up, Graph g) {
         String name = up.getGraphName();
         for (Update act : up.getUpdates()) {
-            switch (act.type()) {
-                case Basic.DROP:
-                    if (act.getBasic().getGraph() != null && act.getBasic().getGraph().equals(name)) {
-                        g.setNamedGraph(name, null);
-                        return;
-                    }
+            if (act.type() == Update.Keyword.DROP) {
+                if (act.getBasic().getGraph() != null && act.getBasic().getGraph().equals(name)) {
+                    g.setNamedGraph(name, null);
+                    return;
+                }
             }
         }
     }

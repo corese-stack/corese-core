@@ -455,14 +455,14 @@ public class GraphManager {
 
         switch (ope.type()) {
 
-            case Update.DROP:
+            case DROP:
 
                 if (isRule(uri)) {
                     // clear also the rule base
                     wf.removeEngine(Engine.RULE_ENGINE);
                 }
 
-            case Update.CLEAR:
+            case CLEAR:
 
                 if (isEntailment(uri)) {
                     getGraph().getEventManager().finish(Event.ActivateRDFSEntailment);
@@ -472,7 +472,7 @@ public class GraphManager {
                 break;
 
 
-            case Update.CREATE:
+            case CREATE:
 
                 if (isEntailment(uri)) {
                     getGraph().getEventManager().start(Event.ActivateRDFSEntailment);

@@ -770,7 +770,7 @@ stack = BasicGraphPattern.create();
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case LOAD:{
       jj_consume_token(LOAD);
-ope = Basic.create(Update.LOAD);
+ope = Basic.create(Update.Keyword.LOAD);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case SILENT:{
         jj_consume_token(SILENT);
@@ -802,12 +802,12 @@ ope.setTarget(graph);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case CLEAR:{
         jj_consume_token(CLEAR);
-ope = Basic.create(Update.CLEAR);
+ope = Basic.create(Update.Keyword.CLEAR);
         break;
         }
       case DROP:{
         jj_consume_token(DROP);
-ope = Basic.create(Update.DROP);
+ope = Basic.create(Update.Keyword.DROP);
         break;
         }
       default:
@@ -856,7 +856,7 @@ ope.setAll(true);
       }
     case CREATE:{
       jj_consume_token(CREATE);
-ope = Basic.create(Update.CREATE);
+ope = Basic.create(Update.Keyword.CREATE);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case SILENT:{
         jj_consume_token(SILENT);
@@ -878,17 +878,17 @@ ope.setGraph(graph);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ADD:{
         jj_consume_token(ADD);
-ope = Basic.create(Update.ADD);
+ope = Basic.create(Update.Keyword.ADD);
         break;
         }
       case MOVE:{
         jj_consume_token(MOVE);
-ope = Basic.create(Update.MOVE);
+ope = Basic.create(Update.Keyword.MOVE);
         break;
         }
       case COPY:{
         jj_consume_token(COPY);
-ope = Basic.create(Update.COPY);
+ope = Basic.create(Update.Keyword.COPY);
         break;
         }
       default:
@@ -995,7 +995,7 @@ if (ope!=null) astu.add(ope);
 astq.setInsertData(true);
       exp = QuadPattern();
 astq.setInsertData(false);
-                 ope = Composite.create(Update.INSERT, exp);
+                 ope = Composite.create(Update.Keyword.INSERT, exp);
       break;
       }
     case DELETE:{
@@ -1006,7 +1006,7 @@ astq.setInsertData(false);
 handler.enterDeleteData();
         exp = QuadPattern();
 handler.leaveDeleteData();
-ope = Composite.create(Update.DELETE, exp);
+ope = Composite.create(Update.Keyword.DELETE, exp);
         break;
         }
       case WHERE:{
@@ -1014,8 +1014,8 @@ ope = Composite.create(Update.DELETE, exp);
 handler.enterWhere();
         exp = QuadPattern();
 handler.leaveWhere();
-upd = Composite.create(Update.COMPOSITE); upd.setBody(exp);
-                                ope = Composite.create(Update.DELETE);    ope.setPattern(exp);
+upd = Composite.create(Update.Keyword.COMPOSITE); upd.setBody(exp);
+                                ope = Composite.create(Update.Keyword.DELETE);    ope.setPattern(exp);
                                 upd.add(ope);
                                 ope = upd;
         break;
@@ -1038,7 +1038,7 @@ astu.add(ope);
 // create an AST as a whole
   final public 
 void DeleteInsertWhere() throws ParseException {Exp exp; Composite upd, ope; Constant uri; Values values;
-upd = Composite.create(Update.COMPOSITE);
+upd = Composite.create(Update.Keyword.COMPOSITE);
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case WITH:{
       jj_consume_token(WITH);
@@ -1056,12 +1056,12 @@ upd.setWith(uri);
 handler.enterDelete();
       exp = QuadPattern();
 handler.leaveDelete();
-ope = Composite.create(Update.DELETE); ope.setPattern(exp); upd.add(ope);
+ope = Composite.create(Update.Keyword.DELETE); ope.setPattern(exp); upd.add(ope);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case INSERT:{
         jj_consume_token(INSERT);
         exp = QuadPattern();
-ope = Composite.create(Update.INSERT); ope.setPattern(exp); upd.add(ope);
+ope = Composite.create(Update.Keyword.INSERT); ope.setPattern(exp); upd.add(ope);
         break;
         }
       default:
@@ -1073,7 +1073,7 @@ ope = Composite.create(Update.INSERT); ope.setPattern(exp); upd.add(ope);
     case INSERT:{
       jj_consume_token(INSERT);
       exp = QuadPattern();
-ope = Composite.create(Update.INSERT); ope.setPattern(exp); upd.add(ope);
+ope = Composite.create(Update.Keyword.INSERT); ope.setPattern(exp); upd.add(ope);
       break;
       }
     default:

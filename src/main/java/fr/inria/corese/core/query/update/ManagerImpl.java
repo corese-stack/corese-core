@@ -61,13 +61,13 @@ public class ManagerImpl implements Manager {
 
         switch (ope.type()) {
 
-            case Update.LOAD:
+            case LOAD:
                 return load(q, ope);
                 
-            case Update.PROLOG:
+            case PROLOG:
                 return true;
 
-            case Update.CREATE:
+            case CREATE:
                 return create(ope);
                 
             default:
@@ -77,23 +77,23 @@ public class ManagerImpl implements Manager {
                 boolean res = true;
                 switch (ope.type()) {
 
-                    case Update.CLEAR:
+                    case CLEAR:
                         res = clear(ope, ds);
                         break;
 
-                    case Update.DROP:
+                    case DROP:
                         res = drop(ope, ds);
                         break;
 
-                    case Update.ADD:
+                    case ADD:
                         res = add(ope, ds);
                         break;
 
-                    case Update.MOVE:
+                    case MOVE:
                         res = move(ope, ds);
                         break;
 
-                    case Update.COPY:
+                    case COPY:
                         res = copy(ope, ds);
                         break;
                 } 
