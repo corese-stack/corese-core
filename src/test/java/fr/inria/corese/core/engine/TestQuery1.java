@@ -83,6 +83,9 @@ public class TestQuery1 {
     // <http://ns.inria.fr/ast/sql#>\n";
     static Graph graph;
 
+    private static final String localRDF = "src/test/resources/data/rdf.2014.ttl";
+    private static final String localRDFS = "src/test/resources/data/rdfs.2014.ttl";
+
     @BeforeClass
     static public void init() {
         // Query.STD_PLAN = Query.PLAN_RULE_BASED;
@@ -5920,15 +5923,15 @@ public class TestQuery1 {
 
         Graph g = createGraph();
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
-        Transformer t = Transformer.createWE(g, Transformer.TURTLE, RDF.RDF);
+        Transformer t = Transformer.createWE(g, Transformer.TURTLE, localRDF);
         String str = t.transform();
         // System.out.println("result:\n" + str);
         assertEquals(6202, str.length());
 
-        t = Transformer.createWE(g, Transformer.TURTLE, RDFS.RDFS);
+        t = Transformer.createWE(g, Transformer.TURTLE, localRDFS);
         str = t.transform();
         // System.out.println(str);
         assertEquals(3872, str.length());
@@ -5943,27 +5946,27 @@ public class TestQuery1 {
     public void testGT() throws LoadException, EngineException {
         Graph g = createGraph();
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        File localRDFFile = new File(localRDF);
+        File localRDFSFile = new File(localRDFS);
 
-        String t1 = "template { st:apply-templates-with-graph(st:turtle, rdf:)} where {}";
-        String t2 = "template { st:apply-templates-with-graph(st:turtle, rdfs:)} where {}";
+        ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+
+        String t1 = "template { st:apply-templates-with-graph(st:turtle, \"file://" + localRDFFile.getAbsolutePath() + "\")} where {}";
+        String t2 = "template { st:apply-templates-with-graph(st:turtle, \"file://" + localRDFSFile.getAbsolutePath() + "\")} where {}";
         String t3 = "template { st:apply-templates-with(st:turtle)} where {}";
 
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(t1);
         String str = map.getTemplateStringResult();
-        //// System.out.println(str);
         assertEquals(6202, str.length());
 
         map = exec.query(t2);
         str = map.getTemplateStringResult();
-        // System.out.println(str);
         assertEquals(3872, str.length());
 
         map = exec.query(t3);
         str = map.getTemplateStringResult();
-        //// System.out.println(str);
         assertEquals(9859, str.length());
     }
 
@@ -6004,12 +6007,12 @@ public class TestQuery1 {
     public void testTrig() throws LoadException, EngineException {
         Graph g = Graph.create(true);
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         Transformer pp = Transformer.create(g, Transformer.TRIG);
         String str = pp.transform();
-        assertEquals(15015, str.length());
+        assertEquals(15084, str.length());
     }
 
     @Test
