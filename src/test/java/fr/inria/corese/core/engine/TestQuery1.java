@@ -5942,15 +5942,18 @@ public class TestQuery1 {
         assertEquals(9859, str.length());
     }
 
-/*    @Test
+    @Test
     public void testGT() throws LoadException, EngineException {
         Graph g = createGraph();
         Load ld = Load.create(g);
+        File localRDFFile = new File(localRDF);
+        File localRDFSFile = new File(localRDFS);
+
         ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
         ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
-        String t1 = "template { st:apply-templates-with-graph(st:turtle, rdf:)} where {}";
-        String t2 = "template { st:apply-templates-with-graph(st:turtle, rdfs:)} where {}";
+        String t1 = "template { st:apply-templates-with-graph(st:turtle, \"file://" + localRDFFile.getAbsolutePath() + "\")} where {}";
+        String t2 = "template { st:apply-templates-with-graph(st:turtle, \"file://" + localRDFSFile.getAbsolutePath() + "\")} where {}";
         String t3 = "template { st:apply-templates-with(st:turtle)} where {}";
 
         QueryProcess exec = QueryProcess.create(g);
@@ -5960,12 +5963,12 @@ public class TestQuery1 {
 
         map = exec.query(t2);
         str = map.getTemplateStringResult();
-        assertEquals(3849, str.length());
+        assertEquals(3872, str.length());
 
         map = exec.query(t3);
         str = map.getTemplateStringResult();
         assertEquals(9859, str.length());
-    }*/
+    }
 
     @Test
     public void testGCC() throws EngineException {
