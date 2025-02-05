@@ -103,7 +103,7 @@ public class CompileService implements URLParam {
     void complete(URLServer serv, Query q, ASTQuery ast) {
         if (!ast.hasLimit()) {
             ASTQuery gast = q.getGlobalQuery().getAST();
-            IDatatype dt  = gast.getMetaValue(Metadata.LIMIT);
+            IDatatype dt  = gast.getMetaValue(Metadata.Type.LIMIT);
             int myLimit   = serv.intValue(LIMIT);
             
             if (myLimit >= 0) {
@@ -125,7 +125,6 @@ public class CompileService implements URLParam {
                 }
             }
         }
-        //logger.info("Limit: " + ast.getLimit());
     }
 
     boolean getIsValues(URLServer serv, Query q) {
@@ -135,10 +134,10 @@ public class CompileService implements URLParam {
         else if (serv.hasParameter(BINDING, FILTER)) {
             return false;
         }
-        else if (hasRecMetaData(q, Metadata.BINDING, KG_VALUES)) {
+        else if (hasRecMetaData(q, Metadata.Type.BINDING, KG_VALUES)) {
             return true;
         }
-        else if (hasRecMetaData(q, Metadata.BINDING, KG_FILTER)) {
+        else if (hasRecMetaData(q, Metadata.Type.BINDING, KG_FILTER)) {
             return false;
         }
         else {
@@ -147,19 +146,19 @@ public class CompileService implements URLParam {
     }
 
     boolean isValues(URLServer serv, Query q) {
-        return serv.hasParameter(BINDING, VALUES) || hasRecMetaData(q, Metadata.BINDING, KG_VALUES);
+        return serv.hasParameter(BINDING, VALUES) || hasRecMetaData(q, Metadata.Type.BINDING, KG_VALUES);
     }
 
     boolean isFilter(URLServer serv, Query q) {
-        return serv.hasParameter(BINDING, FILTER) || hasRecMetaData(q, Metadata.BINDING, KG_FILTER);
+        return serv.hasParameter(BINDING, FILTER) || hasRecMetaData(q, Metadata.Type.BINDING, KG_FILTER);
     }
     
-    boolean hasMetaData(Query q, int meta, String type) {
+    boolean hasMetaData(Query q, Metadata.Type meta, String type) {
          ASTQuery ast =  getAST(q.getGlobalQuery());
          return ast.hasMetadata(meta, type);
     }
     
-    boolean hasRecMetaData(Query q, int meta, String type) {
+    boolean hasRecMetaData(Query q, Metadata.Type meta, String type) {
          if (getAST(q).hasMetadata(meta, type)) {
              return true;
          }

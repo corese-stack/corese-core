@@ -76,12 +76,12 @@ public class Selector {
         predicateVariable = new HashMap<>();
         tripleVariable    = new HashMap<>();
         bgpVariable       = new HashMap<>();
-        if (ast.hasMetadata(Metadata.SPARQL10)) {
+        if (ast.hasMetadata(Metadata.Type.SPARQL10)) {
             sparql10 = true;
         }
         
-        count = ast.hasMetadata(Metadata.COUNT);
-        trace = ast.hasMetadata(Metadata.TRACE);
+        count = ast.hasMetadata(Metadata.Type.COUNT);
+        trace = ast.hasMetadata(Metadata.Type.TRACE);
     }
     
 
@@ -161,7 +161,6 @@ public class Selector {
         ast.getLog().setASTIndex(a);
         ast.getLog().setIndexMap(map);
         ast.getLog().set(LogKey.INDEX, url);
-        //ast.getLog().setExceptionList(getQuerySolver().getLog().getExceptionList());
     }
     
     public static double time(Date d1, Date d2) {
@@ -238,8 +237,7 @@ public class Selector {
             }
         }
         Date d2 = new Date();
-        boolean b = getAstSelector().complete();       
-        trace(map, d1, d2);
+        boolean b = getAstSelector().complete();
         logger.info("Source Selection Join Test Success: " + b);
         // if selection join failure occurs in optional/minus/union/exists
         // do not fail, else fail
@@ -260,13 +258,13 @@ public class Selector {
             meta.add(Metadata.SHOW);
             aa.setAnnotation(meta);
         }
-        if (ast.hasMetadata(Metadata.REPORT)) {
-            aa.getCreateMetadata().add(Metadata.REPORT);
+        if (ast.hasMetadata(Metadata.Type.REPORT)) {
+            aa.getCreateMetadata().add(Metadata.Type.REPORT);
             ASTParser walk = new ASTParser(aa).report();
             aa.process(walk);
         }
-        if (ast.getMetaValue(Metadata.TIMEOUT)!=null) {
-            aa.getCreateMetadata().add(Metadata.TIMEOUT, ast.getMetaValue(Metadata.TIMEOUT));
+        if (ast.getMetaValue(Metadata.Type.TIMEOUT)!=null) {
+            aa.getCreateMetadata().add(Metadata.Type.TIMEOUT, ast.getMetaValue(Metadata.Type.TIMEOUT));
         }
     }
         
@@ -286,24 +284,6 @@ public class Selector {
             return null; //ast.getServiceList();
         }
         return getPredicateService(t.getPredicate().getConstant());
-    }
-   
-    void trace(Mappings map, Date d1, Date d2) {
-        if (ast.hasMetadata(Metadata.TRACE)) {
-            System.out.println("Selection Time: " + (d2.getTime() - d1.getTime()) / 1000.0);
-        }
-        if (ast.isDebug()) {
-            System.out.println("Triple Selection");
-            for (String pred : getPredicateService().keySet()) {
-                System.out.println(pred + " " + getPredicateService().get(pred));
-            }
-            for (Triple t : getTripleService().keySet()) {
-                System.out.println(t + " " + getTripleService().get(t));
-            }
-        }
-        if (trace) {
-            System.out.println(map);
-        }
     }
     
     void declare(Constant p, Variable var) {
@@ -362,7 +342,7 @@ public class Selector {
         }
         else {
             Exp service;
-            if (ast.hasMetadata(Metadata.GRAPH)) {
+            if (ast.hasMetadata(Metadata.Type.GRAPH)) {
                 service = Source.create(serv, bgp);
             }
             else {
@@ -426,22 +406,22 @@ public class Selector {
     }
     
     void metadata(ASTQuery aa, ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.EVENT) || ast.hasMetadata(Metadata.SEQUENCE) || ast.hasMetadata(Metadata.TRACE)) {
+        if (ast.hasMetadata(Metadata.Type.EVENT) || ast.hasMetadata(Metadata.Type.SEQUENCE) || ast.hasMetadata(Metadata.Type.TRACE)) {
             Metadata m = new Metadata();
             aa.setMetadata(m);
         
-            if (ast.hasMetadata(Metadata.EVENT)) {
-                m.add(Metadata.EVENT);
+            if (ast.hasMetadata(Metadata.Type.EVENT)) {
+                m.add(Metadata.Type.EVENT);
                 aa.setDefine(ast.getDefine());
                 aa.setDefineLambda(ast.getDefineLambda());
             }
             
-            if (ast.hasMetadata(Metadata.SEQUENCE)) {
-                m.add(Metadata.SEQUENCE);
+            if (ast.hasMetadata(Metadata.Type.SEQUENCE)) {
+                m.add(Metadata.Type.SEQUENCE);
             }
             
-            if (ast.hasMetadata(Metadata.TRACE)) {
-                m.add(Metadata.TRACE);
+            if (ast.hasMetadata(Metadata.Type.TRACE)) {
+                m.add(Metadata.Type.TRACE);
             }
         }
     }
@@ -875,12 +855,8 @@ public class Selector {
         }
     }
     void process10(List<Constant> list) throws EngineException {
-        Date d1 = new Date();
         ASTQuery aa = createSelector(list, true);
         Mappings map = getQuerySolver().basicQuery(aa);
-        if (ast.isDebug()) {
-            System.out.println(map);
-        }
         for (Mapping m : map) {
             IDatatype serv =  m.getValue(SERVER_VAR);
             for (String pred : predicateVariable.keySet()) {
@@ -891,9 +867,6 @@ public class Selector {
                 }
             }
         }
-        
-        Date d2 = new Date();
-        trace(map, d1, d2);
     }
     
         List<Constant> getServiceList(boolean sparql10) {
@@ -901,12 +874,12 @@ public class Selector {
         List<Constant> res = new ArrayList<>();
         for (Constant serv : list) {
             if (sparql10){
-                if (ast.hasMetadataValue(Metadata.SPARQL10, serv.getLabel())) {
+                if (ast.hasMetadataValue(Metadata.Type.SPARQL10, serv.getLabel())) {
                     res.add(serv);
                 }
             }
             else {
-                if (! ast.hasMetadataValue(Metadata.SPARQL10, serv.getLabel())) {
+                if (! ast.hasMetadataValue(Metadata.Type.SPARQL10, serv.getLabel())) {
                     res.add(serv);
                 }
             }

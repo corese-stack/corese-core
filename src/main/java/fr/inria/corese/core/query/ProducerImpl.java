@@ -6,12 +6,12 @@ import static fr.inria.corese.core.kgram.sorter.core.Const.OBJECT;
 import static fr.inria.corese.core.kgram.sorter.core.Const.PREDICATE;
 import static fr.inria.corese.core.kgram.sorter.core.Const.SUBJECT;
 import static fr.inria.corese.core.kgram.sorter.core.Const.TRIPLE;
-import static fr.inria.corese.core.sparql.triple.parser.Metadata.RDF_STAR_SELECT;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,7 +313,7 @@ public class ProducerImpl
     }
 
     boolean isNested(Query q, Edge edge) {
-        return edge.isNested() || q.getGlobalAST().hasMetadata(RDF_STAR_SELECT);
+        return edge.isNested() || q.getGlobalAST().hasMetadata(Metadata.Type.RDF_STAR_SELECT);
     }
 
     // special case with optimizations for rule engine

@@ -977,7 +977,7 @@ public class PluginImpl
 
     IDatatype db(Environment env, Graph g) {
         ASTQuery ast = env.getQuery().getAST();
-        String name = ast.getMetadataValue(Metadata.DB);
+        String name = ast.getMetadataValue(Metadata.Type.DB);
         return db(name, g);
     }
 

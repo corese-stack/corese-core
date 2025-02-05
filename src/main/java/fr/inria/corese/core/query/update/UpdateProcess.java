@@ -214,7 +214,7 @@ public class UpdateProcess {
         // execute where part in delete insert where
         Mappings map = getQueryProcess().basicQuery(null, q, mm);
         
-        if (query.getAST().hasMetadata(Metadata.SELECT)) {
+        if (query.getAST().hasMetadata(Metadata.Type.SELECT)) {
             // evaluate insert where as select where
             return map;
         }

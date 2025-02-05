@@ -335,8 +335,8 @@ public class FederateVisitor implements QueryVisitor, URLParam {
        
     // Federation definition
     boolean init()  {
-        if (ast.hasMetadata(Metadata.FEDERATION)) {
-            List<String> list = ast.getMetadata().getValues(Metadata.FEDERATION);
+        if (ast.hasMetadata(Metadata.Type.FEDERATION)) {
+            List<String> list = ast.getMetadata().getValues(Metadata.Type.FEDERATION);
             List<Atom> serviceList;
             boolean define = true;
             
@@ -368,7 +368,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
                 
                 if (serviceList == null) {
                     logger.info("Undefined federation: " + list.get(0));
-                    //return false;
                     serviceList = new ArrayList<>();
                     serviceList.add(Constant.createResource(list.get(0)));
                 }
@@ -445,7 +444,7 @@ public class FederateVisitor implements QueryVisitor, URLParam {
      */
     void option()  {
         logger.info(ast.getMetadata().toString());
-        if (ast.hasMetadataValue(Metadata.TYPE, Metadata.VERBOSE)) {
+        if (ast.hasMetadataValue(Metadata.Type.TYPE, Metadata.VERBOSE)) {
             verbose = true;
         }
         if (skip(Metadata.DISTRIBUTE_NAMED)) {
@@ -469,24 +468,24 @@ public class FederateVisitor implements QueryVisitor, URLParam {
         if (skip(Metadata.EXIST)) {
             exist = false;
         }
-        if (ast.hasMetadata(Metadata.MERGE_SERVICE)) {
+        if (ast.hasMetadata(Metadata.Type.MERGE_SERVICE)) {
             setMergeService(true);
         }
-        if (ast.hasMetadata(Metadata.BOUNCE)) {
+        if (ast.hasMetadata(Metadata.Type.BOUNCE)) {
             bounce = true;
         }
-        if (ast.hasMetadata(Metadata.VARIABLE) || ast.hasMetadata(Metadata.PUBLIC)) {
+        if (ast.hasMetadata(Metadata.Type.VARIABLE) || ast.hasMetadata(Metadata.Type.PUBLIC)) {
             variable = true;
         }
-        if (ast.hasMetadata(Metadata.SERVER)) {
+        if (ast.hasMetadata(Metadata.Type.SERVER)) {
             variable = true;
             aggregate = true;
         }
-        if (ast.hasMetadata(Metadata.PROVENANCE)) {
+        if (ast.hasMetadata(Metadata.Type.PROVENANCE)) {
             variable = true;
             provenance = true;
         }
-        if (ast.hasMetadata(Metadata.SPARQL)) {
+        if (ast.hasMetadata(Metadata.Type.SPARQL)) {
             setSparql(true);
         }
         
@@ -520,10 +519,10 @@ public class FederateVisitor implements QueryVisitor, URLParam {
             // remove endpoint uri from result of index source discovery
             setExclude(ast.getMetadata().getValues(Metadata.FED_EXCLUDE));
         }
-        if (ast.hasMetadata(Metadata.INDEX)) {
+        if (ast.hasMetadata(Metadata.Type.INDEX)) {
             // federate query with index for source discovery
             // @index <http://index.org/sparql>
-            setIndexURLList(ast.getMetadata().getValues(Metadata.INDEX));
+            setIndexURLList(ast.getMetadata().getValues(Metadata.Type.INDEX));
             logger.info("Index URL: "+ getIndexURLList());
         }
         
@@ -538,9 +537,9 @@ public class FederateVisitor implements QueryVisitor, URLParam {
              }
         }
         
-        if (ast.hasMetadataValue(Metadata.SPLIT)) {
+        if (ast.hasMetadataValue(Metadata.Type.SPLIT)) {
             // @split owl:sameAs
-            setSplit(ast.getMetadata().getValues(Metadata.SPLIT));
+            setSplit(ast.getMetadata().getValues(Metadata.Type.SPLIT));
             logger.info("Split: "+ getSplit());
         }
         
@@ -590,7 +589,7 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     }
     
     boolean skip(String name) {
-        return ast.hasMetadataValue(Metadata.SKIP, name);
+        return ast.hasMetadataValue(Metadata.Type.SKIP, name);
     }
     
     boolean isExist() {

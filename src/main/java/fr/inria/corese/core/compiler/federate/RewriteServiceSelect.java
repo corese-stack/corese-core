@@ -38,7 +38,7 @@ public class RewriteServiceSelect {
         ASTQuery aa = ast.subCreate();
         aa.setBody(s.getBodyExp());
         aa.setSelectAll(true);
-        if (ast.getMetaValue(Metadata.LIMIT)!=null) {
+        if (ast.getMetaValue(Metadata.Type.LIMIT)!=null) {
             aa.setLimit(ast.getLimit());
         }
         Query q = Query.create(aa);

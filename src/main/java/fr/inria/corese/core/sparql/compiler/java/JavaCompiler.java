@@ -139,8 +139,7 @@ public class JavaCompiler {
 
     public void compile(ASTExtension ext) throws IOException, EngineException {
         for (Function exp : ext.getFunctionList()) {
-            //System.out.println(exp);
-            if (!exp.hasMetadata(Metadata.SKIP)) {
+            if (!exp.hasMetadata(Metadata.Type.SKIP)) {
                 compile(exp);
                 append(NL);
             }
@@ -836,10 +835,9 @@ public class JavaCompiler {
     }
 
     void path(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.PATH)) {
-            setPath(ast.getMetadata().getValue(Metadata.PATH));
+        if (ast.hasMetadata(Metadata.Type.PATH)) {
+            setPath(ast.getMetadata().getValue(Metadata.Type.PATH));
         }
-        System.out.println("path: " + getPath());
     }
 
     void trailer() {

@@ -31,7 +31,7 @@ public class RewriteService {
     }
     
     void process(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.PUBLIC)) {
+        if (ast.hasMetadata(Metadata.Type.PUBLIC)) {
             export = true;
         }
         process(ast.getBody());

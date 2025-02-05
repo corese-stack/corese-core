@@ -75,7 +75,7 @@ public class RewriteServiceGraph {
     }
     
     void init() {
-        List<String> list = ast.getMetadata().getValues(Metadata.GRAPH);
+        List<String> list = ast.getMetadata().getValues(Metadata.Type.GRAPH);
         if (list != null) {
             for (int i = 0; i < list.size(); i++) {
                 declare(list.get(i++), list.get(i));

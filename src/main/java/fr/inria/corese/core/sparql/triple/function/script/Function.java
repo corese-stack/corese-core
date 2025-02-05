@@ -187,8 +187,7 @@ public class Function extends Statement {
         return annot != null;
     }
 
-    @Override
-    public boolean hasMetadata(int type) {
+    public boolean hasMetadata(Metadata.Type type) {
         return annot != null && annot.hasMetadata(type);
     }
 
@@ -261,19 +260,19 @@ public class Function extends Statement {
     void annotate(Metadata m, String a) {
         switch (m.type(a)) {
 
-            case Metadata.DEBUG:
+            case DEBUG:
                 setDebug(true);
                 break;
 
-            case Metadata.TRACE:
+            case TRACE:
                 setTrace(true);
                 break;
 
-            case Metadata.TEST:
+            case TEST:
                 setTester(true);
                 break;
 
-            case Metadata.PUBLIC:
+            case PUBLIC:
                 setPublic(true);
                 break;
         }

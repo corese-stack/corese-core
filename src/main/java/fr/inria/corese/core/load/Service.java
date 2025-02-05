@@ -633,8 +633,8 @@ public class Service implements URLParam {
     }
 
     String encoding(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.ENCODING)) {
-            return ast.getMetadata().getStringValue(Metadata.ENCODING);
+        if (ast.hasMetadata(Metadata.Type.ENCODING)) {
+            return ast.getMetadata().getStringValue(Metadata.Type.ENCODING);
         }
         return ENCODING;
     }
@@ -760,7 +760,7 @@ public class Service implements URLParam {
         if (ast.getGlobalAST().isDebug()) {
             System.out.println(isPost()?"POST":"GET");
         }
-        getCreateParser().setTrap(getURL().hasParameter(MODE, TRAP) || ast.getGlobalAST().hasMetadata(Metadata.TRAP));
+        getCreateParser().setTrap(getURL().hasParameter(MODE, TRAP) || ast.getGlobalAST().hasMetadata(Metadata.Type.TRAP));
         if (! isShowResult()) {
             setShowResult(ast.getGlobalAST().hasMetadata(Metadata.SHOW));
             getCreateParser().setShowResult(isShowResult());        
@@ -770,8 +770,8 @@ public class Service implements URLParam {
     // use case for limit: @federate with one URL -> direct service
     void limit(ASTQuery ast) {
         if (!ast.hasLimit()) {
-            if (ast.getMetaValue(Metadata.LIMIT)!=null) {
-                ast.setLimit(ast.getMetaValue(Metadata.LIMIT).intValue());
+            if (ast.getMetaValue(Metadata.Type.LIMIT)!=null) {
+                ast.setLimit(ast.getMetaValue(Metadata.Type.LIMIT).intValue());
             } else {
                 Integer lim = getURL().intValue(LIMIT);
                 if (lim != -1) {

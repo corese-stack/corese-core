@@ -300,8 +300,8 @@ public class ResultFormat implements ResultFormatDef {
             return ResultFormatDef.format.TEXT_FORMAT;
         }
         ASTQuery ast = (ASTQuery) m.getAST();
-        if (ast != null && ast.hasMetadata(Metadata.DISPLAY)) {
-            String val = ast.getMetadata().getValue(Metadata.DISPLAY);
+        if (ast != null && ast.hasMetadata(Metadata.Type.DISPLAY)) {
+            String val = ast.getMetadata().getValue(Metadata.Type.DISPLAY);
             type = table.get(val);
             if (type == null) {
                 type = ResultFormatDef.format.UNDEF_FORMAT;

@@ -374,27 +374,24 @@ public class Transformer implements ExpType {
     void metadata(ASTQuery ast, Query q) {
         Metadata meta = ast.getMetadata();
         if (meta != null) {
-            if (ast.hasMetadata(Metadata.TRACE)) {
-                System.out.println(ast.toString());
-            }
-            if (ast.hasMetadata(Metadata.TEST)) {
+            if (ast.hasMetadata(Metadata.Type.TEST)) {
                 q.setTest(true);
             }
-            if (ast.hasMetadata(Metadata.PARALLEL)) {
+            if (ast.hasMetadata(Metadata.Type.PARALLEL)) {
                 q.setParallel(true);
             }
-            if (ast.hasMetadata(Metadata.SEQUENCE)) {
+            if (ast.hasMetadata(Metadata.Type.SEQUENCE)) {
                 q.setParallel(false);
             }
-            if (ast.hasMetadata(Metadata.UPDATE)) {
+            if (ast.hasMetadata(Metadata.Type.UPDATE)) {
                 q.setDetail(true);
             }
-            if (meta.hasMetadata(Metadata.UNLOCK) || 
-                    (meta.getDatatypeValue(Metadata.LOCK) != null
-                    && !meta.getDatatypeValue(Metadata.LOCK).booleanValue())) {
+            if (meta.hasMetadata(Metadata.Type.UNLOCK) ||
+                    (meta.getDatatypeValue(Metadata.Type.LOCK) != null
+                    && !meta.getDatatypeValue(Metadata.Type.LOCK).booleanValue())) {
                 q.setLock(false);
             }
-            if (ast.hasMetadata(Metadata.PATH_TYPE)) {
+            if (ast.hasMetadata(Metadata.Type.PATH_TYPE)) {
                 q.setPathType(true);
             }
         }
@@ -407,8 +404,8 @@ public class Transformer implements ExpType {
     
     @Deprecated
     void toJava(ASTQuery ast) throws EngineException{
-        if (ast.hasMetadata(Metadata.COMPILE)){
-            String name = ast.getMetadata().getValue(Metadata.COMPILE);
+        if (ast.hasMetadata(Metadata.Type.COMPILE)){
+            String name = ast.getMetadata().getValue(Metadata.Type.COMPILE);
             JavaCompiler jc = new JavaCompiler(name);
             try {
                 jc.compile(ast);
@@ -436,14 +433,14 @@ public class Transformer implements ExpType {
      * Metadata => Visitor
      */
     void visitor(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.METADATA)){
+        if (ast.hasMetadata(Metadata.Type.METADATA)){
             add(new MetadataVisitor());
         }
-        if (ast.hasMetadata(Metadata.LDPATH)) {
-            ast.getMetadata().add(Metadata.VISITOR, LINKED_DATA_PATH_VISITOR);
+        if (ast.hasMetadata(Metadata.Type.LDPATH)) {
+            ast.getMetadata().add(Metadata.Type.VISITOR, LINKED_DATA_PATH_VISITOR);
         }
-        if (ast.hasMetadata(Metadata.VISITOR)) {
-            for (String name : ast.getMetadata().getValues(Metadata.VISITOR)) {
+        if (ast.hasMetadata(Metadata.Type.VISITOR)) {
+            for (String name : ast.getMetadata().getValues(Metadata.Type.VISITOR)) {
                 try {
                     Class visClass = Class.forName(name);
                     Object obj = visClass.getDeclaredConstructor().newInstance();
@@ -468,7 +465,7 @@ public class Transformer implements ExpType {
      * Rewrite every triple t as: service <s1> <s2> { t }
      */
     void federate(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.FEDERATION) && !ast.hasMetadata(Metadata.FEDERATE)) {
+        if (ast.hasMetadata(Metadata.Type.FEDERATION) && !ast.hasMetadata(Metadata.Type.FEDERATE)) {
             add(new FederateVisitor(getSPARQLEngine()).setMappings(getMappings()));
         }
         
@@ -497,12 +494,12 @@ public class Transformer implements ExpType {
     }
     
     void annotateLocal(ASTQuery ast){
-        if (ast.hasMetadata(Metadata.ALGEBRA)){
+        if (ast.hasMetadata(Metadata.Type.ALGEBRA)){
             // @algebra use case with @db
             setBGP(true);
             setAlgebra(true);
         }
-        if (ast.hasMetadata(Metadata.PATH_TYPE)){
+        if (ast.hasMetadata(Metadata.Type.PATH_TYPE)){
             setPathType(true);
         }
     }

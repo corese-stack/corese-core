@@ -158,7 +158,7 @@ public class Simplify extends Util {
      * merged with s2
      */
     Exp move(Exp bgp, ServiceList serviceList) {
-        if (! visitor.getAST().hasMetadata(Metadata.MOVE)) {
+        if (! visitor.getAST().hasMetadata(Metadata.Type.MOVE)) {
             return bgp;
         }
         boolean go = true;
@@ -250,9 +250,9 @@ public class Simplify extends Util {
     }
     
     boolean isMoveable(Constant predicate) {
-        return visitor.getAST().hasMetadata(Metadata.MOVE)
-                && (visitor.getAST().hasMetadataValue(Metadata.MOVE, predicate.getLabel())
-                 || visitor.getAST().getMetadata().getValues(Metadata.MOVE) == null);
+        return visitor.getAST().hasMetadata(Metadata.Type.MOVE)
+                && (visitor.getAST().hasMetadataValue(Metadata.Type.MOVE, predicate.getLabel())
+                 || visitor.getAST().getMetadata().getValues(Metadata.Type.MOVE) == null);
     }
     
     /**
@@ -305,7 +305,7 @@ public class Simplify extends Util {
     
     // @bounce <URI>
     boolean bounce(Service s) {
-        return visitor.getAST().hasMetadataValue(Metadata.BOUNCE, s.getServiceName().getLabel());
+        return visitor.getAST().hasMetadataValue(Metadata.Type.BOUNCE, s.getServiceName().getLabel());
     }
       
     /**

@@ -433,7 +433,7 @@ public class GraphManager {
     
     // @format st:rdfxml st:json st:turtle
     Loader.format getFormat(Query q) {
-        String ft = q.getAST().getMetadataValue(Metadata.FORMAT);
+        String ft = q.getAST().getMetadataValue(Metadata.Type.FORMAT);
         if (ft == null) {
             return Loader.format.UNDEF_FORMAT;
         }

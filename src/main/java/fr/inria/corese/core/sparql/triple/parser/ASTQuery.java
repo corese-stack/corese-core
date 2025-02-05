@@ -335,7 +335,7 @@ public class ASTQuery
     }    
     
     public boolean isFederateVisitorable() {
-        return hasMetadata(Metadata.FEDERATION) || 
+        return hasMetadata(Metadata.Type.FEDERATION) ||
                 (getServiceList() != null && getServiceList().size()>1);
     } 
     
@@ -1136,7 +1136,7 @@ public class ASTQuery
          metadata = m;
     }
     
-    public void setMetadata(int type) {
+    public void setMetadata(Metadata.Type type) {
         getCreateMetadata().add(type);
     }
     
@@ -1171,7 +1171,7 @@ public class ASTQuery
     }
     
     public boolean isFederateIndex() {
-        if (hasMetadata(Metadata.INDEX)) {
+        if (hasMetadata(Metadata.Type.INDEX)) {
             return true;
         }
         if (!getDataset().getIndex().isEmpty()) {
@@ -1181,13 +1181,13 @@ public class ASTQuery
     }
     
     public boolean isFederate() {
-        return getGlobalAST().hasMetadata(Metadata.FEDERATE) 
-            || getGlobalAST().hasMetadata(Metadata.FEDERATION); 
+        return getGlobalAST().hasMetadata(Metadata.Type.FEDERATE)
+            || getGlobalAST().hasMetadata(Metadata.Type.FEDERATION);
     }
 
     // hasMetadata functions for string value only
     // not for other datatype value such as number, boolean
-    public boolean hasMetadata(int type) {
+    public boolean hasMetadata(Metadata.Type type) {
         return getMetadata() != null && getMetadata().hasMetadata(type);
     }
     
@@ -1200,15 +1200,15 @@ public class ASTQuery
         return metadata != null && metadata.hasMetadata(type);
     }
     
-    public boolean hasMetadata(int type, String value) {
+    public boolean hasMetadata(Metadata.Type type, String value) {
         return metadata != null && metadata.hasValue(type, value);
     }
     
-    public boolean hasMetadataValue(int type, String value) {
+    public boolean hasMetadataValue(Metadata.Type type, String value) {
         return metadata != null && metadata.hasValues(type, value);
     }
     
-    public boolean hasMetadataValue(int type) {
+    public boolean hasMetadataValue(Metadata.Type type) {
         return metadata != null && metadata.getValues(type)!=null;
     }
     
@@ -1217,7 +1217,7 @@ public class ASTQuery
     }
     
     // string value only
-    public String getMetadataValue(int type) {
+    public String getMetadataValue(Metadata.Type type) {
         if (getMetadata() == null) {
             return null;
         }
@@ -1225,7 +1225,7 @@ public class ASTQuery
     }
     
     // datatype value other than string, e.g. number, boolean
-    public IDatatype getMetadataDatatypeValue(int type) {
+    public IDatatype getMetadataDatatypeValue(Metadata.Type type) {
         if (getMetadata() == null) {
             return null;
         }
@@ -1233,7 +1233,7 @@ public class ASTQuery
     }
     
     // datatype value other than string, e.g. number, boolean
-    public IDatatype getMetaValue(int type) {
+    public IDatatype getMetaValue(Metadata.Type type) {
         return getMetadataDatatypeValue(type);
     }
     
@@ -1268,16 +1268,16 @@ public class ASTQuery
     public void annotate(Metadata meta) {
         for (String m : meta) {
             switch (meta.type(m)) {
-                case Metadata.MORE:
+                case MORE:
                     setMore(true);
                     break;
-                case Metadata.RELAX:
+                case RELAX:
                     setRelax(true);
                     break;
-                case Metadata.DEBUG:
+                case DEBUG:
                     setDebug(true);
                     break;
-                case Metadata.FEDERATE:
+                case FEDERATE:
                     defService(meta.getValues(m));
                     break;
             }
@@ -3620,9 +3620,6 @@ public class ASTQuery
         return getLog();
     }
 
-    /**
-     * @param groupBy the groupBy to set
-     */
     public HashMap<String, Expression> getGroupByMap() {
         return groupBy;
     }

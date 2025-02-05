@@ -121,7 +121,7 @@ public class ProviderService implements URLParam {
         // federate visitor may have recorded data in AST Context
         // share it with Binding Context Log
         getLog().share(getGlobalAST().getLog());
-        if (getGlobalAST().hasMetadata(Metadata.BINDING, Metadata.SKIP_STR)) {
+        if (getGlobalAST().hasMetadata(Metadata.Type.BINDING, Metadata.SKIP_STR)) {
             setBind(false);
         }
     }
@@ -136,7 +136,6 @@ public class ProviderService implements URLParam {
         if (getServiceExp().getNumber() > 0 && res != null && res.isEmpty() && isBind()
                 && hasValue(WHY)) {
             // generate a log, skip the result
-            // debugSend(serv, exp);
         }
         return res;
     }
@@ -152,43 +151,7 @@ public class ProviderService implements URLParam {
         // slice by default
         Mappings res = send(serviceList, serv, (isBind()) ? getMappings() : null, bslice, slice);
         restore(getAST());
-        // if (res != null) {
-        // res.limit(getAST().getLimit());
-        // }
         return res;
-    }
-
-    /**
-     * @draft: try again by relaxing the query 1) without binding to see the
-     *         kind of results we could have and try to understand the failure
-     *         2) @todo:
-     *         remove filter if any
-     *
-     */
-    Mappings debugSend(Node serv, Exp exp) throws EngineException {
-        // no binding:
-        setBind(false);
-        // upgrade service number in case of log to keep service std log
-        getServiceExp().setNumber(getServiceExp().getNumber() * 10);
-        getAST().setLimit(20);
-        Mappings res = basicSend(serv, exp);
-        return res;
-    }
-
-    // draft
-    void variableSend(Node serv, Exp exp) throws EngineException {
-        setBind(true);
-        getServiceExp().setNumber(getServiceExp().getNumber() * 10);
-        fr.inria.corese.core.sparql.triple.parser.Exp body = getAST().getBody();
-
-        if (body.size() > 0 && body.get(0).isTriple()) {
-            Triple t = body.get(0).getTriple();
-            if (t.getPredicate().isConstant()) {
-                t.setPredicate(new Variable("?_pred_"));
-                System.out.println("PS:\n" + getAST());
-                Mappings res = basicSend(serv, exp);
-            }
-        }
     }
 
     void restore(ASTQuery ast) {
@@ -397,7 +360,7 @@ public class ProviderService implements URLParam {
                     addResult(service, sol, res);
                     size += length;
                     count++;
-                    if (getGlobalAST().hasMetadata(Metadata.TRACE)) {
+                    if (getGlobalAST().hasMetadata(Metadata.Type.TRACE)) {
                         logger.info(String.format(
                                 "Service %s with %s parameters out of %s, results: %s, total results: %s",
                                 service.getURL(), Math.min(size, map.size()),
@@ -407,7 +370,7 @@ public class ProviderService implements URLParam {
                         break;
                     }
                 }
-                if (getGlobalAST().hasMetadata(Metadata.TRACE)) {
+                if (getGlobalAST().hasMetadata(Metadata.Type.TRACE)) {
                     logger.info(String.format(
                             "Service %s total results: %s", service.getURL(), sol.size()));
                 }
@@ -510,13 +473,7 @@ public class ProviderService implements URLParam {
         error(serv, q, getAST(), e);
     }
 
-    // logger.error("ProcessingException: " + serv.getURL());
-    // getLog().addException(new EngineException(e, e.getMessage())
-    // .setURL(serv).setAST(targetAST));
-    // error(serv, q.getGlobalQuery(), getAST(), e);
-
     // @loop @limit 1000 @start 0 @until 9
-    // for (i=0; i<until; i++) offset = i*limit
     Mappings sendWithLoop(URLServer serv, ASTQuery ast, Mappings map,
             int start, int limit, int timeout, int count)
             throws EngineException, IOException {
@@ -569,7 +526,7 @@ public class ProviderService implements URLParam {
             return sol;
         } else {
             Mappings res = sendStep(serv, ast, map, start, limit, timeout, count);
-            if (getGlobalAST().hasMetadata(Metadata.TRACE)) {
+            if (getGlobalAST().hasMetadata(Metadata.Type.TRACE)) {
                 logger.info(String.format("service results: %s %s", serv, res.size()));
             }
             return res;
@@ -693,26 +650,6 @@ public class ProviderService implements URLParam {
         }
     }
 
-    boolean processMessage(Mappings map) {
-        String url = map.getLink(URLParam.MES);
-        if (url != null) {
-            return processMessage(url);
-        }
-        return true;
-    }
-
-    boolean processMessage(String url) {
-        String text = new Service().getString(url);
-        JSONObject obj = new JSONObject(text);
-
-        System.out.println("PS: message");
-        for (String key : obj.keySet()) {
-            System.out.println(key + " " + obj.get(key));
-        }
-
-        return true;
-    }
-
     // is there a limit on size of input
     boolean stop(URLServer serv, int size) {
         if (serv.hasParameter(INPUT)) {
@@ -744,7 +681,7 @@ public class ProviderService implements URLParam {
     }
 
     void reportAST(ASTQuery ast, Mappings map, int count) {
-        if (getGlobalAST().hasMetadata(Metadata.DETAIL)) {
+        if (getGlobalAST().hasMetadata(Metadata.Type.DETAIL)) {
             map.completeReport(URLParam.QUERY, ast.toString());
         }
         map.completeReport(CALL, count);
@@ -835,7 +772,7 @@ public class ProviderService implements URLParam {
             }
         }
 
-        boolean distinct = getGlobalAST().hasMetadata(Metadata.DISTINCT);
+        boolean distinct = getGlobalAST().hasMetadata(Metadata.Type.DISTINCT);
         // TODO: if two Mappings have their own duplicates, they are removed
         if (res != null && res.getSelect() != null && distinct) {
             res = res.distinct(res.getSelect(), res.getSelect());
@@ -907,7 +844,7 @@ public class ProviderService implements URLParam {
 
     int getTimeout(Node serv, Mappings map) {
         Integer timeout = TIMEOUT_DEFAULT;
-        IDatatype dttimeout = getGlobalAST().getMetaValue(Metadata.TIMEOUT);
+        IDatatype dttimeout = getGlobalAST().getMetaValue(Metadata.Type.TIMEOUT);
         if (dttimeout != null) {
             timeout = dttimeout.intValue();
         } else {
@@ -921,7 +858,7 @@ public class ProviderService implements URLParam {
     }
 
     int getSlice(Node serv, Mappings map) {
-        IDatatype dtslice = getGlobalAST().getMetadataDatatypeValue(Metadata.SLICE);
+        IDatatype dtslice = getGlobalAST().getMetadataDatatypeValue(Metadata.Type.SLICE);
         if (dtslice != null) {
             return dtslice.intValue();
         }
@@ -1037,7 +974,6 @@ public class ProviderService implements URLParam {
             service.setTimeout(timeout);
             service.setCount(count);
             service.setBind(b);
-            // service.setLog(getLog());
             service.setDebug(q.isRecDebug());
             Mappings map = service.query(q, ast, null);
             log(serv, service.getReport());

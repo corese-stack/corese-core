@@ -70,7 +70,7 @@ public class ASTRewriter implements QueryVisitor {
     
     // @relax kg:uri_literal_property
     void init(){
-        List<String> list = ast.getMetadata().getValues(Metadata.RELAX);
+        List<String> list = ast.getMetadata().getValues(Metadata.Type.RELAX);
         if (list == null){
             return;
         }  

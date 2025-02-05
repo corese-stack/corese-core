@@ -36,7 +36,7 @@ public class RewriteList implements FederateMerge {
     // return false when one bgp has no service
     // @focus "var" -> merge triple with variable var in the same way as bnode variable
     boolean process(Exp body) {
-        focus = visitor.getAST().getMetadataDatatypeValue(Metadata.FOCUS);
+        focus = visitor.getAST().getMetadataDatatypeValue(Metadata.Type.FOCUS);
         boolean suc = true;
         if (getVisitor().isProcessList()) {
             List<BasicGraphPattern> list = new ArrayList<>();
@@ -125,8 +125,7 @@ public class RewriteList implements FederateMerge {
         if (uriList.isEmpty()) {
             return null;
         }
-        Service s = Service.create(uriList, bgp);
-        return s;
+        return Service.create(uriList, bgp);
     }
     
     ArrayList<Atom> intersection(List<Atom> l1, List<Atom> l2) {

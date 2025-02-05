@@ -30,7 +30,7 @@ public class FederatedQueryProcess  {
     
     public FederatedQueryProcess defineFederation(String name, String... url) {
         getQueryProcess().defineFederation(name, Arrays.asList(url));
-        getMetadata().add(Metadata.FEDERATION, name);
+        getMetadata().add(Metadata.Type.FEDERATION, name);
         return this;
     }
     
@@ -50,21 +50,21 @@ public class FederatedQueryProcess  {
     
     
     public FederatedQueryProcess setLimit(int n) {
-        getMetadata().add(Metadata.LIMIT, DatatypeMap.newInstance(n));
+        getMetadata().add(Metadata.Type.LIMIT, DatatypeMap.newInstance(n));
         return this;
     }
     
     public FederatedQueryProcess setTimeout(int n) {
-        getMetadata().add(Metadata.TIMEOUT, DatatypeMap.newInstance(n));
+        getMetadata().add(Metadata.Type.TIMEOUT, DatatypeMap.newInstance(n));
         return this;
     }    
     
     public FederatedQueryProcess setTrace(boolean b) {
         if (b) {
-            getMetadata().add(Metadata.TRACE);
+            getMetadata().add(Metadata.Type.TRACE);
         }
         else {
-            getMetadata().remove(Metadata.TRACE);
+            getMetadata().remove(Metadata.Type.TRACE);
         }
         return this;
     } 

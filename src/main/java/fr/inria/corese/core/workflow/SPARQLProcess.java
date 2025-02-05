@@ -321,7 +321,7 @@ public class SPARQLProcess extends  WorkflowProcess {
     
     Graph getGraph(Mappings map, Data data) {
         ASTQuery ast = (ASTQuery) map.getAST();
-        if (isAProbe() || ast.hasMetadata(Metadata.TYPE, Metadata.PROBE)){
+        if (isAProbe() || ast.hasMetadata(Metadata.Type.TYPE, Metadata.PROBE)){
             // probe is a query that does not impact the workflow (except Update)
             // @type kg:probe : return input graph as is
             return data.getGraph();

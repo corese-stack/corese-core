@@ -811,12 +811,12 @@ public class QueryProcess extends QuerySolver {
 
     void dbProducer(Query q) {
         ASTQuery ast = q.getAST();
-        if (ast.hasMetadata(Metadata.DB)) {
+        if (ast.hasMetadata(Metadata.Type.DB)) {
             String factory = DB_FACTORY;
-            if (ast.hasMetadata(Metadata.DB_FACTORY)) {
-                factory = ast.getMetadataValue(Metadata.DB_FACTORY);
+            if (ast.hasMetadata(Metadata.Type.DB_FACTORY)) {
+                factory = ast.getMetadataValue(Metadata.Type.DB_FACTORY);
             }
-            Producer prod = getCreateProducer(getGraph(), factory, ast.getMetadataValue(Metadata.DB));
+            Producer prod = getCreateProducer(getGraph(), factory, ast.getMetadataValue(Metadata.Type.DB));
             setProducer(prod);
         }
     }
@@ -827,7 +827,7 @@ public class QueryProcess extends QuerySolver {
             finishEval.finish(q, map);
             map.setEval(null);
         }
-        if (q.getAST().hasMetadata(Metadata.LOG)) {
+        if (q.getAST().hasMetadata(Metadata.Type.LOG)) {
             processLog(q, map);
         }
         if (!getLog().getLinkList().isEmpty()) {
@@ -876,7 +876,7 @@ public class QueryProcess extends QuerySolver {
 
     void processLog(Query q, Mappings map) {
         LogManager man = getLogManager(map);
-        String fileName = q.getAST().getMetadata().getValue(Metadata.LOG);
+        String fileName = q.getAST().getMetadata().getValue(Metadata.Type.LOG);
 
         try {
             man.toFile(fileName);

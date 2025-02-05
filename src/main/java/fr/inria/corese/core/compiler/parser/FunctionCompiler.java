@@ -109,14 +109,14 @@ public class FunctionCompiler {
 
     // @import <uri> select where 
     void imports(Query q, ASTQuery ast) throws EngineException {
-        if (ast.hasMetadata(Metadata.IMPORT)) {
+        if (ast.hasMetadata(Metadata.Type.IMPORT)) {
             basicImports(q, ast, ast.getMetadata());
         }
     }
     
     void basicImports(Query q, ASTQuery ast, Metadata m) throws EngineException {
-        if (m.hasMetadata(Metadata.IMPORT)) {
-            for (String path : m.getValues(Metadata.IMPORT)) {
+        if (m.hasMetadata(Metadata.Type.IMPORT)) {
+            for (String path : m.getValues(Metadata.Type.IMPORT)) {
                 imports(q, ast, path);
             }
         }
@@ -243,7 +243,7 @@ public class FunctionCompiler {
             dh.setDebug(true);
         }
         ext.setHierarchy(dh);
-        boolean pub = ast.hasMetadata(Metadata.PUBLIC);
+        boolean pub = ast.hasMetadata(Metadata.Type.PUBLIC);
         for (Function exp : aext.getFunList()) { 
             ext.define(exp);
             if (pub || exp.isPublic()) {
