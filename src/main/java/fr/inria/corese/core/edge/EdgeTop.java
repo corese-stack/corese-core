@@ -20,7 +20,7 @@ import fr.inria.corese.core.sparql.triple.parser.AccessRight;
  *
  */
 public abstract class EdgeTop extends GraphObject implements Edge {
-    private byte level = AccessRight.DEFAULT;
+    private AccessRight.AccessRights level = AccessRight.DEFAULT;
     public static final String NL = System.getProperty("line.separator");
     private boolean nested = false;
     // created by values, bind or triple()
@@ -36,19 +36,13 @@ public abstract class EdgeTop extends GraphObject implements Edge {
 
     // manage access right
     @Override
-    public byte getLevel() {
-        // return -1;
+    public AccessRight.AccessRights getLevel() {
         return level;
     }
 
     @Override
-    public Edge setLevel(byte b) {
+    public Edge setLevel(AccessRight.AccessRights b) {
         level = b;
-        return this;
-    }
-
-    public Edge setLevel(int b) {
-        level = (byte) b;
         return this;
     }
 

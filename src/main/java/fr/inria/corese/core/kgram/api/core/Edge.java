@@ -2,6 +2,7 @@ package fr.inria.corese.core.kgram.api.core;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 
 /**
  * Interface for Producer iterator that encapsulate Edge or Node with its Graph
@@ -56,7 +57,7 @@ public interface Edge extends Pointerable {
     /**
      * Is node returned by getNode()
      *
-     * @param n
+     * @param node
      * @return
      */
     default boolean contains(Node node) {return false;}
@@ -69,11 +70,11 @@ public interface Edge extends Pointerable {
     default void setEdgeIndex(int n) {}
 
     // manage access right
-    default byte getLevel() {
-        return -1;
+    default AccessRight.AccessRights getLevel() {
+        return AccessRight.AccessRights.NONE;
     }
 
-    default Edge setLevel(byte b) {
+    default Edge setLevel(AccessRight.AccessRights b) {
         return this;
     }
 

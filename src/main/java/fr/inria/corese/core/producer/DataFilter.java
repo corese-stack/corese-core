@@ -29,7 +29,7 @@ public class DataFilter implements ExprType {
     
     private int test;
     int index, other = 1;
-    byte level = AccessRight.DEFAULT;
+    AccessRight.AccessRights level = AccessRight.DEFAULT;
     private AccessRight accessRight;
     private boolean nested = false;
     
@@ -51,7 +51,7 @@ public class DataFilter implements ExprType {
        this(test, null, index);
     }
     
-    public DataFilter(int test, byte level){
+    public DataFilter(int test, AccessRight.AccessRights level){
        this.test = test;
        this.level = level;
     }
