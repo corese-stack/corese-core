@@ -463,22 +463,19 @@ public class Eval implements ExpType, Plugin {
     }
 
     void debug() {
-        Message.log(Message.LOOP, nbCall + " " + nbEdge);
+        logger.warn(Message.Prefix.LOOP.getString(), nbCall + " " + nbEdge);
         if (results.size() == 0) {
             if (query.isFail()) {
-                Message.log(Message.FAIL);
-                System.out.println("eval: " + query);
+                logger.warn(Message.Prefix.FAIL.getString());
                 for (Filter filter : query.getFailures()) {
-                    Message.log(filter + " ");
+                    logger.warn(filter + " ");
                 }
-                Message.log();
             } else {
                 if (maxExp == null) {
-                    Message.log(Message.FAIL_AT, "init phase, e.g. parameter binding");
+                    logger.warn(Message.Prefix.FAIL_AT.getString(), "init phase, e.g. parameter binding");
                 } else {
-                    Message.log(Message.FAIL_AT);
-                    Message.log(maxExp);
-                    getTrace().append(String.format("SPARQL fail at: %s", maxExp)).append(Message.NL);
+                    logger.warn(Message.Prefix.FAIL_AT.getString(), maxExp);
+                    getTrace().append(String.format("SPARQL fail at: %s", maxExp)).append(System.getProperty("line.separator"));
                 }
             }
         }
@@ -1078,26 +1075,6 @@ public class Eval implements ExpType, Plugin {
         if (n >= stack.size()) {
             backtrack = solution(p, null, n);
             return backtrack;
-        }
-
-        if (isDebug()) {
-
-            if (n > level
-                    || (maxExp.type() == UNION)) {
-                Exp ee = stack.get(n);
-                if (true){//(ee.type() != AND) {
-                    level = n;
-                    maxExp = stack.get(n);
-                    String s = String.format("%02d", n);
-                    Message.log(Message.EVAL, s + " " + maxExp);
-                    if (map!=null) {
-                        logger.warn(String.format("With mappings:\nvalues %s\n%s",
-                                map.getNodeList(), map.toString(false, false, DISPLAY_RESULT_MAX)));
-                    }
-                    getTrace().append(String.format("Eval: %02d %s", n, maxExp))
-                            .append(Message.NL).append(Message.NL);
-                }
-            }
         }
 
         if (n > maxLevel) {

@@ -63,11 +63,6 @@ public class Compile implements ExprType {
 	public boolean check(Exp exp1, Exp exp2){
 		return checker.check(exp1.getFilter().getExp(), exp2.getFilter().getExp());
 	}
-	
-	public void test(Regex exp){
-		if (exp instanceof Expr)
-			checker.test((Expr) exp);
-	}
 
 	/**
 	 * exp is a FILTER Exp

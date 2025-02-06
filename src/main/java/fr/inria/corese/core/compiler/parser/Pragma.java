@@ -141,10 +141,6 @@ public class Pragma {
 
         for (fr.inria.corese.core.sparql.triple.parser.Exp pragma : exp.getBody()) {
 
-            if (query != null && query.isDebug()) {
-                Message.log(Message.PRAGMA, pragma);
-            }
-
             if (pragma.isFilter()) {
             } else if (pragma.isTriple()) {
                 Triple t = pragma.getTriple();
@@ -180,9 +176,6 @@ public class Pragma {
 
         for (fr.inria.corese.core.sparql.triple.parser.Exp pragma : exp.getBody()) {
 
-            if (ast.isDebug()) {
-                Message.log(Message.PRAGMA, pragma);
-            }
             if (pragma.isFilter()) {
                 compile(pragma.getFilter());
             } else if (pragma.isTriple()) {

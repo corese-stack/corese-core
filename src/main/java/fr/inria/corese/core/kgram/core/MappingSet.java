@@ -1,7 +1,6 @@
 package fr.inria.corese.core.kgram.core;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import static fr.inria.corese.core.kgram.tool.Message.NL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -105,13 +104,13 @@ public class MappingSet {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("inter: ").append(getIntersection()).append(NL);
-        sb.append("union: ").append(getUnion()).append(NL);
+        sb.append("inter: ").append(getIntersection()).append(System.lineSeparator());
+        sb.append("union: ").append(getUnion()).append(System.lineSeparator());
         if (set1 != null) {
-            sb.append("first var: ").append(set1.getUnion()).append(NL);
+            sb.append("first var: ").append(set1.getUnion()).append(System.lineSeparator());
         }
         if (set2 != null) {
-            sb.append("rest var:  ").append(set2.getUnion()).append(NL);
+            sb.append("rest var:  ").append(set2.getUnion()).append(System.lineSeparator());
         }
         if (varList!=null) {
             sb.append("common var:  ").append(varList).append(" always bound: ").append(isBound);

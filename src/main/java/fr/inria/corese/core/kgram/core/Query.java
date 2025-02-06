@@ -1620,8 +1620,8 @@ public class Query extends Exp implements Graphable {
                 if (!isTriple(exp, var)) {
                     // no error message for use case: 
                     // var = ?_bn = <<s p o>> 
-                    Message.log(Message.UNDEF_VAR, var);
-                    addError(Message.get(Message.UNDEF_VAR), var);
+                    logger.warn(Message.Prefix.UNDEF_VAR.getString(), var);
+                    addError(Message.Prefix.UNDEF_VAR.getString(), var);
                 }
             } else if (!isExist && !hasExist) {
                 int n = qIndex(query, qNode);

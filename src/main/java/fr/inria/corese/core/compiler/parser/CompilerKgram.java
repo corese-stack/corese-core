@@ -28,6 +28,8 @@ import java.util.List;
  * @author corby
  */
 public class CompilerKgram implements ExpType, Compiler {
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CompilerKgram.class);
+
     static int count = 0;
     static final String EQUAL = "=";
 
@@ -93,8 +95,7 @@ public class CompilerKgram implements ExpType, Compiler {
         Expression ee = process(exp);
         Expression cpl = ee.process(ast);
         if (cpl == null) {
-            Message.log(Message.REWRITE, exp);
-            Message.log(ast);
+            logger.warn(Message.Prefix.REWRITE.getString(), exp, ast);
             cpl = exp;
         }
         cpl.compile(ast);
