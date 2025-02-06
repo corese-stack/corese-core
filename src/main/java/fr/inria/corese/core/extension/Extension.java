@@ -268,7 +268,7 @@ public class Extension extends Core {
     
    public IDatatype closeVisitor() {
        getEval().setVisitor(new ProcessVisitorDefault());
-       getVisitor().setDefaultValue(TRUE);
+       getVisitor().setDefaultValue(DatatypeMap.TRUE);
        return visitor();
    } 
    

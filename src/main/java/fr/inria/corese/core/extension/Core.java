@@ -117,15 +117,6 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         return  map.getValue(var.getLabel());
     }
 
-    IDatatype xt_print(IDatatype... dt) {
-        for (IDatatype val : dt) {
-            System.out.print(dt);
-            System.out.println(" ");
-        }
-        System.out.println();
-        return TRUE;
-    }
-
     IDatatype xt_load(IDatatype... dt) {
         try {
             //return new GraphSpecificFunction("load").load(this, dt, null, null, Level.DEFAULT);
@@ -147,23 +138,6 @@ public class Core extends PluginImpl implements FunctionEvaluator {
     IDatatype xt_value(IDatatype s, IDatatype p) {
         return value(null, getProducer(), null, s, p, 1);
     }
-
-//    IDatatype xt_objects(IDatatype s, IDatatype p) {
-//        return enumerate(s, p, null, 1);
-//    }
-//
-//    IDatatype xt_subjects(IDatatype p, IDatatype o) {
-//        return enumerate(null, p, o, 0);
-//    }
-//
-//    IDatatype enumerate(IDatatype s, IDatatype p, IDatatype o, int n) {
-//        ArrayList<IDatatype> list = new ArrayList<>();
-//        for (IDatatype dt : edge(null, getProducer(), s, p, o)) {
-//            Edge edge = dt.getPointerObject().getEdge();
-//            list.add( edge.getNode(n).getDatatypeValue());
-//        }
-//        return DatatypeMap.newList(list);
-//    }
 
     IDatatype xt_insert(IDatatype... ldt) {
         return insert(null, getProducer(), ldt);
@@ -256,7 +230,7 @@ public class Core extends PluginImpl implements FunctionEvaluator {
     }
    
    public IDatatype safe(IDatatype dt) {
-       return (dt == null) ? FALSE : TRUE;
+       return (dt == null) ? DatatypeMap.FALSE : DatatypeMap.TRUE;
    }
 
    // rq:gt -> gt

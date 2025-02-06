@@ -30,12 +30,9 @@ public abstract class ProxyInterpreter implements ExprType {
 
     private static final String URN_UUID = "urn:uuid:";
     private static Logger logger = LoggerFactory.getLogger(ProxyInterpreter.class);
-    public static final IDatatype TRUE = DatatypeMap.TRUE;
-    public static final IDatatype FALSE = DatatypeMap.FALSE;
-    public static final IDatatype UNDEF = DatatypeMap.UNBOUND;
 
     static final String UTF8 = "UTF-8";
-    public static final String RDFNS = NSManager.RDF; //"http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    public static final String RDFNS = NSManager.RDF;
     public static final String RDFTYPE = RDFNS + "type";
     private static final String USER_DISPLAY = NSManager.USER + "display";
     public static int count = 0;
@@ -54,59 +51,26 @@ public abstract class ProxyInterpreter implements ExprType {
     boolean SPARQLCompliant = false;
     protected IDatatype EMPTY = DatatypeMap.newStringBuilder("");
 
-    public ProxyInterpreter() {
-//        sql = new SQLFun();
-//        custom = new Custom();
-        //setPlugin(this);
+    protected ProxyInterpreter() {
     }
 
     public void setEvaluator(Interpreter ev) {
         eval =  ev;
-//        if (plugin != null) {
-//            plugin.setEvaluator(ev);
-//        }
     }
 
     public Interpreter getEvaluator() {
         return eval;
     }
 
-//    public void setPlugin(ProxyInterpreter p) {
-//        plugin = p;
-//        //plugin.setEvaluator(eval);
-//    }
-
-//    public ProxyInterpreter getPlugin() {
-//        return plugin;
-//    }
-//
-//    public ProxyInterpreter getComputerPlugin() {
-//        return plugin;
-//    }
-
     public GraphProcessor getGraphProcessor() {
-        //return plugin.getGraphProcessor();
         return null;
     }
 
     public ComputerProxy getComputerTransform() {
-        //return plugin.getComputerTransform();
         return null;
     }
 
-    public void setMode(int mode) {
-//        switch (mode) {
-//
-//            case Evaluator.SPARQL_MODE:
-//                SPARQLCompliant = true;
-//                break;
-//
-//            case Evaluator.KGRAM_MODE:
-//                SPARQLCompliant = false;
-//                break;
-//        }
-//        plugin.setMode(mode);
-    }
+    public abstract void setMode(int mode);
 
     public void start() {
         number = 0;
@@ -125,9 +89,9 @@ public abstract class ProxyInterpreter implements ExprType {
 
     public IDatatype getValue(boolean b) {
         if (b) {
-            return TRUE;
+            return DatatypeMap.TRUE;
         } else {
-            return FALSE;
+            return DatatypeMap.FALSE;
         }
     }
 
@@ -161,25 +125,16 @@ public abstract class ProxyInterpreter implements ExprType {
         return null;
     }
 
-    public void start(Producer p, Environment env) {
-        //plugin.start(p, env);
-    }
+    public abstract void start(Producer p, Environment env);
 
-    public void finish(Producer p, Environment env) {
-        //plugin.finish(p, env);
-    }
-
-//    public IDatatype getBufferedValue(StringBuilder sb, Environment env) {
-//        //return plugin.getBufferedValue(sb, env);
-//        return null;
-//    }
+    public abstract void finish(Producer p, Environment env);
    
     public Environment getEnvironment() {
         return environment;
     }
 
     public Context getContext() {
-        return ((Interpreter) getEval().getEvaluator()).getContext(getEnvironment().getBind(), getEnvironment(), getProducer());
+        return getEval().getEvaluator().getContext(getEnvironment().getBind(), getEnvironment(), getProducer());
     }
 
     public Eval getEval() {

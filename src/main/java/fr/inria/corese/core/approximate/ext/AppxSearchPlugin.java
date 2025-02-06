@@ -2,6 +2,7 @@ package fr.inria.corese.core.approximate.ext;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseStringLiteral;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.ExprType;
@@ -22,8 +23,8 @@ import fr.inria.corese.core.query.PluginImpl;
  */
 public class AppxSearchPlugin implements ExprType {
 
-    static final IDatatype TRUE = PluginImpl.TRUE;
-    static final IDatatype FALSE = PluginImpl.FALSE;
+    static final IDatatype TRUE = DatatypeMap.TRUE;
+    static final IDatatype FALSE = DatatypeMap.FALSE;
     private final PluginImpl plugin;
 
     public AppxSearchPlugin(PluginImpl p) {

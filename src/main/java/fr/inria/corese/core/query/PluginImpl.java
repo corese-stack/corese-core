@@ -737,7 +737,7 @@ public class PluginImpl
             Graph gg = (Graph) first.getPointerObject();
             e = gg.insert(param[1], param[2], param[3]);
         }
-        return (e == null) ? FALSE : TRUE;
+        return (e == null) ? DatatypeMap.FALSE : DatatypeMap.TRUE;
     }
 
     // function xt:delete
@@ -752,7 +752,7 @@ public class PluginImpl
             le = gg.delete(param[1], param[2], param[3]);
         }
 
-        return (le == null || !le.iterator().hasNext()) ? FALSE : TRUE;
+        return (le == null || !le.iterator().hasNext()) ? DatatypeMap.FALSE : DatatypeMap.TRUE;
     }
 
     public Graph getGraph() {
@@ -963,7 +963,7 @@ public class PluginImpl
 
         }
 
-        return TRUE;
+        return DatatypeMap.TRUE;
     }
 
     EventManager getEventManager(Producer p) {
