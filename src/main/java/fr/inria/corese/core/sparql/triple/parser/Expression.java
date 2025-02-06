@@ -49,10 +49,9 @@ import java.util.Collection;
 public class Expression extends TopExp
         implements Regex, Filter, Expr, Pointerable {
 
-    public static final int STDFILTER = 0;
-    public static final int ENDFILTER = 1;
-    public static final int POSFILTER = 2;
-    public static final int BOUND = 4;
+    public enum Type {
+        STDFILTER, ENDFILTER, POSFILTER, BOUND
+    }
     static ArrayList<Expr> empty = new ArrayList<Expr>(0);
     int retype = Regex.UNDEF;
     boolean isSystem = false;
@@ -464,7 +463,7 @@ public class Expression extends TopExp
         return false;
     }
 
-    public boolean isType(ASTQuery ast, int type) {
+    public boolean isType(ASTQuery ast, Expression.Type  type) {
         return false;
     }
 
