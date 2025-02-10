@@ -164,12 +164,8 @@ public class AppxSearchPlugin implements ExprType {
         if (c1 == c2){
             return true;
         }
-        if ((c1 == IDatatype.STRING && c2 == IDatatype.LITERAL) ||
-            (c2 == IDatatype.STRING && c1 == IDatatype.LITERAL)){
-            return true;
-        }
-        
-        return false;
+        return (c1 == IDatatype.STRING && c2 == IDatatype.LITERAL) ||
+                (c2 == IDatatype.STRING && c1 == IDatatype.LITERAL);
     }
   
 }

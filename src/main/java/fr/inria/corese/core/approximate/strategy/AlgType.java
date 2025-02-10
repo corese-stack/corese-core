@@ -24,6 +24,6 @@ public enum AlgType {
      * @return
      */
     public static List<AlgType> allValues() {
-        return Arrays.asList(new AlgType[]{ng, jw, ch, wn, eq});
+        return Arrays.asList(ng, jw, ch, wn, eq);
     }
 }

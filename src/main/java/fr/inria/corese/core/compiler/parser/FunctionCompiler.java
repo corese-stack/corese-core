@@ -39,8 +39,8 @@ import org.slf4j.LoggerFactory;
  */
 public class FunctionCompiler {
 
-    private static String NL = System.getProperty("line.separator");
-    private static Logger logger = LoggerFactory.getLogger(FunctionCompiler.class);
+    private static final String NL = System.getProperty("line.separator");
+    private static final Logger logger = LoggerFactory.getLogger(FunctionCompiler.class);
     private static HashMap<String, String> loaded;
     HashMap<String, String> imported;
     Transformer transformer;
@@ -163,7 +163,7 @@ public class FunctionCompiler {
             sb.append(exp.toString()).append(NL);
         }
         if (Access.UNDEFINED_EXPRESSION_EXCEPTION) {
-            throw new UndefinedExpressionException(TermEval.UNDEFINED_EXPRESSION_MESS + NL + sb.toString());
+            throw new UndefinedExpressionException(TermEval.UNDEFINED_EXPRESSION_MESS + NL + sb);
         }
         else {
             logger.error(TermEval.UNDEFINED_EXPRESSION_MESS);
@@ -239,9 +239,6 @@ public class FunctionCompiler {
     void define(ASTQuery ast, ASTExtension aext, Query q) {
         ASTExtension ext = q.getCreateExtension();
         DatatypeHierarchy dh = new DatatypeHierarchy();
-        if (q.isDebug()) {
-            dh.setDebug(true);
-        }
         ext.setHierarchy(dh);
         boolean pub = ast.hasMetadata(Metadata.Type.PUBLIC);
         for (Function exp : aext.getFunList()) { 
@@ -295,7 +292,7 @@ public class FunctionCompiler {
     }
     
     public static void clean() {
-        getLoaded().clear();;
+        getLoaded().clear();
     }
 
     public static HashMap<String, String> getLoaded() {

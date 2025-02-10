@@ -2,73 +2,73 @@ package fr.inria.corese.core.sparql.datatype;
 
 public interface RDF {
     
-	 static final String XML   =  "http://www.w3.org/XML/1998/namespace";
-	 static final String RDF   =  "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-	 static final String RDFS  =  "http://www.w3.org/2000/01/rdf-schema#";
-	 static final String XSD   =  "http://www.w3.org/2001/XMLSchema#";
-	 static final String OWL   =  "http://www.w3.org/2002/07/owl#";
-	 static final String RDF_HTML   =  RDF + "HTML";
+	 String XML   =  "http://www.w3.org/XML/1998/namespace";
+	 String RDF   =  "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+	 String RDFS  =  "http://www.w3.org/2000/01/rdf-schema#";
+	 String XSD   =  "http://www.w3.org/2001/XMLSchema#";
+	 String OWL   =  "http://www.w3.org/2002/07/owl#";
+	 String RDF_HTML   =  RDF + "HTML";
          
-         static final String FIRST = RDF+"first";
-         static final String REST  = RDF+"rest";           
-         static final String OWL_SAME_AS = OWL+"sameAs";
+         String FIRST = RDF+"first";
+         String REST  = RDF+"rest";
+         String OWL_SAME_AS = OWL+"sameAs";
 	 
-	 static final String XSDPrefix  = "xsd";
-	 static final String RDFPrefix =  "rdf";
-	 static final String RDFSPrefix =  "rdfs";
-	 static final String XMLPrefix =  "xml";
-	 static final String OWLPrefix =  "owl";
+	 String XSDPrefix  = "xsd";
+	 String RDFPrefix =  "rdf";
+	 String RDFSPrefix =  "rdfs";
+	 String XMLPrefix =  "xml";
+	 String OWLPrefix =  "owl";
 	 
-	static final String RDFSRESOURCE= RDFS+"Resource";
-	static final String RDFSLITERAL 	= RDFS+"Literal";
-	static final String XMLLITERAL  	= RDF+"XMLLiteral";
-	static final String HTML  	= RDF+"HTML";
-	static final String LANGSTRING  = RDF+"langString";
-	static final String BLANKSEED   = "_:";
+	String RDFSRESOURCE= RDFS+"Resource";
+	String RDFSLITERAL 	= RDFS+"Literal";
+	String XMLLITERAL  	= RDF+"XMLLiteral";
+	String HTML  	= RDF+"HTML";
+	String LANGSTRING  = RDF+"langString";
+	String BLANKSEED   = "_:";
 	
-	static final String qxsdString 	 = "xsd:string";
-	static final String qxsdInteger  = "xsd:integer";
-	static final String qxsdBoolean  = "xsd:boolean";
-	static final String qxsdlangString= "rdf:langString";
-	static final String qrdfsLiteral = "rdfs:Literal";
+	String qxsdString 	 = "xsd:string";
+	String qxsdInteger  = "xsd:integer";
+	String qxsdBoolean  = "xsd:boolean";
+	String qxsdlangString= "rdf:langString";
+	String qrdfsLiteral = "rdfs:Literal";
 
-	static final String xsdboolean 	= XSD+"boolean";
-	static final String xsdinteger 	= XSD+"integer";
-	static final String xsdlong 	= XSD+"long";
-	static final String xsdint 	= XSD+"int";
-	static final String xsdshort 	= XSD+"short";
-	static final String xsdbyte	= XSD+"byte";
-	static final String xsddecimal 	= XSD+"decimal";
-	static final String xsdfloat 	= XSD+"float";
-	static final String xsddouble 	= XSD+"double";
+	String xsdboolean 	= XSD+"boolean";
+	String xsdinteger 	= XSD+"integer";
+	String xsdlong 	= XSD+"long";
+	String xsdint 	= XSD+"int";
+	String xsdshort 	= XSD+"short";
+	String xsdbyte	= XSD+"byte";
+	String xsddecimal 	= XSD+"decimal";
+	String xsdfloat 	= XSD+"float";
+	String xsddouble 	= XSD+"double";
 
-	static final String xsdnonNegativeInteger = XSD+"nonNegativeInteger";
-	static final String xsdnonPositiveInteger = XSD+"nonPositiveInteger";
-	static final String xsdpositiveInteger 	  = XSD+"positiveInteger";
-	static final String xsdnegativeInteger    = XSD+"negativeInteger";
+	String xsdnonNegativeInteger = XSD+"nonNegativeInteger";
+	String xsdnonPositiveInteger = XSD+"nonPositiveInteger";
+	String xsdpositiveInteger 	  = XSD+"positiveInteger";
+	String xsdnegativeInteger    = XSD+"negativeInteger";
 
-	static final String xsdunsignedLong    = XSD+"unsignedLong";
-	static final String xsdunsignedInt     = XSD+"unsignedInt";
-	static final String xsdunsignedShort   = XSD+"unsignedShort";
-	static final String xsdunsignedByte    = XSD+"unsignedByte";
+	String xsdunsignedLong    = XSD+"unsignedLong";
+	String xsdunsignedInt     = XSD+"unsignedInt";
+	String xsdunsignedShort   = XSD+"unsignedShort";
+	String xsdunsignedByte    = XSD+"unsignedByte";
 
-	static final String rdflangString 	= RDF+"langString";
-	static final String xsdstring 	= XSD+"string";
-	static final String xsdnormalizedString 	= XSD+"normalizedString";
-	static final String xsdtoken 	= XSD+"token";
-	static final String xsdnmtoken 	= XSD+"NMTOKEN";
-	static final String xsdanyURI 	= XSD+"anyURI";
-	static final String xsdname 	= XSD+"Name";
-	static final String xsdncname 	= XSD+"NCName";
-	static final String xsdlanguage = XSD+"language";
+	String rdflangString 	= RDF+"langString";
+	String xsdstring 	= XSD+"string";
+	String xsdnormalizedString 	= XSD+"normalizedString";
+	String xsdtoken 	= XSD+"token";
+	String xsdnmtoken 	= XSD+"NMTOKEN";
+	String xsdanyURI 	= XSD+"anyURI";
+	String xsdname 	= XSD+"Name";
+	String xsdncname 	= XSD+"NCName";
+	String xsdlanguage = XSD+"language";
 
-	static final String xsdduration = XSD+"duration";
-	static final String xsddaytimeduration = XSD+"dayTimeDuration";
-	static final String xsddate 	= XSD+"date";
-	static final String xsddateTime = XSD+"dateTime";
-	static final String xsdday 		= XSD+"gDay";
-	static final String xsdmonth 	= XSD+"gMonth";
-	static final String xsdyear 	= XSD+"gYear";
+	String xsdduration = XSD+"duration";
+	String xsddaytimeduration = XSD+"dayTimeDuration";
+	String xsddate 	= XSD+"date";
+	String xsddateTime = XSD+"dateTime";
+	String xsdday 		= XSD+"gDay";
+	String xsdmonth 	= XSD+"gMonth";
+	String xsdyear 	= XSD+"gYear";
 
 
 }

@@ -121,10 +121,7 @@ public class AccessNamespace {
         if (accept.isEmpty()) {
             return resultWhenEmptyAccept;
         }
-        if (accept.match(ns)) {
-            return true;
-        }
-        return false;
+        return accept.match(ns);
     } 
     
     

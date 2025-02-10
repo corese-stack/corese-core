@@ -30,10 +30,7 @@ public class CompareMappings {
         return check(result, solution); 
     }
     
-    public boolean process() {  
-        if (result.size() != solution.size()) {
-            display("Different number of results: %s vs %s", result.size(), solution.size());
-        }
+    public boolean process() {
         return check(result, solution); 
     }
 
@@ -51,21 +48,10 @@ public class CompareMappings {
 
             if (!ok) {
                 success = false;
-                display("Difference at rank %s: \n%svs\n%s", i, res, sol);                                                
-                display("--");
             }
             i++;
         }
         return success;
-    }
-    
-    void display(String mes, Object... obj) {
-        System.out.println(String.format(mes, obj));
-    }
-    
-    void info(Mappings result, Mappings solution) {
-        display("result:\n", result);
-        display("solution:\n", solution);
     }
 
     // compare two results

@@ -25,7 +25,7 @@ import fr.inria.corese.core.sparql.storage.api.IStorage;
 public class CoreseStringLiteral extends CoreseStringableImpl {
 
     static int code = STRING;
-    private static Logger logger = LoggerFactory.getLogger(CoreseStringLiteral.class);
+    private static final Logger logger = LoggerFactory.getLogger(CoreseStringLiteral.class);
 
     private IStorage manager;
     private int id;

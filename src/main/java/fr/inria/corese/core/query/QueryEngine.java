@@ -34,9 +34,9 @@ import fr.inria.corese.core.sparql.triple.parser.Access.Level;
  */
 public class QueryEngine implements Engine {
 
-    private static Logger logger = LoggerFactory.getLogger(QueryEngine.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueryEngine.class);
     Graph graph;
-    private QueryProcess exec;
+    private final QueryProcess exec;
     ArrayList<Query> list;
     private Dataset ds;
     HashMap<String, Query> table;
@@ -189,10 +189,6 @@ public class QueryEngine implements Engine {
         else {
             q.getExtension().add(ext);
         }
-    }
-            
-    public void trace() {
-        System.out.println(index.toString());
     }
 
     public List<Query> getQueries() {

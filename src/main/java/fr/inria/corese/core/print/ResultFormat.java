@@ -299,7 +299,7 @@ public class ResultFormat implements ResultFormatDef {
         if (m.getQuery().isTemplate()) {
             return ResultFormatDef.format.TEXT_FORMAT;
         }
-        ASTQuery ast = (ASTQuery) m.getAST();
+        ASTQuery ast = m.getAST();
         if (ast != null && ast.hasMetadata(Metadata.Type.DISPLAY)) {
             String val = ast.getMetadata().getValue(Metadata.Type.DISPLAY);
             type = table.get(val);
@@ -375,9 +375,6 @@ public class ResultFormat implements ResultFormatDef {
         Transformer t = Transformer.create(theGraph(), getMappings(), getTransformation());
         if (getContext() != null) {
             t.setContext(getContext());
-            if (getContext().hasValue(URLParam.DEBUG)) {
-                t.setDebug(true);
-            }
         }
         if (getBind() != null) {
             t.setBinding(getBind());

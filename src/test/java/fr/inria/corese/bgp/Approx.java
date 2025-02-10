@@ -52,10 +52,8 @@ public class Approx {
 //                             + "'URI_LEX',  "
 //                             + "'LITERAL_LEX' "
 //                             + "}"
-                             
-                             ;
-                                         
-                     
+
+
 //                     + "pragma {"
 //                     + "kg:approximate kg:strategy  "
 //                     + "'URI_LEX', "

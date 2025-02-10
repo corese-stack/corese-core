@@ -27,7 +27,7 @@ public class CoreseInteger extends CoreseNumber {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(CoreseInteger.class);
+    private static final Logger logger = LoggerFactory.getLogger(CoreseInteger.class);
     public static final CoreseInteger ZERO = new CoreseInteger(0);
     public static final CoreseInteger ONE = new CoreseInteger(1);
     public static final CoreseInteger TWO = new CoreseInteger(2);

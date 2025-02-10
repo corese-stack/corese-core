@@ -38,7 +38,7 @@ import java.util.TreeMap;
 public class Construct
         implements Comparator<Node> {
 
-   private static Logger logger = LoggerFactory.getLogger(Construct.class);
+   private static final Logger logger = LoggerFactory.getLogger(Construct.class);
     private static boolean allEntailment = false;
     static final String BLANK = "_:b_";
     static final String DOT = ".";
@@ -59,7 +59,6 @@ public class Construct
     private boolean isInsert = false;
     boolean isBuffer = false;
     private boolean test = false;
-    public static boolean trace = false;
     Rule rule;
     HashMap<Node, Node> table;
     private TreeNode literalMap;
@@ -456,10 +455,6 @@ public class Construct
      * If an insert node does not exist in the graph, it is added in the graph now
      */    
     Edge construct(Node gNode, Edge edge, Environment env, List<Edge> insertEdgeList, boolean rec) {
-        if (trace) {
-            System.out.println("___");
-            System.out.println("construct edge: " + edge);
-        }
         Node pred = edge.getEdgeVariable();
         if (pred == null) {
             pred = edge.getEdgeNode();
@@ -605,7 +600,6 @@ public class Construct
             IDatatype dt = null;
             
             if (targetNode == null) {
-                trace("query node: %s %s %s", queryNode, queryNode.isTriple(), queryNode.isTripleWithEdge());
                 if (queryNode.isTriple()) {
                     if (queryNode.getEdge() == null) {
                         return null;
@@ -685,19 +679,15 @@ public class Construct
             boolean rec) {
         // t.edge = s p o
         Edge edge = refNode.getEdge();
-        trace1(gNode, refNode, edge);
         // instantiate s p o wrt to target graph 
         Edge query = construct(gNode, edge, map, insertEdgeList, true);
         if (query == null) {
             // when delete, we may have a null result when some node does not exist
             return null;
         }
-        trace("ref node query edge: %s %s %s", query, 
-                query.getReferenceNode(), query.getClass().getName());
         
        if (isDelete()) {
             Edge target = getGraphManager().find(query);
-            trace2(query, target);
             if (target == null) {
                 // edge does not exist in graph: skip this delete 
                 return null;
@@ -713,33 +703,6 @@ public class Construct
                 insertEdgeList.add(query);
             }
             return query.getReferenceNode();
-        }
-    }
-    
-
-    
-    void trace(String mes, Object... obj) {
-        if (trace) {
-            System.out.println(String.format(mes, obj));
-        }
-    }
-    void trace1(Node gNode, Node refNode, Edge edge) {
-        if (trace) {
-            trace("graph node: %s", gNode);
-            trace("ref node: %s [%s] edge: %s", refNode, refNode.getLabel(), edge);
-        }
-    }
-    
-    void trace2(Edge query, Edge target) {
-        if (trace) {
-            System.out.println("query edge:  " + query);
-            System.out.println("target edge: " + target);
-        }
-    }
-    
-    void trace3(Node refNode, Node resultNode) {
-        if (trace) {
-            trace("ref node: %s=%s label: ",refNode, resultNode, resultNode.getLabel());
         }
     }
        

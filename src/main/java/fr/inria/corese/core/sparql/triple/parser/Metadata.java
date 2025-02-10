@@ -136,7 +136,7 @@ public class Metadata extends ASTObject
     public static final String DISCOVERY = "@discovery";
     public static final String LOOP = AT + URLParam.LOOP;
     public static final String START = AT + URLParam.START;
-    public static final String UNTIL = AT + URLParam.UNTIL;;
+    public static final String UNTIL = AT + URLParam.UNTIL;
     public static final String HIDE = "@hide";
     public static final String LIMIT_STR = "@limit";
 

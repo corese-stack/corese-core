@@ -47,7 +47,7 @@ public class Query extends Exp implements Graphable {
     public static final int DEFAULT_SLICE = 20;
 
 	
-    private static Logger logger = LoggerFactory.getLogger(Query.class);
+    private static final Logger logger = LoggerFactory.getLogger(Query.class);
 
     public static final String PATHNODE = "pathNode";
     public static final String BPATH = "_:_path_";
@@ -125,7 +125,7 @@ public class Query extends Exp implements Graphable {
     HashMap<String, Object> tprinter;
     
     Compile compiler;
-    private QuerySorter querySorter;
+    private final QuerySorter querySorter;
 
     HashMap<String, Object> pragma;
     // Extended filters: pathNode()
@@ -193,7 +193,7 @@ public class Query extends Exp implements Graphable {
 
     private boolean isService = false;
 
-    private boolean isBind = false;
+    private final boolean isBind = false;
 
     private boolean isSynchronized = false;
     private boolean lock = true;
@@ -207,7 +207,7 @@ public class Query extends Exp implements Graphable {
     private boolean isAllResult = false;
 
     private Exp templateGroup, templateNL;
-    private List<Node> argList;
+    private final List<Node> argList;
     private Mapping mapping;
     private List<Edge> edgeList;
     private String name;
@@ -1166,9 +1166,7 @@ public class Query extends Exp implements Graphable {
                     return false;
                 }
             }
-        } else if (!member(exp.getNode(), getGroupBy())) {
-            return false;
-        }
+        } else return member(exp.getNode(), getGroupBy());
         return true;
     }
 
@@ -1309,13 +1307,6 @@ public class Query extends Exp implements Graphable {
     @Override
     public Query getQuery() {
         return this;
-    }
-
-    public void trace() {
-        System.out.println("patternNodes: " + patternNodes);
-        System.out.println("queryNodes: " + queryNodes);
-        System.out.println("patternSelectNodes: " + patternSelectNodes);
-        System.out.println("querySelectNodes: " + querySelectNodes);
     }
 
 
@@ -2382,9 +2373,7 @@ public class Query extends Exp implements Graphable {
     public Expr getGlobalExpression(String name) {
         if (getGlobalQuery() != this) {
             Expr ee = getGlobalQuery().getLocalExpression(name);
-            if (ee != null) {
-                return ee;
-            }
+            return ee;
         }
         return null;
     }

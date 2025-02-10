@@ -41,7 +41,7 @@ import fr.inria.corese.core.sparql.triple.parser.Access;
  */
 public class WorkflowParser {
 
-    private static Logger logger = LoggerFactory.getLogger(WorkflowParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowParser.class);
     public static final String PREF = NSManager.SWL;
         
     public static final String QUERY = PREF + "Query";
@@ -109,7 +109,6 @@ public class WorkflowParser {
     private Graph graph;
     private SemanticWorkflow sw;
     private String path;
-    private boolean debug = !true;
     private SWMap map;
     private Context context;
     private PreProcessor process;
@@ -211,9 +210,6 @@ public class WorkflowParser {
       
 
     public SemanticWorkflow parse(Node wf) throws LoadException, SafetyException {
-        if (isDebug()) {
-            System.out.println("WP: " + wf);
-        }
         if (map.containsKey(wf.getLabel())) {
             // reference to already defined Workflow
             return map.get(wf.getLabel());
@@ -394,9 +390,6 @@ public class WorkflowParser {
         }
         Context context = cb.process(c);
         sw.setContext(context);
-        if (isDebug()) {
-            System.out.println(context);
-        }
     }
     
     void complete(Graph g) {
@@ -424,9 +417,6 @@ public class WorkflowParser {
      WorkflowProcess createProcess(IDatatype dt) throws LoadException, SafetyException {
         WorkflowProcess ap = null;
         IDatatype dtype = getValue(RDF.TYPE, dt);
-        if (isDebug()) {
-            System.out.println("WP: " + dt + " " + dtype);
-        }
         if (dtype == null) {
             if (dt.isURI()) {
                 // default is Query
@@ -434,7 +424,6 @@ public class WorkflowParser {
             }
         } else {
              String type = dtype.getLabel();
-             // System.out.println("Parser: " + type);
              if (type.equals(WORKFLOW)) {
                  // special case (with complete done)
                  ap = subWorkflow(getGraph().getNode(dt));
@@ -534,7 +523,7 @@ public class WorkflowParser {
       */
     ShapeWorkflow datashape(IDatatype dt, boolean shex) throws SafetyException {
         IDatatype dtest = getValue(TEST_VALUE, dt);
-        boolean test = (dtest == null) ? false : dtest.booleanValue();
+        boolean test = dtest != null && dtest.booleanValue();
         // format parameter => rdf and shacl input as text (otherwise as URL)
         String sformat = getStringParam(FORMAT_PARAM);
         boolean isURL = (sformat == null);
@@ -719,8 +708,8 @@ public class WorkflowParser {
         IDatatype drec   = getValue(REC, dt);
         IDatatype format = getValue(FORMAT, dt);
         String name = (dname == null) ? null : dname.getLabel();
-        boolean rec = (drec == null) ? false : drec.booleanValue();
-        boolean named = (dnamed == null) ? false : dnamed.booleanValue();
+        boolean rec = drec != null && drec.booleanValue();
+        boolean named = dnamed != null && dnamed.booleanValue();
         SemanticWorkflow w = new SemanticWorkflow();
         
         for (Edge ent : getGraph().getEdges(PATH, subject, 0)){
@@ -894,20 +883,6 @@ public class WorkflowParser {
      */
     public void setGraph(Graph graph) {
         this.graph = graph;
-    }
-
-    /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * @param debug the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     /**

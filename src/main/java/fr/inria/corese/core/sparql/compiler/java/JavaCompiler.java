@@ -51,7 +51,7 @@ import org.slf4j.Logger;
  */
 public class JavaCompiler {
 
-    private static Logger logger = LoggerFactory.getLogger(JavaCompiler.class);
+    private static final Logger logger = LoggerFactory.getLogger(JavaCompiler.class);
     static final String NL = System.getProperty("line.separator");
     // where to write the Java code
     private String path =
@@ -816,8 +816,6 @@ public class JavaCompiler {
             setPackage(name.substring(0, index));
             this.name = name.substring(index + 1);
         }
-        System.out.println("package: " + this.getPackage());
-        System.out.println("class: " + this.name);
     }
 
     void init() {

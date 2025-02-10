@@ -21,7 +21,7 @@ import fr.inria.corese.core.util.Property;
  * STORAGE_MODE = dataset|db|db_all
  */
 public class DatasetManager {
-    private static Logger logger = LoggerFactory.getLogger(DatasetManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(DatasetManager.class);
 
     private DataManager dataManager;
     private String id;

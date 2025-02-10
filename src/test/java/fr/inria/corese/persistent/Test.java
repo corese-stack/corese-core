@@ -18,9 +18,10 @@ import org.apache.commons.lang.RandomStringUtils;
  */
 public class Test {
 
-    private IStorage manager;
-    private Map<Integer, String> literalsAll = new HashMap<Integer, String>();
-    private int min, max;
+    private final IStorage manager;
+    private final Map<Integer, String> literalsAll = new HashMap<Integer, String>();
+    private final int min;
+    private final int max;
     private int index = 1;
 
     public Test(int min, int max) {

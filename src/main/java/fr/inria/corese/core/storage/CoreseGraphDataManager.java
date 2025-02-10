@@ -17,7 +17,7 @@ import fr.inria.corese.core.sparql.triple.parser.HashMapList;
  * DataManager for corese Graph for testing purpose
  */
 public class CoreseGraphDataManager implements DataManager {
-    private static Logger logger = LoggerFactory.getLogger(CoreseGraphDataManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(CoreseGraphDataManager.class);
     static final String STORAGE_PATH = "http://ns.inria.fr/corese/dataset";
     private static final String DEBUG = "debug";
 
@@ -57,24 +57,21 @@ public class CoreseGraphDataManager implements DataManager {
     @Override
     public void startReadTransaction() {
         getGraph().init();
-        trace("start read transaction " + getPath());
     }
 
     @Override
     public void endReadTransaction() {
-        trace("end read transaction " + getPath());
+
     }
 
     @Override
     public void startWriteTransaction() {
-        trace("start write transaction " + getPath());
         getGraph().init();
     }
 
     @Override
     public void endWriteTransaction() {
         getGraph().init();
-        trace("end write transaction " + getPath());
     }
 
     public String getStoragePath() {
@@ -101,15 +98,7 @@ public class CoreseGraphDataManager implements DataManager {
     @Override
     public Iterable<Edge> getEdges(
             Node subject, Node predicate, Node object, List<Node> from) {
-        trace("iterate: %s %s %s %s", subject, predicate, object, from);
         return getGraph().iterate(subject, predicate, object, from);
-    }
-
-    @Override
-    public void trace(String mes, Object... obj) {
-        if (isDebug()) {
-            logger.info(String.format(mes, obj));
-        }
     }
 
     @Override
@@ -167,9 +156,7 @@ public class CoreseGraphDataManager implements DataManager {
     // @todo: rdf star
     @Override
     public Edge insert(Edge edge) {
-        trace("insert: %s", edge);
-        Edge res = getGraph().insertEdgeWithTargetNode(edge);
-        return res;
+        return getGraph().insertEdgeWithTargetNode(edge);
     }
 
     @Override

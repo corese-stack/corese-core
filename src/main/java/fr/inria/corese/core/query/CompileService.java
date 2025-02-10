@@ -297,13 +297,12 @@ public class CompileService implements URLParam {
             filter.getArg(0).isVariable() && filter.getArg(0).equals(var)) {
             b.setGlobalVariable(var.getLabel(), dt);            
             try {
-                IDatatype res = filter.eval((Interpreter)env.getEval().getEvaluator(), b, env, env.getEval().getProducer());
+                IDatatype res = filter.eval(env.getEval().getEvaluator(), b, env, env.getEval().getProducer());
                 if (res == null) {
                     return false;
                 }
                 return res.booleanValue();
             } catch (EngineException ex) {
-                System.out.println("filter: " + var + " " + dt + " " + "error");
                 return false;
             }
         }

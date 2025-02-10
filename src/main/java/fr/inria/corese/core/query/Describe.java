@@ -144,7 +144,6 @@ public class Describe {
 		QueryProcess exec = QueryProcess.create(g);
 		try {
 			for (String q : queries){
-				System.out.println(q);
 				map = exec.query(q);
 				info(q + NL, map);
 			}

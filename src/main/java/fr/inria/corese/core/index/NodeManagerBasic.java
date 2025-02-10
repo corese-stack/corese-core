@@ -24,7 +24,7 @@ import java.util.HashMap;
  */
 public class NodeManagerBasic {
 
-    private Graph graph;
+    private final Graph graph;
     private HashMap<Node, PredicateList> nodePredicateTable;
     // in some case content is obsolete
     private boolean active = true;
@@ -32,7 +32,6 @@ public class NodeManagerBasic {
     private boolean available = true;
     private int count = 0;
     private int index =0;
-    private boolean debug = false;
     // record position of node in edge list
     boolean isPosition = true;
     private static final String NL = System.getProperty("line.separator");
@@ -117,9 +116,6 @@ public class NodeManagerBasic {
             synchronized (graph) {
                 graph.getIndex(index).indexNodeManager();
             }
-            if (debug) {
-                System.out.println("NMP create: " + index + " " + node + " " + getPredicateList(node));
-            }
             return getPredicateList(node);
         } 
         else {
@@ -169,16 +165,6 @@ public class NodeManagerBasic {
     
     public void setAvailable(boolean available) {
         this.available = available;
-    }
-
-     
-    public boolean isDebug() {
-        return debug;
-    }
-
-   
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
     
     public String display() {

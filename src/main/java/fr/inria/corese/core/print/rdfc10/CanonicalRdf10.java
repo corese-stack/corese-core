@@ -25,11 +25,11 @@ import fr.inria.corese.core.kgram.core.Mappings;
  */
 public class CanonicalRdf10 {
 
-    private CanonicalizationState canonicalizationState;
-    private CanonicalizedDataset canonicalizedDataset;
+    private final CanonicalizationState canonicalizationState;
+    private final CanonicalizedDataset canonicalizedDataset;
 
-    private EdgeFactory edgeFactory = Graph.create().getEdgeFactory();
-    private NTriplesFormat ntriplesFormat = NTriplesFormat.create(Graph.create());
+    private final EdgeFactory edgeFactory = Graph.create().getEdgeFactory();
+    private final NTriplesFormat ntriplesFormat = NTriplesFormat.create(Graph.create());
 
     private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA_256;
 

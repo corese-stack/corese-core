@@ -22,8 +22,8 @@ public class Message {
         LOOP("Loop: "),
         AGG("Aggregate limited to (defined) variable: ");
 
-        private String prefix;
-        private Prefix(String p) {
+        private final String prefix;
+        Prefix(String p) {
             prefix = p;
         }
         public String getString() {

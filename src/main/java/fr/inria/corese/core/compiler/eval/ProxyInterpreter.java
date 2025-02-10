@@ -29,7 +29,7 @@ import fr.inria.corese.core.sparql.triple.parser.Context;
 public abstract class ProxyInterpreter implements ExprType {
 
     private static final String URN_UUID = "urn:uuid:";
-    private static Logger logger = LoggerFactory.getLogger(ProxyInterpreter.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProxyInterpreter.class);
 
     static final String UTF8 = "UTF-8";
     public static final String RDFNS = NSManager.RDF;

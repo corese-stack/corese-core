@@ -120,11 +120,9 @@ public class RuleEngine implements Engine, Graphable {
     // true when a set of optimizations is possible, e.g. with std graph
     // false with DataManager
     private boolean optimizable = true;
-    private boolean debug = false;
-    boolean trace = false;
     private boolean simpleTrace = false;
     private boolean test = false;
-    // int loop = 0;
+
     Profile profile = STDRL;
     private boolean isActivate = true;
     // optimize transitive rule
@@ -134,7 +132,7 @@ public class RuleEngine implements Engine, Graphable {
     private boolean optimizeRuleDataManager = RULE_DATAMANAGER_OPTIMIZE;
     // closure specific connectivity test: set it to false (too expensive)
     private boolean isConnect = false;
-    // private boolean isDuplicate = false;
+
     private boolean isSkipPath = false;
     private boolean synchronize = false;
     private boolean event = true;
@@ -168,7 +166,7 @@ public class RuleEngine implements Engine, Graphable {
             return path;
         }
 
-    };
+    }
 
     public RuleEngine() {
         rules = new ArrayList<>();
@@ -335,7 +333,6 @@ public class RuleEngine implements Engine, Graphable {
      */
     public void cleanOWL() throws IOException, EngineException, LoadException {
         Cleaner cl = new Cleaner(getGraphStore(), getDataManager());
-        cl.setDebug(isDebug());
         if (isEvent()) {
             cl.setVisitor(getVisitor());
         }
@@ -395,10 +392,6 @@ public class RuleEngine implements Engine, Graphable {
     public IDatatype setFast(boolean b) {
         setSpeedUp(b);
         return DatatypeMap.TRUE;
-    }
-
-    public void setTrace(boolean b) {
-        trace = b;
     }
 
     /**
@@ -512,10 +505,7 @@ public class RuleEngine implements Engine, Graphable {
         }
         getQueryProcess().setSynchronized(isSynchronized());
         getGraphStore().getEventManager().start(Event.InferenceEngine, getClass().getName());
-        if (isTraceMemory()) {
-            logger.info("Memory before rule engine: " + Tool.getMemoryUsageMegabytes());
-            logger.info("Graph size: " + protectGraphSize());
-        }
+
         if (Property.get(Property.Value.RULE_TRANSITIVE_FUNCTION) != null) {
             setFunTransitive(Property.getBooleanValue(Property.Value.RULE_TRANSITIVE_FUNCTION));
         }
@@ -540,22 +530,10 @@ public class RuleEngine implements Engine, Graphable {
         if (!getErrorList().isEmpty()) {
             throw new EngineException("RuleEngine Constraint Error", getErrorList());
         }
-        if (isTraceMemory()) {
-            logger.info("Memory after rule engine: " + Tool.getMemoryUsageMegabytes());
-            logger.info("Graph size: " + protectGraphSize());
-        }
-    }
-
-    boolean isTraceMemory() {
-        return Property.getBooleanValue(Property.Value.TRACE_MEMORY);
     }
 
     public Graph getRDFGraph() {
         return graph;
-    }
-
-    public void setDebug(boolean b) {
-        debug = b;
     }
 
     public void clear() {
@@ -720,9 +698,6 @@ public class RuleEngine implements Engine, Graphable {
         int start = getGraphManager().size();
         try {
             infer(m, b);
-            if (trace) {
-                // traceSize();
-            }
             return getGraphManager().size() - start;
         } catch (OutOfMemoryError e) {
             throw new EngineException(e);
@@ -764,22 +739,6 @@ public class RuleEngine implements Engine, Graphable {
         getGraphStore().getEventManager().finish(Event.RuleEngine);
     }
 
-    void traceSize() {
-        // Get current size of heap in bytes
-        long heapSize = Runtime.getRuntime().totalMemory();
-        System.out.println("size: " + heapSize / 1000000);
-
-        // Get maximum size of heap in bytes. The heap cannot grow beyond this size.
-        // Any attempt will result in an OutOfMemoryException.
-        long heapMaxSize = Runtime.getRuntime().maxMemory();
-        System.out.println("max size: " + heapMaxSize / 1000000);
-
-        // Get amount of free memory within the heap in bytes. This size will increase
-        // after garbage collection and decrease as new objects are created.
-        long heapFreeSize = Runtime.getRuntime().freeMemory();
-        System.out.println("free size: " + heapFreeSize / 1000000);
-    }
-
     // loop on rules until nothing new happens
     void infer(Mapping mapping, Binding bind) throws EngineException {
         int size = getGraphManager().size(),
@@ -818,19 +777,12 @@ public class RuleEngine implements Engine, Graphable {
             skip = 0;
             nbrule = 0;
             tnbres = 0;
-            if (trace) {
-                System.out.println("Loop: " + loop);
-            }
 
             if (isOptimize()) {
                 getResultWatcher().start(loop);
-                getResultWatcher().setTrace(trace);
             }
             logger.info("rules: "+getRules().size());
             for (Rule rule : getRules()) {
-                if (isDebug()) {
-                    rule.getQuery().setDebug(true);
-                }
                 if (isSimpleTrace()) logger.info("rule: " +rule.getName() + " " + loop + " " +  timestamp);
                 int nbres = 0;
 
@@ -843,10 +795,6 @@ public class RuleEngine implements Engine, Graphable {
                     newRecord = record(rule, timestamp, loop);
 
                     if (loop == 0 || newRecord.accept(rule.getRecord())) {
-
-                        if (trace && loop > 0) {
-                            rule.getRecord().trace(newRecord);
-                        }
 
                         if (loop > 0) {
                             getResultWatcher().start(rule.getRecord(), newRecord);
@@ -870,32 +818,9 @@ public class RuleEngine implements Engine, Graphable {
                    nbres = process(rule, mapping, bind, null, loop, isOptimize()?timestamp++:-1, nbrule);
                     nbrule++;
                 }
-
-                if (trace) {
-                    stable.record(rule, nbres);
-                }
             }
             
-            int graphSize = getGraphManager().size(); 
-
-            if (isTraceMemory()) {
-                System.out.println("Loop: " + loop);
-                System.out.println("Memory used: " + Tool.getMemoryUsageMegabytes());
-                System.out.println("Grah size: " + graphSize);
-            }
-
-            if (trace) {
-                System.out.println("NBrule: " + nbrule);
-                System.out.println("Graph: " + graphSize);
-            }
-
-            if (isDebug()) {
-                System.out.println("Skip: " + skip);
-                System.out.println("Run: " + nbrule);
-                System.out.println("Graph: " + graphSize);
-                tskip += skip;
-                trun += nbrule;
-            }
+            int graphSize = getGraphManager().size();
 
             if (graphSize > size) {
                 // There are new edges: entailment again
@@ -906,12 +831,6 @@ public class RuleEngine implements Engine, Graphable {
             }
 
             getEventManager().finish(Event.InferenceCycle);
-        }
-
-        if (isDebug()) {
-            System.out.println("Total Skip: " + tskip);
-            System.out.println("Total Run: " + trun);
-            logger.debug("** Rule: " + (getGraphManager().size() - start));
         }
     }
 
@@ -960,12 +879,6 @@ public class RuleEngine implements Engine, Graphable {
         }
     }
 
-    public void trace() {
-        for (Rule r : stable.sort()) {
-            System.out.println(stable.get(r) + " " + r.getQuery().getAST());
-        }
-    }
-
     /**
      * Clean index of edges that are stored when isOptim=true
      */
@@ -975,23 +888,11 @@ public class RuleEngine implements Engine, Graphable {
         cleanRules();
     }
 
-    void trace(String mes, Object... obj) {
-        if (trace) {
-            System.out.println(String.format(mes, obj));
-        }
-    }
-
     /**
      * Process one rule
      */
     int process(Rule rule, Mapping m, Binding bind, Record newRecord, int loop, int timestamp, int nbr)
             throws EngineException {
-
-        if (trace) {
-            trace("loop %s: %s: %s %s",
-                    loop, nbr, rule.getIndex(), ((getResultWatcher() != null) ? getResultWatcher().isNew() : ""));
-            System.out.println(rule.getAST());
-        }
         getEventManager().start(Event.Rule);
 
         Date d1 = new Date();
@@ -1042,7 +943,6 @@ public class RuleEngine implements Engine, Graphable {
             }
         }
 
-        trace(d1, new Date(), rule, start);
         getEventManager().finish(Event.Rule);
         return graphSize() - start;
     }
@@ -1079,7 +979,6 @@ public class RuleEngine implements Engine, Graphable {
     Closure getClosure(Rule r) {
         if (r.getClosure() == null) {
             Closure c = createClosure(getGraphStore(), getResultWatcher().getDistinct());
-            c.setTrace(isSimpleTrace());
             r.setClosure(c);
             c.setQuery(r.getQuery());
             c.setConnect(isConnect());
@@ -1108,20 +1007,9 @@ public class RuleEngine implements Engine, Graphable {
         getGraphManager().startRule();
         if (cons.isBuffer()) {
             // cons insert list contains only new edges that do not exist
-            if (r.isDebug()) {
-                System.out.println();
-                logger.info(String.format("rule %s", r.getName()));
-                for (Edge edge : cons.getInsertList()){
-                    logger.info(String.format("%s ", edge));
-                }
-
-            }            
             cons.getGraphManager().insert(r.getUniquePredicate(), cons.getInsertList());
         } else {
             // create edges from Mappings as usual
-            if (r.isDebug()) {
-                logger.info(String.format("rule %s %s ", r.getName(), map.toString(true)));
-            }
             cons.entailment(map);
         }
         getGraphManager().endRule();
@@ -1149,20 +1037,6 @@ public class RuleEngine implements Engine, Graphable {
             return new RuleError(r, cons.getInsertList());
         } else {
             return new RuleError(r, map);
-        }
-    }
-
-    void trace(Date d1, Date d2, Rule rule, int start) {
-        if (trace) {
-            double tt = (d2.getTime() - d1.getTime()) / (1000.0);
-            if (tt > 1) {
-                System.out.println("Time : " + tt);
-                // System.out.println(rule.getAST());
-                rule.setTime(tt + rule.getTime());
-            }
-            System.out.println("New: " + (getGraphManager().size() - start));
-            System.out.println("Size: " + getGraphManager().size());
-
         }
     }
 
@@ -1569,10 +1443,6 @@ public class RuleEngine implements Engine, Graphable {
 
     public void setErrorList(List<RuleError> errorList) {
         this.errorList = errorList;
-    }
-
-    public boolean isDebug() {
-        return debug;
     }
 
     public GraphManager getGraphManager() {

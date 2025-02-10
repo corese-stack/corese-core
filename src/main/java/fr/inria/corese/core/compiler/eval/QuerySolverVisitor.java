@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class QuerySolverVisitor extends QuerySolverVisitorBasic {
 
-    private static Logger logger = LoggerFactory.getLogger(QuerySolverVisitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitor.class);
     
      public QuerySolverVisitor() {}
 
@@ -356,7 +356,7 @@ public class QuerySolverVisitor extends QuerySolverVisitorBasic {
     
     @Override
     public IDatatype error(Eval eval, Expr exp, IDatatype[] args) {
-        return  overload.error(eval, exp, (IDatatype[]) args);
+        return  overload.error(eval, exp, args);
     }
     
     @Override
@@ -367,7 +367,7 @@ public class QuerySolverVisitor extends QuerySolverVisitorBasic {
        
    @Override
     public IDatatype overload(Eval eval, Expr exp, IDatatype res, IDatatype[] args) {
-        return overload.overload(eval, exp,  res, (IDatatype[]) args);
+        return overload.overload(eval, exp,  res, args);
     }   
     
     @Override

@@ -146,7 +146,7 @@ public class ASTQuery
     boolean describeAll = false;
     boolean isBind = false;
     private boolean ldscript = false;
-    private boolean insideWhere = false;
+    private final boolean insideWhere = false;
     private boolean federateVisit = false;
     // max cg result
     int MaxResult = LIMIT_DEFAULT;
@@ -197,7 +197,7 @@ public class ASTQuery
     List<Expression> sort = new ArrayList<>();
     List<Expression> lGroup = new ArrayList<>();
     // group by (exp as var)
-    private HashMap<String, Expression> groupBy = new HashMap<>();
+    private final HashMap<String, Expression> groupBy = new HashMap<>();
     List<Atom> relax = new ArrayList<>();
     private List<QueryVisitor> visitList;
     private Dataset // Triple store default dataset
@@ -228,7 +228,7 @@ public class ASTQuery
     ASTTemplate atemp;
     
     private boolean renameBlankNode = true;
-    private String groupSeparator = " ";
+    private final String groupSeparator = " ";
     private boolean isTemplate = false;
     private boolean isAllResult = false;
     private boolean submitTriple = true;
@@ -240,9 +240,10 @@ public class ASTQuery
     private final Map<String, List<String>> approximateSearchOptions = new HashMap<String, List<String>>();
     private String service;
     private List<Atom> serviceList;
-    private List<Constant> predicateList;
+    private final List<Constant> predicateList;
     // triple without path, triple with path
-    private List<Triple> tripleList, pathList;
+    private final List<Triple> tripleList;
+    private List<Triple> pathList;
     private fr.inria.corese.core.kgram.core.Query updateQuery;
     private AccessRight accessRight;
     private ASTSelector astSelector;
@@ -357,7 +358,7 @@ public class ASTQuery
     }
 
     class ExprTable extends HashMap<Expression, Expression> {
-    };
+    }
 
     /**
      * The constructor of the class 
@@ -1033,7 +1034,7 @@ public class ASTQuery
    
     Constant functionName(){
         UUID uuid = UUID.randomUUID();
-        return createQName(FUN_PREF +  uuid.toString());
+        return createQName(FUN_PREF + uuid);
     }
 
     /**
@@ -1174,10 +1175,7 @@ public class ASTQuery
         if (hasMetadata(Metadata.Type.INDEX)) {
             return true;
         }
-        if (!getDataset().getIndex().isEmpty()) {
-            return true;
-        }
-        return false;
+        return !getDataset().getIndex().isEmpty();
     }
     
     public boolean isFederate() {
@@ -2148,14 +2146,10 @@ public class ASTQuery
     }
 
     private boolean knownDatatype(String datatype) {
-        if (datatype.startsWith(RDFS.XSD)
+        return datatype.startsWith(RDFS.XSD)
                 || datatype.startsWith(RDFS.XSDPrefix)
                 || datatype.startsWith(RDFS.RDF)
-                || datatype.startsWith(RDFS.RDFPrefix)) {
-            return true;
-        } else {
-            return false;
-        }
+                || datatype.startsWith(RDFS.RDFPrefix);
     }
 
     public void setCorrect(boolean b) {
@@ -2946,7 +2940,7 @@ public class ASTQuery
     }
     
     public void cleanSelect() {
-        selectVar.clear();;
+        selectVar.clear();
         selectAllVar.clear();
         selectFunctions.clear();
         selectExp.clear();

@@ -27,12 +27,10 @@ public class EdgeFactory {
     static final String METADATA = NSManager.USER + "metadata";
     public static boolean OPTIMIZE_EDGE = true;
     public static boolean EDGE_TRIPLE_NODE = false;
-    public static boolean trace = false;
     Graph graph;
     QueryProcess exec;
-    boolean 
-            isTag = false,
-            isGraph = false;
+    boolean isTag = false;
+    boolean isGraph = false;
     int count = 0;
     String key;
     private boolean optimize = OPTIMIZE_EDGE;
@@ -41,19 +39,6 @@ public class EdgeFactory {
         graph = g;
         key = hashCode() + ".";
     }
-
-    static public void trace(){
-        System.out.println("Typ: " + typ);
-        System.out.println("Sub: " + sub); 
-        System.out.println("Fst: " + fst); 
-        System.out.println("Rst: " + rst); 
-        System.out.println();
-        System.out.println("Def: " + def);
-        System.out.println("Rul: " + rul);
-        System.out.println("Ent: " + ent);
-        System.out.println("Std: " + std);
-        System.out.println("Tot: " + (std+def+rul+ent));        
-    }   
 
     public Edge create(Node source, Node subject, Node predicate, Node object) {
         if (graph.isTuple()){
@@ -76,7 +61,7 @@ public class EdgeFactory {
         }
         IDatatype dt = null;
         try {
-            dt = exec.funcall(METADATA, new IDatatype[0]);
+            dt = exec.funcall(METADATA);
         } catch (EngineException ex) {
         }
         if (dt == null) {

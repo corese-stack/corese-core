@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Simplify extends Util {
     static Logger logger = LoggerFactory.getLogger(Simplify.class);
-    private static boolean MERGE_EVEN_IF_NOT_CONNECTED = false;
+    private static final boolean MERGE_EVEN_IF_NOT_CONNECTED = false;
     // heuristics to simplify service s bgp1 optional service (S) bgp2 
     // when all triple of bgp2
     // join with connected triple of bgp1 in s
@@ -35,7 +35,7 @@ public class Simplify extends Util {
     // heuristics similar to federate bgp, heuristics cover both arg of optional
     
     FederateVisitor visitor;
-    private boolean debug = false;
+    private final boolean debug = false;
     private boolean mergeEvenIfNotConnected = MERGE_EVEN_IF_NOT_CONNECTED;
     
     Simplify(FederateVisitor vis) {

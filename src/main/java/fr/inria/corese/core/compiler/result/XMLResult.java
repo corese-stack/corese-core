@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
 @Deprecated
 public class XMLResult {
 
-    private static Logger logger = LoggerFactory.getLogger(XMLResult.class);
+    private static final Logger logger = LoggerFactory.getLogger(XMLResult.class);
     static final String NL = System.getProperty("line.separator");
 
     // create target Node
@@ -73,8 +74,6 @@ public class XMLResult {
     private static final int PREDICATE = 11;
     private static final int OBJECT = 12;
     
-    
-    private boolean debug = false;
     private boolean trapError = false;
     private boolean showResult = false;
     private List<String> link;
@@ -116,13 +115,8 @@ public class XMLResult {
         
         if (isShowResult()) {
             String str = read(stream);
-            System.out.println(str);
             setShowResult(false);
             return parseString(str);
-        }
-        
-        if (debug) {
-            System.out.println("start parse XML result");
         }
         Mappings map = new Mappings();
 
@@ -131,7 +125,7 @@ public class XMLResult {
         factory.setNamespaceAware(true);
         try {
             SAXParser parser = factory.newSAXParser();
-            InputStreamReader r = new InputStreamReader(stream, "UTF-8");
+            InputStreamReader r = new InputStreamReader(stream, StandardCharsets.UTF_8);
             parser.parse(new InputSource(r), handler);
             complete(map);
             map.setLinkList(getLink());
@@ -141,7 +135,6 @@ public class XMLResult {
                 logger.error(e.toString());
                 complete(map);
                 map.setError(true);
-                System.out.println("Return partial result of size: " + map.size());
                 return map;
             }
             else {
@@ -240,7 +233,6 @@ public class XMLResult {
     public class MyHandler extends DefaultHandler {
 
         Mappings maps;
-        //Mapping map;
         List<Node> lvar, lval;
         String var;
         VTable vtable;
@@ -264,9 +256,6 @@ public class XMLResult {
 
         @Override
         public void startDocument() {
-            if (debug) {
-                System.out.println("start document");
-            }
         }
 
         // called for each binding
@@ -298,9 +287,6 @@ public class XMLResult {
         @Override
         public void startElement(String namespaceURI, String simpleName,
                 String qualifiedName, Attributes atts) {
-            if (debug) {
-                System.out.println("open: " + qualifiedName);
-            }
             isContent = false;
 
             switch (type(simpleName)) {
@@ -414,10 +400,6 @@ public class XMLResult {
 
         @Override
         public void endElement(String namespaceURI, String simpleName, String qualifiedName) {
-            if (debug) {
-                System.out.println("close: " + qualifiedName);
-            }
-            
             if (triple > 0) {
                 triple(namespaceURI, simpleName, qualifiedName);
                 triple--;
@@ -444,9 +426,6 @@ public class XMLResult {
 
                     case RESULT:
                         Mapping map = Mapping.create(lvar, lval);
-                        if (debug) {
-                            System.out.println(map);
-                        }
                         maps.add(map);
                 }
             }
@@ -457,7 +436,7 @@ public class XMLResult {
          * element.
          */
         @Override
-        public void characters(char buf[], int offset, int len) {
+        public void characters(char[] buf, int offset, int len) {
             if (isContent) {
                 String s = new String(buf, offset, len);
                 if (text == null) {
@@ -477,7 +456,6 @@ public class XMLResult {
         try {
             URL uri = new URL(path);
             return uri.openStream();
-        } catch (MalformedURLException e) {
         } catch (IOException e) {
         }
 
@@ -522,7 +500,6 @@ public class XMLResult {
                 isnl = true;
             }
             sb.append(str);
-            //sb.append(NL);
         }
         return sb.toString();
     }

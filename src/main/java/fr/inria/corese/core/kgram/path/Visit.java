@@ -159,9 +159,6 @@ public class Visit {
 
         void remove(Node n) {
             if (isReverse) {
-                if (!list.get(list.size() - 1).equals(n)) {
-                    System.out.println("** ERROR Visit: " + n + " " + list);
-                }
                 list.remove(list.size() - 1);
             } else {
                 table.remove(n);

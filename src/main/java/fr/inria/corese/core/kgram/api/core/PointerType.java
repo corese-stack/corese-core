@@ -29,7 +29,7 @@ public enum PointerType {
     
         public String name;
                 
-        private PointerType(String n) {
+        PointerType(String n) {
             name = DT+n;
         }
         

@@ -98,7 +98,6 @@ public class Eval implements ExpType, Plugin {
     EvalSPARQL evalSparql;
     CompleteSPARQL completeSparql;
     List<Node> empty = new ArrayList<>(0);
-    //HashMap<String, Boolean> local;
     
     EvalGraph evalGraphNew;
     EvalJoin join;
@@ -109,28 +108,28 @@ public class Eval implements ExpType, Plugin {
     }
 
     int // count number of eval() calls
-            nbEdge = 0, nbCall = 0,
-            rcount = 0,
-            backjump = -1, indexToDiffer = -1,
-            // max level in stack for debug
-            level = -1,
-            maxLevel = -1,
-            limit = Integer.MAX_VALUE;
-    private boolean debug = false;
+            nbEdge = 0;
+    int nbCall = 0;
+    int rcount = 0;
+    int backjump = -1;
+    int indexToDiffer = -1;
+    int level = -1;
+    int maxLevel = -1;
+    int limit = Integer.MAX_VALUE;
     // subeval = false: eval query/subquery
     // subeval = true:  eval statement (union, optional, minus, graph, join)
-    boolean isSubEval = false,
+    boolean isSubEval = false;
             // return only select variables in Mapping
-            onlySelect = true,
-            optim = true,
-            draft = true;
+    boolean onlySelect = true;
+    boolean optim = true;
+    boolean draft = true;
     private boolean hasListener = false;
     boolean storeResult = true;
     private int nbResult;
     boolean hasFilter = false;
-    private boolean hasCandidate = false,
-            hasStatement = false,
-            hasProduce = false;
+    private boolean hasCandidate = false;
+    private boolean hasStatement = false;
+    private boolean hasProduce = false;
     private boolean stop = false;
     private boolean joinMappings = JOIN_MAPPINGS;
     
@@ -188,7 +187,7 @@ public class Eval implements ExpType, Plugin {
      * Main eval function
      */
     public Mappings query(Query q) throws SparqlException {
-        return query(null, q, (Mapping) null);
+        return query(null, q, null);
     }
     
     public Mappings query(Query q, Mapping m) throws SparqlException {
@@ -289,9 +288,6 @@ public class Eval implements ExpType, Plugin {
             }
         }
 
-        if (isDebug() && !isSubEval && !q.isSubQuery()) {
-            debug();
-        }
         getEvaluator().finish(getMemory());
         return getResults();
     }
@@ -503,9 +499,6 @@ public class Eval implements ExpType, Plugin {
     Mappings subEval(Query q, Node gNode, Stack stack, Mappings map, int n) throws SparqlException {
         setSubEval(true);
         starter(q);
-        if (q.isDebug()) {
-            setDebug(true);
-        }
         eval(getProducer(), gNode, stack, map, n);
 
         return getResults();
@@ -754,10 +747,6 @@ public class Eval implements ExpType, Plugin {
         level = n;
     }
 
-    public void setDebug(boolean b) {
-        debug = b;
-    }
-
     public void setSubEval(boolean b) {
         isSubEval = b;
     }
@@ -832,12 +821,8 @@ public class Eval implements ExpType, Plugin {
             }
             getProducer().init(q);
             evaluator.start(memory);
-            setDebug(q.isDebug());
             if (q.isAlgebra()) {
                 complete(q);
-            }
-            if (isDebug()) {
-                System.out.println(q);
             }
         }
     }
@@ -912,32 +897,17 @@ public class Eval implements ExpType, Plugin {
      * order by limit offset
      */
     public Mappings modifier(Query q, Mappings map) throws SparqlException {
-        if (q.isDebug()) {
-            System.out.println("modifier");
-        }
         q.complete(getProducer());        
         Memory env = new Memory(getMatcher(), getEvaluator());
         env.init(q).setBinding(getMemory().getBind()).setResults(map);
         env.setEval(this);
-        
-        if (q.isDebug()) {
-            System.out.println("prepare modifier");
-        }
+
         map.modify(q);
-        
-        if (q.isDebug()) {
-            System.out.println("select expression");
-        }
+
         map.modifySelect(this, q);  
-        
-        if (q.isDebug()) {
-            System.out.println("aggregate");
-        }
+
         map.modifyAggregate(q, getEvaluator(), env, getProducer()); 
-        
-        if (q.isDebug()) {
-            System.out.println("order by");
-        }
+
         map.modifyDistinct();
         map.modifyOrderBy(this, q);
         map.modifyLimitOffset();
@@ -962,9 +932,6 @@ public class Eval implements ExpType, Plugin {
                 Node node = map.getNode(qNode);
                 if (node != null) {
                     bind(qqNode, node);
-                    if (isDebug()) {
-                        logger.debug("Bind: " + qqNode + " = " + node);
-                    }
                 }
             }
         }
@@ -978,7 +945,7 @@ public class Eval implements ExpType, Plugin {
             }
         }
         PathFinder pathFinder = PathFinder.create(this, p, query);
-        //pathFinder.setDefaultBreadth(false);
+
         if (hasEvent) {
             pathFinder.set(manager);
         }
@@ -1117,7 +1084,7 @@ public class Eval implements ExpType, Plugin {
                             process(graphNode, p, exp);
                             return backtrack;
                     }
-                };
+                }
 
                 if (hasStatement) {
                     getVisitor().statement(this, getGraphNode(graphNode), exp);
@@ -1824,12 +1791,6 @@ public class Eval implements ExpType, Plugin {
             getMemory().pop(qNode);
         }
     }
-    
-    void trace(String mes, Object... obj) {
-        if (getQuery().isDebug()) {
-            System.out.println(String.format(mes, obj));
-        }
-    }
 
     /**
      * Enumerate candidate edges
@@ -1864,14 +1825,7 @@ public class Eval implements ExpType, Plugin {
         if (data != null && data.getNodeList() != null) {
             if (isPushEdgeMappings()) {
                 // push values(data) before edge in stack
-                if (isDebug()) {
-                    logger.warn(String.format("Push edge mappings:\nvalues %s\n%s",
-                            data.getNodeList(), data.toString(false, false, DISPLAY_RESULT_MAX)));
-                }
                 return eval(p, graphNode, stack.addCopy(n, exp.getValues(data)), n);
-            } else if (isDebug()) {
-                logger.warn(String.format("Eval edge skip mappings:\nvalues %s\n%s",
-                        data.getNodeList(), data.toString(false, false, DISPLAY_RESULT_MAX)));
             }
         }
 
@@ -1931,7 +1885,6 @@ public class Eval implements ExpType, Plugin {
                     }
 
                     bmatch &= push(p, qEdge, edge, graphNode, graph, n);
-                    if (!bmatch) trace("push success: %s", bmatch);
                 }
 
                 if (isEvent) {
@@ -1981,13 +1934,8 @@ public class Eval implements ExpType, Plugin {
 
         // copy current Eval,  new stack
         // bind sub query select nodes in new memory
-        Eval ev = copy(copyMemory(env, getQuery(), subQuery, null), p, getEvaluator(), subQuery, false);      
-        ev.setDebug(isDebug());
+        Eval ev = copy(copyMemory(env, getQuery(), subQuery, null), p, getEvaluator(), subQuery, false);
         Mappings lMap = ev.eval(graphNode, subQuery, null, selectQueryMappings(data));
-        
-        if (isDebug()) {
-            logger.info("subquery results size:\n"+ lMap.size());
-        }
 
         getVisitor().query(this, getGraphNode(graphNode), exp, lMap);
         getVisitor().finish(lMap);
@@ -2172,14 +2120,11 @@ public class Eval implements ExpType, Plugin {
 
     private boolean push(Producer p, Edge qEdge, Edge ent, Node gNode, Node node, int n) {
         Memory env = getMemory();
-        if (!env.push(p, qEdge, ent, n)) {
-            return false;
-        }
+        return env.push(p, qEdge, ent, n);
 //        if (gNode != null && !env.push(gNode, node, n)) {
 //            env.pop(qEdge, ent);
 //            return false;
 //        }
-        return true;
     }
 
     private boolean match(Node qNode, Node node, Node gNode, Node graphNode) {
@@ -2346,10 +2291,6 @@ public class Eval implements ExpType, Plugin {
         setPushEdgeMappings(b);
         setParameterGraphMappings(b);
         setParameterUnionMappings(b);
-    }
-
-    public boolean isDebug() {
-        return debug;
     }
     
     

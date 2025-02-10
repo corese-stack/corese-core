@@ -27,7 +27,7 @@ import java.util.Map;
 public interface IDatatype
         extends Iterable<IDatatype>,  Node, Loopable, DatatypeValue, Comparable {
     
-    public enum NodeKind {
+    enum NodeKind {
         URI(0), BNODE(1), TRIPLE(2), LITERAL(3), UNDEF(4);
         int index;
         
@@ -42,63 +42,63 @@ public interface IDatatype
         static public int size() {
             return NodeKind.values().length;
         }
-    };
+    }
 
-    static final int VALUE = -1;
-    static final int RESULT = -2;
+    int VALUE = -1;
+    int RESULT = -2;
     // use case: cast
-    static final int UNDEFINED = -1;
-    static final int LITERAL = 0;
-    static final int STRING = 1;
-    static final int XMLLITERAL = 2;
-    static final int NUMBER = 3;
-    static final int DATE = 4;
-    static final int BOOLEAN = 5;
-    static final int STRINGABLE = 6;
-    static final int URI = 7;
-    static final int UNDEF = 8;
-    static final int BLANK = 9;
-    static final int DOUBLE = 11;
-    static final int FLOAT = 12;
-    static final int DECIMAL = 13;
-    static final int LONG = 14;
-    static final int INTEGER = 15;
-    static final int URI_LITERAL = 16;
-    static final int TRIPLE = 17;
+    int UNDEFINED = -1;
+    int LITERAL = 0;
+    int STRING = 1;
+    int XMLLITERAL = 2;
+    int NUMBER = 3;
+    int DATE = 4;
+    int BOOLEAN = 5;
+    int STRINGABLE = 6;
+    int URI = 7;
+    int UNDEF = 8;
+    int BLANK = 9;
+    int DOUBLE = 11;
+    int FLOAT = 12;
+    int DECIMAL = 13;
+    int LONG = 14;
+    int INTEGER = 15;
+    int URI_LITERAL = 16;
+    int TRIPLE = 17;
 
     // Pseudo codes (target is Integer or String ...)
-    static final int DAY = 21;
-    static final int MONTH = 22;
-    static final int YEAR = 23;
-    static final int DURATION = 24;
-    static final int DATETIME = 25;
-    static final int GENERIC_INTEGER = 26;
+    int DAY = 21;
+    int MONTH = 22;
+    int YEAR = 23;
+    int DURATION = 24;
+    int DATETIME = 25;
+    int GENERIC_INTEGER = 26;
 
-    static final String KGRAM = ExpType.KGRAM;
-    public static final String RULE = KGRAM + "Rule";
-    public static final String QUERY = KGRAM + "Query";
-    public static final String GRAPH = KGRAM + "Graph";
-    public static final String MAPPINGS = KGRAM + "Mappings";
+    String KGRAM = ExpType.KGRAM;
+    String RULE = KGRAM + "Rule";
+    String QUERY = KGRAM + "Query";
+    String GRAPH = KGRAM + "Graph";
+    String MAPPINGS = KGRAM + "Mappings";
 
-    public static final String ENTITY_DATATYPE = ExpType.DT + "entity";
-    public static final String RESOURCE_DATATYPE = ExpType.DT + "resource";
-    public static final String URI_DATATYPE = ExpType.DT + "uri";
-    public static final String BNODE_DATATYPE = ExpType.DT + "bnode";
-    public static final String LITERAL_DATATYPE = ExpType.DT + "literal";
-    public static final String STANDARD_DATATYPE = ExpType.DT + "standard";
-    public static final String EXTENDED_DATATYPE = ExpType.DT + "extended";
-    public static final String ERROR_DATATYPE = ExpType.DT + "error";
+    String ENTITY_DATATYPE = ExpType.DT + "entity";
+    String RESOURCE_DATATYPE = ExpType.DT + "resource";
+    String URI_DATATYPE = ExpType.DT + "uri";
+    String BNODE_DATATYPE = ExpType.DT + "bnode";
+    String LITERAL_DATATYPE = ExpType.DT + "literal";
+    String STANDARD_DATATYPE = ExpType.DT + "standard";
+    String EXTENDED_DATATYPE = ExpType.DT + "extended";
+    String ERROR_DATATYPE = ExpType.DT + "error";
 
-    public static final String GRAPH_DATATYPE    = ExpType.DT + "graph";    // same as PointerType.GRAPH.name; 
-    public static final String MAPPINGS_DATATYPE = ExpType.DT + "mappings"; // same as PointerType.MAPPINGS.name;  
-    public static final String MAPPING_DATATYPE  = ExpType.DT + "mapping"; // same as PointerType.MAPPING.name;  
+    String GRAPH_DATATYPE    = ExpType.DT + "graph";    // same as PointerType.GRAPH.name;
+    String MAPPINGS_DATATYPE = ExpType.DT + "mappings"; // same as PointerType.MAPPINGS.name;
+    String MAPPING_DATATYPE  = ExpType.DT + "mapping"; // same as PointerType.MAPPING.name;
 
-    public static final String ITERATE_DATATYPE = ExpType.DT + "iterate";
-    public static final String MAP_DATATYPE     = ExpType.DT + "map";
-    public static final String LIST_DATATYPE = ExpType.DT + "list";
-    public static final String JSON_DATATYPE = ExpType.DT + "json";
-    public static final String XML_DATATYPE = ExpType.DT + "xml";
-    public static final String SYSTEM = ExpType.DT + "system";
+    String ITERATE_DATATYPE = ExpType.DT + "iterate";
+    String MAP_DATATYPE     = ExpType.DT + "map";
+    String LIST_DATATYPE = ExpType.DT + "list";
+    String JSON_DATATYPE = ExpType.DT + "json";
+    String XML_DATATYPE = ExpType.DT + "xml";
+    String SYSTEM = ExpType.DT + "system";
     
     IDatatype copy();
     

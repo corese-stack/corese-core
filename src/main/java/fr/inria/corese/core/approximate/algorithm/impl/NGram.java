@@ -14,7 +14,7 @@ import java.util.Map;
 public class NGram extends BaseAlgorithm {
 
     private final static int NG = 3;//default
-    private int n;
+    private final int n;
 
     public NGram() {
         this(NG);
@@ -50,7 +50,7 @@ public class NGram extends BaseAlgorithm {
         int res = 0;
 
         for (String t1 : tokens1.keySet()) {
-            if (tokens2.keySet().contains(t1)) {
+            if (tokens2.containsKey(t1)) {
                 res++;
             }
         }

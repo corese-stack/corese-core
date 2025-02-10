@@ -171,9 +171,6 @@ public class PluginImpl
         ASTQuery ast = env.getQuery().getAST();
         if (ext != null && ext.isMethod() && ast.hasMetadata(Metadata.METHOD)) {
             ClassHierarchy ch = new ClassHierarchy(getGraph(p));
-            if (env.getQuery().getGlobalQuery().isDebug()) {
-                ch.setDebug(true);
-            }
             ext.setHierarchy(ch);
             // WARNING: draft test below
             // store current graph in the Interpreter
@@ -895,23 +892,6 @@ public class PluginImpl
                     }
                 } else {
                     g.removeListener();
-                }
-                break;
-            case VERBOSE:
-                break;
-            case DEBUG:
-                switch (dt2.getLabel()) {
-                    case TRANSFORMER:
-                        // xt:tune(st:debug, st:transformer, st:ds)
-                        Transformer.debug(dt3.getLabel(), dt.length > 3 ? dt[3].booleanValue() : true);
-                        break;
-
-                    case BINDING:
-                        env.getBind().setDebug(dt3.booleanValue());
-                        break;
-
-                    default:
-                        getEvaluator().setDebug(dt2.booleanValue());
                 }
                 break;
 

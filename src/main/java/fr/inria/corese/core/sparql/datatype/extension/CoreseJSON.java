@@ -116,7 +116,7 @@ public class CoreseJSON extends CoreseExtension {
             case UNDEF: 
                 switch (value.getDatatypeURI()) {
                     case LIST_DATATYPE: json.put(key, toJSONArray(value)); break;
-                    case JSON_DATATYPE: json.put(key, (JSONObject) value.getNodeObject()); break;
+                    case JSON_DATATYPE: json.put(key, value.getNodeObject()); break;
                     case MAPPINGS_DATATYPE: 
                         json.put(key, value.getNodeObject()); 
                         break;
@@ -266,7 +266,7 @@ public class CoreseJSON extends CoreseExtension {
                             arr.put(i, toJSONArray(value));
                             break;
                         case JSON_DATATYPE:
-                            arr.put(i, (JSONObject) value.getNodeObject());
+                            arr.put(i, value.getNodeObject());
                             break;
                         case MAPPINGS_DATATYPE:
                             arr.put(i,  value.getNodeObject());

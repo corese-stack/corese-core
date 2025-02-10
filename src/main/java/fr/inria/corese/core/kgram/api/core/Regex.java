@@ -9,19 +9,19 @@ import fr.inria.corese.core.sparql.api.IDatatype;
  */
 public interface Regex {
 	
-	public static final int UNDEF	= -1;
-	public static final int LABEL	= 0;
-	public static final int NOT 	= 1;
-	public static final int SEQ 	= 2;
-	public static final int STAR 	= 3;
-	public static final int PLUS 	= 4;
-	public static final int OPTION 	= 5;
-	public static final int COUNT 	= 6;
-	public static final int ALT		= 7;
-	public static final int PARA	= 8;
-	public static final int TEST	= 9;
-	public static final int CHECK	= 10;
-	public static final int REVERSE	= 11;
+	int UNDEF	= -1;
+	int LABEL	= 0;
+	int NOT 	= 1;
+	int SEQ 	= 2;
+	int STAR 	= 3;
+	int PLUS 	= 4;
+	int OPTION 	= 5;
+	int COUNT 	= 6;
+	int ALT		= 7;
+	int PARA	= 8;
+	int TEST	= 9;
+	int CHECK	= 10;
+	int REVERSE	= 11;
 
 	
 	String getName();

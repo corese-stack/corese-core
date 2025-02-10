@@ -64,7 +64,7 @@ public class ResultMessage {
      * "message" return context as json object
      */
     public JSONObject process(Mappings map) {
-        setAst((ASTQuery) map.getAST());
+        setAst(map.getAST());
         setJson(getContext().json());
         // select data from ContextLog
         if (getLog() != null) {

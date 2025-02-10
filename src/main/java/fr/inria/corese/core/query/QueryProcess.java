@@ -76,7 +76,7 @@ public class QueryProcess extends QuerySolver {
     static final String FUNLIB = "/function/";
     private static final String EVENT = "event";
     static HashMap<String, Producer> dbmap;
-    private static Logger logger = LoggerFactory.getLogger(QueryProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueryProcess.class);
     private static ProducerImpl dbProducer;
     private static String solverVisitorName = null;
     private static String serverVisitorName = null;
@@ -575,7 +575,7 @@ public class QueryProcess extends QuerySolver {
     }
 
     public Query compile(String squery, Context c) throws EngineException {
-        return compile(squery, (c == null) ? (Dataset) null : new Dataset(c));
+        return compile(squery, (c == null) ? null : new Dataset(c));
     }
 
     public ASTQuery ast(String q) throws EngineException {

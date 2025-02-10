@@ -644,16 +644,11 @@ public class Property {
                 Graph.setDefaultVerbose(b);
                 break;
 
-            case TRANSFORMER_DEBUG:
-                Transformer.setDefaultDebug(b);
-                break;
-
             case SOLVER_DEBUG:
                 Exp.DEBUG_DEFAULT = b;
                 break;
 
             case LDSCRIPT_DEBUG:
-                Binding.DEBUG_DEFAULT = b;
                 Function.nullcheck = b;
                 break;
 

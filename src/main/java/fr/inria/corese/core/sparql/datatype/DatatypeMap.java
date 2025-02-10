@@ -4,6 +4,8 @@ import fr.inria.corese.core.sparql.datatype.extension.CoreseIterate;
 import fr.inria.corese.core.sparql.datatype.extension.CoreseUndefFuture;
 import fr.inria.corese.core.kgram.api.core.DatatypeValueFactory;
 import fr.inria.corese.core.kgram.api.core.Edge;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
 
 import org.slf4j.Logger;
@@ -65,7 +67,7 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(DatatypeMap.class);
+    private static final Logger logger = LoggerFactory.getLogger(DatatypeMap.class);
     public static final IDatatype ZERO = newInstance(0);
     public static final IDatatype ONE = newInstance(1);
     public static final IDatatype TWO = newInstance(2);
@@ -1243,25 +1245,22 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
             if (stdChar(c)) {
                 sb.append(c);
             } else {
-                try {
-                    byte[] bytes = Character.toString(c).getBytes("UTF-8");
+                byte[] bytes = Character.toString(c).getBytes(StandardCharsets.UTF_8);
 
-                    for (byte b : bytes) {
-                        sb.append("%");
+                for (byte b : bytes) {
+                    sb.append("%");
 
-                        char cc = (char) (b & 0xFF);
+                    char cc = (char) (b & 0xFF);
 
-                        String hexa = Integer.toHexString(cc).toUpperCase();
+                    String hexa = Integer.toHexString(cc).toUpperCase();
 
-                        if (hexa.length() == 1) {
-                            sb.append("0");
-                        }
-
-                        sb.append(hexa);
+                    if (hexa.length() == 1) {
+                        sb.append("0");
                     }
 
-                } catch (UnsupportedEncodingException e) {
+                    sb.append(hexa);
                 }
+
             }
         }
 

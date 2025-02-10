@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class Interpreter implements Computer, Evaluator, ExprType {
 
     public static boolean testNewEval = false;
-    private static Logger logger = LoggerFactory.getLogger(Interpreter.class);
+    private static final Logger logger = LoggerFactory.getLogger(Interpreter.class);
     static final String MEMORY = Exp.KGRAM + "memory";
     static final String STACK = Exp.KGRAM + "stack";
     public static int DEFAULT_MODE = KGRAM_MODE;
@@ -66,7 +66,7 @@ public class Interpreter implements Computer, Evaluator, ExprType {
     }
 
     public static ASTExtension getCreateExtension(Query q) {
-        ASTExtension ext = q.getExtension();;
+        ASTExtension ext = q.getExtension();
         if (ext == null) {
             ext = createExtension();
             q.setExtension(ext);

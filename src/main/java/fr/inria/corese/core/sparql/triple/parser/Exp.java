@@ -39,9 +39,9 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(Exp.class);
+    private static final Logger logger = LoggerFactory.getLogger(Exp.class);
 
-    private ArrayList<Exp> body;
+    private final ArrayList<Exp> body;
 
     public Exp() {
         body = new ArrayList<>();
@@ -354,7 +354,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
 
     public Exp eget(int i) {
         if (this.size() > i) {
-            return (Exp) get(i);
+            return get(i);
         } else {
             return null;
         }

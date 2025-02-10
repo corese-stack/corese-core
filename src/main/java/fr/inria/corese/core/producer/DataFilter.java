@@ -143,7 +143,7 @@ public class DataFilter implements ExprType {
                 // if query edge is
                 // nested:   asserted edge ok, nested edge ok
                 // asserted: asserted edge ok, nested edge not ok
-                return (isNested() || RDF_STAR_SELECT) ? true : edge.isAsserted();
+                return isNested() || RDF_STAR_SELECT || edge.isAsserted();
                 
             default:
                 IDatatype dt =  getValue(edge, index);

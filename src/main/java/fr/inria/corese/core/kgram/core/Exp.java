@@ -897,9 +897,7 @@ public class Exp extends PointerObject
         if (e1.isPath() && e2.isGraph()) {
             Node var1 = e1.getEdge().getEdgeVariable();
             Node var2 = e2.getGraphName();
-            if (var1 != null && var2.isVariable() && var1.same(var2)) {
-                return true;
-            }
+            return var1 != null && var2.isVariable() && var1.same(var2);
         }
         return false;
     }
@@ -1523,7 +1521,7 @@ public class Exp extends PointerObject
                     if (j >= 0) {
                         Exp g = get(j);
                         if ((g.isEdge() || g.isPath())
-                                && (bind.isBindCst() ? g.bind(bind.first().getNode()) : true)) {
+                                && (!bind.isBindCst() || g.bind(bind.first().getNode()))) {
                             bind.status(true);
                             g.setBind(bind);
                         }
@@ -1875,9 +1873,7 @@ public class Exp extends PointerObject
         }
         else if (isJoin()) {
             Exp fst = get(0);
-            if (fst.isAnd() && fst.size() > 0 && fst.get(0).isEdgePath()) {
-                return true;
-            }
+            return fst.isAnd() && fst.size() > 0 && fst.get(0).isEdgePath();
         }
         return false;
     }

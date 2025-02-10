@@ -20,7 +20,7 @@ public interface TransformVisitor {
     
     boolean isVisited(IDatatype dt);
 
-    public IDatatype visitedGraphNode();
+    IDatatype visitedGraphNode();
         
     Collection<IDatatype> getErrors(IDatatype dt);
     

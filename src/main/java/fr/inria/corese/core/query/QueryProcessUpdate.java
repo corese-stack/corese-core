@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Olivier Corby, INRIA, I3S 2020
  */
 public class QueryProcessUpdate { 
-    private static Logger logger = LoggerFactory.getLogger(QueryProcessUpdate.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueryProcessUpdate.class);
     
     static boolean reentrant = false;
     private QueryProcess exec;
@@ -126,7 +126,7 @@ public class QueryProcessUpdate {
         if (m == null) {
             return getQueryProcess().getEnvironmentBinding();
         }
-        Binding b = (Binding) m.getBind();
+        Binding b = m.getBind();
         if (b == null) {
             return getQueryProcess().getEnvironmentBinding();
         }

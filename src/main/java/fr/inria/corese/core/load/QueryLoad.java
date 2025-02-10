@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class QueryLoad extends Load {
 
-    private static Logger logger = LoggerFactory.getLogger(QueryLoad.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueryLoad.class);
     static final String NL = System.getProperty("line.separator");
     QueryEngine engine;
 

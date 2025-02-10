@@ -42,8 +42,6 @@ public class QueryGraphVisitorImpl implements QueryGraphVisitor {
 
     int count = 0;
     
-    private boolean debug = false;
-    
     class Table extends HashMap<Node, Node> { }
 
     public static QueryGraphVisitorImpl create(){
@@ -167,9 +165,6 @@ public class QueryGraphVisitorImpl implements QueryGraphVisitor {
      */
     void list(Graph g, Node node){
          List<Node> nl = g.getList(node);
-         if (isDebug()){
-             System.out.println("QV: " + node + " " + nl);
-         }
          for (Node elem : nl){
              create(node, elem);
          }
@@ -192,9 +187,6 @@ public class QueryGraphVisitorImpl implements QueryGraphVisitor {
         }
        Exp exp = Exp.create(Exp.PATH, edge);
        exp.setRegex(re);
-       if (isDebug()){
-           System.out.println("QV: " + exp);
-       }
        query.getBody().add(exp);
        return exp;
     }
@@ -207,20 +199,6 @@ public class QueryGraphVisitorImpl implements QueryGraphVisitor {
     Term list(){
         return Term.create(Term.RE_SEQ, Term.function(Term.STAR, Constant.create(REST)), 
                 Constant.create(FIRST));
-    }
-
-    /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * @param debug the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
 

@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author Olivier Corby, Wimmics INRIA I3S, 2020
  */
 public class Extension extends Core {
-    private static Logger logger = LoggerFactory.getLogger(Extension.class);
+    private static final Logger logger = LoggerFactory.getLogger(Extension.class);
     
     static Extension singleton;
     

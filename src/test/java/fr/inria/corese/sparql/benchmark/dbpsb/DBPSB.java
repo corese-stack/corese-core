@@ -21,7 +21,7 @@ public class DBPSB {
 
     public final static int REPEAT = 10;
     
-    public static void main(String args[]) throws EngineException {
+    public static void main(String[] args) throws EngineException {
 
         long[][] r = new long[plans.length][Queries.q.length];
 
@@ -75,6 +75,6 @@ public class DBPSB {
             sb.append(sum / group.length + "\n");
         }
 
-        System.out.println(sb.toString());
+        System.out.println(sb);
     }
 }

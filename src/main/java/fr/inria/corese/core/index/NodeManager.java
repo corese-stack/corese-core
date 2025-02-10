@@ -33,7 +33,6 @@ public class NodeManager {
     private boolean available = true;
     private int count = 0;
     private int index =0;
-    private boolean debug = false;
     // record position of node in edge list
     private boolean position = true;
     private static final String NL = System.getProperty("line.separator");
@@ -148,9 +147,6 @@ public class NodeManager {
             synchronized (getGraph()) {
                 getGraph().getIndex(getIndex()).indexNodeManager();
             }
-            if (debug) {
-                System.out.println("NMP create: " + getIndex() + " " + node + " " + getPredicateList(node));
-            }
             return getPredicateList(node);
         } 
         else {
@@ -208,16 +204,6 @@ public class NodeManager {
     
     public void setAvailable(boolean available) {
         this.available = available;
-    }
-
-     
-    public boolean isDebug() {
-        return debug;
-    }
-
-   
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
     
     public String display() {

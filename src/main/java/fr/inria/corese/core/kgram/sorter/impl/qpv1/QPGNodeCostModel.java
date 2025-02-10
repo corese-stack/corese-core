@@ -257,12 +257,8 @@ public class QPGNodeCostModel extends AbstractCostModel {
 
     @Override
     public boolean isParametersOK(List params) {
-        if (params == null || params.size() != 2 || !(params.get(0) instanceof Integer)
-                || !(params.get(1) instanceof Integer)) {
-            return false;
-        }
-
-        return true;
+        return params != null && params.size() == 2 && params.get(0) instanceof Integer
+                && params.get(1) instanceof Integer;
     }
 
     @Override

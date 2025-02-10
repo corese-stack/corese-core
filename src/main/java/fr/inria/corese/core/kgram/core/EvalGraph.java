@@ -49,7 +49,7 @@ public class EvalGraph {
 
         for (Mapping m : res) {
             if (stop) {
-                return eval.STOP;
+                return Eval.STOP;
             }            
             
             Node namedGraph = null;

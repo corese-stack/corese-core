@@ -41,13 +41,7 @@ public class ShexConstraint implements Constant {
             process((LiteralStemConstraint) cst);
         } else if (cst instanceof NodeKindConstraint) {
             process((NodeKindConstraint) cst);
-        } else {
-            trace("undef cst: " + cst.getClass().getName() + " " + cst);
         }
-    }
-
-    void trace(Object obj) {
-        System.out.println(obj.getClass().getName() + " " + obj);
     }
 
     String getValue(String val) {
@@ -125,9 +119,6 @@ public class ShexConstraint implements Constant {
             } 
             else if (cc instanceof LanguageStemConstraint) {
                 cstList.add(process((LanguageStemConstraint) cc));
-            } 
-            else {
-                System.out.println("Undef Value Set Cst: " + cc);
             }
         }
         
@@ -139,10 +130,9 @@ public class ShexConstraint implements Constant {
         if (cstList.size() == 1) {
             return cstList.get(0).nl();
         }
-        
-        ShexShacl res = new ShexShacl()
+
+        return new ShexShacl()
                 .insert(SH_OR, cstList).pw().nl();
-        return res;
     }
     
     ShexShacl process(IRIStemConstraint cst) {
@@ -163,7 +153,6 @@ public class ShexConstraint implements Constant {
             stem.pattern(getStem(cst.getStem())).nl(); 
         }
         else {
-            //trace(cst);
             stem.language(getStem(cst.getStem())).nl();
         }
         ShexShacl constraint = processBasic(cst.getExclusions());

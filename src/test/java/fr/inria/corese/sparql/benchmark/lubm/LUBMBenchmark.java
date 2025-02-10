@@ -21,8 +21,8 @@ public final class LUBMBenchmark {
     static final String lubm = LUBMBenchmark.class.getClassLoader().getResource("data").getPath() + "/lubm/";
 
     private static final long FAIL = -1;
-    private Graph graph;
-    private QueryProcess exec;
+    private final Graph graph;
+    private final QueryProcess exec;
     String name;
     String[] q;
 

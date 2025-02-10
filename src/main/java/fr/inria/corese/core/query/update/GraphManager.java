@@ -112,10 +112,6 @@ public class GraphManager {
             getGraph().getEventManager().finish(e);
         }
     }
-
-    public void trace() {
-        System.out.println(getGraph().display());
-    }
     
     /**
      * Corese extension:

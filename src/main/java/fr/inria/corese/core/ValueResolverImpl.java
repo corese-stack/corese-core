@@ -19,7 +19,7 @@ public class ValueResolverImpl implements ValueResolver {
 
     HashMap<String, IDatatype> tvalues;
     MessageDigest hasher;
-    private String NAME = "MD5";
+    private final String NAME = "MD5";
     int count = 0;
 
     public ValueResolverImpl() {

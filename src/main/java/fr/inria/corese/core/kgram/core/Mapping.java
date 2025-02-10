@@ -44,7 +44,6 @@ public class Mapping
         implements Result, Environment, Pointerable {
 
 
-    public static boolean DEBUG_DEFAULT = false; 
     static final Edge[] emptyEdge = new Edge[0];
     static final Node[] emptyNode = new Node[0];
     private Edge[] queryEdges;
@@ -71,7 +70,6 @@ public class Mapping
     private Binding bind;
     private Eval eval;
     private IDatatype report;
-    boolean debug = DEBUG_DEFAULT;
     
     public Mapping() {
         init(emptyEdge, emptyEdge);
@@ -1028,22 +1026,11 @@ public class Mapping
         switch (var.subtype()) {
             case ExprType.LOCAL: {               
                 Node node = get(var);
-                if (debug && node == null) {
-                    System.out.println("Mapping: Unbound variable: " + var);
-                }
                 return node;
             }
         }
         Node node = getNodeValue(var.getLabel());
-        if (debug && node == null) {
-            System.out.println("Mapping: Unbound variable: " + var);
-        }
         return node;
-//            int i = getIndex(var.getLabel());
-//            if (i == -1){
-//                return null;
-//            }                  
-//            return nodes[i];
     }
 
     @Override

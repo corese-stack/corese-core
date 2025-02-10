@@ -13,8 +13,6 @@ public class TraceVisitor implements QueryVisitor {
 
     @Override
     public void visit(ASTQuery ast) {
-        System.out.println("TraceVisitor:");
-        System.out.println(ast);
     }
 
     @Override

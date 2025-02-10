@@ -54,7 +54,7 @@ import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
  */
 public class QuerySolver implements SPARQLEngine {
 
-    private static Logger logger = LoggerFactory.getLogger(QuerySolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuerySolver.class);
     public static final String MAIN_FUN = NSManager.EXT + "main";
 
     public static final int STD_ENTAILMENT = 0;
@@ -296,7 +296,7 @@ public class QuerySolver implements SPARQLEngine {
 
     @Override
     public Mappings eval(Query query, Mapping m, Producer p) throws SparqlException {
-        return query((Node) null, query, m);
+        return query(null, query, m);
     }
 
     @Override
@@ -308,7 +308,7 @@ public class QuerySolver implements SPARQLEngine {
      * Core QueryExec processor
      */
     public Mappings query(Query query, Mapping m) throws EngineException {
-        return query((Node) null, query, m);
+        return query(null, query, m);
     }
 
     /**

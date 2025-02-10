@@ -39,7 +39,7 @@ public class DBpediaLiteralStats {
         }
     }
 
-    public static int[][] load() throws FileNotFoundException, IOException {
+    public static int[][] load() throws IOException {
         FileInputStream fis = new FileInputStream(new File("/Users/fsong/Google Drive/mac osx/5. Persistent/dbpedia_literal.txt"));
 
         //Construct BufferedReader from InputStreamReader

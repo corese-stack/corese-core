@@ -182,16 +182,6 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         return x;
     }
     
-
-
-    void trace(Object... lobj) {
-        for (Object obj : lobj) {
-            System.out.print(obj);
-            System.out.print(" ");
-        }
-        System.out.println("");
-    }
-    
     /**
      * funcall(sh:shacl)
      * ->
@@ -219,14 +209,6 @@ public class Core extends PluginImpl implements FunctionEvaluator {
     
     public HashMap<String, String> getFunctionName() {
         return functionName;
-    }
-    
-   public void trace() {
-        HashMap<String, String> map = getFunctionName();
-        int i = 0;
-        for (String key : map.keySet()) {
-            System.out.println(i++ + " " + map.get(key));
-        }
     }
    
    public IDatatype safe(IDatatype dt) {

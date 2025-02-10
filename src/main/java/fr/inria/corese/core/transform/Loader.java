@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Loader {
     
-    private static Logger logger = LoggerFactory.getLogger(Loader.class);
-    private String STL = NSManager.STL;
+    private static final Logger logger = LoggerFactory.getLogger(Loader.class);
+    private final String STL = NSManager.STL;
     public static final String PPLIB = "/template/";
     private Level level = Level.USER_DEFAULT;
     
@@ -117,10 +117,10 @@ public class Loader {
         // base for templates
         // use case: format { <format/main.html> ?x }
         qe.setBase(NSManager.toURI(pp));
-        if (nsm.isPredefinedTransformation(pp)) {
+        if (NSManager.isPredefinedTransformation(pp)) {
             // predefined pprinter: st:owl st:spin
             // loaded from Corese resource
-            name = nsm.strip(pp, STL);
+            name = NSManager.strip(pp, STL);
         }  else {
             ld.parseDir(toFile(pp), fr.inria.corese.core.api.Loader.format.QUERY_FORMAT);
             return;
@@ -153,7 +153,7 @@ public class Loader {
     
     // remove #
     String clean(String uri){
-        return trans.getURI(uri);
+        return Transformer.getURI(uri);
     }
         
 

@@ -36,17 +36,11 @@ public class RuleProcess extends  WorkflowProcess {
     
     @Override
     void start(Data data){
-        if (isDebug()){
-              System.out.println("RuleBase: " + path);
-         }
     }
     
     @Override
     void finish(Data data){
-        collect(data);           
-        if (isDebug()){
-              System.out.println(data.getGraph());
-         }
+        collect(data);
     }
     
     @Override

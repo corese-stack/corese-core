@@ -41,9 +41,6 @@ public class TestProcess extends SemanticProcess {
     @Override
     public Data run(Data data) throws EngineException {
         boolean test = test(data);
-        if (isDebug()){
-            System.out.println(pif + " : " + test);
-        }
         if (test) {
             if (pthen != null) {
                 return pthen.compute(data);

@@ -59,13 +59,5 @@ public class CompositeProcess extends WorkflowProcess {
             }
         }
     }
-     
-    @Override
-    public void setRecDisplay(boolean b){
-        super.setDisplay(b);
-        for (WorkflowProcess p : getProcessList()){
-            p.setDisplay(b);
-        }
-    } 
     
 }

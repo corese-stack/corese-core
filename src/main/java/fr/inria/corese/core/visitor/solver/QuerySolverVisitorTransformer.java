@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
 
    
-    private static Logger logger = LoggerFactory.getLogger(QuerySolverVisitorTransformer.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitorTransformer.class);
     
     private static String visitorName;
     

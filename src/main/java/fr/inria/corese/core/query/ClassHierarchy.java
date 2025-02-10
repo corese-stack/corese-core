@@ -70,9 +70,6 @@ public class ClassHierarchy extends DatatypeHierarchy {
         if (list.isEmpty()){
             return super.getSuperTypes(object, type);
         }
-        if (isDebug()){
-            System.out.println("CH: " + object + " " + list);
-        }       
         return list;
     }
    

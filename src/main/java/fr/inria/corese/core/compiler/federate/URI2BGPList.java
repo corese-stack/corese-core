@@ -18,7 +18,6 @@ import java.util.List;
  * b) uriList2bgp:   uri -> (connected bgp) triple with several URI
  */
 public class URI2BGPList {
-    public static boolean TRACE_SKIP = false;
     // uri -> bgp list
     HashMap<String, List<BasicGraphPattern>> uri2bgp;
     // bgp -> uri list
@@ -150,12 +149,6 @@ public class URI2BGPList {
                         // source selection confirm that triple join with bgp
                         bgp.add(triple);
                         return i;
-                    } else {
-                        // source selection confirm that triple does not join with bgp
-                        if (TRACE_SKIP) {
-                            trace("bgp join skip connection: %s %s", triple, uri);
-                            trace("%s", bgp);
-                        }
                     }
                 } else {
                     bgp.add(triple);
@@ -268,24 +261,6 @@ public class URI2BGPList {
             sb.append("\n");
         }
         return sb.toString();
-    }
-    
-    void trace() {
-        // uri -> bgp list, triple with one uri
-        trace("uri\n%s", this);
-        // uri -> bgp list, triple with several uri
-        trace("uri list\n%s", getUriList2bgp());
-        trace("bgp2uri:\n");
-        
-        for (BasicGraphPattern bgp
-                : getUriList2bgp().getBgp2uri().keySet()) {
-            trace("%s: %s", bgp,
-                    getUriList2bgp().getBgp2uri().get(bgp));
-        }
-    }
-    
-    void trace(String mes, Object... obj) {
-        System.out.println(String.format(mes, obj));
     }
     
     void add(Triple t) {

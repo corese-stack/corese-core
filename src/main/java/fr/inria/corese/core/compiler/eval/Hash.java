@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class Hash {
-	private static Logger logger = LoggerFactory.getLogger(Hash.class);	
+	private static final Logger logger = LoggerFactory.getLogger(Hash.class);
 
 	//static String SHA224 = "SHA-224";
 	String name;

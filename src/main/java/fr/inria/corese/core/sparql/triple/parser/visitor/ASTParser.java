@@ -309,7 +309,7 @@ public class ASTParser implements Walker, URLParam {
         }
         exp.setNumber(nbService++);
         if (top() == null) {
-            ast.logger.error("AST stack empty");
+            ASTQuery.logger.error("AST stack empty");
         }
         else {
             top().getServiceExpList().add(exp);

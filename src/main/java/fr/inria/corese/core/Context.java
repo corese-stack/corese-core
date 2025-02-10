@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Context implements Graphable {
 
-    private ArrayList<Node> queryNodes;
+    private final ArrayList<Node> queryNodes;
     private Node ruleEngineNode;
     RuleEngine re;
     private int max = 10;

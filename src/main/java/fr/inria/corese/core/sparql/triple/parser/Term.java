@@ -95,7 +95,7 @@ public class Term extends Expression {
     String modality;
     int type = ExprType.UNDEF, oper = ExprType.UNDEF;
     int min = -1, max = -1;
-    private int place = -1;
+    private final int place = -1;
     private int arity = 0;
 
     static {
@@ -1917,6 +1917,6 @@ public class Term extends Expression {
 
     @Override
     public IDatatype eval(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
-        throw new EngineException("Undefined expression: " + this.toString());
+        throw new EngineException("Undefined expression: " + this);
     }
 }

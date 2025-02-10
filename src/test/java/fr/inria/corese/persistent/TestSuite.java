@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
  */
 public class TestSuite {
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         testSpeedInSingleFiles();
         //testCorrectness();
         //testSpeed();
@@ -79,9 +79,9 @@ public class TestSuite {
         "R. (ms):   "
     };
 
-    private int[][] tests;
-    private int numOfTests;
-    private int runTimes;
+    private final int[][] tests;
+    private final int numOfTests;
+    private final int runTimes;
     private int fileSize = -1;
 
     public TestSuite(int[][] tests, int runTimes, int numOfTests) {

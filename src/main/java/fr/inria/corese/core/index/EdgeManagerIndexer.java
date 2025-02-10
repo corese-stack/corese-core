@@ -42,8 +42,6 @@ import java.util.*;
  */
 public class EdgeManagerIndexer 
         implements Index {
-    public static boolean TRACE_REDUCE = false;
-    public static boolean TRACE_INSERT = false;
     // draft test to iterate edge list with subList(b, e) with rdf star only (predicate!=null)
     public static boolean ITERATE_SUBLIST = false;
     public static boolean RECORD_END = false;
@@ -52,7 +50,7 @@ public class EdgeManagerIndexer
     private static final String NL = System.getProperty("line.separator");
     static final int IGRAPH = Graph.IGRAPH;
     static final int ILIST = Graph.ILIST;
-    private static Logger logger = LoggerFactory.getLogger(EdgeManagerIndexer.class);
+    private static final Logger logger = LoggerFactory.getLogger(EdgeManagerIndexer.class);
     private boolean byIndex = true;
     int index = 0, other = 1;
     int count = 0;
@@ -70,7 +68,7 @@ public class EdgeManagerIndexer
     HashMap<Node, EdgeManager> table;
     private NodeManager nodeManager;
     //TransitiveEdgeManager transitiveManager;
-    private boolean debug = false;
+    private final boolean debug = false;
 
     public EdgeManagerIndexer(Graph g, boolean bi, int index) {
         init(g, bi, index);
@@ -663,17 +661,11 @@ public class EdgeManagerIndexer
      * index NodeManager
      */
     private void reduce() {
-        if (TRACE_REDUCE) {
-            System.out.println("before reduce:\n" + getGraph().display());
-        }
         getNodeManager().start();
         for (Node pred : getSortedProperties()) {
             reduce(pred);
         }
         getNodeManager().finish();
-        if (TRACE_REDUCE) {
-            System.out.println("after reduce:\n" + getGraph().display());
-        }
     }
 
     private void reduce(Node pred) {
@@ -724,7 +716,7 @@ public class EdgeManagerIndexer
         synchronized (pred) {
             EdgeManager list = get(pred);
             if (list != null && list.size() == 0) {
-                EdgeManager std = (EdgeManager) getGraph().getIndex().get(pred);
+                EdgeManager std = getGraph().getIndex().get(pred);
                 list.copy(std);
                 list.sort();
             }
@@ -944,16 +936,11 @@ public class EdgeManagerIndexer
      *               nested delete nested
      */
     boolean accept(Edge edge, Edge target) {
-        if (edge.isAsserted()) { 
+        // nested delete nested when super user
+        if (edge.isAsserted()) {
             return target.isAsserted() ||  superUser(edge);
         } 
-        else if (target.isNested() && superUser(edge)) {
-            // nested delete nested when super user
-            return true;
-        }
-        else {
-            return false;
-        }
+        else return target.isNested() && superUser(edge);
     }
 
     boolean onInsert(Edge ent) {
@@ -1049,12 +1036,8 @@ public class EdgeManagerIndexer
     }
 
     private void update(Node g1, Node g2, Node pred, EdgeManager list, int n, Graph.GRAPH_OPERATION mode) {
-        boolean isBefore = false;
-        
-        if (g2 != null && nodeCompare(g1, g2) < 0) {
-            isBefore = true;
-        }
-        
+        boolean isBefore = g2 != null && nodeCompare(g1, g2) < 0;
+
         for (int i = n; i < list.size();) {
             Edge ent = list.get(i);
             Edge ee;

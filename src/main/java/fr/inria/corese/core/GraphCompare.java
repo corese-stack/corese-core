@@ -12,7 +12,7 @@ import java.util.Iterator;
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */
 public class GraphCompare {
-    private static Logger logger = LoggerFactory.getLogger(GraphCompare.class);
+    private static final Logger logger = LoggerFactory.getLogger(GraphCompare.class);
 
     Graph g1, g2;
 

@@ -122,9 +122,7 @@ public class ExpEdge extends Exp {
      */
     boolean compatible(Expr e, int node){
         if (node == PREDICATE){
-            if (e.match(ExprType.LANG) || e.match(ExprType.DATATYPE)){
-                return false;
-            }             
+            return !e.match(ExprType.LANG) && !e.match(ExprType.DATATYPE);
         }
         return true;
     }

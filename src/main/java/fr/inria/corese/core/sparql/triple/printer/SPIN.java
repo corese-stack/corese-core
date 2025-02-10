@@ -862,7 +862,7 @@ public class SPIN implements ASTVisitor {
     @Override
     public void visit(Term term) {
         if (term.isExist()) {
-            visit((Exist) term.getExist());
+            visit(term.getExist());
         } else {
             boolean isIn = term.getName().equalsIgnoreCase(Processor.IN);
 

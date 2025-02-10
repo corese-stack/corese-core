@@ -229,10 +229,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     
     @Override
     public void after(Mappings map) {
-        if (provenance) {
-            Provenance prov = getProvenance(map);
-            System.out.println(prov);        
-        }
     }
     
     // start function
@@ -242,11 +238,9 @@ public class FederateVisitor implements QueryVisitor, URLParam {
         if (! init()) {
             return;
         }
-        getGroupBGP().setDebug(ast.isDebug());
         
         if (isSparql()) {
             // select where { BGP } -> select where { service URLs { BGP } }
-            verbose("\nbefore:\n%s", ast.getBody());
             sparql(ast);
         }
         else {       
@@ -259,7 +253,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
                 // triple selection
                 suc = sourceSelection(ast);
             }
-            verbose("\nbefore:\n%s", ast.getBody());
             
             if (suc) {
                 rewrite(ast);
@@ -303,7 +296,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     
     void after(ASTQuery ast) {
         error(ast);
-        verbose(ast);
     }
     
     void error(ASTQuery ast) {
@@ -315,15 +307,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
         if (ast.hasUndefinedService()) {
             logger.error("Query rewrite fail due to undefined triple");
             ast.setFail(true);
-        }
-    }
-    
-    void verbose(ASTQuery ast) {
-        if (verbose) {
-            System.out.println("\nafter:");
-            System.out.println(ast.getMetadata());
-            System.out.println(ast.getBody());
-            System.out.println();
         }
     }
     
@@ -626,7 +609,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
                 String uri = at.getConstant().getLongName();
                 if (c.accept(uri)) {
                     uri = c.tune(uri);
-                    System.out.println("Fed tune: " + uri);
                     alist.add(Constant.createResource(uri));
                 }
             }
@@ -754,12 +736,7 @@ public class FederateVisitor implements QueryVisitor, URLParam {
             // and do not rewrite anything yet (effective)
             // else rewrite triple as service  (deprecated)
             URI2BGPList uri2bgp = 
-                 getGroupBGP().process(namedGraph, main, body, filterList); 
-            
-            if (isTraceFederate()) {
-                trace("body first phase:\n%s", body);
-                uri2bgp.trace();
-            }     
+                 getGroupBGP().process(namedGraph, main, body, filterList);
             
             if (isFederateBGP()) {
                 // rewrite connected bgp with several uri as service
@@ -860,16 +837,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
         }
                 
         return body;
-    }
-
-    void verbose(String mes, Object... obj) {
-        if (verbose)  {
-            trace(mes, obj);
-        }
-    }
-    
-    void trace(String mes, Object... obj) {
-        System.out.println(String.format(mes, obj));
     }
     
     int insert(Exp body, Exp exp, int i) {
@@ -979,7 +946,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     
     void error(Triple t) {
         logger.error("Undefined triple: " + t);
-        //ast.setFail(true);
     }
     
     List<Atom> getAtomList(List<String> list) {
@@ -1098,11 +1064,8 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     }
        
     boolean acceptWithoutJoinTest(Triple t) {
-        if (t.isPath() && !SELECT_JOIN_PATH) {
-            // there is no join test for path: accept it
-           return true;            
-        }
-        return false;
+        // there is no join test for path: accept it
+        return t.isPath() && !SELECT_JOIN_PATH;
     }
     
     boolean rewriteFilter(Atom name, Expression exp) {
@@ -1206,9 +1169,6 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     
     public List<Atom> getFederationFilter(String name) {
         List<Atom> list = getFederation().get(name);
-        if (list == null) {
-            return null;
-        }
         return list;
     }
 

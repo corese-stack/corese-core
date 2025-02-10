@@ -37,7 +37,7 @@ public class EdgeManager implements Iterable<Edge> {
     Graph graph;
     private EdgeManagerIndexer indexer;
     // Predicate of this EdgeManager: edges in this edge list have this predicate
-    private Node predicate;
+    private final Node predicate;
     private ArrayList<Edge> edgeList;
     // comparator to sort edge list: g s p o t < g s p o
     private Comparator<Edge> comparatorIndex;
@@ -365,14 +365,6 @@ public class EdgeManager implements Iterable<Edge> {
         return null;
     }
     
-    void traceEdgeList() {
-        for (Edge e : getEdgeList()) {
-            System.out.println(String.format("%s label=%s index=%s", e,
-                    e.getSubjectNode().getLabel(),
-                    e.getSubjectNode().getIndex()));
-        }
-    }
-    
     Iterable<Edge> getEdges(Node node, int beginIndex) {
         return new EdgeManagerIterate(this, beginIndex);
     }
@@ -460,10 +452,8 @@ public class EdgeManager implements Iterable<Edge> {
         int n = findEdgeNodeTerm(n1, n2);
         if (n >= 0 && n < getEdgeList().size()) {
             Edge ent = getEdgeList().get(n);
-            if (n1.getIndex() == getNodeIndex(ent, 0)
-                    && n2.getIndex() == getNodeIndex(ent, 1)) {
-                return true;
-            }
+            return n1.getIndex() == getNodeIndex(ent, 0)
+                    && n2.getIndex() == getNodeIndex(ent, 1);
         }
         return false;
     }
@@ -736,7 +726,7 @@ public class EdgeManager implements Iterable<Edge> {
     Comparator<Edge> createComparator(boolean equalWithoutConsideringMetadataNode) {
 
         return new Comparator<>() {
-            boolean equalWithoutConsideringMetadata = equalWithoutConsideringMetadataNode;
+            final boolean equalWithoutConsideringMetadata = equalWithoutConsideringMetadataNode;
      
             @Override
             public int compare(Edge e1, Edge e2) {

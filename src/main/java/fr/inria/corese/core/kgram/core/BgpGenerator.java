@@ -23,6 +23,6 @@ public interface BgpGenerator {
     
      Exp process(Exp exp);
 
-    public HashMap<Edge, Exp> getEdgeAndContext();
+    HashMap<Edge, Exp> getEdgeAndContext();
     
 }

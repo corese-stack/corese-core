@@ -46,7 +46,7 @@ public class PluginTransform implements ComputerProxy {
      */
     @Override
     public Transformer getTransformer(Binding b, Environment env, Producer p) throws EngineException {
-        return getTransformer(b, env, p, null, (IDatatype) null, null);
+        return getTransformer(b, env, p, null, null, null);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class PluginTransform implements ComputerProxy {
      * Return current transformer (do not create in case of different graph)
      */
     Transformer getTransformerCurrent(Binding b, Environment env, Producer p) throws EngineException {
-        return getTransformer(b, env, p, (IDatatype) null, (IDatatype) null, true, false);
+        return getTransformer(b, env, p, null, null, true, false);
     }
 
     /**
@@ -205,8 +205,7 @@ public class PluginTransform implements ComputerProxy {
     }
 
     boolean isWith(Expr exp) {
-        return (exp == null) ? true
-                : exp.oper() == ExprType.APPLY_TEMPLATES_GRAPH
+        return exp == null || exp.oper() == ExprType.APPLY_TEMPLATES_GRAPH
                 || exp.oper() == ExprType.APPLY_TEMPLATES_WITH_GRAPH;
     }
 

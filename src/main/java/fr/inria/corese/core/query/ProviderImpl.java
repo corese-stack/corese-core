@@ -48,7 +48,7 @@ public class ProviderImpl implements Provider, URLParam {
     HashMap<String, QueryProcess> table;
     Hashtable<String, Double> version;
     private QueryProcess defaut;
-    private int limit = 30;
+    private final int limit = 30;
 
     private ProviderImpl() {
         table = new HashMap<>();
@@ -122,7 +122,7 @@ public class ProviderImpl implements Provider, URLParam {
     }
     
      Binding getBinding(Environment env) {
-        return (Binding) env.getBind();
+        return env.getBind();
     }
     
     /**

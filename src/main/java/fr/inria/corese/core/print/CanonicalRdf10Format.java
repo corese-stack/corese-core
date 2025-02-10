@@ -15,7 +15,7 @@ import fr.inria.corese.core.kgram.core.Mappings;
  */
 public class CanonicalRdf10Format extends NQuadsFormat {
 
-    private CanonicalizedDataset canonicalizedDataset;
+    private final CanonicalizedDataset canonicalizedDataset;
 
     public CanonicalRdf10Format(Graph graph) {
         super(graph);

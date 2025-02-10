@@ -65,7 +65,6 @@ public class Cleaner {
      * by same bnode
      */
     void clean(Graph g, String[] lq, boolean resource) throws IOException, EngineException, LoadException {
-        Date d1 = new Date();
         QueryLoad ql = QueryLoad.create();
         QueryProcess exec = QueryProcess.create(g, getDataManager());
         // escape QueryProcess write lock in case
@@ -94,8 +93,6 @@ public class Cleaner {
                  throw e;
              }
         }
-        Date d2 = new Date();
-        System.out.println("Clean: " + ((d2.getTime() - d1.getTime()) / 1000.0));
     }
 
     Mapping createMapping(ProcessVisitor vis) {

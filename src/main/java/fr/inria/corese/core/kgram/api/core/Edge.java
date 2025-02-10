@@ -95,7 +95,7 @@ public interface Edge extends Pointerable {
     @Override
     Edge getEdge();
 
-    default Object getProvenance() { return null;};
+    default Object getProvenance() { return null;}
 
     default void setProvenance(Object obj) {}
 

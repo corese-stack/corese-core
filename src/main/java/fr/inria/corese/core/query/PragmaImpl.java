@@ -65,23 +65,6 @@ public class PragmaImpl extends Pragma {
 	
 		return query;
 	}
-	
-	/**
-	 * [a kg:Insert ; kg:triple(?x rdf:type c:Person)]
-	 * Triple represented by a list
-	 */
-	public void list(Atom g, RDFList list){
-		System.out.println(list.head() + " " + list.getList());
-		
-		for (Expression exp : list.getList()){
-			System.out.println(exp);
-		}
-
-		
-		for (fr.inria.corese.core.sparql.triple.parser.Exp exp : list.getBody()){
-			//System.out.println(exp);
-		}
-	}
 
 	public void triple(Atom g, Triple t, fr.inria.corese.core.sparql.triple.parser.Exp pragma){
 		//System.out.println(t);
@@ -96,15 +79,6 @@ public class PragmaImpl extends Pragma {
 		}
 		
 		else if (subject.equals(SELF)){
-//			if (property.equals(ENTAIL)){
-//				boolean b = value(object);
-//				graph.setEntailment();
-//				graph.setEntailment(b);
-//				// as graph.isUpdate may have been set to false
-//				// we force entailment
-//				if (b) graph.setUpdate(true);	
-//			}
-//			else 
 			if (property.equals(STATUS)){
 				new Describe(exec, query).describe(value(object));
 			}

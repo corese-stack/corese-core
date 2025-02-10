@@ -13,17 +13,17 @@ import fr.inria.corese.core.sparql.api.IDatatype.NodeKind;
  *
  */
 public interface Node extends Pointerable, Comparable {
-        public static final String INITKEY = "";
+        String INITKEY = "";
 
-	public static final int DEPTH 	= 0;
-	public static final int LENGTH 	= 1;
-	public static final int REGEX 	= 2;
-	public static final int OBJECT 	= 3;
+	int DEPTH 	= 0;
+	int LENGTH 	= 1;
+	int REGEX 	= 2;
+	int OBJECT 	= 3;
 
 	
-	public static final int PSIZE 	= 4;
+	int PSIZE 	= 4;
 
-	public static final int STATUS 	= 4;
+	int STATUS 	= 4;
         
         default NodeKind getNodeKind() {
             return getValue().getNodeKind();

@@ -40,10 +40,8 @@ public class WorkflowProcess implements AbstractProcess {
     private SemanticWorkflow workflow;
     private WorkflowVisitor visitor;
     private QuerySolverVisitorTransformer workflowVisitor;
-    private boolean debug = false;
     // true means return input graph (use case: select where and return graph as is)
     private boolean probe = false;
-    private boolean display = false;
     private boolean collect = false;
     private boolean visit = false;
     private boolean log = false; 
@@ -77,7 +75,6 @@ public class WorkflowProcess implements AbstractProcess {
      
     private void before(Data data) {
         initContextData(data);
-        beforeDebug(data);
         if (recVisitor() != null){
             recVisitor().before(this, data);
         }
@@ -88,10 +85,6 @@ public class WorkflowProcess implements AbstractProcess {
     }
     
     private void after(Data in, Data data) {
-//        if (in.getVisitor() != null && data.getVisitor() == null){
-//            data.setVisitor(in.getVisitor());
-//        }
-        afterDebug(data);
         if (recVisitor() != null){
             recVisitor().after(this, data);
         }
@@ -136,27 +129,6 @@ public class WorkflowProcess implements AbstractProcess {
             setContext(new Context());
         }
         data.initContext(getContext());
-    }
-    
-
-    void beforeDebug(Data data) {
-        if (isRecDebug()) {
-            System.out.println("SW: " + getURI() + " " + getClass().getName());           
-        } 
-    }
-
-    void afterDebug(Data data) {
-        if (isRecDebug()) {
-            System.out.println(data);
-            if (data.getVisitedGraph() != null) {
-                display(data.getVisitedGraph());
-            }
-        }
-    }
-    
-    void display(Graph g){
-        Transformer t = Transformer.create(g, Transformer.TURTLE);
-        System.out.println(t);
     }
      
     public List<WorkflowProcess> getProcessList(){
@@ -251,14 +223,6 @@ public class WorkflowProcess implements AbstractProcess {
     boolean isRecCollect(){
         return isCollect() || (pgetWorkflow().isCollect());
     }
-     
-    boolean isRecDisplay(){
-        return isDisplay() || pgetWorkflow().isDisplay() ;
-    }   
-    
-    boolean isRecDebug(){
-        return isDebug() || pgetWorkflow().isDebug();
-    }
     
     WorkflowVisitor recVisitor(){
         return pgetWorkflow().getVisitor();
@@ -295,22 +259,6 @@ public class WorkflowProcess implements AbstractProcess {
      */
     public void setWorkflow(SemanticWorkflow workflow) {
         this.workflow = workflow;
-    }
-
-    /**
-     * @return the debug
-     */
-    @Override
-    public boolean isDebug() {
-        return debug;
-    }
-    
-    /**
-     * @param debug the debug to set
-     */
-    @Override
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     /**
@@ -358,26 +306,6 @@ public class WorkflowProcess implements AbstractProcess {
     @Override
     public void setProbe(boolean probe) {
         this.probe = probe;
-    }
-
-    /**
-     * @return the display
-     */
-    @Override
-    public boolean isDisplay() {
-        return display;
-    }
-
-    /**
-     * @param display the display to set
-     */
-    @Override
-    public void setDisplay(boolean display) {
-        this.display = display;
-    }
-    
-     public void setRecDisplay(boolean display) {
-        this.display = display;
     }
 
     @Override
@@ -465,12 +393,6 @@ public class WorkflowProcess implements AbstractProcess {
     void set(String name, IDatatype dt){
         if (name.equals(NAME)){
             setName(dt.stringValue());
-        }
-        else if (name.equals(DEBUG)){
-            setDebug(dt.booleanValue());        
-        }
-        else  if (name.equals(DISPLAY)){
-            setDisplay(dt.booleanValue());        
         }
         else if (name.equals(RESULT)){
             setResult(dt.getLabel());        

@@ -65,7 +65,6 @@ public class TestRuleEngine {
 
     @AfterClass
     static public void finish() {
-        EdgeFactory.trace();
     }
 
     static GraphStore createGraph() {
@@ -86,7 +85,7 @@ public class TestRuleEngine {
                 + "}";
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(q);
-        IDatatype dt = (IDatatype) map.getValue("?g");
+        IDatatype dt = map.getValue("?g");
         Graph gg = (Graph) dt.getPointerObject();
         assertEquals(7, gg.size());
     }

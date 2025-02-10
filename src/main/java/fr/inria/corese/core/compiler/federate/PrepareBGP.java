@@ -26,7 +26,6 @@ public class PrepareBGP extends Util {
     static final String FAKE_URI = "http://ns.inria.fr/_fake_";
 
     private FederateVisitor visitor;
-    private boolean debug = false;
     private boolean skipSameAs = true;
 
     PrepareBGP(FederateVisitor vis) {
@@ -113,7 +112,7 @@ public class PrepareBGP extends Util {
         if ((main.isOptional()|| main.isMinus()) && body == main.get(1)) {
             return false;
         }
-        return getVisitor().USE_JOIN;
+        return FederateVisitor.USE_JOIN;
     }
         
     // create map URI -> (BGP1 .. BGPn)        
@@ -347,10 +346,6 @@ public class PrepareBGP extends Util {
         }
         return false;
     }
-    
-  void trace(String mes, Object... obj) {
-        System.out.println(String.format(mes, obj));
-    }
 
     /**
      * First phase: service with one URI
@@ -393,11 +388,6 @@ public class PrepareBGP extends Util {
                     // intersection of BGP and exists variables
                     List<Variable> currentIntersection = intersectionVariable(existVarList, bgpVarList);
 
-                    if (isDebug()) {
-                        System.out.println("R: bgp: " + bgpVarList  + " exist: " + existVarList);
-                        System.out.println("Intersection: " + currentIntersection);
-                    }
-
                     if (servExist.getServiceName().equals(servBGP.getServiceName())) {
                         // bgp service and exists service with same URI
                         if (equal(currentIntersection, existVarList)) {
@@ -433,7 +423,6 @@ public class PrepareBGP extends Util {
                 if (bgpList.size() == 1) {
                     // there is one bgp service with same URI as filter exists service
                     // merge filter exists into bgp with same service URI
-                    if (isDebug()) System.out.println("move1: " + filterExist);
                     // remove service from filter exists
                     termExist.setExistBGP(servExist.getBodyExp());
                     // move filter exist into relevant bgp service 
@@ -556,12 +545,6 @@ public class PrepareBGP extends Util {
                         List<Variable> bgpVarList = service.getInscopeVariables();
                         List<Variable> currentIntersection = intersectionVariable(existVarList, bgpVarList);
 
-                        if (isDebug()) {
-                            System.out.println("R: " + existVarList + " " + bgpVarList);
-                            System.out.println("Intersection: " + currentIntersection);
-                        }
-                        
-                        //if (servExist.getServiceName().equals(servBGP.getServiceName())) {
                         if (equalURI(servExist.getServiceList(), service.getServiceList())) {
                             if (equal(currentIntersection, existVarList)) {
                                 serviceList.add(service);
@@ -593,8 +576,7 @@ public class PrepareBGP extends Util {
                     }
                 }
                 
-                if (serviceList.size() >0) { //== 1) {
-                    if (isDebug()) System.out.println("move2: " + filterExist);
+                if (serviceList.size() >0) {
                     // remove service clause from exists (keep service bgp)
                     termExist.setExistBGP(servExist.getBodyExp());
                     // move exist into relevant service 
@@ -605,22 +587,6 @@ public class PrepareBGP extends Util {
             }
         }
         return false;
-    }
-    
-   
-
-    /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * @param debug the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     public FederateVisitor getVisitor() {

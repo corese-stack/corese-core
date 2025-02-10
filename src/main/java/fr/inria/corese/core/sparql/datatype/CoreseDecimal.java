@@ -101,7 +101,7 @@ public class CoreseDecimal extends CoreseDouble {
         this.checkNoExposant(value);
         super.setValue(Double.parseDouble(value));
         this.bdValue = new BigDecimal(value);
-        this.setLabel(String.valueOf(value));
+        this.setLabel(value);
     }
 
     @Override

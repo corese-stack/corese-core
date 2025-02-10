@@ -16,7 +16,8 @@ public class GraphDistance {
     private Graph graph;
     private JSONObject json;
     private NSManager nsm;
-    public enum Mode {URI, NAME, DEFAULT};
+    public enum Mode {URI, NAME, DEFAULT}
+
     private Mode mode = Mode.DEFAULT;
     
     public GraphDistance(Graph g) {
@@ -60,7 +61,7 @@ public class GraphDistance {
     
     void match(Iterable<Node> it, IDatatype dt, int distance) {
         String label = dt.getLabel();
-        String name  = getNsm().nstrip(label);
+        String name  = NSManager.nstrip(label);
 
         int minLabel = Integer.MAX_VALUE;
         double minName  = Double.MAX_VALUE;
@@ -79,7 +80,7 @@ public class GraphDistance {
                 closeLabel = node.getLabel();
             }
             
-            String name2 = getNsm().nstrip(node.getLabel());
+            String name2 = NSManager.nstrip(node.getLabel());
             double dist2 = nameDistance(name, name2);
             
             if (dist2 < minName) {
@@ -134,7 +135,7 @@ public class GraphDistance {
             return 0;
         }
         // same name without case: better than any other distance
-        if (l1.toLowerCase().equals(l2.toLowerCase())) {
+        if (l1.equalsIgnoreCase(l2)) {
             return 0.3;
         }
         // distance when one name contain other name is less than

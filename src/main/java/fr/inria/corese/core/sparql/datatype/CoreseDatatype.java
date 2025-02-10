@@ -7,11 +7,7 @@ import static fr.inria.corese.core.sparql.datatype.Cst.jTypeInteger;
 import static fr.inria.corese.core.sparql.datatype.RDF.RDF_HTML;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -453,7 +449,7 @@ public class CoreseDatatype
             return loopIterator();
         }
         else {
-            return new ArrayList<IDatatype>(0).iterator();
+            return Collections.emptyIterator();
         }
     }
     
@@ -1103,7 +1099,7 @@ public class CoreseDatatype
     }
 
     static boolean isNumber(String name, String cname) {
-        return dm.isNumber(name)
+        return DatatypeMap.isNumber(name)
                 || cname.equals(jTypeInteger) || cname.equals(jTypeGenericInteger);
     }
 
@@ -1354,10 +1350,7 @@ public class CoreseDatatype
         if (getDatatype() == null) {
             return false;
         }
-        if (getDatatype().equals(type)) {
-            return true;
-        }       
-        return false;
+        return getDatatype().equals(type);
     }
     
     @Override

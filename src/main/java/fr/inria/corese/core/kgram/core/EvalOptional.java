@@ -156,9 +156,6 @@ public class EvalOptional {
      * Mapping m from map before binding BGP2 with map
      */
     Mappings filter(Node gNode, Exp exp, Environment memory, Producer p, Mappings map) throws SparqlException {
-        if (memory.getQuery().isDebug()) {
-            System.out.println("filter inscope: " + exp.getInscopeFilter());
-        }
         for (int i = 0; i < map.size();) {
             Mapping m = map.get(i);
             m.setQuery(memory.getQuery());
@@ -182,9 +179,6 @@ public class EvalOptional {
             } else {
                 map.remove(i);
             }
-        }
-        if (memory.getQuery().isDebug()) {
-            System.out.println("filter mappings:\n" + map);
         }
         return map;
     }

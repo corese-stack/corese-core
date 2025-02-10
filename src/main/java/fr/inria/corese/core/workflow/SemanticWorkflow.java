@@ -84,11 +84,6 @@ public class SemanticWorkflow extends  CompositeProcess {
        return add(new SPARQLProcess(q, path));
     }
     
-//     public SemanticWorkflow addQueryPath(String path) throws LoadException{
-//        String q = QueryLoad.create().readWE(path, isServerMode());
-//        return addQuery(q, path);
-//    }
-    
     // return input graph
     public SemanticWorkflow addQueryProbe(String q){
        SPARQLProcess sp = new SPARQLProcess(q);
@@ -216,7 +211,6 @@ public class SemanticWorkflow extends  CompositeProcess {
            
     Data exec(Data data) throws EngineException {  
         collect(data);
-        trace();
         for (WorkflowProcess p : getProcessList()){
             p.inherit(this);
             data = p.compute(data);           
@@ -268,12 +262,6 @@ public class SemanticWorkflow extends  CompositeProcess {
             }
             setLoop(c.get(Context.STL_LOOP).intValue());
         }
-    } 
-    
-    void trace(){
-         if (isDebug() && getContext() != null){
-            System.out.println(getContext());
-        }
     }
         
     
@@ -299,15 +287,6 @@ public class SemanticWorkflow extends  CompositeProcess {
     public void setLoop(int loop) {
         this.loop = loop;
     }
-    
-    @Override
-    public void setDebug(boolean b){
-        super.setDebug(b);
-        for (WorkflowProcess p : getProcessList()){
-            p.setDebug(b);
-        }
-    }
-
     
     @Override
     public String getTransformation(){       

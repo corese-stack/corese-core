@@ -46,19 +46,19 @@ public class ApproximateStrategy {
     //private static Priority priority = new Priority();
     static {
         //*** DEFAULT MAP STRATEGY - ALGORITHMS
-        defaultStrategyMap.put(URI_LEX, Arrays.asList(new AlgType[]{ng, jw}));//S P O
-        defaultStrategyMap.put(URI_WN, Arrays.asList(new AlgType[]{wn}));//S P O
-        defaultStrategyMap.put(URI_EQUALITY, Arrays.asList(new AlgType[]{eq}));//S P O
+        defaultStrategyMap.put(URI_LEX, Arrays.asList(ng, jw));//S P O
+        defaultStrategyMap.put(URI_WN, Arrays.asList(wn));//S P O
+        defaultStrategyMap.put(URI_EQUALITY, Arrays.asList(eq));//S P O
 
-        defaultStrategyMap.put(PROPERTY_EQUALITY, Arrays.asList(new AlgType[]{eq}));//P
-        defaultStrategyMap.put(CLASS_HIERARCHY, Arrays.asList(new AlgType[]{ch}));//A rdf:type B
+        defaultStrategyMap.put(PROPERTY_EQUALITY, Arrays.asList(eq));//P
+        defaultStrategyMap.put(CLASS_HIERARCHY, Arrays.asList(ch));//A rdf:type B
 
-        defaultStrategyMap.put(LITERAL_WN, Arrays.asList(new AlgType[]{wn}));//O@literal@xsd:string@en
-        defaultStrategyMap.put(LITERAL_LEX, Arrays.asList(new AlgType[]{ng, jw}));//O@literal@xsd:string
+        defaultStrategyMap.put(LITERAL_WN, Arrays.asList(wn));//O@literal@xsd:string@en
+        defaultStrategyMap.put(LITERAL_LEX, Arrays.asList(ng, jw));//O@literal@xsd:string
         
        // strategyMap = defaultStrategyMap;
 
-        mergableStrategy = Arrays.asList(new StrategyType[]{URI_LEX, URI_WN, CLASS_HIERARCHY, LITERAL_WN, LITERAL_LEX});
+        mergableStrategy = Arrays.asList(URI_LEX, URI_WN, CLASS_HIERARCHY, LITERAL_WN, LITERAL_LEX);
         
         defaultStrategy = new ArrayList<StrategyType>();
         defaultStrategy.add(URI_LEX);

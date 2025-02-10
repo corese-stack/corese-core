@@ -33,15 +33,12 @@ public class SorterNew extends Sorter {
         Map<Integer, List<Exp>> ESGs = tokenize(expression);
         if (ESGs.isEmpty()) return;
 
-        message("** Before sorting [whole]" + expression);
         long start = System.currentTimeMillis();
 
         // === Iterate each sub set and create ESG and sorting === 
         for (Entry<Integer, List<Exp>> entrySet : ESGs.entrySet()) {
             Integer startIndex = entrySet.getKey();
             List<Exp> exps = entrySet.getValue();
-
-            message(" -- Sorting [before], " + exps.size() + " :" + exps);
 
             // ** 1 create graph (list of nodes and their edges) **
             QPGraph bpg = new QPGraph(exps, bindings);
@@ -90,16 +87,10 @@ public class SorterNew extends Sorter {
                     }
                 }
             }
-
-            message(" -- Sorting time:" + (System.currentTimeMillis() - stop1) + "ms");
-            message(" -- Sorting [after] :" + exps+ "\n");
             
             // ** 4 rewrite **
             is.rewrite(expression, l, startIndex);
         }
-
-        message("** After sorting [whole]:" + expression);
-        message("** Query sorting time:" + (System.currentTimeMillis() - start) + "ms **\n");
 
     }
 
@@ -140,11 +131,5 @@ public class SorterNew extends Sorter {
         }
 
         return ESGs;
-    }
-
-    private void message(String msg) {
-        if (print) {
-            System.out.println(msg);
-        }
     }
 }

@@ -54,7 +54,7 @@ public class NSManager extends ASTObject {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(NSManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(NSManager.class);
     public static final String FPPN = "ftp://ftp-sop.inria.fr/wimmics/soft/pprint/";
     public static final String XSD = RDFS.XSD;
     public static final String XSI = "http://www.w3.org/2001/XMLSchema-instance#";
@@ -426,7 +426,7 @@ public class NSManager extends ASTObject {
      * Returns the prefix of the namespace
      */
     public String getPrefix(String ns) {
-        return (String) tns.get(ns);
+        return tns.get(ns);
     }
 
     void defPrefix(String prefix, String ns) {

@@ -39,7 +39,7 @@ public class Context {
     
     
     Context(RepeatedTripleExpression e) {
-        setRepeatedExpr((RepeatedTripleExpression) e);
+        setRepeatedExpr(e);
     }
     
     Context(NodeConstraint... cst) {

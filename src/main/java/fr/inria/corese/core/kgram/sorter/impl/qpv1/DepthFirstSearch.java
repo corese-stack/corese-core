@@ -125,9 +125,7 @@ public class DepthFirstSearch implements ISort {
 
         //1 remvoe visited nodes
         for (QPGNode node : visited) {
-            if (children.contains(node)) {
-                children.remove(node);
-            }
+            children.remove(node);
         }
 
         return children;
@@ -156,9 +154,7 @@ public class DepthFirstSearch implements ISort {
 
         //1 remvoe visited nodes
         for (QPGNode node : visited) {
-            if (children.contains(node)) {
-                children.remove(node);
-            }
+            children.remove(node);
         }
 
         return children;

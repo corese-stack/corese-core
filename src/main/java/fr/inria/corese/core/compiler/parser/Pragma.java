@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Pragma {
 
-    private static Logger logger = LoggerFactory.getLogger(Pragma.class);
+    private static final Logger logger = LoggerFactory.getLogger(Pragma.class);
 
     public static final String KG = ExpType.KGRAM;
     public static final String STL = ExpType.STL;

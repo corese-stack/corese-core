@@ -18,8 +18,8 @@ public class ASTTemplate {
     private static final String FORMAT = Processor.STL_FORMAT;
     private static String FUN_TEMPLATE_AGG = Processor.FUN_AGGREGATE; //Processor.FUN_GROUPCONCAT ;
     private static String FUN_TEMPLATE_CONCAT = Processor.FUN_CONCAT;
-    private static String FUN_TURTLE = Processor.FUN_TURTLE;
-    private static String FUN_FORMAT = Processor.FUN_FORMAT;
+    private static final String FUN_TURTLE = Processor.FUN_TURTLE;
+    private static final String FUN_FORMAT = Processor.FUN_FORMAT;
     private static final String FUN_PROCESS = Processor.FUN_PROCESS;
     private static final String FUN_PROCESS_URI = Processor.FUN_PROCESS_URI;
     private static final String FUN_NL = Processor.FUN_NL;
@@ -28,7 +28,7 @@ public class ASTTemplate {
     private static final String SBOX = "sbox";
     private static final String BOX = "box";
     // functions whose variable are compiled as (coalesce(st:process(?x), "")
-    private static String[] PPRINT_META = {GROUPCONCAT, CONCAT, FUN_TEMPLATE_CONCAT, COALESCE, IF};
+    private static final String[] PPRINT_META = {GROUPCONCAT, CONCAT, FUN_TEMPLATE_CONCAT, COALESCE, IF};
     
     private String groupSeparator = " ";
     private String templateSeparator = System.getProperty("line.separator");

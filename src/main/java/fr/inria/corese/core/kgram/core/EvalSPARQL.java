@@ -15,12 +15,10 @@ public class EvalSPARQL {
     
     Eval eval;
     Query query;
-    private boolean debug = false;
     
     EvalSPARQL(Query q, Eval e){
         eval = e;
         query = q;
-        debug = q.isDebug();
     }
     
     Mappings eval(Node graph,  Producer p, Exp exp){
@@ -29,11 +27,6 @@ public class EvalSPARQL {
     
     Mappings eval(Node graph,  Producer p, Exp exp, Mapping m){
         Mappings map;
-        if (debug){
-            System.out.println("SPARQL: " + exp);
-            System.out.println(m);
-            System.out.println();
-        }
 
         switch (exp.type()){
             
@@ -51,11 +44,6 @@ public class EvalSPARQL {
                 
             default: map = Mappings.create(query);
                                                
-        }
-        
-        if (debug){
-            System.out.println("Result: " + map.size());
-            System.out.println(map);
         }
         
         return map;

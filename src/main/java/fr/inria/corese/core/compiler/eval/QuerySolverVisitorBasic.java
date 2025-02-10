@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class QuerySolverVisitorBasic extends PointerObject implements ProcessVisitor {
 
-    private static Logger logger = LoggerFactory.getLogger(QuerySolverVisitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitor.class);
 
     public static boolean REENTRANT_DEFAULT = false;
 
@@ -245,40 +245,6 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
         return (exp != null);
     }
 
-    void trace(Eval ev, String metadata, IDatatype[] param) {
-        if (isVerbose()) {
-            //mytrace(ev, metadata, param);
-            trace(metadata, param);
-        }
-    }
-
-    void trace(String metadata, IDatatype[] param) {
-        System.out.println(metadata);
-        for (IDatatype dt : param) {
-            if (dt != null) {
-                trace(dt);
-                System.out.println();
-            }
-        }
-    }
-
-    void trace(IDatatype dt) {
-        if (dt.isPointer()) {
-            if (dt.pointerType() == PointerType.GRAPH) {
-                System.out.println(dt);
-            } else {
-                System.out.println(dt.getPointerObject());
-            }
-        } else {
-            System.out.println(dt);
-        }
-    }
-
-    IDatatype mytrace(Eval eval, String metadata, IDatatype[] param) {
-        callbackSimple(eval, TRACE, toArray(metadata));
-        return callbackSimple(eval, TRACE, param);
-    }
-
     /**
      * @before function us:before(?q) call function us:before set Visitor as
      * inactive during function call to prevent loop and also in case where
@@ -292,7 +258,6 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
         if (isRunning() || !isEvent() || !accept(metadata)) {
             return null;
         }
-        trace(ev, metadata, param);
         Function function = getDefineMetadata(getEnvironment(), metadata, param.length);
         if (function != null) {
             // prevent infinite loop in case where there is a query in the function
@@ -312,7 +277,6 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
      * ?b
      */
     public IDatatype callbackBasic(Eval ev, String metadata, IDatatype[] param) {
-        trace(ev, metadata, param);
         return callbackSimple(ev, metadata, param);
     }
     
@@ -347,7 +311,7 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
         if (function != null) {
             // prevent infinite loop in case where there is a query in the function
             setActive(true);
-            IDatatype dt = new ListSort("sort").sort((Computer) ev.getEvaluator(), ev.getEnvironment().getBind(), ev.getEnvironment(),
+            IDatatype dt = new ListSort("sort").sort(ev.getEvaluator(), ev.getEnvironment().getBind(), ev.getEnvironment(),
                     ev.getProducer(), function, param[0]);
             setActive(false);
             return dt;
@@ -388,7 +352,7 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
 
     IDatatype call(Function fun, IDatatype[] param, Evaluator eval, Environment env, Producer p) {
         try {
-            return new Funcall(fun.getFunction().getLabel()).callWE((Computer) eval, env.getBind(), env, p, fun, param);
+            return new Funcall(fun.getFunction().getLabel()).callWE(eval, env.getBind(), env, p, fun, param);
         } catch (EngineException ex) {
             logger.error(ex.getMessage());
             return null;

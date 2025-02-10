@@ -4427,9 +4427,7 @@ private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, lo
       case 0:
          return ((jjbitVec2[i2] & l2) != 0L);
       default :
-         if ((jjbitVec0[i1] & l1) != 0L)
-            return true;
-         return false;
+          return (jjbitVec0[i1] & l1) != 0L;
    }
 }
 private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2)
@@ -4453,9 +4451,7 @@ private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, lo
       case 255:
          return ((jjbitVec10[i2] & l2) != 0L);
       default :
-         if ((jjbitVec3[i1] & l1) != 0L)
-            return true;
-         return false;
+          return (jjbitVec3[i1] & l1) != 0L;
    }
 }
 private static final boolean jjCanMove_2(int hiByte, int i1, int i2, long l1, long l2)
@@ -4479,9 +4475,7 @@ private static final boolean jjCanMove_2(int hiByte, int i1, int i2, long l1, lo
       case 255:
          return ((jjbitVec10[i2] & l2) != 0L);
       default :
-         if ((jjbitVec3[i1] & l1) != 0L)
-            return true;
-         return false;
+          return (jjbitVec3[i1] & l1) != 0L;
    }
 }
 
@@ -4716,7 +4710,7 @@ static final long[] jjtoMore = {
     private final int[] jjrounds = new int[180];
     private final int[] jjstateSet = new int[2 * 180];
     private final StringBuilder jjimage = new StringBuilder();
-    private StringBuilder image = jjimage;
+    private final StringBuilder image = jjimage;
     private int jjimageLen;
     private int lengthOfMatch;
     protected int curChar;

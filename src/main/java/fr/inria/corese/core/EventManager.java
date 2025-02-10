@@ -21,7 +21,7 @@ import org.slf4j.Logger;
  */
 public class EventManager implements EventHandler {
 
-    private static Logger logger = LoggerFactory.getLogger(EventManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
 
     private Graph graph;
     private boolean isEntail = true;

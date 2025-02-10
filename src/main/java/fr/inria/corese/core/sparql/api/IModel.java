@@ -24,14 +24,14 @@ public interface IModel {
      * @param name a parameter.
      * @return the parameter's value.
      */
-	public String getParameter(String name);
+    String getParameter(String name);
 	
 	/**
      * Return the given parameter's values.
      * @param name a parameter.
      * @return the parameter's values.
      */
-	public String[] getParameterValues(String name);
+    String[] getParameterValues(String name);
 
 	
 }

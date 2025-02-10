@@ -13,11 +13,11 @@ import fr.inria.corese.core.sparql.api.Computer;
 */
 public interface Evaluator extends Computer {
 	
-	static final int KGRAM_MODE 	= 0;
-	static final int SPARQL_MODE  	= 1;
+	int KGRAM_MODE 	= 0;
+	int SPARQL_MODE  	= 1;
         
-        public static final int CACHE_MODE = 101;
-        public static final int NO_CACHE_MODE = 102;
+        int CACHE_MODE = 101;
+        int NO_CACHE_MODE = 102;
 	
 	void setMode(int mode);
 	

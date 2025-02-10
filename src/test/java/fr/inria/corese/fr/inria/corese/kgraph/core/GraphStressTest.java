@@ -50,7 +50,7 @@ public class GraphStressTest {
 //		sb.append("allocated memory: " + format.format(allocatedMemory / 1024));
 //		sb.append("max memory: " + format.format(maxMemory / 1024) + "<br/>");
 //		sb.append("total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "<br/>");
-		System.out.println(sb.toString());
+		System.out.println(sb);
 	}
 
 

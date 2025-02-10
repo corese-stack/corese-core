@@ -18,7 +18,7 @@ import org.slf4j.Logger;
  *
  */
 public class LoadProcess extends WorkflowProcess {
-    private static Logger logger = LoggerFactory.getLogger(LoadProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoadProcess.class);
     
     public static final String FILE = "file://";
     String name;
@@ -27,9 +27,9 @@ public class LoadProcess extends WorkflowProcess {
     String text;
     Loader.format format = Loader.format.UNDEF_FORMAT;
     Loader.format requiredFormat = Loader.format.UNDEF_FORMAT;
-    private Loader.format[] FORMATS =  { Loader.format.TURTLE_FORMAT, Loader.format.RDFXML_FORMAT, Loader.format.JSONLD_FORMAT };
+    private final Loader.format[] FORMATS =  { Loader.format.TURTLE_FORMAT, Loader.format.RDFXML_FORMAT, Loader.format.JSONLD_FORMAT };
     private PreProcessor processor;
-    private boolean protectMode = false;
+    private final boolean protectMode = false;
     
     public LoadProcess(String path){
         this.path = path;
@@ -69,9 +69,6 @@ public class LoadProcess extends WorkflowProcess {
     
     @Override
     void start(Data data){
-        if (isDebug()){
-            System.out.println("Load: " + path);
-        }
     }
     
      @Override

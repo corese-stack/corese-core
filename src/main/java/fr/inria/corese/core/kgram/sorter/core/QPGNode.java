@@ -119,7 +119,7 @@ public class QPGNode {
                         return this.isShared(bpn2.exp.getNodeList(), bpn1.exp.getEdge());
                     case BIND:
                         return this.isShared(bpn2.exp.getFilter(), bpn1.exp.getEdge());
-                    default: ;
+                    default:
                 }
                 break;
             case GRAPH:
@@ -139,7 +139,7 @@ public class QPGNode {
                         else {
                             return this.isShared(bpn2.exp.getNode(), bpn1.exp);
                         }
-                    default:;
+                    default:
                 }
             case BIND:
                 switch (type2) {
@@ -154,7 +154,7 @@ public class QPGNode {
                         else {
                             return this.compare(bpn2.exp.getNode(), bpn1.exp.getNode());
                         }
-                    default:;
+                    default:
                 }
             default:
                 break;

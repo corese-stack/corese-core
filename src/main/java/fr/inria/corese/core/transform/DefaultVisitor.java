@@ -42,11 +42,11 @@ public class DefaultVisitor implements TemplateVisitor {
     HashMap <String, Boolean> map;
     HashMap <IDatatype, List<IDatatype>> errors;
     private ArrayList<IDatatype> visitedList;
-    private HashMap<IDatatype, IDatatype> distinct, value;
+    private HashMap<IDatatype, IDatatype> distinct;
+    private final HashMap<IDatatype, IDatatype> value;
     
     private String transform = Transformer.TURTLE;
-    private boolean silent = true;
-    private String NL = System.getProperty("line.separator");
+    private final String NL = System.getProperty("line.separator");
     // boolean value (if any) that means that visitor must consider visited node
     // use case: st:visit(st:exp, ?x, ?suc)
     // if (?suc = acceptValue) node ?x is considered
@@ -99,14 +99,8 @@ public class DefaultVisitor implements TemplateVisitor {
         if (obj.equals(GRAPH)){
             addGraph((Graph) arg.getPointerObject());
         }
-        else if (obj.equals(TRACE)){
-            silent = ! getValue(arg);
-        }
         else if (obj.equals(TRANSFORM)){
             setTransform(arg.getLabel());
-        }
-        else if (obj.equals(SILENT)){
-            silent = getValue(arg);
         }
         else if (obj.equals(ACCEPT)){
             // accept node when boolean value is arg
@@ -126,21 +120,6 @@ public class DefaultVisitor implements TemplateVisitor {
     void process(IDatatype name, IDatatype obj, IDatatype arg) {
        if (accept(name) && accept(arg)){
             store(name, obj);
-            if (! silent){
-                trace(name, obj);
-            }
-        }
-    }
-    
-    void trace(IDatatype name, IDatatype obj) {
-        try {
-            Transformer t = Transformer.create(graph, getTransform());
-            IDatatype dt = t.process(obj);
-            System.out.println(name);
-            System.out.println((dt != null) ? dt.getLabel() : obj);
-            System.out.println();
-        } catch (EngineException ex) {
-            Logger.getLogger(DefaultVisitor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -56,7 +56,6 @@ public class ResultWatcher implements ResultListener, GraphListener {
     private Graph graph;
     Distinct distinct;
     ArrayList<Edge> insertEdgeList;
-    private boolean trace;
     private boolean performSelectNewEdge;
     boolean localSelectNewEdge = false;
     private boolean optimizeRuleDataManager = false;
@@ -268,7 +267,6 @@ public class ResultWatcher implements ResultListener, GraphListener {
             else if (performSelectNewEdge) {
                 performSelectNewEdge = false;
                 if (isOptimizeRuleDataManager()) {
-//                    exp = union(exp);
 //                    RuleEngine.logger.info("Watcher local select new edge: "+exp);
 //                    // local listen take care of it
 //                    localSelectNewEdge = true;
@@ -292,15 +290,12 @@ public class ResultWatcher implements ResultListener, GraphListener {
      */
     @Override
     public boolean listen(Exp exp, Edge queryEdge, Edge targetEdge) {
-        if (selectNewEdge
-                && queryEdge.getEdgeIndex() == queryNewEdgeIndex
-                && targetEdge.getEdgeIndex() < timestamp) {
-            return false;
-        }
+        return !selectNewEdge
+                || queryEdge.getEdgeIndex() != queryNewEdgeIndex
+                || targetEdge.getEdgeIndex() >= timestamp;
 //        else if (localSelectNewEdge && exp.getLevel()!=-1) {
 //            return targetEdge.getEdgeIndex() >= exp.getLevel();
 //        }
-        return true;
     }
     
     @Override
@@ -343,10 +338,6 @@ public class ResultWatcher implements ResultListener, GraphListener {
             a2.add(exp.get(flt));
         }
         Exp ee = Exp.create(Exp.UNION, a1, a2);
-
-        if (trace) {
-            System.out.println("Compile: " + ee);
-        }
 
         return ee;
     }
@@ -417,45 +408,21 @@ public class ResultWatcher implements ResultListener, GraphListener {
     @Override
     public void load(String path) {
     }
-
-    
-//    public boolean isSkipPath() {
-//        return isSkipPath;
-//    }
-//
-//   
-//    public void setSkipPath(boolean isSkipPath) {
-//        this.isSkipPath = isSkipPath;
-//    }
-
     
     public boolean isDistinct() {
         return isDistinct;
     }
-
     
     public void setDistinct(boolean isDistinct) {
         this.isDistinct = isDistinct;
     }
-
    
     public boolean isTest() {
         return test;
     }
-
     
     public void setTest(boolean test) {
         this.test = test;
-    }
-
-   
-    public boolean isTrace() {
-        return trace;
-    }
-
-    
-    public void setTrace(boolean trace) {
-        this.trace = trace;
     }
 
     public boolean isNew() {

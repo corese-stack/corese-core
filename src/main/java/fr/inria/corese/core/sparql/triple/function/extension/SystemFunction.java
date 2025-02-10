@@ -66,7 +66,6 @@ public class SystemFunction extends TermEval {
     }
     
     IDatatype debug(IDatatype dt, Computer eval, Binding b, Environment env, Producer p) {
-        b.setDebug(dt.booleanValue());
         return TRUE;
     }
     

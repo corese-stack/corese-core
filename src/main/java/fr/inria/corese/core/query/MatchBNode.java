@@ -29,9 +29,10 @@ import java.util.logging.Logger;
  */
 public class MatchBNode {
 
-        TreeNode ttrue, tfalse;
-        Graph graph;
-        int count = 0;
+    TreeNode ttrue;
+    TreeNode tfalse;
+    Graph graph;
+    int count = 0;
 
     MatchBNode(Graph g) {
         ttrue  = new TreeNode();
@@ -59,10 +60,6 @@ public class MatchBNode {
         boolean b = match(n1, n2, new TreeNode(), n); 
         count++;
         
-//        if (b){
-//            trace(n1, n2);
-//        }             
-        
         if  (b){
             ttrue.put(dt1, dt2);
             ttrue.put(dt2, dt1);
@@ -85,38 +82,7 @@ public class MatchBNode {
         else {
             return tfalse;
         }
-        
     }
-    
-    void trace(Node n1, Node n2) {
-            try {
-                Transformer t = Transformer.create(graph, Transformer.TURTLE);
-                System.out.println(n1 + " " + t.process(n1).getLabel());
-                System.out.println(n2 + " " + t.process(n2).getLabel());
-//        System.out.println("MBN: " + graph.getList(n1));
-//        System.out.println("MBN: " + graph.getList(n2));
-System.out.println();
-
-
-//        if (b){
-//            List<Entity> l1 = g.getEdgeListSimple(n1);
-//            List<Entity> l2 = g.getEdgeListSimple(n2);
-//            for (Entity e :l1){
-//                System.out.print(e.getEdge().getEdgeNode() + " ");
-//            }
-//            System.out.println();
-//            for (Entity e :l2){
-//                System.out.print(e.getEdge().getEdgeNode() + " ");
-//            }
-//            System.out.println();
-//            System.out.println();        
-//        }
-            } catch (EngineException ex) {
-                Logger.getLogger(MatchBNode.class.getName()).log(Level.SEVERE, null, ex);
-            }
-    }
-    
-    
 
     /**
      * Two different blank nodes match if they have the same edges and their
@@ -221,17 +187,14 @@ System.out.println();
     boolean clean2(List<Edge> l1, List<Edge> l2, int n){
         if (l1.size() == l2.size()) {
             return true;
-        }      
-        if (n == 0 && clean(l1, l2)) {
-                // one of them may have an additional edge: skip it
-                // use case: 
-                // xx a _:b1
-                // _:b2 subClassOf _:b3
-                // _:b1 _:b2 may match if we skip the subClassOf edge
-                // TODO: clean this
-                return true;               
         }
-        return false;
+        // one of them may have an additional edge: skip it
+        // use case:
+        // xx a _:b1
+        // _:b2 subClassOf _:b3
+        // _:b1 _:b2 may match if we skip the subClassOf edge
+        // TODO: clean this
+        return n == 0 && clean(l1, l2);
     }
     
     boolean match(List<Edge> l1, List<Edge> l2) {

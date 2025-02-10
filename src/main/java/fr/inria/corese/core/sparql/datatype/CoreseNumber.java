@@ -296,7 +296,7 @@ public abstract class CoreseNumber extends CoreseDatatype {
                     }
             }
         } catch (java.lang.ArithmeticException a) {
-            logger.error(a.toString() + " " + this + " " + dt);
+            logger.error(a + " " + this + " " + dt);
         }
         return null;
     }

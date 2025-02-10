@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 
 public class Processor {
-	private static Logger logger = LoggerFactory.getLogger(Processor.class); 
+	private static final Logger logger = LoggerFactory.getLogger(Processor.class);
         
         static Class[] noargs = new Class[0];
 
@@ -449,10 +449,10 @@ public class Processor {
 	private boolean isCorrect = true;
         boolean isCompiled = false;
 	public static int count = 0;
-	private static final int IFLAG[] = {
+	private static final int[] IFLAG = {
 		Pattern.DOTALL, Pattern.MULTILINE, Pattern.CASE_INSENSITIVE,
 		Pattern.COMMENTS};
-	static final String SFLAG[] = {"s", "m", "i", "x"};
+	static final String[] SFLAG = {"s", "m", "i", "x"};
         		
 	public static HashMap<String, Integer> table;
 	public static HashMap<Integer, String> tname, toccur;
@@ -1150,16 +1150,6 @@ public class Processor {
         boolean fixed(String name){
             return  fixed.containsKey(name);
         }
-        
-        public static void test(){
-            for (String name : table.keySet()){
-                if (! name.startsWith("http://")){
-                    if (table.containsKey(KGRAM + name)){
-                        System.out.println(name);
-                    }
-                }
-            }
-        }
 	       
 	
 	static int getOper(Term term){
@@ -1200,11 +1190,6 @@ public class Processor {
     }
         	
 	public static void finish(){
-		for (Integer n : table.values()){
-			if (! toccur.containsKey(n)){
-				System.out.println("Missing test: " + tname.get(n));
-			}
-		}
 	}
 	
 		       
@@ -1467,8 +1452,8 @@ public class Processor {
                     return;
                 }
                 String packageName = methodName.substring(0, lio);
-                String classPackage = packageName.substring(functionPrefix.length(), packageName.length());
-                methodName = methodName.substring(packageName.length() + 1, methodName.length());
+                String classPackage = packageName.substring(functionPrefix.length());
+                methodName = methodName.substring(packageName.length() + 1);
 
                 ClassLoader cl = getClass().getClassLoader();
                 Class className = cl.loadClass(classPackage);

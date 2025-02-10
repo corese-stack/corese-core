@@ -33,9 +33,6 @@ public class AssertProcess extends SemanticProcess {
         if (val.getMappings() != null){
             res.setSuccess(val.getMappings().size() > 0);
             res.addData(val);
-            if (isDebug()){
-                System.out.println(val.getMappings());
-            }
         }
         else if (dt == null || ! dt.equals(value)){
             res.setSuccess(false);
@@ -50,23 +47,6 @@ public class AssertProcess extends SemanticProcess {
     
     @Override
     void finish(Data data){
-       if (isVerbose()){
-           message(data);
-       }
-    }
-       
-    void message(Data data){
-        if (data.isSuccess()){
-            System.out.println(getName() + " ok");
-        }
-        else {
-           if (data.getDataList() != null){
-               System.out.println(getName() + " fail");
-           }
-           else {
-                System.out.println(getName() + " fail: find " + data.getDatatypeValue() + " instead of: " + value);
-           }
-       }
     }
     
     @Override

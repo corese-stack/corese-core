@@ -19,16 +19,15 @@ import org.slf4j.Logger;
  *
  */
 public class Workflow implements Engine {
-    private static Logger logger = LoggerFactory.getLogger(Workflow.class);
+    private static final Logger logger = LoggerFactory.getLogger(Workflow.class);
 
     Graph graph;
     ArrayList<Engine> engines;
     // RDFS entailment
     private Entailment inference;
-    boolean isDebug = false,
-            isIdle = true,
-            isActivate = true,
-            isClearEntailment = false;
+    boolean isIdle = true;
+    boolean isActivate = true;
+    boolean isClearEntailment = false;
 
     Workflow(Graph g) {
         engines = new ArrayList<Engine>();
@@ -48,10 +47,6 @@ public class Workflow implements Engine {
 
     public void removeEngine(Engine e) {
         engines.remove(e);
-    }
-
-    public void setDebug(boolean b) {
-        isDebug = b;
     }
 
     public void setClearEntailment(boolean b) {
@@ -133,10 +128,6 @@ public class Workflow implements Engine {
 
         while (count > 1) {
             count = 0;
-
-            if (isDebug) {
-                System.out.println("** W run: " + e.getClass().getName());
-            }
 
             if (e.isActivate()) {
                 boolean b = e.process();

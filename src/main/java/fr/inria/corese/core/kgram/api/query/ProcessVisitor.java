@@ -22,10 +22,6 @@ public interface ProcessVisitor extends Pointerable {
 
     int SLICE_DEFAULT = 20;
     
-    default void trace(String name) {
-        System.out.println("Visitor event " + name);
-    }
-    
     default void setActive(boolean b) {}
     
     default boolean isActive() {return true;}
@@ -163,8 +159,8 @@ public interface ProcessVisitor extends Pointerable {
     
     default int compare(Eval eval, int res, IDatatype dt1, IDatatype dt2) { return res ;}
     
-    default IDatatype datatype(IDatatype type, IDatatype sup) { return type ;};
-    
+    default IDatatype datatype(IDatatype type, IDatatype sup) { return type ;}
+
     default IDatatype insert(IDatatype path, Edge edge) { return defaultValue();}
     
     default IDatatype delete(Edge edge) { return defaultValue();}

@@ -19,7 +19,7 @@ import java.util.List;
 public class DataStore {
 
     Graph graph;
-    private ArrayList<Node> defaultGraphList;
+    private final ArrayList<Node> defaultGraphList;
 
     DataStore(Graph g) {
         graph = g;

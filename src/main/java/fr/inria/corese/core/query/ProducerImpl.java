@@ -55,7 +55,7 @@ import fr.inria.corese.core.sparql.triple.parser.AccessRight;
  */
 public class ProducerImpl
         implements Producer, IProducerQP {
-    private static Logger logger = LoggerFactory.getLogger(ProducerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProducerImpl.class);
 
     public static final int OWL_RL = 1;
     static final int IGRAPH = Graph.IGRAPH;
@@ -460,13 +460,6 @@ public class ProducerImpl
         return list;
     }
 
-    void trace(Iterable<Edge> it) {
-        System.out.println("trace iterator:");
-        for (Edge e : it) {
-            System.out.println(e);
-        }
-    }
-
     /**
      * 
      * @param queryGraphNode:  named graph or null (query node)
@@ -829,16 +822,6 @@ public class ProducerImpl
                 }
             }
         }
-
-        System.out.print("bindings ");
-        for (String var : lVar) {
-            System.out.print(var + " ");
-        }
-        System.out.println("{(");
-        for (Node node : lNode) {
-            System.out.print(node + " ");
-        }
-        System.out.println(")}");
 
     }
 

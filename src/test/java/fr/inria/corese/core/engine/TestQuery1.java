@@ -2902,7 +2902,7 @@ public class TestQuery1 {
         IDatatype dt = map.getValue("?t");
         int i = 0;
         for (IDatatype val : dt.getValueList()) {
-            assertEquals((i++ == 1) ? true : false, val.booleanValue());
+            assertEquals(i++ == 1, val.booleanValue());
         }
     }
 
@@ -2930,7 +2930,7 @@ public class TestQuery1 {
         IDatatype dt = map.getValue("?t");
         int i = 0;
         for (IDatatype val : dt.getValueList()) {
-            assertEquals((i++ == 1) ? true : false, val.booleanValue());
+            assertEquals(i++ == 1, val.booleanValue());
         }
     }
 
@@ -3834,7 +3834,7 @@ public class TestQuery1 {
 
         Mappings map = exec.query(q);
         assertEquals("10", map.getTemplateStringResult());
-        Context c = (Context) map.getContext();
+        Context c = map.getContext();
         IDatatype val = c.getName("test");
         assertEquals(10, val.intValue());
         assertEquals(true, map.getQuery().getTransformer() == null);
@@ -3856,7 +3856,7 @@ public class TestQuery1 {
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?tt");
         assertEquals(10, dt.intValue());
-        Context c = (Context) map.getContext();
+        Context c = map.getContext();
         IDatatype val = c.getName("test");
         assertEquals(10, val.intValue());
     }

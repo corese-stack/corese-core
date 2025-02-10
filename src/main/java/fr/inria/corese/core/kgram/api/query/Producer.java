@@ -23,10 +23,10 @@ import java.util.ArrayList;
  */
 public interface Producer {
 
-    public static final int DEFAULT = 0;
-    public static final int SKIP_DUPLICATE_TEST = 1;
+    int DEFAULT = 0;
+    int SKIP_DUPLICATE_TEST = 1;
     // Producer delivers from Path of from Provenance Graph
-    public static final int EXTENSION = 2;
+    int EXTENSION = 2;
 
     /**
      * KGRAM calls this method before executing a query. It enables to
@@ -36,22 +36,18 @@ public interface Producer {
     default void init(Query q) {
     }
 
-    ;
-	default void start(Query q) {
+    default void start(Query q) {
     }
 
-    ;
-	default void finish(Query q) {
+    default void finish(Query q) {
     }
 
-    ;
-	
-	/**
+    /**
 	 * A hook to tune Producer
 	 */
     void setMode(int n);
 
-    public int getMode();
+    int getMode();
 
     /**
      * Return all graph nodes that are known by the Producer. Should return

@@ -32,7 +32,6 @@ import java.util.ArrayList;
  */
 public class Memory extends PointerObject implements Environment {
 
-    public static boolean DEBUG_DEFAULT = false;
     public static boolean IS_EDGE = !true;
     static final Edge[] emptyEdges = new Edge[0];
     static final Edge[] emptyEntities = new Edge[0];
@@ -68,10 +67,10 @@ public class Memory extends PointerObject implements Environment {
             isEdge = IS_EDGE;
     EventManager manager;
     boolean hasEvent = false;
-    int nbEdge = 0, nbNode = 0;
+    int nbEdge = 0;
+    int nbNode = 0;
     private Binding bind;
     private ApproximateSearchEnv appxSearchEnv;
-    boolean debug = DEBUG_DEFAULT;
 
     public Memory() {}
     
@@ -614,12 +613,6 @@ public class Memory extends PointerObject implements Environment {
         return push(null, q, ent, n);
     }
     
-    void trace(String mes, Object... obj){
-        if (getQuery().isDebug()) {
-            System.out.println(String.format(mes, obj));
-        }
-    }
-    
     boolean push(Producer p, Edge q, Edge ent, int n) {
         boolean success = true;
         int max = q.nbNode();
@@ -631,7 +624,6 @@ public class Memory extends PointerObject implements Environment {
                     success = pushNodeList(p, node, ent, i);
                 } else {
                     success = push(node, ent.getNode(i), n);
-                    if (!success) trace("push: %s=%s success: %s", node, ent.getNode(i), success);
                 }
 
                 if (!success) {
@@ -892,7 +884,6 @@ public class Memory extends PointerObject implements Environment {
                         pop(res.getQueryEdge(i), res.getEdge(i));
                     }
                     // TODO: pop the nodes
-                    System.out.println("**** MEMORY: push mapping fail on edges");
                     return false;
                 }
                 k++;
@@ -1100,30 +1091,17 @@ public class Memory extends PointerObject implements Environment {
                 return get(var);
 
             case ExprType.UNDEF:
-                if (debug) {
-                    System.out.println("Memory UNDEF: Unbound variable: " + var);
-                }
                 return null;
             // sparql bgp
             case ExprType.GLOBAL:
                 index = getIndex(var.getLabel());
                 var.setIndex(index);
                 if (index == ExprType.UNBOUND) {
-                    if (debug) {
-                        System.out.println("Memory GLOBAL: Unbound variable: " + var);
-                    }
                     return null;
                 }
 
         }
         Node node = getNode(index);
-        if (node == null && debug) {
-            System.out.println("Memory DEFAULT: Unbound variable: " + var);
-            if (var.getLabel().equals("?value")) {
-                System.out.println(query.getAST());
-                System.out.println(this);
-            }
-        }
         return node;
     }
 
@@ -1145,12 +1123,6 @@ public class Memory extends PointerObject implements Environment {
     public int sum(Node qNode) {
         return -1;
     }
-
-    // sum(?x)
-//    @Override
-//    public void aggregate(Evaluator eval, Producer p, Filter f) {
-//        current().aggregate(eval, f, this, p);
-//    }
 
     public Node max(Node qNode) {
         return current().max(qNode);

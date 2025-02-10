@@ -19,8 +19,8 @@ import java.util.List;
  */
 public class QuerySorter implements ExpType {
 
-    private boolean isSort = true;
-    private boolean testJoin = false;
+    private final boolean isSort = true;
+    private final boolean testJoin = false;
 
     private Sorter sort;
     private Query query;
@@ -274,7 +274,7 @@ public class QuerySorter implements ExpType {
 
                 for (Exp g : exp) {
                     if (((g.isEdge() || g.isPath()) && g.getEdge().contains(n))
-                            && (bid.isBindCst() ? g.bind(bid.first().getNode()) : true)) {
+                            && (!bid.isBindCst() || g.bind(bid.first().getNode()))) {
                         if (g.getBind() == null) {
                             bid.status(true);
                             g.setBind(bid);
@@ -302,9 +302,6 @@ public class QuerySorter implements ExpType {
     void compile(Expr exp, VString lVar, boolean opt) {
         if (exp.oper() == ExprType.EXIST) {
             compile(getQuery().getPattern(exp), lVar, opt);
-            if (getQuery().isValidate()) {
-                System.out.println("QuerySorter exists: \n" + getQuery().getPattern(exp));
-            }
         } else {
             for (Expr ee : exp.getExpList()) {
                 compile(ee, lVar, opt);

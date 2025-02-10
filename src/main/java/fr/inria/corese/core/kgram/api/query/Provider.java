@@ -32,10 +32,10 @@ public interface Provider {
         
 	default Mappings service(Node serv, Exp exp, Mappings map, Eval eval) 
             throws SparqlException { 
-            return null; };
+            return null; }
 
-	void set(String uri, double version);
+    void set(String uri, double version);
 
-        public boolean isSparql0(Node serv);
+        boolean isSparql0(Node serv);
 
 }   

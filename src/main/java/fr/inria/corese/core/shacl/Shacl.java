@@ -26,7 +26,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  */
 public class Shacl {
 
-    private static Logger logger = LoggerFactory.getLogger(Shacl.class);
+    private static final Logger logger = LoggerFactory.getLogger(Shacl.class);
     static final String SH = NSManager.SHACL;
     private static final String NBRESULT = NSManager.SHACL + "result";
     private static final String TRACE_VAR = "?shaclTrace";

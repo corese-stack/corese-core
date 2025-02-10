@@ -92,9 +92,7 @@ public class MappingSet {
     MappingSet start() {
         varList = computeVarList();
         isBound = isBound(varList);
-        if (isDebug()) {
-            System.out.println(this);
-        }
+
         if (isBound) {
             set2.getMappings().sort(varList);
         }

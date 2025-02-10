@@ -17,19 +17,19 @@ public interface Matcher {
 	 * Match mode
 	 */
 	// equality of types
-	public static final int UNDEF = -1;
+    int UNDEF = -1;
 	
-	public static final int STRICT = 0;
+	int STRICT = 0;
 	// exploit type inference (subsumption)
-	public static final int SUBSUME = 1;
+    int SUBSUME = 1;
 	// type inference and accept generalization of types 
-	public static final int GENERAL = 2;
+    int GENERAL = 2;
 	// subsume + generalize
-	public static final int MIX = 3;
+    int MIX = 3;
 	// accept any types
-	public static final int RELAX = 4;
+    int RELAX = 4;
 	// exploit rules 
-	public static final int INFERENCE = 5;
+    int INFERENCE = 5;
 
 
 	/**

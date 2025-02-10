@@ -21,13 +21,10 @@ import org.slf4j.LoggerFactory;
  * @author Olivier Corby, Wimmics INRIA I3S, 2014
  */
 public class RDFizer {
-    private static Logger logger = LoggerFactory.getLogger(RDFizer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RDFizer.class);
 
     public boolean isGraphAble(Object obj) {
-        if (obj instanceof Graphable) {
-            return true;
-        }
-        return false;
+        return obj instanceof Graphable;
     }
 
     public Graph getGraph(Object obj) {

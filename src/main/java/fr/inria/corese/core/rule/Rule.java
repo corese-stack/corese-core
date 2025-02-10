@@ -75,12 +75,6 @@ public class Rule {
             setRuleType(type);
             setConstraint(type.equals(CONSTRAINT_TYPE));
         }
-//        if (n!=null){
-//            //@todo : clean with slot mode = basic
-//            if (n.equals(AXIOM)){
-//                setOptimize(false);
-//            }
-//        }
     }
 
     public static Rule create(String n, Query q) {
@@ -190,7 +184,6 @@ public class Rule {
             return res;
 
         } catch (EngineException ex) {
-            System.out.println("R: error:  " + getAST());
             return DEFAULT;
         }
 

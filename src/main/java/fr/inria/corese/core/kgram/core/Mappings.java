@@ -41,23 +41,23 @@ import org.slf4j.LoggerFactory;
  */
 public class Mappings extends PointerObject
         implements Comparator<Mapping>, Iterable<Mapping> {
-    private static Logger logger = LoggerFactory.getLogger(Mappings.class);
+    private static final Logger logger = LoggerFactory.getLogger(Mappings.class);
 
     private static final String NL = System.getProperty("line.separator");
     private static final String AGGREGATE_LOCAL = "@local";
     private static final long serialVersionUID = 1L;
-    private static int SELECT = -1;
-    private static int HAVING = -2;
+    private static final int SELECT = -1;
+    private static final int HAVING = -2;
     // SPARQL: -1 (unbound first)
     // Corese order: 1 (unbound last)
     public static int unbound = -1;
     List<Node> select;
-    boolean isDistinct = false,
-            // statisfy having(test)
-            isValid = true,
-            hasEvent = false,
-            // if true, store all Mapping of the group
-            isListGroup = false;
+    boolean isDistinct = false;
+    // statisfy having(test)
+    boolean isValid = true;
+    boolean hasEvent = false;
+    // if true, store all Mapping of the group
+    boolean isListGroup = false;
     boolean sortWithDesc = true;
     private Query query;
     private List<Mapping> list;
@@ -89,7 +89,6 @@ public class Mappings extends PointerObject
     private boolean isFake = false;
     // parse error in service result
     private boolean error = false;
-    //private Node result;
     // return Binding stack as part of result to share it
     private Binding binding;
     // Federate Service manage provenance
@@ -379,7 +378,7 @@ public class Mappings extends PointerObject
                     && obj != this
                     && obj instanceof PointerObject) {
                 sb.append(" : \n");
-                sb.append(obj.toString());
+                sb.append(obj);
             }
             sb.append("; ");
         }
@@ -548,7 +547,7 @@ public class Mappings extends PointerObject
     }
 
     boolean accept(Node node) {
-        return (getDistinct() == null) ? true : getDistinct().accept(node);
+        return getDistinct() == null || getDistinct().accept(node);
     }
 
     // TODO: check select == null
@@ -654,9 +653,6 @@ public class Mappings extends PointerObject
      * Compute order by array again and set it in every Mapping
      */
     void setOrderBy(Eval eval, Query q) {
-        if (q.isDebug()) {
-            System.out.println("Order By: " + this.toString(true));
-        }
         for (Mapping m : this) {
             int i = 0;
                         
@@ -669,17 +665,9 @@ public class Mappings extends PointerObject
                         // @todo: complete Mapping m with Binding, etc.
                         m.setBind(eval.getEnvironment().getBind());
                         node = eval.eval(null, exp.getFilter(), m, eval.getProducer());
-                        if (q.isDebug()) {
-                            System.out.println("Order By eval: " + exp);
-                            System.out.println(m);
-                        }
                     } catch (SparqlException ex) {
                         Eval.logger.error("Order By error: " + ex);
                     }
-                }
-                if (q.isDebug()) {
-                    System.out.println("Order By Result: " + exp + " " + node);
-                    System.out.println("__");
                 }
                 // order by array was reset by prepareModify()
                 m.getOrderBy()[i++] = node;

@@ -42,7 +42,7 @@ public class SPARQLProcess extends  WorkflowProcess {
         this.level = level;
     }
 
-    private static Logger logger = LoggerFactory.getLogger(SPARQLProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(SPARQLProcess.class);
     static final String NL = System.getProperty("line.separator");
     static final NSManager nsm = NSManager.create();
     private static final String PARAM    = "$param";
@@ -76,10 +76,6 @@ public class SPARQLProcess extends  WorkflowProcess {
     
     @Override
     void start(Data data){
-        if (isRecDebug() || isRecDisplay()){
-            System.out.println(getWorkflow().getPath());
-            System.out.println("Query: " + getQuery());
-        }
         data.getEventManager().start(Event.WorkflowQuery);
         if (getContext() != null) {
             getContext().setUserQuery(isUserQuery());
@@ -98,13 +94,6 @@ public class SPARQLProcess extends  WorkflowProcess {
      @Override
     void finish(Data data) {
         collect(data);
-        if (isRecDebug() || isRecDisplay()) {
-            if (isGraphResult()) {
-                System.out.println(data.getGraph());
-            } else {
-                System.out.println(data.getMappings());
-            }
-        }
         data.getEventManager().finish(Event.WorkflowQuery);
         if (getContext() != null) {
             getContext().setUserQuery(false);
@@ -132,10 +121,6 @@ public class SPARQLProcess extends  WorkflowProcess {
             g = GraphStore.create();
         }
         QueryProcess exec = QueryProcess.create(g, data.getDataManager());
-//        if (getWorkflow().getGraph() != null){
-//            // draft: additional graph considered as contextual dataset
-//            exec.add(getWorkflow().getGraph());
-//        }
         if (getPath() != null){
             exec.setDefaultBase(getPath());
         }
@@ -261,7 +246,6 @@ public class SPARQLProcess extends  WorkflowProcess {
     
     void log1(Graph g, Context c){
         if (isLog() || pgetWorkflow().isLog()){
-            //logger.info(NL + getQuery());
             if (c != null){ 
                 String str = c.trace();
                 if (str.length() > 0){
@@ -281,10 +265,6 @@ public class SPARQLProcess extends  WorkflowProcess {
     }
     
     void complete(Data data) {
-//        TemplateVisitor vis = (TemplateVisitor) data.getMappings().getQuery().getTemplateVisitor();
-//        if (vis != null){
-//            data.setVisitor(vis);
-//        }
         Node temp = data.getMappings().getTemplateResult();
         if (temp != null){
             data.setDatatypeValue( temp.getValue());
@@ -320,7 +300,7 @@ public class SPARQLProcess extends  WorkflowProcess {
      
     
     Graph getGraph(Mappings map, Data data) {
-        ASTQuery ast = (ASTQuery) map.getAST();
+        ASTQuery ast = map.getAST();
         if (isAProbe() || ast.hasMetadata(Metadata.Type.TYPE, Metadata.PROBE)){
             // probe is a query that does not impact the workflow (except Update)
             // @type kg:probe : return input graph as is

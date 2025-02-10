@@ -29,8 +29,8 @@ public class Agent  {
     static final String ENTAILMENT = NS+"entailment";
     static final String TEST = NS+"test";
     
-    private static Agent singleton;
-    private static IDatatype dt;
+    private static final Agent singleton;
+    private static final IDatatype dt;
     private String name;
     private Graph graph;
     
@@ -96,7 +96,6 @@ public class Agent  {
    
    
    IDatatype test() {
-       System.out.println("test");
        return DatatypeMap.TRUE;
    }
     

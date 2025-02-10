@@ -22,7 +22,7 @@ import org.slf4j.Logger;
  */
 public class EventLogger {
 
-    private static Logger logger = LoggerFactory.getLogger(EventLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventLogger.class);
     public static boolean DEFAULT_METHOD = false;
     static final String INSERT_FUN = NSManager.USER + "insert";
     static final String DELETE_FUN = NSManager.USER + "delete";

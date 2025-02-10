@@ -12,11 +12,9 @@ import static fr.inria.corese.core.kgram.core.Eval.DISPLAY_RESULT_MAX;
  */
 public class EvalJoin {
     public static boolean SORT_OVERLOAD = true;
-    public static boolean DEBUG_JOIN = false;
 
     Eval eval;
     boolean stop = false;
-    boolean debug = DEBUG_JOIN;
     
     EvalJoin(Eval eval) {
         this.eval = eval;
@@ -35,11 +33,6 @@ public class EvalJoin {
      * cartesian product
      */
     int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
-        if (debug) {
-            if (data!=null) {
-                System.out.println("join 1st with data:\n" + data);
-            }
-        }
         int backtrack = n - 1;
         Memory env = eval.getMemory();
         Mappings map1 = eval.subEval(p, graphNode, graphNode, exp.first(), exp, data);
@@ -67,9 +60,6 @@ public class EvalJoin {
         Mappings joinMappings = null;
         if (eval.isJoinMappings()) {
             joinMappings = set1.prepareMappingsRest(exp.rest());
-            if (debug) {
-                System.out.println("join 2nd with data:\n" + joinMappings);
-            }
         }
         Mappings map2 = eval.subEval(p, graphNode, graphNode, exp.rest(), exp, joinMappings);
 
@@ -77,12 +67,6 @@ public class EvalJoin {
 
         if (map2.size() == 0) {
             return backtrack;
-        }
-        if (eval.isDebug()) {
-            System.out.println("join map1:\n" + 
-                    map1.toString(false, false, DISPLAY_RESULT_MAX));
-            System.out.println("join map2:\n" + 
-                    map2.toString(false, false, DISPLAY_RESULT_MAX));
         }
         
         return join(p, graphNode, stack, env, map1, map2, n);
@@ -116,11 +100,6 @@ public class EvalJoin {
             map1 = map2;
             map2 = tmp;
         }
-        if (debug) {
-            System.out.println("join:");
-            System.out.println(map1);
-            System.out.println(map2);
-        }        
         if (SORT_OVERLOAD) {
             // setEval enable node comparison overload by Visitor compare() for extended datatypes
             map2.setEval(eval);
@@ -142,9 +121,6 @@ public class EvalJoin {
                             return STOP;
                         }
                         if (env.push(m2, n)) {
-                            if (debug) {
-                                System.out.println("join 1:\n" + m1 + "\n" + m2);
-                            }
                             backtrack = eval.eval(p, graphNode, stack, n + 1);
                             env.pop(m2);
                             if (backtrack < n) {
@@ -184,9 +160,6 @@ public class EvalJoin {
                                 // map2 is sorted, if n1 != n2 we can exit the loop
                                 break;
                             } else if (env.push(m2, n)) {
-                                if (debug) {
-                                    System.out.println("join 2:\n" + m1 + "\n" + m2);
-                                }
                                 backtrack = eval.eval(p, graphNode, stack, n + 1);
                                 env.pop(m2);
                                 if (backtrack < n) {
@@ -239,43 +212,6 @@ public class EvalJoin {
         Exp fst = exp.first();
         return fst.isBGPAnd() && fst.size() == 1 && fst.get(0).isValues() ;
     }
-    
-    //    int eval2(Producer p, Node gNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
-//        int backtrack = n - 1;
-//        Memory env = eval.getMemory();
-//        Mappings map1 = eval.subEval(p, gNode, gNode, exp.first(), exp, data);
-//        if (map1.size() == 0) {
-//            eval.getVisitor().join(eval, eval.getGraphNode(gNode), exp, map1, map1);
-//            return backtrack;
-//        }
-//        Date d1 = new Date();
-//        Mappings map1Extended = map1; 
-//        if (data != null && isFirstWithValuesOnly(exp)) {
-//            // use case: join(values ?s { <uri> }, service ?s { })
-//            // where values specify endpoint URL for service and 
-//            // previous data contains relevant bindings for service in rest
-//            // let's give a chance to pass relevant data to rest (service)
-//            // although there is values in between
-//            map1Extended = map1.join(data);
-//        }
-//
-//        Date d2 = new Date();
-//        if (stop) {
-//            return STOP;
-//        }
-//        
-//        MappingSet set1 = new MappingSet(getQuery(), map1Extended);
-//        Exp rest = set1.prepareRest(exp);
-//        Mappings map2 = eval.subEval(p, gNode, gNode, rest, exp, set1.getJoinMappings());
-//
-//        eval.getVisitor().join(eval, eval.getGraphNode(gNode), exp, map1, map2);
-//
-//        if (map2.size() == 0) {
-//            return backtrack;
-//        }
-//       
-//        return join(p, gNode, stack, env, map1, map2, n);
-//    }
     
     @Deprecated
     private int join(Producer p, Node graphNode, Exp exp, Mappings map1, Mappings map2, Stack stack, int n) throws SparqlException {
@@ -360,13 +296,8 @@ public class EvalJoin {
                     }
                 }
             }
-        } 
-//        else {
-//            backtrack = joinWithCommonVariable(p, graphNode, stack, env, map1, map2, n);
-//        }
+        }
         return backtrack;
     }
-    
 
-    
 }

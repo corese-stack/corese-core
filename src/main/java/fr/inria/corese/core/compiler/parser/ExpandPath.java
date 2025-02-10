@@ -39,7 +39,7 @@ import fr.inria.corese.core.kgram.core.Query;
  */
 public class ExpandPath implements QueryVisitor {
 	
-	private static Logger log = LoggerFactory.getLogger(ExpandPath.class);
+	private static final Logger log = LoggerFactory.getLogger(ExpandPath.class);
 	
 	private static final String ROOT = "?_VAR_";
 	private static final String NEQ = Term.SNEQ;

@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class ShapeWorkflow extends SemanticWorkflow {
-    private static Logger logger = LoggerFactory.getLogger(ShapeWorkflow.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShapeWorkflow.class);
     public static final String SHAPE_NAME           = NSManager.STL + "shape";
     public static final String SHAPE_TRANS_TEST     = "/user/corby/home/AAData/sttl/datashape/main";
     public static final String SHAPE_TRANS_TEST_LDS = "/user/corby/home/AAData/sttl/datashape/main";
@@ -257,11 +257,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
                 && ! isValidate()) {
             validator = new ShapeWorkflow(ShapeWorkflow.class.getResource(SHAPE_SHAPE).toString(), shape);
             validator.setValidate(true);
-            Data res = validator.process();
-            System.out.println("Validate: " + getShape());
-            if (res.getVisitedGraph().size() > 0) {
-                System.out.println("Result: \n" + res);
-            }
         }
     }
     
@@ -289,7 +284,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
         }
         else {
             try {
-                //res = data.getTemplateResult();
                 Transformer t = Transformer.create(data.getVisitedGraph(), resultFormat);
                 res = t.transform();
             } catch (EngineException ex) {

@@ -22,7 +22,7 @@ public class PointerObject implements Pointerable {
     
     @Override
     public String getDatatypeLabel() {
-        return String.format("[%s:%s]", object.getClass().getName(), object.toString());
+        return String.format("[%s:%s]", object.getClass().getName(), object);
     }
     
     @Override

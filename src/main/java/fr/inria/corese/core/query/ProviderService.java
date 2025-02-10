@@ -284,20 +284,6 @@ public class ProviderService implements URLParam {
         return res;
     }
 
-    void trace(Mappings map) {
-        if (map.getSelect() != null) {
-            for (Node node : map.getSelect()) {
-                System.out.println("service select: " + node + " " + node.getIndex());
-            }
-        }
-        for (Mapping m : map) {
-            for (Node node : m.getQueryNodeList()) {
-                System.out.println("service ql: " + node + " " + node.getIndex());
-            }
-        }
-        System.out.println(map);
-    }
-
     /**
      * Execute service in a parallel thread
      */

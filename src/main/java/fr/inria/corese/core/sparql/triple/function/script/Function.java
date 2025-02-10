@@ -36,16 +36,14 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class Function extends Statement {
-    private static Logger logger = LoggerFactory.getLogger(Function.class);
+    private static final Logger logger = LoggerFactory.getLogger(Function.class);
 
     static final IDatatype RDF_TYPE = DatatypeMap.newResource(RDF.RDF+"type");
     public static boolean typecheck = false;
     public static boolean nullcheck = false;
     public static boolean rdftypecheck = false;  
-    
-    private boolean isDebug = false;
+
     private boolean isTest = false;
-    private boolean isTrace = false;
     private boolean isPublic = false;
     private boolean lambda = false;
     private boolean visited = false;
@@ -140,9 +138,6 @@ public class Function extends Statement {
     @Override
     public Expression compile(ASTQuery ast) throws EngineException {
         Expression exp = super.compile(ast);
-        if (isTrace()) {
-            System.out.println(this);
-        }
         return exp;
     }
 
@@ -259,15 +254,6 @@ public class Function extends Statement {
 
     void annotate(Metadata m, String a) {
         switch (m.type(a)) {
-
-            case DEBUG:
-                setDebug(true);
-                break;
-
-            case TRACE:
-                setTrace(true);
-                break;
-
             case TEST:
                 setTester(true);
                 break;
@@ -276,21 +262,6 @@ public class Function extends Statement {
                 setPublic(true);
                 break;
         }
-    }
-
-    /**
-     * @return the isDebug
-     */
-    @Override
-    public boolean isDebug() {
-        return isDebug;
-    }
-
-    /**
-     * @param isDebug the isDebug to set
-     */
-    public void setDebug(boolean isDebug) {
-        this.isDebug = isDebug;
     }
 
     /**
@@ -306,21 +277,6 @@ public class Function extends Statement {
      */
     public void setTester(boolean isTest) {
         this.isTest = isTest;
-    }
-
-    /**
-     * @return the isTrace
-     */
-    @Override
-    public boolean isTrace() {
-        return isTrace;
-    }
-
-    /**
-     * @param isTrace the isTrace to set
-     */
-    public void setTrace(boolean isTrace) {
-        this.isTrace = isTrace;
     }
 
     /**
@@ -466,13 +422,7 @@ public class Function extends Statement {
 
     boolean result(Computer eval, Binding b, Environment env, Producer p, IDatatype[] param, IDatatype dt) {
         if (dt == null) {
-            if (nullcheck) {
-                System.out.print("Null result: " + getSignature() + " ");
-                for (IDatatype val : param) {
-                    System.out.print(val + " ");
-                }
-                System.out.println();
-            }
+            return true;
         } else if (getReturnDatatype() != null) {
             boolean bb = check(eval, b, env, p, dt, getReturnDatatype());
             if (!bb) {
@@ -509,9 +459,7 @@ public class Function extends Statement {
             if (rdftypecheck) {
                 // test xt:exists(value, rdf:type, type)
                 boolean bb = exists(env, p, value, RDF_TYPE, type);
-                if (!bb) {
-                    return false;
-                }
+                return bb;
             }
         }
         return true;

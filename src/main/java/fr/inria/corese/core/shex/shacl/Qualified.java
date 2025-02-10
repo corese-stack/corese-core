@@ -25,10 +25,6 @@ public class Qualified extends HashMap<String, List<TripleExpr>> {
     Qualified() {
     }
     
-    void traceClass(Object obj) {
-        System.out.println(obj.getClass().getName());
-    }
-    
     // test ex:p and ^ex:p 
     void create(AbstractNaryShapeExpr exp, Context ct) {
         create(exp, ct, true);

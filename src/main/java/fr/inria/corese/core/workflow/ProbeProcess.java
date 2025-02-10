@@ -20,9 +20,6 @@ public class ProbeProcess extends SemanticProcess {
     
     @Override
     void start(Data data){
-//        if (getModeString() != null && getModeString().equals(WorkflowParser.VISITOR)){
-//            data.setVisitor(new DefaultVisitor());
-//        }
     }
     
     @Override
@@ -30,11 +27,9 @@ public class ProbeProcess extends SemanticProcess {
     }
     
     @Override
-    public Data run(Data data) throws EngineException {   
-        logger.info("Probe workflow");
+    public Data run(Data data) throws EngineException {
         for (WorkflowProcess wp : getProcessList()){
-            System.out.println(wp);
-            Data res = wp.compute(data);
+            wp.compute(data);
         }
         return data;
     }

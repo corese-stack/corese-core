@@ -32,12 +32,6 @@ public class OWLRule {
 	Graph  graph;
 	RuleEngine re;
 	
-	boolean debug = true;
-	
-	
-	
-	
-	
 	OWLRule(Graph g){
 		graph = g;
 		re = RuleEngine.create(graph);
@@ -63,19 +57,13 @@ public class OWLRule {
 	 * 
 	 */
 	public void process(String src) throws EngineException, LoadException{
-				
 		Load ld = Load.create(graph);
 		ld.setEngine(re);
 		ld.parse(src);		
 		QueryEngine qe = ld.getQueryEngine();
-		
-		for (Rule r : re.getRules()){
-			trace (r.getQuery().getAST());
-		}
 				
 		if (qe != null){
 			for (Query query : qe.getQueries()){
-				trace(query);
 				process(query);
 			}
 		}
@@ -105,17 +93,7 @@ public class OWLRule {
 				String srule = nrule.getLabel();
 				srule = ns.toString() + srule;
 				re.defRule(srule);
-				trace(srule);
 			}
-		}
-	}
-	
-	
-
-	void trace(Object o){
-		if (debug){
-			System.out.println(o);
-			System.out.println();
 		}
 	}
 

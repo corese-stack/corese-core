@@ -36,7 +36,7 @@ import org.w3c.dom.Document;
 
 public class XPathFun {
 
-    private static Logger logger = LoggerFactory.getLogger(XPathFun.class);
+    private static final Logger logger = LoggerFactory.getLogger(XPathFun.class);
 
     NSManager nsm;
     NamespaceContext context;
@@ -89,7 +89,7 @@ public class XPathFun {
     void setNSM(final NSManager nsm) {
         if (xpath != null) {
             context = new NamespaceContext() {
-                NSManager nm = nsm;
+                final NSManager nm = nsm;
 
                 public String getNamespaceURI(String prefix) {
                     return nm.getNamespace(prefix);

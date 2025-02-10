@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @author Olivier Corby - Wimmics Inria I3S - 2015
  */
 public interface Pointerable extends Loopable {
-    static final ArrayList empty = new ArrayList(0);
+    ArrayList empty = new ArrayList(0);
           
     default PointerType pointerType() {
         return PointerType.UNDEF;

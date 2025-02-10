@@ -11,7 +11,9 @@ import java.util.HashMap;
  */
 public class Record  {
 
-    private int timestamp, loop, size;
+    private int timestamp;
+    private final int loop;
+    private int size;
     private Node predicate;
     private Rule rule;
     private int count = 0;
@@ -53,16 +55,6 @@ public class Record  {
         }
         setCount(n);
         return n > 0 ;
-    }
-    
-     void trace(Record tnew){
-        Record told = this;
-        for (Node pred : rule.getPredicates()) {
-            if (tnew.get(pred) > told.get(pred)) {
-                double dd = ((double)(tnew.get(pred) - told.get(pred))) / (double)tnew.get(pred);
-                System.out.println(pred + " : " + (tnew.get(pred) - told.get(pred)) + "/" + tnew.get(pred) + " = " + dd);
-            }
-        }
     }
     
     Integer get(Node n){

@@ -48,21 +48,6 @@ public class Provenance {
         return table;
     }
     
-    
-    void display() {
-        for (Mapping m : map) {
-            for (Variable var : varList) {
-                System.out.println(var + " " + m.getValue(var.getLabel()));
-                for (Variable name : table.get(var)) {
-                    if (!name.equals(var) && m.getValue(name.getLabel()) != null) {
-                        System.out.println(name + " " + m.getValue(name.getLabel()));
-                    }
-                }
-            }
-            System.out.println("__");
-        }
-    }
-    
     void aggregate() {
         group = Group.create(getNodeList());
         for (Mapping m : map) {

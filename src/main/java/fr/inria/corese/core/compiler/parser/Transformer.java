@@ -46,7 +46,7 @@ import java.util.HashMap;
  */
 public class Transformer implements ExpType {
   
-    private static Logger logger = LoggerFactory.getLogger(Transformer.class);
+    private static final Logger logger = LoggerFactory.getLogger(Transformer.class);
     private static final String LINKED_DATA_PATH_VISITOR = 
             "fr.inria.corese.core.visitor.ldpath.LinkedDataPath";
     public static final String NL = System.getProperty("line.separator");
@@ -1124,10 +1124,8 @@ public class Transformer implements ExpType {
 
             add(select, exp);
 
-            if (lNodes.contains(exp.getNode())) {
-                // undef variable of former exp is current exp as var
-                lNodes.remove(exp.getNode());
-            }
+            // undef variable of former exp is current exp as var
+            lNodes.remove(exp.getNode());
         }
 
         for (Node node : lNodes) {

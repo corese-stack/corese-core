@@ -32,12 +32,4 @@ public class Tool {
     public static double time(Date d1) {
         return time(d1, new Date());
     }
-    
-    public static void display(String mes, Object... obj) {
-        System.out.println(String.format(mes, obj));
-    }
-    
-    public static void trace(String mes, Object... obj) {
-        System.out.println(String.format(mes, obj));
-    }
 }

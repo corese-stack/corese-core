@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author Olivier Corby - Inria I3S - 2020
  */
 public class Shex implements Constant {
-    private static Logger logger = LoggerFactory.getLogger(Shex.class);
+    private static final Logger logger = LoggerFactory.getLogger(Shex.class);
 
      static final String SH_PREFIX = NSManager.SHACL_PREFIX+":";
      static final String SH = NSManager.SHACL;
@@ -47,7 +47,7 @@ public class Shex implements Constant {
     private boolean cardinality = true;
     // (A|B) * -> A? B?
     private boolean expCardinality = true;
-    private boolean optional = false;
+    private final boolean optional = false;
     private boolean closed = true;
 
     public Shex() {
@@ -61,7 +61,7 @@ public class Shex implements Constant {
         return parse(schemaFile);
     }
     
-    public StringBuilder parseString(String str) throws IOException, Exception {        
+    public StringBuilder parseString(String str) throws Exception {
         File f = File.createTempFile("tmp", ".shex");
         f.setWritable(true);
         FileWriter w = new FileWriter(f);
@@ -146,8 +146,6 @@ public class Shex implements Constant {
             process((ShapeNot) exp, ct);
         } else if (exp instanceof NodeConstraint) {
             process((NodeConstraint) exp);
-        } else {
-            other(exp);
         }
     }
 
@@ -177,7 +175,6 @@ public class Shex implements Constant {
         }
         
         if (sh != null) {
-            //ct = context(ct);
             ct.setShape(sh);
             boolean not = ct.getNotExpr() != null;
             if (not) {
@@ -234,7 +231,6 @@ public class Shex implements Constant {
             // insert node constraint list inside shape 
             process(shape, cstList);
         } else {
-            //ct = context(ct);
             new Qualified().create(exp, ct);
             
             if (getCurrentLabel() != null) {
@@ -255,12 +251,10 @@ public class Shex implements Constant {
         if (getCurrentLabel() != null) {
             declareShape();
         }
-        //ct = context(ct);
-//        new Qualified().create(exp, ct);
+
         getShacl().openList(SH_OR);
         
         for (ShapeExpr ee : exp.getSubExpressions()) {
-            //traceClass(ee);trace(ee);
             getShacl().openBracket();
             // context use case: OR inside qualifiedValueShape
             process(ee, ct);
@@ -288,13 +282,8 @@ public class Shex implements Constant {
      * Triple Expr
      * 
      ***********************************************************************/
-    
-//    void process(TripleExpr exp) {
-//        process(exp, null);
-//    }
 
     void process(TripleExpr exp, Context ct) {
-        //traceClass(exp);
         if (exp instanceof TripleExprRef) {
             process((TripleExprRef) exp, ct);
         } else if (exp instanceof TripleConstraint) {
@@ -307,9 +296,6 @@ public class Shex implements Constant {
         } 
         else if (exp instanceof EmptyTripleExpression) {
             process((EmptyTripleExpression) exp);
-        } 
-        else {
-            trace("**** undef: " + exp.getClass().getName());
         }
     }
     
@@ -322,12 +308,6 @@ public class Shex implements Constant {
     }
     
     void process(RepeatedTripleExpression exp, Context ct) {
-//        if (exp.getSubExpression() instanceof AbstractNaryTripleExpr) {
-//            logger.info("Cardinality on: " + 
-//                    exp.getSubExpression().getClass().getName());
-//            logger.info(exp.toString());
-//        }
-        //ct = context(ct);
         RepeatedTripleExpression save = ct.getRepeatedExpr();
         process(exp.getSubExpression(), ct.setRepeatedExpr(exp));
         ct.setRepeatedExpr(save);
@@ -340,7 +320,6 @@ public class Shex implements Constant {
     
     // EachOf OneOf
     void process(AbstractNaryTripleExpr exp, Context ct) {
-        //ct = context(ct);
         if (isExpCardinality()) {
             // (A|B)* -> A? B?
             processWithCardinality(exp, ct);
@@ -399,7 +378,6 @@ public class Shex implements Constant {
      * several occurrences of same (inverse) property processed as qualifiedValueShape
      */
     void process(EachOf exp, Context ct) {
-        //ct = context(ct);
         // check qualifiedValueShape
         new Qualified().create(exp, ct);
         
@@ -561,7 +539,6 @@ public class Shex implements Constant {
 
 
     void process(TripleConstraint tc, Context ct) {
-        //ct = context(ct);
         if (isExtendShacl() && isShacl(tc.getProperty())) {
             processShacl(tc);
         } 
@@ -766,26 +743,6 @@ public class Shex implements Constant {
         if (max < Integer.MAX_VALUE) {
             define(SH_QUALIFIED_MAX_COUNT, max);
         }
-    }
-    
-    /**
-     * **************************************************************************
-     *
-     */
-    
-        
-
-    void trace(Object obj) {
-        System.out.println(obj);
-    }
-
-    void other(ShapeExpr exp) {
-        trace("**** undef: " + exp.getClass().getName());
-    }
-
-
-    void traceClass(Object obj) {
-        trace(obj.getClass().getName());
     }
     
     void define(String name, String value) {

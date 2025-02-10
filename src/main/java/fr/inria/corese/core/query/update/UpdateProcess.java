@@ -42,13 +42,13 @@ import java.util.List;
  */
 public class UpdateProcess {
 
-    private static Logger logger = LoggerFactory.getLogger(UpdateProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateProcess.class);
 
     private ManagerImpl manager; 
     private QueryProcess exec;
     Query query;
     private Dataset dataset;
-    private List<ProcessVisitor> visitorList;
+    private final List<ProcessVisitor> visitorList;
 
     UpdateProcess(QueryProcess e, ManagerImpl man, Dataset ds) {
         manager = man;

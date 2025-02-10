@@ -36,9 +36,6 @@ public class TransformationProcess extends  WorkflowProcess {
       
     @Override
      void start(Data data){
-        if (isDebug()){
-            System.out.println("Transformer: " + getPath());
-        }  
         data.getEventManager().start(Event.WorkflowTransformation, getPath());
         // focus this event only
         data.getEventManager().show(Event.WorkflowTransformation);
@@ -64,13 +61,6 @@ public class TransformationProcess extends  WorkflowProcess {
             }
         }
         Transformer t = Transformer.create(data.getGraph(), getPath());
-        t.setDebug(isDebug());
-        if (getContext().hasValue(Context.STL_MODE, URLParam.DEBUG)) {
-            t.setDebug(true);
-        }
-        if (isDebug()) {
-            System.out.println("Transformer graph size: " + data.getGraph().size());
-        }
         setTransfomer(t);
         init(t, data, getContext());
         Data res = new Data(data.getGraph());

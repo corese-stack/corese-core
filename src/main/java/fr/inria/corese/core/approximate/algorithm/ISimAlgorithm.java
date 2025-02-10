@@ -8,10 +8,10 @@ package fr.inria.corese.core.approximate.algorithm;
  */
 public interface ISimAlgorithm {
 
-    public final static int NA = Integer.MIN_VALUE;//not calculated
+    int NA = Integer.MIN_VALUE;//not calculated
 
-    public final static double MIN = 0.0d;
-    public final static double MAX = 1.0d;
+    double MIN = 0.0d;
+    double MAX = 1.0d;
 
     //double calculate(String s1, String s2);
     /**

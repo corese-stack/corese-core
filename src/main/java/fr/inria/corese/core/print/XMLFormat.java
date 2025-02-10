@@ -81,7 +81,7 @@ public class XMLFormat extends AbstractNestedResultFormat {
 
     enum XMLTitle implements Title {
         XMLDEC, OCOM, CCOM
-    };
+    }
 
     public <T extends AbstractNestedResultFormat.Title> String getTitle(T t) {
         if (XMLTitle.XMLDEC.equals(t)) {

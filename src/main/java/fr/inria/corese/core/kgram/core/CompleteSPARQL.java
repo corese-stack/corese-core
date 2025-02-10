@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class CompleteSPARQL {
-    private static Logger logger = LoggerFactory.getLogger(CompleteSPARQL.class);
+    private static final Logger logger = LoggerFactory.getLogger(CompleteSPARQL.class);
     
     Eval eval;
     Query query;
