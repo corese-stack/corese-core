@@ -12,7 +12,6 @@ module fr.inria.corese.corese_core {
     requires jdk.management;
     requires org.json; //
     requires org.apache.commons.lang3;
-    requires shexjava.core;
     requires org.slf4j;
     requires junit;
     requires jsonld.java;
@@ -46,8 +45,6 @@ module fr.inria.corese.corese_core {
     exports fr.inria.corese.core.compiler.api;
     exports fr.inria.corese.core.compiler.result;
     exports fr.inria.corese.core.compiler.federate;
-
-    exports fr.inria.corese.core.shex.shacl;
 
     exports fr.inria.corese.core.kgram.core;
     exports fr.inria.corese.core.kgram.api.core;
