@@ -52,14 +52,6 @@ public class TestSuite {
         };
 
         new TestSuite(Test2, 1000, Test2.length).test();
-//        
-//        int[] buffer_size = {1 * MB, 2 * MB, 4 * MB, 8 * MB, 16 * MB, 32 * MB};
-//        for (int c : buffer_size) {
-//            System.out.println("\n======= " + convert(c, true) + " ========");
-//            //Parameters.BUF_SIZE = c;
-//            
-//            new TestSuite(Test1, 100, Test1.length).test();
-//        }
 
     }
 
@@ -143,8 +135,6 @@ public class TestSuite {
                 sb.append(bytesAll + NL + NL);
             }
         }
-
-        System.out.println(sb);
     }
 
     public static String convert(long bytes, boolean precise) {

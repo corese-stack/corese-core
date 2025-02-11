@@ -23,11 +23,10 @@ public class GraphStressTest {
 		int size = 1;
 		while (size < 100_000_000) {
 			Graph graph = Graph.create();
-//			EdgeFactory edgeFactory = new EdgeFactory(graph);
+
 			for (int nbNode = 0; nbNode < size; nbNode++) {
 				Node n = graph.createNode("node_" + nbNode);
 				graph.add(n);
-//				System.out.println("graph.size = " + graph.size());
 			}
 			displayMemoryState();
 			size *= 2;
@@ -46,11 +45,6 @@ public class GraphStressTest {
 
 		long usedMemory = allocatedMemory - freeMemory;
 		sb.append("used memory: " + format.format(usedMemory / 1024));
-//		sb.append("free memory: " + format.format(freeMemory / 1024) + "<br/>");
-//		sb.append("allocated memory: " + format.format(allocatedMemory / 1024));
-//		sb.append("max memory: " + format.format(maxMemory / 1024) + "<br/>");
-//		sb.append("total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "<br/>");
-		System.out.println(sb);
 	}
 
 

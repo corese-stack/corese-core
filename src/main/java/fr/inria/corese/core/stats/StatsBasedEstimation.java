@@ -12,6 +12,9 @@ import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.sorter.core.QPGEdge;
 import fr.inria.corese.core.kgram.sorter.impl.qpv1.BasicPatternGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static fr.inria.corese.core.stats.IStats.PREDICATE;
 import static fr.inria.corese.core.stats.IStats.SUBJECT;
 import java.util.List;
@@ -31,7 +34,8 @@ import java.util.List;
  * @date 19 mai 2014
  */
 public class StatsBasedEstimation implements IEstimate {
-    
+
+    private final static Logger logger = LoggerFactory.getLogger(StatsBasedEstimation.class);
     private IStats meta;
     private QPGraph g;
     private List<Exp> bindings;
@@ -43,7 +47,7 @@ public class StatsBasedEstimation implements IEstimate {
     
     public StatsBasedEstimation(IStats meta) {
         if (!this.meta.statsEnabled()) {
-            System.err.println("!! Meta deta statistics not enabled, unable to estimate selectivity and sort !!");
+            logger.warn("!! Meta deta statistics not enabled, unable to estimate selectivity and sort !!");
             return;
         }
         this.meta = meta;
@@ -55,18 +59,18 @@ public class StatsBasedEstimation implements IEstimate {
         if (producer instanceof IStats) {
             this.meta = (IStats) producer;
             if (!this.meta.statsEnabled()) {
-                System.err.println("!! Meta deta statistics not enabled, unable to estimate selectivity and sort !!");
+                logger.warn("!! Meta deta statistics not enabled, unable to estimate selectivity and sort !!");
                 return;
             }
             
             if ((utility instanceof List)) {
                 this.bindings = (List<Exp>) utility;
             } else {
-                System.err.println("!! List of binding values are not available, unable to estimate selectivity !!");
+                logger.warn("!! List of binding values are not available, unable to estimate selectivity !!");
                 return;
             }
         } else {
-            System.err.println("!! Producer type not compitable, cannot get statstics data !!");
+            logger.warn("!! Producer type not compitable, cannot get statstics data !!");
             return;
         }
         

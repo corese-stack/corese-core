@@ -37,27 +37,22 @@ public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
    
 
     public IDatatype beforeTransformer(String uri) {
-        //System.out.println("beforeTransformer: " + uri);
         return callback(BEFORE_TRANSFORMER, toArray(getTransformer(), uri));
     }
 
     public IDatatype afterTransformer(String uri, String res) {
-//        System.out.println("afterTransformer: " + uri);
-//        System.out.println(res);
         return callback(AFTER_TRANSFORMER, toArray(getTransformer(), uri, res));
     }
     
     
     
     public IDatatype beforeWorkflow(Context ctx, Data data) {
-        //System.out.println("beforeWorkflow:");
         return callback(BEFORE_WORKFLOW, toArray(
             ctx, data.getGraph()));
     }
     
     
     public IDatatype afterWorkflow(Context ctx, Data data) {
-        //System.out.println("beforeWorkflow: " + data);
         return callback(AFTER_WORKFLOW, toArray(ctx, data));
     }
     

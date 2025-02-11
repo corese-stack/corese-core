@@ -37,7 +37,6 @@ public final class LUBMBenchmark {
         bench.load(lubm+"/u1/");
         bench.load(lubm+"/u2/");
         bench.run(10);
-        System.out.println(bench.report());
     }
 
     public void load(String data) {
@@ -65,14 +64,13 @@ public final class LUBMBenchmark {
 
         for (int j = 0; j < q.length; j++) {
             //long ms = 0;
-            System.out.println(q[j]);
+
             for (int i = 0; i < repeat; i++) {
                 long t = execute(q[j]);
                 results[j][i] = t;
                 if (t == FAIL) {//query engine exception
                     break;
                 }
-                //ms += t/q.length;
             }
         }
     }
@@ -83,7 +81,6 @@ public final class LUBMBenchmark {
         try {
             start = System.currentTimeMillis();
             Mappings m= exec.query(q);
-            System.out.println(m.size());
             end = System.currentTimeMillis();
         } catch (EngineException ex) {
             return FAIL;

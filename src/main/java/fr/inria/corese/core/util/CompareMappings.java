@@ -85,12 +85,6 @@ public class CompareMappings {
             for (Node node : kgmap.getSelect()) {
                 if (kgres.getNodeValue(node) != null && w3res.getNode(node) == null) {
                     ok = false;
-//                    if (w3res.getQueryNodes().length > 0) {
-//                        System.out.println("kg: "+ node + " = " + kgres.getNodeValue(node));
-//                        System.out.println();
-//                        System.out.println("w3c: " + w3res);
-//                        System.out.println("kgr: " + kgres);
-//                    }
                     break;
                 }
             }

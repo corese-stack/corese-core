@@ -18,11 +18,10 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 @SuppressWarnings ("unused")
 public class SparqlCoreseTokenManager implements SparqlCoreseConstants {
         void CommonTokenAction(Token token) {
-                //System.out.println(token+" ");
         }
 
   /** Debug output. */
-  public  java.io.PrintStream debugStream = System.out;
+  public  java.io.PrintStream debugStream = System.err;
   /** Set debug output. */
   public  void setDebugStream(java.io.PrintStream ds) { debugStream = ds; }
 private int jjStopAtPos(int pos, int kind)

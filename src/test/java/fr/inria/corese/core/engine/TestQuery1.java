@@ -197,30 +197,14 @@ public class TestQuery1 {
         try {
             exec.compile(q);
         } catch (EngineException ex) {
-            System.out.println(ex);
         }
 
-    }
-
-    static void after2() {
-        System.out.println("After");
-        int i = 0;
-        for (IDatatype dt : DatatypeMap.getPublicDatatypeValue()) {
-            System.out.println(i++ + " " + dt.getValueList().get(0) + " " + dt.getValueList().get(1));
-        }
-        i = 0;
-        for (IDatatype dt : DatatypeMap.getPublicDatatypeValue()
-                .get(DatatypeMap.newResource(NSManager.USER, "error"))) {
-            System.out.println(i++ + " " + dt);
-        }
     }
 
     static void init(Graph g, Load ld) throws LoadException {
 
         ld.parse(TestQuery1.class.getResourceAsStream("/data/comma/comma.rdfs"));
-        // ld.parse(data + "comma/comma.rdfs");
         ld.parse(TestQuery1.class.getResourceAsStream("/data/comma/model.rdf"));
-        // ld.parse(data + "comma/model.rdf");
         ld.parseDir(data + "comma/data");
     }
 
@@ -269,7 +253,7 @@ public class TestQuery1 {
         t.process();
         Transformer t2 = Transformer.create(g, Transformer.TURTLE_HTML);
         IDatatype dt = t2.process(t.getBinding());
-        // System.out.println(dt.getLabel());
+
         assertEquals(true, dt.getLabel().contains("<span class='fail'>"));
     }
 
@@ -357,7 +341,7 @@ public class TestQuery1 {
         b.setGlobalVariable("?count", DatatypeMap.ZERO);
         exec.query(i);
         Mappings map = exec.query(q, b);
-        // System.out.println(map);
+
         // Mappings parameter do not focus edge iteration in query/union because select
         // ?n
         assertEquals(8, map.size());
@@ -388,7 +372,7 @@ public class TestQuery1 {
         b.setGlobalVariable("?count", DatatypeMap.ZERO);
         exec.query(i);
         Mappings map = exec.query(q, b);
-        // System.out.println(map);
+
         // Mappings parameter focus edge iteration in query/union because ?y is bound in
         // both branches
         assertEquals(2, map.size());
@@ -504,10 +488,6 @@ public class TestQuery1 {
         DatatypeValue rdf = map.getValue("?rdf");
         DatatypeValue json = map.getValue("?json");
         map.getValue("?g");
-
-        System.out.println(xml.stringValue());
-        System.out.println(rdf.stringValue());
-        System.out.println(json.stringValue());
     }
 
     @Test
@@ -803,7 +783,7 @@ public class TestQuery1 {
         exec.query(i);
         Mappings map = exec.query(q);
         Graph res = (Graph) map.getGraph();
-        // System.out.println(map.getGraph());
+
         assertEquals(3, res.size());
     }
 
@@ -914,7 +894,6 @@ public class TestQuery1 {
         assertEquals("test", map.getValue("?local").stringValue());
         assertEquals("ns:test", map.getValue("?name").stringValue());
         assertEquals("text", map.getValue("?text").stringValue());
-        // System.out.println(map);
     }
 
     @Test
@@ -949,7 +928,7 @@ public class TestQuery1 {
 
         exec.query(init);
         Mappings map = exec.query(query);
-        // System.out.println(map);
+
         assertEquals("Catonmat10", map.getValue("?t").stringValue());
         assertEquals("red", map.getValue("?c").stringValue());
         assertEquals("phrase", map.getValue("?n").stringValue());
@@ -1181,7 +1160,7 @@ public class TestQuery1 {
 
         exec.query(i);
         Mappings map = exec.query(q);
-        System.out.println("res: " + map.getValue("?t").stringValue());
+
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
@@ -1209,7 +1188,7 @@ public class TestQuery1 {
 
         exec.query(i);
         Mappings map = exec.query(q);
-        // System.out.println(map.getValue("?t").stringValue());
+
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
@@ -1237,7 +1216,7 @@ public class TestQuery1 {
 
         exec.query(i);
         Mappings map = exec.query(q);
-        // System.out.println(map.getValue("?t").stringValue());
+
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
@@ -1268,7 +1247,7 @@ public class TestQuery1 {
 
         exec.query(i);
         Mappings map = exec.query(q);
-        // System.out.println(map.getValue("?t").stringValue());
+
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
@@ -1645,7 +1624,6 @@ public class TestQuery1 {
         exec.query(i11);
         graph.getNamedGraph("http://example.org/g1");
         exec.query(q4);
-        // System.out.println(m4);
 
         exec.query(q);
         exec.query(i2);
@@ -1947,7 +1925,7 @@ public class TestQuery1 {
                 + "}";
         exec.query(i);
         Mappings map = exec.query(q);
-        // System.out.println(map);
+
         IDatatype dt = map.getValue("?o");
         assertEquals(20, dt.intValue());
     }

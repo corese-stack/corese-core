@@ -276,7 +276,6 @@ public class MappingSet {
             // or  2) rest recursively starts with edge/path
             // --2) special case taken into account in eval and()
             // eval(rest, map) may take Mappings map argument into account
-            //System.out.println("parameter");
             setJoinMappings(map);
         } else {
             // inject Mappings map in copy of rest as a values clause

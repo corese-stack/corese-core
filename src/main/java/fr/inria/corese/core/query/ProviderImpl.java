@@ -115,10 +115,7 @@ public class ProviderImpl implements Provider, URLParam {
         if (Access.reject(Feature.SPARQL_SERVICE, b.getAccessLevel())) {
                 throw new SafetyException(TermEval.SERVICE_MESS);
         }
-        Mappings map = serviceBasic(serv, exp, lmap, eval);
-//        System.out.println("service result");
-//        System.out.println(map.toString(true, true, 10));
-        return map;
+        return serviceBasic(serv, exp, lmap, eval);
     }
     
      Binding getBinding(Environment env) {

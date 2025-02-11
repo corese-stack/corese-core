@@ -44,10 +44,6 @@ public class TestRuleEngine {
         Load load = Load.create(graph);
         QueryProcess.setPlanDefault(Query.QP_HEURISTICS_BASED);
         try {
-            System.out.println(data + "engine/ontology/test.rdfs");
-            System.out.println(data + "engine/data/test.rdf");
-            System.out.println(data + "engine/rule/test2.brul");
-            System.out.println(data + "engine/rule/meta.rul");
 
             load.parse(data + "engine/ontology/test.rdfs");
             load.parse(data + "engine/data/test.rdf");
@@ -124,10 +120,10 @@ public class TestRuleEngine {
 
         try {
             exec.query(init);
-            // re.setDebug(true);
+
             re.process();
             Mappings map = exec.query(query);
-            //// System.out.println(map);
+
             assertEquals("Result", 1, map.size());
 
         } catch (EngineException e) {

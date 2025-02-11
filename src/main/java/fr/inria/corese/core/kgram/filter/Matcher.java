@@ -23,11 +23,9 @@ public class Matcher implements ExprType {
 	}
 
 	boolean match(Pattern qe, Expr te, MatchBind bind){
-		//System.out.println("** Matcher: " + qe + " " + te);
 		rec = qe.isRec();
 		matchConstant = qe.isMatchConstant();
 		boolean b = process(qe, te, bind);
-		//System.out.println("** Matcher: " + qe + " " + te + " " + b);
 		return b;
 	}
 	
@@ -175,20 +173,15 @@ public class Matcher implements ExprType {
 				return false;
 			}
 
-			//System.out.println("** M2: " + qarg + " " + targ);
-
 			if (process(qarg, targ, bind)){
 				// OK
 			}
-			//System.out.println("** M3: " + qarg + " " + targ);
-			else if (rec){ 
-				//System.out.println("** M4: " + qarg + " " + targ);
+			else if (rec){
 				// recursive match of Pattern qe on argument targ
 				// qe = OR(EXP)
 				// qarg = EXP
 				// targ = OR(EXP1, EXP2)
 				if (process(qe, targ, bind)){
-					//System.out.println("** M5: " + qe + " " + targ);
 					// OK
 				}
 				else {
@@ -201,7 +194,6 @@ public class Matcher implements ExprType {
 				return false;
 			}
 		}
-		//System.out.println("** M6: " + qe + " " + te);
 
 		if (! bind.hasValue(qe)){
 			// because when rec = true, qe may have already been bound to an arg of te
@@ -232,8 +224,6 @@ public class Matcher implements ExprType {
 			process(fst, te.getExp(0), bind) &&
 			process(snd, te.getExp(1), bind);
 
-		//System.out.println("** M9: " + qe + " " + te + " " + b);
-
 		if (! b){
 			bind.clean(size);
 
@@ -242,8 +232,7 @@ public class Matcher implements ExprType {
 				// switch ?x = ?y to ?y = ?x
 				b = 
 					process(snd, te.getExp(0), bind) &&
-					process(fst, te.getExp(1), bind);	
-				//System.out.println("** M10: " + qe + " " + te + " " + b);
+					process(fst, te.getExp(1), bind);
 			}
 		}
 

@@ -73,8 +73,7 @@ public class ValueResolverImpl implements ValueResolver {
         }
 
         String res = hashString.toString();
-        count++;  
-       // System.out.println("VR: " + res.equals(tmp) + " " + res + " " + tmp);
+        count++;
         return res;
     }
     

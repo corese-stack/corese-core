@@ -49,7 +49,6 @@ public class Test {
         double[] read = this.read(false, 0, true);
         r[c++] = read[0];
         r[c++] = read[1];
-        System.out.println(manager.toString());
         return r;
     }
 
@@ -63,7 +62,6 @@ public class Test {
             read(true, 1 * feed, true);
             delete(2 * feed);
             read(true, 1 * feed, true);
-            System.out.println(manager);
         }
     }
 
@@ -82,7 +80,7 @@ public class Test {
         }
 
         this.literalsAll.putAll(literalStrings);
-        System.out.println("[Generate]: " + count + " records generated.");
+
         return length / count;
     }
         
@@ -105,7 +103,7 @@ public class Test {
             //}
         }
         long time = System.currentTimeMillis() - start;
-        System.out.println("[Write]: " + (generated ? nRecords : TestSuite.texts.length) + " records wrote to file.");
+
         return new double[]{(double) avg, time * 1.0 / 1000, time * 1.0 / counter};
     }
 
@@ -178,15 +176,9 @@ public class Test {
 
                 if (literalsAll.get(key).equals(literalsRead.get(key))) {
                     correct++;
-                } else {
-                   // System.out.println("[Read Error]: "+((StringManager)manager).getLiteralsOnDiskMeta(key)+" ====");
-                    //System.out.println("=== orginal literal ===\n" + literalsAll.get(key));
-                    //System.out.println("\n=== read literal ===\n" + literalsRead.get(key));
                 }
-            }
 
-            System.out.println("[Read]: " + literalsRead.size() + " / " + correct + ", "
-                    + (literalsRead.size() == correct ? "!! OK !!" : "** FAI L**"));
+            }
         }
         return new double[]{time * 1.0 / 1000, time * 1.0 / literalsRead.size()};
     }
@@ -207,7 +199,6 @@ public class Test {
             }
         }
 
-        System.out.println("[Delete from RAM]: " + nDeleted + " records deleted.");
         if (literalsAll.isEmpty()) {
             System.exit(0);
         }

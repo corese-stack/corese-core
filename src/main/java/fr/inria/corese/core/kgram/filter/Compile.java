@@ -292,7 +292,7 @@ public class Compile implements ExprType {
 	List<Expr> getConstants(Expr exp, List<Expr> list){
 		switch (exp.type()){
 		
-		case CONSTANT:  			//System.out.println(exp);
+		case CONSTANT:
 			list.add(exp); break;
 			
 		case VARIABLE: break;
