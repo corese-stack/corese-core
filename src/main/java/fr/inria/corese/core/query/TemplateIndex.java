@@ -1,5 +1,6 @@
 package fr.inria.corese.core.query;
 
+import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.kgram.api.core.Edge;
@@ -109,7 +110,7 @@ class TemplateIndex extends HashMap<String, List<Query>> {
 
     Mappings anyMappings(Exp exp) {
         for (Exp ee : exp) {
-            if (ee.type() == Exp.VALUES) {
+            if (ee.type() == ExpType.Type.VALUES) {
                 return ee.getMappings();
             }
         }
@@ -119,7 +120,7 @@ class TemplateIndex extends HashMap<String, List<Query>> {
     void add(String type, Query q) {
         List<Query> list = get(type);
         if (list == null) {
-            list = new ArrayList<Query>();
+            list = new ArrayList<>();
             put(type, list);
         }
         list.add(q);

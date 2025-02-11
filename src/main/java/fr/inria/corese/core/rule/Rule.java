@@ -102,10 +102,6 @@ public class Rule {
     void set(List<Node> list) {
         predicates = list;
     }
-    
-    boolean isDebug() {
-        return getQuery().isDebug();
-    }
 
     List<Node> getPredicates() {
         return predicates;

@@ -497,9 +497,9 @@ public class ProducerImpl
             Memory mem = (Memory) env;
             Eval eval = mem.getEval();
             // prevent loop on BGP exp:
-            exp.setType(Exp.AND);
+            exp.setType(Exp.Type.AND);
             Mappings map = eval.subEval(this, gNode, gNode, exp, exp, null);
-            exp.setType(Exp.BGP);
+            exp.setType(Exp.Type.BGP);
             return map;
         } else {
             return Mappings.create(query, true);
@@ -516,8 +516,7 @@ public class ProducerImpl
      */
     Iterable<Edge> localMatch(Iterable<Edge> it, Node gNode, Edge edge, Environment env) {
         if (isMatch && !env.getQuery().isRelax()) {
-            MatchIterator mit = new MatchIterator(it, gNode, edge, getGraph(), env, match);
-            return mit;
+            return new MatchIterator(it, gNode, edge, getGraph(), env, match);
         } else {
             // if query is relax, we want all types to find best match
             // hence skip MatchIterator

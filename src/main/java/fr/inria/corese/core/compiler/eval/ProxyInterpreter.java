@@ -3,6 +3,7 @@ package fr.inria.corese.core.compiler.eval;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.ExprType;
 import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Evaluator;
 import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.sparql.api.ComputerProxy;
@@ -53,7 +54,7 @@ public abstract class ProxyInterpreter implements ExprType {
         return null;
     }
 
-    public abstract void setMode(int mode);
+    public abstract void setMode(Evaluator.Mode mode);
 
     public void start() {
         number = 0;

@@ -25,7 +25,7 @@ public interface ExpType {
 
     String KPREF = "kg";
 
-    public enum Title {
+    public enum Type {
     	EMPTY("EMPTY"),
 		AND("AND"),
 		UNION("UNION"),
@@ -62,7 +62,7 @@ public interface ExpType {
 		VALUES("VALUES"),
 		OPT_BIND("OPT_BIND");
 		private final String title;
-		Title(String title) {
+		Type(String title) {
 			this.title = title;
 		}
 

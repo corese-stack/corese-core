@@ -12,7 +12,7 @@ import static fr.inria.corese.core.kgram.api.core.PointerType.NODE;
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public interface Node extends Pointerable, Comparable<Node> {
+public interface Node extends Pointerable, Comparable {
     String INITKEY = "";
 
     int DEPTH = 0;
@@ -65,6 +65,14 @@ public interface Node extends Pointerable, Comparable<Node> {
 
     default int compareTo(Node node) {
         return getDatatypeValue().compareTo(node.getDatatypeValue());
+    }
+
+    @Override
+    default int compareTo(Object obj) {
+        if(obj instanceof Node) {
+            return compareTo((Node) obj);
+        }
+        return -1;
     }
 
     String getLabel();

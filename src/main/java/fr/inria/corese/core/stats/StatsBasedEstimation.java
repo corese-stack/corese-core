@@ -1,10 +1,10 @@
 package fr.inria.corese.core.stats;
 
+import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.sorter.impl.qpv1.QPGNodeCostModel;
 import fr.inria.corese.core.kgram.sorter.core.QPGraph;
 import fr.inria.corese.core.kgram.sorter.core.QPGNode;
 import fr.inria.corese.core.kgram.sorter.core.IEstimate;
-import static fr.inria.corese.core.kgram.api.core.ExpType.FILTER;
 import fr.inria.corese.core.kgram.api.core.Filter;
 import fr.inria.corese.core.kgram.api.core.Node;
 import static fr.inria.corese.core.kgram.api.core.Node.OBJECT;
@@ -39,8 +39,6 @@ public class StatsBasedEstimation implements IEstimate {
     private final static double SEL_FILTER = 1.0;
     
     public StatsBasedEstimation() {
-        //todo 
-        //this();
     }
     
     public StatsBasedEstimation(IStats meta) {
@@ -83,7 +81,7 @@ public class StatsBasedEstimation implements IEstimate {
         //**3 add the selectivity of filter to linked variables
         //@deprecated, to be removed
         for (QPGNode node : g.getAllNodes()) {
-            if (node.getType() == FILTER) {
+            if (node.getType() == ExpType.Type.FILTER) {
                 double sf = this.getSel(node.getExp().getFilter());
                 node.setCost(sf);
                 for (QPGNode n : this.g.getLinkedNodes(node)) {
@@ -151,17 +149,6 @@ public class StatsBasedEstimation implements IEstimate {
             sel = meta.getCountByValue(varNode, type) * 1.0 / meta.getAllTriplesNumber();
             //2 unbound variable, check if bound to a list of constant values
         }
-        /*
-         else {
-         //if bound to some values, then cumulate the selectivity of each
-         List<Node> lBind = this.isBound(varNode);
-         if (lBind != null) {
-         sel = 0;
-         for (Node v : lBind) {
-         sel += meta.getCountByValue(v, type) * 1.0 / meta.getAllTriplesNumber();
-         }
-         }
-         }*/
         return sel;
     }
 
@@ -171,28 +158,8 @@ public class StatsBasedEstimation implements IEstimate {
         return SEL_FILTER;
     }
 
-    // todo
-//    private List<Node> isBound(Node var) {
-//        for (Exp exp : bindings) {
-//            if (var.getLabel().equalsIgnoreCase(exp.get(0).getNode().getLabel())) {
-//                List<Node> lBind = new ArrayList<Node>();
-//                Object o = exp.getObject();
-////                for (Expr ex : (List<Expr>) exp.getObject()) {
-////                    lBind.add(ex.);
-////                }
-//                return lBind;
-//            }
-//        }
-//        return null;
-//    }
     //Calculate the weight of an edge between two triple patterns
     //just simply multiply the selectivity of the two nodes, can be improved
     private void join() {
-//        for (QPGEdge edge : g.getAllEdges()) {
-//            edge.setCost(1.0);
-////            double s1 = edge.get(0).getSelectivity();
-////            double s2 = edge.get(1).getSelectivity();
-////            edge.setWeight(s1 * s2);
-//        }
     }
 }

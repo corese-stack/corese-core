@@ -1,9 +1,6 @@
 package fr.inria.corese.core.rule;
 
-import fr.inria.corese.core.kgram.api.core.Expr;
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.core.*;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.core.Distinct;
 import fr.inria.corese.core.kgram.core.Exp;
@@ -17,7 +14,6 @@ import fr.inria.corese.core.logic.RDFS;
 import fr.inria.corese.core.query.Construct;
 import java.util.ArrayList;
 import java.util.List;
-import fr.inria.corese.core.kgram.api.core.Edge;
 
 /**
  * Watch kgram query solutions of rules for RuleEngine 1 Check that a solution
@@ -243,26 +239,26 @@ public class ResultWatcher implements ResultListener, GraphListener {
     public Exp listen(Exp exp, int n) {
         switch (exp.type()) {
 
-            case Exp.PATH:
-            case Exp.QUERY:
+            case PATH:
+            case QUERY:
                 selectNewResult = false;
                 break;
 
-            case Exp.UNION:
-            case Exp.OPTION:
+            case UNION:
+            case OPTION:
                 // because we may not go through the branch with new edges
                 // check new at the end as usual
                 selectNewEdge = false;
                 break;
         }
 
-        if (n == 0 && exp.type() == Exp.AND) { // && ! isOptimizeRuleDataManager()) {
+        if (n == 0 && exp.type() == ExpType.Type.AND) {
 
             if (getRule().isGTransitive() && getRule().getQuery().getEdgeList() != null) {
                 // rule exp = where { ?p a owl:TransitiveProperty . ?x ?p ?y . ?y ?p ?z }
                 // there is a list of new candidates for ?x ?p ?y
                 // sparql skip first query edge: skip exp.get(0)
-                exp = Exp.create(Exp.AND, exp.get(1), exp.get(2));
+                exp = Exp.create(ExpType.Type.AND, exp.get(1), exp.get(2));
             } 
             else if (performSelectNewEdge) {
                 performSelectNewEdge = false;
@@ -322,22 +318,22 @@ public class ResultWatcher implements ResultListener, GraphListener {
             flt = 1;
         }
 
-        Exp e1 = Exp.create(Exp.EDGE, exp.get(fst).getEdge());
+        Exp e1 = Exp.create(ExpType.Type.EDGE, exp.get(fst).getEdge());
         e1.setLevel(timestamp);
 
-        Exp a1 = Exp.create(Exp.AND, e1, exp.get(snd));
+        Exp a1 = Exp.create(ExpType.Type.AND, e1, exp.get(snd));
         if (exp.size() == 3) {
             a1.add(exp.get(flt));
         }
 
-        Exp e2 = Exp.create(Exp.EDGE, exp.get(snd).getEdge());
+        Exp e2 = Exp.create(ExpType.Type.EDGE, exp.get(snd).getEdge());
         e2.setLevel(timestamp);
 
-        Exp a2 = Exp.create(Exp.AND, e2, exp.get(fst));
+        Exp a2 = Exp.create(ExpType.Type.AND, e2, exp.get(fst));
         if (exp.size() == 3) {
             a2.add(exp.get(flt));
         }
-        Exp ee = Exp.create(Exp.UNION, a1, a2);
+        Exp ee = Exp.create(ExpType.Type.UNION, a1, a2);
 
         return ee;
     }
@@ -347,18 +343,18 @@ public class ResultWatcher implements ResultListener, GraphListener {
                 + "negative: " + cneg;
     }
 
-    /**
+    /*
      * *******************************************************************
      *
      *
      */
     Exp compile(Exp exp) {
-        Exp e1 = Exp.create(Exp.EDGE, exp.get(1).getEdge());
-        Exp e2 = Exp.create(Exp.EDGE, exp.get(0).getEdge());
-        Exp ee = Exp.create(Exp.AND, e1, e2);
+        Exp e1 = Exp.create(ExpType.Type.EDGE, exp.get(1).getEdge());
+        Exp e2 = Exp.create(ExpType.Type.EDGE, exp.get(0).getEdge());
+        Exp ee = Exp.create(ExpType.Type.AND, e1, e2);
         exp.get(0).setIndex(timestamp);
         e1.setIndex(timestamp);
-        Exp union = Exp.create(Exp.UNION, exp, ee);
+        Exp union = Exp.create(ExpType.Type.UNION, exp, ee);
         return union;
     }
 
@@ -377,35 +373,28 @@ public class ResultWatcher implements ResultListener, GraphListener {
         return insertEdgeList;
     }
 
-    @Override
     public void addSource(Graph g) {
     }
 
-    @Override
     public boolean onInsert(Graph g, Edge ent) {
         return true;
     }
 
-    @Override
     public void insert(Graph g, Edge ent) {
         if (ent.getEdgeLabel().equals(RDFS.SUBCLASSOF)) {
             getInsertEdgeList().add(ent);
         }
     }
 
-    @Override
     public void delete(Graph g, Edge ent) {
     }
 
-    @Override
     public void start(Graph g, Query q) {
     }
 
-    @Override
     public void finish(Graph g, Query q, Mappings m) {
     }
 
-    @Override
     public void load(String path) {
     }
     

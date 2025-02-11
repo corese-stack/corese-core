@@ -1,5 +1,6 @@
 package fr.inria.corese.core.util;
 
+import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
@@ -185,7 +186,7 @@ public class QueryGraphVisitorImpl implements QueryGraphVisitor {
             re.compile(ast);
         } catch (EngineException ex) {
         }
-       Exp exp = Exp.create(Exp.PATH, edge);
+       Exp exp = Exp.create(ExpType.Type.PATH, edge);
        exp.setRegex(re);
        query.getBody().add(exp);
        return exp;

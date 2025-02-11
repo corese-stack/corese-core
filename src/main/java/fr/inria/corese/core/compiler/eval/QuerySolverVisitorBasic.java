@@ -100,7 +100,7 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
             BGP, JOIN, OPTIONAL, MINUS, UNION, FILTER, SELECT, SERVICE, QUERY, GRAPH,
             AGGREGATE, HAVING, FUNCTION, ORDERBY, DISTINCT
     };
-    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitorBasic.class);
     public static boolean REENTRANT_DEFAULT = false;
     private static boolean event = true;
     boolean select = false;

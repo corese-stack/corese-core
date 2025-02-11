@@ -334,9 +334,6 @@ public class Transformer implements ExpType {
         }
 
         q.setSort(ast.isSorted());
-        if (ast.isDebug()) {
-            q.setDebug(ast.isDebug());
-        }
         q.setCheck(ast.isCheck());
         q.setRelax(ast.isMore());
         q.setPlanProfile(getPlanProfile());
@@ -559,11 +556,11 @@ public class Transformer implements ExpType {
             }
 
             ast.getTemplateGroup().compile(ast);
-            q.setTemplateGroup(Exp.create(FILTER, ast.getTemplateGroup()));
+            q.setTemplateGroup(Exp.create(Type.FILTER, ast.getTemplateGroup()));
 
             Term nl = Term.function(Processor.STL_NL);
             nl.compile(ast);
-            q.setTemplateNL(Exp.create(FILTER, nl));
+            q.setTemplateNL(Exp.create(Type.FILTER, nl));
 
             for (Variable var : ast.getArgList()) {
                 Node node = compiler.createNode(var);
@@ -614,7 +611,6 @@ public class Transformer implements ExpType {
         } else {
             q.setConstruct(true);
         }
-        //q.setConstruct(true);
         q.setConstructNodes(cons.getNodes());
     }
 
@@ -687,7 +683,7 @@ public class Transformer implements ExpType {
 
     Exp compile(fr.inria.corese.core.sparql.triple.parser.Exp query, boolean opt, int level) throws EngineException {
         Exp exp = null;
-        int type = getType(query);
+        Type type = getType(query);
         opt = opt || isOption(type);
 
         switch (type) {
@@ -786,7 +782,7 @@ public class Transformer implements ExpType {
     Exp compileBind(ASTQuery ast, Expression e, Variable var) throws EngineException {
         fr.inria.corese.core.kgram.api.core.Filter f = compileSelect(e, ast);
         Node node = compiler.createNode(var);
-        Exp exp = Exp.create(BIND);
+        Exp exp = Exp.create(Type.BIND);
         exp.setFilter(f);
         exp.setNode(node);
         exp.setFunctional(f.isFunctional());
@@ -815,7 +811,7 @@ public class Transformer implements ExpType {
      */
     Exp compileService(Service service) throws EngineException {
         Node src = compile(service.getServiceName());
-        Exp node = Exp.create(NODE, src);
+        Exp node = Exp.create(Type.NODE, src);
 
         fr.inria.corese.core.sparql.triple.parser.Exp body = service.get(0);
         ASTQuery aa;
@@ -836,7 +832,7 @@ public class Transformer implements ExpType {
         q.setService(true);
         q.setSilent(service.isSilent());
 
-        Exp exp = Exp.create(SERVICE, node, q);
+        Exp exp = Exp.create(Type.SERVICE, node, q);
         exp.setSilent(service.isSilent());
         exp.setGenerated(service.isGenerated());
 
@@ -890,7 +886,7 @@ public class Transformer implements ExpType {
             }
         }
 
-        Exp bind = Exp.create(VALUES);
+        Exp bind = Exp.create(Type.VALUES);
         bind.setNodeList(lNode);
         bind.setMappings(lMap);
         return bind;
@@ -906,8 +902,8 @@ public class Transformer implements ExpType {
             if (q.getBody().size() == 0) {
                 q.setBody(q.getValues());
             } else {
-                Exp exp = Exp.create(JOIN, Exp.create(BGP, q.getValues()), q.getBody());
-                q.setBody(Exp.create(BGP, exp));
+                Exp exp = Exp.create(Type.JOIN, Exp.create(Type.BGP, q.getValues()), q.getBody());
+                q.setBody(Exp.create(Type.BGP, exp));
             }
         }
     }
@@ -1041,7 +1037,7 @@ public class Transformer implements ExpType {
     void having(Query q, ASTQuery ast) throws EngineException {
         if (ast.getHaving() != null) {
             fr.inria.corese.core.kgram.api.core.Filter having = compileSelect(ast.getHaving(), ast);
-            q.setHaving(Exp.create(FILTER, having));
+            q.setHaving(Exp.create(Type.FILTER, having));
         }
     }
 
@@ -1069,7 +1065,7 @@ public class Transformer implements ExpType {
             // retrieve var node from query
             String varName = variable.getName();
             Node node = getNode(qCurrent, variable);
-            Exp exp = Exp.create(NODE, node);
+            Exp exp = Exp.create(Type.NODE, node);
 
             // process filter if any
             Expression ee = ast.getExpression(varName);
@@ -1098,7 +1094,7 @@ public class Transformer implements ExpType {
 
         for (Node node : lNodes) {
             // additional variables for exp in select (exp as var)
-            Exp exp = Exp.create(NODE, node);
+            Exp exp = Exp.create(Type.NODE, node);
             exp.status(true);
             select.add(exp);
         }
@@ -1124,7 +1120,7 @@ public class Transformer implements ExpType {
     List<Exp> toExp(List<Node> lNode) {
         List<Exp> lExp = new ArrayList<>();
         for (Node node : lNode) {
-            lExp.add(Exp.create(NODE, node));
+            lExp.add(Exp.create(Type.NODE, node));
         }
         return lExp;
     }
@@ -1314,7 +1310,7 @@ public class Transformer implements ExpType {
                     ast.addErrorMessage(ASTQuery.ORDER_GROUP_UNDEFINED, ee);
                     node = compiler.createNode(ee.getName());
                 }
-                Exp e = Exp.create(NODE, node);
+                Exp e = Exp.create(Type.NODE, node);
 
                 if (exp != null && exp.isAggregate()) {
                     // order by ?count
@@ -1326,7 +1322,7 @@ public class Transformer implements ExpType {
                 // TODO: check rewrite fun() as var
                 fr.inria.corese.core.kgram.api.core.Filter f = compile(ee);
                 Node node = createNode();
-                Exp exp = Exp.create(NODE, node);
+                Exp exp = Exp.create(Type.NODE, node);
                 exp.setFilter(f);
                 list.add(exp);
             }
@@ -1365,7 +1361,7 @@ public class Transformer implements ExpType {
      * If this exp is BGP{e1 .. en}
      * return: BGP{JOIN{BGP{e1 .. en} rst}}
      */
-    void join(Exp exp, Exp rst, int type) {
+    void join(Exp exp, Exp rst, Type type) {
         if (exp.isBGPAnd() && exp.size() > 0) {
             Exp fst = exp.get(0);
             if (exp.size() == 1) {
@@ -1378,7 +1374,7 @@ public class Transformer implements ExpType {
                     fst.add(ee);
                 }
             }
-            Exp body = Exp.create(JOIN, fst, rst);
+            Exp body = Exp.create(Type.JOIN, fst, rst);
             exp.getExpList().clear();
             exp.add(body);
         } else {
@@ -1386,8 +1382,8 @@ public class Transformer implements ExpType {
         }
     }
 
-    int bgpType() {
-        return (isBGP()) ? BGP : AND;
+    Type bgpType() {
+        return (isBGP()) ? Type.BGP : Type.AND;
     }
 
     Exp compileEdge(Triple t, boolean opt) throws EngineException {
@@ -1400,10 +1396,10 @@ public class Transformer implements ExpType {
 
     Exp basicCompileEdge(Triple t) throws EngineException {
         Edge r = compiler.compile(t, getAST().isInsertData());
-        Exp exp = Exp.create(EDGE, r);
+        Exp exp = Exp.create(Type.EDGE, r);
         if (t.isXPath()) {
             // deprecated ?x xpath() ?y
-            exp.setType(EVAL);
+            exp.setType(Type.EVAL);
             fr.inria.corese.core.kgram.api.core.Filter xpath = compiler.compile(t.getXPath());
             exp.setFilter(xpath);
         } else if (t.isPath()) {
@@ -1417,7 +1413,7 @@ public class Transformer implements ExpType {
 
 
     void path(Triple tt, Exp exp) throws EngineException {
-        exp.setType(PATH);
+        exp.setType(Type.PATH);
         Expression regex = tt.getRegex();
         if (regex == null) {
             // deprecated: there may be a match($path, regex)
@@ -1500,8 +1496,8 @@ public class Transformer implements ExpType {
     Exp compileGraph(Exp exp, Atom at) {
         Node src = compiler.createNode(at, getAST().isInsertData());
         // create a NODE kgram expression for graph ?g
-        Exp node = Exp.create(NODE, src);
-        Exp gnode = Exp.create(GRAPHNODE, node);
+        Exp node = Exp.create(Type.NODE, src);
+        Exp gnode = Exp.create(Type.GRAPHNODE, node);
         exp.add(0, gnode);
         return exp;
     }
@@ -1511,12 +1507,12 @@ public class Transformer implements ExpType {
         Exp exp;
 
         if (qvec.size() == 1) {
-            exp = Exp.create(FILTER, qvec.get(0));
+            exp = Exp.create(Type.FILTER, qvec.get(0));
             compileExist(qvec.get(0).getExp(), opt);
         } else {
-            exp = Exp.create(AND);
+            exp = Exp.create(Type.AND);
             for (fr.inria.corese.core.kgram.api.core.Filter qm : qvec) {
-                Exp f = Exp.create(FILTER, qm);
+                Exp f = Exp.create(Type.FILTER, qm);
                 compileExist(qm.getExp(), opt);
                 exp.add(f);
             }
@@ -1624,7 +1620,7 @@ public class Transformer implements ExpType {
         }
     }
 
-    boolean isOption(int type) {
+    boolean isOption(Type type) {
         switch (type) {
             case OPTION:
             case OPTIONAL:
@@ -1637,41 +1633,41 @@ public class Transformer implements ExpType {
         }
     }
 
-    int getType(fr.inria.corese.core.sparql.triple.parser.Exp query) {
+    ExpType.Type getType(fr.inria.corese.core.sparql.triple.parser.Exp query) {
         if (query.isFilter()) {
-            return FILTER;
+            return ExpType.Type.FILTER;
         } else if (query.isTriple()) {
-            return EDGE;
+            return ExpType.Type.EDGE;
         } else if (query.isUnion()) {
-            return UNION;
+            return ExpType.Type.UNION;
         } else if (query.isJoin()) {
-            return JOIN;
+            return ExpType.Type.JOIN;
         } else if (query.isOption()) {
-            return OPTION;
+            return ExpType.Type.OPTION;
         } else if (query.isOptional()) {
-            return OPTIONAL;
+            return ExpType.Type.OPTIONAL;
         } else if (query.isMinus()) {
-            return MINUS;
+            return ExpType.Type.MINUS;
         } else if (query.isGraph()) {
-            return GRAPH;
+            return ExpType.Type.GRAPH;
         } else if (query.isService()) {
-            return SERVICE;
+            return ExpType.Type.SERVICE;
         } else if (query.isQuery()) {
-            return QUERY;
+            return ExpType.Type.QUERY;
         } else if (query.isBind()) {
-            return BIND;
+            return ExpType.Type.BIND;
         } else if (query.isValues()) {
-            return VALUES;
+            return ExpType.Type.VALUES;
         } else if (query.isBGP()) {
             return bgpType();
         } else if (query.isAnd()) {
-            return AND;
+            return ExpType.Type.AND;
         } else {
-            return EMPTY;
+            return ExpType.Type.EMPTY;
         }
     }
 
-    int cpType(int type) {
+    Type cpType(Type type) {
         switch (type) {
             default:
                 return type;

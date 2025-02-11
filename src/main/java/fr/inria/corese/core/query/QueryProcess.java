@@ -1013,7 +1013,7 @@ public class QueryProcess extends QuerySolver {
      * Implement SPARQL compliance
      */
     Mappings sparqlQueryUpdate(String squery, Dataset ds, int entail) throws EngineException {
-        getEvaluator().setMode(Evaluator.SPARQL_MODE);
+        getEvaluator().setMode(Evaluator.Mode.SPARQL_MODE);
         setSPARQLCompliant(true);
 
         if (entail != STD_ENTAILMENT) {

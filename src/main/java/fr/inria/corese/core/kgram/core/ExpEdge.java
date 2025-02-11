@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class ExpEdge extends Exp {
 
-    ExpEdge(Title t){
+    ExpEdge(Type t){
         super(t);
     }
 

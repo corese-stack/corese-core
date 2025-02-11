@@ -347,7 +347,7 @@ public interface IDatatype
     /**
      * Compare 2 datatypes
      *
-     * @param dt2 another datatype
+     * @param dt another datatype
      * @return 0 if they are equals, an int > 0 if the datatype is greater than
      * dt2, an int < 0 if the datatype is lesser
      */

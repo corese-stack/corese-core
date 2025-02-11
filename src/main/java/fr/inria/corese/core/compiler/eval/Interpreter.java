@@ -33,9 +33,8 @@ public class Interpreter implements Computer, Evaluator, ExprType {
     Producer producer;
     Eval kgram;
     ResultListener listener;
-    int mode = DEFAULT_MODE;
+    Mode mode = DEFAULT_MODE;
     boolean hasListener = false;
-    boolean isDebug = false;
     // fr.inria.corese.core.query.PluginImpl
     private ProxyInterpreter plugin;
 
@@ -70,11 +69,6 @@ public class Interpreter implements Computer, Evaluator, ExprType {
     }
 
     @Override
-    public void setDebug(boolean b) {
-        isDebug = b;
-    }
-
-    @Override
     public void addResultListener(ResultListener rl) {
         listener = rl;
         hasListener = rl != null;
@@ -86,19 +80,19 @@ public class Interpreter implements Computer, Evaluator, ExprType {
     }
 
     @Override
-    public int getMode() {
+    public Mode getMode() {
         return mode;
     }
 
     @Override
-    public void setMode(int m) {
+    public void setMode(Mode m) {
         mode = m;
         getPlugin().setMode(m);
     }
 
     @Override
     public boolean isCompliant() {
-        return mode == SPARQL_MODE;
+        return mode == Mode.SPARQL_MODE;
     }
 
     @Override

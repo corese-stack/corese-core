@@ -313,12 +313,8 @@ public class ProviderService implements URLParam {
 
         try {
             if (slice) {
-                boolean debug = service.hasParameter(MODE, DEBUG) || getQuery().isRecDebug();
 
                 if (map.isEmpty()) {
-                    if (debug) {
-                        logger.info("Candidate Mappings are empty: skip service " + service.getURL());
-                    }
                     traceAST(service, getAST());
                 }
 
@@ -388,7 +384,6 @@ public class ProviderService implements URLParam {
             int start, int limit, int timeout, int count) throws EngineException {
         Query q = getQuery();
         // use case: ldscript nested query
-        boolean debug = serv.hasParameter(MODE, DEBUG) || q.isRecDebug();
         ASTQuery targetAST = getAST();
         try {
 
@@ -406,15 +401,8 @@ public class ProviderService implements URLParam {
                     if (ares.isBnode()) {
                         logger.info("Skip bindings with blank nodes");
                     }
-                    if (debug) {
-                        logger.info("Skip slice for absence of relevant binding");
-                    }
                     return Mappings.create(q);
                 }
-            }
-
-            if (debug) {
-                logger.info(String.format("** Service %s \n%s", serv, ast));
             }
 
             targetAST = ast;
@@ -425,9 +413,7 @@ public class ProviderService implements URLParam {
             if (res != null) {
                 reportAST(ast, res, count);
             }
-            if (debug && res != null) {
-                traceResult(serv, res);
-            }
+
             if (res != null && res.isError()) {
                 logger.info("Parse error in result of service: " + serv.getURL());
             }
@@ -960,7 +946,6 @@ public class ProviderService implements URLParam {
             service.setTimeout(timeout);
             service.setCount(count);
             service.setBind(b);
-            service.setDebug(q.isRecDebug());
             Mappings map = service.query(q, ast, null);
             log(serv, service.getReport());
             return map;

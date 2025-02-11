@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 
 import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.kgram.api.query.Evaluator;
 import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.util.GraphListen;
 import org.slf4j.Logger;
@@ -145,7 +146,7 @@ public class PluginImpl
     }
 
     @Override
-    public void setMode(int mode) {
+    public void setMode(Evaluator.Mode mode) {
         // TODO document why this method is empty
     }
 

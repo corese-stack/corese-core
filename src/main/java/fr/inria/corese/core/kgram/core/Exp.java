@@ -30,8 +30,8 @@ public class Exp extends PointerObject
     static final String SP = " ";
     // group edge even if there is a disconnected filter
     public static boolean groupEdge = true;
-    static Exp empty = new Exp(Title.EMPTY);
-    Title type;
+    static Exp empty = new Exp(Type.EMPTY);
+    Type type;
     int index = -1;
     // optional success
     boolean // default status must be false (for order by desc())
@@ -86,27 +86,27 @@ public class Exp extends PointerObject
     private boolean mappings = false;
 
 
-    Exp(Title t) {
+    Exp(Type t) {
         type = t;
         args = new VExp();
         lFilter = new ArrayList<>();
     }
 
-    public static Exp create(Title t) {
-        if (t == Title.PATH || t == Title.EDGE) {
+    public static Exp create(Type t) {
+        if (t == Type.PATH || t == Type.EDGE) {
             return new ExpEdge(t);
         }
         return new Exp(t);
     }
 
-    public static Exp create(Title t, Exp e1, Exp e2) {
+    public static Exp create(Type t, Exp e1, Exp e2) {
         Exp e = create(t);
         e.add(e1);
         e.add(e2);
         return e;
     }
 
-    public static Exp create(Title t, Exp e1, Exp e2, Exp e3) {
+    public static Exp create(Type t, Exp e1, Exp e2, Exp e3) {
         Exp e = create(t);
         e.add(e1);
         e.add(e2);
@@ -114,32 +114,32 @@ public class Exp extends PointerObject
         return e;
     }
 
-    public static Exp create(Title t, Exp e1) {
+    public static Exp create(Type t, Exp e1) {
         Exp e = create(t);
         e.add(e1);
         return e;
     }
 
-    public static Exp create(Title t, Node n) {
+    public static Exp create(Type t, Node n) {
         Exp exp = create(t);
         exp.setNode(n);
         return exp;
     }
 
-    public static Exp create(Title t, Edge e) {
+    public static Exp create(Type t, Edge e) {
         Exp exp = create(t);
         exp.setEdge(e);
         return exp;
     }
 
-    public static Exp create(Title t, Filter e) {
+    public static Exp create(Type t, Filter e) {
         Exp exp = create(t);
         exp.setFilter(e);
         return exp;
     }
 
     public static Exp createValues(List<Node> list, Mappings map) {
-        Exp exp = create(Title.VALUES);
+        Exp exp = create(Type.VALUES);
         exp.setNodeList(list);
         exp.setMappings(map);
         return exp;
@@ -182,11 +182,11 @@ public class Exp extends PointerObject
     }
 
     public boolean isBGP() {
-        return type == Title.BGP;
+        return type == Type.BGP;
     }
 
     public boolean isBGPAnd() {
-        return type == Title.AND || type == Title.BGP;
+        return type == Type.AND || type == Type.BGP;
     }
 
     public boolean isBGPAble() {
@@ -244,15 +244,15 @@ public class Exp extends PointerObject
     }
 
     public void add(Edge e) {
-        args.add(create(Title.EDGE, e));
+        args.add(create(Type.EDGE, e));
     }
 
     public void add(Node n) {
-        args.add(create(Title.NODE, n));
+        args.add(create(Type.NODE, n));
     }
 
     public void add(Filter f) {
-        args.add(create(Title.FILTER, f));
+        args.add(create(Type.FILTER, f));
     }
 
     public void set(int n, Exp e) {
@@ -265,7 +265,7 @@ public class Exp extends PointerObject
     }
 
     public void insert(Exp e) {
-        if (type() == Title.AND && e.type() == Title.AND) {
+        if (type() == Type.AND && e.type() == Type.AND) {
             for (Exp ee : e) {
                 insert(ee);
             }
@@ -300,7 +300,7 @@ public class Exp extends PointerObject
     StringBuilder toString(StringBuilder sb, int n) {
         sb.append(title()).append(SP);
 
-        if (type() == Title.VALUES) {
+        if (type() == Type.VALUES) {
             sb.append(getNodeList());
             sb.append(SP);
         }
@@ -329,10 +329,10 @@ public class Exp extends PointerObject
             }
         }
 
-        if (type() == Title.VALUES) {
+        if (type() == Type.VALUES) {
             nl(sb, 0);
             sb.append(getMappings().toString(true));
-        } else if (type() == Title.WATCH || type() == Title.CONTINUE || type() == Title.BACKJUMP) {
+        } else if (type() == Type.WATCH || type() == Type.CONTINUE || type() == Type.BACKJUMP) {
             // skip because loop
         } else {
             if (isOptional() && isPostpone()) {
@@ -348,7 +348,7 @@ public class Exp extends PointerObject
             }
         }
 
-        if (type() == Title.VALUES) {
+        if (type() == Type.VALUES) {
             indent(sb, n);
         }
         sb.append("}");
@@ -387,7 +387,7 @@ public class Exp extends PointerObject
         return status;
     }
 
-    public Title type() {
+    public Type type() {
         return type;
     }
 
@@ -416,10 +416,10 @@ public class Exp extends PointerObject
     }
 
     public boolean isBGPFilter() {
-        return isBGP() && isOnly(Title.FILTER);
+        return isBGP() && isOnly(Type.FILTER);
     }
 
-    boolean isOnly(Title type) {
+    boolean isOnly(Type type) {
         for (Exp exp : this) {
             if (exp.type() != type) {
                 return false;
@@ -429,7 +429,7 @@ public class Exp extends PointerObject
     }
 
     public boolean isFilter() {
-        return type == Title.FILTER;
+        return type == Type.FILTER;
     }
 
     public boolean isAggregate() {
@@ -449,11 +449,11 @@ public class Exp extends PointerObject
     }
 
     public boolean isNode() {
-        return type == Title.NODE;
+        return type == Type.NODE;
     }
 
     public boolean isEdge() {
-        return type == Title.EDGE;
+        return type == Type.EDGE;
     }
 
     public boolean isEdgePath() {
@@ -461,15 +461,15 @@ public class Exp extends PointerObject
     }
 
     public boolean isOption() {
-        return type == Title.OPTION;
+        return type == Type.OPTION;
     }
 
     public boolean isOptional() {
-        return type == Title.OPTIONAL;
+        return type == Type.OPTIONAL;
     }
 
     public boolean isJoin() {
-        return type == Title.JOIN;
+        return type == Type.JOIN;
     }
 
     public boolean isAndJoin() {
@@ -477,7 +477,7 @@ public class Exp extends PointerObject
     }
 
     public boolean isAnd() {
-        return type == Title.AND;
+        return type == Type.AND;
     }
 
     public boolean isBinary() {
@@ -485,31 +485,31 @@ public class Exp extends PointerObject
     }
 
     public boolean isGraph() {
-        return type == Title.GRAPH;
+        return type == Type.GRAPH;
     }
 
     public boolean isUnion() {
-        return type == Title.UNION;
+        return type == Type.UNION;
     }
 
     public boolean isMinus() {
-        return type == Title.MINUS;
+        return type == Type.MINUS;
     }
 
     public boolean isQuery() {
-        return type == Title.QUERY;
+        return type == Type.QUERY;
     }
 
     public boolean isService() {
-        return type == Title.SERVICE;
+        return type == Type.SERVICE;
     }
 
     public boolean isAtomic() {
-        return type == Title.FILTER || type == Title.EDGE || type == Title.NODE
-                || type == Title.ACCEPT;
+        return type == Type.FILTER || type == Type.EDGE || type == Type.NODE
+                || type == Type.ACCEPT;
     }
 
-    public void setType(Title n) {
+    public void setType(Type n) {
         type = n;
     }
 
@@ -657,7 +657,7 @@ public class Exp extends PointerObject
     }
 
     public boolean isPath() {
-        return type == Title.PATH;
+        return type == Type.PATH;
     }
 
     public void setPath(Exp path) {
@@ -669,7 +669,7 @@ public class Exp extends PointerObject
     }
 
     public boolean isValues() {
-        return type == Title.VALUES;
+        return type == Type.VALUES;
     }
 
     public void setValues(Exp values) {
@@ -677,7 +677,7 @@ public class Exp extends PointerObject
     }
 
     public boolean isBind() {
-        return type == Title.BIND;
+        return type == Type.BIND;
     }
 
     public void setBind(Exp bind) {
@@ -779,8 +779,8 @@ public class Exp extends PointerObject
      * in other words, this is only for main body BGP
      */
     boolean distinct(Node qNode) {
-        Title title = type();
-        if (title == Title.AND || title == Title.BGP) {
+        Type title = type();
+        if (title == Type.AND || title == Type.BGP) {
             for (int i = 0; i < size(); i++) {
                 Exp exp = get(i);
                 switch (exp.type()) {
@@ -789,7 +789,7 @@ public class Exp extends PointerObject
                     case XPATH:
                     case EVAL:
                         if (exp.contains(qNode)) {
-                            add(i + 1, Exp.create(Title.ACCEPT, qNode));
+                            add(i + 1, Exp.create(Type.ACCEPT, qNode));
                             return true;
                         }
                         break;
@@ -807,7 +807,7 @@ public class Exp extends PointerObject
     }
 
     boolean isSortable() {
-        return isEdge() || isPath() || isGraph() || type == Title.OPT_BIND;
+        return isEdge() || isPath() || isGraph() || type == Type.OPT_BIND;
     }
 
     boolean isSimple() {
@@ -928,8 +928,8 @@ public class Exp extends PointerObject
     }
 
     void addBind(List<String> lVar) {
-        Title title = type();
-        if (title == Title.EDGE || title == Title.PATH) {
+        Type title = type();
+        if (title == Type.EDGE || title == Type.PATH) {
             for (int i = 0; i < nbNode(); i++) {
                 Node bindNode = getNode(i);
                 addBind(bindNode, lVar);
@@ -1392,7 +1392,7 @@ public class Exp extends PointerObject
     }
 
     public void getFilterVar(List<String> list, boolean excludeLocal) {
-        if (type == Title.FILTER) {
+        if (type == Type.FILTER) {
             List<String> lVar = getFilter().getVariables(excludeLocal);
             for (String varString : lVar) {
                 if (!list.contains(varString)) {
@@ -1407,11 +1407,11 @@ public class Exp extends PointerObject
     }
 
     boolean isBindCst() {
-        return type() == Title.OPT_BIND && size() == 1;
+        return type() == Type.OPT_BIND && size() == 1;
     }
 
     boolean isBindVar() {
-        return type() == Title.OPT_BIND && size() == 2;
+        return type() == Type.OPT_BIND && size() == 2;
     }
 
     /**
@@ -1421,9 +1421,9 @@ public class Exp extends PointerObject
         List<Exp> lBind = new ArrayList<>();
         for (int i = 0; i < size(); i++) {
             Exp f = get(i);
-            if ((f.type() == Title.VALUES) || (f.isFilter() && f.size() > 0)) {
+            if ((f.type() == Type.VALUES) || (f.isFilter() && f.size() > 0)) {
                 Exp bindExp = f.first();
-                if ((bindExp.type() == Title.OPT_BIND) && (bindExp.isBindCst())) {
+                if ((bindExp.type() == Type.OPT_BIND) && (bindExp.isBindCst())) {
                     // ?x = cst
                     lBind.add(bindExp);
                 }
@@ -1440,7 +1440,7 @@ public class Exp extends PointerObject
             Exp f = get(i);
             if (f.isFilter() && f.size() > 0) {
                 Exp bindExp = f.first();
-                if (bindExp.type() == Title.OPT_BIND
+                if (bindExp.type() == Type.OPT_BIND
                         // no bind (?x = ?y) in case of JOIN
                         && (!Query.testJoin || bindExp.isBindCst())) {
                     int j = i - 1;
@@ -1590,7 +1590,7 @@ public class Exp extends PointerObject
      * this postponed filter must be processed at the end of optional after join occurred
      */
     public void optional() {
-        Exp p = Exp.create(Title.BGP);
+        Exp p = Exp.create(Type.BGP);
         Exp rest = rest();
         for (Exp exp : rest) {
             if (exp.isFilter() && !rest.simpleBind(exp.getFilter())) {
@@ -1829,15 +1829,15 @@ public class Exp extends PointerObject
                 get(1).isRecFederate();
     }
 
-    boolean isFirstWith(Title type) {
+    boolean isFirstWith(Type type) {
         return type() == type || (isBGPAnd() && size() > 0 && get(0).type() == type);
     }
 
-    boolean isGraphFirstWith(Title type) {
-        return type() == Title.GRAPH && size() > 1 && get(1).isFirstWith(type);
+    boolean isGraphFirstWith(Type type) {
+        return type() == Type.GRAPH && size() > 1 && get(1).isFirstWith(type);
     }
 
-    boolean isJoinFirstWith(Title type) {
+    boolean isJoinFirstWith(Type type) {
         return isFirstWith(type) || isGraphFirstWith(type);
     }
 
@@ -1936,13 +1936,13 @@ public class Exp extends PointerObject
      */
 
     void doDispatch() {
-        Exp join = Exp.create(Title.JOIN);
-        Exp basic = Exp.create(Title.BGP);
+        Exp join = Exp.create(Type.JOIN);
+        Exp basic = Exp.create(Type.BGP);
         for (Exp exp : this) {
             if (exp.isStatement()) {
                 if (basic.size() > 0) {
                     join.add(basic);
-                    basic = Exp.create(Title.BGP);
+                    basic = Exp.create(Type.BGP);
                 }
                 join.add(exp);
             } else {
@@ -1964,7 +1964,7 @@ public class Exp extends PointerObject
         if (i == size() - 1) {
             return last();
         } else {
-            return Exp.create(Title.JOIN, get(i), dispatch(i + 1));
+            return Exp.create(Type.JOIN, get(i), dispatch(i + 1));
         }
     }
 
@@ -1975,14 +1975,14 @@ public class Exp extends PointerObject
      */
     Exp join() {
         List<Node> connectedNode = null;
-        Exp connectedExp = Exp.create(Title.AND);
+        Exp connectedExp = Exp.create(Type.AND);
         List<Exp> disconnectedExp = new ArrayList<>();
         boolean disconnectedFilter = false;
 
         for (int i = 0; i < size(); i++) {
             Exp e = get(i);
 
-            if (e.type() == Title.FILTER) {
+            if (e.type() == Type.FILTER) {
                 Filter f = e.getFilter();
                 List<String> lvar = f.getVariables();
 
@@ -2001,7 +2001,7 @@ public class Exp extends PointerObject
                 continue;
             } else {// TODO: UNION
                 List<Node> nodes;
-                if (type() == Title.MINUS || type() == Title.OPTIONAL) {
+                if (type() == Type.MINUS || type() == Type.OPTIONAL) {
                     nodes = e.first().getAllNodes();
                 } else {
                     nodes = e.getAllNodes();
@@ -2009,7 +2009,7 @@ public class Exp extends PointerObject
 
                 if (disconnectedFilter) {
                     if (!groupEdge) {
-                        connectedExp = Exp.create(Title.AND);
+                        connectedExp = Exp.create(Type.AND);
                         connectedNode = null;
                     }
                     disconnectedFilter = false;
@@ -2021,7 +2021,7 @@ public class Exp extends PointerObject
                     connectedNode.addAll(nodes);
                 } else {
                     add(disconnectedExp, connectedExp);
-                    connectedExp = Exp.create(Title.AND);
+                    connectedExp = Exp.create(Type.AND);
                     connectedNode = nodes;
                 }
             }
@@ -2057,16 +2057,16 @@ public class Exp extends PointerObject
 
             Exp cur = list.get(i);
 
-            if (cur.type() == Title.FILTER || exp.type() == Title.FILTER) {
+            if (cur.type() == Type.FILTER || exp.type() == Type.FILTER) {
                 // and
-                if (exp.type() == Title.AND) {
+                if (exp.type() == Type.AND) {
                     exp.add(cur);
                 } else {
-                    exp = Exp.create(Title.AND, exp, cur);
+                    exp = Exp.create(Type.AND, exp, cur);
                 }
             } else {
                 // variables that may be bound from environment (e.g. values)
-                exp = Exp.create(Title.JOIN, exp, cur);
+                exp = Exp.create(Type.JOIN, exp, cur);
                 exp.bindNodes();
             }
         }

@@ -644,10 +644,6 @@ public class Property {
                 Graph.setDefaultVerbose(b);
                 break;
 
-            case SOLVER_DEBUG:
-                Exp.DEBUG_DEFAULT = b;
-                break;
-
             case LDSCRIPT_DEBUG:
                 Function.nullcheck = b;
                 break;

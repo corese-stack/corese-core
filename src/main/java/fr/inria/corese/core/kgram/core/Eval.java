@@ -342,8 +342,8 @@ public class Eval implements ExpType, Plugin {
      */
     int queryWithJoinValues(Node gNode, Query q, Mappings map)
             throws SparqlException {
-        Exp values = Exp.create(Title.AND, q.getValues());
-        return evalExp(gNode, q, Exp.create(Title.JOIN, values, q.getBody()), map);
+        Exp values = Exp.create(Type.AND, q.getValues());
+        return evalExp(gNode, q, Exp.create(Type.JOIN, values, q.getBody()), map);
     }
 
     /**
@@ -580,7 +580,7 @@ public class Eval implements ExpType, Plugin {
      * Bind service variable if any
      */
     void bindService(Memory freshMemory, Exp exp, Exp main) {
-        if (main.type() == Title.JOIN) {
+        if (main.type() == Type.JOIN) {
             service(exp, freshMemory);
         }
     }
@@ -591,14 +591,14 @@ public class Eval implements ExpType, Plugin {
      * bind it in subeval memory
      */
     void service(Exp exp, Memory freshMemory) {
-        if (exp.type() == Title.SERVICE) {
+        if (exp.type() == Type.SERVICE) {
             bindService(exp, freshMemory);
         } else {
             for (Exp ee : exp.getExpList()) {
-                Title type = ee.type();
-                if (type == Title.SERVICE) {
+                Type type = ee.type();
+                if (type == Type.SERVICE) {
                     bindService(ee, freshMemory);
-                } else if (type == Title.AND || type == Title.BGP || type == Title.JOIN) {
+                } else if (type == Type.AND || type == Type.BGP || type == Type.JOIN) {
                     service(ee, freshMemory);
                 }
             }
@@ -1045,8 +1045,8 @@ public class Eval implements ExpType, Plugin {
             } else {
                 // draft test not used
                 if (query.getGlobalQuery().isAlgebra()) {
-                    Title type = exp.type();
-                    if (type == Title.BGP || type == Title.JOIN || type == Title.MINUS || type == Title.OPTIONAL || type == Title.GRAPH || type == Title.UNION) {
+                    Type type = exp.type();
+                    if (type == Type.BGP || type == Type.JOIN || type == Type.MINUS || type == Type.OPTIONAL || type == Type.GRAPH || type == Type.UNION) {
                         process(graphNode, p, exp);
                         return backtrack;
                     }
@@ -1237,7 +1237,7 @@ public class Eval implements ExpType, Plugin {
     Mappings unionBranch(Producer p, Node graphNode, Exp exp, Exp main, Mappings data) throws SparqlException {
         Node queryNode = null;
 
-        if (exp.isFirstWith(Title.UNION)) {
+        if (exp.isFirstWith(Type.UNION)) {
             // union in union: eval inner union with parameter data as is
             return subEval(p, graphNode, queryNode, exp, main, data);
         } else if (isFederate(exp) || exp.isUnion() || isParameterUnionMappings()) {

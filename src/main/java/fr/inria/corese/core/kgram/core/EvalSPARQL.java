@@ -199,14 +199,14 @@ public class EvalSPARQL {
     }
 
     Mappings basic(Node graph, Producer p, Exp exp, Mapping m) {
-        exp.setType(Exp.Title.AND);
+        exp.setType(Exp.Type.AND);
         Mappings map = null;
         try {
             map = eval.exec(graph, p, exp, m);
         } catch (SparqlException ex) {
             ex.printStackTrace();
         }
-        exp.setType(Exp.Title.BGP);
+        exp.setType(Exp.Type.BGP);
         return map;
     }
 

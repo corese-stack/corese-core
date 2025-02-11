@@ -30,7 +30,7 @@ public class QueryCheck {
     boolean check(Query q, Exp exp) {
         switch (exp.type()) {
 
-            case ExpType.EDGE:
+            case EDGE:
                 Edge edge = exp.getEdge();
                 Node pred = edge.getEdgeNode();
                 Node var = edge.getEdgeVariable();
@@ -76,7 +76,7 @@ public class QueryCheck {
 
                 break;
 
-            case ExpType.UNION:
+            case UNION:
 
                 for (Exp ee : exp.getExpList()) {
                     if (check(q, ee)) {
@@ -85,8 +85,8 @@ public class QueryCheck {
                 }
                 return false;
 
-            case ExpType.AND:
-            case ExpType.GRAPH:
+            case AND:
+            case GRAPH:
 
                 for (Exp ee : exp.getExpList()) {
                     boolean b = check(q, ee);

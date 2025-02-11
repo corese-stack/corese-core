@@ -256,8 +256,6 @@ public class Pragma {
                     query.setTest(value(object));
                 } else if (property.equals(OPTIM)) {
                     query.setOptimize(value(object));
-                } else if (property.equals(DEBUG)) {
-                    query.setDebug(value(object));
                 } else if (property.equals(SORT)) {
                     query.setSort(value(object));
                 } else if (property.equals(LISTEN) && value(object)) {

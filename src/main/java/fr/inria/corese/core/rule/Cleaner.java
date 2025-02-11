@@ -115,11 +115,11 @@ public class Cleaner {
         // remove triples with obsolete bnodes as subject
         String clean = ql.getResource("/query/clean.rq");
         // tell Transformer to cache st:hash transformation result
-        exec.getEvaluator().setMode(Evaluator.CACHE_MODE);
+        exec.getEvaluator().setMode(Evaluator.Mode.CACHE_MODE);
         // replace duplicate OWL expressions by one of them
         Mappings m1 = exec.query(unify);
         Mappings m2 = exec.query(clean);
-        exec.getEvaluator().setMode(Evaluator.NO_CACHE_MODE);
+        exec.getEvaluator().setMode(Evaluator.Mode.NO_CACHE_MODE);
     }
 
     /**

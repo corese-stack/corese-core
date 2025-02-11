@@ -15,7 +15,6 @@ import fr.inria.corese.core.kgram.path.Path;
  *
  */
 public class NodeImpl extends GraphObject implements Node
-        //,  Comparable<NodeImpl> 
 {
 
     // true means graph nodes are IDatatype instead of NodeImpl

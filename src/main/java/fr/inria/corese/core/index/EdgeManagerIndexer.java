@@ -55,6 +55,7 @@ public class EdgeManagerIndexer
     int scoIndex = -1;
     int typeIndex = -1;
     boolean isUpdate = true;
+    public static boolean test = true;
     boolean isIndexer = false;
             // do not create entailed edge in kg:entailment if it already exist in another graph
     boolean isOptim = false;

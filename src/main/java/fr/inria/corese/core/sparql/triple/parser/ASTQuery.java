@@ -3623,7 +3623,7 @@ public class ASTQuery
      * Mappings map is result of source selection
      */
     public ArrayList<Expression> getUndefinedTriple(Mappings map) {
-        HashMap<String, Integer> res = map.countBooleanValue();
+        Map<String, Integer> res = map.countBooleanValue();
         Exp body = getServiceBody();
         ArrayList<Expression> list = new ArrayList<>();
         
