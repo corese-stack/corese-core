@@ -1,11 +1,7 @@
 package fr.inria.corese.core.compiler.federate;
 
-import fr.inria.corese.core.sparql.triple.parser.Atom;
-import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.core.sparql.triple.parser.Exp;
-import fr.inria.corese.core.sparql.triple.parser.Service;
-import fr.inria.corese.core.sparql.triple.parser.Triple;
-import fr.inria.corese.core.sparql.triple.parser.Union;
+import fr.inria.corese.core.sparql.triple.parser.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,7 +135,6 @@ public class RewriteBGPList {
             if (! contains(bgpList, triple)) {
                 Service service = getVisitor().getRewriteTriple()
                  .rewriteTripleWithSeveralURI(namedGraph, triple, body, filterList);
-               // getVisitor().filter(body, service.getBodyExp());
                 exp.add(service);
             }
         }

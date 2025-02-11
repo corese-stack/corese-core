@@ -265,14 +265,14 @@ public class PluginImpl
     // algo: jw --jaro winckler ng --ngram wn eq
     @Override
     public IDatatype approximate(Expr exp, Environment env, Producer p, IDatatype[] param) {
-        return getApproximateSearch().eval(exp, env, p, param);
+        return getApproximateSearch().evaluate(exp, env, p, param);
     }
 
     // function xt:sim
     // compute similarity of solution ?
     @Override
     public IDatatype approximate(Expr exp, Environment env, Producer p) {
-        return getApproximateSearch().eval(exp, env, p);
+        return getApproximateSearch().evaluate(exp, env, p);
     }
 
     // function xt:depth

@@ -11,14 +11,14 @@ import fr.inria.corese.core.approximate.strategy.AlgType;
 public class Jaro extends BaseAlgorithm {
 
     public Jaro() {
-        super(AlgType.jw);
+        super(AlgType.JW);
     }
 
     /**
      * gets the similarity of the two strings using Jaro distance.
      *
-     * @param s1 the first input string
-     * @param s2 the second input string
+     * @param s1        the first input string
+     * @param s2        the second input string
      * @param parameter
      * @return a value between 0-1 of the similarity
      */

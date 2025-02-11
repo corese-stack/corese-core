@@ -2385,7 +2385,7 @@ public class Query extends Exp implements Graphable {
     }
     
      @Override
-    public Object getValue(String var, int n) {
+    public Object getValue(String variable, int n) {
          List<Edge> list = getEdges();
          if (n >= list.size()) {
              return null;

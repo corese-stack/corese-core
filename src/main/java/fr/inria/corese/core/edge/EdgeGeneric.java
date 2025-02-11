@@ -9,13 +9,11 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
  * Buffer Edge as Quad to deliver complete edge for Producer
  *
  * @author Olivier Corby, Wimmics, INRIA I3S, 2014
- *
  */
 public class EdgeGeneric extends EdgeTop implements Edge {
     static int pcount = 0;
-    public static boolean displayGraph = true;
-    int index = -1;
     protected Node graph, predicate, subject, object;
+    int index = -1;
     private Object prov;
 
     public EdgeGeneric() {
@@ -100,32 +98,33 @@ public class EdgeGeneric extends EdgeTop implements Edge {
     }
 
     @Override
+    public void setEdgeIndex(int n) {
+        index = n;
+    }
+
+    @Override
     public String getEdgeLabel() {
         return getEdgeNode().getLabel();
     }
 
     @Override
     public Node getNode(int n) {
-        switch (n) {
-            case Graph.IGRAPH:
-                return getGraph();
-            case 0:
-                return subject;
-            case 1:
-                return object;
+        if (n == Graph.IGRAPH) {
+            return getGraph();
+        } else if (n == 0) {
+            return subject;
+        } else if (n == 1) {
+            return object;
         }
         return null;
     }
 
     @Override
     public void setNode(int i, Node n) {
-        switch (i) {
-            case 0:
-                subject = n;
-                break;
-            case 1:
-                object = n;
-                break;
+        if (i == 0) {
+            subject = n;
+        } else if (i == 1) {
+            object = n;
         }
     }
 
@@ -137,11 +136,6 @@ public class EdgeGeneric extends EdgeTop implements Edge {
     @Override
     public int nbGraphNode() {
         return 2;
-    }
-
-    @Override
-    public void setEdgeIndex(int n) {
-        index = n;
     }
 
     @Override
@@ -161,13 +155,11 @@ public class EdgeGeneric extends EdgeTop implements Edge {
 
     @Override
     public Node getNode() {
-        // TODO Auto-generated method stub
         return DatatypeMap.createObject(this.toString(), this);
     }
 
     @Override
     public Node getEdgeVariable() {
-        // TODO Auto-generated method stub
         return null;
     }
 

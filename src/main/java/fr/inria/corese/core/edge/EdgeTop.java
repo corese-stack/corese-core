@@ -1,10 +1,5 @@
 package fr.inria.corese.core.edge;
 
-import static fr.inria.corese.core.kgram.api.core.PointerType.TRIPLE;
-
-import java.util.ArrayList;
-import java.util.Objects;
-
 import fr.inria.corese.core.GraphObject;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
@@ -14,24 +9,27 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 
+import java.util.ArrayList;
+import java.util.Objects;
+
+import static fr.inria.corese.core.kgram.api.core.PointerType.TRIPLE;
+
 /**
- *
  * @author Olivier Corby, Wimmics Inria I3S, 2014
- *
  */
 public abstract class EdgeTop extends GraphObject implements Edge {
-    private AccessRight.AccessRights level = AccessRight.DEFAULT;
     public static final String NL = System.getProperty("line.separator");
+    private AccessRight.AccessRights level = AccessRight.DEFAULT;
     private boolean nested = false;
     // created by values, bind or triple()
     private boolean created = false;
 
-    public Edge copy() {
-        return create(getGraph(), getNode(0), getEdgeNode(), getNode(1));
-    }
-
     public static Edge create(Node source, Node subject, Node predicate, Node objet) {
         return null;
+    }
+
+    public Edge copy() {
+        return create(getGraph(), getNode(0), getEdgeNode(), getNode(1));
     }
 
     // manage access right
@@ -56,12 +54,12 @@ public abstract class EdgeTop extends GraphObject implements Edge {
         return null;
     }
 
+    public void setEdgeNode(Node pred) {
+    }
+
     @Override
     public Node getProperty() {
         return getEdgeNode();
-    }
-
-    public void setEdgeNode(Node pred) {
     }
 
     @Override
@@ -105,16 +103,15 @@ public abstract class EdgeTop extends GraphObject implements Edge {
     }
 
     @Override
-    public IDatatype getValue(String var, int n) {
-        switch (n) {
-            case 0:
-                return nodeValue(getNode(0));
-            case 1:
-                return nodeValue(getEdgeNode());
-            case 2:
-                return nodeValue(getNode(1));
-            case 3:
-                return nodeValue(getGraph());
+    public IDatatype getValue(String varString, int n) {
+        if (n == 0) {
+            return nodeValue(getNode(0));
+        } else if (n == 1) {
+            return nodeValue(getEdgeNode());
+        } else if (n == 2) {
+            return nodeValue(getNode(1));
+        } else if (n == 3) {
+            return nodeValue(getGraph());
         }
         return null;
     }

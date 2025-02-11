@@ -13,7 +13,6 @@ public interface ISimAlgorithm {
     double MIN = 0.0d;
     double MAX = 1.0d;
 
-    //double calculate(String s1, String s2);
     /**
      * Calculate the similarity between strings s1 and s2
      *

@@ -2,55 +2,41 @@ package fr.inria.corese.core.compiler.eval;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Expr;
-import fr.inria.corese.core.kgram.api.core.PointerType;
-import fr.inria.corese.core.kgram.api.query.Environment;
-import fr.inria.corese.core.kgram.api.query.Evaluator;
-import fr.inria.corese.core.kgram.api.query.Hierarchy;
-import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.*;
 import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.kgram.core.PointerObject;
 import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.extension.ListSort;
 import fr.inria.corese.core.sparql.triple.function.script.Funcall;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.function.extension.ListSort;
 import fr.inria.corese.core.sparql.triple.function.script.LDScript;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Callback manager for LDScript functions with specific annotations Eval SPARQL
  * processor calls before() and after()
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2018
  * @before function us:before(?q) {}
  * @after function us:after(?m) {}
  * @produce function us:produce(?q) {}
  * @candidate function us:candidate(?q, ?e) {}
  * @result function us:result(?m) {}
  * @solution function us:solution(?m) {}
- *
- * @author Olivier Corby, Wimmics INRIA I3S, 2018
- *
  */
 public class QuerySolverVisitorBasic extends PointerObject implements ProcessVisitor {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitor.class);
-
-    public static boolean REENTRANT_DEFAULT = false;
-
     public static final String RECURSION = "@recursion";
     public static final String VERBOSE = "@verbose";
-
     public static final String SHARE = "@share";
     public static final String TRACE = "@display";
     public static final String PREPARE = "@prepare";
@@ -73,7 +59,6 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
     public static final String START = "@start";
     public static final String FINISH = "@finish";
     public static final String OVERLOAD = "@overload";
-
     public static final String LIMIT = "@limit";
     public static final String TIMEOUT = "@timeout";
     public static final String SLICE = "@slice";
@@ -104,41 +89,30 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
     public static final String DELETE = "@delete";
     public static final String UPDATE = "@update";
     public static final int UPDATE_ARITY = 3;
-
     public static final String INIT_PARAM = "@initParam";
     public static final String INIT_SERVER = "@initServer";
-    public static final String BEFORE_REQUEST = "@beforeRequest";
-    public static final String AFTER_REQUEST = "@afterRequest";
-
     public static final String BEFORE_TRANSFORMER = "@beforeTransformer";
     public static final String AFTER_TRANSFORMER = "@afterTransformer";
     public static final String BEFORE_WORKFLOW = "@beforeWorkflow";
     public static final String AFTER_WORKFLOW = "@afterWorkflow";
-
-    static final String USER = NSManager.USER;
-    static final String PRODUCE_METHOD = USER + "produce";
-
     static final String[] EVENT_LIST = {
-        BEFORE, AFTER, START, FINISH, PRODUCE, RESULT, STATEMENT, CANDIDATE, PATH, STEP, VALUES, BIND,
-        BGP, JOIN, OPTIONAL, MINUS, UNION, FILTER, SELECT, SERVICE, QUERY, GRAPH,
-        AGGREGATE, HAVING, FUNCTION, ORDERBY, DISTINCT
+            BEFORE, AFTER, START, FINISH, PRODUCE, RESULT, STATEMENT, CANDIDATE, PATH, STEP, VALUES, BIND,
+            BGP, JOIN, OPTIONAL, MINUS, UNION, FILTER, SELECT, SERVICE, QUERY, GRAPH,
+            AGGREGATE, HAVING, FUNCTION, ORDERBY, DISTINCT
     };
-
+    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitor.class);
+    public static boolean REENTRANT_DEFAULT = false;
     private static boolean event = true;
-
-    private boolean active = false;
-    private boolean reentrant = REENTRANT_DEFAULT;
     boolean select = false;
-    private boolean shareable = false;
-    private boolean debug = false;
-    private boolean verbose = false;
-    private boolean function = false;
-
-    private Eval eval;
     Query query;
     ASTQuery ast;
     HashMap<Environment, IDatatype> distinct;
     QuerySolverOverload overload;
+    private boolean active = false;
+    private boolean reentrant = REENTRANT_DEFAULT;
+    private boolean shareable = false;
+    private boolean function = false;
+    private Eval eval;
 
     public QuerySolverVisitorBasic() {
         distinct = new HashMap<>();
@@ -150,9 +124,18 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
         eval = e;
     }
 
-    @Override
-    public void setProcessor(Eval e) {
-        setEval(e);
+    /**
+     * @return the event
+     */
+    public static boolean isEvent() {
+        return event;
+    }
+
+    /**
+     * @param aEvent the event to set
+     */
+    public static void setEvent(boolean aEvent) {
+        event = aEvent;
     }
 
     @Override
@@ -160,16 +143,15 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
         return getEval();
     }
 
+    @Override
+    public void setProcessor(Eval e) {
+        setEval(e);
+    }
+
     Hierarchy getHierarchy() {
         return getEnvironment().getExtension().getHierarchy();
     }
 
-    // datatype(us:km, us:length)
-//    public IDatatype datatype(IDatatype type, IDatatype sup) {
-//        getHierarchy().defSuperType(type, sup);
-//        return type;
-//    }
-    //@Override
     public IDatatype datatype(IDatatype type, IDatatype sup) {
         getHierarchy().defSuperType(type, sup);
         return type;
@@ -179,9 +161,6 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
         return getHierarchy().getSuperTypes(null, type);
     }
 
-//    String getSuperType(IDatatype dt) {
-//        return getSuperType ((IDatatype) dt);
-//    }
     String getSuperType(IDatatype type) {
         List<String> list = getSuperTypes(type);
         if (list == null || list.isEmpty()) {
@@ -190,19 +169,10 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
         return list.get(list.size() - 1);
     }
 
-    // Draft for testing
-    void test() {
-        IDatatype dt = DatatypeMap.map();
-        dt.set(DatatypeMap.newInstance("test"), DatatypeMap.newInstance(10));
-        Binding b = getEnvironment().getBind();
-        b.setVariable("?global", dt);
-    }
-
     void initialize() {
         // Visitor shared among different query processing:
         // query in function, transformer
         setShareable(ast.hasMetadata(SHARE));
-        setVerbose(ast.hasMetadata(VERBOSE));
         setFunction(define(FUNCTION, 2));
         if (ast.hasMetadata(RECURSION)) {
             // Visitor still active inside event function
@@ -232,12 +202,12 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
         return true;
     }
 
-    public void setOverload(boolean b) {
-        overload.setOverload(b);
-    }
-
     public boolean isOverload() {
         return overload.isOverload();
+    }
+
+    public void setOverload(boolean b) {
+        overload.setOverload(b);
     }
 
     public boolean define(String name, int arity) {
@@ -279,19 +249,18 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
     public IDatatype callbackBasic(Eval ev, String metadata, IDatatype[] param) {
         return callbackSimple(ev, metadata, param);
     }
-    
+
     Function getDefineMetadata(Environment env, String metadata, int n) {
         return new LDScript().getDefineMetadata(env, metadata, n);
     }
-    
+
     Function getDefineMethod(Environment env, String name, IDatatype type, IDatatype[] param) {
         return new LDScript().getDefineMethod(env, name, type, param);
     }
-    
+
     Function getDefine(Environment env, String name, int n) {
         return new LDScript().getDefine(env, name, n);
     }
-
 
     IDatatype callbackSimple(Eval ev, String metadata, IDatatype[] param) {
         Function function = getDefineMetadata(getEnvironment(), metadata, param.length);
@@ -344,8 +313,7 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
     public IDatatype methodBasic(Eval ev, String name, IDatatype type, IDatatype[] param) {
         Function exp = getDefineMethod(getEnvironment(), name, type, param);
         if (exp != null) {
-            IDatatype dt = call(exp, param, ev.getEvaluator(), ev.getEnvironment(), ev.getProducer());
-            return dt;
+            return call(exp, param, ev.getEvaluator(), ev.getEnvironment(), ev.getProducer());
         }
         return null;
     }
@@ -430,20 +398,6 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
     }
 
     /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * @param debug the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
-    /**
      * @return the reentrant
      */
     public boolean isReentrant() {
@@ -455,20 +409,6 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
      */
     public void setReentrant(boolean reentrant) {
         this.reentrant = reentrant;
-    }
-
-    /**
-     * @return the verbose
-     */
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    /**
-     * @param verbose the verbose to set
-     */
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
     }
 
     /**
@@ -497,20 +437,6 @@ public class QuerySolverVisitorBasic extends PointerObject implements ProcessVis
      */
     public void setEval(Eval eval) {
         this.eval = eval;
-    }
-
-    /**
-     * @return the event
-     */
-    public static boolean isEvent() {
-        return event;
-    }
-
-    /**
-     * @param aEvent the event to set
-     */
-    public static void setEvent(boolean aEvent) {
-        event = aEvent;
     }
 
 }

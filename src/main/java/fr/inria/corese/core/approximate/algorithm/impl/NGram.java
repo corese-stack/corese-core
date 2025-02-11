@@ -1,7 +1,7 @@
 package fr.inria.corese.core.approximate.algorithm.impl;
 
 import fr.inria.corese.core.approximate.strategy.AlgType;
-import fr.inria.corese.core.approximate.algorithm.Utils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,14 +21,13 @@ public class NGram extends BaseAlgorithm {
     }
 
     public NGram(int n) {
-        super(AlgType.ng);
+        super(AlgType.NG);
         this.n = n;
     }
 
     @Override
     public double calculate(String s1, String s2, String parameter) {
-        double sim = this.calculate(s1, s2);
-        return sim;
+        return this.calculate(s1, s2);
     }
 
     private double calculate(String s1, String s2) {
@@ -38,7 +37,6 @@ public class NGram extends BaseAlgorithm {
             Map<String, Integer> res2 = tokenize(s2, n);
 
             int c = common(res1, res2);
-            //int u = Math.max(s1.length(), s2.length()) - n + 1;
             int u = res1.size() + res2.size() - c;
             //u = u > 0 ? u : 1;
             sim = (double) c / (double) u;
@@ -59,7 +57,7 @@ public class NGram extends BaseAlgorithm {
     }
 
     private Map<String, Integer> tokenize(String c, int n) {
-        Map<String, Integer> tokens = new HashMap<String, Integer>();
+        Map<String, Integer> tokens = new HashMap<>();
 
         String spacer = "";
         c = spacer + c + spacer;

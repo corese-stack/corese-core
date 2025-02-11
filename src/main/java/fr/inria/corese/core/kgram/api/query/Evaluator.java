@@ -2,75 +2,36 @@ package fr.inria.corese.core.kgram.api.query;
 
 import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.kgram.event.ResultListener;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
 /**
  * Interface for the connector that evaluates filters
- * 
-* @author Olivier Corby, Edelweiss, INRIA 2010
-*
-*/
+ *
+ * @author Olivier Corby, Edelweiss, INRIA 2010
+ */
 public interface Evaluator extends Computer {
-	
-	int KGRAM_MODE 	= 0;
-	int SPARQL_MODE  	= 1;
-        
-        int CACHE_MODE = 101;
-        int NO_CACHE_MODE = 102;
-	
-	void setMode(int mode);
-	
-	int getMode();
-        
-        void setDebug(boolean b);
 
-	
-	/**
-	 * Evaluate a filter 
-	 * 
-	 * @param f
-	 * @param e
-	 * @return
-	 */
-	//boolean test(Filter f, Environment e) throws SparqlException;
-//        
-	//boolean test(Filter f, Environment e, Producer p) throws SparqlException ;
+    Mode getMode();
 
-	/**
-	 * Evaluate a filter and return a Node
-	 * use case: select fun(?x) as ?y
-	 * 
-	 * @param f
-	 * @param e
-	 * @return
-	 */
-	//Node eval(Filter f, Environment e, Producer p) throws SparqlException;
-        
-        /**
-	 * Evaluate an extension function filter and return Mappings
-	 * use case: select sql('select from where') as (?x ?y) where {}
-	 * TODO: should be an interface instead of Mappings
-	 * 	
-	 */
-//	Mappings eval(Filter f, Environment e, List<Node> nodes) throws SparqlException;
-	                             
+    void setMode(Mode mode);
 
-        // cast Java object into IDatatype
-        //Node cast(Object obj, Environment e, Producer p);
+    Binding getBinder();
 
-        Binding getBinder();
-				        
-        void setProducer(Producer p);
-        
-        void setKGRAM(Eval o);
-        
-        //Eval getEval();
+    void setProducer(Producer p);
 
-        void addResultListener(ResultListener rl);
-        
-        void start(Environment env);
-        void finish(Environment env);
-        void init(Environment env);
-        
+    void setKGRAM(Eval o);
+
+    void addResultListener(ResultListener rl);
+
+    void start(Environment env);
+
+    void finish(Environment env);
+
+    void init(Environment env);
+
+    public enum Mode {
+        KGRAM_MODE, SPARQL_MODE, CACHE_MODE, NO_CACHE_MODE
+    }
+
 }

@@ -3,13 +3,20 @@ package fr.inria.corese.core.kgram.core;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Producer;
+
 import static fr.inria.corese.core.kgram.core.Eval.STOP;
 
 /**
- *
  * @author corby
  */
 public class EvalOptional {
+
+    Eval eval;
+    private boolean stop = false;
+
+    EvalOptional(Eval e) {
+        eval = e;
+    }
 
     /**
      * @return the stop
@@ -25,15 +32,7 @@ public class EvalOptional {
         this.stop = stop;
     }
 
-    private boolean stop = false;
-    Eval eval;
-
-    EvalOptional(Eval e) {
-        eval = e;
-    }
-
     /**
-     *
      * A optional B Filter F map1 = eval(A) ; map2 = eval(values Vb {
      * distinct(map1/Vb) } B) Vb = variables in-subscope in B, ie in-scope
      * except in right arg of an optional in B for m1 in map1: for m2 in map2:
@@ -42,7 +41,6 @@ public class EvalOptional {
      */
     int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
         int backtrack = n - 1;
-        boolean hasGraph = graphNode != null;
         Memory env = eval.getMemory();
         Node queryNode = null;
 
@@ -60,7 +58,7 @@ public class EvalOptional {
         Mappings map = set1.prepareMappingsRest(rest);
 
         if (map != null && exp.getInscopeFilter() != null) {
-            /**
+            /*
              * Use case: BGP1 optional { filter(exp) BGP2} all var in
              * exp.getVariables() are inscope(BGP1, BGP2) and are bound in
              * Mappings map => select Mapping m in map where filter (exp)
@@ -72,7 +70,7 @@ public class EvalOptional {
             map = nmap;
         }
 
-        /**
+        /*
          * Push bindings from map1 into rest when there is at least one variable
          * in-subscope of rest that is always bound in map1 ?x p ?y optional {
          * ?y q ?z } -> values ?y { y1 yn } {?x p ?y optional { ?y q ?z }}
@@ -85,20 +83,15 @@ public class EvalOptional {
          */
         if (map != null && map.isEmpty()) {
             // Every Mapping fail filter, rest() will always fail: skip optional rest()
-            if (env.getQuery().isDebug()) {
-                trace(exp);
-            }
             map2 = Mappings.create(env.getQuery());
         } else {
-            //rest = set1.getRest(exp, map); 
-            map2 = eval.subEval(p, graphNode, queryNode, rest, exp, map); //set1.getJoinMappings());
+            map2 = eval.subEval(p, graphNode, queryNode, rest, exp, map);
         }
 
         eval.getVisitor().optional(eval, eval.getGraphNode(graphNode), exp, map1, map2);
 
         MappingSet set = new MappingSet(getQuery(), exp, set1,
                 new MappingSet(getQuery(), map2));
-        set.setDebug(env.getQuery().isDebug());
         set.start();
 
         for (Mapping m1 : map1) {
@@ -128,25 +121,16 @@ public class EvalOptional {
                 }
             }
 
-            if (nbsuc == 0) {
-                if (env.push(m1, n)) {
-                    backtrack = eval.eval(p, graphNode, stack, n + 1);
-                    env.pop(m1);
-                    if (backtrack < n) {
-                        return backtrack;
-                    }
+            if ((nbsuc == 0) && (env.push(m1, n))) {
+                backtrack = eval.eval(p, graphNode, stack, n + 1);
+                env.pop(m1);
+                if (backtrack < n) {
+                    return backtrack;
                 }
             }
         }
 
         return backtrack;
-    }
-
-    void trace(Exp exp) {
-        Eval.logger.info("Optional: candidate Mappings fail filter:");
-        Eval.logger.info(exp.getInscopeFilter().toString());
-        Eval.logger.info("Skip optional part:");
-        Eval.logger.info(exp.toString());
     }
 
     /**
@@ -156,18 +140,16 @@ public class EvalOptional {
      * Mapping m from map before binding BGP2 with map
      */
     Mappings filter(Node gNode, Exp exp, Environment memory, Producer p, Mappings map) throws SparqlException {
-        for (int i = 0; i < map.size();) {
+        for (int i = 0; i < map.size(); ) {
             Mapping m = map.get(i);
             m.setQuery(memory.getQuery());
             m.setMap(memory.getMap());
             m.setBind(memory.getBind());
-            //m.setGraphNode(gNode);
             m.setEval(eval);
             boolean suc = true;
 
             for (Exp ft : exp.getInscopeFilter()) {
                 boolean b = eval.test(gNode, ft.getFilter(), m, p);
-                //m.setGraphNode(null);
                 if (!b) {
                     suc = false;
                     break;
@@ -184,6 +166,7 @@ public class EvalOptional {
     }
 
     /**
+     *
      */
     boolean filter(Environment memory, Producer p, Node queryNode, Node gNode, Mapping map, Exp exp) throws SparqlException {
         if (exp.isPostpone()) {
@@ -193,10 +176,8 @@ public class EvalOptional {
                 map.setQuery(memory.getQuery());
                 map.setMap(memory.getMap());
                 map.setBind(memory.getBind());
-                //map.setGraphNode(gNode);
                 map.setEval(eval);
                 boolean b = eval.test(gNode, f.getFilter(), map, p);
-                //map.setGraphNode(null);
                 if (eval.hasFilter) {
                     b = eval.getVisitor().filter(eval, gNode, f.getFilter().getExp(), b);
                 }

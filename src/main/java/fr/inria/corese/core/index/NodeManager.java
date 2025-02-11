@@ -6,6 +6,8 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.sparql.api.IDatatype.NodeKind;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manage a table of list of properties for each node
@@ -26,7 +28,7 @@ import java.util.HashMap;
 public class NodeManager {
 
     private Graph graph;
-    private ArrayList<PredicateTable> predicateTableList;
+    private List<PredicateTable> predicateTableList;
     // in some case content is obsolete
     private boolean active = true;
     // safety to switch off
@@ -126,8 +128,7 @@ public class NodeManager {
     }
         
     // edge subList for node starts at begin
-    void add(Node node, Node predicate, int begin, int end) {        
-        //System.out.println("NM: " + node + "(" + begin + ", " + end + ")");
+    void add(Node node, Node predicate, int begin, int end) {
         if (isEffective()) {
             PredicateList list = get(node);
             if (list == null) {
@@ -241,15 +242,15 @@ public class NodeManager {
     }
     
     // one map per kind of Node
-    public HashMap<Node, PredicateList> getPredicateTable(Node node) {        
+    public Map<Node, PredicateList> getPredicateTable(Node node) {
         return getPredicateTableList().get(node.getNodeKind().getIndex());
     }
 
-    public ArrayList<PredicateTable> getPredicateTableList() {
+    public List<PredicateTable> getPredicateTableList() {
         return predicateTableList;
     }
 
-    public void setPredicateTableList(ArrayList<PredicateTable> predicateTableList) {
+    public void setPredicateTableList(List<PredicateTable> predicateTableList) {
         this.predicateTableList = predicateTableList;
     }
 

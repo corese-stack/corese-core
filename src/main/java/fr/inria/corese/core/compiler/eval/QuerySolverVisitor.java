@@ -3,17 +3,14 @@ package fr.inria.corese.core.compiler.eval;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Eval;
-import fr.inria.corese.core.kgram.core.Exp;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.*;
 import fr.inria.corese.core.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Callback manager for LDScript functions with specific annotations Eval SPARQL
@@ -324,8 +321,7 @@ public class QuerySolverVisitor extends QuerySolverVisitorBasic {
     @Override
     public IDatatype function(Eval eval, Expr funcall, Expr fundef) {  
         if (isFunction()) {
-            IDatatype dt = callback(eval, FUNCTION, toArray(funcall, fundef));       
-            return dt;
+            return callback(eval, FUNCTION, toArray(funcall, fundef));
         }
         return null;
     }
@@ -341,7 +337,7 @@ public class QuerySolverVisitor extends QuerySolverVisitorBasic {
     }
     
     @Override
-    public IDatatype select(Eval eval, Expr e, IDatatype dt) {       
+    public IDatatype select(Eval eval, Expr e, IDatatype dt) {
         IDatatype val = callback(eval, SELECT, toArray(e, dt));
         return dt;
     }

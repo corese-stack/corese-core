@@ -46,33 +46,30 @@ public class EdgeManagerIndexer
     public static boolean ITERATE_SUBLIST = false;
     public static boolean RECORD_END = false;
     // true: store internal Edge without predicate Node
-    public static boolean test = true;
-    private static final String NL = System.getProperty("line.separator");
     static final int IGRAPH = Graph.IGRAPH;
     static final int ILIST = Graph.ILIST;
     private static final Logger logger = LoggerFactory.getLogger(EdgeManagerIndexer.class);
     private boolean byIndex = true;
     int index = 0, other = 1;
     int count = 0;
-    int scoIndex = -1, typeIndex = -1;
-    boolean isDebug = !true,
-            isUpdate = true,
-            isIndexer = false,
+    int scoIndex = -1;
+    int typeIndex = -1;
+    boolean isUpdate = true;
+    boolean isIndexer = false;
             // do not create entailed edge in kg:entailment if it already exist in another graph
-            isOptim = false;
-    Comparator<Edge> comparatorIndex, comparator;
+    boolean isOptim = false;
+    Comparator<Edge> comparatorIndex;
+    Comparator<Edge> comparator;
     private Graph graph;
     List<Node> sortedProperties;
     PredicateList sortedPredicates;
     // Property Node -> Edge List 
     HashMap<Node, EdgeManager> table;
     private NodeManager nodeManager;
-    //TransitiveEdgeManager transitiveManager;
-    private final boolean debug = false;
 
     public EdgeManagerIndexer(Graph g, boolean bi, int index) {
         init(g, bi, index);
-        table = new HashMap();
+        table = new HashMap<>();
         nodeManager = new NodeManager(g, index);
     }
 
@@ -80,13 +77,10 @@ public class EdgeManagerIndexer
         setGraph(g);
         index = n;
         byIndex = bi;
-        switch (index) {
-            case 0:
-                other = 1;
-                break;
-            default:
-                other = 0;
-                break;
+        if (index == 0) {
+            other = 1;
+        } else {
+            other = 0;
         }
     }
     
@@ -145,9 +139,6 @@ public class EdgeManagerIndexer
    
 
     Node getNode(Edge ent, int n) {
-//        if (n == IGRAPH) {
-//            return ent.getGraph();
-//        }
         return ent.getNode(n);
     }
 
@@ -180,12 +171,7 @@ public class EdgeManagerIndexer
         for (Node pred : getProperties()) {
             sortedProperties.add(pred);
         }
-        Collections.sort(sortedProperties, new Comparator<Node>() {
-            @Override
-            public int compare(Node o1, Node o2) {
-                return o1.compare(o2);
-            }
-        });
+        sortedProperties.sort(Node::compare);
     }
 
     @Override
@@ -809,9 +795,6 @@ public class EdgeManagerIndexer
             return list;
         }
         else {
-            if (debug) {
-                logger.info("getEdges: " + pred + " " + node + " " + beginIndex);
-            }
             return list.getEdges(node, beginIndex);
         }    
     }
@@ -1084,10 +1067,7 @@ public class EdgeManagerIndexer
     private void clear(Node pred, Edge ent) {
         for (EdgeManagerIndexer ei : getGraph().getIndexList()) {
             if (ei.getIndex() != IGRAPH) {
-                Edge rem = ei.delete(pred, ent);
-                if (isDebug && rem != null) {
-                    logger.debug("** EI clear: " + ei.getIndex() + " " + rem);
-                }
+                ei.delete(pred, ent);
             }
         }
     }
