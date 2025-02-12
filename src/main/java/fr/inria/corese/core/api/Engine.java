@@ -9,11 +9,12 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
  */
 public interface Engine {
 
-    int UNDEF = -1;
-    int RDFS_ENGINE = 0;
-    int RULE_ENGINE = 1;
-    int QUERY_ENGINE = 2;
-    int WORKFLOW_ENGINE = 3;
+    public enum Type {
+        RDFS_ENGINE,
+        RULE_ENGINE,
+        QUERY_ENGINE,
+        WORKFLOW_ENGINE
+    }
 
     boolean isActivate();
 
@@ -37,7 +38,7 @@ public interface Engine {
     // graph have been cleared
     void onClear();
 
-    int type();
+    Type type();
 
 
 }

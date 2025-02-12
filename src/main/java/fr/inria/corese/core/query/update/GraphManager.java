@@ -445,7 +445,7 @@ public class GraphManager {
 
                 if (isRule(uri)) {
                     // clear also the rule base
-                    wf.removeEngine(Engine.RULE_ENGINE);
+                    wf.removeEngine(Engine.Type.RULE_ENGINE);
                 }
 
             case CLEAR:

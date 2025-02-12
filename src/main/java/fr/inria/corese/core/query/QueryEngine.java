@@ -309,8 +309,8 @@ public class QueryEngine implements Engine {
     }
 
     @Override
-    public int type() {
-        return Engine.QUERY_ENGINE;
+    public Type type() {
+        return Engine.Type.QUERY_ENGINE;
     }
 
     public void sort() {

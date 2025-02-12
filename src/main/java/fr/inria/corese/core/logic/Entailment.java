@@ -960,7 +960,7 @@ public class Entailment implements Engine {
     }
 
     @Override
-    public int type() {
-        return RDFS_ENGINE;
+    public Type type() {
+        return Type.RDFS_ENGINE;
     }
 }

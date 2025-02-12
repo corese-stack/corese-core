@@ -1,6 +1,7 @@
 package fr.inria.corese.core.extension;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
@@ -103,10 +104,10 @@ public class Agent {
     void entailment() {
         if (getGraph() != null) {
             RuleEngine re = RuleEngine.create(graph);
-            re.setProfile(RuleEngine.OWL_RL);
             try {
+                re.setProfile(RuleEngine.Profile.OWLRL);
                 re.process();
-            } catch (EngineException ex) {
+            } catch (EngineException | LoadException ex) {
                 Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

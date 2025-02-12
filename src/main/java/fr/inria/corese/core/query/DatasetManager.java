@@ -36,7 +36,7 @@ public class DatasetManager {
 
             if (isStorage()) {
                 // default mode is db storage
-                setDataManager(StorageFactory.getDataManager(getId()));
+                setDataManager(StorageFactory.getSingleton().getDataManager(getId()));
                 logger.info("Storage: " + getId());
             }
         }
@@ -87,9 +87,9 @@ public class DatasetManager {
     public void defineDataManager(TypeDataBase typeDB, String id, String param) {
         logger.info("Create data manager " + typeDB + " with id " + id + " with config " + param);
         if (typeDB == TypeDataBase.JAVA) {
-            StorageFactory.defineDataManager(param, new DataManagerJava(param));
+            StorageFactory.getSingleton().defineDataManager(param, new DataManagerJava(param));
         } else if (typeDB == TypeDataBase.CORESE_GRAPH) {
-            StorageFactory.defineDataManager(id, new CoreseGraphDataManagerBuilder().build());
+            StorageFactory.getSingleton().defineDataManager(id, new CoreseGraphDataManagerBuilder().build());
         }
     }
 
@@ -112,8 +112,8 @@ public class DatasetManager {
     }
 
     public QueryProcess createStorageQueryProcessList(Graph g) {
-        DataManager[] dmList = StorageFactory.getDataManagerList()
-                .toArray(new DataManager[StorageFactory.getDataManagerList().size()]);
+        DataManager[] dmList = StorageFactory.getSingleton().getDataManagerList()
+                .toArray(new DataManager[StorageFactory.getSingleton().getDataManagerList().size()]);
         return QueryProcess.create(g, dmList);
     }
 
@@ -158,7 +158,7 @@ public class DatasetManager {
     }
 
     public DataManager getDataManager(String path) {
-        return StorageFactory.getDataManager(path);
+        return StorageFactory.getSingleton().getDataManager(path);
     }
 
     public String getId() {

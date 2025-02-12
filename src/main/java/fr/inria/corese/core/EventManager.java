@@ -201,7 +201,7 @@ public class EventManager implements EventHandler {
                 break;
                 
             case ActivateRuleEngine:    
-                getWorkflow().setActivate(Engine.RULE_ENGINE, true);
+                getWorkflow().setActivate(Engine.Type.RULE_ENGINE, true);
                 setEntail(true); 
                 break;
                 
@@ -257,7 +257,7 @@ public class EventManager implements EventHandler {
                 break;
                 
             case ActivateRuleEngine:    
-                getWorkflow().setActivate(Engine.RULE_ENGINE, false);
+                getWorkflow().setActivate(Engine.Type.RULE_ENGINE, false);
                 break;
                 
             case RuleEngine:

@@ -200,15 +200,15 @@ public class Workflow implements Engine {
     }
 
     @Override
-    public int type() {
-        return WORKFLOW_ENGINE;
+    public Type type() {
+        return Type.WORKFLOW_ENGINE;
     }
 
     public void clear() {
         engines.clear();
     }
 
-    public void removeEngine(int type) {
+    public void removeEngine(Type type) {
         for (int i = 0; i < engines.size();) {
             if (engines.get(i).type() == type) {
                 engines.remove(engines.get(i));
@@ -218,7 +218,7 @@ public class Workflow implements Engine {
         }
     }
 
-    public void setActivate(int type, boolean b) {
+    public void setActivate(Type type, boolean b) {
 
         for (Engine e : engines) {
             if (e.type() == type) {

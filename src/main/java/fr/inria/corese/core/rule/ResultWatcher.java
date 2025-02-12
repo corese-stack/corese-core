@@ -41,7 +41,6 @@ public class ResultWatcher implements ResultListener, GraphListener {
     boolean selectNewEdge = false;
     boolean start = true;
     private boolean isDistinct = true;
-    //private boolean isSkipPath = false;
     private boolean test = false;
     int queryNewEdgeIndex = -1;
 
@@ -114,7 +113,7 @@ public class ResultWatcher implements ResultListener, GraphListener {
             }
         } else if (loop > 0 && getQuery().getEdgeList() == null) {
             int n = 0;
-            boolean ok = true;
+
             double tt = 0.0;
             // new edges <= 30% edges
             for (Node predicate : getRule().getPredicates()) {
@@ -130,7 +129,8 @@ public class ResultWatcher implements ResultListener, GraphListener {
             // 2 predicates with new edges and may be 1 a filter
             if (n <= 2 && tt < TOTAL) {
                 Exp body = getQuery().getBody();
-                int ne = 0, nf = 0;
+                int ne = 0;
+                int nf = 0;
 
                 for (Exp exp : body) {
                     if (exp.isEdge() && exp.getEdge().getEdgeVariable() == null) {
@@ -141,7 +141,7 @@ public class ResultWatcher implements ResultListener, GraphListener {
                 }
 
                 if (ne == 2 && nf <= 1) {
-                    performSelectNewEdge = doit(true);
+                    performSelectNewEdge = true;
                 }
             }
         }

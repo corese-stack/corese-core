@@ -17,20 +17,20 @@ import fr.inria.corese.core.load.LoadException;
 public class RuleProcess extends  WorkflowProcess {
 
     private RuleEngine engine;
-    int profile = -1;
+    RuleEngine.Profile profile = RuleEngine.Profile.STDRL;
     private boolean onUpdate = false;
     
     public RuleProcess(String p){
         path = p;
         if (path.equals(NSManager.OWLRL)){
-            profile = RuleEngine.OWL_RL;
+            profile = RuleEngine.Profile.OWLRL;
         }
         else if (path.equals(NSManager.RDFSRL)){
-            profile = RuleEngine.OWL_RL_LITE;
+            profile = RuleEngine.Profile.OWLRL_LITE;
         }
     }
     
-    public RuleProcess(int p){
+    public RuleProcess(RuleEngine.Profile p){
         profile = p;
     }
     
@@ -80,7 +80,7 @@ public class RuleProcess extends  WorkflowProcess {
     
     RuleEngine create(Graph g) throws LoadException {
         RuleEngine re;
-        if (profile == -1) {
+        if (profile == RuleEngine.Profile.STDRL) {
             re = create(g, getPath());
         } else {
             re = RuleEngine.create(g);

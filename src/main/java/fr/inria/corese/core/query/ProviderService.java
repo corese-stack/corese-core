@@ -855,7 +855,7 @@ public class ProviderService implements URLParam {
     }
 
     DataManager dataManager(URLServer url) throws EngineException {
-        DataManager man = StorageFactory.getDataManager(url.getStoragePath());
+        DataManager man = StorageFactory.getSingleton().getDataManager(url.getStoragePath());
         if (man == null) {
             if (url.hasParameter()) {
                 if (url.hasParameter(MODE, "dataset")) {
@@ -863,7 +863,7 @@ public class ProviderService implements URLParam {
                 } else {
                     man = new DataManagerJava(url.getStoragePathWithParameter());
                 }
-                StorageFactory.defineDataManager(url.getStoragePathWithParameter(), man);
+                StorageFactory.getSingleton().defineDataManager(url.getStoragePathWithParameter(), man);
             } else {
                 throw new EngineException(
                         String.format("Undefined storage manager: %s %s", url.getServer(), url.getStoragePath()));

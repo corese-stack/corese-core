@@ -732,7 +732,7 @@ public class QueryProcess extends QuerySolver {
      */
     Mappings basicQuery(Node gNode, Query q, Mapping m, Dataset ds) throws EngineException {
         String path = q.getAST().getDataset().getStoragePath();
-        if (path != null && StorageFactory.getDataManager(path) != null) {
+        if (path != null && StorageFactory.getSingleton().getDataManager(path) != null) {
             return basicQueryStorage(gNode, q, m, ds);
         }
         return basicQueryProcess(gNode, q, m, ds);
@@ -795,7 +795,7 @@ public class QueryProcess extends QuerySolver {
     // @todo: copy this QueryProcess
     Mappings basicQueryStorage(Node gNode, Query q, Mapping m, Dataset ds) throws EngineException {
         return QueryProcess.create(getGraph(),
-                StorageFactory.getDataManager(q.getAST().getDataset().getStoragePath()))
+                StorageFactory.getSingleton().getDataManager(q.getAST().getDataset().getStoragePath()))
                 .basicQueryProcess(gNode, q, m, ds);
     }
 

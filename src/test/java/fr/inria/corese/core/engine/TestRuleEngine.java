@@ -146,8 +146,7 @@ public class TestRuleEngine {
             throw ex;
         }
         RuleEngine re = ld.getRuleEngine();
-        // Date d1 = new Date();
-        re.setProfile(RuleEngine.OWL_RL_FULL);
+        re.setProfile(RuleEngine.ProfileType.OWL_RL_FULL);
         re.process();
 
         String q = "prefix f: <http://example.com/owl/families/>"
@@ -178,8 +177,6 @@ public class TestRuleEngine {
             System.out.println(ex);
         }
         RuleEngine re = ld.getRuleEngine();
-        // Date d1 = new Date();
-        // re.setProfile(re.OWL_RL);
         re.process();
 
         String q = "prefix f: <http://example.com/owl/families/>"
@@ -210,7 +207,7 @@ public class TestRuleEngine {
             System.out.println(ex);
         }
         RuleEngine re = RuleEngine.create(gs);
-        re.setProfile(RuleEngine.OWL_RL);
+        re.setProfile(RuleEngine.ProfileType.OWL_RL);
         // Date d1 = new Date();
         re.process();
 
@@ -237,7 +234,7 @@ public class TestRuleEngine {
         Load ld = Load.create(g);
         ld.parse(data + "template/owl/data/primer.owl");
         RuleEngine re = RuleEngine.create(g);
-        re.setProfile(RuleEngine.OWL_RL_LITE);
+        re.setProfile(RuleEngine.ProfileType.OWL_RL_LITE);
         re.process();
 
         String q = "select * "
@@ -309,7 +306,7 @@ public class TestRuleEngine {
         Load ld = Load.create(g);
         ld.parse(data + "template/owl/data/primer.owl");
         RuleEngine re = RuleEngine.create(g);
-        re.setProfile(RuleEngine.OWL_RL_LITE);
+        re.setProfile(RuleEngine.ProfileType.OWL_RL_LITE);
         // re.process();
         g.addEngine(re);
         String q = "select * "
@@ -399,48 +396,6 @@ public class TestRuleEngine {
         Mappings map = exec.query(q);
         assertEquals(n, map.size());
     }
-
-    // //@Test
-    // public void test1(){
-    //
-    // String query =
-    // "prefix c: <http://www.inria.fr/acacia/comma#>" +
-    // "select ?x ?y where { " +
-    // "?y c:hasSister ?z" +
-    // "?x c:hasBrother ?y " +
-    // "}";
-    //
-    // LBind bind = rengine.SPARQLProve(query);
-    // assertEquals("Result", 13, bind.size());
-    // }
-    //
-    //
-    // //@Test
-    // public void test2(){
-    //
-    // String query =
-    // "prefix c: <http://www.inria.fr/acacia/comma#>" +
-    // "select * where {" +
-    // "?x c:hasGrandParent c:Pierre " +
-    // "}";
-    //
-    // LBind bind = rengine.SPARQLProve(query);
-    // assertEquals("Result", 4, bind.size());
-    // }
-    //
-    //
-    // //@Test
-    // public void test3(){
-    //
-    // String query =
-    // "prefix c: <http://www.inria.fr/acacia/comma#>" +
-    // "select * where {" +
-    // "?x c:hasGrandParent c:Pierre ?x c:hasID ?id " +
-    // "}";
-    //
-    // LBind bind = rengine.SPARQLProve(query);
-    // assertEquals("Result", 0, bind.size());
-    // }
 
     @Test
     public void test4() throws EngineException {

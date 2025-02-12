@@ -1,5 +1,6 @@
 package fr.inria.corese.core.workflow;
 
+import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.Context;
@@ -120,7 +121,7 @@ public class SemanticWorkflow extends  CompositeProcess {
     }
     
     // RuleBase.OWL_RL
-    public SemanticWorkflow addRule(int type){
+    public SemanticWorkflow addRule(RuleEngine.Profile type){
        return add(new RuleProcess(type));
     }
     

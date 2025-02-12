@@ -89,17 +89,6 @@ public class Shacl {
         setShacl(shacl);
     }
 
-    /**
-     * Set a different SHACL interpreter, ex. SHACL-S
-     */
-    public static void setSHACL_Interpreter(String SHACL_Interpreter) {
-        Shacl.SHACL_Interpreter = SHACL_Interpreter;
-    }
-
-    public static String getSHACL_Interpreter() {
-        return SHACL_Interpreter;
-    }
-
     public Binding input() {
         if (getInput() == null) {
             setInput(Binding.create());

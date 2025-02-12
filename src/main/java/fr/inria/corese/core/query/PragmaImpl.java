@@ -104,7 +104,7 @@ public class PragmaImpl extends Pragma {
      * (des)activate rule engines
      */
     private void rule(boolean value) {
-        graph.getWorkflow().setActivate(Engine.RULE_ENGINE, value);
+        graph.getWorkflow().setActivate(Engine.Type.RULE_ENGINE, value);
         if (value) {
             graph.getEventManager().start(Event.ActivateEntailment);
         }
