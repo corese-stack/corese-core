@@ -1,54 +1,43 @@
 package fr.inria.corese.core.query.update;
 
 import fr.inria.corese.core.Event;
-import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
 import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.kgram.core.Mapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Dataset;
-import fr.inria.corese.core.sparql.triple.parser.Exp;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.sparql.triple.parser.Source;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.sparql.triple.update.ASTUpdate;
 import fr.inria.corese.core.sparql.triple.update.Basic;
 import fr.inria.corese.core.sparql.triple.update.Composite;
 import fr.inria.corese.core.sparql.triple.update.Update;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.parser.Access;
-import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.sparql.triple.parser.Metadata;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * SPARQL 1.1 Update
- *
+ * <p>
  * Called by QueryProcess.query() to handle update query
  * Compile update query into specific AST which is executed by ManagerImpl
  *
  * @author Olivier Corby, Edelweiss, INRIA 2011
- *
  */
 public class UpdateProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(UpdateProcess.class);
-
-    private ManagerImpl manager; 
-    private QueryProcess exec;
-    Query query;
-    private Dataset dataset;
     private final List<ProcessVisitor> visitorList;
+    Query query;
+    private ManagerImpl manager;
+    private QueryProcess exec;
+    private Dataset dataset;
 
     UpdateProcess(QueryProcess e, ManagerImpl man, Dataset ds) {
         manager = man;
@@ -67,7 +56,7 @@ public class UpdateProcess {
      */
     public Mappings update(Query q, Mapping m, Binding bind) throws EngineException {
         query = q;
-        ASTQuery ast =  q.getAST();
+        ASTQuery ast = q.getAST();
         ASTUpdate astu = ast.getUpdate();
         Mappings map = Mappings.create(q);
         getManager().setLevel(getLevel(bind));
@@ -75,25 +64,19 @@ public class UpdateProcess {
         NSManager nsm = null;
         // Visitor was setup by QueryProcessUpdate init(q, m)
         addVisitor(getQueryProcess().getVisitor());
-        
+
         for (Update u : astu.getUpdates()) {
             boolean suc = true;
 
-            switch (u.type()) {
-
-                case PROLOG:
-                    // local prolog, get the local NSManager
-                    // for next operations
-                    nsm = u.getLocalNSM();
-                    break;
-
-                default:
-                    // assign local NSManager to current operation
-                    if (nsm != null) {
-                        u.setLocalNSM(nsm);
-                    }
+            if (u.type() == Update.Keyword.PROLOG) {// local prolog, get the local NSManager
+                // for next operations
+                nsm = u.getLocalNSM();
+            } else {// assign local NSManager to current operation
+                if (nsm != null) {
+                    u.setLocalNSM(nsm);
+                }
             }
-            
+
             getQueryProcess().getEventManager().start(Event.UpdateStep, u);
             Eval eval = getQueryProcess().getCurrentEval();
             if (u.isBasic()) {
@@ -105,7 +88,7 @@ public class UpdateProcess {
                 Composite c = u.getComposite();
                 // pass current binding as parameter
                 // use case: @event function has defined global variable
-                map = process(q, c, m, bind); 
+                map = process(q, c, m, bind);
             }
             // save and restore eval to get initial Visitor with possible @event function
             // because @event function may execute query and hence reset eval
@@ -119,17 +102,17 @@ public class UpdateProcess {
         }
         return map;
     }
-    
+
     Level getLevel(Mapping m) {
         return Access.getLevel(m, Level.USER_DEFAULT);
-    } 
-    
+    }
+
     Level getLevel(Binding b) {
         if (b == null) {
             return Level.USER_DEFAULT;
         }
         return b.getAccessLevel();
-    } 
+    }
 
     Mappings process(Query q, Composite ope, Mapping m, Binding b) throws EngineException {
         ASTQuery ast = null;
@@ -158,11 +141,12 @@ public class UpdateProcess {
         return update(q, ast, m, b);
     }
 
-    
+
     /**
      * Share global variables from LDScript Bind stack
-     * Binding b is the stack shared by update subqueries and 
+     * Binding b is the stack shared by update subqueries and
      * PRAGMA: m.getBind() = b
+     *
      * @event functions
      */
     Mapping getMapping(Query q, Mapping m, Binding b) {
@@ -178,7 +162,7 @@ public class UpdateProcess {
         // previous subquery @event function has set global variables 
         // stored in Binding of previous Eval
         // share these global variables with current Eval
-        if (b != null) {            
+        if (b != null) {
             mm = setBind(mm, b);
         }
 
@@ -191,7 +175,7 @@ public class UpdateProcess {
         mm.getBind().setVisitor(mm.getBind().getVisitor());
         return mm;
     }
-    
+
     Mapping setBind(Mapping m, Binding b) {
         if (m == null) {
             m = new Mapping();
@@ -209,16 +193,16 @@ public class UpdateProcess {
         getQueryProcess().logStart(query);
         Query q = compile(ast);
         inherit(q, query);
-        Mapping mm = getMapping(q, m, b);  
+        Mapping mm = getMapping(q, m, b);
 
         // execute where part in delete insert where
         Mappings map = getQueryProcess().basicQuery(null, q, mm);
-        
+
         if (query.getAST().hasMetadata(Metadata.Type.SELECT)) {
             // evaluate insert where as select where
             return map;
         }
-   
+
         // execute delete in delete insert where
         if (q.isDelete()) {
             getManager().delete(q, map, getDataset());
@@ -229,14 +213,14 @@ public class UpdateProcess {
             getManager().insert(q, map, getDataset());
         }
 
-        for(ProcessVisitor visitor : getVisitorList()) {
+        for (ProcessVisitor visitor : getVisitorList()) {
             visitor(visitor, q, map);
         }
         getQueryProcess().logFinish(query, map);
 
         return map;
     }
-    
+
     Query compile(ASTQuery ast) throws EngineException {
         Query q = ast.getUpdateQuery();
         if (q == null) {
@@ -246,11 +230,11 @@ public class UpdateProcess {
         }
         return q;
     }
-    
+
     void inherit(Query update, Query query) {
         update.setDetail(query.isDetail());
     }
-    
+
     /**
      * @update function
      * To get delete & insert list requires q.isDetail() = true
@@ -266,12 +250,12 @@ public class UpdateProcess {
         if (insert == null) {
             insert = new ArrayList<>();
         }
-        if(delete.isEmpty() && insert.isEmpty()) {
+        if (delete.isEmpty() && insert.isEmpty()) {
             return;
         }
         vis.update(q, delete, insert);
     }
-    
+
     ASTQuery getInsertData(Query q, Composite ope) {
         ASTQuery ast = ope.getAST();
         if (ast == null) {
@@ -280,7 +264,7 @@ public class UpdateProcess {
         }
         return ast;
     }
-    
+
     ASTQuery getDeleteData(Query q, Composite ope) {
         ASTQuery ast = ope.getAST();
         if (ast == null) {
@@ -289,7 +273,7 @@ public class UpdateProcess {
         }
         return ast;
     }
-    
+
     ASTQuery getDeleteInsert(Query q, Composite ope) {
         ASTQuery ast = ope.getAST();
         if (ast == null) {
@@ -298,7 +282,7 @@ public class UpdateProcess {
         }
         return ast;
     }
-    
+
 
     /**
      * insert data {<a> ex:p <b>} Ground pattern (no variable) Processed as a
@@ -312,14 +296,12 @@ public class UpdateProcess {
         Exp exp = ope.getData();
         if (!exp.validateData(ast)) {
             q.setCorrect(false);
-            return null; 
+            return null;
         }
 
-        if (exp != null) {
-            ast.setBody(BasicGraphPattern.create());
-            ast.setInsert(exp);
-            ast.setInsertData(true);
-        }
+        ast.setBody(BasicGraphPattern.create());
+        ast.setInsert(exp);
+        ast.setInsertData(true);
 
         // Processed as a construct (add) on target graph
         return ast;
@@ -328,7 +310,6 @@ public class UpdateProcess {
     /**
      * delete data {<a> ex:p <b>} Ground pattern (no variable) Processed by
      * Construct as a delete query in the target graph
-     *
      */
     ASTQuery deleteData(Query q, Composite ope) {
 
@@ -339,14 +320,12 @@ public class UpdateProcess {
         if (!exp.validateData(ast) || !exp.validateDelete()) {
             q.setCorrect(false);
             q.addError("** Update: delete not valid: ", exp);
-            return null; 
+            return null;
         }
 
-        if (exp != null) {
-            ast.setBody(BasicGraphPattern.create());
-            ast.setDelete(exp);
-            ast.setDeleteData(true);
-        }
+        ast.setBody(BasicGraphPattern.create());
+        ast.setDelete(exp);
+        ast.setDeleteData(true);
 
         return ast;
 
@@ -385,7 +364,7 @@ public class UpdateProcess {
                 if (!exp.validateDelete()) {
                     q.setCorrect(false);
                     q.addError("Error: Blank Node in Delete", "");
-                    return null; //Mappings.create(q);
+                    return null;
                 }
             }
         }
@@ -395,13 +374,12 @@ public class UpdateProcess {
 
     /**
      * Create an AST with the where part (empty for data update)
-     *
      */
     ASTQuery createAST(Query q, Composite ope) {
         ASTQuery ast = ASTQuery.create();
-        ASTQuery ga =  q.getAST();
+        ASTQuery ga = q.getAST();
         ast.setNSM(ope.getNSM());
-        
+
         ast.setPragma(ga.getPragma());
         ast.setPrefixExp(ga.getPrefixExp());
         ast.shareFunction(ga);
@@ -420,7 +398,7 @@ public class UpdateProcess {
         } else {
             ast.setDataset(ope.getDataset());
         }
-        
+
         return ast;
     }
 

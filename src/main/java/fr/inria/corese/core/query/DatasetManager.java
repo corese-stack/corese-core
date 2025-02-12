@@ -1,11 +1,5 @@
 package fr.inria.corese.core.query;
 
-import java.security.InvalidParameterException;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.rule.RuleEngine;
@@ -13,6 +7,11 @@ import fr.inria.corese.core.storage.CoreseGraphDataManagerBuilder;
 import fr.inria.corese.core.storage.DataManagerJava;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.util.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.security.InvalidParameterException;
+import java.util.List;
 
 /**
  * Manage dataset and/or db storage according to Property
@@ -32,7 +31,7 @@ public class DatasetManager {
     public DatasetManager init() {
         List<List<String>> storages = Property.getStorageparameters();
 
-        if (storages != null && storages.size() > 0) {
+        if (storages != null && !storages.isEmpty()) {
             defineDataManager(storages);
 
             if (isStorage()) {
@@ -43,13 +42,6 @@ public class DatasetManager {
         }
 
         return this;
-    }
-
-    public enum TypeDataBase {
-        RDF4J_MODEL,
-        JENA_TDB1,
-        CORESE_GRAPH,
-        JAVA,
     }
 
     // Create one DataManager in StorageFactory for each db path
@@ -175,6 +167,13 @@ public class DatasetManager {
 
     public void setId(String path) {
         this.id = path;
+    }
+
+    public enum TypeDataBase {
+        RDF4J_MODEL,
+        JENA_TDB1,
+        CORESE_GRAPH,
+        JAVA,
     }
 
 }

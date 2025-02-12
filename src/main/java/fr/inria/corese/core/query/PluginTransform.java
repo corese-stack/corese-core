@@ -1,17 +1,13 @@
 package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.load.QueryLoad;
-import fr.inria.corese.core.transform.DefaultVisitor;
-import fr.inria.corese.core.transform.TemplateVisitor;
-import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.ExprType;
-import static fr.inria.corese.core.kgram.api.core.PointerType.GRAPH;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.sparql.api.ComputerProxy;
 import fr.inria.corese.core.sparql.api.GraphProcessor;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -20,9 +16,15 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import java.io.IOException;
+import fr.inria.corese.core.transform.DefaultVisitor;
+import fr.inria.corese.core.transform.TemplateVisitor;
+import fr.inria.corese.core.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+
+import static fr.inria.corese.core.kgram.api.core.PointerType.GRAPH;
 
 /**
  * Transformer LDScript functions.
@@ -60,17 +62,17 @@ public class PluginTransform implements ComputerProxy {
     }
 
     @Override
-    public TemplateVisitor getVisitor(Binding b, Environment env, Producer p) {        
+    public TemplateVisitor getVisitor(Binding b, Environment env, Producer p) {
         return getVisitorNew(b, env, p);
     }
-           
+
     // TemplateVisitor is shared among every Binding of every subtransformation
-    public TemplateVisitor getVisitorNew(Binding b, Environment env, Producer p) {        
+    public TemplateVisitor getVisitorNew(Binding b, Environment env, Producer p) {
         TemplateVisitor vis = (TemplateVisitor) b.getTransformerVisitor();
-        if (vis == null) {            
+        if (vis == null) {
             vis = new DefaultVisitor((Graph) p.getGraph());
             b.setTransformerVisitor(vis);
-        }        
+        }
         return vis;
     }
 
@@ -109,16 +111,15 @@ public class PluginTransform implements ComputerProxy {
 
     Context getQueryContext(Binding b, Environment env, Producer p) {
         Query q = env.getQuery().getGlobalQuery();
-        Context c =  q.getContext();
-        
+        Context c = q.getContext();
+
         if (c == null && !q.isTransformationTemplate()) {
             //  std Query or Template alone
-            
+
             if (b.getContext() != null) {
                 // use case: xt:sparql(query) create Context using st:set
                 return b.getContext();
-            }
-            else {
+            } else {
                 c = new Context();
                 q.setContext(c);
                 b.setContext(c);
@@ -148,11 +149,11 @@ public class PluginTransform implements ComputerProxy {
      * graph use case: graph ?shape { st:cget(sh:def, ?name) } TODO: cache for
      * named graph
      */
-    Transformer getTransformer(Binding b, Environment env, Producer prod, IDatatype uri, IDatatype dtgname, boolean current, boolean isGraph) 
+    Transformer getTransformer(Binding b, Environment env, Producer prod, IDatatype uri, IDatatype dtgname, boolean current, boolean isGraph)
             throws EngineException {
         try {
             Query q = env.getQuery();
-            ASTQuery ast =  q.getAST();
+
             String transform = getTrans(uri);
             Transformer t = (Transformer) q.getTransformer(transform);
 
@@ -245,7 +246,7 @@ public class PluginTransform implements ComputerProxy {
         }
         return dt.stringValue();
     }
-    
+
     String getFormatURI(String uri) {
         try {
             QueryLoad ql = QueryLoad.create();
@@ -255,9 +256,7 @@ public class PluginTransform implements ComputerProxy {
                 return ql.getResource(name);
             }
             return ql.readProtect(uri);
-        } catch (LoadException ex) {
-            logger.error(ex.getMessage());
-        } catch (IOException ex) {
+        } catch (LoadException | IOException ex) {
             logger.error(ex.getMessage());
         }
 

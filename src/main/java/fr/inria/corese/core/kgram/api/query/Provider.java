@@ -18,8 +18,4 @@ public interface Provider {
         return null;
     }
 
-    void set(String uri, double version);
-
-    boolean isSparql0(Node serv);
-
 }   

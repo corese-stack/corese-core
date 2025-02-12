@@ -1,49 +1,47 @@
 package fr.inria.corese.core.query;
 
+import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.api.Engine;
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.transform.Transformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.parser.Dataset;
-import fr.inria.corese.core.compiler.api.QueryVisitor;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Exp;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.api.Engine;
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.transform.Transformer;
 import static fr.inria.corese.core.transform.Transformer.STL_PROFILE;
-import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
-import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 
 /**
  * Equivalent of RuleEngine for Query and Template Run a set of query
  * Used by Transformer to manage set of templates
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
- *
  */
 public class QueryEngine implements Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryEngine.class);
-    Graph graph;
     private final QueryProcess exec;
+    Graph graph;
     ArrayList<Query> list;
-    private Dataset ds;
     HashMap<String, Query> table;
     HashMap<String, ArrayList<Query>> tableList;
     TemplateIndex index;
     boolean isActivate = true;
     boolean isWorkflow = false;
+    private Dataset ds;
     private boolean transformation = false;
     private String base;
     private Level level = Level.USER_DEFAULT;
@@ -66,11 +64,10 @@ public class QueryEngine implements Engine {
         try {
             defQuery(q);
         } catch (EngineException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("", e);
         }
     }
-    
+
     Dataset getCreateDataset() {
         if (getDataset() == null) {
             setDataset(Dataset.create());
@@ -79,9 +76,9 @@ public class QueryEngine implements Engine {
     }
 
     public Query defQuery(String q) throws EngineException {
-        if (getBase() != null){
+        if (getBase() != null) {
             getQueryProcess().setBase(getBase());
-        }       
+        }
         getCreateDataset().setLevel(getLevel());
         Query qq = getQueryProcess().compile(q, getDataset());
         if (qq != null) {
@@ -90,12 +87,12 @@ public class QueryEngine implements Engine {
         }
         return qq;
     }
-    
-    
+
+
     /**
      * Remove compile time context
      * Use case: server may have runtime Context
-     */   
+     */
     void cleanContext(Query q) {
         q.setContext(null);
         q.getAST().setContext(null);
@@ -123,7 +120,7 @@ public class QueryEngine implements Engine {
     }
 
     /**
-     * called once with this transformer map and 
+     * called once with this transformer map and
      * may be called again with outer transformer map if any
      * map belongs to current or outer transformer
      * current transformer may inherit table from outer transformer
@@ -132,7 +129,6 @@ public class QueryEngine implements Engine {
      */
     public void complete(Transformer trans) {
         complete();
-        //trans.setTransformerMap(map);
         for (Query q : getTemplates()) {
             trans.complete(q);
             complete(q);
@@ -142,17 +138,17 @@ public class QueryEngine implements Engine {
             complete(q);
         }
     }
-    
+
     void complete(Query q) {
         q.setTransformationTemplate(true);
         q.setListPath(true);
     }
-    
+
     void complete() {
         for (String name : table.keySet()) {
-            ArrayList<Query> list = new ArrayList<>(1);
-            list.add(table.get(name));
-            tableList.put(name, list);
+            ArrayList<Query> queryArrayList = new ArrayList<>(1);
+            queryArrayList.add(table.get(name));
+            tableList.put(name, queryArrayList);
         }
     }
 
@@ -161,32 +157,28 @@ public class QueryEngine implements Engine {
      */
     public void profile() {
         Query profile = getTemplate(STL_PROFILE);
-        if (profile != null) {
+        if ((profile != null) && (profile.getExtension() != null)) {
+            // share profile function definitions in templates
+            fr.inria.corese.core.compiler.parser.Transformer tr = fr.inria.corese.core.compiler.parser.Transformer.create();
+            ASTExtension ext = profile.getExtension();
+            tr.definePublic(ext, profile, false);
 
-            if (profile.getExtension() != null) {
-                // share profile function definitions in templates
-                fr.inria.corese.core.compiler.parser.Transformer tr = fr.inria.corese.core.compiler.parser.Transformer.create();
-                ASTExtension ext = profile.getExtension();
-                tr.definePublic(ext, profile, false);
-                
-                for (Query t : getTemplates()) {
-                    addExtension(t, ext);
-                }
-                for (Query t : getNamedTemplates()) {
-                    addExtension(t, ext);
-                }
+            for (Query t : getTemplates()) {
+                addExtension(t, ext);
+            }
+            for (Query t : getNamedTemplates()) {
+                addExtension(t, ext);
             }
         }
     }
-    
-    void addExtension(Query q, ASTExtension ext){
-        if (ext == null){
+
+    void addExtension(Query q, ASTExtension ext) {
+        if (ext == null) {
             return;
         }
-        if (q.getExtension() == null){
+        if (q.getExtension() == null) {
             q.setExtension(ext);
-        }
-        else {
+        } else {
             q.getExtension().add(ext);
         }
     }
@@ -214,7 +206,7 @@ public class QueryEngine implements Engine {
     public Query getTemplate(String name) {
         return table.get(name);
     }
-    
+
     public List<Query> getTemplateList(String name) {
         return tableList.get(name);
     }
@@ -222,31 +214,30 @@ public class QueryEngine implements Engine {
     public Collection<Query> getNamedTemplates() {
         return table.values();
     }
-    
+
     public Query getTemplate() {
         Query q = getTemplate(STL_PROFILE);
         if (q != null) {
             return q;
         } else if (getTemplates().isEmpty()) {
-            for (Query qq : table.values()){
-                    return qq;
+            for (Query qq : table.values()) {
+                return qq;
             }
         } else {
             return getTemplates().get(0);
         }
         return null;
     }
-    
+
 
     public boolean isEmpty() {
         return list.isEmpty() && table.isEmpty();
     }
-    
-    public boolean contains(Query q){
-        if (q.getName() == null){
+
+    public boolean contains(Query q) {
+        if (q.getName() == null) {
             return list.contains(q);
-        }
-        else {
+        } else {
             return table.containsValue(q);
         }
     }
@@ -276,54 +267,21 @@ public class QueryEngine implements Engine {
 
     public Mappings process(Query q, Mapping m) {
         try {
-            Mappings map = getQueryProcess().query(null, q, m, null);
-            return map;
+            return getQueryProcess().query(null, q, m, null);
         } catch (EngineException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("", e);
         }
         return Mappings.create(q);
-    }
-
-    /**
-     * pname is property name queries are construct where find a query with
-     * construct {?x pname ?y} process the query use case: ProducerImpl
-     * getEdges() computed by construct-where
-     */
-    Mappings process(Node start, String pname, int index) {
-        for (Query q : getQueries()) {
-
-            if (q.isConstruct()) {
-                Exp cons = q.getConstruct();
-                for (Exp ee : cons.getExpList()) {
-
-                    if (ee.isEdge()) {
-                        Edge edge = ee.getEdge();
-                        if (edge.getEdgeLabel().equals(pname)) {
-
-                            Mapping bind = null;
-                            if (start != null) {
-                                bind = Mapping.create(edge.getNode(index), start);
-                            }
-
-                            Mappings map = process(q, bind);
-                            return map;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public void setActivate(boolean b) {
-        isActivate = b;
     }
 
     @Override
     public boolean isActivate() {
         return isActivate;
+    }
+
+    @Override
+    public void setActivate(boolean b) {
+        isActivate = b;
     }
 
     /**
@@ -361,7 +319,7 @@ public class QueryEngine implements Engine {
     }
 
     public void clean() {
-        ArrayList<Query> l = new ArrayList<Query>();
+        ArrayList<Query> l = new ArrayList<>();
         for (Query q : list) {
             if (!q.isFail()) {
                 l.add(q);
