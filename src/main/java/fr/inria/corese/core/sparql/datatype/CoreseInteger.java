@@ -35,7 +35,7 @@ public class CoreseInteger extends CoreseNumber {
     public static final CoreseInteger FOUR = new CoreseInteger(4);
     public static final CoreseInteger FIVE = new CoreseInteger(5);
     static final CoreseURI datatype = new CoreseURI(RDF.xsdinteger);
-    static final int code = INTEGER;
+    static final IDatatype.Datatype code = IDatatype.Datatype.INTEGER;
     long lvalue;
 
     CoreseInteger() {}
@@ -70,7 +70,7 @@ public class CoreseInteger extends CoreseNumber {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
 

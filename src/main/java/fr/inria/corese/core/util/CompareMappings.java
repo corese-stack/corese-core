@@ -169,8 +169,8 @@ public class CompareMappings {
     }
 
     boolean matchDatatype(IDatatype dt1, IDatatype dt2) {
-        return (dt1.getCode() == IDatatype.LITERAL) && (dt2.getCode() == IDatatype.STRING)
-                || (dt1.getCode() == IDatatype.STRING) && (dt2.getCode() == IDatatype.LITERAL);
+        return (dt1.getCode() == IDatatype.Datatype.LITERAL) && (dt2.getCode() == IDatatype.Datatype.STRING)
+                || (dt1.getCode() == IDatatype.Datatype.STRING) && (dt2.getCode() == IDatatype.Datatype.LITERAL);
     }
     
     

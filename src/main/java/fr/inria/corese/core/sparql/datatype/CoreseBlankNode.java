@@ -14,7 +14,7 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
  */
 public class CoreseBlankNode extends CoreseResource {
 
-    static int code = BLANK;
+    static IDatatype.Datatype code = IDatatype.Datatype.BLANK;
     // true when this bnode is the datatype value of a variable.
     boolean variable = false;
 
@@ -23,7 +23,7 @@ public class CoreseBlankNode extends CoreseResource {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
     

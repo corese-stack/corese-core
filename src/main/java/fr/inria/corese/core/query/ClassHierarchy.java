@@ -22,14 +22,14 @@ import java.util.logging.Logger;
  */
 public class ClassHierarchy extends DatatypeHierarchy {
 
-    static final String queryObject =
+    private static final String queryObject =
             "select (aggregate(?c) as ?list) where { "
                     + "select distinct ?c ?x where {"
                     + "?x rdf:type/rdfs:subClassOf* ?c "
                     + "} order by desc(kg:depth(?c))"
                     + "}";
 
-    static final String queryClass =
+    private static final String queryClass =
             "select (aggregate(?c) as ?list) where { "
                     + "select distinct ?c ?x where {"
                     + "?x rdfs:subClassOf* ?c "
@@ -39,7 +39,8 @@ public class ClassHierarchy extends DatatypeHierarchy {
     static final String X = "?x";
     static final String LIST = "?list";
 
-    Graph graph, fake;
+    Graph graph;
+    Graph fake;
     QueryProcess exec;
 
     ClassHierarchy(Graph g) {
@@ -104,8 +105,8 @@ public class ClassHierarchy extends DatatypeHierarchy {
         return list;
     }
 
-    Mapping getMapping(String var, IDatatype dt) {
-        return Mapping.create(NodeImpl.createVariable(var), getNode(dt));
+    Mapping getMapping(String varString, IDatatype dt) {
+        return Mapping.create(NodeImpl.createVariable(varString), getNode(dt));
     }
 
     Node getNode(IDatatype dt) {

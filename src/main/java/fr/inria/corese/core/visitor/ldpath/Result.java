@@ -258,7 +258,7 @@ public class Result {
                 String slot = map.get(name);
                 if (ddt == null && (slot.contains("min") || slot.contains("max") || slot.contains("avg"))) {
                     // skip
-                } else if (dd.getCode() == IDatatype.DECIMAL) {
+                } else if (dd.getCode() == IDatatype.Datatype.DECIMAL) {
                     slot(sb, slot, String.format("%.3f", dd.doubleValue()));
                 }
                 else {

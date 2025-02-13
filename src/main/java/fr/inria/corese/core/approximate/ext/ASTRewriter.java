@@ -141,8 +141,8 @@ public class ASTRewriter implements QueryVisitor {
             } else if (pos == O && triple.isType()) {
                 add(lst, CLASS_HIERARCHY);
             }
-        } else if ((dt.isLiteral() && relaxLiteral) && (dt.getCode() == IDatatype.STRING ||
-                dt.getCode() == IDatatype.LITERAL)) {
+        } else if ((dt.isLiteral() && relaxLiteral) && (dt.getCode() == IDatatype.Datatype.STRING ||
+                dt.getCode() == IDatatype.Datatype.LITERAL)) {
             add(lst, LITERAL_LEX);
         }
 

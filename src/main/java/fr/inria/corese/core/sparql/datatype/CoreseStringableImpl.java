@@ -39,7 +39,7 @@ public abstract class CoreseStringableImpl extends CoreseDatatype {
     private static final Logger logger = LoggerFactory.getLogger(CoreseStringableImpl.class);
     private final Marker fatal = MarkerFactory.getMarker("FATAL");
 
-    static int code = STRINGABLE;
+    static IDatatype.Datatype code = IDatatype.Datatype.STRINGABLE;
     public static int count = 0;
     String value = "";
 
@@ -86,7 +86,7 @@ public abstract class CoreseStringableImpl extends CoreseDatatype {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
 

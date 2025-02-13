@@ -151,12 +151,12 @@ public class AppxSearchPlugin implements ExprType {
 
     }
     
-    boolean match(int c1, int c2){
+    boolean match(IDatatype.Datatype c1, IDatatype.Datatype c2){
         if (c1 == c2){
             return true;
         }
-        return (c1 == IDatatype.STRING && c2 == IDatatype.LITERAL) ||
-                (c2 == IDatatype.STRING && c1 == IDatatype.LITERAL);
+        return (c1 == IDatatype.Datatype.STRING && c2 == IDatatype.Datatype.LITERAL) ||
+                (c2 == IDatatype.Datatype.STRING && c1 == IDatatype.Datatype.LITERAL);
     }
   
 }

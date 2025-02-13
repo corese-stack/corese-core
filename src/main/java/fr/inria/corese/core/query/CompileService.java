@@ -98,9 +98,7 @@ public class CompileService implements URLParam {
                 // limit of outer query of service (if any)
                 int limit = q.getOuterQuery().getAST().getLimit();
                 // @limit of global query
-                if (dt != null) {
-                    limit = dt.intValue();
-                }
+                limit = dt.intValue();
                 // select lower limit
                 ast.setLimit(Math.min(limit, ast.getLimit()));
             } else {
@@ -450,8 +448,8 @@ public class CompileService implements URLParam {
         ArrayList<Term> lt = new ArrayList<>();
         boolean blank = false;
 
-        for (Variable var : lvar) {
-            Node valNode = m.getNodeValue(var.getLabel());
+        for (Variable variable : lvar) {
+            Node valNode = m.getNodeValue(variable.getLabel());
             if (valNode != null) {
                 if (valNode.isBlank()) {
                     // do not send bnode because it will raise a syntax error
@@ -460,7 +458,7 @@ public class CompileService implements URLParam {
                     blank = true;
                     res.setBnode(true);
                 } else {
-                    Term t = filter(ast, var, valNode.getDatatypeValue());
+                    Term t = filter(ast, variable, valNode.getDatatypeValue());
                     lt.add(t);
                 }
             }
@@ -537,44 +535,6 @@ public class CompileService implements URLParam {
     void submit(List<Term> lt) {
     }
 
-
-    /**
-     * Generate bindings as a string values () {()} syntax
-     */
-    StringBuilder strBindings(Query q, Mappings map) {
-
-        String SPACE = " ";
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("values (");
-
-        for (Node qv : q.getSelect()) {
-            sb.append(qv.getLabel());
-            sb.append(SPACE);
-        }
-        sb.append("){");
-
-        for (Mapping m : map) {
-
-            sb.append("(");
-
-            for (Node varNode : q.getSelect()) {
-                Node val = m.getNode(varNode);
-                if (val == null) {
-                    sb.append("UNDEF");
-                } else {
-                    sb.append(val.getValue().toString());
-                }
-                sb.append(SPACE);
-            }
-
-            sb.append(")");
-        }
-
-        sb.append("}");
-        return sb;
-
-    }
 
     /**
      * @return the env

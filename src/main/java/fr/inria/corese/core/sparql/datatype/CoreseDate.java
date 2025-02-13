@@ -15,7 +15,7 @@ public class CoreseDate extends CoreseDatatype {
 
     private final XMLGregorianCalendar cal;
     private static final String TODAY = "today";
-    private static final int code = DATE;
+    private static final IDatatype.Datatype code = IDatatype.Datatype.DATE;
     private static final CoreseURI datatype = new CoreseURI(RDF.xsddate);
     String label;
        
@@ -44,7 +44,7 @@ public class CoreseDate extends CoreseDatatype {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
 
@@ -65,7 +65,6 @@ public class CoreseDate extends CoreseDatatype {
 
     @Override
     public String getLabel() {
-        //return this.cal.toString();
         return label;
     }
     
