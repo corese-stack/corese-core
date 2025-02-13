@@ -70,7 +70,7 @@ public class TestQuery1 {
     // private static org.slf4j.Logger logger =
     // LoggerFactory.getLogger(TestQuery1.class);
 
-    static String data = TestQuery1.class.getResource("/data/").getPath();
+    static String data = TestQuery1.class.getResource("/data-test/").getPath();
     // static String QUERY = TestQuery1.class.getResource("query/").getPath();
     // static String test = TestQuery1.class.getResource("test/").getPath();
     // static String text = TestQuery1.class.getResource("text/").getPath();
@@ -8066,7 +8066,7 @@ public class TestQuery1 {
                 + "</doc>'^^rdf:XMLLiteral   "
                 + "}";
 
-        String phrase = TestQuery1.class.getResource("/data/text/phrase.xml").getPath();
+        String phrase = TestQuery1.class.getResource("/data-test/text/phrase.xml").getPath();
 
         String query = ""
                 + "base      <http://www.example.org/schema/>"
