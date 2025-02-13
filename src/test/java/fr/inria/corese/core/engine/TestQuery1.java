@@ -213,12 +213,9 @@ public class TestQuery1 {
     }
 
     static void init(Graph g, Load ld) throws LoadException {
-
-        ld.parse(TestQuery1.class.getResourceAsStream("/data/comma/comma.rdfs"));
-        // ld.parse(data + "comma/comma.rdfs");
-        ld.parse(TestQuery1.class.getResourceAsStream("/data/comma/model.rdf"));
-        // ld.parse(data + "comma/model.rdf");
-        ld.parseDir(data + "comma/data");
+        ld.parse(TestQuery1.class.getResourceAsStream("/data-test/comma/comma.rdfs"));
+        ld.parse(TestQuery1.class.getResourceAsStream("/data-test/comma/model.rdf"));
+        ld.parseDir(TestQuery1.class.getResource("/data-test/comma/data").getPath());
     }
 
     Graph getGraph() {
@@ -231,12 +228,9 @@ public class TestQuery1 {
 
         Load ld = Load.create(graph);
         try {
-            ld.parse(TestQuery1.class.getResource("data").getPath() + "/"
-                    + "comma/comma.rdfs");
-            ld.parse(TestQuery1.class.getResource("data").getPath() + "/"
-                    + "comma/model.rdf");
-            ld.parseDir(
-                    TestQuery1.class.getResource("data").getPath() + "/" + "comma/data");
+            ld.parse(TestQuery1.class.getResource("/data-test/comma/comma.rdfs").getPath());
+            ld.parse(TestQuery1.class.getResource("/data-test/comma/model.rdf").getPath());
+            ld.parseDir(TestQuery1.class.getResource("/data-test/comma/data").getPath());
         } catch (LoadException ex) {
         }
 
