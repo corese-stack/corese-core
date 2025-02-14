@@ -1,48 +1,45 @@
 package fr.inria.corese.core.workflow;
 
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.rule.Rule;
-import fr.inria.corese.core.rule.RuleEngine;
+import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.rule.Rule;
+import fr.inria.corese.core.rule.RuleEngine;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
- *
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
- *
  */
-public class RuleProcess extends  WorkflowProcess {
+public class RuleProcess extends WorkflowProcess {
 
-    private RuleEngine engine;
     RuleEngine.Profile profile = RuleEngine.Profile.STDRL;
+    private RuleEngine engine;
     private boolean onUpdate = false;
-    
-    public RuleProcess(String p){
+
+    public RuleProcess(String p) {
         path = p;
-        if (path.equals(NSManager.OWLRL)){
+        if (path.equals(NSManager.OWLRL)) {
             profile = RuleEngine.Profile.OWLRL;
-        }
-        else if (path.equals(NSManager.RDFSRL)){
+        } else if (path.equals(NSManager.RDFSRL)) {
             profile = RuleEngine.Profile.OWLRL_LITE;
         }
     }
-    
-    public RuleProcess(RuleEngine.Profile p){
+
+    public RuleProcess(RuleEngine.Profile p) {
         profile = p;
     }
-    
+
     @Override
-    void start(Data data){
+    void start(Data data) {
     }
-    
+
     @Override
-    void finish(Data data){
+    void finish(Data data) {
         collect(data);
     }
-    
+
     @Override
     public Data run(Data data) throws EngineException {
         if (isOnUpdate()) {
@@ -57,10 +54,10 @@ public class RuleProcess extends  WorkflowProcess {
         // run rule engine on current graph
         return infer(data, data.getGraph());
     }
-    
+
     Data infer(Data data, Graph g) throws EngineException {
         try {
-            RuleEngine re = create(g); 
+            RuleEngine re = create(g);
             re.setContext(getContext());
             setEngine(re);
             re.process();
@@ -71,13 +68,13 @@ public class RuleProcess extends  WorkflowProcess {
             throw new EngineException(ex);
         }
     }
-    
+
     @Override
-    public String stringValue(Data data){
+    public String stringValue(Data data) {
         return data.getGraph().toString();
     }
-    
-    
+
+
     RuleEngine create(Graph g) throws LoadException {
         RuleEngine re;
         if (profile == RuleEngine.Profile.STDRL) {
@@ -89,16 +86,16 @@ public class RuleProcess extends  WorkflowProcess {
         init(re);
         return re;
     }
-    
-    void init(RuleEngine re){
-        if (getContext() != null){
-            for (Rule r : re.getRules()){
+
+    void init(RuleEngine re) {
+        if (getContext() != null) {
+            for (Rule r : re.getRules()) {
                 r.getQuery().setContext(getContext());
             }
         }
     }
-    
-    RuleEngine create(Graph g, String p) throws LoadException{
+
+    RuleEngine create(Graph g, String p) throws LoadException {
         Load ld = Load.create(g);
         ld.parse(p, Loader.format.RULE_FORMAT);
         return ld.getRuleEngine();
@@ -132,6 +129,5 @@ public class RuleProcess extends  WorkflowProcess {
         this.onUpdate = onUpdate;
     }
 
-  
-    
+
 }

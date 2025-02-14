@@ -1,53 +1,26 @@
 package fr.inria.corese.core.util;
 
-import static fr.inria.corese.core.util.Property.Value.DATATYPE_ENTAILMENT;
-import static fr.inria.corese.core.util.Property.Value.IMPORT;
-import static fr.inria.corese.core.util.Property.Value.LOAD_RULE;
-import static fr.inria.corese.core.util.Property.Value.PREFIX;
-import static fr.inria.corese.core.util.Property.Value.SERVICE_HEADER;
-import static fr.inria.corese.core.util.Property.Value.SERVICE_SEND_PARAMETER;
-import static fr.inria.corese.core.util.Property.Value.STORAGE;
-import static fr.inria.corese.core.util.Property.Value.STORAGE_MODE;
-import static fr.inria.corese.core.util.Property.Value.VARIABLE;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import fr.inria.corese.core.kgram.core.Exp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import fr.inria.corese.core.EdgeFactory;
+import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.NodeImpl;
 import fr.inria.corese.core.compiler.eval.Interpreter;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import fr.inria.corese.core.compiler.federate.RewriteBGPList;
 import fr.inria.corese.core.compiler.federate.SelectorFilter;
 import fr.inria.corese.core.compiler.federate.SelectorIndex;
-import fr.inria.corese.core.EdgeFactory;
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.NodeImpl;
 import fr.inria.corese.core.index.EdgeManagerIndexer;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.load.QueryLoad;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.load.Service;
-import fr.inria.corese.core.load.ServiceParser;
+import fr.inria.corese.core.load.*;
 import fr.inria.corese.core.producer.DataFilter;
 import fr.inria.corese.core.query.CompileService;
 import fr.inria.corese.core.query.MatcherImpl;
 import fr.inria.corese.core.query.ProviderService;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.core.visitor.solver.QuerySolverVisitorRule;
-import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
-import fr.inria.corese.core.kgram.core.Eval;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
@@ -55,16 +28,22 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.function.term.TermEval;
-import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.sparql.triple.parser.AccessRight;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.sparql.triple.parser.ParserHandler;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import fr.inria.corese.core.sparql.triple.parser.visitor.ASTParser;
+import fr.inria.corese.core.visitor.solver.QuerySolverVisitorRule;
+import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static fr.inria.corese.core.util.Property.Value.*;
 
 /**
  * Corese configuration with properties such as: LOAD_IN_DEFAULT_GRAPH
@@ -78,14 +57,10 @@ import fr.inria.corese.core.sparql.triple.parser.visitor.ASTParser;
  * Define variable:
  * VARIABLE = $home=/user/home/
  * LOAD_DATASET = $home/file.ttl
- * 
+ * <p>
  * Olivier Corby
  */
 public class Property {
-
-    private static final Logger logger = LoggerFactory.getLogger(Property.class);
-
-    private static Property singleton = null;
 
     public static final String STAR = "*";
     public static final String RDF_XML = "rdf+xml";
@@ -96,13 +71,13 @@ public class Property {
     public static final String DATASET = "dataset";
     public static final String DB = "db";
     public static final String DB_ALL = "db_all";
-
     static final String VAR_CHAR = "$";
     static final String LOCAL = "./";
     static final String SEP = ";";
     static final String EQ = "=";
+    private static final Logger logger = LoggerFactory.getLogger(Property.class);
     private static final String STD = "std";
-
+    private static Property singleton = null;
     private Map<Value, Boolean> booleanProperty;
     private Map<Value, String> stringProperty;
     private Map<Value, Integer> integerProperty;
@@ -116,193 +91,6 @@ public class Property {
     private String path;
     private String parent;
 
-    public enum Value {
-        // VARIABLE = home=/home/name/dir
-        VARIABLE,
-        IMPORT,
-
-        TRACE_MEMORY,
-        TRACE_GENERIC,
-        // generic property for testing purpose
-        TEST_FEDERATE,
-        // turtle file path where federation are defined
-        FEDERATION,
-        // generate partition of connected bgp
-        FEDERATE_BGP,
-        // do not split complete partition if any
-        FEDERATE_PARTITION,
-        // test and use join between right and left exp of optional
-        FEDERATE_OPTIONAL,
-        FEDERATE_MINUS,
-        FEDERATE_UNDEFINED,
-        // complete bgp partition with additional partition of triple alone (as before)
-        FEDERATE_COMPLETE,
-        // source selection with filter
-        FEDERATE_FILTER,
-        FEDERATE_FILTER_ACCEPT,
-        FEDERATE_FILTER_REJECT,
-        // source selection with bind (exists {t1 . t2} as ?b_i)
-        FEDERATE_JOIN,
-        // authorize path in join test
-        FEDERATE_JOIN_PATH,
-        FEDERATE_SPLIT,
-
-        // index query pattern skip predicate for source discovery
-        FEDERATE_INDEX_SKIP,
-        FEDERATE_INDEX_PATTERN,
-        FEDERATE_INDEX_SUCCESS,
-        FEDERATE_INDEX_LENGTH,
-
-        FEDERATE_BLACKLIST,
-        FEDERATE_BLACKLIST_EXCEPT,
-        FEDERATE_QUERY_PATTERN,
-        FEDERATE_PREDICATE_PATTERN,
-
-        // boolan value
-        DISPLAY_URI_AS_PREFIX,
-        // rdf star reference node displayed as nested triple
-        DISPLAY_AS_TRIPLE,
-        // Graph node implemented as IDatatype instead of NodeImpl
-        GRAPH_NODE_AS_DATATYPE,
-        BLANK_NODE,
-        // load rdf file into graph kg:default instead of graph file-path
-        LOAD_IN_DEFAULT_GRAPH,
-        // constraint rule error in specific named graph
-        CONSTRAINT_NAMED_GRAPH,
-        // constraint rule error in external named graph
-        CONSTRAINT_GRAPH,
-        // graph ?g { } iterate std and external named graph
-        EXTERNAL_NAMED_GRAPH,
-        GRAPH_INDEX_END,
-        GRAPH_INDEX_TRANSITIVE,
-        GRAPH_INDEX_LOAD_SKIP,
-        // rdf* draft
-        RDF_STAR,
-        // enforce compliance: no literal as subject
-        RDF_STAR_VALIDATION,
-        // joker: asserted query triple return asserted and nested triple (default
-        // false)
-        RDF_STAR_SELECT,
-        // joker: asserted delete triple deletes asserted and nested triple (default
-        // false)
-        RDF_STAR_DELETE,
-        // use TripleNode implementation
-        RDF_STAR_TRIPLE,
-        // corese server for micro services
-        REENTRANT_QUERY,
-        // activate access level control (default is true)
-        ACCESS_LEVEL,
-        // activate access right for rdf triples wrt to namespace (default is false)
-        ACCESS_RIGHT,
-        // activate @event ldscript function call for sparql query processing
-        EVENT,
-        SKOLEMIZE,
-
-        VERBOSE,
-        SOLVER_DEBUG,
-        TRANSFORMER_DEBUG,
-
-        LOG_NODE_INDEX,
-        LOG_RULE_CLEAN,
-
-        SOLVER_SORT_CARDINALITY,
-        SOLVER_QUERY_PLAN, // STD | ADVANCED
-        // string value
-        SOLVER_VISITOR,
-        SOLVER_OVERLOAD,
-        RULE_VISITOR,
-        TRANSFORMER_VISITOR,
-        SERVER_VISITOR,
-        PREFIX,
-        // Testing purpose
-        INTERPRETER_TEST,
-        // 1 ; 01 ; 1.0 have different Node
-        // when true: nodes can be joined by graph matching
-        // when false: they do not join
-        DATATYPE_ENTAILMENT,
-        SPARQL_COMPLIANT,
-        SPARQL_ORDER_UNBOUND_FIRST,
-
-        DISABLE_OWL_AUTO_IMPORT,
-        OWL_CLEAN,
-        OWL_CLEAN_QUERY,
-        OWL_RL,
-
-        RULE_TRANSITIVE_FUNCTION,
-        RULE_TRANSITIVE_OPTIMIZE,
-        // rule engine use edge index with data manager
-        RULE_DATAMANAGER_OPTIMIZE,
-        // replace kg:rule_i by kg:rule
-        RULE_DATAMANAGER_CLEAN,
-        // for testing edge iterator filter edge index
-        RULE_DATAMANAGER_FILTER_INDEX,
-        RULE_TRACE,
-
-        FUNCTION_PARAMETER_MAX,
-
-        // init graph
-        GUI_TITLE,
-        GUI_BROWSE,
-        GUI_XML_MAX,
-        GUI_TRIPLE_MAX,
-        GUI_INDEX_MAX,
-        // rdf+xml turtle json
-        GUI_CONSTRUCT_FORMAT,
-        GUI_SELECT_FORMAT,
-        GUI_DEFAULT_QUERY,
-        GUI_QUERY_LIST,
-        GUI_TEMPLATE_LIST,
-        GUI_EXPLAIN_LIST,
-        GUI_RULE_LIST,
-
-        // application/rdf+xml
-        LOAD_FORMAT,
-        // integer value
-        // max number of triples for each rdf file load
-        LOAD_LIMIT,
-        LOAD_WITH_PARAMETER,
-        LOAD_DATASET,
-        LOAD_QUERY,
-        LOAD_FUNCTION,
-        LOAD_RULE,
-
-        RDFS_ENTAILMENT,
-
-        LDSCRIPT_VARIABLE,
-        LDSCRIPT_DEBUG,
-        LDSCRIPT_CHECK_DATATYPE,
-        LDSCRIPT_CHECK_RDFTYPE,
-
-        SERVICE_BINDING,
-        SERVICE_SLICE,
-        SERVICE_LIMIT,
-        SERVICE_TIMEOUT,
-        SERVICE_SEND_PARAMETER,
-        SERVICE_PARAMETER,
-        SERVICE_LOG,
-        SERVICE_REPORT,
-        SERVICE_DISPLAY_RESULT,
-        SERVICE_DISPLAY_MESSAGE,
-        SERVICE_HEADER,
-
-        // service result may be RDF graph (e.g. when format=turtle)
-        // apply service query on the graph
-        SERVICE_GRAPH,
-
-        STORAGE,
-        STORAGE_SERVICE,
-        // default storage: db|dataset
-        STORAGE_MODE,
-
-        // parser configuration
-        STRICT_MODE,
-
-        // Elasticsearch parameters
-        // TODO Change class to be able to define application-specific properties
-        ELASTICSEARCH_API_KEY,
-        ELASTICSEARCH_API_ADDRESS,
-    }
-
     Property() {
         booleanProperty = new EnumMap<>(Value.class);
         stringProperty = new EnumMap<>(Value.class);
@@ -314,7 +102,7 @@ public class Property {
     }
 
     protected static Property getSingleton() {
-        if(singleton == null) {
+        if (singleton == null) {
             singleton = new Property();
             set(SERVICE_SEND_PARAMETER, true);
             set(DATATYPE_ENTAILMENT, true);
@@ -357,30 +145,14 @@ public class Property {
         return getSingleton().getBooleanProperty().containsKey(value) || getSingleton().getStringProperty().containsKey(value) || getSingleton().getIntegerProperty().containsKey(value) || getSingleton().getListProperty().containsKey(value);
     }
 
-    private boolean hasBooleanProperty(Value value) {
-        return getBooleanProperty().containsKey(value);
-    }
-
-    private boolean hasStringProperty(Value value) {
-        return getStringProperty().containsKey(value);
-    }
-
-    private boolean hasIntegerProperty(Value value) {
-        return getIntegerProperty().containsKey(value);
-    }
-
-    private boolean hasListProperty(Value value) {
-        return getListProperty().containsKey(value);
-    }
-
     public static Object get(Value value) {
-        if(getSingleton().hasBooleanProperty(value))
+        if (getSingleton().hasBooleanProperty(value))
             return getBooleanValue(value);
-        if(getSingleton().hasStringProperty(value))
+        if (getSingleton().hasStringProperty(value))
             return getStringValue(value);
-        if(getSingleton().hasIntegerProperty(value))
+        if (getSingleton().hasIntegerProperty(value))
             return getIntegerValue(value);
-        if(getSingleton().hasListProperty(value))
+        if (getSingleton().hasListProperty(value))
             return getListValue(value);
         return null;
     }
@@ -438,77 +210,6 @@ public class Property {
     public static String basicDisplay() {
         return String.format("Property:\n%s\n%s",
                 getSingleton().getBooleanProperty().toString(), getSingleton().getStringProperty().toString());
-    }
-
-    void basicLoad(String path) throws IOException {
-        setPath(path);
-        File file = new File(path);
-        setParent(file.getParent());
-        getImports().put(path, path);
-        try (FileReader loadPathReader = new FileReader(path)) {
-            getProperties().load(loadPathReader);
-        } catch (IOException e) {
-            logger.error("Error loading: " + path);
-            throw e;
-        }
-        // start with variable because import may use variable,
-        // as well as other properties
-        defineVariable();
-        imports();
-        init();
-    }
-
-    /**
-     * @todo: ./ in imported file is the path of main property file
-     * @todo: there is no recursive import
-     */
-    private void imports() throws IOException {
-        if (getProperties().containsKey(IMPORT.toString())) {
-
-            for (String name : ((String) get(IMPORT)).split(SEP)) {
-                String importPath = expand(name);
-
-                if (getImports().containsKey(importPath)) {
-                    logger.info("Skip import: " + importPath);
-                } else {
-                    getImports().put(importPath, importPath);
-                    logger.info("Import: " + importPath);
-                    try (FileReader importReader = new FileReader(importPath)) {
-                        getProperties().load(importReader);
-                    }
-                    // @note: imported variable overload Properties and Property variable property
-                    // but complete variable hashmap properly
-                    defineVariable();
-                }
-            }
-        }
-    }
-
-    void init() {
-        defineProperty();
-    }
-
-    void defineProperty() {
-        for (String name : getProperties().stringPropertyNames()) {
-            String value = getProperties().getProperty(name);
-            try {
-                define(name, value);
-            } catch (Exception e) {
-                logger.info("Incorrect Property: " + name + " " + value);
-            }
-        }
-    }
-
-    /**
-     * Do it first
-     * VARIABLE = $gui=/a/path
-     */
-    void defineVariable() {
-        if (getProperties().containsKey(VARIABLE.toString())) {
-            basicSet(VARIABLE, (String) get(VARIABLE));
-            // variable definitions in a hashmap
-            defineVariableMap();
-        }
     }
 
     public static void define(String name, String value) {
@@ -729,7 +430,7 @@ public class Property {
     }
 
     static void basicSet(Value value, String... str) {
-            logger.debug("{} = {}", value, str);
+        logger.debug("{} = {}", value, str);
         switch (value) {
             case FEDERATE_BLACKLIST:
                 getSingleton().blacklist(str);
@@ -847,6 +548,187 @@ public class Property {
         }
     }
 
+    static void basicSet(Value value, int n) {
+        logger.debug("{} = {}", value, n);
+        getSingleton().getIntegerProperty().put(value, n);
+
+        switch (value) {
+
+            case SERVICE_SLICE:
+            case SERVICE_LIMIT:
+            case SERVICE_TIMEOUT:
+                // use integer table
+                break;
+
+            case SERVICE_DISPLAY_RESULT:
+                ProviderService.DISPLAY_RESULT_MAX = n;
+                ContextLog.DISPLAY_RESULT_MAX = n;
+                Eval.DISPLAY_RESULT_MAX = n;
+                break;
+
+            case LOAD_LIMIT:
+                Load.setLimitDefault(n);
+                break;
+
+            case FUNCTION_PARAMETER_MAX:
+                ASTExtension.FUNCTION_PARAMETER_MAX = n;
+                break;
+
+            case FEDERATE_INDEX_LENGTH:
+                FederateVisitor.NB_ENDPOINT = n;
+                break;
+        }
+    }
+
+    public static List<List<String>> getStorageparameters() {
+
+        String storages = stringValue(STORAGE);
+
+        List<List<String>> storageList = new ArrayList<>();
+        if (storages == null) {
+            return storageList;
+        }
+
+        for (String storageStr : storages.split(SEP)) {
+
+            String[] storageLst = storageStr.split(",", 3);
+            storageList.add(List.of(storageLst).stream().map(str -> getSingleton().expand(str)).collect(Collectors.toList()));
+        }
+        return storageList;
+    }
+
+    public static Integer intValue(Value val) {
+        return getSingleton().getIntegerProperty().get(val);
+    }
+
+    public static List<String> listValue(Value value) {
+        return getSingleton().getListProperty().get(value);
+    }
+
+    public static String stringValue(Value val) {
+        return getSingleton().getStringProperty().get(val);
+    }
+
+    public static String[] stringValueList(Value val) {
+        String str = stringValue(val);
+        if (val == null || str == null) {
+            return new String[0];
+        }
+        return str.split(SEP);
+    }
+
+    // current storage mode to create QueryProcess
+    public static boolean isDataset() {
+        if (stringValue(STORAGE) == null) {
+            // there is no db storage path
+            return true;
+        }
+        if (stringValue(STORAGE_MODE) == null) {
+            // there is db storage path and no mode specified -> db mode, not dataset
+            return false;
+        }
+        // STORAGE_MODE = db|dataset
+        return stringValue(STORAGE_MODE).equals(DATASET);
+    }
+
+    // current storage mode
+    public static boolean isStorage() {
+        return !isDataset();
+    }
+
+    // consider all db
+    public static boolean isStorageAll() {
+        return isStorage() &&
+                getSingleton().protectEquals(stringValue(STORAGE_MODE), DB_ALL);
+    }
+
+    private boolean hasBooleanProperty(Value value) {
+        return getBooleanProperty().containsKey(value);
+    }
+
+    private boolean hasStringProperty(Value value) {
+        return getStringProperty().containsKey(value);
+    }
+
+    private boolean hasIntegerProperty(Value value) {
+        return getIntegerProperty().containsKey(value);
+    }
+
+    private boolean hasListProperty(Value value) {
+        return getListProperty().containsKey(value);
+    }
+
+    void basicLoad(String path) throws IOException {
+        setPath(path);
+        File file = new File(path);
+        setParent(file.getParent());
+        getImports().put(path, path);
+        try (FileReader loadPathReader = new FileReader(path)) {
+            getProperties().load(loadPathReader);
+        } catch (IOException e) {
+            logger.error("Error loading: " + path);
+            throw e;
+        }
+        // start with variable because import may use variable,
+        // as well as other properties
+        defineVariable();
+        imports();
+        init();
+    }
+
+    /**
+     * @todo: ./ in imported file is the path of main property file
+     * @todo: there is no recursive import
+     */
+    private void imports() throws IOException {
+        if (getProperties().containsKey(IMPORT.toString())) {
+
+            for (String name : ((String) get(IMPORT)).split(SEP)) {
+                String importPath = expand(name);
+
+                if (getImports().containsKey(importPath)) {
+                    logger.info("Skip import: " + importPath);
+                } else {
+                    getImports().put(importPath, importPath);
+                    logger.info("Import: " + importPath);
+                    try (FileReader importReader = new FileReader(importPath)) {
+                        getProperties().load(importReader);
+                    }
+                    // @note: imported variable overload Properties and Property variable property
+                    // but complete variable hashmap properly
+                    defineVariable();
+                }
+            }
+        }
+    }
+
+    void init() {
+        defineProperty();
+    }
+
+    void defineProperty() {
+        for (String name : getProperties().stringPropertyNames()) {
+            String value = getProperties().getProperty(name);
+            try {
+                define(name, value);
+            } catch (Exception e) {
+                logger.info("Incorrect Property: " + name + " " + value);
+            }
+        }
+    }
+
+    /**
+     * Do it first
+     * VARIABLE = $gui=/a/path
+     */
+    void defineVariable() {
+        if (getProperties().containsKey(VARIABLE.toString())) {
+            basicSet(VARIABLE, (String) get(VARIABLE));
+            // variable definitions in a hashmap
+            defineVariableMap();
+        }
+    }
+
     void setQueryPattern(String str) {
         QueryLoad ql = QueryLoad.create();
         for (Pair pair : getValueList(Value.FEDERATE_QUERY_PATTERN)) {
@@ -916,38 +798,6 @@ public class Property {
         ArrayList<String> alist = new ArrayList<>();
         Collections.addAll(alist, list);
         FederateVisitor.BLACKLIST_EXCEPT = alist;
-    }
-
-    static void basicSet(Value value, int n) {
-        logger.debug("{} = {}", value, n);
-        getSingleton().getIntegerProperty().put(value, n);
-
-        switch (value) {
-
-            case SERVICE_SLICE:
-            case SERVICE_LIMIT:
-            case SERVICE_TIMEOUT:
-                // use integer table
-                break;
-
-            case SERVICE_DISPLAY_RESULT:
-                ProviderService.DISPLAY_RESULT_MAX = n;
-                ContextLog.DISPLAY_RESULT_MAX = n;
-                Eval.DISPLAY_RESULT_MAX = n;
-                break;
-
-            case LOAD_LIMIT:
-                Load.setLimitDefault(n);
-                break;
-
-            case FUNCTION_PARAMETER_MAX:
-                ASTExtension.FUNCTION_PARAMETER_MAX = n;
-                break;
-
-            case FEDERATE_INDEX_LENGTH:
-                FederateVisitor.NB_ENDPOINT = n;
-                break;
-        }
     }
 
     // variable definition may use preceding variables
@@ -1114,55 +964,6 @@ public class Property {
         return list;
     }
 
-    public class Pair {
-
-        private String first;
-        private String second;
-
-        Pair(String f, String r) {
-            first = f;
-            second = r;
-        }
-
-        public String getKey() {
-            return first;
-        }
-
-        public void setFirst(String first) {
-            this.first = first;
-        }
-
-        public String getValue() {
-            return second;
-        }
-
-        public String getPath() {
-            return expand(getValue());
-        }
-
-        public void setSecond(String second) {
-            this.second = second;
-        }
-
-    }
-
-    public static List<List<String>> getStorageparameters() {
-
-        String storages = stringValue(STORAGE);
-
-        List<List<String>> storageList = new ArrayList<>();
-        if (storages == null) {
-            return storageList;
-        }
-
-        for (String storageStr : storages.split(SEP)) {
-
-            String[] storageLst = storageStr.split(",", 3);
-            storageList.add(List.of(storageLst).stream().map( str -> getSingleton().expand(str)).collect(Collectors.toList()));
-        }
-        return storageList;
-    }
-
     void prefix() {
         for (Pair pair : getValueListBasic(PREFIX)) {
             NSManager.defineDefaultPrefix(pair.getKey().strip(), pair.getValue().strip());
@@ -1194,12 +995,12 @@ public class Property {
         this.stringProperty = stringProperty;
     }
 
-    protected void setProperties(Properties properties) {
-        this.properties = properties;
-    }
-
     protected Properties getProperties() {
         return properties;
+    }
+
+    protected void setProperties(Properties properties) {
+        this.properties = properties;
     }
 
     protected Map<Value, Integer> getIntegerProperty() {
@@ -1210,28 +1011,8 @@ public class Property {
         this.integerProperty = integerProperty;
     }
 
-    public static Integer intValue(Value val) {
-        return getSingleton().getIntegerProperty().get(val);
-    }
-
-    public static List<String> listValue(Value value) {
-        return getSingleton().getListProperty().get(value);
-    }
-
-    public static String stringValue(Value val) {
-        return getSingleton().getStringProperty().get(val);
-    }
-
     protected String pathValue(Value val) {
         return expand(stringValue(val));
-    }
-
-    public static String[] stringValueList(Value val) {
-        String str = stringValue(val);
-        if (val == null || str == null) {
-            return new String[0];
-        }
-        return str.split(SEP);
     }
 
     protected Map<String, String> getVariableMap() {
@@ -1274,33 +1055,227 @@ public class Property {
         this.listProperty = listProperty;
     }
 
-    // current storage mode to create QueryProcess
-    public static boolean isDataset() {
-        if (stringValue(STORAGE) == null) {
-            // there is no db storage path
-            return true;
-        }
-        if (stringValue(STORAGE_MODE) == null) {
-            // there is db storage path and no mode specified -> db mode, not dataset
-            return false;
-        }
-        // STORAGE_MODE = db|dataset
-        return stringValue(STORAGE_MODE).equals(DATASET);
-    }
-
-    // current storage mode
-    public static boolean isStorage() {
-        return !isDataset();
-    }
-
-    // consider all db
-    public static boolean isStorageAll() {
-        return isStorage() &&
-                getSingleton().protectEquals(stringValue(STORAGE_MODE), DB_ALL);
-    }
-
     boolean protectEquals(String variable, String value) {
         return variable != null && variable.equals(value);
+    }
+
+    public enum Value {
+        // VARIABLE = home=/home/name/dir
+        VARIABLE,
+        IMPORT,
+
+        TRACE_MEMORY,
+        TRACE_GENERIC,
+        // generic property for testing purpose
+        TEST_FEDERATE,
+        // turtle file path where federation are defined
+        FEDERATION,
+        // generate partition of connected bgp
+        FEDERATE_BGP,
+        // do not split complete partition if any
+        FEDERATE_PARTITION,
+        // test and use join between right and left exp of optional
+        FEDERATE_OPTIONAL,
+        FEDERATE_MINUS,
+        FEDERATE_UNDEFINED,
+        // complete bgp partition with additional partition of triple alone (as before)
+        FEDERATE_COMPLETE,
+        // source selection with filter
+        FEDERATE_FILTER,
+        FEDERATE_FILTER_ACCEPT,
+        FEDERATE_FILTER_REJECT,
+        // source selection with bind (exists {t1 . t2} as ?b_i)
+        FEDERATE_JOIN,
+        // authorize path in join test
+        FEDERATE_JOIN_PATH,
+        FEDERATE_SPLIT,
+
+        // index query pattern skip predicate for source discovery
+        FEDERATE_INDEX_SKIP,
+        FEDERATE_INDEX_PATTERN,
+        FEDERATE_INDEX_SUCCESS,
+        FEDERATE_INDEX_LENGTH,
+
+        FEDERATE_BLACKLIST,
+        FEDERATE_BLACKLIST_EXCEPT,
+        FEDERATE_QUERY_PATTERN,
+        FEDERATE_PREDICATE_PATTERN,
+
+        // boolan value
+        DISPLAY_URI_AS_PREFIX,
+        // rdf star reference node displayed as nested triple
+        DISPLAY_AS_TRIPLE,
+        // Graph node implemented as IDatatype instead of NodeImpl
+        GRAPH_NODE_AS_DATATYPE,
+        BLANK_NODE,
+        // load rdf file into graph kg:default instead of graph file-path
+        LOAD_IN_DEFAULT_GRAPH,
+        // constraint rule error in specific named graph
+        CONSTRAINT_NAMED_GRAPH,
+        // constraint rule error in external named graph
+        CONSTRAINT_GRAPH,
+        // graph ?g { } iterate std and external named graph
+        EXTERNAL_NAMED_GRAPH,
+        GRAPH_INDEX_END,
+        GRAPH_INDEX_TRANSITIVE,
+        GRAPH_INDEX_LOAD_SKIP,
+        // rdf* draft
+        RDF_STAR,
+        // enforce compliance: no literal as subject
+        RDF_STAR_VALIDATION,
+        // joker: asserted query triple return asserted and nested triple (default
+        // false)
+        RDF_STAR_SELECT,
+        // joker: asserted delete triple deletes asserted and nested triple (default
+        // false)
+        RDF_STAR_DELETE,
+        // use TripleNode implementation
+        RDF_STAR_TRIPLE,
+        // corese server for micro services
+        REENTRANT_QUERY,
+        // activate access level control (default is true)
+        ACCESS_LEVEL,
+        // activate access right for rdf triples wrt to namespace (default is false)
+        ACCESS_RIGHT,
+        // activate @event ldscript function call for sparql query processing
+        EVENT,
+        SKOLEMIZE,
+
+        VERBOSE,
+        SOLVER_DEBUG,
+        TRANSFORMER_DEBUG,
+
+        LOG_NODE_INDEX,
+        LOG_RULE_CLEAN,
+
+        SOLVER_SORT_CARDINALITY,
+        SOLVER_QUERY_PLAN, // STD | ADVANCED
+        // string value
+        SOLVER_VISITOR,
+        SOLVER_OVERLOAD,
+        RULE_VISITOR,
+        TRANSFORMER_VISITOR,
+        SERVER_VISITOR,
+        PREFIX,
+        // Testing purpose
+        INTERPRETER_TEST,
+        // 1 ; 01 ; 1.0 have different Node
+        // when true: nodes can be joined by graph matching
+        // when false: they do not join
+        DATATYPE_ENTAILMENT,
+        SPARQL_COMPLIANT,
+        SPARQL_ORDER_UNBOUND_FIRST,
+
+        DISABLE_OWL_AUTO_IMPORT,
+        OWL_CLEAN,
+        OWL_CLEAN_QUERY,
+        OWL_RL,
+
+        RULE_TRANSITIVE_FUNCTION,
+        RULE_TRANSITIVE_OPTIMIZE,
+        // rule engine use edge index with data manager
+        RULE_DATAMANAGER_OPTIMIZE,
+        // replace kg:rule_i by kg:rule
+        RULE_DATAMANAGER_CLEAN,
+        // for testing edge iterator filter edge index
+        RULE_DATAMANAGER_FILTER_INDEX,
+        RULE_TRACE,
+
+        FUNCTION_PARAMETER_MAX,
+
+        // init graph
+        GUI_TITLE,
+        GUI_BROWSE,
+        GUI_XML_MAX,
+        GUI_TRIPLE_MAX,
+        GUI_INDEX_MAX,
+        // rdf+xml turtle json
+        GUI_CONSTRUCT_FORMAT,
+        GUI_SELECT_FORMAT,
+        GUI_DEFAULT_QUERY,
+        GUI_QUERY_LIST,
+        GUI_TEMPLATE_LIST,
+        GUI_EXPLAIN_LIST,
+        GUI_RULE_LIST,
+
+        // application/rdf+xml
+        LOAD_FORMAT,
+        // integer value
+        // max number of triples for each rdf file load
+        LOAD_LIMIT,
+        LOAD_WITH_PARAMETER,
+        LOAD_DATASET,
+        LOAD_QUERY,
+        LOAD_FUNCTION,
+        LOAD_RULE,
+
+        RDFS_ENTAILMENT,
+
+        LDSCRIPT_VARIABLE,
+        LDSCRIPT_DEBUG,
+        LDSCRIPT_CHECK_DATATYPE,
+        LDSCRIPT_CHECK_RDFTYPE,
+
+        SERVICE_BINDING,
+        SERVICE_SLICE,
+        SERVICE_LIMIT,
+        SERVICE_TIMEOUT,
+        SERVICE_SEND_PARAMETER,
+        SERVICE_PARAMETER,
+        SERVICE_LOG,
+        SERVICE_REPORT,
+        SERVICE_DISPLAY_RESULT,
+        SERVICE_DISPLAY_MESSAGE,
+        SERVICE_HEADER,
+
+        // service result may be RDF graph (e.g. when format=turtle)
+        // apply service query on the graph
+        SERVICE_GRAPH,
+
+        STORAGE,
+        STORAGE_SERVICE,
+        // default storage: db|dataset
+        STORAGE_MODE,
+
+        // parser configuration
+        STRICT_MODE,
+
+        // Elasticsearch parameters
+        // TODO Change class to be able to define application-specific properties
+        ELASTICSEARCH_API_KEY,
+        ELASTICSEARCH_API_ADDRESS,
+    }
+
+    public class Pair {
+
+        private String first;
+        private String second;
+
+        Pair(String f, String r) {
+            first = f;
+            second = r;
+        }
+
+        public String getKey() {
+            return first;
+        }
+
+        public void setFirst(String first) {
+            this.first = first;
+        }
+
+        public String getValue() {
+            return second;
+        }
+
+        public String getPath() {
+            return expand(getValue());
+        }
+
+        public void setSecond(String second) {
+            this.second = second;
+        }
+
     }
 
 }

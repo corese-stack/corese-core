@@ -101,7 +101,7 @@ public class GraphCompare {
      */
     boolean compare(Graph g2, Node pred2, TBN t, Edge ent1, boolean isGraph) {
         Iterable<Edge> l2 = g2.getEdges(pred2);
-        Iterator<Edge> it = l2.iterator();
+
         for (Edge ent2 : l2) {
             if (compare(ent1, ent2, t, isGraph)) {
                 return true;

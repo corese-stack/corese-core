@@ -19,7 +19,9 @@ import org.slf4j.LoggerFactory;
  * Domain Specific Workflow to process DataShape on RDF Graph
  * 
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
- *
+ * @deprecated
+ * @since 2025
+ * This can't possibly work due to references to path local of ocorby system
  */
 public class ShapeWorkflow extends SemanticWorkflow {
     private static final Logger logger = LoggerFactory.getLogger(ShapeWorkflow.class);
