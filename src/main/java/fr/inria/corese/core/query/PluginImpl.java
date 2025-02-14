@@ -24,7 +24,6 @@ import fr.inria.corese.core.EventManager;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.Graph.TreeNode;
 import fr.inria.corese.core.GraphStore;
-import fr.inria.corese.core.approximate.ext.AppxSearchPlugin;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.LoadFormat;
@@ -119,8 +118,6 @@ public class PluginImpl
     private PluginTransform pt;
     // draft storage for large literal values (not used)
     private static IStorage storageMgr;
-    // Plugin for approximate search
-    private AppxSearchPlugin approximateSearch;
 
     int index = 0;
 
@@ -136,9 +133,7 @@ public class PluginImpl
     }
 
     void init() {
-        pt = new PluginTransform(this);
-        setApproximateSearch(new AppxSearchPlugin(this));
-    }
+        pt = new PluginTransform(this);    }
 
     public static PluginImpl create(Matcher m) {
         return new PluginImpl(m);
@@ -261,21 +256,6 @@ public class PluginImpl
     @Override
     public IDatatype format(IDatatype[] ldt) {
         return getPluginTransform().format(ldt);
-    }
-
-    // function xt:approximate
-    // xt:approximate(var, val, algo, threshold)
-    // algo: jw --jaro winckler ng --ngram wn eq
-    @Override
-    public IDatatype approximate(Expr exp, Environment env, Producer p, IDatatype[] param) {
-        return getApproximateSearch().eval(exp, env, p, param);
-    }
-
-    // function xt:sim
-    // compute similarity of solution ?
-    @Override
-    public IDatatype approximate(Expr exp, Environment env, Producer p) {
-        return getApproximateSearch().eval(exp, env, p);
     }
 
     // function xt:depth
@@ -1221,14 +1201,6 @@ public class PluginImpl
     @Override
     public GraphProcessor getGraphProcessor() {
         return this;
-    }
-
-    public AppxSearchPlugin getApproximateSearch() {
-        return approximateSearch;
-    }
-
-    public void setApproximateSearch(AppxSearchPlugin approximateSearch) {
-        this.approximateSearch = approximateSearch;
     }
 
 }

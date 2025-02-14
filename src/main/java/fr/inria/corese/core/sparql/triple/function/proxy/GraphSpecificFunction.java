@@ -90,12 +90,6 @@ public class GraphSpecificFunction extends LDScript {
                         return proc.similarity(env, p, param[0], param[1]);
                     default: return null;
                 }
-                
-            case APPROXIMATE:
-                  return proc.approximate(this, env, p, param);
-                  
-             case APP_SIM:
-                  return proc.approximate(this, env, p);
                   
              case STL_INDEX: 
                  return proc.index(env, p);

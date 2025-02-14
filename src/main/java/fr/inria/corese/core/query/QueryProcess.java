@@ -7,7 +7,6 @@ import fr.inria.corese.core.api.DataBroker;
 import fr.inria.corese.core.api.DataBrokerConstruct;
 import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.api.Log;
-import fr.inria.corese.core.approximate.ext.ASTRewriter;
 import fr.inria.corese.core.compiler.eval.Interpreter;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
@@ -553,10 +552,6 @@ public class QueryProcess extends QuerySolver {
 
     @Override
     public Query compile(String squery, Dataset ds) throws EngineException {
-        if (!hasVisitor()) {
-            // Rewrite query when @relax annotation, otherwise do nothing
-            addVisitor(new ASTRewriter());
-        }
         Query q = super.compile(squery, ds);
         if (q.getAST().getLog().getASTSelect() != null) {
             getLog().share(q.getAST().getLog());

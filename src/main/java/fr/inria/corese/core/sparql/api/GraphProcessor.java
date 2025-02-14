@@ -42,9 +42,6 @@ public interface GraphProcessor {
     
     IDatatype similarity(Environment env, Producer p, IDatatype dt1, IDatatype dt2);
     
-    IDatatype approximate (Expr exp, Environment env, Producer p);
-    IDatatype approximate (Expr exp, Environment env, Producer p, IDatatype[] param);
-    
     IDatatype depth(Environment env, Producer p, IDatatype dt);
     
     IDatatype index(Environment env, Producer p);
