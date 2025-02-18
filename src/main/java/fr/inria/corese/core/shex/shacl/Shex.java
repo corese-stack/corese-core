@@ -1,5 +1,6 @@
 package fr.inria.corese.core.shex.shacl;
 
+import fr.inria.corese.core.next.api.model.Value;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.lille.shexjava.graph.TCProperty;
 import fr.inria.lille.shexjava.schema.Label;
@@ -19,7 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import org.eclipse.rdf4j.model.Value;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
