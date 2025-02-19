@@ -43,7 +43,7 @@ public class SPARQLProcess extends  WorkflowProcess {
     }
 
     private static Logger logger = LoggerFactory.getLogger(SPARQLProcess.class);
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final NSManager nsm = NSManager.create();
     private static final String PARAM    = "$param";
     private static final String ARG      = "$arg";

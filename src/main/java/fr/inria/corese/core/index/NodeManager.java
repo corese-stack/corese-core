@@ -36,7 +36,7 @@ public class NodeManager {
     private boolean debug = false;
     // record position of node in edge list
     private boolean position = true;
-    private static final String NL = System.getProperty("line.separator");
+    private static final String NL = "\n";
     PredicateList emptyPredicateList;
     
     public class PredicateTable extends HashMap<Node, PredicateList> {

@@ -8,7 +8,7 @@ import java.util.Date;
  *
  */
 public class Header {
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     
  static final String importList = 
               "import fr.inria.corese.core.sparql.api.IDatatype;\n"

@@ -78,7 +78,7 @@ public class ASTQuery
 
     static final String FUN_NAME = NSManager.EXT_PREF+":_fun_";
     static final String FUN_PREF = NSManager.EXT_PREF+":";
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static int nbt = 0; // to generate an unique id for a triple if needed
     static int nbbnode = 0; // createBlankNode()
     public final static int QT_SELECT = 0;

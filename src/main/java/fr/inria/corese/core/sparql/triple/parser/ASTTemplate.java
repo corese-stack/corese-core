@@ -31,7 +31,7 @@ public class ASTTemplate {
     private static String[] PPRINT_META = {GROUPCONCAT, CONCAT, FUN_TEMPLATE_CONCAT, COALESCE, IF};
     
     private String groupSeparator = " ";
-    private String templateSeparator = System.getProperty("line.separator");
+    private String templateSeparator = "\n";
     private Term templateGroup;
     ArrayList<Expression> template;
 

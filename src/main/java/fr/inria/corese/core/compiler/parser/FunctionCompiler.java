@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FunctionCompiler {
 
-    private static String NL = System.getProperty("line.separator");
+    private static String NL = "\n";
     private static Logger logger = LoggerFactory.getLogger(FunctionCompiler.class);
     private static HashMap<String, String> loaded;
     HashMap<String, String> imported;

@@ -15,7 +15,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  */
 public class ASTUpdate {
 
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     private static final String PV = ";";
 
     List<Update> list;

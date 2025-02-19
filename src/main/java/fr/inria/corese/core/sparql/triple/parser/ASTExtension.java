@@ -26,7 +26,7 @@ public class ASTExtension implements Extension {
     private static ASTExtension singleton;
     public static int FUNCTION_PARAMETER_MAX = 20;
     private static Logger logger = LoggerFactory.getLogger(ASTExtension.class);
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     public static final String TYPE = ExpType.TYPE_METADATA;
     //FunMap map;
     FunMap[] maps;

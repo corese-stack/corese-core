@@ -16,7 +16,7 @@ import fr.inria.corese.core.Graph;
  */
 public class Describe {
 	
-	static final String NL = System.getProperty("line.separator");
+	static final String NL = "\n";
 
 	static final String nbClass = 
 		"# Class" + NL +

@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 public class Provenance {
-    final static String NL = System.getProperty("line.separator");
+    final static String NL = "\n";
     
     HashMap<Variable, List<Variable>> table;
     List<Variable> varList;

@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  *
  */
 public class Aggregate extends LDScript {
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static boolean compareIndex = false;
     Group group;
     TreeData tree;

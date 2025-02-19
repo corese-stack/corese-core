@@ -25,7 +25,7 @@ public class ShexShacl {
     static final String CL = ")"; 
     static final String PATH = "[%s %s]";
     static final String STRING = NSManager.XSD+"string";
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final String title = "# Shex Shacl Translation";
     static final String sign  = "# Olivier Corby - Inria I3S - 2020";
     static final String SHEX  = "shex";

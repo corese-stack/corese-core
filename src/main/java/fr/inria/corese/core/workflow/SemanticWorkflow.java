@@ -15,7 +15,7 @@ import fr.inria.corese.core.sparql.triple.parser.Access;
  *
  */
 public class SemanticWorkflow extends  CompositeProcess {
-    private static final String NL = System.getProperty("line.separator");
+    private static final String NL = "\n";
      
     Data data;
     private int loop = -1;

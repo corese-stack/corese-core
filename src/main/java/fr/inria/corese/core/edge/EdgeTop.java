@@ -21,7 +21,7 @@ import fr.inria.corese.core.sparql.triple.parser.AccessRight;
  */
 public abstract class EdgeTop extends GraphObject implements Edge {
     private byte level = AccessRight.DEFAULT;
-    public static final String NL = System.getProperty("line.separator");
+    public static final String NL = "\n";
     private boolean nested = false;
     // created by values, bind or triple()
     private boolean created = false;

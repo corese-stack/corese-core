@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 public class ASTBuffer  {
     
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final String SPACE = " ";
     private HashMap<Triple, Triple> done;
     private boolean service = false;

@@ -30,7 +30,7 @@ public class ShapeWorkflow extends SemanticWorkflow {
     public static final String SHAPE_TRANS          = Transformer.DATASHAPE;
     public static final String FORMAT               = Transformer.TURTLE;
     public static final String FORMAT_HTML          = Transformer.TURTLE_HTML;
-    private static final String NL                  = System.getProperty("line.separator");
+    private static final String NL                  = "\n";
     
     static final String MAIN = Transformer.STL_MAIN;
     static final String SHAPE_NODE  = NSManager.SHAPE + "shapeNode";
