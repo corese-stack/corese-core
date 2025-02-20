@@ -1,5 +1,18 @@
 # Corese Changelog
 
+## Version 4.6.2 – 2025-02-20
+
+### Fixed
+
+- Fixed JSON-LD serializer errors on Windows.
+- Fixed non-functional unit tests.
+
+### Changed
+
+- Updated and corrected documentation:
+  - Fixed broken links.
+  - Updated graph import/export formats.
+
 ## Version 4.6.1 – 2024-12-12
 
 ### Added
