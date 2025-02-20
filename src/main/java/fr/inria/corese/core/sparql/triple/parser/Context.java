@@ -23,7 +23,7 @@ import org.json.JSONObject;
  */
 public class Context extends ASTObject implements URLParam {
 
-    public static final String NL = System.getProperty("line.separator");
+    public static final String NL = "\n";
     public static final String STL = NSManager.STL;
     public static final String STL_QUERY    = STL + "query";
     public static final String STL_NAME     = STL + "name"; // query path name

@@ -49,7 +49,7 @@ public class EdgeManagerIndexer
     public static boolean RECORD_END = false;
     // true: store internal Edge without predicate Node
     public static boolean test = true;
-    private static final String NL = System.getProperty("line.separator");
+    private static final String NL = "\n";
     static final int IGRAPH = Graph.IGRAPH;
     static final int ILIST = Graph.ILIST;
     private static Logger logger = LoggerFactory.getLogger(EdgeManagerIndexer.class);

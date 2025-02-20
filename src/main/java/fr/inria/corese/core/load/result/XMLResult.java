@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public class XMLResult {
 
     private static Logger logger = LoggerFactory.getLogger(XMLResult.class);
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
 
     // create target Node
     Producer producer;

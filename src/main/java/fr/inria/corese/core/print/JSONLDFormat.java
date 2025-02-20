@@ -11,11 +11,11 @@ import java.util.Set;
 
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.logic.RDF;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.logic.RDF;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
@@ -60,7 +60,7 @@ public class JSONLDFormat extends RDFFormat {
     public static final String SBRACKET_LEFT = "[";
     public static final String SBRACKET_RIGHT = "]";
     public static final String SP_TAB = "\t";
-    public static final String SP_NL = System.getProperty("line.separator");
+    public static final String SP_NL = "\n";
 
     Graph graph;
     Mapper map;

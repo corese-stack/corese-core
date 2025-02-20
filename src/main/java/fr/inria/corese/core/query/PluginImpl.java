@@ -85,7 +85,7 @@ public class PluginImpl
 
     static public Logger logger = LoggerFactory.getLogger(PluginImpl.class);
     static String DEF_PPRINTER = Transformer.PPRINTER;
-    private static final String NL = System.getProperty("line.separator");
+    private static final String NL = "\n";
     private static final IDatatype SUB_CLASS_OF = DatatypeMap.newResource(RDFS.SUBCLASSOF);
     static int nbBufferedValue = 0;
     static final String EXT = ExpType.EXT;

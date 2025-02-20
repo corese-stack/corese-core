@@ -1,15 +1,18 @@
 package fr.inria.corese.core.sparql;
 
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.print.*;
-import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import org.json.JSONObject;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.print.CSVFormat;
+import fr.inria.corese.core.print.JSONFormat;
+import fr.inria.corese.core.print.TSVFormat;
+import fr.inria.corese.core.print.TripleFormat;
+import fr.inria.corese.core.print.XMLFormat;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 /**
  * Tests done to check the format for SELECT and INSERT
@@ -24,7 +27,8 @@ public class EmptyResultFormatTest {
         JSONFormat resultJSON = JSONFormat.create(results);
         String resultString = resultJSON.toStringBuffer().toString();
 
-        assertEquals("{\"head\": { \"vars\": []},\"results\": { \"bindings\": [{}] }}", resultString.trim().replaceAll("\n", ""));
+        assertEquals("{\"head\": { \"vars\": []},\"results\": { \"bindings\": [{}] }}".replaceAll("\\s+", ""),
+                resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -35,7 +39,8 @@ public class EmptyResultFormatTest {
         JSONFormat resultJSON = JSONFormat.create(results);
         String resultString = resultJSON.toStringBuffer().toString();
 
-        assertEquals("{\"head\": { \"vars\": []},\"results\": { \"bindings\": [{}] }}", resultString.trim().replaceAll("\n", ""));
+        assertEquals("{\"head\": { \"vars\": []},\"results\": { \"bindings\": [{}] }}".replaceAll("\\s+", ""),
+                resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -46,7 +51,10 @@ public class EmptyResultFormatTest {
         XMLFormat resultXML = XMLFormat.create(results);
         String resultString = resultXML.toStringBuffer().toString();
 
-        assertEquals("<?xml version=\"1.0\" ?><sparql xmlns='http://www.w3.org/2005/sparql-results#'><head></head><results><result></result></results></sparql>", resultString.trim().replaceAll("\n", ""));
+        assertEquals(
+                "<?xml version=\"1.0\" ?><sparql xmlns='http://www.w3.org/2005/sparql-results#'><head></head><results><result></result></results></sparql>"
+                        .replaceAll("\\s+", ""),
+                resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -57,7 +65,10 @@ public class EmptyResultFormatTest {
         XMLFormat resultXML = XMLFormat.create(results);
         String resultString = resultXML.toStringBuffer().toString();
 
-        assertEquals("<?xml version=\"1.0\" ?><sparql xmlns='http://www.w3.org/2005/sparql-results#'><head></head><results><result></result></results></sparql>", resultString.trim().replaceAll("\n", ""));
+        assertEquals(
+                "<?xml version=\"1.0\" ?><sparql xmlns='http://www.w3.org/2005/sparql-results#'><head></head><results><result></result></results></sparql>"
+                        .replaceAll("\\s+", ""),
+                resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -68,7 +79,7 @@ public class EmptyResultFormatTest {
         TSVFormat resultTSV = TSVFormat.create(results);
         String resultString = resultTSV.toString();
 
-        assertEquals("", resultString.trim().replaceAll("\n", ""));
+        assertEquals("".replaceAll("\\s+", ""), resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -79,7 +90,7 @@ public class EmptyResultFormatTest {
         TSVFormat resultTSV = TSVFormat.create(results);
         String resultString = resultTSV.toString();
 
-        assertEquals("", resultString.trim().replaceAll("\n", ""));
+        assertEquals("".replaceAll("\\s+", ""), resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -90,7 +101,7 @@ public class EmptyResultFormatTest {
         CSVFormat resultCSV = CSVFormat.create(results);
         String resultString = resultCSV.toString();
 
-        assertEquals("", resultString.trim().replaceAll("\n", ""));
+        assertEquals("".replaceAll("\\s+", ""), resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -101,7 +112,7 @@ public class EmptyResultFormatTest {
         CSVFormat resultCSV = CSVFormat.create(results);
         String resultString = resultCSV.toString();
 
-        assertEquals("", resultString.trim().replaceAll("\n", ""));
+        assertEquals("".replaceAll("\\s+", ""), resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -112,7 +123,7 @@ public class EmptyResultFormatTest {
         TripleFormat resultTriple = TripleFormat.create(results);
         String resultString = resultTriple.toString();
 
-        assertEquals("", resultString.trim().replaceAll("\n", ""));
+        assertEquals("".replaceAll("\\s+", ""), resultString.trim().replaceAll("\\s+", ""));
     }
 
     @Test
@@ -123,6 +134,6 @@ public class EmptyResultFormatTest {
         TripleFormat resultTriple = TripleFormat.create(results);
         String resultString = resultTriple.toString();
 
-        assertEquals("", resultString.trim().replaceAll("\n", ""));
+        assertEquals("", resultString.trim().replaceAll("\\s+", ""));
     }
 }

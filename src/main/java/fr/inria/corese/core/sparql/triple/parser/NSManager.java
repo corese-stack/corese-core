@@ -144,7 +144,7 @@ public class NSManager extends ASTObject {
     private static final String seed = "ns";
     private static final String DOT = ".";
     public static final String HASH = "#";
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final char[] END_CHAR = { '#', '/', '?' }; // , ':'}; // may end an URI ...
     static final String[] PB_CHAR_NAME = { ".", "\u2013", ":", "#", "(", ")", "'", "\"", ",", ";", "[", "]", "{", "}",
             "?", "&", "=" };

@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 public class Access {
     public static Logger logger = LoggerFactory.getLogger(Access.class);
     
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     // throw exception for undefined expression, see FunctionCompiler
     // false -> SPARQL semantics
     // true  -> safety check semantics

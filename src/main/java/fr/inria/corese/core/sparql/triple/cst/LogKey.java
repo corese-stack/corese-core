@@ -56,6 +56,6 @@ public interface LogKey {
     static final String RESULT_SELECT = "ns:outputSelect";
     static final String RESULT_INDEX = "ns:outputIndex";
     static final String BNODE = "ns:bnode";
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
 
 }
