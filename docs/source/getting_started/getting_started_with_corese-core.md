@@ -79,16 +79,6 @@ graph.addEdge(edithPiafIRI, lastNameProperty, piafDatatype);
 ### 2.2. Load Graph from file
 
 This example shows how to load a graph from a file.
-Corese Loader can load formats :
-
-- RDF/XML (.rdf)
-- TURTLE (.ttl)
-- TRIG (.trig)
-- JSONLD (.jsonld)
-- NTRIPLES (.nt)
-- NQUADS (.nq)
-- JSON-LD (.jsonld)
-- RDFa (.html)
 
 ```java
 // Create a new empty Graph
@@ -96,8 +86,18 @@ Graph graph = Graph.create();
 
 // Create loader and parse file
 Load ld = Load.create(graph);
-ld.parse("input graph file path");
+ld.parse("input graph file path", Load.format.TURTLE_FORMAT);
 ```
+
+Corese Loader can load formats :
+
+- RDF/XML (.rdf) `Load.format.RDFXML_FORMAT`
+- TURTLE (.ttl) `Load.format.TURTLE_FORMAT`
+- TRIG (.trig) `Load.format.TRIG_FORMAT`
+- JSONLD (.jsonld) `Load.format.JSONLD_FORMAT`
+- NTRIPLES (.nt) `Load.format.NT_FORMAT`
+- NQUADS (.nq) `Load.format.NQUADS_FORMAT`
+- RDFa (.html) `Load.format.RDFA_FORMAT`
 
 ### 2.3. Export Graph to file
 
@@ -107,7 +107,7 @@ This example shows how to serialize a graph in file, here in TURTLE format.
 // We assume that the 'graph' variable has been define previously
 
 // Create exporter
-ResultFormat exporter = ResultFormat.create(graph, ResultFormat.TURTLE_FORMAT);
+ResultFormat exporter = ResultFormat.create(graph, ResultFormatDef.format.TURTLE_FORMAT);
 String result = exporter.toString();
 
 // Write result in file
@@ -116,14 +116,16 @@ writer.write(result);
 writer.close();
 ```
 
-Corese Transformer can serialize graphs in different formats :
+Corese can serialize graphs in the following formats:
 
-- RDF/XML `ResultFormat.RDF_XML_FORMAT`
-- TURTLE `ResultFormat.TURTLE_FORMAT`
-- TRIG `ResultFormat.TRIG_FORMAT`
-- JSONLD `ResultFormat.JSONLD_FORMAT`
-- NTRIPLES `ResultFormat.NTRIPLES_FORMAT`
-- NQUADS `ResultFormat.NQUADS_FORMAT`
+- RDF/XML `ResultFormatDef.format.RDF_XML_FORMAT`
+- TURTLE `ResultFormatDef.format.TURTLE_FORMAT`
+- TRIG `ResultFormatDef.format.TRIG_FORMAT`
+- JSONLD `ResultFormatDef.format.JSONLD_FORMAT`
+- NTRIPLES `ResultFormatDef.format.`
+- NQUADS `ResultFormatDef.format.NQUADS_FORMAT`
+- Canonical RDF SHA-256 `ResultFormatDef.format.RDFC10_SHA256_FORMAT`
+- Canonical RDF SHA-384 `ResultFormatDef.format.RDFC10_SHA384_FORMAT`
 
 ## 3. SPARQL Protocol and RDF Query Language
 
@@ -296,8 +298,8 @@ Shacl shacl = new Shacl(dataGraph, shapeGraph);
 Graph result = shacl.eval();
 
 // print results
-Transformer transformer = Transformer.create(result, Transformer.TURTLE);
-System.out.println(transformer.toString());
+ResultFormat exporter = ResultFormat.create(graph, ResultFormatDef.format.TURTLE_FORMAT);
+System.out.println(exporter.toString());
 ```
 
 **Input graph file path:**
