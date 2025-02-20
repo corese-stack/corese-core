@@ -56,7 +56,7 @@ public interface Edge extends Pointerable {
     /**
      * Is node returned by getNode()
      *
-     * @param n
+     * @param node
      * @return
      */
     default boolean contains(Node node) {return false;}

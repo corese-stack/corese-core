@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
-public class AbstractModel implements Model {
+public abstract class AbstractModel implements Model {
 
     @Override
     public Model unmodifiable() {

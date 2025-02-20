@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.api.model;
 
-
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;

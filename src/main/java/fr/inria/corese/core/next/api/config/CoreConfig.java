@@ -1,6 +1,10 @@
 package fr.inria.corese.core.next.api.config;
 
 import com.typesafe.config.*;
+
+/**
+ * Configuration class for Corese Core
+ */
 public class CoreConfig {
     public static CoreConfig instance = null;
 
