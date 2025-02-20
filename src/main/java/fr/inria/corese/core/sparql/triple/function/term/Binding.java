@@ -44,7 +44,7 @@ public class Binding implements Binder {
     private static final String LIST = "list";
     private static final String NUMBER = "number";
     
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     public static final int UNBOUND = ExprType.UNBOUND;
     public static boolean DEBUG_DEFAULT = false;
     public static boolean DYNAMIC_CAPTURE_DEFAULT = false;

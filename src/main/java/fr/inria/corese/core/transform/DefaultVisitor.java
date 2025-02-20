@@ -46,7 +46,7 @@ public class DefaultVisitor implements TemplateVisitor {
     
     private String transform = Transformer.TURTLE;
     private boolean silent = true;
-    private String NL = System.getProperty("line.separator");
+    private String NL = "\n";
     // boolean value (if any) that means that visitor must consider visited node
     // use case: st:visit(st:exp, ?x, ?suc)
     // if (?suc = acceptValue) node ?x is considered

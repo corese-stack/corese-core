@@ -8,7 +8,7 @@ import java.util.List;
  *
  */
 public class RewriteErrorManager {
-    final static String NL = System.getProperty("line.separator");
+    final static String NL = "\n";
     private List<RewriteError> errorList;
 
 

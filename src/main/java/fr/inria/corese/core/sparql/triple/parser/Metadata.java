@@ -17,7 +17,7 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
  */
 public class Metadata extends ASTObject
         implements Iterable<String> {
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final int UNDEFINED = -1;
     static final String AT = "@";
     public static final int TEST = 0;

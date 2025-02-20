@@ -73,7 +73,7 @@ public class Graph extends GraphObject implements
     static final String SKOLEM = ExpType.SKOLEM;
     static final int TAGINDEX = 2;
     private static final String SHAPE_CONFORM = NSManager.SHAPE + "conforms";
-    private static final String NL = System.getProperty("line.separator");
+    private static final String NL = "\n";
     private static final String[] PREDEFINED = {
             Entailment.DEFAULT, Entailment.ENTAIL, Entailment.RULE, Entailment.CONSTRAINT,
             RDFS.SUBCLASSOF, RDFS.LABEL,
@@ -847,7 +847,7 @@ public class Graph extends GraphObject implements
     }
 
     public String display(int n, int max) {
-        String sep = System.getProperty("line.separator");
+        String sep = "\n";
         StringBuilder sb = new StringBuilder();
 
         for (Node p : getSortedProperties()) {

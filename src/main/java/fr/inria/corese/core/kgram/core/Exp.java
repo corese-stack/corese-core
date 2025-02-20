@@ -35,7 +35,7 @@ public class Exp extends PointerObject
     public static final int GRAPH_NAME = 3;
     public static boolean DEBUG_DEFAULT = false;
     
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final String SP = " ";
     static Exp empty = new Exp(EMPTY);
     // group edge even if there is a disconnected filter

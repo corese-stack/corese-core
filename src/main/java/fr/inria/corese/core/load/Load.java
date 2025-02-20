@@ -554,7 +554,7 @@ public class Load
     }
 
     Reader reader(InputStream stream) throws UnsupportedEncodingException {
-        return new InputStreamReader(stream);
+        return new InputStreamReader(stream, StandardCharsets.UTF_8);
     }
 
     void close(InputStream stream) throws LoadException {

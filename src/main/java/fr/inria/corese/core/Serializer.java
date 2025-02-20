@@ -8,7 +8,7 @@ package fr.inria.corese.core;
  */
 public class Serializer {
 
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     StringBuilder sb;
 
     public Serializer() {

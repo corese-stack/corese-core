@@ -22,7 +22,7 @@ public class TemplatePrinter {
 	String from, to;
 	FileWriter fw;
         StringBuilder sb;
-	static final String NL 			= System.getProperty("line.separator");
+	static final String NL 			= "\n";
 	
         TemplatePrinter(){
              sb = new StringBuilder();            

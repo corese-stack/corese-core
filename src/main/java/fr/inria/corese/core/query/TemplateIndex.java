@@ -138,9 +138,9 @@ class TemplateIndex extends HashMap<String, List<Query>> {
         for (String dt : keySet()) {
             List<Query> l = get(dt);
             sb.append(dt);
-            sb.append(System.getProperty("line.separator"));
+            sb.append("\n");
             sb.append(l);
-            sb.append(System.getProperty("line.separator"));
+            sb.append("\n");
         }
         return sb.toString();
     }

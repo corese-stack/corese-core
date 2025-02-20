@@ -49,7 +49,7 @@ public class RDFFormat {
     static final String OWLCLASS = "owl:Class";
     static final String SPACE = " ";
     static final String INDENTATION = "  ";
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     private static final String OCOM = "<!--";
     private static final String CCOM = "-->";
     private static final String LT = "<";
