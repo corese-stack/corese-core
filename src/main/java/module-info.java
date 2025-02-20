@@ -16,6 +16,7 @@ module fr.inria.corese.corese_core {
     requires junit;
     requires jsonld.java;
     requires commons.lang; //
+    requires typesafe.config; //
 
     exports fr.inria.corese.core.load;
     exports fr.inria.corese.core.load.result;

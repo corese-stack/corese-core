@@ -74,6 +74,7 @@ dependencies {
     implementation("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}") // Semargl core for RDF parsing and transformation
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                          // JSON-LD processing for Linked Data in JSON format
     implementation("junit:junit:4.13.2")                                                 // JUnit framework for unit testing in Java
+    implementation("com.typesafe:config:1.4.3")                                          // Typesafe config
     api("org.slf4j:slf4j-api:2.0.9")                                                     // Simple Logging Facade for Java (SLF4J)
 }
 
