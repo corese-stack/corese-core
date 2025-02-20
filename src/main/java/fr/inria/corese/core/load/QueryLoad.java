@@ -32,7 +32,7 @@ public class QueryLoad extends Load {
     static final String FILE = "file://";
     static final String FTP = "ftp://";
     static final String[] PROTOCOLS = {HTTP, FILE, FTP};
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     QueryEngine engine;
 
     QueryLoad() {

@@ -35,7 +35,7 @@ public class NodeManagerBasic {
     private boolean debug = false;
     // record position of node in edge list
     boolean isPosition = true;
-    private static final String NL = System.getProperty("line.separator");
+    private static final String NL = "\n";
     
     NodeManagerBasic(Graph g, int index) {
         graph = g;

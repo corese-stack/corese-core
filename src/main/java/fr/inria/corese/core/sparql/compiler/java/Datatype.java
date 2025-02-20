@@ -17,7 +17,7 @@ import java.util.TreeMap;
  *
  */
 public class Datatype {
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final String VAR = "_cst_";
     int count = 0;
 

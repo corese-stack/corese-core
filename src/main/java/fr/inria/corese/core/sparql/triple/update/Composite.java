@@ -21,7 +21,7 @@ public class Composite extends Update {
     static final String NAMED = "using named";
     static final String WHERE = "where";
     static final String DATA = "data";
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
 
     Exp data,
             // insert delete

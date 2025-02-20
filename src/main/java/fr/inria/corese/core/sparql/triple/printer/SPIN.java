@@ -70,7 +70,7 @@ public class SPIN implements ASTVisitor {
     private static final String SPOBJECT = "sp:object";
     private static final String SP_TRIPLE_PATH = "sp:TriplePath";
     private static final String SPPATH = "sp:path";
-    private static final String NL = System.getProperty("line.separator");
+    private static final String NL = "\n";
     private static final String SPRESULT_VARIABLES = "sp:resultVariables";
     private static final String SPFROM_NAMED = "sp:fromNamed";
     private static final String OSBRACKET = KeywordPP.OPEN_SQUARE_BRACKET;

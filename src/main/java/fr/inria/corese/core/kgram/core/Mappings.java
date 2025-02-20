@@ -43,7 +43,7 @@ public class Mappings extends PointerObject
         implements Comparator<Mapping>, Iterable<Mapping> {
     private static Logger logger = LoggerFactory.getLogger(Mappings.class);
 
-    private static final String NL = System.getProperty("line.separator");
+    private static final String NL = "\n";
     private static final String AGGREGATE_LOCAL = "@local";
     private static final long serialVersionUID = 1L;
     private static int SELECT = -1;

@@ -69,7 +69,7 @@ public class ResourceReader {
                 break;
             }
             if (isnl){
-                sb.append(System.getProperty("line.separator"));
+                sb.append("\n");
             }
             else {
                 isnl = true;

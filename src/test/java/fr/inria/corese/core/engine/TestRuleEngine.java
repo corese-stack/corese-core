@@ -31,7 +31,7 @@ import fr.inria.corese.core.sparql.storage.api.Parameters;
  */
 public class TestRuleEngine {
 
-    static String data = TestRuleEngine.class.getResource("/data/").getPath();
+    static String data = TestRuleEngine.class.getResource("/data-test/").getPath();
     static Graph graph;
     static Engine rengine;
     static RuleEngine fengine;
