@@ -28,4 +28,4 @@ Contents:
 
 4. Advanced SPARQL Features
    Explore advanced SPARQL extensions for enhanced query capabilities.
-   `SPARQL service extension <advanced/SPARQL_service_extension.html>`_
+   `SPARQL service extension <advanced/SPARQL_Service_Extension.html>`_
