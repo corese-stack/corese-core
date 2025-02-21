@@ -1,9 +1,11 @@
 name: "Sphinx: Render development docs"
 run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
+
 on:
   push:
     branches:
       - "develop"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,20 +23,35 @@ jobs:
       with:
         ref: develop
 
-    - name: Fetch tags
-      run: git fetch --prune --unshallow --tags --force
+    - name: Check existing tags before fetch
+      run: git tag --sort=-v:refname || echo "No tags found"
+
+    - name: Delete all local tags to avoid conflicts
+      run: git tag -d $(git tag) || echo "No tags to delete"
+
+    - name: Fetch updated tags
+      run: git fetch --prune --tags --force
+
+    - name: Check tags after fetch
+      run: git tag --sort=-v:refname || echo "No tags found after fetch"
 
     - name: Build Sphinx documentation with multiversion
       run: |
+        set -x  # Enable debug mode to log executed commands
         source /builds/miniconda3/etc/profile.d/conda.sh
         conda activate corese-core-documentation
         cd docs/source
-        doxygen DoxyfileFull
+        doxygen DoxyfileFull || { echo "Doxygen failed"; exit 1; }
         cd ../..
-        mkdir build/
-        mkdir build/html/
-        mkdir build/html/dev/
-        mv docs/build/doxygen_html/* build/html/dev/
+
+        mkdir -p build/html/dev/
+
+        if [ -d "docs/build/doxygen_html" ]; then
+          mv docs/build/doxygen_html/* build/html/dev/
+        else
+          echo "Warning: docs/build/doxygen_html does not exist!"
+        fi
+        set +x  # Disable debug mode
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
