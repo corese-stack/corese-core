@@ -1,0 +1,16 @@
+.. _dir__builds_actions-runners__work_corese-core_corese-core_src:
+
+
+Directory src
+=============
+
+
+*Directory path:* ``/builds/actions-runners/_work/corese-core/corese-core/src``
+
+Subdirectories
+--------------
+
+- :ref:`dir__builds_actions-runners__work_corese-core_corese-core_src_main`
+
+
+

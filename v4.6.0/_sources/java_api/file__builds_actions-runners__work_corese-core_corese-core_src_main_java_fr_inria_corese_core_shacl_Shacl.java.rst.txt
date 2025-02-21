@@ -1,0 +1,47 @@
+
+.. _file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shacl_Shacl.java:
+
+File Shacl.java
+===============
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_shacl>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/shacl``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+Definition (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/shacl/Shacl.java``)
+--------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+Includes
+--------
+
+
+- ``org.slf4j.Logger``
+
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__shacl`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1shacl_1_1Shacl`
+
