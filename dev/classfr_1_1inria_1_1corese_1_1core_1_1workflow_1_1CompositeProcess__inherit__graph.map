@@ -1,0 +1,21 @@
+<map id="CompositeProcess" name="CompositeProcess">
+<area shape="rect" id="Node000001" title=" " alt="" coords="352,152,495,177"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticProcess.html" title="Super class of Process with a Process List (Test, Parallel, ..)" alt="" coords="275,225,409,251"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="402,188,357,227,354,223,398,184"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticWorkflow.html" title="Workflow of Query | Update | RuleBase | Transformation Each Process pass a Data with Graph to next Pr..." alt="" coords="483,225,625,251"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="458,182,534,223,531,227,455,186"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowProcess.html" title="Root class." alt="" coords="357,79,489,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="426,118,426,152,421,152,421,118"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AbstractProcess.html" title=" " alt="" coords="360,5,487,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="426,44,426,79,421,79,421,44"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AssertProcess.html" title=" " alt="" coords="5,299,119,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="285,257,108,301,107,296,283,251"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ParallelProcess.html" title="Run Processes as in parallel with copy of input Graph." alt="" coords="143,299,263,324"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="309,259,227,301,225,296,306,254"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ProbeProcess.html" title="Execute a sub Process but return the input Data Used for e.g trace purpose." alt="" coords="287,299,397,324"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="345,264,345,299,339,299,339,264"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TestProcess.html" title=" " alt="" coords="421,299,519,324"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="376,255,450,296,448,301,373,260"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ShapeWorkflow.html" title="Domain Specific Workflow to process DataShape on RDF Graph." alt="" coords="543,299,666,324"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="573,261,599,297,594,300,568,264"/>
+</map>

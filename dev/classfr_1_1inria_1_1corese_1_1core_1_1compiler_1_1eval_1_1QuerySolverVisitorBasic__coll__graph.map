@@ -1,0 +1,14 @@
+<map id="QuerySolverVisitorBasic" name="QuerySolverVisitorBasic">
+<area shape="rect" id="Node000001" title="Callback manager for LDScript functions with specific annotations Eval SPARQL processor calls before(..." alt="" coords="31,256,210,281"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,116,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="45,43,34,61,26,81,18,132,20,163,30,192,43,212,61,229,98,254,95,258,58,233,39,215,25,195,15,164,13,132,21,79,29,59,40,40"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolverVisitorBasic.html" title="Callback manager for LDScript functions with specific annotations Eval SPARQL processor calls before(..." alt="" coords="35,80,214,105"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="82,40,116,78,112,81,78,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="167,5,282,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="230,44,231,113,226,154,215,194,205,216,189,234,151,258,148,254,186,230,201,213,210,192,221,153,226,113,225,44"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="199,41,143,82,139,77,196,37"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolverOverload.html" title=" " alt="" coords="40,168,201,193"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="123,207,123,255,118,255,118,207"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="119,154,121,105,127,106,125,154"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="88,115,75,130,73,140,78,149,98,166,95,170,74,152,68,141,70,128,84,112"/>
+</map>

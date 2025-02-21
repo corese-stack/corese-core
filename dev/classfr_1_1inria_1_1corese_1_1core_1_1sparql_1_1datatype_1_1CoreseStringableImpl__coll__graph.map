@@ -1,0 +1,35 @@
+<map id="CoreseStringableImpl" name="CoreseStringableImpl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,168,180"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html" title=" " alt="" coords="274,80,401,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="269,111,187,132,116,157,114,152,186,127,268,106"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringableImpl.html" title=" " alt="" coords="256,155,419,180"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="340,120,340,154,335,154,335,120"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="294,5,381,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="340,45,340,80,335,80,335,45"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseURI.html" title=" " alt="" coords="193,331,284,356"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="229,318,223,283,220,240,225,195,231,173,242,153,255,137,272,123,306,103,309,108,275,127,259,140,246,156,236,175,230,196,225,240,228,282,234,317"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseResource.html" title=" " alt="" coords="243,243,370,268"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="255,318,295,267,300,270,259,321"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseString.html" title=" " alt="" coords="342,421,447,446"/>
+<area shape="poly" id="edge11_Node000007_Node000004" title=" " alt="" coords="269,361,321,392,372,418,369,423,319,397,266,366"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseBoolean.html" title=" " alt="" coords="131,421,251,446"/>
+<area shape="poly" id="edge20_Node000013_Node000004" title=" " alt="" coords="204,366,192,381,188,401,190,420,185,421,182,401,187,379,200,363"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="282,279,267,294,246,332,241,329,263,290,278,275"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="331,194,313,243,308,241,326,192"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringLiteral.html" title=" " alt="" coords="308,331,455,356"/>
+<area shape="poly" id="edge10_Node000008_Node000006" title=" " alt="" coords="357,190,372,214,384,242,389,291,386,330,381,330,384,291,379,243,368,216,353,193"/>
+<area shape="poly" id="edge8_Node000002_Node000007" title=" " alt="" coords="435,412,454,400,472,384,485,366,489,344,489,166,487,152,482,140,461,121,432,109,400,101,401,96,434,104,464,117,486,137,492,150,495,166,495,345,489,368,476,388,458,404,438,417"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="388,369,396,420,390,421,383,370"/>
+<area shape="poly" id="edge18_Node000013_Node000008" title=" " alt="" coords="371,370,361,384,347,397,300,419,251,430,250,425,298,414,344,392,357,381,367,367"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1DatatypeMap.html" title=" " alt="" coords="509,525,619,551"/>
+<area shape="poly" id="edge12_Node000002_Node000009" title=" " alt="" coords="633,534,693,528,752,512,776,499,796,482,809,461,813,434,813,167,811,160,802,154,769,141,657,121,520,108,401,100,401,94,521,102,658,116,770,136,805,149,815,157,819,165,819,435,814,463,800,485,779,503,754,516,694,533,634,540"/>
+<area shape="poly" id="edge16_Node000009_Node000009" title=" " alt="" coords="634,528,642,531,646,538,638,547,620,550,619,545,635,542,641,538,639,536,632,533"/>
+<area shape="rect" id="Node000010" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1Cst.html" title=" " alt="" coords="472,421,515,446"/>
+<area shape="poly" id="edge13_Node000009_Node000010" title=" " alt="" coords="511,456,558,524,554,527,507,459"/>
+<area shape="rect" id="Node000011" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1RDF.html" title=" " alt="" coords="539,421,589,446"/>
+<area shape="poly" id="edge14_Node000009_Node000011" title=" " alt="" coords="567,460,567,525,561,525,561,460"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="613,421,779,446"/>
+<area shape="poly" id="edge15_Node000009_Node000012" title=" " alt="" coords="672,457,581,527,577,523,669,452"/>
+<area shape="poly" id="edge17_Node000009_Node000013" title=" " alt="" coords="246,447,523,523,521,528,245,452"/>
+<area shape="poly" id="edge19_Node000013_Node000013" title=" " alt="" coords="266,424,277,433,269,441,251,444,250,439,267,437,272,434,263,429"/>
+</map>

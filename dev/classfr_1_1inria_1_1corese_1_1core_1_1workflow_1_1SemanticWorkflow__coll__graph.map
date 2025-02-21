@@ -1,0 +1,11 @@
+<map id="SemanticWorkflow" name="SemanticWorkflow">
+<area shape="rect" id="Node000001" title="Workflow of Query | Update | RuleBase | Transformation Each Process pass a Data with Graph to next Pr..." alt="" coords="67,243,209,268"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1CompositeProcess.html" title=" " alt="" coords="5,155,148,180"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,190,132,241,127,244,91,193"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowProcess.html" title="Root class." alt="" coords="11,80,143,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="79,120,79,154,74,154,74,120"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AbstractProcess.html" title=" " alt="" coords="13,5,140,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="79,45,79,80,74,80,74,45"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1Data.html" title=" " alt="" coords="173,155,226,180"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="185,193,149,244,144,241,181,190"/>
+</map>

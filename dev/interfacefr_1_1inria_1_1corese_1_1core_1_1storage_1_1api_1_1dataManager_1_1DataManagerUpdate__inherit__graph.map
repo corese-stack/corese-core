@@ -1,0 +1,5 @@
+<map id="DataManagerUpdate" name="DataManagerUpdate">
+<area shape="rect" id="Node000001" title="Interface to adapt an external storage system to Corese." alt="" coords="5,5,163,31"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1storage_1_1api_1_1dataManager_1_1DataManager.html" title="Interface to adapt an external storage system to Corese." alt="" coords="29,79,139,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,44,87,79,81,79,81,44"/>
+</map>

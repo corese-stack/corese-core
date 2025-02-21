@@ -1,0 +1,5 @@
+<map id="Simplify" name="Simplify">
+<area shape="rect" id="Node000001" title="Merge several service with same URI into one service." alt="" coords="5,79,80,104"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Util.html" title=" " alt="" coords="20,5,65,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="45,44,45,79,40,79,40,44"/>
+</map>

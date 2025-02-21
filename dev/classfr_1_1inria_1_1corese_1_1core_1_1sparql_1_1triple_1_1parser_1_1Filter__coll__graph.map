@@ -1,0 +1,25 @@
+<map id="Filter" name="Filter">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,405,60,431"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Exp.html" title=" " alt="" coords="53,155,100,180"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="60,192,48,210,39,230,29,280,27,330,33,405,28,405,22,330,24,279,34,229,43,208,56,189"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Filter.html" title=" " alt="" coords="49,229,104,255"/>
+<area shape="poly" id="edge9_Node000008_Node000002" title=" " alt="" coords="79,194,79,229,74,229,74,194"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1TopExp.html" title="Root of SPARQL Expression (filter) and Exp (triple, option, ...)" alt="" coords="303,80,371,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,110,101,162,99,157,288,105"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Expression.html" title=" " alt="" coords="118,317,211,343"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="359,114,382,144,403,180,409,199,412,219,409,238,400,256,382,276,360,293,310,315,258,327,212,332,211,326,257,322,309,310,357,288,378,273,396,253,404,237,406,219,404,201,398,182,378,147,355,117"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="285,5,389,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="339,45,339,80,334,80,334,45"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="13,80,140,105"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="79,120,79,154,74,154,74,120"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="137,352,52,407,49,403,134,348"/>
+<area shape="poly" id="edge13_Node000006_Node000006" title=" " alt="" coords="226,321,238,330,230,338,212,341,211,335,227,333,233,330,224,326"/>
+<area shape="poly" id="edge10_Node000008_Node000006" title=" " alt="" coords="140,309,125,295,86,257,90,253,129,291,144,306"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="128,229,191,255"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="164,268,167,317,161,317,158,269"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="81,267,92,292,107,305,126,315,123,320,104,310,88,295,77,269"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="215,229,266,255"/>
+<area shape="poly" id="edge11_Node000006_Node000009" title=" " alt="" coords="223,267,177,319,173,315,219,263"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="290,229,386,255"/>
+<area shape="poly" id="edge12_Node000006_Node000010" title=" " alt="" coords="304,263,189,319,187,315,301,258"/>
+</map>

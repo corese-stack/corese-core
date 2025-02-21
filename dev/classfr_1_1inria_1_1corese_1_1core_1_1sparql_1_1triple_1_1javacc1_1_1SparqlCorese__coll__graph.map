@@ -1,0 +1,16 @@
+<map id="SparqlCorese" name="SparqlCorese">
+<area shape="rect" id="Node000001" title=" " alt="" coords="219,200,327,225"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html" title="Token literal values and constants." alt="" coords="5,5,179,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,44,63,83,62,103,69,121,99,154,138,177,180,193,220,202,219,207,179,198,136,182,96,158,64,124,57,103,58,81,74,42"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseTokenManager.html" title="Token Manager." alt="" coords="79,95,281,121"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="115,39,170,93,166,97,111,42"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="193,132,206,153,222,174,253,198,250,202,218,178,201,156,189,134"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SimpleCharStream.html" title="An implementation of interface CharStream, where the stream is assumed to contain only ASCII characte..." alt="" coords="221,5,365,31"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="309,43,313,54,326,116,324,144,313,177,304,191,293,202,289,198,300,187,308,175,319,143,321,117,308,55,304,44"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="251,39,222,57,203,77,189,97,184,94,199,73,218,53,248,34"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1Token.html" title="Describes the input token stream." alt="" coords="459,95,517,121"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="453,129,349,178,299,202,296,197,347,174,451,124"/>
+<area shape="poly" id="edge8_Node000005_Node000005" title=" " alt="" coords="532,98,540,101,544,108,535,117,518,119,517,114,533,112,539,108,537,105,530,103"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="439,5,537,31"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="491,44,491,95,485,95,485,44"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="QueryGraphVisitorImpl" name="QueryGraphVisitorImpl">
+<area shape="rect" id="Node000001" title="QueryGraph Visitor for query(RDF Graph) Replace RDF List by rdf:rest* / rdf:first in query graph Matc..." alt="" coords="5,79,176,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="19,5,162,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,44,93,79,88,79,88,44"/>
+</map>

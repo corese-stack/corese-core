@@ -1,0 +1,7 @@
+<map id="SparqlCoreseConstants" name="SparqlCoreseConstants">
+<area shape="rect" id="Node000001" title="Token literal values and constants." alt="" coords="62,5,235,31"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCorese.html" title=" " alt="" coords="5,79,113,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,41,76,81,72,76,122,37"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseTokenManager.html" title="Token Manager." alt="" coords="138,79,341,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,37,226,76,223,81,173,41"/>
+</map>

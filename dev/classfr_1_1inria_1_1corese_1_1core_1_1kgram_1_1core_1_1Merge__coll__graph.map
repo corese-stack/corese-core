@@ -1,0 +1,32 @@
+<map id="Merge" name="Merge">
+<area shape="rect" id="Node000001" title=" " alt="" coords="831,169,893,195"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Group.html" title="select distinct ?x ?y select (count(distinct *) as ?c)" alt="" coords="638,55,699,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="704,85,841,167,838,172,702,89"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="289,5,481,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="483,30,568,45,638,58,637,64,568,50,482,35"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="311,55,459,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="473,65,638,65,638,70,473,70"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,55,240,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="254,65,311,65,311,70,254,70"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mappings.html" title=" " alt="" coords="626,169,711,195"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="725,179,831,179,831,185,725,185"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1PointerObject.html" title=" " alt="" coords="330,104,441,129"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="454,128,569,154,626,169,625,174,567,159,453,134"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="75,104,171,129"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="185,114,330,114,330,119,185,119"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="293,153,478,179"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="492,169,626,177,626,182,492,175"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="306,203,465,228"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="478,202,626,184,626,190,479,207"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventManager.html" title="Event Manager for consistency and trace Update and Inference are tracked Debug mode traces events Sho..." alt="" coords="327,267,443,292"/>
+<area shape="poly" id="edge10_Node000006_Node000011" title=" " alt="" coords="440,260,567,218,635,192,637,197,569,223,442,265"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventLogger.html" title=" " alt="" coords="617,276,720,301"/>
+<area shape="poly" id="edge13_Node000013_Node000011" title=" " alt="" coords="457,279,617,284,617,290,457,284"/>
+<area shape="rect" id="Node000012" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1EventHandler.html" title=" " alt="" coords="67,267,178,292"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="192,277,327,277,327,282,192,282"/>
+<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="627,309,569,326,537,330,505,326,455,312,412,295,414,290,456,307,506,321,537,324,567,321,625,304"/>
+<area shape="rect" id="Node000014" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Merge_1_1ListMappings.html" title=" " alt="" coords="592,345,745,371"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="706,337,744,311,777,280,807,247,849,193,854,196,811,251,780,284,747,315,709,341"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="299,356,472,381"/>
+<area shape="poly" id="edge15_Node000014_Node000015" title=" " alt="" coords="486,362,592,358,592,364,486,368"/>
+</map>

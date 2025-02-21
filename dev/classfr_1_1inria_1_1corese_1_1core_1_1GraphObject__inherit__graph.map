@@ -1,0 +1,63 @@
+<map id="GraphObject" name="GraphObject">
+<area shape="rect" id="Node000001" title=" " alt="" coords="164,325,267,351"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1Graph.html" title="Graph Manager Edges are stored in an index An index is a table: predicate &#45;&gt; List&lt;Edge&gt; Edge List are..." alt="" coords="339,203,401,228"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="242,314,351,226,354,230,245,318"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1NodeImpl.html" title="Node." alt="" coords="327,276,413,301"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="268,318,328,299,330,304,270,324"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTop.html" title=" " alt="" coords="332,349,408,375"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="281,345,332,354,331,359,280,351"/>
+<area shape="rect" id="Node000031" href="$classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataProducer.html" title="Transient Dataset over graph in order to iterate edges Use case: Producer getEdges() default or named..." alt="" coords="315,399,425,424"/>
+<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="254,354,316,385,341,396,338,401,314,390,252,359"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,325,116,351"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,335,164,335,164,341,129,341"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1GraphStore.html" title="Draft Graph Store where named graphs are hidden for system use." alt="" coords="487,177,582,203"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="414,206,487,195,487,200,414,211"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1NodeGraph.html" title="Node that contain the named graph of node, only for PP query." alt="" coords="487,227,582,252"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="425,269,490,250,492,255,427,275"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1TripleNode.html" title="Node that is a Triple Can be used as Node in the graph Can be subject/object of an Edge." alt="" coords="489,276,580,301"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="427,286,489,286,489,291,427,291"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeBinary.html" title="Graph Edge for the defaultGraph." alt="" coords="487,325,583,351"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="421,352,486,342,487,348,422,357"/>
+<area shape="rect" id="Node000028" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeGeneric.html" title="Buffer Edge as Quad to deliver complete edge for Producer." alt="" coords="483,375,587,400"/>
+<area shape="poly" id="edge27_Node000008_Node000028" title=" " alt="" coords="422,367,483,377,482,382,421,373"/>
+<area shape="rect" id="Node000029" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeImpl.html" title="Graph Edge with n nodes (not only triple) RDF star triple with reference node t g &lt;&gt;" alt="" coords="493,424,576,449"/>
+<area shape="poly" id="edge28_Node000008_Node000029" title=" " alt="" coords="413,378,427,385,474,410,500,421,498,426,472,415,424,390,410,383"/>
+<area shape="rect" id="Node000030" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTripleNode.html" title="Edge(g, t) where t = s p o and t : Node as triple reference s p o {| q v |} ::= Edge(g,..." alt="" coords="473,473,596,499"/>
+<area shape="poly" id="edge29_Node000008_Node000030" title=" " alt="" coords="420,380,427,385,443,405,451,424,459,442,475,460,493,471,490,475,472,464,455,445,447,426,439,408,423,389,416,384"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTriple.html" title="Graph Edge for the defaultGraph." alt="" coords="676,79,765,104"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="591,315,594,312,610,287,617,263,618,239,616,214,615,189,616,164,624,139,642,113,657,102,675,95,677,100,660,107,646,117,629,141,621,165,620,189,622,214,624,238,623,264,615,290,598,316,595,319"/>
+<area shape="rect" id="Node000016" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryFirst.html" title="Graph Edge for the defaultGraph." alt="" coords="659,128,783,153"/>
+<area shape="poly" id="edge15_Node000009_Node000016" title=" " alt="" coords="591,315,594,312,607,294,614,276,617,238,620,201,627,182,642,163,658,151,661,156,646,167,632,184,625,202,622,239,619,277,612,296,598,316,595,319"/>
+<area shape="rect" id="Node000017" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryLabel.html" title="Graph Edge for the defaultGraph." alt="" coords="655,177,786,203"/>
+<area shape="poly" id="edge16_Node000009_Node000017" title=" " alt="" coords="590,316,594,312,611,288,617,263,623,238,631,225,642,212,661,200,663,205,646,216,635,228,628,240,622,264,616,290,598,316,593,320"/>
+<area shape="rect" id="Node000018" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryRest.html" title="Graph Edge for the defaultGraph." alt="" coords="658,227,783,252"/>
+<area shape="poly" id="edge17_Node000009_Node000018" title=" " alt="" coords="586,317,594,312,609,300,618,287,627,275,643,262,669,250,672,254,645,267,631,279,622,291,613,303,598,316,588,322"/>
+<area shape="rect" id="Node000019" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinarySubclass.html" title="Graph Edge for the defaultGraph." alt="" coords="644,276,797,301"/>
+<area shape="poly" id="edge18_Node000009_Node000019" title=" " alt="" coords="595,319,671,299,673,304,596,325"/>
+<area shape="rect" id="Node000020" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1binary_1_1EdgeBinaryType.html" title="Graph Edge for the defaultGraph." alt="" coords="657,325,784,351"/>
+<area shape="poly" id="edge19_Node000009_Node000020" title=" " alt="" coords="596,335,657,335,657,341,596,341"/>
+<area shape="rect" id="Node000021" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternal.html" title="Graph Edge for internal storage." alt="" coords="669,375,773,400"/>
+<area shape="poly" id="edge20_Node000009_Node000021" title=" " alt="" coords="596,351,673,372,671,377,595,357"/>
+<area shape="rect" id="Node000022" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalDefault.html" title="Graph Edge for internal storage." alt="" coords="645,424,797,449"/>
+<area shape="poly" id="edge21_Node000009_Node000022" title=" " alt="" coords="586,354,598,361,612,374,622,387,631,399,645,410,669,422,666,426,643,415,627,402,618,390,609,378,594,365,584,359"/>
+<area shape="rect" id="Node000023" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalEntail.html" title="Graph Edge for internal storage." alt="" coords="650,473,791,499"/>
+<area shape="poly" id="edge22_Node000009_Node000023" title=" " alt="" coords="591,356,598,362,616,387,622,413,628,437,646,460,663,471,661,476,642,464,624,439,617,414,611,390,594,365,588,360"/>
+<area shape="rect" id="Node000024" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1internal_1_1EdgeInternalRule.html" title="Graph Edge for internal storage." alt="" coords="654,523,787,548"/>
+<area shape="poly" id="edge23_Node000009_Node000024" title=" " alt="" coords="592,356,598,362,612,381,619,401,622,438,625,474,632,492,646,509,661,520,658,525,642,513,627,494,620,475,616,438,614,402,607,384,594,365,588,360"/>
+<area shape="rect" id="Node000025" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleTop.html" title="Edge entailed by a Rule index and provenance." alt="" coords="668,572,773,597"/>
+<area shape="poly" id="edge24_Node000009_Node000025" title=" " alt="" coords="593,356,598,362,615,388,622,414,622,463,620,487,621,511,629,535,646,559,669,574,666,578,642,563,624,537,616,512,615,487,616,463,617,414,610,390,594,365,589,360"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeDefault.html" title="Graph Edge for the defaultGraph." alt="" coords="864,5,967,31"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="764,71,844,40,876,28,877,33,846,44,766,76"/>
+<area shape="rect" id="Node000012" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeEntail.html" title=" " alt="" coords="870,55,961,80"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="779,82,870,70,870,75,779,87"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeQuad.html" title="Graph Edge as Quad." alt="" coords="871,104,959,129"/>
+<area shape="poly" id="edge12_Node000010_Node000013" title=" " alt="" coords="779,96,872,108,871,114,779,102"/>
+<area shape="rect" id="Node000014" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRule.html" title="Edge entailed by a Rule index and provenance." alt="" coords="874,153,957,179"/>
+<area shape="poly" id="edge13_Node000010_Node000014" title=" " alt="" coords="780,106,798,113,846,138,878,151,876,156,844,143,796,118,778,111"/>
+<area shape="rect" id="Node000015" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleGraph.html" title="Edge entailed by a Rule index and provenance." alt="" coords="1033,153,1156,179"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="971,163,1033,163,1033,169,971,169"/>
+<area shape="rect" id="Node000026" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleSubclass.html" title="Edge entailed by a Rule index and provenance." alt="" coords="845,547,985,572"/>
+<area shape="poly" id="edge25_Node000025_Node000026" title=" " alt="" coords="786,573,845,566,845,571,787,579"/>
+<area shape="rect" id="Node000027" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleType.html" title="Edge entailed by a Rule index and provenance." alt="" coords="859,596,972,621"/>
+<area shape="poly" id="edge26_Node000025_Node000027" title=" " alt="" coords="787,590,859,599,858,604,786,595"/>
+</map>

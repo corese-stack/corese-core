@@ -1,0 +1,9 @@
+<map id="DataBrokerConstructLocal" name="DataBrokerConstructLocal">
+<area shape="rect" id="Node000001" title="Broker between GraphManager and Corese graph Used by: sparql construct/update with corese graph sparq..." alt="" coords="59,152,249,177"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1DataBrokerLocal.html" title="Broker between ProducerImpl and corese graph." alt="" coords="5,79,135,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,111,142,150,139,154,92,115"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="23,5,117,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,44,73,79,67,79,67,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="159,79,317,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="216,115,169,154,166,150,212,111"/>
+</map>

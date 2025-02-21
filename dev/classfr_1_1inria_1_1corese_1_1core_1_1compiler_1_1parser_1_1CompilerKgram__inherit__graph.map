@@ -1,0 +1,7 @@
+<map id="CompilerKgram" name="CompilerKgram">
+<area shape="rect" id="Node000001" title="Proxy between KGRAM compiler and corese.core.compiler." alt="" coords="32,79,156,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,81,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="62,41,88,77,84,80,58,44"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Compiler.html" title="Compiler API for Transformer." alt="" coords="105,5,187,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="132,43,105,80,100,77,127,40"/>
+</map>

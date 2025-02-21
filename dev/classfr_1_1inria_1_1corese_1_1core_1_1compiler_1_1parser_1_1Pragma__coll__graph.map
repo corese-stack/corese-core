@@ -1,0 +1,13 @@
+<map id="Pragma" name="Pragma">
+<area shape="rect" id="Node000001" title="Pragma processor." alt="" coords="198,181,270,207"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Transformer.html" title="Compiler of SPARQL AST to KGRAM Exp Query Use Corese.Core.Sparql parser Use an abstract compiler to g..." alt="" coords="184,93,284,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,133,237,181,231,181,231,133"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,81,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,34,209,91,207,96,80,39"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1CompilerFactory.html" title=" " alt="" coords="106,5,234,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="189,40,227,91,223,94,185,43"/>
+<area shape="rect" id="Node000005" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Compiler.html" title="Compiler API for Transformer." alt="" coords="259,5,340,31"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="284,43,245,94,241,91,280,40"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Checker.html" title="Type Checking." alt="" coords="365,5,439,31"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="381,42,338,72,278,96,276,91,335,67,377,38"/>
+</map>

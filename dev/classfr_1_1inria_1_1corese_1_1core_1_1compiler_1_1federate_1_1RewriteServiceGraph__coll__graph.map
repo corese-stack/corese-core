@@ -1,0 +1,25 @@
+<map id="RewriteServiceGraph" name="RewriteServiceGraph">
+<area shape="rect" id="Node000001" title="Rewrite service &lt;uri&gt; { } as service &lt;uri&gt; { graph &lt;g&gt; { }} Use case: agroportal store is structured ..." alt="" coords="369,271,528,296"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1FederateVisitor.html" title="Prototype for federated query." alt="" coords="151,175,272,201"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="269,202,350,230,430,268,427,273,348,234,267,207"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteService.html" title="Rewrite service (uri) { } as values ?serv { (uri) } service ?serv { }." alt="" coords="42,271,162,296"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="156,208,137,219,120,234,110,252,106,271,100,270,105,250,116,230,134,215,154,204"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteNamedGraph.html" title=" " alt="" coords="187,271,345,296"/>
+<area shape="poly" id="edge11_Node000010_Node000002" title=" " alt="" coords="206,214,205,230,210,245,221,258,236,268,233,273,217,262,205,248,200,231,201,214"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,80,108,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="88,110,194,173,191,177,86,115"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="132,80,221,105"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="188,117,210,174,205,176,183,119"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Stack.html" title=" " alt="" coords="246,80,305,105"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="262,118,221,177,217,174,258,115"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="183,5,338,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="268,44,276,79,270,80,263,45"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="124,260,196,199,200,203,128,264"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteList.html" title="Rewrite rdf list into one service bgp Rewrite bgp with bnode into one service bgp: ?..." alt="" coords="345,80,440,105"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="360,114,297,146,235,178,233,173,294,142,357,109"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="362,5,482,31"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="415,45,400,81,395,79,410,43"/>
+<area shape="poly" id="edge10_Node000002_Node000010" title=" " alt="" coords="250,260,234,233,216,202,221,200,239,231,255,257"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="343,168,554,208"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="451,222,451,270,446,270,446,222"/>
+</map>

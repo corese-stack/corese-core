@@ -1,0 +1,5 @@
+<map id="NodeManager" name="NodeManager">
+<area shape="rect" id="Node000001" title="Manage a table of list of properties for each node Node ni &#45;&gt; (p1, ." alt="" coords="5,93,119,119"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1index_1_1PredicateList.html" title="List of predicates of a given Node in NodeManager List of positions of node in edge list of each pred..." alt="" coords="9,5,115,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,45,65,93,59,93,59,45"/>
+</map>

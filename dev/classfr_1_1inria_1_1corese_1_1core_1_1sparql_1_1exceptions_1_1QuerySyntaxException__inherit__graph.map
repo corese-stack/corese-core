@@ -1,0 +1,7 @@
+<map id="QuerySyntaxException" name="QuerySyntaxException">
+<area shape="rect" id="Node000001" title="This exception is thrown when there is an error in the syntax of the query." alt="" coords="5,152,176,177"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1EngineException.html" title="This class gathers all the exceptions that can be thrown in Corese." alt="" coords="25,79,156,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,118,93,152,88,152,88,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="27,5,154,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,44,93,79,88,79,88,44"/>
+</map>

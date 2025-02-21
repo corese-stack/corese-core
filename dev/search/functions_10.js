@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['qnameuri_0',['qnameURI',['../classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1Transformer.html#ac20540da20be8c74d00a810094ef20ba',1,'fr::inria::corese::core::transform::Transformer']]],
+  ['query_1',['query',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolver.html#aec1bf88e7861dc73e3a32cba7c104eb2',1,'fr.inria.corese.core.compiler.eval.QuerySolver.query(Query query, Mapping m)'],['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolver.html#a34bd44ec9809818a874b95be6a3c1fec',1,'fr.inria.corese.core.compiler.eval.QuerySolver.query(Node gNode, Query query, Mapping m)'],['../classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Eval.html#a92c55a0d3fc0f64b11bb007f771276f2',1,'fr.inria.corese.core.kgram.core.Eval.query()'],['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html#a5b2c3ed3718066bac2549a08fa5003d3',1,'fr.inria.corese.core.query.QueryProcess.query(String squery, Mapping map, Dataset ds)'],['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1QueryProcess.html#a92c55a0d3fc0f64b11bb007f771276f2',1,'fr.inria.corese.core.query.QueryProcess.query(Query q)']]]
+];

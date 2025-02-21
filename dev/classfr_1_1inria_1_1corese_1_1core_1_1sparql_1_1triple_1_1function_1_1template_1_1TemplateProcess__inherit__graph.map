@@ -1,0 +1,5 @@
+<map id="TemplateProcess" name="TemplateProcess">
+<area shape="rect" id="Node000001" title="st:process(?x) can be overloaded by function st:process(?x) { body }" alt="" coords="5,79,137,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="28,5,115,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,44,74,79,69,79,69,44"/>
+</map>

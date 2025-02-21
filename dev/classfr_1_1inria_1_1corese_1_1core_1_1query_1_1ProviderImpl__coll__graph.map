@@ -1,0 +1,7 @@
+<map id="ProviderImpl" name="ProviderImpl">
+<area shape="rect" id="Node000001" title="Implements service expression There may be local QueryProcess for some URI (use case: W3C test case) ..." alt="" coords="44,79,149,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,81,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="62,40,90,77,86,80,58,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="105,5,195,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="135,43,107,80,103,77,131,40"/>
+</map>

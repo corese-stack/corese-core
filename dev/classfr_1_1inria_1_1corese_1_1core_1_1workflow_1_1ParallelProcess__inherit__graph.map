@@ -1,0 +1,11 @@
+<map id="ParallelProcess" name="ParallelProcess">
+<area shape="rect" id="Node000001" title="Run Processes as in parallel with copy of input Graph." alt="" coords="17,299,137,324"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticProcess.html" title="Super class of Process with a Process List (Test, Parallel, ..)" alt="" coords="10,225,143,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,264,79,299,74,299,74,264"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1CompositeProcess.html" title=" " alt="" coords="5,152,148,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="79,191,79,225,74,225,74,191"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowProcess.html" title="Root class." alt="" coords="11,79,143,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="79,118,79,152,74,152,74,118"/>
+<area shape="rect" id="Node000005" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AbstractProcess.html" title=" " alt="" coords="13,5,140,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="79,44,79,79,74,79,74,44"/>
+</map>

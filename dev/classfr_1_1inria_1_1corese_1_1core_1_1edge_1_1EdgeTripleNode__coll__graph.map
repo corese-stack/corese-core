@@ -1,0 +1,11 @@
+<map id="EdgeTripleNode" name="EdgeTripleNode">
+<area shape="rect" id="Node000001" title="Edge(g, t) where t = s p o and t : Node as triple reference s p o {| q v |} ::= Edge(g,..." alt="" coords="50,225,173,251"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTop.html" title=" " alt="" coords="73,152,149,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,191,114,225,109,225,109,191"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1GraphObject.html" title=" " alt="" coords="9,79,112,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="79,114,105,150,101,153,75,117"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,5,116,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="63,44,63,79,58,79,58,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="136,79,191,104"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="149,117,122,153,118,150,145,114"/>
+</map>

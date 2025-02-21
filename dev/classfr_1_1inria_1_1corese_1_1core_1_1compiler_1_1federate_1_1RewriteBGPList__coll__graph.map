@@ -1,0 +1,9 @@
+<map id="RewriteBGPList" name="RewriteBGPList">
+<area shape="rect" id="Node000001" title="Rewrite BGP of triple with several URI input: &#160;&#160;map: uri &#45;&gt; bgpList create: map: bgp &#45;&gt; uriList where..." alt="" coords="47,197,170,223"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1URI2BGPList.html" title="This class has two instances the main instance contains the second one a) main instance: uri &#45;&gt; (conn..." alt="" coords="5,95,108,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,134,59,153,66,172,76,185,89,195,86,199,72,189,61,175,54,155,52,134"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="133,95,213,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,134,139,175,121,199,116,196,134,172,158,131"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="61,5,284,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="175,59,175,94,170,94,170,59"/>
+</map>

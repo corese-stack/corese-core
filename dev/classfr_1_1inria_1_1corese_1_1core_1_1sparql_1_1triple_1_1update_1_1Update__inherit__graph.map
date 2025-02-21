@@ -1,0 +1,9 @@
+<map id="Update" name="Update">
+<area shape="rect" id="Node000001" title=" " alt="" coords="49,79,118,104"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Basic.html" title="load clear drop create add move copy" alt="" coords="5,152,63,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="70,117,44,153,40,150,65,114"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Composite.html" title=" " alt="" coords="87,152,179,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="101,114,127,150,122,153,97,117"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="49,5,117,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,44,86,79,81,79,81,44"/>
+</map>

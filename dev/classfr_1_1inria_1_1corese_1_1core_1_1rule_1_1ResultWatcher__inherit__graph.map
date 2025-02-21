@@ -1,0 +1,7 @@
+<map id="ResultWatcher" name="ResultWatcher">
+<area shape="rect" id="Node000001" title="Watch kgram query solutions of rules for RuleEngine 1 Check that a solution at loop n contains at lea..." alt="" coords="74,79,190,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,120,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,39,123,77,119,80,82,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="145,5,258,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,43,145,80,141,77,179,39"/>
+</map>

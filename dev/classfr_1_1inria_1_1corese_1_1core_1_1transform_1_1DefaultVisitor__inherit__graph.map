@@ -1,0 +1,7 @@
+<map id="DefaultVisitor" name="DefaultVisitor">
+<area shape="rect" id="Node000001" title="Transformer Visitor to be used in a transformation Store and/or log visited nodes,..." alt="" coords="14,152,126,177"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1transform_1_1TemplateVisitor.html" title="Visitor that can be associated to a transformation use case: filter(st:visit(st:exp,..." alt="" coords="8,79,132,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,118,73,152,67,152,67,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,135,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,44,73,79,67,79,67,44"/>
+</map>

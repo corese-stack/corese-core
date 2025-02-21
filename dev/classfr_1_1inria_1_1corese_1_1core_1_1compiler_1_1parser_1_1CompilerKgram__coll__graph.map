@@ -1,0 +1,13 @@
+<map id="CompilerKgram" name="CompilerKgram">
+<area shape="rect" id="Node000001" title="Proxy between KGRAM compiler and corese.core.compiler." alt="" coords="84,168,208,193"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,80,81,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,112,133,165,130,170,66,116"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Compiler.html" title="Compiler API for Transformer." alt="" coords="105,80,187,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,119,149,167,143,167,143,119"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1EdgeImpl.html" title=" " alt="" coords="211,80,294,105"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="229,116,162,170,159,166,226,112"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="144,5,255,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="218,41,246,78,242,81,214,44"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="279,5,333,31"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="291,44,263,81,259,78,287,41"/>
+</map>

@@ -1,0 +1,45 @@
+<map id="Exp" name="Exp">
+<area shape="rect" id="Node000001" title="KGRAM/SPARQL expressions: bgp, union, optional, etc." alt="" coords="292,377,339,403"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1PointerObject.html" title=" " alt="" coords="332,80,443,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="417,112,446,138,474,170,484,189,490,208,491,228,486,248,472,272,455,293,416,331,375,360,340,380,337,375,372,355,413,327,452,290,468,269,481,246,486,227,485,209,479,191,469,173,443,141,414,116"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Exp.html" title="KGRAM/SPARQL expressions: bgp, union, optional, etc." alt="" coords="195,273,241,298"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="365,117,311,170,282,209,255,248,231,274,227,271,251,245,278,205,307,166,361,113"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mappings.html" title=" " alt="" coords="521,168,606,193"/>
+<area shape="poly" id="edge18_Node000011_Node000002" title=" " alt="" coords="453,107,503,127,532,146,554,166,550,170,528,150,501,132,451,112"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="339,5,435,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="390,45,390,80,385,80,385,45"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,80,81,105"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="42,119,38,171,42,236,49,269,60,300,77,328,101,351,136,365,189,375,292,385,292,390,188,380,134,370,98,356,73,332,55,303,44,270,37,236,33,171,37,119"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="48,119,55,155,71,192,85,210,98,222,134,244,196,271,193,276,131,249,95,227,81,214,66,195,50,157,43,120"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Stack.html" title="KGRAM stack of expressions." alt="" coords="81,168,139,193"/>
+<area shape="poly" id="edge16_Node000010_Node000004" title=" " alt="" coords="63,115,103,166,99,169,59,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="321,168,413,193"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="366,207,355,274,334,354,324,378,319,376,329,352,349,273,361,206"/>
+<area shape="poly" id="edge9_Node000007_Node000005" title=" " alt="" coords="349,206,326,228,299,249,243,278,240,273,297,244,323,224,346,202"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="631,168,757,193"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="693,207,681,254,670,279,655,302,631,325,608,338,551,356,492,371,433,381,339,390,339,385,432,376,491,366,549,351,606,333,628,320,651,298,665,277,676,252,688,206"/>
+<area shape="poly" id="edge10_Node000007_Node000006" title=" " alt="" coords="660,202,602,227,535,249,451,266,368,277,242,286,241,281,367,272,450,261,533,244,600,222,658,197"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="241,306,306,375,302,379,237,310"/>
+<area shape="poly" id="edge11_Node000007_Node000007" title=" " alt="" coords="256,274,264,277,268,286,259,296,242,298,241,292,257,291,263,285,261,281,254,278"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="163,168,246,193"/>
+<area shape="poly" id="edge25_Node000001_Node000008" title=" " alt="" coords="153,202,136,219,127,240,128,259,136,278,151,298,183,329,222,353,260,369,292,380,291,385,258,374,219,357,180,333,147,302,131,281,123,260,122,239,132,216,150,198"/>
+<area shape="poly" id="edge12_Node000007_Node000008" title=" " alt="" coords="211,207,219,272,214,273,205,208"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="113,80,248,105"/>
+<area shape="poly" id="edge13_Node000008_Node000009" title=" " alt="" coords="190,118,204,167,199,168,185,119"/>
+<area shape="poly" id="edge15_Node000010_Node000009" title=" " alt="" coords="165,118,122,169,118,166,161,114"/>
+<area shape="poly" id="edge26_Node000001_Node000010" title=" " alt="" coords="98,206,89,227,82,251,80,276,87,299,105,323,129,343,156,358,186,369,245,382,292,386,292,391,244,387,184,374,154,363,126,347,101,327,82,301,75,276,77,250,84,225,94,204"/>
+<area shape="poly" id="edge14_Node000007_Node000010" title=" " alt="" coords="129,203,166,245,201,271,198,275,163,249,125,206"/>
+<area shape="poly" id="edge27_Node000001_Node000011" title=" " alt="" coords="568,207,567,241,561,281,547,321,536,339,522,355,509,364,489,371,438,381,339,390,339,385,438,376,487,366,506,359,519,351,532,336,543,319,556,280,562,240,562,207"/>
+<area shape="poly" id="edge17_Node000007_Node000011" title=" " alt="" coords="513,200,242,280,241,274,511,195"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="467,80,652,105"/>
+<area shape="poly" id="edge19_Node000011_Node000012" title=" " alt="" coords="563,119,565,167,560,168,558,119"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="676,80,835,105"/>
+<area shape="poly" id="edge20_Node000011_Node000013" title=" " alt="" coords="718,114,591,170,588,165,716,109"/>
+<area shape="rect" id="Node000014" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventManager.html" title="Event Manager for consistency and trace Update and Inference are tracked Debug mode traces events Sho..." alt="" coords="859,80,975,105"/>
+<area shape="poly" id="edge21_Node000011_Node000014" title=" " alt="" coords="857,111,607,172,606,166,856,106"/>
+<area shape="rect" id="Node000016" href="$classfr_1_1inria_1_1corese_1_1core_1_1EventLogger.html" title=" " alt="" coords="887,168,989,193"/>
+<area shape="poly" id="edge24_Node000016_Node000014" title=" " alt="" coords="935,117,939,129,942,149,942,168,937,168,937,150,934,130,930,119"/>
+<area shape="rect" id="Node000015" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1EventHandler.html" title=" " alt="" coords="861,5,972,31"/>
+<area shape="poly" id="edge22_Node000014_Node000015" title=" " alt="" coords="919,45,919,80,914,80,914,45"/>
+<area shape="poly" id="edge23_Node000014_Node000016" title=" " alt="" coords="915,158,909,145,907,124,910,105,915,106,912,124,914,143,920,155"/>
+</map>

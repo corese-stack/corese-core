@@ -1,0 +1,27 @@
+<map id="CoreseUndefLiteral" name="CoreseUndefLiteral">
+<area shape="rect" id="Node000001" title=" " alt="" coords="372,299,519,324"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseExtension.html" title="Extension datatypes for list, map, xml, json." alt="" coords="167,372,297,397"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="399,331,267,374,266,369,397,326"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseIterate.html" title=" " alt="" coords="322,372,433,397"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="427,336,390,374,386,370,423,332"/>
+<area shape="rect" id="Node000012" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoresePointer.html" title="Extension IDatatype that contains LDScript Pointerable object These objects implement an API that ena..." alt="" coords="457,372,570,397"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="468,332,504,370,500,374,464,336"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseUndefFuture.html" title="Encapsulate an expression Expr to be evaluated later such as concat(str, st:number(),..." alt="" coords="595,372,741,397"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="495,326,633,369,631,374,493,331"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringLiteral.html" title=" " alt="" coords="372,225,519,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="448,264,448,299,443,299,443,264"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringableImpl.html" title=" " alt="" coords="364,152,527,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="448,191,448,225,443,225,443,191"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html" title=" " alt="" coords="382,79,509,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="448,118,448,152,443,152,443,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="402,5,489,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="448,44,448,79,443,79,443,44"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseJSON.html" title=" " alt="" coords="5,445,104,471"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="192,405,85,448,83,443,190,400"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseList.html" title=" " alt="" coords="128,445,219,471"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="216,410,185,447,181,444,212,406"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseMap.html" title=" " alt="" coords="243,445,338,471"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="252,406,283,444,279,447,248,410"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseXML.html" title="Datatype to manage XML objects as DOM Node, Document, etc." alt="" coords="362,445,457,471"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="274,400,381,443,379,448,272,405"/>
+</map>

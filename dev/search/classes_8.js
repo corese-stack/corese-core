@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['icache_0',['ICache',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1cache_1_1ICache.html',1,'fr::inria::corese::core::sparql::storage::cache']]],
+  ['idatatype_1',['IDatatype',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1IDatatype.html',1,'fr::inria::corese::core::sparql::api']]],
+  ['idatatypelist_2',['IDatatypeList',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1IDatatypeList.html',1,'fr::inria::corese::core::sparql::api']]],
+  ['iestimate_3',['IEstimate',['../interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1IEstimate.html',1,'fr::inria::corese::core::kgram::sorter::core']]],
+  ['ifthenelseterm_4',['IfThenElseTerm',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1core_1_1IfThenElseTerm.html',1,'fr::inria::corese::core::sparql::triple::function::core']]],
+  ['igraph_5',['IGraph',['../interfacefr_1_1inria_1_1corese_1_1core_1_1api_1_1IGraph.html',1,'fr::inria::corese::core::api']]],
+  ['iloadserialization_6',['ILoadSerialization',['../interfacefr_1_1inria_1_1corese_1_1core_1_1load_1_1ILoadSerialization.html',1,'fr::inria::corese::core::load']]],
+  ['imodel_7',['IModel',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1api_1_1IModel.html',1,'fr::inria::corese::core::sparql::api']]],
+  ['in_8',['In',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1In.html',1,'fr::inria::corese::core::sparql::triple::function::term']]],
+  ['index_9',['Index',['../interfacefr_1_1inria_1_1corese_1_1core_1_1Index.html',1,'fr::inria::corese::core']]],
+  ['interpreter_10',['Interpreter',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1Interpreter.html',1,'fr::inria::corese::core::compiler::eval']]],
+  ['introspection_11',['Introspection',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1proxy_1_1Introspection.html',1,'fr::inria::corese::core::sparql::triple::function::proxy']]],
+  ['iofunction_12',['IOFunction',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1IOFunction.html',1,'fr::inria::corese::core::sparql::triple::function::extension']]],
+  ['iproducerqp_13',['IProducerQP',['../interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1IProducerQP.html',1,'fr::inria::corese::core::kgram::sorter::core']]],
+  ['isimalgorithm_14',['ISimAlgorithm',['../interfacefr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1ISimAlgorithm.html',1,'fr::inria::corese::core::approximate::algorithm']]],
+  ['isort_15',['ISort',['../interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1ISort.html',1,'fr::inria::corese::core::kgram::sorter::core']]],
+  ['istats_16',['IStats',['../interfacefr_1_1inria_1_1corese_1_1core_1_1stats_1_1IStats.html',1,'fr::inria::corese::core::stats']]],
+  ['istorage_17',['IStorage',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1api_1_1IStorage.html',1,'fr::inria::corese::core::sparql::storage::api']]],
+  ['iterate_18',['Iterate',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1Iterate.html',1,'fr::inria::corese::core::sparql::triple::function::extension']]]
+];

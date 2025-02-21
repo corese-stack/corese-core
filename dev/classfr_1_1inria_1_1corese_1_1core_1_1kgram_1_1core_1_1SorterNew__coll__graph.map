@@ -1,0 +1,5 @@
+<map id="SorterNew" name="SorterNew">
+<area shape="rect" id="Node000001" title="A new sorter for QP." alt="" coords="5,79,96,104"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Sorter.html" title="Sort KGRAM edges in connected order before query process." alt="" coords="20,5,81,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="53,44,53,79,48,79,48,44"/>
+</map>

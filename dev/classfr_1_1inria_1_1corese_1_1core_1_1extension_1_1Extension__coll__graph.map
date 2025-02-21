@@ -1,0 +1,13 @@
+<map id="Extension" name="Extension">
+<area shape="rect" id="Node000001" title="Generic Java Extension function public class prefix fun: &lt;function://fr.inria.corese...." alt="" coords="82,243,169,268"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Core.html" title="Super class for Java extension function class public class Myclass extends Core Extension function ca..." alt="" coords="94,80,146,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,119,128,243,122,243,118,119"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Extension.html" title="Generic Java Extension function public class prefix fun: &lt;function://fr.inria.corese...." alt="" coords="142,155,229,180"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="142,114,177,153,173,156,138,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,96,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,39,111,78,107,82,70,43"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="120,5,259,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="170,43,133,82,129,78,167,39"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="171,193,136,244,132,241,167,190"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="244,159,255,167,247,175,229,177,228,172,245,170,250,167,241,164"/>
+</map>

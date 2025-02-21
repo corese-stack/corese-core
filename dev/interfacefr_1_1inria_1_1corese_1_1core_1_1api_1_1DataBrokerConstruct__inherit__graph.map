@@ -1,0 +1,5 @@
+<map id="DataBrokerConstruct" name="DataBrokerConstruct">
+<area shape="rect" id="Node000001" title="Broker between GraphManager and graph DataManager for sparql query construct and sparql update Refine..." alt="" coords="5,79,163,104"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1api_1_1DataBroker.html" title="Broker between ProducerImpl and graph DataManager for sparql query for the where part Refined by core..." alt="" coords="37,5,131,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,44,87,79,81,79,81,44"/>
+</map>

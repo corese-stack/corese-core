@@ -1,0 +1,7 @@
+<map id="Cache" name="Cache">
+<area shape="rect" id="Node000001" title="Cache: store subsumption between query and target node." alt="" coords="75,168,138,193"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="53,80,161,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,119,109,167,104,167,104,119"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,208,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,45,109,80,104,80,104,45"/>
+</map>

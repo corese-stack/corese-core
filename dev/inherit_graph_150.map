@@ -1,0 +1,17 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1ISimAlgorithm.html" title="Interface for implementing the similarity measurement algorithms." alt="" coords="5,104,120,129"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1BaseAlgorithm.html" title="Base Algorithm." alt="" coords="168,104,287,129"/>
+<area shape="poly" id="edge387_Node000000_Node000001" title=" " alt="" coords="134,114,168,114,168,119,134,119"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1ClassHierarchy.html" title="Class Hierarchy (to be intregared ... or not...)" alt="" coords="351,5,471,31"/>
+<area shape="poly" id="edge388_Node000001_Node000002" title=" " alt="" coords="252,93,289,66,333,40,361,28,363,33,336,44,292,70,256,98"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1CombinedAlgorithm.html" title="Combined algorithm (composed of several algorithms)" alt="" coords="335,55,487,80"/>
+<area shape="poly" id="edge389_Node000001_Node000003" title=" " alt="" coords="287,98,362,78,363,83,289,103"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1Equality.html" title="Equality.java." alt="" coords="373,104,448,129"/>
+<area shape="poly" id="edge390_Node000001_Node000004" title=" " alt="" coords="300,114,373,114,373,119,300,119"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1Jaro.html" title="Jaro distance metric (Jaro, 1989, 1995)" alt="" coords="387,153,434,179"/>
+<area shape="poly" id="edge391_Node000001_Node000005" title=" " alt="" coords="289,130,388,157,386,163,288,136"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1NGram.html" title="N&#45;Gram similarity measurement algorithm." alt="" coords="377,203,445,228"/>
+<area shape="poly" id="edge393_Node000001_Node000007" title=" " alt="" coords="257,136,293,162,336,188,378,204,376,209,333,192,291,167,254,140"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1JaroWinkler.html" title="Jaro–Winkler distance (Winkler, 1990) based on Jaro." alt="" coords="535,153,632,179"/>
+<area shape="poly" id="edge392_Node000005_Node000006" title=" " alt="" coords="448,163,534,163,534,169,448,169"/>
+</map>

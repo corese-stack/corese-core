@@ -1,0 +1,12 @@
+<map id="ASTUpdate" name="ASTUpdate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,93,100,119"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Basic.html" title="load clear drop create add move copy" alt="" coords="143,5,200,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,41,122,57,70,95,67,91,119,53,142,36"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1ASTUpdate.html" title=" " alt="" coords="124,93,219,119"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="174,45,174,93,169,93,169,45"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Update.html" title=" " alt="" coords="222,181,291,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="253,168,244,114,234,84,220,56,208,43,193,33,196,29,211,39,224,53,239,82,249,113,258,167"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="295,93,363,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="312,131,269,183,265,179,308,127"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="187,129,207,155,238,179,234,183,203,159,182,133"/>
+</map>

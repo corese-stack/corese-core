@@ -1,0 +1,12 @@
+<map id="ShexConstraint" name="ShexConstraint">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,168,127,193"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1Constant.html" title=" " alt="" coords="121,5,201,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,44,94,131,74,169,69,166,89,128,143,41"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1Shex.html" title="Shex to Shacl translator." alt="" coords="133,80,188,105"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="163,45,163,80,158,80,158,45"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1ShexConstraint.html" title=" " alt="" coords="167,168,288,193"/>
+<area shape="poly" id="edge5_Node000004_Node000002" title=" " alt="" coords="196,35,246,73,270,99,289,128,290,142,284,154,260,170,257,166,280,150,285,141,283,130,266,102,243,77,193,40"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="132,115,112,131,77,170,73,166,108,127,129,111"/>
+<area shape="poly" id="edge6_Node000004_Node000003" title=" " alt="" coords="156,119,155,131,159,143,171,156,188,166,185,170,168,160,154,145,150,132,150,119"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="213,157,196,131,173,107,177,104,200,128,217,154"/>
+</map>

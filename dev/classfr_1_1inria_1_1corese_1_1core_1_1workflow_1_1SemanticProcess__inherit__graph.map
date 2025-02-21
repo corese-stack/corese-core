@@ -1,0 +1,17 @@
+<map id="SemanticProcess" name="SemanticProcess">
+<area shape="rect" id="Node000001" title="Super class of Process with a Process List (Test, Parallel, ..)" alt="" coords="206,225,339,251"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AssertProcess.html" title=" " alt="" coords="5,299,119,324"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="227,257,97,301,95,296,225,252"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ParallelProcess.html" title="Run Processes as in parallel with copy of input Graph." alt="" coords="143,299,263,324"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="254,263,216,300,213,297,250,259"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ProbeProcess.html" title="Execute a sub Process but return the input Data Used for e.g trace purpose." alt="" coords="287,299,397,324"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="295,259,333,297,329,300,292,263"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TestProcess.html" title=" " alt="" coords="421,299,519,324"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="318,253,439,296,437,301,316,258"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1CompositeProcess.html" title=" " alt="" coords="201,152,344,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="275,191,275,225,270,225,270,191"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowProcess.html" title="Root class." alt="" coords="207,79,339,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="275,118,275,152,270,152,270,118"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AbstractProcess.html" title=" " alt="" coords="209,5,336,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="275,44,275,79,270,79,270,44"/>
+</map>

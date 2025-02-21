@@ -1,0 +1,18 @@
+<map id="EdgeRuleTop" name="EdgeRuleTop">
+<area shape="rect" id="Node000001" title="Edge entailed by a Rule index and provenance." alt="" coords="97,299,203,324"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleSubclass.html" title="Edge entailed by a Rule index and provenance." alt="" coords="5,372,145,397"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="130,335,89,374,86,370,126,331"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1rule_1_1EdgeRuleType.html" title="Edge entailed by a Rule index and provenance." alt="" coords="169,372,283,397"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="174,331,215,370,212,374,170,335"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeBinary.html" title="Graph Edge for the defaultGraph." alt="" coords="102,225,198,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,264,153,299,147,299,147,264"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTop.html" title=" " alt="" coords="75,152,151,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="127,188,146,224,142,226,123,191"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1GraphObject.html" title=" " alt="" coords="35,79,137,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="98,116,111,151,106,153,93,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="31,5,141,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="89,44,89,79,83,79,83,44"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="161,79,216,104"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="185,118,156,226,151,224,179,117"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="168,115,127,154,123,150,165,111"/>
+</map>

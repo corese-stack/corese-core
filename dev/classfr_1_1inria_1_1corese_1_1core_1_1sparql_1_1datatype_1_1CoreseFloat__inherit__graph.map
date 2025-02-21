@@ -1,0 +1,11 @@
+<map id="CoreseFloat" name="CoreseFloat">
+<area shape="rect" id="Node000001" title=" " alt="" coords="19,299,119,324"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDouble.html" title=" " alt="" coords="12,225,125,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,264,71,299,66,299,66,264"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseNumber.html" title=" " alt="" coords="9,152,128,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,191,71,225,66,225,66,191"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html" title=" " alt="" coords="5,79,132,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="71,118,71,152,66,152,66,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="25,5,112,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="71,44,71,79,66,79,66,44"/>
+</map>

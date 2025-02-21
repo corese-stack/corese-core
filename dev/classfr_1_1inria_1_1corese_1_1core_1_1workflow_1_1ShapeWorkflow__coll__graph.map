@@ -1,0 +1,25 @@
+<map id="ShapeWorkflow" name="ShapeWorkflow">
+<area shape="rect" id="Node000001" title="Domain Specific Workflow to process DataShape on RDF Graph." alt="" coords="237,419,359,444"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticWorkflow.html" title="Workflow of Query | Update | RuleBase | Transformation Each Process pass a Data with Graph to next Pr..." alt="" coords="25,243,168,268"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,281,73,318,73,337,80,355,95,371,112,385,152,406,195,419,237,425,236,431,194,424,150,411,109,390,91,375,76,357,68,338,68,317,80,279"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ShapeWorkflow.html" title="Domain Specific Workflow to process DataShape on RDF Graph." alt="" coords="90,331,213,356"/>
+<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="114,278,146,329,141,332,109,281"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1CompositeProcess.html" title=" " alt="" coords="5,155,148,180"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="85,193,96,242,91,243,80,194"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowProcess.html" title="Root class." alt="" coords="197,80,329,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="222,113,107,157,105,152,220,108"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TransformationProcess.html" title=" " alt="" coords="337,243,507,268"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="286,113,413,241,409,244,282,117"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1LoadProcess.html" title="Load a directory." alt="" coords="209,243,312,268"/>
+<area shape="poly" id="edge9_Node000008_Node000004" title=" " alt="" coords="266,119,264,243,258,243,260,119"/>
+<area shape="rect" id="Node000005" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AbstractProcess.html" title=" " alt="" coords="200,5,327,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="266,45,266,80,261,80,261,45"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1Data.html" title=" " alt="" coords="173,155,226,180"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="176,191,113,244,109,240,173,187"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="410,281,376,335,332,396,311,420,307,417,328,393,372,332,406,278"/>
+<area shape="poly" id="edge12_Node000009_Node000007" title=" " alt="" coords="373,275,188,333,187,328,372,270"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="283,277,300,301,314,330,318,354,316,379,305,419,300,417,311,378,312,355,309,331,296,304,279,280"/>
+<area shape="poly" id="edge13_Node000009_Node000008" title=" " alt="" coords="237,279,168,333,165,328,233,275"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="184,361,279,416,277,421,182,365"/>
+<area shape="poly" id="edge14_Node000009_Node000009" title=" " alt="" coords="228,335,239,343,231,351,213,354,212,348,229,346,234,343,225,339"/>
+</map>

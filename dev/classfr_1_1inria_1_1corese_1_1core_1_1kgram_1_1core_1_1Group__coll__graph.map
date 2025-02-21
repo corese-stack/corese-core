@@ -1,0 +1,9 @@
+<map id="Group" name="Group">
+<area shape="rect" id="Node000001" title="select distinct ?x ?y select (count(distinct *) as ?c)" alt="" coords="92,168,153,193"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,80,197,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,118,122,167,117,168,105,119"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="222,80,370,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="262,114,147,170,145,165,259,109"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="179,5,413,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="299,45,299,80,293,80,293,45"/>
+</map>

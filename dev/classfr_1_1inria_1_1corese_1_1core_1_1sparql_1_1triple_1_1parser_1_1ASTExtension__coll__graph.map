@@ -1,0 +1,9 @@
+<map id="ASTExtension" name="ASTExtension">
+<area shape="rect" id="Node000001" title="Manage extension functions Function exp must have executed exp.local() to tag local variables." alt="" coords="41,168,152,193"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,80,92,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,116,92,166,88,169,59,119"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTExtension_1_1FunMap.html" title=" " alt="" coords="116,80,283,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,116,113,170,109,165,173,112"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="92,5,307,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="202,45,202,80,197,80,197,45"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Graph.TreeNode" name="Graph.TreeNode">
+<area shape="rect" id="Node000001" title="With CompareNode: manage 1, 01, 1.0 as different Node (with same index) With CompareIndex: manage IDa..." alt="" coords="22,93,149,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,165,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,59,88,93,83,93,83,59"/>
+</map>

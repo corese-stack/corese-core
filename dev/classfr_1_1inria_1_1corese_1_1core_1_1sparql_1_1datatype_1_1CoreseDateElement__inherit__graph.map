@@ -1,0 +1,17 @@
+<map id="CoreseDateElement" name="CoreseDateElement">
+<area shape="rect" id="Node000001" title=" " alt="" coords="101,299,253,324"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDay.html" title=" " alt="" coords="5,372,99,397"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="147,333,74,374,71,369,144,328"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseMonth.html" title=" " alt="" coords="123,372,231,397"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="180,338,180,372,175,372,175,338"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseYear.html" title=" " alt="" coords="255,372,350,397"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="211,328,283,369,281,374,208,333"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseInteger.html" title=" " alt="" coords="121,225,234,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,264,180,299,175,299,175,264"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseNumber.html" title=" " alt="" coords="118,152,237,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,191,180,225,175,225,175,191"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html" title=" " alt="" coords="114,79,241,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="180,118,180,152,175,152,175,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="134,5,221,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="180,44,180,79,175,79,175,44"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1BaseMap.html" title="The statistics data in fact is a map, this base class implements the basic map between distinct node ..." alt="" coords="5,55,88,80"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1HashBucket.html" title="Save map between nodes ( convert to hash code) and their count." alt="" coords="147,5,245,31"/>
+<area shape="poly" id="edge279_Node000000_Node000001" title=" " alt="" coords="98,48,156,28,157,33,99,53"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1ReducedMap.html" title="Save part of the map between nodes and their count, in order to reduce the size of mapping." alt="" coords="143,55,249,80"/>
+<area shape="poly" id="edge280_Node000000_Node000002" title=" " alt="" coords="102,65,143,65,143,70,102,70"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1stats_1_1data_1_1SimpleAverage.html" title="Simple average, number of all triples/number of distinct resources." alt="" coords="136,104,256,129"/>
+<area shape="poly" id="edge281_Node000000_Node000003" title=" " alt="" coords="99,82,157,101,156,106,98,87"/>
+</map>

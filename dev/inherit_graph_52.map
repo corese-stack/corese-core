@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1Constant.html" title=" " alt="" coords="5,31,85,56"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1Shex.html" title="Shex to Shacl translator." alt="" coords="167,5,221,31"/>
+<area shape="poly" id="edge307_Node000000_Node000001" title=" " alt="" coords="98,32,166,20,167,25,99,37"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1ShexConstraint.html" title=" " alt="" coords="133,55,255,80"/>
+<area shape="poly" id="edge308_Node000000_Node000002" title=" " alt="" coords="99,49,133,55,132,60,98,55"/>
+</map>

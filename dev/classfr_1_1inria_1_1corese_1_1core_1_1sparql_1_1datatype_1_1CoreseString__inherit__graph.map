@@ -1,0 +1,15 @@
+<map id="CoreseString" name="CoreseString">
+<area shape="rect" id="Node000001" title=" " alt="" coords="90,299,195,324"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseGeneric.html" title="Generic datatype for other such as dayTimeDuration." alt="" coords="5,372,123,397"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="122,335,79,374,75,370,118,331"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringBuilder.html" title=" " alt="" coords="147,372,298,397"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="167,331,211,370,208,374,164,335"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringLiteral.html" title=" " alt="" coords="69,225,216,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,264,145,299,140,299,140,264"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseStringableImpl.html" title=" " alt="" coords="61,152,224,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="145,191,145,225,140,225,140,191"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html" title=" " alt="" coords="79,79,206,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="145,118,145,152,140,152,140,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="99,5,186,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="145,44,145,79,140,79,140,44"/>
+</map>

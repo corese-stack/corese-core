@@ -1,0 +1,7 @@
+<map id="CombinedAlgorithm" name="CombinedAlgorithm">
+<area shape="rect" id="Node000001" title="Combined algorithm (composed of several algorithms)" alt="" coords="5,152,157,177"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1impl_1_1BaseAlgorithm.html" title="Base Algorithm." alt="" coords="22,79,141,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,118,84,152,79,152,79,118"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1approximate_1_1algorithm_1_1ISimAlgorithm.html" title="Interface for implementing the similarity measurement algorithms." alt="" coords="24,5,139,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="84,44,84,79,79,79,79,44"/>
+</map>

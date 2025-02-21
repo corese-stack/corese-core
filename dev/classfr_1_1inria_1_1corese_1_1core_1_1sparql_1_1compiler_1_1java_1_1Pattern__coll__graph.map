@@ -1,0 +1,18 @@
+<map id="Pattern" name="Pattern">
+<area shape="rect" id="Node000001" title="Compile exists {} and subquery clause with kgram() function Pass bound variables as parameters: kgram..." alt="" coords="138,359,206,384"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1JavaCompiler.html" title="Java Compiler for LDScript Take an AST as input and compile the LDScript function definitions in Java..." alt="" coords="14,271,124,296"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,303,159,356,156,360,92,307"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Header.html" title=" " alt="" coords="16,359,85,384"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="66,310,56,359,50,358,61,309"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="17,352,5,337,3,328,5,319,18,304,34,294,37,298,22,308,10,321,8,328,9,335,21,349"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Datatype.html" title="Generate IDatatype constant and IDatatype variable." alt="" coords="86,183,169,208"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="137,221,171,358,166,359,131,222"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="114,221,79,272,75,269,110,218"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="56,95,200,120"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="130,134,130,182,125,182,125,134"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="48,5,208,45"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="130,59,130,94,125,94,125,59"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1compiler_1_1java_1_1Stack.html" title="Stack record bound variables for parameter passing to exists and subquery Bound variables are functio..." alt="" coords="209,183,268,208"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="232,222,179,359,174,357,227,220"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="205,217,93,273,91,268,202,212"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="JSONFormat" name="JSONFormat">
+<area shape="rect" id="Node000001" title="SPARQL JSON Result Format for KGRAM Mappings." alt="" coords="60,152,160,177"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1AbstractNestedResultFormat.html" title="Mother class for the query result formats such as XML and JSON." alt="" coords="5,79,215,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,118,113,152,107,152,107,118"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1print_1_1QueryResultFormat.html" title="Root class for Result Format." alt="" coords="36,5,184,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,44,113,79,107,79,107,44"/>
+</map>

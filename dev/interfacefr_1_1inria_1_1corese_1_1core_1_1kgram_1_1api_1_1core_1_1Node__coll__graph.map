@@ -1,0 +1,9 @@
+<map id="Node" name="Node">
+<area shape="rect" id="Node000001" title="Interface of Node provided by graph implementation and also by KGRAM query Node." alt="" coords="98,152,154,177"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Pointerable.html" title="Interface for objects that can be object of a CoresePointer." alt="" coords="17,79,113,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,113,118,150,114,154,82,116"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Loopable.html" title="Interface for (var in exp) {}." alt="" coords="5,5,124,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="67,44,67,79,62,79,62,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="137,79,238,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="170,116,138,154,134,150,166,113"/>
+</map>

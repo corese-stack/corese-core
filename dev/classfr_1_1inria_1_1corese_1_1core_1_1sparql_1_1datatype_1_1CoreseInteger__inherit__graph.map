@@ -1,0 +1,19 @@
+<map id="CoreseInteger" name="CoreseInteger">
+<area shape="rect" id="Node000001" title=" " alt="" coords="211,225,325,251"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDateElement.html" title=" " alt="" coords="101,299,253,324"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="244,261,194,301,191,296,241,257"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseGenericInteger.html" title="int short ..." alt="" coords="277,299,440,324"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="295,257,345,296,342,301,292,261"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseNumber.html" title=" " alt="" coords="209,152,327,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="271,191,271,225,265,225,265,191"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDatatype.html" title=" " alt="" coords="205,79,331,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="271,118,271,152,265,152,265,118"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="225,5,311,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="271,44,271,79,265,79,265,44"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseDay.html" title=" " alt="" coords="5,372,99,397"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="147,333,74,374,71,369,144,328"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseMonth.html" title=" " alt="" coords="123,372,231,397"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="180,338,180,372,175,372,175,338"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseYear.html" title=" " alt="" coords="255,372,350,397"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="211,328,283,369,281,374,208,333"/>
+</map>
