@@ -79,7 +79,7 @@ public interface KeywordPP {
     public final static String PRAGMA = "pragma";
 
     public final static String SPACE = " ";
-    public final static String SPACE_LN = " " + System.getProperty("line.separator");
+    public final static String SPACE_LN = " " + "\n";
     
     public final static String OPEN_BRACKET = "{";
     public final static String CLOSE_BRACKET = "}";

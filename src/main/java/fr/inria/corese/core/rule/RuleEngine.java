@@ -81,7 +81,7 @@ import fr.inria.corese.core.sparql.triple.printer.SPIN;
  */
 public class RuleEngine implements Engine, Graphable {
 
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final String OWL_RL_PROFILE = NSManager.OWL_RL_PROFILE;
     public static final int OWL_RL_FULL = -1;
     public static final int STD = 0;

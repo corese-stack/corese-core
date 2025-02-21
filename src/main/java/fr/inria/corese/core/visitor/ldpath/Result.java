@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  *
  */
 public class Result {
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     static final String LDP = "http://ns.inria.fr/ldpath/" ;
     static final String TTL = ".ttl";
     static final String JSON = ".json"; 

@@ -52,7 +52,7 @@ import org.slf4j.Logger;
 public class JavaCompiler {
 
     private static Logger logger = LoggerFactory.getLogger(JavaCompiler.class);
-    static final String NL = System.getProperty("line.separator");
+    static final String NL = "\n";
     // where to write the Java code
     private String path =
       "/user/corby/home/NetBeansProjects/corese-github-v4/" +

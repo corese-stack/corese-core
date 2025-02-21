@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  */
 public class Term extends Expression {
 
-    public static final String NL = System.getProperty("line.separator");
+    public static final String NL = "\n";
     static final String RE_CHECK = "check";
     static final String RE_PARA = "||";
     public static final String RE_ALT = "|";

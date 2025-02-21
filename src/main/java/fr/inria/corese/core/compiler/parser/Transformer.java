@@ -49,7 +49,7 @@ public class Transformer implements ExpType {
     private static Logger logger = LoggerFactory.getLogger(Transformer.class);
     private static final String LINKED_DATA_PATH_VISITOR = 
             "fr.inria.corese.core.visitor.ldpath.LinkedDataPath";
-    public static final String NL = System.getProperty("line.separator");
+    public static final String NL = "\n";
     public static final String ROOT = "?_kgram_";
     public static final String THIS = "?this";
     private static final String EXTENSION = Processor.KGEXTENSION;

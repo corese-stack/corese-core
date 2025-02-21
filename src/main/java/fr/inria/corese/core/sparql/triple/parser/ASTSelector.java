@@ -26,7 +26,7 @@ public class ASTSelector {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getPredicateService().toString());
-        sb.append(System.getProperty("line.separator"));
+        sb.append("\n");
         sb.append(getTripleService().toString());
         return sb.toString();
     }

@@ -124,7 +124,7 @@ public class Transformer implements TransformProcessor {
     private static final String OUT = ASTQuery.OUT;
     public static final String IN = ASTQuery.IN;
     public static final String IN2 = ASTQuery.IN2;
-    private static String NL = System.getProperty("line.separator");
+    private static String NL = "\n";
     private static boolean isOptimizeDefault = false;
     private static boolean isExplainDefault = false;
     public static boolean DEFAULT_DEBUG = false;

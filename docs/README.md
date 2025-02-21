@@ -10,6 +10,7 @@ To install the dependencies to build the documentation:
 
 ``` shell
 pip install -r docs/requirements.txt
+
 ```
 ## Documentation generation
 
@@ -18,6 +19,7 @@ Following that, the corese-core documentation can be generated through a single 
 ``` shell
 sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${sourcedir}/java_api' -v
 ```
+
 ## Switcher generation
 
 - To navigate between versions by means of the switcher (the dropdown list indicating the available version), the switcher.json object must be generated. 

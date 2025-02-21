@@ -43,7 +43,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  */
 public class CoreseDatatype
         implements IDatatype {
-    public static final String NL = System.getProperty("line.separator");
+    public static final String NL = "\n";
     public static boolean DISPLAY_AS_PREFIX = true;
     public static Logger logger = LoggerFactory.getLogger(CoreseDatatype.class);
     static final CoreseURI datatype = new CoreseURI(RDF.RDFSRESOURCE);
