@@ -1,9 +1,11 @@
 name: "Sphinx: Render production docs"
 run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
+
 on:
   push:
     branches:
       - "main"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,16 +23,29 @@ jobs:
       with:
         ref: main
 
-    - name: Fetch tags
-      run: git fetch --prune --unshallow --tags --force
+    - name: Check existing tags before fetch
+      run: git tag --sort=-v:refname || echo "No tags found"
+
+    - name: Delete all local tags to avoid conflicts
+      run: git tag -d $(git tag) || echo "No tags to delete"
+
+    - name: Fetch updated tags
+      run: git fetch --prune --tags --force
+
+    - name: Check tags after fetch
+      run: git tag --sort=-v:refname || echo "No tags found after fetch"
 
     - name: Build Sphinx documentation with multiversion
       run: |
+        set -x  # Enable debug mode
         source /builds/miniconda3/etc/profile.d/conda.sh
         conda activate corese-core-documentation
-        sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${sourcedir}/java_api'
-        chmod u+x docs/switcher_generator.sh
+
+        sphinx-multiversion docs/source build/html -D exhale_args.containmentFolder="\${sourcedir}/java_api"
+
+        chmod +x docs/switcher_generator.sh
         ./docs/switcher_generator.sh build/html/switcher.json build/html/index.html
+        set +x  # Disable debug mode
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
