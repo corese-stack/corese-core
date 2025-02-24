@@ -18,6 +18,9 @@ import java.util.List;
  */
 public class SimAlgorithmFactory {
 
+    private SimAlgorithmFactory() {
+    }
+
     public static ISimAlgorithm create(String name) {
         AlgType alg = ApproximateStrategy.valueOf(name);
         return alg == null ? null : create(alg);
@@ -32,15 +35,13 @@ public class SimAlgorithmFactory {
     public static ISimAlgorithm create(AlgType type) {
         switch (type) {
 
-            case ng:
+            case NG:
                 return new NGram();
-            case eq:
+            case EQ:
                 return new Equality();
-            case jw:
+            case JW:
                 return new JaroWinkler();
-            case ch:
-            //integrate the old algorithm
-            //return new ClassHieararchy(alg);
+            case CH:
             default:
                 return null;
         }
@@ -65,7 +66,7 @@ public class SimAlgorithmFactory {
      * @return
      */
     public static ISimAlgorithm createCombined(List<AlgType> algs, boolean defWeights) {
-        List<ISimAlgorithm> algList = new LinkedList<ISimAlgorithm>();
+        List<ISimAlgorithm> algList = new LinkedList<>();
 
         for (AlgType at : algs) {
             ISimAlgorithm alg = create(at);

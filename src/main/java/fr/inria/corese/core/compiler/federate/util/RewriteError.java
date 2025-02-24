@@ -14,12 +14,10 @@ public class RewriteError {
         exp = e;
         message = mes;
     }
-    
+
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s:\n%s",getMessage(), getExp()));
-        return sb.toString();
+        return String.format("%s:\n%s", getMessage(), getExp());
     }
 
     public Exp getExp() {

@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class ListSort extends Funcall {
-    private static Logger logger = LoggerFactory.getLogger(ListSort.class);
+    private static final Logger logger = LoggerFactory.getLogger(ListSort.class);
 
     public ListSort(){}
     

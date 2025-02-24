@@ -1,6 +1,5 @@
 package fr.inria.corese.core.approximate.algorithm.impl;
 
-import fr.inria.corese.core.approximate.algorithm.Utils;
 
 /**
  * Jaro–Winkler distance (Winkler, 1990) based on Jaro

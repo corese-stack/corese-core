@@ -1,26 +1,22 @@
 package fr.inria.corese.core.query;
 
-import java.util.List;
-
+import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.core.Sorter;
-import fr.inria.corese.core.Graph;
+
+import java.util.List;
 
 /**
  * Sort KGRAM edges in connected order before query process Take cardinality
  * into account
  *
  * @author Olivier Corby, Edelweiss, INRIA 2011
- *
  */
 public class SorterImpl extends Sorter {
 
     Graph graph;
-
-    SorterImpl() {
-    }
 
     SorterImpl(Graph g) {
         graph = g;
@@ -43,10 +39,8 @@ public class SorterImpl extends Sorter {
         int n1 = e1.nBind(lNode, lVar, lBind);
         int n2 = e2.nBind(lNode, lVar, lBind);
 
-        if (n1 == 0 && n2 == 0) {
-            if (beforeBind(q, e2, e1)) {
-                return true;
-            }
+        if ((n1 == 0 && n2 == 0) && (beforeBind(q, e2, e1))) {
+            return true;
         }
 
         if (n1 == n2 && e1.isEdge() && e2.isEdge()) {

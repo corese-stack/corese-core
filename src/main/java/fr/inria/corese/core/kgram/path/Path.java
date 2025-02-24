@@ -152,7 +152,7 @@ public class Path extends ProducerDefault implements Pointerable {
     public Edge getEdge(int n) {
         Edge ent = path.get(n);
         if (ent instanceof EdgeInv) {
-            return (EdgeInv) ent;
+            return ent;
         }
         return ent.getEdge();
     }
@@ -238,7 +238,7 @@ public class Path extends ProducerDefault implements Pointerable {
             private int i = 0;
             private int j = 0;
             private int ii;
-            private boolean hasNext = length() > 0 ? true : false;
+            private boolean hasNext = length() > 0;
 
             @Override
             public boolean hasNext() {
@@ -287,15 +287,6 @@ public class Path extends ProducerDefault implements Pointerable {
         }
         str += "}";
         return str;
-    }
-
-    public void trace() {
-        int i = 0;
-        for (Iterator<Node> it = nodeIterator(); it.hasNext();) {
-            Node cc = it.next();
-            System.out.println(i++ + " " + cc + " ");
-        }
-        System.out.println();
     }
 
     @Override

@@ -19,7 +19,7 @@ import fr.inria.corese.core.kgram.api.core.Expr;
  *
  */
 public class MatchBind {
-	private static Logger logger = LoggerFactory.getLogger(MatchBind.class);	
+	private static final Logger logger = LoggerFactory.getLogger(MatchBind.class);
 
 	Hashtable<Expr, Expr> table;
 	List<Expr> stack;

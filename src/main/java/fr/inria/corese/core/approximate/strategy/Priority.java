@@ -2,12 +2,13 @@ package fr.inria.corese.core.approximate.strategy;
 
 import fr.inria.corese.core.approximate.algorithm.ISimAlgorithm;
 import fr.inria.corese.core.approximate.algorithm.impl.BaseAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class for generating the weights of each algorithm based on their priorities
@@ -17,9 +18,10 @@ import org.slf4j.LoggerFactory;
  */
 public class Priority {
 
-    private final static Logger logger = LoggerFactory.getLogger(Priority.class);
-    // private static final Map<StrategyType, Double> strategyMap = new EnumMap<StrategyType, Double>(StrategyType.class);
-    private static final Map<AlgType, Double> algorithmMap = new EnumMap<AlgType, Double>(AlgType.class);
+    private static final Logger logger = LoggerFactory.getLogger(Priority.class);
+    private static final Map<AlgType, Double> algorithmMap = new EnumMap<>(AlgType.class);
+    private Priority() {
+    }
 
     public static void init(List<Double> values, List<AlgType> target) {
         if (values != null && values.size() != target.size()) {
@@ -39,7 +41,7 @@ public class Priority {
 
     //"ng-ss-ch-eq" -> [0.1, 0.2, 0.3, 0.4]
     public static double[] getWeightByAlgorithm(List<ISimAlgorithm> algs) {
-        List<AlgType> types = new ArrayList<AlgType>();
+        List<AlgType> types = new ArrayList<>();
         for (ISimAlgorithm alg : algs) {
             types.add(((BaseAlgorithm) alg).getType());
         }

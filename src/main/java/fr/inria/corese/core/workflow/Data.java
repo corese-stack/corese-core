@@ -1,28 +1,26 @@
 package fr.inria.corese.core.workflow;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import fr.inria.corese.core.EventManager;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.transform.TemplateVisitor;
-import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
 import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.transform.TemplateVisitor;
+import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
- *
  */
 public class Data {
 
@@ -79,7 +77,6 @@ public class Data {
         Data data = new Data(process, map, graph);
         data.setDatatypeValue(datatype);
         data.setDataList(dataList);
-        // data.setVisitor(visitor);
         data.setDataset(dataset);
         data.setContext(context);
         data.setTemplateResult(templateResult);
@@ -162,15 +159,6 @@ public class Data {
         this.context = context;
     }
 
-    // public TemplateVisitor getVisitor() {
-    // return visitor;
-    // }
-    //
-    //
-    // public void setVisitor(TemplateVisitor visitor) {
-    // this.visitor = visitor;
-    // }
-
     public Graph getVisitedGraph() {
         TemplateVisitor vis = getTransformerVisitor();
         if (vis == null) {
@@ -185,13 +173,6 @@ public class Data {
         }
         return (TemplateVisitor) getBinding().getTransformerVisitor();
     }
-
-    // public Graph getVisitedGraph(){
-    // if (getVisitor() == null){
-    // return null;
-    // }
-    // return getVisitor().visitedGraph();
-    // }
 
     public String getTemplateResult() {
         return templateResult;
@@ -221,9 +202,13 @@ public class Data {
         return dataList;
     }
 
+    public void setDataList(List<Data> dataList) {
+        this.dataList = dataList;
+    }
+
     public List<Data> getResultList() {
         if (dataList == null) {
-            return new ArrayList<Data>();
+            return new ArrayList<>();
         }
         return dataList;
     }
@@ -262,7 +247,7 @@ public class Data {
     }
 
     IDatatype getTransformationList() {
-        ArrayList<IDatatype> list = new ArrayList<IDatatype>();
+        ArrayList<IDatatype> list = new ArrayList<>();
         for (Data d : getDataList()) {
             if (d.getTemplateResult() != null) {
                 list.add(d.getDatatypeValue());
@@ -287,22 +272,16 @@ public class Data {
         if (c != null) {
             ds.setContext(c);
         }
-        // if (getVisitor()!= null) {
-        // ds.setTemplateVisitor(getVisitor());
-        // }
+
         if (getBinding() != null) {
             ds.setBinding(getBinding());
         }
         return ds;
     }
 
-    public void setDataList(List<Data> dataList) {
-        this.dataList = dataList;
-    }
-
     void addData(Data d) {
         if (dataList == null) {
-            dataList = new ArrayList<Data>();
+            dataList = new ArrayList<>();
         }
         dataList.add(d);
     }

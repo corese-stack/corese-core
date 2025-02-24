@@ -33,15 +33,14 @@ import org.slf4j.Logger;
  */
 public class ExpressionVisitorVariable implements ExpressionVisitor {
   
-    private static Logger logger = LoggerFactory.getLogger(ExpressionVisitorVariable.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExpressionVisitorVariable.class);
    
-    private boolean let = false;
+    private final boolean let = false;
     private boolean functionDefinition = false;
-    private boolean trace = false;
     private int nbVariable = 0;
     
     // stack of defined variables: function parameter/let/for
-    private List<Variable> list;
+    private final List<Variable> list;
     private ASTQuery ast;
     private Function fun;
     HashMap<Variable, Integer> reference;
@@ -246,9 +245,6 @@ public class ExpressionVisitorVariable implements ExpressionVisitor {
     }
         
     void function(Function f) {
-        if (trace) {
-            System.out.println("**** Vis Fun: " + f);
-        }
         
         if (isFunctionDefinition()){
             // f is lambda inside a function

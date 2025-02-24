@@ -16,9 +16,9 @@ import org.semarglproject.sink.TripleSink;
  */
 public class CoreseRDFaTripleSink implements TripleSink {
 
-    private AddTripleHelper helper;
-    private Graph graph;
-    private Node graphSource;
+    private final AddTripleHelper helper;
+    private final Graph graph;
+    private final Node graphSource;
 
     /**
      * Constructor 

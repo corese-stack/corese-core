@@ -92,7 +92,7 @@ public class CoreseDateTest {
     @Test
     public void getCode() throws DatatypeConfigurationException {
         IDatatype date = DatatypeMap.newDate();
-        assertEquals(IDatatype.DATETIME, date.getCode());
+        assertEquals(IDatatype.Datatype.DATETIME, date.getCode());
     }
 
     @Test

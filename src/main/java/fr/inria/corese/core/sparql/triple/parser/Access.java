@@ -52,7 +52,7 @@ public class Access {
         
         PUBLIC(1), RESTRICTED(2), PRIVATE(3), DENIED(4), SUPER_USER(5)  ; 
         
-        private int value;
+        private final int value;
         
         // default feature access level 
         public static Level DEFAULT = PRIVATE;
@@ -65,7 +65,7 @@ public class Access {
         public static Level DENY    = DENIED;
 
         
-        private Level(int n) {
+        Level(int n) {
             value = n;
         }
         
@@ -86,8 +86,8 @@ public class Access {
             return getValue() >= featureLevel.getValue();
         }
     
-    } ;
-    
+    }
+
     public enum Feature  {  
         EVENT,
         // @import <http://myfun.org/fun.rq> 
@@ -143,7 +143,7 @@ public class Access {
                
     }
     
-    private FeatureLevel table;
+    private final FeatureLevel table;
     
     private static boolean protect = false;
     
@@ -531,7 +531,7 @@ public class Access {
         if (m == null || m.getBind() == null) {
             return level;
         }
-        return ((fr.inria.corese.core.sparql.triple.function.term.Binding)m.getBind()).getAccessLevel();
+        return m.getBind().getAccessLevel();
     }
 
     public static boolean isDefaultResultWhenEmptyAccept() {

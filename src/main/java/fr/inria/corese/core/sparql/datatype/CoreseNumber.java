@@ -19,7 +19,7 @@ import fr.inria.corese.core.sparql.api.IDatatype;
  */
 public abstract class CoreseNumber extends CoreseDatatype {
 
-    static final int code = NUMBER;
+    static final IDatatype.Datatype code = IDatatype.Datatype.NUMBER;
     private String label;
 
     /**
@@ -69,7 +69,7 @@ public abstract class CoreseNumber extends CoreseDatatype {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
 
@@ -296,7 +296,7 @@ public abstract class CoreseNumber extends CoreseDatatype {
                     }
             }
         } catch (java.lang.ArithmeticException a) {
-            logger.error(a.toString() + " " + this + " " + dt);
+            logger.error(a + " " + this + " " + dt);
         }
         return null;
     }

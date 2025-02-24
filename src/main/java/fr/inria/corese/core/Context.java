@@ -1,32 +1,31 @@
 package fr.inria.corese.core;
 
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.query.Graphable;
 import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.query.RDFizer;
 import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.load.QueryLoad;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import org.slf4j.LoggerFactory;
 
 /**
  * Graph Execution Context
  * Store History
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2014
- *
  */
 public class Context implements Graphable {
 
-    private ArrayList<Node> queryNodes;
-    private Node ruleEngineNode;
+    private final ArrayList<Node> queryNodes;
     RuleEngine re;
-    private int max = 10;
-    
     Graph graph;
+    private Node ruleEngineNode;
+    private int max = 10;
 
     Context(Graph g) {
         this.graph = g;
@@ -39,18 +38,17 @@ public class Context implements Graphable {
     public Node getQueryNode() {
         if (queryNodes.isEmpty()) {
             return null;
-        }       
+        }
         return queryNodes.get(queryNodes.size() - 1);
     }
-    
-    Node getRE(){
+
+    Node getRE() {
         RuleEngine re = RuleEngine.create(Graph.create());
-        for (Node n : queryNodes){
+        for (Node n : queryNodes) {
             Query q = (Query) n.getNodeObject();
             re.defRule(q);
         }
-        Node res = DatatypeMap.createObject("RuleEngine", re);
-        return res;
+        return DatatypeMap.createObject("RuleEngine", re);
     }
 
     /**
@@ -58,18 +56,18 @@ public class Context implements Graphable {
      * 0 is last, 1 is before last ...
      */
     public Node getQueryNode(int n) {
-        if (n == -1){
+        if (n == -1) {
             return getRE();
         }
-        int i = queryNodes.size() - 1 - n ;
-        if (i >= 0 && i < queryNodes.size()){
+        int i = queryNodes.size() - 1 - n;
+        if (i >= 0 && i < queryNodes.size()) {
             return queryNodes.get(i);
         }
         return null;
     }
 
     /**
-     * @param queryNode the queryNode to set
+     * @param q the queryNode to set
      */
     public void setQuery(Query q) {
         while (queryNodes.size() >= max) {
@@ -84,30 +82,30 @@ public class Context implements Graphable {
     public Node getRuleEngineNode() {
         return ruleEngineNode;
     }
-    
+
     public Node getRecordNode() {
-        if (re == null){
+        if (re == null) {
             return null;
         }
         return create("Record", re.getRecord());
     }
 
     /**
-     * @param ruleEngineNode the ruleEngineNode to set
+     * @param re the ruleEngineNode to set
      */
     public void setRuleEngine(RuleEngine re) {
         this.re = re;
         this.ruleEngineNode = create("RuleEngine", re);
     }
-    
-    Node create(String name, Object obj){
+
+    Node create(String name, Object obj) {
         return DatatypeMap.createObject(name, obj);
     }
-    
-    Node create(String name, Object obj, String dt){
+
+    Node create(String name, Object obj, String dt) {
         return DatatypeMap.createObject(name, obj, dt);
     }
-    
+
     /**
      * @return the max
      */
@@ -121,8 +119,8 @@ public class Context implements Graphable {
     public void setMax(int max) {
         this.max = max;
     }
-    
-    public void storeIndex(String name){
+
+    public void storeIndex(String name) {
         Graph g = new RDFizer().getGraph(graph.describe());
         graph.setNamedGraph(name, g);
     }
@@ -130,23 +128,22 @@ public class Context implements Graphable {
     @Override
     public String toGraph() {
         StringBuilder sb = new StringBuilder();
-        //sb.append(toRDF());
         sb.append(graph.toRDF());
         return sb.toString();
-    }
-
-    @Override
-    public void setGraph(Object obj) {
     }
 
     @Override
     public Object getGraph() {
         return null;
     }
-    
-    String toRDF(){
+
+    @Override
+    public void setGraph(Object obj) {
+    }
+
+    String toRDF() {
         QueryLoad ql = QueryLoad.create();
-         String str = "";
+        String str = "";
         try {
             str = ql.getResource("/data/kgram.ttl");
         } catch (IOException ex) {

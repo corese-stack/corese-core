@@ -25,7 +25,7 @@ public class ParserSparql1 {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(ParserSparql1.class);
+    private static final Logger logger = LoggerFactory.getLogger(ParserSparql1.class);
 
     SparqlCorese parser;
     ASTQuery ast;

@@ -1,37 +1,26 @@
 package fr.inria.corese.core.compiler.parser;
 
-import java.lang.reflect.InvocationTargetException;
-
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.cst.RDFS;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Atom;
-import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
-import fr.inria.corese.core.sparql.triple.parser.RDFList;
-import fr.inria.corese.core.sparql.triple.parser.Source;
-import fr.inria.corese.core.sparql.triple.parser.Triple;
 import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.api.query.Matcher;
 import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.event.EvalListener;
 import fr.inria.corese.core.kgram.event.EventListener;
-import fr.inria.corese.core.kgram.tool.Message;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.parser.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Pragma processor
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
- *
  */
 public class Pragma {
-
-    private static Logger logger = LoggerFactory.getLogger(Pragma.class);
 
     public static final String KG = ExpType.KGRAM;
     public static final String STL = ExpType.STL;
@@ -44,7 +33,6 @@ public class Pragma {
     public static final String PRAGMA = KG + "pragma";
     public static final String GRAPH = KG + "graph";
     public static final String APPROXIMATE = KG + "approximate";
-
     // kgram
     public static final String OPTIM = KG + "optimize";
     public static final String TEST = KG + "test";
@@ -85,9 +73,7 @@ public class Pragma {
     public static final String TURTLE = KG + "turtle";
     public static final String PLAN = KG + "plan";
     public static final String STD = KG + "std";
-
     public static final String HELP = KG + "help";
-
     public static final String ALGORITHM = KG + "algorithm";
     public static final String PRIORITY_ALGORITHM = KG + "priority_a";
     public static final String STRATEGY = KG + "strategy";
@@ -97,7 +83,6 @@ public class Pragma {
     public static final String POS_TAGGER = KG + "pos_tagger";
     public static final String STRING_METRIC = KG + "string_metric";
     public static final String THRESHOLD = KG + "threshold";
-
     // match
     static final String MODE = KG + "mode";
     // match mode
@@ -107,7 +92,7 @@ public class Pragma {
     static final String SUBSUME = "subsume";
     static final String INFERENCE = "inference";
     static final String MIX = "mix";
-
+    private static final Logger logger = LoggerFactory.getLogger(Pragma.class);
     protected Eval kgram;
     protected Query query;
     protected Transformer transform;
@@ -141,10 +126,6 @@ public class Pragma {
 
         for (fr.inria.corese.core.sparql.triple.parser.Exp pragma : exp.getBody()) {
 
-            if (query != null && query.isDebug()) {
-                Message.log(Message.PRAGMA, pragma);
-            }
-
             if (pragma.isFilter()) {
             } else if (pragma.isTriple()) {
                 Triple t = pragma.getTriple();
@@ -167,12 +148,10 @@ public class Pragma {
     }
 
     public void compile() throws EngineException {
-        //System.out.println("** Compile: " + ast.getPragma());
         compile(null, ast.getPragma());
     }
 
     public void compile(BasicGraphPattern p) throws EngineException {
-        //System.out.println("** Compile: " + ast.getPragma());
         compile(null, p);
     }
 
@@ -180,9 +159,6 @@ public class Pragma {
 
         for (fr.inria.corese.core.sparql.triple.parser.Exp pragma : exp.getBody()) {
 
-            if (ast.isDebug()) {
-                Message.log(Message.PRAGMA, pragma);
-            }
             if (pragma.isFilter()) {
                 compile(pragma.getFilter());
             } else if (pragma.isTriple()) {
@@ -208,7 +184,6 @@ public class Pragma {
 
         if (subject.equals(PATH)) {
             if (property.equals(EXPAND)) {
-                Constant cst = t.getObject().getConstant();
                 if (odt.isNumber()) {
                     transform.add(ExpandPath.create(odt.intValue()));
                 } else {
@@ -224,7 +199,7 @@ public class Pragma {
                 if (t.getObject().isBlankNode()) {
                     // kg:kgram kg:relax (foaf:type)
                     RDFList list = getList(t.getObject(), pragma);
-                    if (list!=null) ast.setRelax(list.getList());
+                    if (list != null) ast.setRelax(list.getList());
                 } else {
                     ast.addRelax(t.getObject());
                 }
@@ -252,8 +227,7 @@ public class Pragma {
     }
 
     String help() {
-        String query
-                = "select where {}\n"
+        return "select where {}\n"
                 + "pragma {\n"
                 + "kg:kgram kg:debug true        # debug mode \n"
                 + "kg:kgram kg:list  true        # list group result \n"
@@ -268,8 +242,6 @@ public class Pragma {
                 + "kg:path  kg:loop  false       # path without loop \n"
                 + "kg:query kg:display true      # pprint query AST \n"
                 + "}";
-
-        return query;
     }
 
     public void triple(Atom g, Triple t, fr.inria.corese.core.sparql.triple.parser.Exp pragma) {
@@ -277,93 +249,107 @@ public class Pragma {
         String subject = t.getSubject().getLabel();
         String property = t.getProperty().getLabel();
         String object = t.getObject().getLabel();
-        //if (object == null) object = t.getObject().getName();
 
-        if (subject.equals(SELF)) {
-            if (property.equals(TEST)) {
-                query.setTest(value(object));
-            } else if (property.equals(OPTIM)) {
-                query.setOptimize(value(object));
-            } else if (property.equals(DEBUG)) {
-                query.setDebug(value(object));
-            } else if (property.equals(SORT)) {
-                query.setSort(value(object));
-            } else if (property.equals(LISTEN) && value(object)) {
-                kgram.addEventListener(EvalListener.create());
-            } else if (property.equals(LIST)) {
-                query.setListGroup(value(object));
-            } else if (property.equals(DETAIL)) {
-                query.setDetail(value(object));
-            }
-        } else if (subject.equals(MATCH)) {
-            if (property.equals(MODE)) {
-                int mode = getMode(object);
-                query.setMode(mode);
-            } else if (property.equals(RDFS.RDFTYPE)) {
-                // kg:match rdf:type <fr.inria.corese.core.kgramenv.util.MatcherImpl>
-                Matcher match = (Matcher) create(object);
-                if (match != null) {
-                    kgram.setMatcher(match);
+        switch (subject) {
+            case SELF:
+                if (property.equals(TEST)) {
+                    query.setTest(value(object));
+                } else if (property.equals(OPTIM)) {
+                    query.setOptimize(value(object));
+                } else if (property.equals(SORT)) {
+                    query.setSort(value(object));
+                } else if (property.equals(LISTEN) && value(object)) {
+                    kgram.addEventListener(EvalListener.create());
+                } else if (property.equals(LIST)) {
+                    query.setListGroup(value(object));
+                } else if (property.equals(DETAIL)) {
+                    query.setDetail(value(object));
                 }
-            }
-        } else if (subject.equals(LISTEN)) {
-            if (property.equals(RDFS.RDFTYPE)) {
-                // kg:listen rdf:type <fr.inria.corese.core.kgram.event.StatListener>
-                EventListener el = (EventListener) create(object);
-                if (el != null) {
-                    kgram.addEventListener(el);
+                break;
+            case MATCH:
+                if (property.equals(MODE)) {
+                    int mode = getMode(object);
+                    query.setMode(mode);
+                } else if (property.equals(RDFS.RDFTYPE)) {
+                    // kg:match rdf:type <fr.inria.corese.core.kgramenv.util.MatcherImpl>
+                    Matcher match = (Matcher) create(object);
+                    if (match != null) {
+                        kgram.setMatcher(match);
+                    }
                 }
-            }
-        } else if (subject.equals(PATH)) {
-            if (property.equals(LIST)) {
-                query.setListPath(value(object));
-            }
-            if (property.equals(TYPE)) {
-                query.setPathType(value(object));
-            } else if (property.equals(STORE)) {
-                query.setStorePath(value(object));
-            } else if (property.equals(CACHE)) {
-                query.setCachePath(value(object));
-            } else if (property.equals(COUNT)) {
-                query.setCountPath(value(object));
-            } else if (property.equals(LOOP)) {
-                query.setCheckLoop(!value(object));
-            }
-        } else if (subject.equals(QUERY)) {
-            if (property.equals(DISPLAY)) {
-                query.addInfo("AST:\n", ast);
-            } else if (property.equals(MATCH)) {
-                query.setMatchBlank(value(object));
-            }
-        } else if (subject.equals(PRAGMA)) {
-            if (property.equals(HELP) && value(object)) {
-                query.addInfo(help(), null);
-            }
-        } else if (subject.equals(SERVICE)) {
-            if (property.equals(SLICE)) {
-                int slice = t.getObject().getDatatypeValue().intValue();
-                query.setSlice(slice);
-            } else if (property.equals(TIMEOUT)) {
-                Integer value = t.getObject().getDatatypeValue().intValue();
-                query.setPragma(TIMEOUT, value);
-            }
-        } else if (subject.equals(DISPLAY) || subject.equals(TEMPLATE)) {
-            if (property.equals(TEMPLATE)) {
-                query.setPragma(TEMPLATE, object);
-            } else if (property.equals(MODE)) {
-                if (object.equals(TURTLE)) {
-                    query.setPragma(TURTLE, TURTLE);
+                break;
+            case LISTEN:
+                if (property.equals(RDFS.RDFTYPE)) {
+                    // kg:listen rdf:type <fr.inria.corese.core.kgram.event.StatListener>
+                    EventListener el = (EventListener) create(object);
+                    if (el != null) {
+                        kgram.addEventListener(el);
+                    }
                 }
-            } else if (property.equals(GRAPH)) {
-                query.setPragma(GRAPH, true);
-            }
+                break;
+            case PATH:
+                if (property.equals(LIST)) {
+                    query.setListPath(value(object));
+                }
+                switch (property) {
+                    case TYPE:
+                        query.setPathType(value(object));
+                        break;
+                    case STORE:
+                        query.setStorePath(value(object));
+                        break;
+                    case CACHE:
+                        query.setCachePath(value(object));
+                        break;
+                    case COUNT:
+                        query.setCountPath(value(object));
+                        break;
+                    case LOOP:
+                        query.setCheckLoop(!value(object));
+                        break;
+                }
+                break;
+            case QUERY:
+                if (property.equals(DISPLAY)) {
+                    query.addInfo("AST:\n", ast);
+                } else if (property.equals(MATCH)) {
+                    query.setMatchBlank(value(object));
+                }
+                break;
+            case PRAGMA:
+                if (property.equals(HELP) && value(object)) {
+                    query.addInfo(help(), null);
+                }
+                break;
+            case SERVICE:
+                if (property.equals(SLICE)) {
+                    int slice = t.getObject().getDatatypeValue().intValue();
+                    query.setSlice(slice);
+                } else if (property.equals(TIMEOUT)) {
+                    Integer value = t.getObject().getDatatypeValue().intValue();
+                    query.setPragma(TIMEOUT, value);
+                }
+                break;
+            case DISPLAY:
+            case TEMPLATE:
+                switch (property) {
+                    case TEMPLATE:
+                        query.setPragma(TEMPLATE, object);
+                        break;
+                    case MODE:
+                        if (object.equals(TURTLE)) {
+                            query.setPragma(TURTLE, TURTLE);
+                        }
+                        break;
+                    case GRAPH:
+                        query.setPragma(GRAPH, true);
+                        break;
+                }
+                break;
         }
 
     }
 
-    /**
-     *
-     */
     RDFList getList(Atom head, fr.inria.corese.core.sparql.triple.parser.Exp pragma) {
         for (fr.inria.corese.core.sparql.triple.parser.Exp exp : pragma.getBody()) {
             if (exp.isRDFList()) {
@@ -405,29 +391,11 @@ public class Pragma {
 
     Object create(String name) {
         try {
-            //EventListener el ;
-            //= (EventListener) Class.forName(object).newInstance();
             Class cname = Class.forName(name);
             Object object = cname.getMethod("create").invoke(cname);
             return object;
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (IllegalAccessException | ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException e) {
+            logger.error("", e);
         }
         return null;
     }

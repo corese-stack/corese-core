@@ -7,6 +7,7 @@ import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.core.Regex;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.tool.MetaIterator;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,11 +15,11 @@ import java.util.List;
 
 /**
  * Node iterator for Property Path
- * @author Olivier Corby, Wimmics INRIA I3S, 2018
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
 public class ProducerImplNode {
-    
+
     ProducerImpl p;
     Graph graph;
 
@@ -26,14 +27,15 @@ public class ProducerImplNode {
         this.p = p;
         graph = p.getGraph();
     }
-    
+
     /**
      * Node iterator for starting PP with exp* when there is no start node
+     *
      * @param namedGraphURI: URI of named graph or null
-     * @param from: empty or default graph specification with select from
+     * @param from:          empty or default graph specification with select from
      */
     public Iterable<Node> getNodeIterator(Node namedGraphURI, List<Node> from, Edge edge,
-            Environment env, List<Regex> exp, int index) {
+                                          Environment env, List<Regex> exp, int index) {
 
         Node node = edge.getNode(index);
 
@@ -45,27 +47,26 @@ public class ProducerImplNode {
             return list;
         } else if (namedGraphURI == null) {
             // default graph nodes
-            if (from.size() > 0) {
+            if (!from.isEmpty()) {
                 return getNodes(namedGraphURI, from, env);
             } else {
                 return getDataBroker().getDefaultNodeList();
             }
         } // named graph nodes
-        else 
-        {
+        else {
             // return nodes of this named graph
             node = getDataBroker().getGraph(namedGraphURI);
             if (node != null) {
                 return getDataBroker().getGraphNodeList(node);
             }
-        } 
+        }
 
         return new ArrayList<>(0);
     }
 
     /**
-     * Enumerate nodes from graphs in the list 
-     * gNode == null : from 
+     * Enumerate nodes from graphs in the list
+     * gNode == null : from
      * gNode != null : from named -- never happens here
      */
     Iterable<Node> getNodes(Node gNode, List<Node> from, Environment env) {
@@ -85,25 +86,25 @@ public class ProducerImplNode {
 
     /**
      * Use case:
-     *
+     * <p>
      * from <g1>
      * from <g2>
      * ?x :p{*} ?y
-     *
+     * <p>
      * enumerate nodes from g1 and g2 and eliminate duplicates
      */
     Iterable<Node> getNodes(final Iterable<Node> iter) {
 
         return () -> {
-            final HashMap<Node, Node> table = new HashMap<Node, Node>();
+            final HashMap<Node, Node> table = new HashMap<>();
             final Iterator<Node> it = iter.iterator();
-            
+
             return new Iterator<Node>() {
                 @Override
                 public boolean hasNext() {
                     return it.hasNext();
                 }
-                
+
                 @Override
                 public Node next() {
                     while (hasNext()) {
@@ -118,7 +119,7 @@ public class ProducerImplNode {
                     }
                     return null;
                 }
-                
+
                 @Override
                 public void remove() {
                 }
@@ -129,6 +130,6 @@ public class ProducerImplNode {
     DataBroker getDataBroker() {
         return p.getDataBroker();
     }
-  
+
 
 }

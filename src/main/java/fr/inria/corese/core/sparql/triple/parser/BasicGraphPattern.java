@@ -295,7 +295,7 @@ public class BasicGraphPattern extends And {
     void check() throws QuerySemanticException {
         if (size() == 1 && get(0).isFilter()) {
             throw new QuerySemanticException("Unbound variable in Filter: "
-                    + this.toString());
+                    + this);
         }
     }
 

@@ -1,20 +1,30 @@
 package fr.inria.corese.core.kgram.core;
 
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Environment;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.query.Environment;
-
 /**
  * Alternative implementation of select distinct *
- * Used by RuleEngine ResultWatcher 
- * @author Olivier Corby, Wimmics, Inria, I3S,  2014
+ * Used by RuleEngine ResultWatcher
  *
+ * @author Olivier Corby, Wimmics, Inria, I3S,  2014
  */
 public class Distinct {
-	private static boolean byIndex = false;
+    private static boolean byIndex = false;
+    TreeMapping table;
+    List<Node> list;
+
+    Distinct() {
+        table = new TreeMapping();
+    }
+    Distinct(List<Node> l) {
+        this();
+        list = l;
+    }
 
     /**
      * @return the byIndex
@@ -29,97 +39,78 @@ public class Distinct {
     public static void setCompareIndex(boolean aByIndex) {
         byIndex = aByIndex;
     }
-        
-	TreeMapping table;
-        List<Node> list;
-        
-	class TreeMapping extends TreeMap<Node[], Node[]> {	
-		
-		TreeMapping(){
-			super(new Compare());
-		}
-	}
-	
 
-	class Compare implements Comparator<Node[]> {
-					
-		Compare(){						
-		}
+    public static Distinct create(List<Node> l) {
+        return new Distinct(l);
+    }
 
-		@Override
-		public int compare(Node[] m1, Node[] m2){
-						
-			for (int i = 0; i<m1.length; i++){
-				int res = compare(m1[i], m2[i]);
-				if (res != 0) return res;
-			}
-			return 0;
-		}
-		
-		
-		
-		int compare(Node n1, Node n2){
-			if (n1 == n2){
-                            return 0;
-			}
-			else if (n1 == null){
-                            return -1;
-			}
-			else if (n2 == null){
-                            return +1;
-			}
-			else if (byIndex && n1.getIndex() != -1 && n2.getIndex() != -1){
-                           return Integer.compare(n1.getIndex(), n2.getIndex());
-			}
-                        else {
-                           return n1.compare(n2);
-                        }
-		}               
-	}
+    public static Distinct create() {
+        return new Distinct();
+    }
 
-        Distinct(){
-            table = new TreeMapping();
+    public boolean isDistinct(Node[] key) {
+
+        if (table.containsKey(key)) {
+            return false;
         }
-	
-	Distinct(List<Node> l){
-            this();
-            list = l;
-	}
-        
-        public static Distinct create(List<Node> l){
-            return new Distinct(l);
+        table.put(key, key);
+        return true;
+    }
+
+    public boolean isDistinct(Environment env) {
+        Node[] key = new Node[list.size()];
+        int i = 0;
+        for (Node node : list) {
+            key[i++] = env.getNode(node);
         }
-	
-	public static Distinct create(){
-            return new Distinct();
+        return isDistinct(key);
+    }
+
+    public boolean isDistinct(Node n1, Node n2) {
+        Node[] key = new Node[2];
+        key[0] = n1;
+        key[1] = n2;
+        return isDistinct(key);
+    }
+
+    class TreeMapping extends TreeMap<Node[], Node[]> {
+
+        TreeMapping() {
+            super(new Compare());
         }
-            
-	public boolean isDistinct(Node[] key){
-										
-		if (table.containsKey(key)){
-			return false;
-		}
-		table.put(key, key);		
-		return true;
-	}
-        
-        public boolean isDistinct(Environment env){
-            Node [] key = new Node[list.size()];
-            int i = 0;
-            for (Node node : list){
-                key[i++] = env.getNode(node);
+    }
+
+    class Compare implements Comparator<Node[]> {
+
+        Compare() {
+        }
+
+        @Override
+        public int compare(Node[] m1, Node[] m2) {
+
+            for (int i = 0; i < m1.length; i++) {
+                int res = compare(m1[i], m2[i]);
+                if (res != 0) return res;
             }
-            return isDistinct(key);
-        }
-        
-        public boolean isDistinct(Node n1, Node n2){
-            Node [] key = new Node[2];
-            key[0] = n1;
-            key[1] = n2;
-            return isDistinct(key);
+            return 0;
         }
 
 
-	
+        int compare(Node n1, Node n2) {
+            if (n1 == n2) {
+                return 0;
+            } else if (n1 == null) {
+                return -1;
+            } else if (n2 == null) {
+                return +1;
+            } else if (byIndex && n1.getIndex() != -1 && n2.getIndex() != -1) {
+                return Integer.compare(n1.getIndex(), n2.getIndex());
+            } else {
+                return n1.compare(n2);
+            }
+        }
+    }
+
+
 }
 

@@ -212,14 +212,14 @@ nexusPublishing {
 /////////////////////////
 
 // Set UTF-8 encoding for Java compilation tasks
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-Xlint:none")
 }
 
 // Configure Javadoc tasks with UTF-8 encoding and disable failure on error.
 // This ensures that Javadoc generation won't fail due to minor issues.
-tasks.withType<Javadoc>() {
+tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
     isFailOnError = false
 }

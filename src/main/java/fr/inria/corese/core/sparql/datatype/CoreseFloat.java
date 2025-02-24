@@ -16,7 +16,7 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 
 public  class CoreseFloat extends CoreseDouble{
 	static final CoreseURI datatype=new CoreseURI(RDF.xsdfloat);
-	static final int code = FLOAT;
+	static final IDatatype.Datatype code = IDatatype.Datatype.FLOAT;
         
         CoreseFloat() {}
 	
@@ -50,25 +50,9 @@ public  class CoreseFloat extends CoreseDouble{
 	}
 	
         @Override
-	 public int getCode(){
+	 public IDatatype.Datatype getCode(){
 			return code;
 		}
-	
-//	public static String getNormalizedLabel(String label){
-//		String str = infinity(label);
-//		if (str!=null) return str;
-//		
-//		float v = Float.parseFloat(label);
-//		double floor = Math.floor(v);
-//		
-//		if(! DatatypeMap.SEVERAL_NUMBER_SPACE &&
-//			floor == v && v <= Long.MAX_VALUE && v >= Long.MIN_VALUE){
-//			return Long.toString((long)floor);
-//		}
-//		else{
-//			return Float.toString(v);
-//		}
-//	}
 	
         @Override
 	public boolean isFloat(){

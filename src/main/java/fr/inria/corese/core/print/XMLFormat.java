@@ -81,7 +81,7 @@ public class XMLFormat extends AbstractNestedResultFormat {
 
     enum XMLTitle implements Title {
         XMLDEC, OCOM, CCOM
-    };
+    }
 
     public <T extends AbstractNestedResultFormat.Title> String getTitle(T t) {
         if (XMLTitle.XMLDEC.equals(t)) {
@@ -177,7 +177,7 @@ public class XMLFormat extends AbstractNestedResultFormat {
 
             if (dt.hasLang()) {
                 printf("<literal xml:lang='%s'>%s</literal>", dt.getLang(), str);
-            } else if (dt.getDatatype() != null && dt.getCode() != IDatatype.LITERAL) {
+            } else if (dt.getDatatype() != null && dt.getCode() != IDatatype.Datatype.LITERAL) {
                 if (dt.isExtension()) {
                     str = toXML(dt.getContent());
                 }

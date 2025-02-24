@@ -18,7 +18,7 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 public class CoreseLiteral extends CoreseStringLiteral { 
 	static final String DATATYPE = RDF.rdflangString; 
 	static final CoreseURI datatype=new CoreseURI(DATATYPE);
-	static final int code=LITERAL;
+	static final IDatatype.Datatype code=IDatatype.Datatype.LITERAL;
 	private IDatatype dataLang=null;
 
 	public CoreseLiteral(String value) {
@@ -45,7 +45,7 @@ public class CoreseLiteral extends CoreseStringLiteral {
 	}
 
         @Override
-	public  int getCode(){
+	public  IDatatype.Datatype getCode(){
 		return code;
 	}
      
@@ -83,15 +83,10 @@ public class CoreseLiteral extends CoreseStringLiteral {
 	boolean testLang(IDatatype iod) {
 		IDatatype dataLang2 = iod.getDataLang();
 		if (dataLang != null) {
-			if (dataLang2 == null || dataLang != dataLang2 ){
-				return false;
-			}
+            return dataLang2 != null && dataLang == dataLang2;
 		}
-		else if (dataLang2 != null){
-			return false;
-		}
-		return true;
-	}
+		else return dataLang2 == null;
+    }
 
 	/**
 	 * Literals are equal if their languages are equal

@@ -26,7 +26,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  */
 public class Shacl {
 
-    private static Logger logger = LoggerFactory.getLogger(Shacl.class);
+    private static final Logger logger = LoggerFactory.getLogger(Shacl.class);
     static final String SH = NSManager.SHACL;
     private static final String NBRESULT = NSManager.SHACL + "result";
     private static final String TRACE_VAR = "?shaclTrace";
@@ -87,17 +87,6 @@ public class Shacl {
     public Shacl(Graph g, Graph shacl) {
         setGraph(g);
         setShacl(shacl);
-    }
-
-    /**
-     * Set a different SHACL interpreter, ex. SHACL-S
-     */
-    public static void setSHACL_Interpreter(String SHACL_Interpreter) {
-        Shacl.SHACL_Interpreter = SHACL_Interpreter;
-    }
-
-    public static String getSHACL_Interpreter() {
-        return SHACL_Interpreter;
     }
 
     public Binding input() {

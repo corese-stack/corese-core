@@ -1,25 +1,21 @@
 package fr.inria.corese.core.sparql.datatype.extension;
 
-import java.util.List;
-
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.api.IDatatypeList;
-import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.FALSE;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import static fr.inria.corese.core.sparql.datatype.DatatypeMap.TRUE;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+
+import java.util.*;
+
+import static fr.inria.corese.core.sparql.datatype.CoreseBoolean.FALSE;
+import static fr.inria.corese.core.sparql.datatype.DatatypeMap.TRUE;
 
 public class CoreseList extends CoreseExtension implements IDatatypeList {
 
-    private List<IDatatype> list;
-    private static int count = 0;
     private static final String SEED = "_l_";
     private static final IDatatype dt = getGenericDatatype(IDatatype.LIST_DATATYPE);
+    private static int count = 0;
+    private List<IDatatype> list;
 
     public CoreseList(String value) {
         super(value);
@@ -40,16 +36,6 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         list = vec;
     }
 
-    @Override
-    public IDatatype getDatatype() {
-        return dt;
-    }
-
-    @Override
-    public IDatatypeList getList() {
-        return this;
-    }
-
     public static CoreseList create(List<IDatatype> vec) {
         return new CoreseList(vec);
     }
@@ -66,22 +52,32 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
     }
 
     public static CoreseList create() {
-        return new CoreseList(new ArrayList<IDatatype>());
+        return new CoreseList(new ArrayList<>());
+    }
+
+    @Override
+    public IDatatype getDatatype() {
+        return dt;
+    }
+
+    @Override
+    public IDatatypeList getList() {
+        return this;
     }
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\"");
         getContent(sb);
         sb.append("\"^^").append(nsm().toPrefix(getDatatypeURI()));
         return sb.toString();
     }
 
-    void getContent(StringBuffer sb) {
+    void getContent(StringBuilder sb) {
         sb.append("(");
-        for (IDatatype dt : list) {
-            sb.append((dt.isList()) ? dt.getContent() : dt);
+        for (IDatatype datatype : list) {
+            sb.append((datatype.isList()) ? datatype.getContent() : datatype);
             sb.append(" ");
         }
         sb.append(")");
@@ -89,7 +85,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
 
     @Override
     public String getContent() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         getContent(sb);
         return sb.toString();
     }
@@ -98,7 +94,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
     public String toSparql(boolean prefix, boolean xsd) {
         return toString();
     }
-    
+
     @Override
     public boolean equalsWE(IDatatype dt) throws CoreseDatatypeException {
         if (dt.isList()) {
@@ -106,7 +102,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         }
         return super.equalsWE(dt);
     }
-        
+
     @Override
     public int compareTo(IDatatype dt) {
         if (dt.isList()) {
@@ -122,8 +118,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
                 }
             }
             return 0;
-        }
-        else {
+        } else {
             return super.compareTo(dt);
         }
     }
@@ -176,7 +171,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
     public IDatatype get(int n) {
         return list.get(n);
     }
-    
+
     @Override
     public int size() {
         if (list == null) {
@@ -188,7 +183,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
 
     @Override
     public boolean isTrue() {
-        return list != null && list.size() > 0;
+        return list != null && !list.isEmpty();
     }
 
     @Override
@@ -218,20 +213,20 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
     public IDatatype rest() {
         return rest(1, list.size());
     }
-    
+
     @Override
     public IDatatype rest(IDatatype index) {
         return rest(index.intValue(), list.size());
     }
-    
+
     @Override
     public IDatatype rest(IDatatype index, IDatatype last) {
-        return rest(index.intValue(), list.size() - last.intValue());        
+        return rest(index.intValue(), list.size() - last.intValue());
     }
-       
+
     IDatatype rest(int index, int size) {
-        ArrayList<IDatatype> res = new ArrayList(list.size());
-        for (int i = index; i<size; i++) {
+        ArrayList<IDatatype> res = new ArrayList<>(list.size());
+        for (int i = index; i < size; i++) {
             res.add(list.get(i));
         }
         return new CoreseList(res);
@@ -248,7 +243,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         list.add(n.intValue(), elem);
         return this;
     }
-    
+
     @Override
     public IDatatype addAll(IDatatype list) {
         getValueList().addAll(list.getValueList());
@@ -257,16 +252,16 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
 
     @Override
     public IDatatype swap(IDatatype i1, IDatatype i2) {
-        IDatatype dt = list.get(i1.intValue());
+        IDatatype swapDt = list.get(i1.intValue());
         list.set(i1.intValue(), list.get(i2.intValue()));
-        list.set(i2.intValue(), dt);
+        list.set(i2.intValue(), swapDt);
         return this;
     }
 
     // copy
     @Override
     public IDatatype cons(IDatatype elem) {
-        ArrayList<IDatatype> res = new ArrayList(list.size() + 1);
+        ArrayList<IDatatype> res = new ArrayList<>(list.size() + 1);
         res.add(elem);
         res.addAll(list);
         return new CoreseList(res);
@@ -277,7 +272,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         if (!dtlist.isList()) {
             return null;
         }
-        ArrayList<IDatatype> res = new ArrayList(list.size() + dtlist.size());
+        ArrayList<IDatatype> res = new ArrayList<>(list.size() + dtlist.size());
         res.addAll(list);
         res.addAll(dtlist.getValues());
         return new CoreseList(res);
@@ -289,39 +284,21 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         if (!dtlist.isList()) {
             return null;
         }
-        ArrayList<IDatatype> res = new ArrayList();
-        CoreseList list = new CoreseList(res);
-        for (IDatatype dt : getValues()) {
-            if (!list.contains(dt)) {
-                list.add(dt);
+        ArrayList<IDatatype> res = new ArrayList<>();
+        CoreseList mergeList = new CoreseList(res);
+        for (IDatatype dt1 : getValues()) {
+            if (!mergeList.contains(dt1)) {
+                mergeList.add(dt1);
             }
         }
-        for (IDatatype dt : dtlist.getValues()) {
-            if (!list.contains(dt)) {
-                list.add(dt);
+        for (IDatatype dt2 : dtlist.getValues()) {
+            if (!mergeList.contains(dt2)) {
+                mergeList.add(dt2);
             }
         }
-        return list;
+        return mergeList;
     }
-    
-    public IDatatype merge2(IDatatype dtlist) {
-        if (!dtlist.isList()) {
-            return null;
-        }
-        ArrayList<IDatatype> res = new ArrayList();
-        for (IDatatype dt : list) {
-            if (!res.contains(dt)) {
-                res.add(dt);
-            }
-        }
-        for (IDatatype dt : dtlist.getValues()) {
-            if (!res.contains(dt)) {
-                res.add(dt);
-            }
-        }
-        return new CoreseList(res);
-    }
-   
+
     @Override
     public boolean contains(IDatatype dt) {
         for (IDatatype elem : getValues()) {
@@ -336,17 +313,17 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
     // merge lists and remove duplicates
     @Override
     public IDatatype merge() {
-        ArrayList<IDatatype> res = new ArrayList();
+        ArrayList<IDatatype> res = new ArrayList<>();
 
-        for (IDatatype dt : list) {
-            if (dt.isList()) {
-                for (IDatatype elem : dt.getValues()) {
+        for (IDatatype dt1 : list) {
+            if (dt1.isList()) {
+                for (IDatatype elem : dt1.getValues()) {
                     if (!res.contains(elem)) {
                         res.add(elem);
                     }
                 }
-            } else if (!res.contains(dt)) {
-                res.add(dt);
+            } else if (!res.contains(dt1)) {
+                res.add(dt1);
             }
         }
 
@@ -360,7 +337,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         }
         return list.get(n.intValue());
     }
-    
+
     @Override
     public IDatatype last(IDatatype n) {
         int i = list.size() - n.intValue() - 1;
@@ -378,14 +355,14 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         list.set(n.intValue(), val);
         return val;
     }
-    
+
     // modify
     @Override
     public IDatatype remove(IDatatype dt) {
         list.remove(dt);
         return this;
     }
-    
+
     @Override
     public IDatatype remove(int n) {
         if (n >= list.size()) {
@@ -394,11 +371,11 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         list.remove(n);
         return this;
     }
-    
+
 
     @Override
     public IDatatype reverse() {
-        ArrayList<IDatatype> res = new ArrayList(list.size());
+        ArrayList<IDatatype> res = new ArrayList<>(list.size());
         int n = list.size() - 1;
         for (int i = 0; i < list.size(); i++) {
             res.add(list.get(n - i));
@@ -417,39 +394,39 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
     public IDatatype member(IDatatype elem) {
         return list.contains(elem) ? TRUE : FALSE;
     }
-    
+
     // because list has its own compareTo (see above)
     @Override
     public int mapCompareTo(IDatatype dt) {
         if (dt.isList()) {
-           return getLabel().compareTo(dt.getLabel());
+            return getLabel().compareTo(dt.getLabel());
         }
         return super.compareTo(dt);
     }
-    
+
     /**
      * this is a list of json objects
-     * each json object records copy of the list 
+     * each json object records copy of the list
      */
     @Override
     public IDatatype dispatch(String name) {
         if (size() > 1) {
-            IDatatype list = duplicate();
-            for (IDatatype dt : this) {
+            IDatatype dispatchList = duplicate();
+            for (IDatatype datatype : this) {
                 // each item record the list of items 
-                dt.set(name, list);
+                datatype.set(name, dispatchList);
             }
         }
         return this;
     }
-    
+
     @Override
     public IDatatypeList duplicate() {
-        ArrayList<IDatatype> list = new ArrayList<>();
-        for (IDatatype dt : this) {
-            list.add(dt.duplicate());
+        ArrayList<IDatatype> duplicateList = new ArrayList<>();
+        for (IDatatype dt1 : this) {
+            duplicateList.add(dt1.duplicate());
         }
-        return new CoreseList(list);
+        return new CoreseList(duplicateList);
     }
-    
+
 }

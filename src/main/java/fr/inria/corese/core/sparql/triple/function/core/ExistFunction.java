@@ -103,8 +103,8 @@ public class ExistFunction extends TermEval {
                 if (res == null) {
                     return null;
                 }
-                if (p.isProducer((Node) res)) {
-                    p = p.getProducer((Node) res, env);
+                if (p.isProducer(res)) {
+                    p = p.getProducer(res, env);
                 }
             }
             Query q = env.getQuery();

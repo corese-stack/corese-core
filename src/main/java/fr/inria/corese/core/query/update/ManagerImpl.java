@@ -1,114 +1,97 @@
 package fr.inria.corese.core.query.update;
 
 import fr.inria.corese.core.Event;
-import fr.inria.corese.core.query.Construct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.update.Basic;
-import fr.inria.corese.core.sparql.triple.update.Update;
-import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.query.Construct;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.update.Basic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * SPARQL 1.1 Update
- *
+ * <p>
  * KGRAM Extensions:
- *
+ * <p>
  * create/drop graph kg:entailment create graph kg:rule
  *
  * @author Olivier Corby, Edelweiss, INRIA 2011
- *
  */
 public class ManagerImpl implements Manager {
 
-   
+
     static Logger logger = LoggerFactory.getLogger(ManagerImpl.class);
     private GraphManager graphManager;
-    enum mode {
-        COPY,
-        MOVE,
-        ADD
-    }
-/*    static final int COPY = 0;
-    static final int MOVE = 1;
-    static final int ADD = 2;
-*/
     private Level level = Level.USER_DEFAULT;
     private AccessRight accessRight;
-
     public ManagerImpl(GraphManager gm) {
         this.graphManager = gm;
-        
-    }
 
-    ManagerImpl() {
     }
 
     public static ManagerImpl create(GraphManager g) {
-        ManagerImpl m = new ManagerImpl(g);
-        return m;
-    } 
+        return new ManagerImpl(g);
+    }
 
     @Override
-    public boolean process(Query q, Basic ope, Dataset ds) throws EngineException  {
+    public boolean process(Query q, Basic ope, Dataset ds) throws EngineException {
         getGraphManager().system(ope);
 
         switch (ope.type()) {
 
-            case Update.LOAD:
+            case LOAD:
                 return load(q, ope);
-                
-            case Update.PROLOG:
+
+            case PROLOG:
                 return true;
 
-            case Update.CREATE:
+            case CREATE:
                 return create(ope);
-                
+
             default:
-                
+
                 getGraphManager().getGraph().getEventManager()
                         .start(Event.BasicUpdate, ope);
                 boolean res = true;
                 switch (ope.type()) {
 
-                    case Update.CLEAR:
+                    case CLEAR:
                         res = clear(ope, ds);
                         break;
 
-                    case Update.DROP:
+                    case DROP:
                         res = drop(ope, ds);
                         break;
 
-                    case Update.ADD:
+                    case ADD:
                         res = add(ope, ds);
                         break;
 
-                    case Update.MOVE:
+                    case MOVE:
                         res = move(ope, ds);
                         break;
 
-                    case Update.COPY:
+                    case COPY:
                         res = copy(ope, ds);
                         break;
-                } 
-                
+                }
+
                 getGraphManager().getGraph().getEventManager()
                         .finish(Event.BasicUpdate, ope);
-                
+
                 return res;
         }
     }
-    
-    boolean load(Query q, Basic ope) throws  EngineException {
+
+    boolean load(Query q, Basic ope) throws EngineException {
         return getGraphManager().load(q, ope, getLevel(), getAccessRight());
     }
-   
+
     private boolean clear(Basic ope, Dataset ds) {
         return clear(ope, ds, false);
     }
@@ -161,7 +144,6 @@ public class ManagerImpl implements Manager {
     }
 
     /**
-     *
      * copy graph | default to target | default
      */
     private boolean update(Basic ope, Dataset ds, mode mode) {
@@ -226,7 +208,6 @@ public class ManagerImpl implements Manager {
         return true;
     }
 
-   
     @Override
     public void insert(Query query, Mappings lMap, Dataset ds) {
         Construct cons = Construct.createInsert(query, getGraphManager());
@@ -241,23 +222,19 @@ public class ManagerImpl implements Manager {
         cons.delete(lMap, ds);
     }
 
-    
     public Level getLevel() {
         return level;
     }
 
-    
     @Override
     public void setLevel(Level level) {
         this.level = level;
     }
 
-    
     public AccessRight getAccessRight() {
         return accessRight;
     }
 
-   
     @Override
     public void setAccessRight(AccessRight accessRight) {
         this.accessRight = accessRight;
@@ -269,5 +246,11 @@ public class ManagerImpl implements Manager {
 
     public void setGraphManager(GraphManager graphManager) {
         this.graphManager = graphManager;
+    }
+
+    enum mode {
+        COPY,
+        MOVE,
+        ADD
     }
 }
