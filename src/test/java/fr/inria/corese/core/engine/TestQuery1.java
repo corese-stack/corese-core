@@ -5979,14 +5979,16 @@ public class TestQuery1 {
 
     @Test
     public void testTrig() throws LoadException, EngineException {
+        Property.set(LOAD_IN_DEFAULT_GRAPH, true);
         Graph g = Graph.create(true);
         Load ld = Load.create(g);
         ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
         ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        Property.set(LOAD_IN_DEFAULT_GRAPH, false);
 
         Transformer pp = Transformer.create(g, Transformer.TRIG);
         String str = normalizeLineEndings(pp.transform());
-        assertEquals(15174, str.length()); // @Todo: need a more robust test
+        assertEquals(14928, str.length()); // @Todo: need a more robust test
     }
 
     @Test
