@@ -87,41 +87,16 @@ public class Checker implements ExprType {
 	
 	
 	boolean match(Expr ee, List<Pattern> pat, String mes){
-		//System.out.println(exp1 + " " + exp2);
 		boolean suc = false, b;
 		
 		for (Pattern p : pat){
 			b = matcher.match(p, ee);
-			//System.out.println(p + " " + ee + " " + b);
 			if (b){
 				suc = true;
-				log(ee, mes);
 			}
 		}
 		
 		return suc;
-	}
-	
-	
-	void log(Expr ee, String mes){
-		
-		if (isPattern(ee) && ee.oper() == AND){
-			query.addInfo(mes + ": " , ee.getExp(0) + " && " + ee.getExp(1));
-			
-			log(mes + " " + ee.getExp(0) + " && " + ee.getExp(1));
-			if (mes.equals(AFALSE)){
-				query.addFailure(ee.getExp(0).getFilter());
-				query.addFailure(ee.getExp(1).getFilter());
-			}				
-		}
-		else {
-			query.addInfo(mes + ": ", ee);
-			
-			log(mes + " " + ee);
-			if (mes.equals(AFALSE)){
-				query.addFailure(ee.getFilter());
-			}
-		}
 	}
 	
 	
@@ -522,26 +497,6 @@ public class Checker implements ExprType {
 	
 	Pattern fun(int ope, Pattern e1){
 		return pat(FUNCTION, ope, e1);
-	}
-	
-
-	
-	void log(Object obj){
-		if (verbose) Message.log(Message.CHECK, count++ + " " + obj);
-	}
-	
-	/**
-	 * Called on path regex 
-	 */
-	void test(Expr path){
-		Pattern p1 = pat(JOKER);
-		Pattern p2 = pat(JOKER);
-
-		Pattern or =  fun(JOKER, or(p1, p2));
-		Pattern seq = fun(MULT, term(DIV, p1, p2));
-
-		boolean b = matcher.match(or, path);
-		//if (b) System.out.println("** Check: " + path);
 	}
 	
 	

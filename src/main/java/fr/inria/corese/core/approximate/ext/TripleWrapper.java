@@ -1,14 +1,14 @@
 package fr.inria.corese.core.approximate.ext;
 
+import fr.inria.corese.core.approximate.strategy.StrategyType;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Triple;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
-import static fr.inria.corese.core.approximate.ext.ASTRewriter.O;
-import static fr.inria.corese.core.approximate.ext.ASTRewriter.P;
-import static fr.inria.corese.core.approximate.ext.ASTRewriter.S;
-import fr.inria.corese.core.approximate.strategy.StrategyType;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static fr.inria.corese.core.approximate.ext.ASTRewriter.*;
 
 /**
  * TripleWrapper.java
@@ -29,7 +29,7 @@ class TripleWrapper {
     }
 
     public TripleWrapper(Triple triple, int position) {
-        this(triple, position, new ArrayList<StrategyType>());
+        this(triple, position, new ArrayList<>());
     }
 
     public Atom getAtom() {
@@ -45,16 +45,16 @@ class TripleWrapper {
         }
     }
 
-    public void setAtom(Variable var) {
+    public void setAtom(Variable variable) {
         switch (position) {
             case S:
-                triple.setSubject(var);
+                triple.setSubject(variable);
                 break;
             case P:
-                triple.setPredicate(var);
+                triple.setPredicate(variable);
                 break;
             case O:
-                triple.setObject(var);
+                triple.setObject(variable);
                 break;
             default:
         }

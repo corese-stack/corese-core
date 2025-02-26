@@ -20,11 +20,7 @@ public class StringHelper {
 	public static boolean equalsIgnoreAccent(String s1, String s2) {
 	     if ((s1 != null) && (s2 != null)) {
 	            return removeAccent(s1).equals(removeAccent(s2));
-	     } else if ((s1 == null) && (s2 == null)) {
-	            return true;
-	     } else {
-	            return false;
-	     }
+	     } else return (s1 == null) && (s2 == null);
 	}
 	
 	/**
@@ -37,11 +33,7 @@ public class StringHelper {
 	public static boolean equalsIgnoreCaseAndAccent(String s1, String s2) {
 	     if ((s1 != null) && (s2 != null)) {
 	            return removeAccent(s1).equalsIgnoreCase(removeAccent(s2));
-	     } else if ((s1 == null) && (s2 == null)) {
-	            return true;
-	     } else {
-	            return false;
-	     }
+	     } else return (s1 == null) && (s2 == null);
 	}
 	
 	/**
@@ -62,11 +54,7 @@ public class StringHelper {
 	    		 tmp2 = tmp2.substring(0, tmp2.length()-1);
 	    	 }
 	         return tmp1.equalsIgnoreCase(tmp2);
-	     } else if ((s1 == null) && (s2 == null)) {
-	         return true;
-	     } else {
-	         return false;
-	     }
+	     } else return (s1 == null) && (s2 == null);
 	}
 
 	/**
@@ -248,19 +236,14 @@ public class StringHelper {
 		} 
 	   	if (word.endsWith("s") || word.endsWith("x")) {
 	   		word = word.substring(0, word.length()-1);
-	   		if (text.contains(word) && containsWord(text, word)) {
-	   			return true;
-			} 
+            return text.contains(word) && containsWord(text, word);
 	   	} else {
 	   		if (text.contains(word+"s") && containsWord(text, word+"s")) {
 	   			return true;
-			} 
-	   		if (text.contains(word+"x") && containsWord(text, word+"x")) {
-	   			return true;
-			} 
+			}
+            return text.contains(word + "x") && containsWord(text, word + "x");
 	   	}
-		return false;
-	}
+    }
 	
 	/**
 	 * Returns the index within the text of the first occurrence of the specified word (or groups of words).

@@ -25,7 +25,6 @@ import fr.inria.corese.core.sparql.triple.api.Walker;
  */
 public class Atom extends Expression implements ElementClause {
 
-    public static boolean display = false;
     boolean isone = false;
     boolean isall = false;
     boolean isdirect = false;

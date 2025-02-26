@@ -30,7 +30,7 @@ import fr.inria.corese.core.sparql.triple.parser.Triple;
  */
 public class CreateImpl extends CreateTriple implements Creator {
     public static boolean USE_REFERENCE_ID = true;
-    private static Logger logger = LoggerFactory.getLogger(CreateImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreateImpl.class);
 
     HashMap<String, String> blank;
     HashMap<String, Node> reference;

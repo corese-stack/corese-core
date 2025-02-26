@@ -52,7 +52,7 @@ public class ASTParser implements Walker, URLParam {
     public ASTParser(ASTQuery ast) {
         this.ast = ast;
         stack = new ArrayList<>();
-        setLog(isLog() || ast.hasMetadata(Metadata.REPORT));
+        setLog(isLog() || ast.hasMetadata(Metadata.Type.REPORT));
     }
 
     // std parser call
@@ -141,7 +141,7 @@ public class ASTParser implements Walker, URLParam {
     void index(ASTQuery ast) {
         boolean index = ast.getDataset().index();
         if (index) {
-            ast.getCreateMetadata().add(Metadata.FEDERATION);
+            ast.getCreateMetadata().add(Metadata.Type.FEDERATION);
         }
     }
 
@@ -182,7 +182,7 @@ public class ASTParser implements Walker, URLParam {
             Variable var = new Variable(String.format(fr.inria.corese.core.sparql.triple.function.term.Binding.SERVICE_REPORT_FORMAT, i));
             varList.add(var);
 
-            if (! ast.isSelectAll() && ! ast.hasMetadata(Metadata.SKIP)) {
+            if (! ast.isSelectAll() && ! ast.hasMetadata(Metadata.Type.SKIP)) {
                 ast.setSelect(var);
             }
         }
@@ -192,7 +192,7 @@ public class ASTParser implements Walker, URLParam {
         if (ast.getValues() == null
                 && !ast.isConstruct()
                 && // @federate <singleURL>
-                (!(ast.hasMetadata(Metadata.FEDERATE) && ast.getServiceList().size() == 1))) {
+                (!(ast.hasMetadata(Metadata.Type.FEDERATE) && ast.getServiceList().size() == 1))) {
             // virtuoso reject construct with values
             // virtuoso reject external values 
             ast.setValues(values);
@@ -200,7 +200,7 @@ public class ASTParser implements Walker, URLParam {
             ast.getBody().add(0, values);
         }
 
-        if (ast.hasMetadata(Metadata.ENUM)) {
+        if (ast.hasMetadata(Metadata.Type.ENUM)) {
             enumReport(ast);
         }
     }
@@ -212,7 +212,7 @@ public class ASTParser implements Walker, URLParam {
      *
      */
     void enumReport(ASTQuery ast) {
-        IDatatype num = ast.getMetadata().getDatatypeValue(Metadata.ENUM);
+        IDatatype num = ast.getMetadata().getDatatypeValue(Metadata.Type.ENUM);
         Variable key = new Variable(VAR_KEY);
         Variable val = new Variable(VAR_VAL);
         List<Variable> vlist = List.of(key, val);
@@ -260,7 +260,7 @@ public class ASTParser implements Walker, URLParam {
                     // export report variable through intermediate subselect 
                     // to top select (skip top select when @skip)
                     if (aa.isSelectAll() || 
-                       (aa == getAST() && aa.hasMetadata(Metadata.SKIP))) {
+                       (aa == getAST() && aa.hasMetadata(Metadata.Type.SKIP))) {
                         // do nothing
                     }
                     else {
@@ -309,7 +309,7 @@ public class ASTParser implements Walker, URLParam {
         }
         exp.setNumber(nbService++);
         if (top() == null) {
-            ast.logger.error("AST stack empty");
+            ASTQuery.logger.error("AST stack empty");
         }
         else {
             top().getServiceExpList().add(exp);

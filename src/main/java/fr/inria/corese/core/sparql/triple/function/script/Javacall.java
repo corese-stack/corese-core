@@ -92,20 +92,20 @@ public class Javacall extends JavaFunction {
     // default cast
     void cast(IDatatype val, int i, Object[] values, Class[] types) {
         switch (val.getCode()) {
-            case IDatatype.INTEGER:
+            case INTEGER:
                 values[i] = val.intValue();
                 break;
-            case IDatatype.DOUBLE:
-            case IDatatype.FLOAT:
-            case IDatatype.DECIMAL:
+            case DOUBLE:
+            case FLOAT:
+            case DECIMAL:
                 values[i] = val.doubleValue();
                 break;
-            case IDatatype.STRING:
-            case IDatatype.LITERAL:
-            case IDatatype.URI:
+            case STRING:
+            case LITERAL:
+            case URI:
                 values[i] = val.stringValue();
                 break;
-            case IDatatype.BOOLEAN:
+            case BOOLEAN:
                 values[i] = val.booleanValue();
                 break;
             default:

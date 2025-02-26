@@ -7,92 +7,90 @@ import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
- * Node that is a Triple 
+ * Node that is a Triple
  * Can be used as Node in the graph
  * Can be subject/object of an Edge
+ *
  * @todo: function getIndex() is the same here for Node and Edge ->
  * rename to getEdgeIndex() or getNodeIndex()
  * It is not a pb because it is mostly used as Node
  */
-public class TripleNode extends NodeImpl implements Edge 
-{
+public class TripleNode extends NodeImpl implements Edge {
     private Node subject;
     private Node predicate;
     private Node object;
-    
+
     public TripleNode(Node s, Node p, Node o) {
         setSubjectNode(s);
         setPropertyNode(p);
         setObjectNode(o);
     }
-    
+
     @Override
     public String toString() {
         return String.format("%s %s %s", pretty(getSubjectNode()), getPropertyNode(), pretty(getObjectNode()));
     }
-    
+
     @Override
-    public Node getNode(){
+    public Node getNode() {
         return this;
     }
-    
+
     @Override
     public Edge getEdge() {
         return this;
     }
-    
+
     @Override
     public boolean isTripleNode() {
         return true;
     }
-        
+
     String pretty(Node n) {
         if (n.isTriple()) {
             return String.format("<<%s>>", n);
         }
         return n.toString();
     }
-    
+
     @Override
     public String getEdgeLabel() {
         return getPropertyNode().getLabel();
     }
-    
+
     public IDatatype createTripleReference() {
         if (getTripleStore() == null) {
             return null;
         }
-        return createTripleReference(getTripleStore());    
+        return createTripleReference(getTripleStore());
     }
-    
+
     public IDatatype createTripleReference(Graph g) {
         setDatatypeValue(g.createTripleReference(
-                   getSubjectNode(), getPropertyNode(), getObjectNode()));
+                getSubjectNode(), getPropertyNode(), getObjectNode()));
         return getDatatypeValue();
     }
-    
+
     @Override
     public Graph getTripleStore() {
         return (Graph) getSubjectNode().getTripleStore();
     }
-    
-     //@Override
+
     public Node getNode(int n) {
-        switch (n) {            
-            case 0:
-                return getSubjectNode();
-            case 1:
-                return getObjectNode();            
+        if (n == 0) {
+            return getSubjectNode();
+        } else if (n == 1) {
+            return getObjectNode();
         }
         return null;
     }
-    
+
     @Override
     public Node getGraph() {
         return null;
     }
-    
-    //@Override
+
+    @Override
     public Node getSubjectNode() {
         return subject;
     }
@@ -100,13 +98,12 @@ public class TripleNode extends NodeImpl implements Edge
     public void setSubjectNode(Node subject) {
         this.subject = subject;
     }
-    
-    //@Override
+
     public Node getProperty() {
         return predicate;
     }
 
-    //@Override
+    @Override
     public Node getPropertyNode() {
         return predicate;
     }
@@ -115,7 +112,7 @@ public class TripleNode extends NodeImpl implements Edge
         this.predicate = predicate;
     }
 
-    //@Override
+    @Override
     public Node getObjectNode() {
         return object;
     }

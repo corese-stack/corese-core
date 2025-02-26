@@ -42,14 +42,10 @@ public class Tests {
     static void test2(String q) throws EngineException {
         QueryProcess exec = getExec();
 
-        System.out.println("\n-- Query --\n" + q);
-
         Mappings map = exec.query(q);
-        System.out.println("-- real mappings [" + map.size() + "] --\n" + map.toString());
 
         exec.setVisitor(new ASTRewriter());
         map = exec.query(q);
-        System.out.println("-- approximate mappings [" + map.size() + "] --\n" + map.toString());
     }
 
     static void test(String q) throws EngineException {
@@ -61,8 +57,6 @@ public class Tests {
         exec.setVisitor(new ASTRewriter());
 
         Mappings map = exec.query(q);
-        System.out.println("\n-- Query --\n" + q);
-        System.out.println("-- approximate mappings [" + map.size() + "] --\n" + map.toString());
     }
 
     //static QueryProcess exec;

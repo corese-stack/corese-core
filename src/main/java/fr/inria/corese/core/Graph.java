@@ -79,6 +79,7 @@ public class Graph extends GraphObject implements
             RDFS.SUBCLASSOF, RDFS.LABEL,
             RDF.TYPE, RDF.FIRST, RDF.REST
     };
+    private static final Logger logger = LoggerFactory.getLogger(Graph.class);
     public static boolean valueOut = !true;
     public static String BLANK = "_:b";
     public static String TRIPLE_REF = "_:t";
@@ -100,12 +101,13 @@ public class Graph extends GraphObject implements
     static long blankid = 0;
     static long triplerefid = 0;
     static boolean byIndexDefault = true;
-    private static Logger logger = LoggerFactory.getLogger(Graph.class);
 
     static {
         setCompareIndex(true);
     }
 
+    // skolem
+    private final String key;
     /**
      * Synchronization:
      * <p>
@@ -177,8 +179,6 @@ public class Graph extends GraphObject implements
     private Distance classDistance, propertyDistance;
     private boolean isSkolem = SKOLEM_DEFAULT;
     private int tagCount = 0;
-    // skolem
-    private String key;
     // name of this graph
     private String name;
     // @deprecated
@@ -194,14 +194,11 @@ public class Graph extends GraphObject implements
     // true when there is a specific Edge Index for RuleEngine
     private boolean hasRuleEdgeList = false;
     // predefined Node for specific named Graph
-    private Node // rule entailment named graph
-            ruleGraph,
+    private Node ruleGraph; // rule entailment named graph
     // rule error named graph (cf RuleEngine OWL RL inconsistency)
-    constraintGraph,
+    private Node constraintGraph;
     // kg:default named graph
-    defaultGraph,
-    // RDFS entailment named graph
-    entailGraph;
+    private Node defaultGraph;
     // List of predefined (graph) Node
     private ArrayList<Node> systemNode;
     // @todo external memory literal value manager
@@ -3369,10 +3366,7 @@ public class Graph extends GraphObject implements
     public Edge addEdge(Node source, Node subject, Node predicate, Node value) {
         Edge e = fac.create(source, subject, predicate, value);
         Edge ee = addEdge(e);
-        if (ee != null) {
-            return ee;
-        }
-        return null;
+        return ee;
     }
 
     public Edge addEdge(Node subject, Node predicate, Node value) {
@@ -3390,10 +3384,7 @@ public class Graph extends GraphObject implements
         }
 
         Edge ee = addEdge(e);
-        if (ee != null) {
-            return ee;
-        }
-        return null;
+        return ee;
     }
 
     /**

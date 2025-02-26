@@ -4,17 +4,16 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
 /**
- *
  * Generate IDatatype constant and IDatatype variable.
- * 
- * @author Olivier Corby, Wimmics INRIA I3S, 2017
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2017
  */
 public class Datatype {
     static final String NL = "\n";
@@ -30,18 +29,18 @@ public class Datatype {
         sb = new StringBuilder();
         sbvar = new StringBuilder();
         cache = new TreeData();
-        strCache = new HashMap<String, String>();
-        varCache = new HashMap<String, String>();
+        strCache = new HashMap<>();
+        varCache = new HashMap<>();
     }
-    
-    StringBuilder getStringBuilder(){
+
+    StringBuilder getStringBuilder() {
         return sb;
     }
-    
-    StringBuilder getStringBuilderVar(){
+
+    StringBuilder getStringBuilderVar() {
         return sbvar;
     }
-    
+
     /**
      * Declare Java global variable for LDScript global variable
      */
@@ -59,28 +58,28 @@ public class Datatype {
      */
     String toJava(IDatatype dt) {
         switch (dt.getCode()) {
-            
-            case IDatatype.URI:
+
+            case URI:
                 return resource(dt);
-            case IDatatype.STRING:
+            case STRING:
                 return string(dt);
-                
-            case IDatatype.INTEGER:
+
+            case INTEGER:
                 return genericInteger(dt);
-            case IDatatype.DOUBLE:
+            case DOUBLE:
                 return newInstance(dt.doubleValue());
-            case IDatatype.DECIMAL:
+            case DECIMAL:
                 return newDecimal(dt.doubleValue());
-            case IDatatype.FLOAT:
+            case FLOAT:
                 return newInstance(dt.floatValue());
-            case IDatatype.BOOLEAN:
+            case BOOLEAN:
                 return newInstance(dt.booleanValue());
-            
-            case IDatatype.LITERAL:
-            case IDatatype.DATE:
-            case IDatatype.DATETIME:
+
+            case LITERAL:
+            case DATE:
+            case DATETIME:
                 return newLiteral(dt);
-            case IDatatype.UNDEF:
+            case UNDEF:
                 if (dt.isList()) {
                     return list(dt);
                 }
@@ -88,12 +87,11 @@ public class Datatype {
 
         return newInstance(dt.stringValue());
     }
-    
-    String genericInteger(IDatatype dt){
-        if (dt.getDatatypeURI().equals(RDF.xsdinteger)){
+
+    String genericInteger(IDatatype dt) {
+        if (dt.getDatatypeURI().equals(RDF.xsdinteger)) {
             return newInteger(dt.longValue());
-        }
-        else {
+        } else {
             return newLiteral(dt);
         }
     }
@@ -115,55 +113,55 @@ public class Datatype {
         }
         return String.format("DatatypeMap.newList(%s)", sb);
     }
-    
-    StringBuilder append(String val){
+
+    StringBuilder append(String val) {
         return sb.append(val);
     }
-    
-    void nl(){
+
+    void nl() {
         append(NL);
     }
-    
+
     /**
      * Generate a constant definition for an URI, return the constant
      */
-    String resource(IDatatype dt){
+    String resource(IDatatype dt) {
         String var = cache.get(dt);
-        if (var == null){
+        if (var == null) {
             var = getVariable(dt, newResource(dt.stringValue()));
         }
         return var;
     }
-    
+
     /**
      * Generate a constant definition for a xsd:string, return the constant
      */
-    String string(IDatatype dt){
+    String string(IDatatype dt) {
         String var = cache.get(dt);
-        if (var == null){
+        if (var == null) {
             var = getVariable(dt, newInstance(clean(dt.stringValue())));
         }
         return var;
     }
-    
+
     String clean(String str) {
         return str.replace("\\$", "\\\\$").replace("\\\n", " ");
     }
-    
+
     String stringasdt(String str) {
         return string(DatatypeMap.newInstance(str));
     }
-    
+
     String variable(String str) {
         return string(DatatypeMap.newInstance(str));
     }
-     
-     /**
+
+    /**
      * Generate a global variable for a name (variable name, function name, etc.), return the variable
      */
     String string(String value) {
         String var = strCache.get(value);
-        if (var == null){
+        if (var == null) {
             var = getVariable();
             strCache.put(value, var);
             append(String.format("static final IDatatype %s = %s;", var, newInstance(value)));
@@ -171,16 +169,16 @@ public class Datatype {
         }
         return var;
     }
-    
-    String getVariable(){
+
+    String getVariable() {
         return VAR + count++;
     }
-    
-    
+
+
     /**
-     * 
+     *
      */
-    String getVariable(IDatatype dt, String value){
+    String getVariable(IDatatype dt, String value) {
         String var = getVariable();
         cache.put(dt, var);
         append(String.format("static final IDatatype %s = %s;", var, value));
@@ -199,13 +197,13 @@ public class Datatype {
             return String.format("DatatypeMap.newInstance(\"%s\", \"%s\")", dt.stringValue(), dt.getDatatypeURI());
         }
     }
-    
+
     String newInstance(int val) {
         return newInteger(val);
     }
 
     String newInteger(long val) {
-        switch ((int)val) {
+        switch ((int) val) {
             case 0:
                 return "DatatypeMap.ZERO";
             case 1:
@@ -229,7 +227,7 @@ public class Datatype {
         }
         return String.format("DatatypeMap.newInteger(%s)", val);
     }
-    
+
     String newDecimal(double val) {
         return String.format("DatatypeMap.newDecimal(%s)", val);
     }
@@ -245,7 +243,7 @@ public class Datatype {
     String newInstance(float val) {
         return String.format("DatatypeMap.newFloat(%s)", val);
     }
-    
+
     String newInstance(long val) {
         return String.format("DatatypeMap.newLong(%s)", val);
     }
@@ -258,10 +256,7 @@ public class Datatype {
         }
     }
 
-    
-    
-    
-    
+
     class TreeData extends TreeMap<IDatatype, String> {
 
         TreeData() {

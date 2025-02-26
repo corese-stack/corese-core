@@ -48,8 +48,8 @@ public class ServiceReport implements URLParam {
         return Property.getBooleanValue(SERVICE_REPORT) ||
                 getURL().hasParameter(MODE, REPORT) ||
                 (getQuery()!=null &&
-                (getQuery().getAST().hasMetadata(Metadata.REPORT)
-                || getGlobalAST().hasMetadata(Metadata.REPORT)));
+                (getQuery().getAST().hasMetadata(Metadata.Type.REPORT)
+                || getGlobalAST().hasMetadata(Metadata.Type.REPORT)));
     }
     
     ASTQuery getGlobalAST() {
@@ -68,7 +68,6 @@ public class ServiceReport implements URLParam {
             set(dt, MES, e.getMessage());
         }
         else {
-            //set(dt, STATUS, ex.getResponse().getStatus());
             if (ex.getResponse().getStatusInfo()!=null){
                 set(dt, INFO, ex.getResponse().getStatusInfo().getReasonPhrase());
             }
@@ -89,8 +88,7 @@ public class ServiceReport implements URLParam {
     void parserReport(Mappings map, String str, boolean suc) {
         if (isReport()) {
             boolean empty = getQuery() != null
-                    && getGlobalAST().hasMetadataValue(Metadata.REPORT, Metadata.EMPTY);
-            //if (!suc || map.size() > 0 || empty) {
+                    && getGlobalAST().hasMetadataValue(Metadata.Type.REPORT, Metadata.EMPTY);
                 // if service is success but return no result:
                 // @report        generate no report (and no result Mapping)
                 // @report empty generate report and create a fake Mapping with report
@@ -109,7 +107,6 @@ public class ServiceReport implements URLParam {
                 else {
                     map.recordReport(node(), dt);
                 }
-            //}
         }
     }
         
@@ -155,7 +152,7 @@ public class ServiceReport implements URLParam {
             set(dt, TIME, getTime());
             set(dt, LOCATION, getLocation());
             
-            if (getGlobalAST().hasMetadata(Metadata.DETAIL)) {
+            if (getGlobalAST().hasMetadata(Metadata.Type.DETAIL)) {
                 //set(dt, RESULT, getResult());
                 set(dt, RESULT, DatatypeMap.createObject(getMappings()));                
             }
@@ -166,7 +163,7 @@ public class ServiceReport implements URLParam {
      * Header and Cookie as json objects
      */
     void reportHeader(IDatatype dt) {
-        if (getGlobalAST().hasMetadata(Metadata.HEADER)) {
+        if (getGlobalAST().hasMetadata(Metadata.Type.HEADER)) {
             IDatatype json = DatatypeMap.json();
             for (String key : resp().getHeaders().keySet()) {
                 json.set(key, resp().getHeaderString(key));
@@ -176,7 +173,7 @@ public class ServiceReport implements URLParam {
             }
         }
 
-        if (getGlobalAST().hasMetadata(Metadata.COOKIE)) {
+        if (getGlobalAST().hasMetadata(Metadata.Type.COOKIE)) {
             IDatatype json = DatatypeMap.json();
             for (String cookie : resp().getCookies().keySet()) {
                 json.set(cookie, resp().getCookies().get(cookie));
@@ -186,21 +183,6 @@ public class ServiceReport implements URLParam {
             }
         }
     }
-    
-//            for (Link link : resp().getLinks()) {
-//                set(dt, "link", link.toString());
-//                System.out.println("SR link: " + link);
-//            }
-
-//            StringBuilder sb = new StringBuilder();
-//
-//            for (String method : resp().getAllowedMethods()) {
-//                sb.append(method).append("; ");
-//            }
-//
-//            if (sb.length() > 0) {
-//                set(dt, "method", sb.toString());
-//            }
     
     Node node() {       
         return node(getURL().getNumber());

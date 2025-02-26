@@ -63,9 +63,7 @@ class State {
 	
 	boolean endLoop(){
 		if (isBound()){
-			if (getCount() >= getMax()){
-				return true;
-			}
+            return getCount() >= getMax();
 		}
 		return false;
 	}

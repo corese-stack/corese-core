@@ -10,13 +10,13 @@ import java.util.List;
  */
 public enum AlgType {
 
-    empty,//no algorithm implemented
-    ng, //n-gram
-    jw, //jaro-winkler (edit distance)
-    ch, //class hierarchy (empty now)
-    wn, //wordnet
-    eq, //equality
-    mult; //combiend algorithm
+    EMPTY,//no algorithm implemented
+    NG, //n-gram
+    JW, //jaro-winkler (edit distance)
+    CH, //class hierarchy (empty now)
+    WN, //wordnet
+    EQ, //equality
+    MULT; //combiend algorithm
 
     /**
      * Return the list of all types of single algorithms
@@ -24,6 +24,6 @@ public enum AlgType {
      * @return
      */
     public static List<AlgType> allValues() {
-        return Arrays.asList(new AlgType[]{ng, jw, ch, wn, eq});
+        return Arrays.asList(NG, JW, CH, WN, EQ);
     }
 }

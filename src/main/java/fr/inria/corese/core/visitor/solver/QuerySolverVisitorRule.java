@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class QuerySolverVisitorRule extends QuerySolverVisitorBasic {
 
   
-    private static Logger logger = LoggerFactory.getLogger(QuerySolverVisitorRule.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitorRule.class);
     
     private RuleEngine re;
     // should rule engine call entailment 

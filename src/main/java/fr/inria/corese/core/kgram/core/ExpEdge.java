@@ -13,16 +13,12 @@ import java.util.List;
  *
  */
 public class ExpEdge extends Exp {
-    
-    static final ArrayList<Filter> EMPTY = new ArrayList<>(0);
-    
 
-    ExpEdge(int t){
+    ExpEdge(Type t){
         super(t);
     }
-    
-    
-    /**
+
+    /*
      ?s ope cst | cst ope ?s  ope ::= = < <= > >=
       
      fun(?s, cst)   fun ::= contains, strstarts, strends, regex
@@ -66,7 +62,7 @@ public class ExpEdge extends Exp {
     public List<Filter> getFilters(int node, int type){
         Node n = getNode(node);
         if (n == null || ! n.isVariable()){
-            return EMPTY;
+            return new ArrayList<>(0);
         }
         ArrayList<Filter> list = new ArrayList<>();
         for (Filter f : getFilters()){            
@@ -122,9 +118,7 @@ public class ExpEdge extends Exp {
      */
     boolean compatible(Expr e, int node){
         if (node == PREDICATE){
-            if (e.match(ExprType.LANG) || e.match(ExprType.DATATYPE)){
-                return false;
-            }             
+            return !e.match(ExprType.LANG) && !e.match(ExprType.DATATYPE);
         }
         return true;
     }
@@ -143,8 +137,8 @@ public class ExpEdge extends Exp {
             }
             else if (compatible(fst, node) && (fst.match(ExprType.DATATYPE) || fst.match(ExprType.LANG)) && fst.arity() == 1) {
                 // datatype(var) == cst
-                Expr var = fst.getExp(0);
-                return var.isVariable() && var.getLabel().equals(n.getLabel());
+                Expr varEpr = fst.getExp(0);
+                return varEpr.isVariable() && varEpr.getLabel().equals(n.getLabel());
             }
         }
         return false;

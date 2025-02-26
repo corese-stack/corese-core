@@ -9,8 +9,9 @@ import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 
 /**
@@ -18,80 +19,79 @@ import java.util.List;
  * These objects implement an API that enables them to be processed by LDScript
  * statements such as for (?e in ?g), xt:gget(?e, "?x", 0) mainly speaking they are iterable
  * Pointerable objects have specific extension datatypes such as dt:graph
- * 
- * @author Olivier Corby, Wimmics INRIA I3S, 2015
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2015
  */
 public class CoresePointer extends CoreseUndefLiteral {
-       
-    private static HashMap<PointerType, IDatatype> map;
 
-    Pointerable pobject;
-    
+    private static EnumMap<PointerType, IDatatype> map;
+
     static {
         init();
     }
-    
+
+    Pointerable pobject;
+
+    public CoresePointer(Pointerable obj) {
+        this(obj.getDatatypeLabel(), obj);
+    }
+
+
+    public CoresePointer(String name, Pointerable obj) {
+        super(name);
+        pobject = obj;
+    }
+
     static void init() {
-        map = new HashMap<>();
+        map = new EnumMap<>(PointerType.class);
         for (PointerType type : PointerType.values()) {
             map.put(type, getGenericDatatype(type.getName()));
         }
     }
-    
-    
-    public CoresePointer (Pointerable obj){
-        this(obj.getDatatypeLabel(), obj);
+
+    public static IDatatype getDatatype(PointerType t) {
+        return map.get(t);
     }
-        
-    public CoresePointer (String name, Pointerable obj){
-        super(name);
-        pobject = obj;
-    } 
-    
+
     @Override
     public IDatatype getDatatype() {
         return getDatatype(pointerType());
     }
-    
-    public static IDatatype getDatatype(PointerType t) {
-        return map.get(t);
-    }
-    
+
     @Override
-    public Pointerable getPointerObject(){
+    public Pointerable getPointerObject() {
         return pobject;
     }
-    
+
     @Override
-    public PointerType pointerType(){
+    public PointerType pointerType() {
         if (pobject == null) {
             return PointerType.UNDEF;
         }
         return pobject.pointerType();
     }
-    
+
     @Override
-    public boolean isPointer(){
+    public boolean isPointer() {
         return true;
     }
-    
-     @Override
+
+    @Override
     public boolean isExtension() {
         return pointerType() != PointerType.UNDEF;
     }
-    
-     @Override
-    public boolean isUndefined() {
-        return ! isExtension();
-    }
-    
+
     @Override
-    public Object getNodeObject(){
+    public boolean isUndefined() {
+        return !isExtension();
+    }
+
+    @Override
+    public Object getNodeObject() {
         // use case: pobject = PointerObject(object)
         return pobject.getPointerObject();
     }
-    
+
     @Override
     public Path getPath() {
         if (pointerType() != PointerType.PATH || getPointerObject() == null) {
@@ -99,52 +99,55 @@ public class CoresePointer extends CoreseUndefLiteral {
         }
         return getPointerObject().getPathObject();
     }
-    
+
     @Override
     public void setObject(Object obj) {
         if (obj instanceof Pointerable) {
             pobject = (Pointerable) obj;
         }
     }
-    
+
     @Override
-    public boolean isLoop(){
-        if (pobject == null){
-            return false; 
+    public boolean isLoop() {
+        if (pobject == null) {
+            return false;
         }
-        switch (pobject.pointerType()){
+        switch (pobject.pointerType()) {
             // expression must not be loopable in map(fun, exp)
-            case EXPRESSION: return false;
-            default: return true;
+            case EXPRESSION:
+                return false;
+            default:
+                return true;
         }
     }
-    
+
     @Override
     public int size() {
         return getPointerObject().size();
     }
-    
+
     @Override
-    public List<IDatatype> getValueList() {   
-         if (pobject == null){
-            return new ArrayList<>(); 
+    public List<IDatatype> getValueList() {
+        if (pobject == null) {
+            return new ArrayList<>();
         }
-        switch (pobject.pointerType()){
-            case EXPRESSION: 
-               return ((Expression) pobject).getValueList();
-               
+        switch (pobject.pointerType()) {
+            case EXPRESSION:
+                return ((Expression) pobject).getValueList();
+
             case STATEMENT:
                 return getValueList(pobject.getStatement());
-               
-            default: return super.getValueList();
+
+            default:
+                return super.getValueList();
         }
     }
-    
+
     @Override
-    public IDatatype getValue(String var, int ind) {
-        return DatatypeMap.getValue(pobject.getValue(var, ind));
+    public IDatatype getValue(String varString, int ind) {
+        return DatatypeMap.getValue(pobject.getValue(varString, ind));
     }
-    
+
     List<IDatatype> getValueList(Exp exp) {
         ArrayList<IDatatype> list = new ArrayList<>();
         for (Exp e : exp) {
@@ -152,29 +155,28 @@ public class CoresePointer extends CoreseUndefLiteral {
         }
         return list;
     }
-           
+
     @Override
-    public Iterable getLoop(){
-        switch (pobject.pointerType()) {
-            case STATEMENT:
-                return getValueList();
+    public Iterable getLoop() {
+        if (pobject.pointerType() == PointerType.STATEMENT) {
+            return getValueList();
         }
         return pobject.getLoop();
     }
-    
+
     @Override
-    public IDatatype display(){
-       return DatatypeMap.createUndef(getContent(), getDatatypeURI());
+    public IDatatype display() {
+        return DatatypeMap.createUndef(getContent(), getDatatypeURI());
     }
- 
-    public String display2(){
+
+    public String display2() {
         StringBuilder sb = new StringBuilder();
         sb.append("\"").append(getContent()).append("\"");
         sb.append("^^").append(nsm().toPrefix(getDatatypeURI()));
         return sb.toString();
     }
-    
-     @Override
+
+    @Override
     public boolean equalsWE(IDatatype dt) throws CoreseDatatypeException {
         if (dt.isPointer()) {
             if (getPointerObject() == null || dt.getPointerObject() == null) {
@@ -187,17 +189,17 @@ public class CoresePointer extends CoreseUndefLiteral {
         }
         return super.equalsWE(dt);
     }
-    
+
     public boolean equalsWE2(IDatatype dt) throws CoreseDatatypeException {
-        if (dt.getCode() != UNDEF || getDatatype()!= dt.getDatatype()) {
+        if (dt.getCode() != IDatatype.Datatype.UNDEF || getDatatype() != dt.getDatatype()) {
             return super.equalsWE(dt);
         }
         if (getPointerObject() == null || dt.getPointerObject() == null) {
             return getPointerObject() == dt.getPointerObject();
-        }        
+        }
         return getPointerObject().equals(dt.getPointerObject());
     }
-    
+
     /**
      * Pragma: they have same pointer type
      */
@@ -205,17 +207,15 @@ public class CoresePointer extends CoreseUndefLiteral {
     public int defaultCompare(IDatatype d2) {
         return getPointerObject().compare(d2.getPointerObject());
     }
-    
+
     @Override
     public IDatatype set(IDatatype key, IDatatype value) {
-        switch (getDatatypeURI()) {
-            case GRAPH_DATATYPE:
-                getPointerObject().getTripleStore()
-                        .set(key, value);
-                break;
+        if (GRAPH_DATATYPE.equals(getDatatypeURI())) {
+            getPointerObject().getTripleStore()
+                    .set(key, value);
         }
         return value;
     }
-        
+
 
 }

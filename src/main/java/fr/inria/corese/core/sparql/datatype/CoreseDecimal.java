@@ -29,7 +29,7 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 public class CoreseDecimal extends CoreseDouble {
 
     static final CoreseURI datatype = new CoreseURI(RDF.xsddecimal);
-    static final int code = DECIMAL;
+    static final IDatatype.Datatype code = IDatatype.Datatype.DECIMAL;
     protected BigDecimal bdValue;
 
     CoreseDecimal() {
@@ -101,7 +101,7 @@ public class CoreseDecimal extends CoreseDouble {
         this.checkNoExposant(value);
         super.setValue(Double.parseDouble(value));
         this.bdValue = new BigDecimal(value);
-        this.setLabel(String.valueOf(value));
+        this.setLabel(value);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class CoreseDecimal extends CoreseDouble {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
 

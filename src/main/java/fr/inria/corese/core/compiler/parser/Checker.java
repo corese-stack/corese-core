@@ -1,15 +1,6 @@
 package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Atom;
-import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Exp;
-import fr.inria.corese.core.sparql.triple.parser.Union;
-import fr.inria.corese.core.sparql.triple.parser.Source;
-import fr.inria.corese.core.sparql.triple.parser.Term;
-import fr.inria.corese.core.sparql.triple.parser.Triple;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.*;
 
 /**
  * Type Checking.
@@ -86,11 +77,11 @@ public class Checker {
         aa.setAsk(true);
 
         Atom c = triple.getArg(1);
-        Variable var = Variable.create(VAR);
+        Variable variable = Variable.create(VAR);
 
         Triple t1 = Triple.create(c, aa.createQName(RDFTYPE), aa.createQName(RDFSCLASS));
-        Triple t2 = Triple.create(c, aa.createQName(RDFSSUBCLASSOF), var);
-        Triple t3 = Triple.create(var, aa.createQName(RDFSSUBCLASSOF), c);
+        Triple t2 = Triple.create(c, aa.createQName(RDFSSUBCLASSOF), variable);
+        Triple t3 = Triple.create(variable, aa.createQName(RDFSSUBCLASSOF), c);
 
         Union exp = Union.create(t1, t2);
         exp = Union.create(exp, t3);
@@ -112,7 +103,7 @@ public class Checker {
         // check <p> rdf:type rdf:Property
         // PB: it may be infered in kg:entailment, hence not really defined in ontology
         Variable gg = Variable.create(GRAPH);
-        Variable var = Variable.create(VAR);
+        Variable variable = Variable.create(VAR);
 
         Constant type = aa.createQName(RDFTYPE);
         Term term = Term.create(NEQ, gg, aa.createQName(ENTAIL));
@@ -123,17 +114,17 @@ public class Checker {
         pat.addFilter(term);
         Source gp = Source.create(gg, pat);
 
-        Triple t2 = Triple.create(p, aa.createQName(RDFSDOMAIN), var);
-        Triple t3 = Triple.create(p, aa.createQName(RDFSRANGE), var);
+        Triple t2 = Triple.create(p, aa.createQName(RDFSDOMAIN), variable);
+        Triple t3 = Triple.create(p, aa.createQName(RDFSRANGE), variable);
 
         Triple t4 = Triple.create(p, type, aa.createQName(OWLSYMMETRIC));
         Triple t5 = Triple.create(p, type, aa.createQName(OWLTRANSITIVE));
 
-        Triple t6 = Triple.create(p, aa.createQName(OWLINVERSEOF), var);
-        Triple t7 = Triple.create(var, aa.createQName(OWLINVERSEOF), p);
+        Triple t6 = Triple.create(p, aa.createQName(OWLINVERSEOF), variable);
+        Triple t7 = Triple.create(variable, aa.createQName(OWLINVERSEOF), p);
 
-        Triple t8 = Triple.create(p, aa.createQName(RDFSSUBPROPERTY), var);
-        Triple t9 = Triple.create(var, aa.createQName(RDFSSUBPROPERTY), p);
+        Triple t8 = Triple.create(p, aa.createQName(RDFSSUBPROPERTY), variable);
+        Triple t9 = Triple.create(variable, aa.createQName(RDFSSUBPROPERTY), p);
 
         BasicGraphPattern bgp = BasicGraphPattern.create();
         bgp.add(gp);

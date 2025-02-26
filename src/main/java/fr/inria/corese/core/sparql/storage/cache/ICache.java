@@ -10,13 +10,13 @@ package fr.inria.corese.core.sparql.storage.cache;
  */
 public interface ICache<K, V> {
 
-    public int size();
+    int size();
 
-    public V get(Object key);
+    V get(Object key);
 
-    public V put(K key, V value);
+    V put(K key, V value);
 
-    public boolean containsKey(Object key);
+    boolean containsKey(Object key);
 
-    public void clear();
+    void clear();
 }

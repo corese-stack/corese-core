@@ -59,7 +59,7 @@ public class Distinct {
         public int compare(IDatatype dt1, IDatatype dt2) {
             if (compareIndex && dt1.getCode() != dt2.getCode()) {
                 // same value with different datatype considered different
-                return Integer.compare(dt1.getCode(), dt2.getCode());
+                return dt1.getCode().compareTo(dt2.getCode());
             } else {
                 return dt1.compareTo(dt2);
             }

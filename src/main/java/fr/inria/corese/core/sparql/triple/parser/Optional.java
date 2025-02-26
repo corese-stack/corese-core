@@ -36,7 +36,7 @@ public class Optional extends Binary {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(Optional.class);
+    private static final Logger logger = LoggerFactory.getLogger(Optional.class);
     // false: OPTION corese (unary)
     // true:  OPTIONAL SPARQL (binary)
     public static boolean isOptional = true;
