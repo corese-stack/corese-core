@@ -16,9 +16,8 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
 public class CoreseResource extends CoreseStringableImpl {
     static IDatatype.Datatype  code=IDatatype.Datatype.URI;
-    static final CoreseURI datatype=new CoreseURI(RDF.RDFSRESOURCE);
 
-  public CoreseResource(String value) {
+    public CoreseResource(String value) {
       super(value);
 
   }

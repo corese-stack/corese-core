@@ -62,4 +62,13 @@ public class IRIUtils {
             return "";
         }
     }
+
+    public static boolean isStandardIRI(String iriString) {
+            try {
+            Pattern pattern = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
+            Matcher matcher = pattern.matcher(iriString);
+            return matcher.matches();
+        } catch (IllegalStateException e) {
+            return false;
+        } }
 }

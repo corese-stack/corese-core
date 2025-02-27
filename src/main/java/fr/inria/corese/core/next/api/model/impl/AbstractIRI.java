@@ -1,14 +1,18 @@
 package fr.inria.corese.core.next.api.model.impl;
 
+import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.util.IRIUtils;
 
-public abstract class AbstractIRI implements IRI {
+public abstract class AbstractIRI implements IRI, Comparable<IRI> {
     private String namespace;
     private String localName;
     private final String fullIRI;
 
     protected AbstractIRI(String fullIRI) {
+        if(! IRIUtils.isStandardIRI(fullIRI)) {
+            throw new IncorrectFormatException("IRI '"+ fullIRI +"' must be a valid IRI");
+        }
         this.fullIRI = fullIRI;
         this.namespace = IRIUtils.guessNamespace(fullIRI);
         this.localName = IRIUtils.guessLocalName(fullIRI);
@@ -38,5 +42,10 @@ public abstract class AbstractIRI implements IRI {
     @Override
     public String stringValue() {
         return this.fullIRI;
+    }
+
+    @Override
+    public int compareTo(IRI o) {
+        return this.stringValue().compareTo(o.stringValue());
     }
 }

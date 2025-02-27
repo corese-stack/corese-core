@@ -7,7 +7,7 @@ import fr.inria.corese.core.kgram.api.core.Node;
  * Intended to be used to be able to pass Corese objects to the API and vice-versa
  *
  */
-public interface CoreseNodeWrapper {
+public interface CoreseNodeAdapter {
 
      /**
       *

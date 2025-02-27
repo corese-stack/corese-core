@@ -8,7 +8,7 @@ import fr.inria.corese.core.sparql.datatype.CoreseURI;
 /**
  * Wrapper for Corese Node that represents an IRI
  */
-public class CoreseIRI extends AbstractIRI implements CoreseNodeWrapper {
+public class CoreseIRI extends AbstractIRI implements CoreseNodeAdapter {
 
     private final Node node;
 
@@ -29,6 +29,11 @@ public class CoreseIRI extends AbstractIRI implements CoreseNodeWrapper {
         } else {
             throw new IllegalArgumentException("Node must be an URI");
         }
+    }
+
+    public CoreseIRI(String namespace, String localName) {
+        super(namespace, localName);
+        this.node = new CoreseURI(namespace + localName);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.api.model.impl.literal;
 
-public class AbstractNumber extends AbstractLiteral implements Comparable<AbstractNumber> {
+public abstract class AbstractNumber implements AbstractLiteral, Comparable<AbstractNumber> {
     /**
      * Comprison using double value
      * @param abstractNumber
