@@ -52,4 +52,12 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
     public int compareTo(IRI o) {
         return this.stringValue().compareTo(o.stringValue());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AbstractIRI that = (AbstractIRI) o;
+        return this.stringValue().equals(that.stringValue());
+    }
 }
