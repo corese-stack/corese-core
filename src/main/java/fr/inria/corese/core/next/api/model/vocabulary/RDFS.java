@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.api.model.vocabulary;
 
 import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.api.model.impl.BasicIRI;
+import fr.inria.corese.core.next.api.model.impl.basic.BasicIRI;
 
 public enum RDFS implements Vocabulary {
     Resource("Resource"),

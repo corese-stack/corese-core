@@ -1,9 +1,9 @@
-package fr.inria.corese.core.next.api.model.impl;
+package fr.inria.corese.core.next.api.model.impl.corese;
 
 import fr.inria.corese.core.next.api.model.*;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
-import fr.inria.corese.core.next.api.model.impl.literal.CoreseDate;
-import fr.inria.corese.core.next.api.model.impl.literal.CoreseDatetime;
+import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDate;
+import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDatetime;
 import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -14,6 +14,16 @@ import java.time.temporal.TemporalAmount;
 import java.util.Date;
 
 public class CoreseAdaptedValueFactory implements ValueFactory {
+
+    private static final CoreseAdaptedValueFactory INSTANCE = new CoreseAdaptedValueFactory();
+
+    private CoreseAdaptedValueFactory() {
+    }
+
+    public static CoreseAdaptedValueFactory getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public IRI createIRI(String iri) {
         return new CoreseIRI(iri);
@@ -126,7 +136,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(Date date) {
-        return null;
+        return new CoreseDate(date);
     }
 
     @Override

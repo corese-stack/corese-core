@@ -1,4 +1,6 @@
-package fr.inria.corese.core.next.api.model.impl;
+package fr.inria.corese.core.next.api.model.impl.basic;
+
+import fr.inria.corese.core.next.api.model.impl.AbstractIRI;
 
 /**
  * Basic implementation of IRI

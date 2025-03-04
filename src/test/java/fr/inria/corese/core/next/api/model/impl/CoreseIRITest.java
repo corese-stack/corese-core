@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.api.model.impl;
 
+import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.api.model.impl.corese.CoreseIRI;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -37,7 +39,7 @@ public class CoreseIRITest {
 
     @Test
     public void constructorStringException() {
-        assertThrows(IllegalArgumentException.class, () -> new CoreseIRI("test"));
+        assertThrows(IncorrectFormatException.class, () -> new CoreseIRI("test"));
     }
 
     @Test

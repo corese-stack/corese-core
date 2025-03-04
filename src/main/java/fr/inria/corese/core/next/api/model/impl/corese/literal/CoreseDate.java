@@ -1,17 +1,20 @@
-package fr.inria.corese.core.next.api.model.impl.literal;
+package fr.inria.corese.core.next.api.model.impl.corese.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.exception.IncorrectDatatypeException;
 import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
-import fr.inria.corese.core.next.api.model.impl.CoreseIRI;
+import fr.inria.corese.core.next.api.model.impl.corese.CoreseIRI;
+import fr.inria.corese.core.next.api.model.impl.literal.AbstractTemporalPointLiteral;
 import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Optional;
 
 public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
@@ -20,6 +23,7 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
     private final IRI datatype;
 
     public CoreseDate(IDatatype coreseObject) {
+        super();
         if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseDate) {
             this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseDate) coreseObject;
             this.datatype = new CoreseIRI(coreseObject.getDatatypeURI());
@@ -30,6 +34,10 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
 
     public CoreseDate(XMLGregorianCalendar calendar) {
         this(new fr.inria.corese.core.sparql.datatype.CoreseDate(calendar.toXMLFormat()));
+    }
+
+    public CoreseDate(Date date) {
+        this(DateFormat.getDateInstance().format(date));
     }
 
     public CoreseDate(String date) {

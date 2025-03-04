@@ -3,10 +3,14 @@ package fr.inria.corese.core.next.api.model.impl;
 import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.util.IRIUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractIRI implements IRI, Comparable<IRI> {
-    private String namespace;
-    private String localName;
+    private static final Logger logger = LoggerFactory.getLogger(AbstractIRI.class);
+
+    private final String namespace;
+    private final String localName;
     private final String fullIRI;
 
     protected AbstractIRI(String fullIRI) {

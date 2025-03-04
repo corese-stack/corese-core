@@ -1,10 +1,11 @@
-package fr.inria.corese.core.next.api.model.impl.literal;
+package fr.inria.corese.core.next.api.model.impl.corese.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
-import fr.inria.corese.core.next.api.model.impl.CoreseIRI;
+import fr.inria.corese.core.next.api.model.impl.corese.CoreseIRI;
+import fr.inria.corese.core.next.api.model.impl.literal.AbstractTemporalPointLiteral;
 import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 import fr.inria.corese.core.sparql.api.IDatatype;
 

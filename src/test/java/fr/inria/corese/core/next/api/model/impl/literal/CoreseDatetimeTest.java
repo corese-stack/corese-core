@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.api.model.impl.literal;
 
+import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDatetime;
 import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 import org.junit.Test;
 
