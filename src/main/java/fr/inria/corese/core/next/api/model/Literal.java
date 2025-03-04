@@ -17,6 +17,10 @@ public interface Literal extends Value {
 		return true;
 	}
 
+	/**
+	 *
+	 * @return the lexical value of the literal
+	 */
 	String getLabel();
 
 	Optional<String> getLanguage();

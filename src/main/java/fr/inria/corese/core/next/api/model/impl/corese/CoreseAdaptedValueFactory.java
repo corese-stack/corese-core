@@ -15,13 +15,7 @@ import java.util.Date;
 
 public class CoreseAdaptedValueFactory implements ValueFactory {
 
-    private static final CoreseAdaptedValueFactory INSTANCE = new CoreseAdaptedValueFactory();
-
-    private CoreseAdaptedValueFactory() {
-    }
-
-    public static CoreseAdaptedValueFactory getInstance() {
-        return INSTANCE;
+    public CoreseAdaptedValueFactory() {
     }
 
     @Override

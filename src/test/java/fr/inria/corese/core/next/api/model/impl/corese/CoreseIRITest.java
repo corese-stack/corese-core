@@ -1,12 +1,24 @@
 package fr.inria.corese.core.next.api.model.impl.corese;
 
 import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.api.model.impl.corese.CoreseIRI;
+import fr.inria.corese.core.next.api.model.IRI;
+import fr.inria.corese.core.next.api.model.IRITest;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
-public class CoreseIRITest {
+public class CoreseIRITest extends IRITest {
+
+    @Override
+    public IRI createIRI(String iri) {
+        return new CoreseIRI(iri);
+    }
+
+    @Override
+    public IRI createIRI(String namespace, String localName) {
+        return new CoreseIRI(namespace, localName);
+    }
 
     @Test
     public void constructorStringTest() {
@@ -40,28 +52,6 @@ public class CoreseIRITest {
     @Test
     public void constructorStringException() {
         assertThrows(IncorrectFormatException.class, () -> new CoreseIRI("test"));
-    }
-
-    @Test
-    public void isIRITest() {
-        CoreseIRI coreseIRI = new CoreseIRI("http://example.org");
-        assertTrue(coreseIRI.isIRI());
-    }
-
-    @Test
-    public void getNamespaceTest() {
-        CoreseIRI coreseIRI = new CoreseIRI("http://example.org/test");
-        assertEquals("http://example.org/", coreseIRI.getNamespace());
-        CoreseIRI coreseIRI2 = new CoreseIRI("http://example.org/test#fragment");
-        assertEquals("http://example.org/test#", coreseIRI2.getNamespace());
-    }
-
-    @Test
-    public void getLocalNameTest() {
-        CoreseIRI coreseIRI = new CoreseIRI("http://example.org/test");
-        assertEquals("test", coreseIRI.getLocalName());
-        CoreseIRI coreseIRI2 = new CoreseIRI("http://example.org/test#fragment");
-        assertEquals("fragment", coreseIRI2.getLocalName());
     }
 
 }
