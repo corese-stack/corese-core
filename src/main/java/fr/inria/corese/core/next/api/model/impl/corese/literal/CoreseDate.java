@@ -20,13 +20,11 @@ import java.util.Optional;
 public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
 
     private final fr.inria.corese.core.sparql.datatype.CoreseDate coreseObject;
-    private final IRI datatype;
 
     public CoreseDate(IDatatype coreseObject) {
-        super();
+        super(new CoreseIRI(coreseObject.getDatatypeURI()));
         if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseDate) {
             this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseDate) coreseObject;
-            this.datatype = new CoreseIRI(coreseObject.getDatatypeURI());
         } else {
             throw new IncorrectOperationException("Cannot create CoreseDate from a non-date Corese object.");
         }
