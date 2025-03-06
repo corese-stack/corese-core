@@ -46,7 +46,7 @@
   </g>
 </defs>
 <script type="application/ecmascript">
-var viewWidth = 1127;
+var viewWidth = 1178;
 var viewHeight = 494;
 var sectionId = 'dynsection-1';
 </script>
@@ -58,8 +58,8 @@ var sectionId = 'dynsection-1';
 <g id="Node000001" class="node">
 <title>Node1</title>
 <g id="a_Node000001"><a xlink:title="Translate an RDF/XML document into a Graph use ARP.">
-<polygon fill="#999999" stroke="#666666" points="1119,-457.01 1079,-457.01 1079,-438.01 1119,-438.01 1119,-457.01"/>
-<text text-anchor="middle" x="1099" y="-445.01" font-family="Helvetica,sans-Serif" font-size="10.00">Load</text>
+<polygon fill="#999999" stroke="#666666" points="1170,-457.01 1130,-457.01 1130,-438.01 1170,-438.01 1170,-457.01"/>
+<text text-anchor="middle" x="1150" y="-445.01" font-family="Helvetica,sans-Serif" font-size="10.00">Load</text>
 </a>
 </g>
 </g>
@@ -76,7 +76,7 @@ var sectionId = 'dynsection-1';
 <g id="edge1_Node000001_Node000002" class="edge">
 <title>Node2&#45;&gt;Node1</title>
 <g id="a_edge1_Node000001_Node000002"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M523.04,-477.2C564.96,-480.92 627.73,-485.51 682.5,-485.51 682.5,-485.51 682.5,-485.51 984.5,-485.51 1020.24,-485.51 1059.19,-468.36 1080.9,-457.1"/>
+<path fill="none" stroke="#63b8ff" d="M523.04,-477.2C564.96,-480.92 627.73,-485.51 682.5,-485.51 682.5,-485.51 682.5,-485.51 1010,-485.51 1054.03,-485.51 1103.22,-467.55 1129.66,-456.33"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="523.13,-473.69 512.85,-476.27 522.49,-480.66 523.13,-473.69"/>
 </a>
 </g>
@@ -112,7 +112,7 @@ var sectionId = 'dynsection-1';
 <g id="edge2_Node000001_Node000003" class="edge">
 <title>Node3&#45;&gt;Node1</title>
 <g id="a_edge2_Node000001_Node000003"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M509.58,-429.18C550.49,-436.58 621.23,-447.51 682.5,-447.51 682.5,-447.51 682.5,-447.51 984.5,-447.51 1017.6,-447.51 1056.14,-447.51 1078.72,-447.51"/>
+<path fill="none" stroke="#63b8ff" d="M509.58,-429.18C550.49,-436.58 621.23,-447.51 682.5,-447.51 682.5,-447.51 682.5,-447.51 1010,-447.51 1052.71,-447.51 1102.81,-447.51 1129.66,-447.51"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="510.08,-425.71 499.61,-427.33 508.8,-432.59 510.08,-425.71"/>
 </a>
 </g>
@@ -129,9 +129,9 @@ var sectionId = 'dynsection-1';
 <!-- Node4 -->
 <g id="Node000004" class="node">
 <title>Node4</title>
-<g id="a_Node000004"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1BuildImpl.html" target="_top" xlink:title="Graph creation Methods are public, Design to be refined.">
-<polygon fill="white" stroke="#666666" points="1015,-351.01 952,-351.01 952,-332.01 1015,-332.01 1015,-351.01"/>
-<text text-anchor="middle" x="983.5" y="-339.01" font-family="Helvetica,sans-Serif" font-size="10.00">BuildImpl</text>
+<g id="a_Node000004"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1RdfxmlTripleCreator.html" target="_top" xlink:title="Implementation of RDF graph construction from RDF/XML sources.">
+<polygon fill="white" stroke="#666666" points="1066,-351.01 952,-351.01 952,-332.01 1066,-332.01 1066,-351.01"/>
+<text text-anchor="middle" x="1009" y="-339.01" font-family="Helvetica,sans-Serif" font-size="10.00">RdfxmlTripleCreator</text>
 </a>
 </g>
 </g>
@@ -139,28 +139,28 @@ var sectionId = 'dynsection-1';
 <g id="edge3_Node000001_Node000004" class="edge">
 <title>Node4&#45;&gt;Node1</title>
 <g id="a_edge3_Node000001_Node000004"><a xlink:title=" ">
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1002.36,-358.2C1026.34,-380.58 1068.14,-419.63 1087.55,-437.75"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="1004.67,-355.56 994.97,-351.3 999.89,-360.68 1004.67,-355.56"/>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M1031.11,-357.61C1060.34,-379.9 1112.23,-419.47 1136.2,-437.75"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="1032.9,-354.58 1022.83,-351.3 1028.66,-360.14 1032.9,-354.58"/>
 </a>
 </g>
-<text text-anchor="middle" x="1047" y="-413.51" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> build</text>
+<text text-anchor="middle" x="1098" y="-422.51" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> build</text>
 </g>
 <!-- Node4&#45;&gt;Node6 -->
 <g id="edge8_Node000006_Node000004" class="edge">
 <title>Node4&#45;&gt;Node6</title>
 <g id="a_edge8_Node000006_Node000004"><a xlink:title=" ">
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M960.83,-357.12C948.1,-365.47 931.34,-375.13 915,-380.51 839.78,-405.29 743.83,-404.96 703.6,-403.49"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="963.03,-359.86 969.33,-351.34 959.09,-354.07 963.03,-359.86"/>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M980.3,-355.58C962.18,-364.17 937.73,-374.59 915,-380.51 838.56,-400.42 743.66,-402.73 703.68,-402.73"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="982.19,-358.56 989.67,-351.05 979.14,-352.26 982.19,-358.56"/>
 </a>
 </g>
-<text text-anchor="middle" x="862" y="-404.51" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> build</text>
+<text text-anchor="middle" x="862" y="-401.51" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> build</text>
 </g>
 <!-- Node5 -->
 <g id="Node000005" class="node">
 <title>Node5</title>
-<g id="a_Node000005"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateTriple.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="899.5,-372.01 824.5,-372.01 824.5,-353.01 899.5,-353.01 899.5,-372.01"/>
-<text text-anchor="middle" x="862" y="-360.01" font-family="Helvetica,sans-Serif" font-size="10.00">CreateTriple</text>
+<g id="a_Node000005"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1TripleCreatorBase.html" target="_top" xlink:title="Base class for creating and inserting RDF triples into a Graph.">
+<polygon fill="white" stroke="#666666" points="913.5,-372.01 810.5,-372.01 810.5,-353.01 913.5,-353.01 913.5,-372.01"/>
+<text text-anchor="middle" x="862" y="-360.01" font-family="Helvetica,sans-Serif" font-size="10.00">TripleCreatorBase</text>
 </a>
 </g>
 </g>
@@ -168,8 +168,8 @@ var sectionId = 'dynsection-1';
 <g id="edge4_Node000004_Node000005" class="edge">
 <title>Node5&#45;&gt;Node4</title>
 <g id="a_edge4_Node000004_Node000005"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M909.6,-354.32C923.78,-351.83 939,-349.16 951.85,-346.9"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="908.75,-350.92 899.5,-356.1 909.96,-357.81 908.75,-350.92"/>
+<path fill="none" stroke="#63b8ff" d="M923.71,-353.72C933.04,-352.37 942.64,-350.98 951.87,-349.64"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="923.11,-350.27 913.71,-355.17 924.11,-357.2 923.11,-350.27"/>
 </a>
 </g>
 </g>
@@ -177,7 +177,7 @@ var sectionId = 'dynsection-1';
 <g id="edge5_Node000005_Node000006" class="edge">
 <title>Node6&#45;&gt;Node5</title>
 <g id="a_edge5_Node000005_Node000006"><a xlink:title=" ">
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M713.09,-391.76C721.66,-388.8 731.14,-385.78 740,-383.51 767.99,-376.34 800.24,-370.88 824.41,-367.32"/>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M713.09,-391.76C721.66,-388.8 731.14,-385.78 740,-383.51 762.82,-377.67 788.49,-372.95 810.29,-369.49"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="711.78,-388.51 703.54,-395.16 714.13,-395.11 711.78,-388.51"/>
 </a>
 </g>
@@ -568,8 +568,8 @@ var sectionId = 'dynsection-1';
 <g id="edge31_Node000004_Node000025" class="edge">
 <title>Node25&#45;&gt;Node4</title>
 <g id="a_edge31_Node000004_Node000025"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M892.72,-329.49C910.77,-331.91 933.77,-334.99 951.97,-337.43"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="893.11,-326.01 882.73,-328.16 892.18,-332.95 893.11,-326.01"/>
+<path fill="none" stroke="#63b8ff" d="M892.97,-328.82C910,-330.7 931.85,-333.11 951.94,-335.33"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="892.88,-325.29 882.56,-327.67 892.11,-332.25 892.88,-325.29"/>
 </a>
 </g>
 </g>
@@ -586,8 +586,8 @@ var sectionId = 'dynsection-1';
 <g id="edge32_Node000004_Node000026" class="edge">
 <title>Node26&#45;&gt;Node4</title>
 <g id="a_edge32_Node000004_Node000026"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M902.69,-301.58C906.88,-303.16 911.05,-304.82 915,-306.51 932.71,-314.12 952.17,-324.44 965.63,-331.89"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="903.58,-298.18 892.98,-298.06 901.19,-304.76 903.58,-298.18"/>
+<path fill="none" stroke="#63b8ff" d="M900.8,-301.46C905.59,-303.14 910.41,-304.86 915,-306.51 938.2,-314.89 964.5,-324.83 983.2,-331.97"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="901.71,-298.08 891.11,-298.09 899.41,-304.69 901.71,-298.08"/>
 </a>
 </g>
 </g>
@@ -604,8 +604,8 @@ var sectionId = 'dynsection-1';
 <g id="edge33_Node000004_Node000027" class="edge">
 <title>Node27&#45;&gt;Node4</title>
 <g id="a_edge33_Node000004_Node000027"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M907.4,-265.18C910.04,-266.51 912.6,-267.95 915,-269.51 941.45,-286.67 964.75,-316.36 975.76,-331.7"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="908.78,-261.96 898.22,-261.09 905.93,-268.36 908.78,-261.96"/>
+<path fill="none" stroke="#63b8ff" d="M905.34,-264.85C908.66,-266.29 911.92,-267.85 915,-269.51 948.04,-287.39 981.63,-316.77 997.91,-331.87"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="906.46,-261.53 895.87,-261.07 903.86,-268.03 906.46,-261.53"/>
 </a>
 </g>
 </g>

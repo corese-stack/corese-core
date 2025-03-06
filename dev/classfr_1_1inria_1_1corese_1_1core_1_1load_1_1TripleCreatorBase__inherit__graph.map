@@ -1,0 +1,7 @@
+<map id="TripleCreatorBase" name="TripleCreatorBase">
+<area shape="rect" id="Node000001" title="Base class for creating and inserting RDF triples into a Graph." alt="" coords="109,5,246,31"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1RdfxmlTripleCreator.html" title="Implementation of RDF graph construction from RDF/XML sources." alt="" coords="5,79,157,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,41,99,81,95,76,149,37"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1TurtleSparqlTripleCreator.html" title="Implementation of RDF triple creation for Turtle and SPARQL&#45;based formats." alt="" coords="182,79,365,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="205,37,259,76,256,81,202,41"/>
+</map>

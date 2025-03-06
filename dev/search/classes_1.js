@@ -18,6 +18,5 @@ var searchData=
   ['brokerdistance_15',['BrokerDistance',['../classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1BrokerDistance.html',1,'fr::inria::corese::core::logic']]],
   ['brokerdistancedatamanager_16',['BrokerDistanceDataManager',['../classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1BrokerDistanceDataManager.html',1,'fr::inria::corese::core::logic']]],
   ['buffer_17',['Buffer',['../classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1path_1_1Buffer.html',1,'fr::inria::corese::core::kgram::path']]],
-  ['build_18',['Build',['../interfacefr_1_1inria_1_1corese_1_1core_1_1load_1_1Build.html',1,'fr::inria::corese::core::load']]],
-  ['buildimpl_19',['BuildImpl',['../classfr_1_1inria_1_1corese_1_1core_1_1load_1_1BuildImpl.html',1,'fr::inria::corese::core::load']]]
+  ['build_18',['Build',['../interfacefr_1_1inria_1_1corese_1_1core_1_1load_1_1Build.html',1,'fr::inria::corese::core::load']]]
 ];

@@ -223,6 +223,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>loadRule</b> (Reader 
 <tr class="memitem:aa73f5b045b5335015c53e762b27e293f" id="r_aa73f5b045b5335015c53e762b27e293f"><td class="memItemLeft" align="right" valign="top"><a id="aa73f5b045b5335015c53e762b27e293f" name="aa73f5b045b5335015c53e762b27e293f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>loadRuleBasic</b> (Reader stream, String name)  throws <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1LoadException.html">LoadException</a> </td></tr>
 <tr class="separator:aa73f5b045b5335015c53e762b27e293f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe7549cf9c821c596fa8b710b7169d74" id="r_afe7549cf9c821c596fa8b710b7169d74"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load.html#afe7549cf9c821c596fa8b710b7169d74">imports</a> (String uri)</td></tr>
+<tr class="memdesc:afe7549cf9c821c596fa8b710b7169d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Imports an RDF resource from the given URI if it has not been loaded yet.  <br /></td></tr>
+<tr class="separator:afe7549cf9c821c596fa8b710b7169d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5126eccfd7eb8c9ad40cc26779b9e73f" id="r_a5126eccfd7eb8c9ad40cc26779b9e73f"><td class="memItemLeft" align="right" valign="top"><a id="a5126eccfd7eb8c9ad40cc26779b9e73f" name="a5126eccfd7eb8c9ad40cc26779b9e73f"></a>
 boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isRenameBlankNode</b> ()</td></tr>
 <tr class="separator:a5126eccfd7eb8c9ad40cc26779b9e73f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -377,6 +380,9 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:a7f9eeb62de65b93e09eb6621998cc1f6" id="r_a7f9eeb62de65b93e09eb6621998cc1f6"><td class="memItemLeft" align="right" valign="top"><a id="a7f9eeb62de65b93e09eb6621998cc1f6" name="a7f9eeb62de65b93e09eb6621998cc1f6"></a>
 static final Logger&#160;</td><td class="memItemRight" valign="bottom"><b>logger</b> = LoggerFactory.getLogger(Load.class)</td></tr>
 <tr class="separator:a7f9eeb62de65b93e09eb6621998cc1f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd18c950d44adb54895e27d7e059a467" id="r_abd18c950d44adb54895e27d7e059a467"><td class="memItemLeft" align="right" valign="top"><a id="abd18c950d44adb54895e27d7e059a467" name="abd18c950d44adb54895e27d7e059a467"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>IMPORTS</b> = NSManager.OWL + &quot;imports&quot;</td></tr>
+<tr class="separator:abd18c950d44adb54895e27d7e059a467"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8209c2701fe20b70b36d40a49e91f483" id="r_a8209c2701fe20b70b36d40a49e91f483"><td class="memItemLeft" align="right" valign="top"><a id="a8209c2701fe20b70b36d40a49e91f483" name="a8209c2701fe20b70b36d40a49e91f483"></a>
 static String&#160;</td><td class="memItemRight" valign="bottom"><b>LOAD_FORMAT</b> = ALL_FORMAT_STR</td></tr>
 <tr class="separator:a8209c2701fe20b70b36d40a49e91f483"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -391,6 +397,34 @@ Protected Member Functions</h2></td></tr>
 <div class="textblock"><p>Translate an RDF/XML document into a Graph use ARP. </p>
 <dl class="section author"><dt>Author</dt><dd>Olivier Corby, Edelweiss INRIA 2010 </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="afe7549cf9c821c596fa8b710b7169d74" name="afe7549cf9c821c596fa8b710b7169d74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe7549cf9c821c596fa8b710b7169d74">&#9670;&#160;</a></span>imports()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void imports </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>uri</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Imports an RDF resource from the given URI if it has not been loaded yet. </p>
+<p>This method ensures that the URI is not imported multiple times by checking the <code>importedURIs</code> map. If the URI is new, it is added to the map and processed using <code>basicImport(uri)</code>.</p>
+<p>The current <code>BuildImpl</code> instance is temporarily saved and restored after the import to maintain consistency.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">uri</td><td>The URI of the RDF resource to import. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a1dce2d516945ca7913f16042860cf973" name="a1dce2d516945ca7913f16042860cf973"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1dce2d516945ca7913f16042860cf973">&#9670;&#160;</a></span>load()</h2>
 

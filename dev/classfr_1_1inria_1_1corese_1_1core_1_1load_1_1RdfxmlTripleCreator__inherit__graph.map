@@ -1,0 +1,11 @@
+<map id="RdfxmlTripleCreator" name="RdfxmlTripleCreator">
+<area shape="rect" id="Node000001" title="Implementation of RDF graph construction from RDF/XML sources." alt="" coords="179,79,331,104"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1TripleCreatorBase.html" title="Base class for creating and inserting RDF triples into a Graph." alt="" coords="5,5,143,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,33,227,76,225,81,115,38"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1load_1_1Build.html" title="Translate an RDF/XML document into a Graph." alt="" coords="167,5,221,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="215,40,247,77,243,80,211,43"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="246,5,387,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="300,43,267,80,263,77,296,40"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="411,5,515,31"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="418,38,290,81,288,76,416,33"/>
+</map>

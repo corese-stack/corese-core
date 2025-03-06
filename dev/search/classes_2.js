@@ -41,7 +41,7 @@ var searchData=
   ['context_38',['context',['../classfr_1_1inria_1_1corese_1_1core_1_1Context.html',1,'Context'],['../classfr_1_1inria_1_1corese_1_1core_1_1shex_1_1shacl_1_1Context.html',1,'Context'],['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Context.html',1,'Context']]],
   ['contextbuilder_39',['ContextBuilder',['../classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1ContextBuilder.html',1,'fr::inria::corese::core::transform']]],
   ['contextlog_40',['ContextLog',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1context_1_1ContextLog.html',1,'fr::inria::corese::core::sparql::triple::parser::context']]],
-  ['core_41',['core',['../classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Core.html',1,'Core'],['../classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1core_1_1Core.html',1,'Core']]],
+  ['core_41',['core',['../classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1core_1_1Core.html',1,'Core'],['../classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Core.html',1,'Core']]],
   ['coreseblanknode_42',['CoreseBlankNode',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseBlankNode.html',1,'fr::inria::corese::core::sparql::datatype']]],
   ['coreseboolean_43',['CoreseBoolean',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseBoolean.html',1,'fr::inria::corese::core::sparql::datatype']]],
   ['coresecalendar_44',['CoreseCalendar',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseCalendar.html',1,'fr::inria::corese::core::sparql::datatype']]],
@@ -85,11 +85,9 @@ var searchData=
   ['coresexml_82',['CoreseXML',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1extension_1_1CoreseXML.html',1,'fr::inria::corese::core::sparql::datatype::extension']]],
   ['coresexmlliteral_83',['CoreseXMLLiteral',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseXMLLiteral.html',1,'fr::inria::corese::core::sparql::datatype']]],
   ['coreseyear_84',['CoreseYear',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseYear.html',1,'fr::inria::corese::core::sparql::datatype']]],
-  ['createimpl_85',['CreateImpl',['../classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateImpl.html',1,'fr::inria::corese::core::load']]],
-  ['createtriple_86',['CreateTriple',['../classfr_1_1inria_1_1corese_1_1core_1_1load_1_1CreateTriple.html',1,'fr::inria::corese::core::load']]],
-  ['creator_87',['Creator',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1api_1_1Creator.html',1,'fr::inria::corese::core::sparql::triple::api']]],
-  ['cst_88',['Cst',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1Cst.html',1,'fr::inria::corese::core::sparql::datatype']]],
-  ['csvformat_89',['CSVFormat',['../classfr_1_1inria_1_1corese_1_1core_1_1print_1_1CSVFormat.html',1,'fr::inria::corese::core::print']]],
-  ['cursor_90',['Cursor',['../classfr_1_1inria_1_1corese_1_1core_1_1index_1_1PredicateList_1_1Cursor.html',1,'fr::inria::corese::core::index::PredicateList']]],
-  ['custom_91',['Custom',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1Custom.html',1,'fr::inria::corese::core::compiler::eval']]]
+  ['creator_85',['Creator',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1api_1_1Creator.html',1,'fr::inria::corese::core::sparql::triple::api']]],
+  ['cst_86',['Cst',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1Cst.html',1,'fr::inria::corese::core::sparql::datatype']]],
+  ['csvformat_87',['CSVFormat',['../classfr_1_1inria_1_1corese_1_1core_1_1print_1_1CSVFormat.html',1,'fr::inria::corese::core::print']]],
+  ['cursor_88',['Cursor',['../classfr_1_1inria_1_1corese_1_1core_1_1index_1_1PredicateList_1_1Cursor.html',1,'fr::inria::corese::core::index::PredicateList']]],
+  ['custom_89',['Custom',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1Custom.html',1,'fr::inria::corese::core::compiler::eval']]]
 ];
