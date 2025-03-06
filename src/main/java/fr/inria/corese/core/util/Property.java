@@ -314,7 +314,7 @@ public class Property {
     }
 
     protected static Property getSingleton() {
-        if(singleton == null) {
+        if (singleton == null) {
             singleton = new Property();
             set(SERVICE_SEND_PARAMETER, true);
             set(DATATYPE_ENTAILMENT, true);
@@ -354,7 +354,10 @@ public class Property {
     }
 
     public static boolean hasProperty(Value value) {
-        return getSingleton().getBooleanProperty().containsKey(value) || getSingleton().getStringProperty().containsKey(value) || getSingleton().getIntegerProperty().containsKey(value) || getSingleton().getListProperty().containsKey(value);
+        return getSingleton().getBooleanProperty().containsKey(value)
+                || getSingleton().getStringProperty().containsKey(value)
+                || getSingleton().getIntegerProperty().containsKey(value)
+                || getSingleton().getListProperty().containsKey(value);
     }
 
     private boolean hasBooleanProperty(Value value) {
@@ -374,13 +377,13 @@ public class Property {
     }
 
     public static Object get(Value value) {
-        if(getSingleton().hasBooleanProperty(value))
+        if (getSingleton().hasBooleanProperty(value))
             return getBooleanValue(value);
-        if(getSingleton().hasStringProperty(value))
+        if (getSingleton().hasStringProperty(value))
             return getStringValue(value);
-        if(getSingleton().hasIntegerProperty(value))
+        if (getSingleton().hasIntegerProperty(value))
             return getIntegerValue(value);
-        if(getSingleton().hasListProperty(value))
+        if (getSingleton().hasListProperty(value))
             return getListValue(value);
         return null;
     }
@@ -738,7 +741,7 @@ public class Property {
     }
 
     static void basicSet(Value value, String... str) {
-            logger.debug("{} = {}", value, str);
+        logger.debug("{} = {}", value, str);
         switch (value) {
             case FEDERATE_BLACKLIST:
                 getSingleton().blacklist(str);
@@ -1167,7 +1170,8 @@ public class Property {
         for (String storageStr : storages.split(SEP)) {
 
             String[] storageLst = storageStr.split(",", 3);
-            storageList.add(List.of(storageLst).stream().map( str -> getSingleton().expand(str)).collect(Collectors.toList()));
+            storageList.add(
+                    List.of(storageLst).stream().map(str -> getSingleton().expand(str)).collect(Collectors.toList()));
         }
         return storageList;
     }
