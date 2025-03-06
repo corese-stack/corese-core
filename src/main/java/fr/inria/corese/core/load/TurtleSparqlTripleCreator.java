@@ -5,12 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.util.Property;
-import fr.inria.corese.core.util.Property.Value;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.triple.api.Creator;
@@ -20,17 +15,22 @@ import fr.inria.corese.core.sparql.triple.parser.Exp;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.parser.RDFList;
 import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.util.Property;
+import fr.inria.corese.core.util.Property.Value;
 
 /**
- *
- * Create Edge on the fly for Turtle parser
- *
+ * Implementation of RDF triple creation for Turtle and SPARQL-based formats.
+ * This class extends TripleCreatorBase and provides methods to process
+ * RDF statements dynamically, handling blank nodes, RDF lists, and triple
+ * references (for RDF-star support).
+ * 
+ * It is optimized for streaming RDF parsing and ensures proper namespace
+ * resolution while inserting triples into the graph.
+ * 
  * @author Olivier Corby, INRIA 2012
- *
  */
-public class CreateImpl extends CreateTriple implements Creator {
+public class TurtleSparqlTripleCreator extends TripleCreatorBase implements Creator {
     public static boolean USE_REFERENCE_ID = true;
-    private static final Logger logger = LoggerFactory.getLogger(CreateImpl.class);
 
     HashMap<String, String> blank;
     HashMap<String, Node> reference;
@@ -39,20 +39,20 @@ public class CreateImpl extends CreateTriple implements Creator {
     Stack<Node> stack;
     String base;
     private boolean renameBlankNode = true;
-    private String resource;
-    private Node node;
     Load load;
 
-    CreateImpl(Graph g, Load ld) {
+    TurtleSparqlTripleCreator(Graph g, Load ld) {
         super(g, ld);
+        graph = g;
+        load = ld;
         blank = new HashMap<>();
         reference = new HashMap<>();
         nsm = NSManager.create();
         stack = new Stack<>();
     }
 
-    public static CreateImpl create(Graph g, Load ld) {
-        return new CreateImpl(g, ld);
+    public static TurtleSparqlTripleCreator create(Graph g, Load ld) {
+        return new TurtleSparqlTripleCreator(g, ld);
     }
 
     @Override
@@ -60,9 +60,8 @@ public class CreateImpl extends CreateTriple implements Creator {
         stack.add(source);
         if (src.isBlankOrBlankNode()) {
             source = addGraph(getID(src.getLabel()), true);
-        }
-        else {
-            source = addGraph(src);        
+        } else {
+            source = addGraph(src);
         }
     }
 
@@ -84,11 +83,9 @@ public class CreateImpl extends CreateTriple implements Creator {
     Node getGraph(Atom graph) {
         if (graph == null) {
             return addDefaultGraphNode();
-        }
-        else if (graph.isBlankOrBlankNode()) {
+        } else if (graph.isBlankOrBlankNode()) {
             return addGraph(getID(graph.getLabel()), true);
-        }
-        else {
+        } else {
             return addGraph(graph);
         }
     }
@@ -124,33 +121,51 @@ public class CreateImpl extends CreateTriple implements Creator {
         triple(property, termList, false);
     }
 
-    Edge triple(Node source, Atom subject, Atom property, Atom object) {
-        if (accept(property.getLabel())) {
-            Node s = getSubject(subject);
-            Node p = getProperty(property);
-            Node o;
-            if (object.isLiteral()) {
-                o = getLiteral(property, object.getConstant());
-            } else {
-                o = getNode(object);
-            }
-
-            Edge e = create(source, s, p, o);
-            add(e);
-            parseImport(property, object);
-            return e;
+    /**
+     * Creates and inserts an RDF triple into the graph.
+     * 
+     * This method first checks whether the property is accepted. If so, it resolves
+     * the subject, predicate, and object nodes, creates the corresponding edge,
+     * and inserts it into the graph.
+     * 
+     * If the property corresponds to an ontology import (owl:imports), it triggers
+     * the import process by calling `handleOntologyImport(property, object)`.
+     * 
+     * @param source        The graph node where the triple belongs.
+     * @param subjectNode   The subject of the triple.
+     * @param predicateNode The predicate (property) of the triple.
+     * @param objectNode    The object of the triple.
+     * @return The created Edge, or null if the property is not accepted.
+     */
+    Edge triple(Node source, Atom subjectNode, Atom predicateNode, Atom objectNode) {
+        if (!accept(predicateNode.getLabel())) {
+            return null;
         }
-        return null;
+
+        Node s = getSubject(subjectNode);
+        Node p = getProperty(predicateNode);
+        Node o = objectNode.isLiteral() ? getLiteral(predicateNode, objectNode.getConstant()) : getNode(objectNode);
+
+        Edge e = create(source, s, p, o);
+        add(e);
+        handleOntologyImport(predicateNode, objectNode);
+        return e;
     }
 
-    void parseImport(Atom property, Atom object) {
-        if (property.getLongName() != null && property.getLongName().equals(Load.IMPORTS)
-                && !Property.getBooleanValue(Value.DISABLE_OWL_AUTO_IMPORT)) {
-            try {
-                load.parseImport(object.getLongName());
-            } catch (LoadException ex) {
-                logger.error(ex.getMessage());
-            }
+    /**
+     * Checks if the given property corresponds to owl:imports and, if applicable,
+     * triggers the import process for the specified object.
+     * 
+     * This method ensures that ontology imports only occur when the
+     * `OWL_AUTO_IMPORT` property is enabled.
+     * 
+     * @param property The predicate of the triple.
+     * @param object   The object of the triple, expected to contain an import URI.
+     */
+    void handleOntologyImport(Atom property, Atom object) {
+        if (Load.IMPORTS.equals(property.getLongName())
+                && Property.getBooleanValue(Value.OWL_AUTO_IMPORT)) {
+            load.imports(object.getLongName());
         }
     }
 

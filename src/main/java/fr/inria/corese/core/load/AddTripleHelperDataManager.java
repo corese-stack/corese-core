@@ -14,8 +14,8 @@ public class AddTripleHelperDataManager extends AddTripleHelper {
 
     private DataManager dataManager;
 
-    public AddTripleHelperDataManager(Graph g, DataManager man) {
-        super(g);
+    public AddTripleHelperDataManager(Graph g, DataManager man, Load load) {
+        super(g, load);
         setDataManager(man);
     }
 
