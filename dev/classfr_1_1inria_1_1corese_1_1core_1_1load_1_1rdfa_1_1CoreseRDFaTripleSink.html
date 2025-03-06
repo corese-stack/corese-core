@@ -95,9 +95,9 @@ Collaboration diagram for CoreseRDFaTripleSink:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afc1199de0ad835d137cf6b0a34ad166a" id="r_afc1199de0ad835d137cf6b0a34ad166a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1rdfa_1_1CoreseRDFaTripleSink.html#afc1199de0ad835d137cf6b0a34ad166a">CoreseRDFaTripleSink</a> (<a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a> graph, String source, <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load.html">Load</a> load)</td></tr>
-<tr class="memdesc:afc1199de0ad835d137cf6b0a34ad166a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <br /></td></tr>
-<tr class="separator:afc1199de0ad835d137cf6b0a34ad166a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38738b6d7d300120f1749d8f575f6558" id="r_a38738b6d7d300120f1749d8f575f6558"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1rdfa_1_1CoreseRDFaTripleSink.html#a38738b6d7d300120f1749d8f575f6558">CoreseRDFaTripleSink</a> (<a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a> graph, DataManager man, String source, <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load.html">Load</a> load)</td></tr>
+<tr class="memdesc:a38738b6d7d300120f1749d8f575f6558"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <br /></td></tr>
+<tr class="separator:a38738b6d7d300120f1749d8f575f6558"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37def54b7d621add01435404f940d127" id="r_a37def54b7d621add01435404f940d127"><td class="memItemLeft" align="right" valign="top"><a id="a37def54b7d621add01435404f940d127" name="a37def54b7d621add01435404f940d127"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addNonLiteral</b> (String subject, String predicate, String object)</td></tr>
 <tr class="separator:a37def54b7d621add01435404f940d127"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,14 +122,20 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><b>setProperty</b> (S
 <tr class="memitem:a7b1a15957fd3e0f0713ed00d94ed2f44" id="r_a7b1a15957fd3e0f0713ed00d94ed2f44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1rdfa_1_1CoreseRDFaTripleSink.html#a7b1a15957fd3e0f0713ed00d94ed2f44">setHelper</a> (boolean renameBNode, int limit)</td></tr>
 <tr class="memdesc:a7b1a15957fd3e0f0713ed00d94ed2f44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set parameters for helper class.  <br /></td></tr>
 <tr class="separator:a7b1a15957fd3e0f0713ed00d94ed2f44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5c394d6931c7735b29dc2a933603b75" id="r_aa5c394d6931c7735b29dc2a933603b75"><td class="memItemLeft" align="right" valign="top"><a id="aa5c394d6931c7735b29dc2a933603b75" name="aa5c394d6931c7735b29dc2a933603b75"></a>
+DataManager&#160;</td><td class="memItemRight" valign="bottom"><b>getDataManager</b> ()</td></tr>
+<tr class="separator:aa5c394d6931c7735b29dc2a933603b75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaaafa0078410b2e7628fc9e20607a0d5" id="r_aaaafa0078410b2e7628fc9e20607a0d5"><td class="memItemLeft" align="right" valign="top"><a id="aaaafa0078410b2e7628fc9e20607a0d5" name="aaaafa0078410b2e7628fc9e20607a0d5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setDataManager</b> (DataManager dataManager)</td></tr>
+<tr class="separator:aaaafa0078410b2e7628fc9e20607a0d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implements the interface TripleSink (from semargl) in order to add the triples (that are parsed by parser of semargl) to the graph of corese system. </p>
 <dl class="section author"><dt>Author</dt><dd>Fuqi Song, wimmics inria i3s </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>Jan 2014 new </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="afc1199de0ad835d137cf6b0a34ad166a" name="afc1199de0ad835d137cf6b0a34ad166a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc1199de0ad835d137cf6b0a34ad166a">&#9670;&#160;</a></span>CoreseRDFaTripleSink()</h2>
+<a id="a38738b6d7d300120f1749d8f575f6558" name="a38738b6d7d300120f1749d8f575f6558"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38738b6d7d300120f1749d8f575f6558">&#9670;&#160;</a></span>CoreseRDFaTripleSink()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -139,6 +145,12 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><b>setProperty</b> (S
           <td>(</td>
           <td class="paramtype"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a>&#160;</td>
           <td class="paramname"><em>graph</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DataManager&#160;</td>
+          <td class="paramname"><em>man</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
