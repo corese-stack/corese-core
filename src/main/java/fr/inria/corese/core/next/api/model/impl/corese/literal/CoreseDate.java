@@ -14,6 +14,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Optional;
 
@@ -105,6 +106,11 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
     @Override
     public XMLGregorianCalendar calendarValue() {
         return this.coreseObject.getCalendar();
+    }
+
+    @Override
+    public TemporalAccessor temporalAccessorValue() {
+        return this.coreseObject.getCalendar().toGregorianCalendar().toZonedDateTime();
     }
 
     @Override

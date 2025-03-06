@@ -5,7 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Period;
+import java.time.temporal.TemporalAccessor;
 
 import static org.junit.Assert.*;
 
@@ -87,20 +90,28 @@ public abstract class ValueFactoryTest {
 
     @Test
     public void testCreateLiteralTemporalAccessor() {
+        TemporalAccessor datetime = this.valueFactory.createLiteral(LocalTime.parse("01:01:01")).temporalAccessorValue();
+        TemporalAccessor date = this.valueFactory.createLiteral(LocalDate.parse("2021-01-01")).temporalAccessorValue();
+
+        assertNotNull(date);
+        assertNotNull(datetime);
     }
 
     @Test
     public void testCreateLiteralTemporalAmount() {
         Duration duration = Duration.ofHours(23);
         Period period = Period.ofDays(100);
+        String fullXSDDurationString = "P100DT23H";
 
         Literal durationDuration = this.valueFactory.createLiteral(duration);
         Literal periodDuration = this.valueFactory.createLiteral(duration);
+        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString);
 
         assertNotNull(this.valueFactory.createLiteral(duration));
         assertNotNull(this.valueFactory.createLiteral(period));
         assertEquals(duration, durationDuration.temporalAmountValue());
         assertEquals(period, periodDuration.temporalAmountValue());
+        assertEquals(fullXSDDurationString, fullXSDDuration.stringValue());
     }
 
     @Test

@@ -1,19 +1,27 @@
 package fr.inria.corese.core.next.api.model.impl.corese;
 
+import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.next.api.model.*;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
 import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDate;
 import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDatetime;
+import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDuration;
+import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseTime;
 import fr.inria.corese.core.next.api.model.vocabulary.XSD;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
 
 public class CoreseAdaptedValueFactory implements ValueFactory {
+
+    private static Logger logger = LoggerFactory.getLogger(CoreseAdaptedValueFactory.class);
 
     public CoreseAdaptedValueFactory() {
     }
@@ -50,6 +58,15 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(String label, IRI datatype) {
+        if (XSD.xsdDate.getIRI().equals(datatype)) {
+            return new CoreseDate(label);
+        } else if (XSD.xsdDateTime.getIRI().equals(datatype)) {
+            return new CoreseDatetime(label);
+        } else if (XSD.xsdTime.getIRI().equals(datatype)) {
+            return new CoreseTime(label);
+        } else if (XSD.xsdDuration.getIRI().equals(datatype)) {
+            return new CoreseDuration(label);
+        }
         return null;
     }
 
@@ -59,6 +76,10 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
             return new CoreseDate(label);
         } else if (XSD.xsdDateTime.equals(datatype)) {
             return new CoreseDatetime(label);
+        } else if (XSD.xsdTime.equals(datatype)) {
+            return new CoreseTime(label);
+        } else if (XSD.xsdDuration.equals(datatype)) {
+            return new CoreseDuration(label);
         }
         return null;
     }
@@ -115,22 +136,33 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(TemporalAccessor value) {
-        return ValueFactory.super.createLiteral(value);
+        if(value.isSupported(ChronoField.HOUR_OF_DAY) && value.isSupported(ChronoField.MINUTE_OF_HOUR) && value.isSupported(ChronoField.SECOND_OF_MINUTE)) {
+            if(value.isSupported(ChronoField.YEAR) && value.isSupported(ChronoField.MONTH_OF_YEAR) && value.isSupported(ChronoField.DAY_OF_MONTH)) {
+                return new CoreseDatetime(value.toString());
+            } else {
+                return new CoreseTime(value.toString());
+            }
+        } else if(value.isSupported(ChronoField.YEAR) && value.isSupported(ChronoField.MONTH_OF_YEAR) && value.isSupported(ChronoField.DAY_OF_MONTH)) {
+            return new CoreseDate(value.toString());
+        } else {
+            return new CoreseDatetime(value.toString());
+        }
     }
 
     /**
-     * There are no classes that implement TemporalAmount in Corese
-     * @param value
-     * @return
+     * There are no classes that implement TemporalAmount in Corese. the returned object is based on CoreseUndefLiteral and offer no operation on durations
+     * @param value the TemporalAmount to be represented as a Literal
+     * @return CoreseDuration
      */
     @Override
     public Literal createLiteral(TemporalAmount value) {
-        return ValueFactory.super.createLiteral(value);
+        logger.debug("Creating a Literal from TemporalAmount");
+        return new CoreseDuration(value);
     }
 
     @Override
     public Literal createLiteral(XMLGregorianCalendar calendar) {
-        return null;
+        return new CoreseDatetime(calendar);
     }
 
     @Override

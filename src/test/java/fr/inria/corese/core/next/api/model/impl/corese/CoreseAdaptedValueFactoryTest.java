@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.time.Duration;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
 public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
@@ -19,6 +20,9 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
     @Test
     @Override
     public void testCreateLiteralTemporalAmount() {
-        assertThrows(UnsupportedOperationException.class, () -> this.valueFactory.createLiteral(Duration.ofDays(1)));
+        Duration duration = Duration.ofHours(23);
+        this.valueFactory.createLiteral(duration);
+
+        assertNotNull(this.valueFactory.createLiteral(duration));
     }
 }

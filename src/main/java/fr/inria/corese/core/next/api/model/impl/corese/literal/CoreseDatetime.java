@@ -12,6 +12,7 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.temporal.TemporalAccessor;
 import java.util.Optional;
 
 public class CoreseDatetime extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
@@ -97,6 +98,11 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
     @Override
     public XMLGregorianCalendar calendarValue() {
         return this.coreseObject.getCalendar();
+    }
+
+    @Override
+    public TemporalAccessor temporalAccessorValue() {
+        return this.coreseObject.getCalendar().toGregorianCalendar().toZonedDateTime();
     }
 
     @Override
