@@ -3,29 +3,34 @@ package fr.inria.corese.core.load;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.core.elasticsearch.EdgeChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.logic.Entailment;
-import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.logic.Entailment;
+import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
 
 /**
- *
+ * Base class for creating and inserting RDF triples into a Graph.
+ * Provides fundamental methods for node creation, edge insertion,
+ * access rights management, and interaction with a DataManager if available.
+ * 
+ * This class serves as the foundation for other implementations that
+ * generate RDF triples from various sources (RDFXML, TURTLE/SPARQL).
+ * 
  * @author Olivier Corby, INRIA 2020
  */
-public class CreateTriple {
-    public static final Logger logger = LoggerFactory.getLogger(CreateTriple.class);
+public abstract class TripleCreatorBase {
+    public static final Logger logger = LoggerFactory.getLogger(TripleCreatorBase.class);
     static final String STAR = "*";
 
     private QueryProcess queryProcess;
@@ -39,10 +44,10 @@ public class CreateTriple {
     int count = 1;
     int limit = Integer.MAX_VALUE;
 
-    CreateTriple() {
+    TripleCreatorBase() {
     }
 
-    CreateTriple(Graph g, Load ld) {
+    TripleCreatorBase(Graph g, Load ld) {
         load = ld;
         queryProcess = load.getCreateQueryProcess();
         graph = g;
@@ -120,11 +125,11 @@ public class CreateTriple {
     Node addGraph(String src) {
         return graph.addGraph(src);
     }
-    
+
     Node addGraph(String src, boolean bnode) {
         return graph.addGraph(src, bnode);
     }
-    
+
     Node addGraph(Atom src) {
         return graph.addGraph(src.getLabel(), src.isBlankOrBlankNode());
     }

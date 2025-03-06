@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://example.org/ontology#"
+    xml:base="http://example.org/ontology"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+    <owl:Ontology rdf:about="http://example.org/ontology">
+        <owl:imports rdf:resource="http://xmlns.com/foaf/0.1/" />
+    </owl:Ontology>
+
+    <owl:Class rdf:about="http://example.org/ontology#Person">
+        <rdfs:label>Person</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person" />
+    </owl:Class>
+
+    <owl:Class rdf:about="http://example.org/ontology#Student">
+        <rdfs:label>Student</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://example.org/ontology#Person" />
+    </owl:Class>
+
+</rdf:RDF>
