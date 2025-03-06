@@ -1,23 +1,25 @@
 # Corese Changelog
 
-## Version 4.6.3 – 2025-
+## Version 4.6.3 – 2025-02-20
 
 ### Added
 
-- Added `DataManager` support for RDFa parsing, enabling alternative storage solutions.
-- Ensures RDFa triples can be stored in the same backends as other RDF formats.
+- `DataManager` support for RDFa parsing, enabling alternative storage solutions.
+- Ensured RDFa triples can be stored in the same backends as other RDF formats.
 
 ### Changed
 
+- Improved SPARQL query result display in the Getting Started guide.
+- Fixed syntax errors in the Mermaid diagram for RDF relationships in the Getting Started guide.
 - Added `com.sun.activation:jakarta.activation:2.0.1` dependency to resolve missing MIME data handling warning.
-- Ensures compatibility with Java 11+ and Jakarta EE.
+- Ensured compatibility with Java 11+ and Jakarta EE.
 
 ### Fixed
 
-- Fixed OWL imports processing across all RDF formats:
-  - RDFXML: Previously ignored the `owl:imports` option.
-  - TTL, TRIG, NT, NQ: Previously caused `NullPointerException` when auto-import was active.
-  - JSON-LD, RDFA: Previously did not process `owl:imports` even when enabled.
+- OWL imports processing across all RDF formats:
+  - **RDFXML**: Previously ignored the `owl:imports` option.
+  - **TTL, TRIG, NT, NQ**: Previously caused `NullPointerException` when auto-import was active.
+  - **JSON-LD, RDFa**: Previously did not process `owl:imports` even when enabled.
 
 ## Version 4.6.2 – 2025-02-20
 
