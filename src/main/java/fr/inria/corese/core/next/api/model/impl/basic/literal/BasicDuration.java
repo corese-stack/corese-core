@@ -61,7 +61,6 @@ public class BasicDuration extends AbstractDuration {
 
     @Override
     public String stringValue() {
-        logger.debug("Getting string value of duration: {} {}", this.temporalAmount, this.temporalAmount.isNegative());
         return this.temporalAmount.toString();
     }
 
@@ -86,7 +85,6 @@ public class BasicDuration extends AbstractDuration {
     }
 
     public static BasicDuration parse(String durationString) {
-        logger.debug("Parsing duration string: {}", durationString);
         Matcher matcher = DURATION_PATTERN.matcher(durationString);
         XSDDuration xsdDuration = new XSDDuration();
 
@@ -99,7 +97,6 @@ public class BasicDuration extends AbstractDuration {
         }
 
         if(matcher.group("sign") != null && matcher.group("sign").equals("-")) {
-            logger.debug("Negative duration");
             xsdDuration.setNegative();
         }
 
@@ -124,13 +121,11 @@ public class BasicDuration extends AbstractDuration {
         }
 
         if(matcher.group("second") != null) {
-            logger.debug("Seconds: {}", matcher.group("second"));
             BigDecimal seconds = new BigDecimal(matcher.group("second"));
             xsdDuration.set(SECONDS, seconds.longValue());
         }
 
         if(matcher.group("nano") != null) {
-            logger.debug("Nanos: {}", matcher.group("nano"));
             BigDecimal nanos = new BigDecimal(matcher.group("nano"));
             nanos = nanos.movePointRight(9); // Nanosecond is 10^-9 of a second
             xsdDuration.set(NANOS, nanos.longValue());
@@ -144,6 +139,10 @@ public class BasicDuration extends AbstractDuration {
         return new BasicDuration(xsdDuration);
     }
 
+    /**
+     * A class to represent a duration as defined in the XSD specification.
+     * The specificity of this class compared to existing ones in Java is that a duration can be negative and that it can have a precision from years to nanoseconds.
+     */
     private static class XSDDuration implements TemporalAmount {
         private final Map<ChronoUnit, Long> values;
         private boolean isNegative;
@@ -163,12 +162,16 @@ public class BasicDuration extends AbstractDuration {
             }
         }
 
+        /**
+         * @param temporalUnit Expected to be a ChronoUnit.
+         * @return 0 by default.
+         */
         @Override
         public long get(TemporalUnit temporalUnit) {
             return values.getOrDefault(temporalUnit, 0L);
         }
 
-        public void set(ChronoUnit temporalUnit, long value) {
+        private void set(ChronoUnit temporalUnit, long value) {
             values.put(temporalUnit, value);
         }
 
@@ -179,16 +182,50 @@ public class BasicDuration extends AbstractDuration {
 
         @Override
         public Temporal addTo(Temporal temporal) {
-            for(Map.Entry<ChronoUnit, Long> entry : values.entrySet()) {
-                temporal = temporal.plus(entry.getValue(), entry.getKey());
+            if(this.isNegative) {
+                return subtractFromRegardlessOfSign(temporal);
+            } else {
+                return addToRegardlessOfSign(temporal);
             }
-            return temporal;
         }
 
         @Override
         public Temporal subtractFrom(Temporal temporal) {
+            if(this.isNegative) {
+                return addToRegardlessOfSign(temporal);
+            } else {
+                return subtractFromRegardlessOfSign(temporal);
+            }
+        }
+
+        /**
+         * Adds the values of this duration to the given temporal, regardless of the sign of the duration.
+         * @param temporal the temporal to add the values to
+         * @return the temporal with the values of this duration added to it
+         */
+        private Temporal addToRegardlessOfSign(Temporal temporal) {
             for(Map.Entry<ChronoUnit, Long> entry : values.entrySet()) {
-                temporal = temporal.minus(entry.getValue(), entry.getKey());
+                if(entry.getValue() != 0 && temporal.isSupported(entry.getKey())) {
+                    temporal = temporal.plus(entry.getValue(), entry.getKey());
+                } else if (entry.getValue() != 0 && !temporal.isSupported(entry.getKey())) {
+                    throw new IncorrectOperationException("Temporal unit " + entry.getKey() + " is not supported by the temporal object");
+                }
+            }
+            return temporal;
+        }
+
+        /**
+         * Subtracts the values of this duration from the given temporal, regardless of the sign of the duration.
+         * @param temporal the temporal to subtract the values from
+         * @return the temporal with the values of this duration subtracted from it
+         */
+        private Temporal subtractFromRegardlessOfSign(Temporal temporal) {
+            for(Map.Entry<ChronoUnit, Long> entry : values.entrySet()) {
+                if(entry.getValue() != 0 && temporal.isSupported(entry.getKey())) {
+                    temporal = temporal.minus(entry.getValue(), entry.getKey());
+                } else if (entry.getValue() != 0 && !temporal.isSupported(entry.getKey())) {
+                    throw new IncorrectOperationException("Temporal unit " + entry.getKey() + " is not supported by the temporal object");
+                }
             }
             return temporal;
         }
@@ -217,6 +254,10 @@ public class BasicDuration extends AbstractDuration {
             return values.hashCode();
         }
 
+        /**
+         * Returns the XSD duration format of the duration.
+         * @return
+         */
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder("");

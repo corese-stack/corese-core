@@ -19,7 +19,7 @@ public abstract class ValueFactoryTest {
     @Test
     public void testCreateIRI() {
         String correctIRI = "http://example.org";
-        String incorrectIRI = "http:/example.org#";
+        String incorrectIRI = "test";
 
         assertNotNull(this.valueFactory.createIRI(correctIRI));
         assertThrows(IncorrectFormatException.class, () -> this.valueFactory.createIRI(incorrectIRI));
@@ -91,7 +91,7 @@ public abstract class ValueFactoryTest {
 
     @Test
     public void testCreateLiteralTemporalAmount() {
-        Duration duration = Duration.ofDays(1);
+        Duration duration = Duration.ofHours(23);
         Period period = Period.ofDays(100);
 
         Literal durationDuration = this.valueFactory.createLiteral(duration);

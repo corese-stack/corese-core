@@ -118,6 +118,11 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
         return ValueFactory.super.createLiteral(value);
     }
 
+    /**
+     * There are no classes that implement TemporalAmount in Corese
+     * @param value
+     * @return
+     */
     @Override
     public Literal createLiteral(TemporalAmount value) {
         return ValueFactory.super.createLiteral(value);
