@@ -1,5 +1,14 @@
 # Corese Changelog
 
+## Version 4.6.3 – 2025-
+
+### Fixed
+
+- Fixed OWL imports processing across all RDF formats:
+  - RDFXML: Previously ignored the `owl:imports` option.
+  - TTL, TRIG, NT, NQ: Previously caused `NullPointerException` when auto-import was active.
+  - JSON-LD, RDFA: Previously did not process `owl:imports` even when enabled.
+
 ## Version 4.6.2 – 2025-02-20
 
 ### Fixed
