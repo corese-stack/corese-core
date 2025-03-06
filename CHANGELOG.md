@@ -2,6 +2,11 @@
 
 ## Version 4.6.3 – 2025-
 
+### Changed
+
+- Added `com.sun.activation:jakarta.activation:2.0.1` dependency to resolve missing MIME data handling warning.
+- Ensures compatibility with Java 11+ and Jakarta EE.
+
 ### Fixed
 
 - Fixed OWL imports processing across all RDF formats:
