@@ -6,8 +6,10 @@ import org.semarglproject.sink.TripleSink;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.load.AddTripleHelper;
+import fr.inria.corese.core.load.AddTripleHelperDataManager;
 import fr.inria.corese.core.load.ILoadSerialization;
 import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
 
 /**
  * Implements the interface TripleSink (from semargl) in order to add the
@@ -20,6 +22,7 @@ public class CoreseRDFaTripleSink implements TripleSink {
 
     private AddTripleHelper helper;
     private Graph graph;
+    private DataManager dataManager;
     private Node graphSource;
 
     /**
@@ -28,7 +31,7 @@ public class CoreseRDFaTripleSink implements TripleSink {
      * @param graph  Graph
      * @param source Name of source graph
      */
-    public CoreseRDFaTripleSink(Graph graph, String source, Load load) {
+    public CoreseRDFaTripleSink(Graph graph, DataManager man, String source, Load load) {
         this.graph = graph;
 
         if (source == null) {
@@ -37,7 +40,12 @@ public class CoreseRDFaTripleSink implements TripleSink {
             graphSource = this.graph.addGraph(source);
         }
 
-        helper = AddTripleHelper.create(this.graph, load);
+        setDataManager(man);
+        if (man == null) {
+            helper = AddTripleHelper.create(graph, load);
+        } else {
+            helper = new AddTripleHelperDataManager(graph, man, load);
+        }
     }
 
     @Override
@@ -88,5 +96,13 @@ public class CoreseRDFaTripleSink implements TripleSink {
     public void setHelper(boolean renameBNode, int limit) {
         helper.setRenameBlankNode(renameBNode);
         helper.setLimit(limit);
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
     }
 }

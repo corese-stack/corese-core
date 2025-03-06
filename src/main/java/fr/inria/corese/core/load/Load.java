@@ -830,7 +830,7 @@ public class Load
 
     // load RDFa
     void loadRDFa(Reader stream, String path, String base, String name) throws LoadException {
-        CoreseRDFaTripleSink sink = new CoreseRDFaTripleSink(getGraph(), null, this);
+        CoreseRDFaTripleSink sink = new CoreseRDFaTripleSink(getGraph(), getDataManager(), null, this);
         sink.setHelper(renameBlankNode, getLimit());
 
         RDFaLoader loader = RDFaLoader.create(stream, base);

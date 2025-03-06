@@ -2,6 +2,11 @@
 
 ## Version 4.6.3 – 2025-
 
+### Added
+
+- Added `DataManager` support for RDFa parsing, enabling alternative storage solutions.
+- Ensures RDFa triples can be stored in the same backends as other RDF formats.
+
 ### Changed
 
 - Added `com.sun.activation:jakarta.activation:2.0.1` dependency to resolve missing MIME data handling warning.
