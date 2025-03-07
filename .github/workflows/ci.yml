@@ -5,10 +5,12 @@ on:
     branches:
       - "main"
       - "develop"
+      - "feature/corese-next"
   pull_request:
     branches:
       - "main"
       - "develop"
+      - "feature/corese-next"
 
 permissions:
   contents: read
