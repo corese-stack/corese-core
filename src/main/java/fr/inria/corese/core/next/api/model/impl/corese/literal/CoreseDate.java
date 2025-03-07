@@ -14,6 +14,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
     }
 
     public CoreseDate(Date date) {
-        this(DateFormat.getDateInstance().format(date));
+        this((new SimpleDateFormat("yyyy-MM-dd" )).format(date));
     }
 
     public CoreseDate(String date) {
