@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.api.model.impl.corese.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.api.exception.IncorrectDatatypeException;
 import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
@@ -33,6 +34,18 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
 
     public CoreseDatetime(String dateXMLDateFormat) {
         this(new fr.inria.corese.core.sparql.datatype.CoreseDateTime(dateXMLDateFormat));
+    }
+
+    public CoreseDatetime(String value, IRI datatype) {
+        this(new fr.inria.corese.core.sparql.datatype.CoreseDateTime(value));
+        this.datatype = datatype;
+    }
+
+    public CoreseDatetime(String value, IRI datatype, CoreDatatype coreDatatype) {
+        this(value, datatype);
+        if(coreDatatype != null && coreDatatype != XSD.xsdDateTime && coreDatatype != XSD.xsdTime) {
+            throw new IncorrectDatatypeException("Cannot create CoreseDatetime with a core datatype other than xsd:dateTime or xsd:time.");
+        }
     }
 
     @Override

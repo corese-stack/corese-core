@@ -86,6 +86,15 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(String label, IRI datatype, CoreDatatype coreDatatype) {
+        if (XSD.xsdDate.equals(coreDatatype)) {
+            return new CoreseDate(label, datatype, coreDatatype);
+        } else if (XSD.xsdDateTime.equals(coreDatatype)) {
+            return new CoreseDatetime(label, datatype, coreDatatype);
+        } else if (XSD.xsdTime.equals(coreDatatype)) {
+            return new CoreseTime(label, datatype, coreDatatype);
+        } else if (XSD.xsdDuration.equals(coreDatatype)) {
+            return new CoreseDuration(label, datatype, coreDatatype);
+        }
         return null;
     }
 

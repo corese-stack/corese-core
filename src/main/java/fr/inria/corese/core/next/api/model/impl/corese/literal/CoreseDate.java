@@ -13,6 +13,7 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.temporal.TemporalAccessor;
@@ -38,6 +39,18 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
 
     public CoreseDate(Date date) {
         this((new SimpleDateFormat("yyyy-MM-dd" )).format(date));
+    }
+
+    public CoreseDate(String value, IRI datatype) {
+        this(new fr.inria.corese.core.sparql.datatype.CoreseDate(value));
+        this.datatype = datatype;
+    }
+
+    public CoreseDate(String value, IRI datatype, CoreDatatype coreDatatype) {
+        this(value, datatype);
+        if(coreDatatype != null && coreDatatype != XSD.xsdDate) {
+            throw new IncorrectDatatypeException("Cannot create CoreseDate with a non-date CoreDatatype.");
+        }
     }
 
     public CoreseDate(String date) {

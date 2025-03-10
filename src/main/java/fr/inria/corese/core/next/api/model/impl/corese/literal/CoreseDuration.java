@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.api.model.impl.corese.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
 import fr.inria.corese.core.next.api.model.impl.literal.AbstractDuration;
 import fr.inria.corese.core.next.api.model.vocabulary.XSD;
@@ -22,6 +23,17 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
 
     public CoreseDuration(String duration) {
         this(new CoreseUndefLiteral(duration, XSD.xsdDuration.getIRI().stringValue()));
+    }
+
+    public CoreseDuration(String value, IRI datatype) {
+        this(new CoreseUndefLiteral(value, datatype.stringValue()));
+    }
+
+    public CoreseDuration(String value, IRI datatype, CoreDatatype coreDatatype) {
+        this(value, datatype);
+        if(coreDatatype != null && coreDatatype != XSD.xsdDuration) {
+            throw new UnsupportedOperationException("Cannot create CoreseDuration with a core datatype other than xsd:duration.");
+        }
     }
 
     public CoreseDuration(TemporalAmount duration) {
