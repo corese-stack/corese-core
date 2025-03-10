@@ -37,7 +37,7 @@ public class ParserHandler {
     private Metadata metadata;
     private ArrayList<EngineException> errorList;
 
-    ParserHandler() {
+    public ParserHandler() {
         errorList = new ArrayList<>();
     }
 

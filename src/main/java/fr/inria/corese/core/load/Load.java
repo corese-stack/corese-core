@@ -808,11 +808,11 @@ public class Load
         cr.start();
 
         IDatatype dt = DatatypeMap.newResource(path);
-        boolean b = true;
+        boolean lock = true;
         if (isEvent()) {
-            b = getCreateQueryProcess().isSynchronized();
+            lock = getCreateQueryProcess().isSynchronized();
         }
-        before(dt, b);
+        before(dt, lock);
         cr.setPath(path);
         LoadTurtle ld = LoadTurtle.create(stream, cr, base);
         ld.setNquad(nquad);
@@ -821,7 +821,7 @@ public class Load
         } catch (QueryLexicalException | QuerySyntaxException e) {
             throw LoadException.create(e, path);
         } finally {
-            after(dt, b);
+            after(dt, lock);
             cr.finish();
         }
     }

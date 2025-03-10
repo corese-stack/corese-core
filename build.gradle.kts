@@ -76,6 +76,7 @@ dependencies {
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                          // JSON-LD processing for Linked Data in JSON format
     implementation("junit:junit:4.13.2")                                                 // JUnit framework for unit testing in Java
     api("org.slf4j:slf4j-api:2.0.9")                                                     // Simple Logging Facade for Java (SLF4J)
+    testImplementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3")              // Log4j 2 SLF4J binding for logging
 }
 
 // Configure extra Java module information for dependencies without module-info
