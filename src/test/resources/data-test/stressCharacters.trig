@@ -1,0 +1,11 @@
+@prefix ns1: <http://example/> .
+
+ns1:graph {
+    ns1:S ns1:p ns1:o .
+
+    ns1:T ns1:p ns1:o .
+
+    ns1:s ns1:p <scheme:!$%25&'()*+,-./0123456789:/@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~?#>,
+            "	",
+            "߿ࠀ࿿က쿿퀀퟿�𐀀𿿽񀀀󿿽􀀀􏿽" .
+}

@@ -102,14 +102,12 @@ public class LoadTurtle {
 
     public void load() throws QueryLexicalException, QuerySyntaxException {
         try {
-            //logger.info("start parser");
             if (isNquad()) {
                 parser.nquad();
             }
             else {
                 parser.load();
             }
-            //logger.info("finish parser");
             for (EngineException e : parser.getHandler().getErrorList()) {
                 throw new QuerySyntaxException(e.getMessage());
             }

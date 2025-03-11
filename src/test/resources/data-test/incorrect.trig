@@ -1,0 +1,7 @@
+@prefix ns1: <http://example/> .
+
+_:graph {
+    <QSEHTJH;UTHES%FE> <dhgjfvse> _:4CatsOnABoat .
+    ns2:s ns1:p ns1:o
+        ns1:p _:4CatsOnABoat .
+}

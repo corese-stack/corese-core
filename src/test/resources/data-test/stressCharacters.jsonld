@@ -1,0 +1,32 @@
+[
+  {
+    "@id": "http://example/s",
+    "http://example/p": [
+      {
+        "@value": "߿ࠀ࿿က쿿퀀퟿�𐀀𿿽񀀀󿿽􀀀􏿽"
+      },
+      {
+        "@value": "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\u000b\f\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
+      },
+      {
+        "@id": "scheme:!$%25&'()*+,-./0123456789:/@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~?#"
+      }
+    ]
+  },
+  {
+    "@id": "http://example/T",
+    "http://example/p": [
+      {
+        "@id": "http://example/o"
+      }
+    ]
+  },
+  {
+    "@id": "http://example/S",
+    "http://example/p": [
+      {
+        "@id": "http://example/o"
+      }
+    ]
+  }
+]

@@ -264,6 +264,9 @@ public class ASTQuery
         return getContext().getLevel();
     }
 
+    /**
+     * @return SPIN representation of the query
+     */
     @Override
     public String toGraph() {
         SPIN sp = SPIN.create();
