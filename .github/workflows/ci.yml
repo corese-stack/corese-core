@@ -6,6 +6,7 @@ on:
       - "main"
       - "develop"
       - "feature/corese-next"
+      - "feature/sonarqube-ci"
   pull_request:
     branches:
       - "main"
