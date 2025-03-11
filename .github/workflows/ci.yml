@@ -11,6 +11,7 @@ on:
       - "main"
       - "develop"
       - "feature/corese-next"
+  workflow_dispatch:
 
 permissions:
   contents: read
