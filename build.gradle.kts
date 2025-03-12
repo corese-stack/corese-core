@@ -6,11 +6,22 @@ plugins {
     signing                                                     // Signs artifacts for Maven Central
     `maven-publish`                                             // Enables publishing to Maven repositories
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0" // Automates Nexus publishing
-    
+
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
     id("org.gradlex.extra-java-module-info") version "1.9"      // Module metadata for JARs without module info
     id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
+    id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
+}
+
+// SonarQube configuration
+sonar {
+    properties {
+        property("sonar.projectKey", "crs-core-new")
+        property("sonar.host.url", "https://sonarqube.inria.fr/sonarqube")
+        property("sonar.login", System.getenv("SONAR_TOKEN"))
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+    }
 }
 
 /////////////////////////
