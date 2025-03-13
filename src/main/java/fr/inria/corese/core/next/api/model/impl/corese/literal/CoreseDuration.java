@@ -3,8 +3,8 @@ package fr.inria.corese.core.next.api.model.impl.corese.literal;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
+import fr.inria.corese.core.next.api.model.base.CoreDatatype.XSD;
 import fr.inria.corese.core.next.api.model.impl.literal.AbstractDuration;
-import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
 
@@ -22,7 +22,7 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
     }
 
     public CoreseDuration(String duration) {
-        this(new CoreseUndefLiteral(duration, XSD.xsdDuration.getIRI().stringValue()));
+        this(new CoreseUndefLiteral(duration, XSD.DURATION.getIRI().stringValue()));
     }
 
     public CoreseDuration(String value, IRI datatype) {
@@ -31,7 +31,7 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
 
     public CoreseDuration(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
-        if(coreDatatype != null && coreDatatype != XSD.xsdDuration) {
+        if(coreDatatype != null && coreDatatype != XSD.DURATION) {
             throw new UnsupportedOperationException("Cannot create CoreseDuration with a core datatype other than xsd:duration.");
         }
     }
@@ -67,7 +67,7 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
 
     @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.xsdDuration;
+        return XSD.DURATION;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.api.model.impl.literal;
 
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
-import fr.inria.corese.core.next.api.model.vocabulary.XSD;
+import fr.inria.corese.core.next.api.model.base.CoreDatatype.XSD;
 
 import java.time.DateTimeException;
 import java.time.temporal.TemporalUnit;
@@ -10,12 +10,12 @@ import java.util.*;
 public abstract class AbstractDuration extends AbstractLiteral implements Comparable<AbstractDuration> {
 
     protected AbstractDuration() {
-        super(XSD.xsdDuration.getIRI());
+        super(XSD.DURATION.getIRI());
     }
 
     @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.xsdDuration;
+        return XSD.DURATION;
     }
 
     /**

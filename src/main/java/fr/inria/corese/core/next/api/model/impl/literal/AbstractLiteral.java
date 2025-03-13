@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.api.model.Literal;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.DateTimeException;
@@ -13,7 +14,10 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.Optional;
 
-public abstract class AbstractLiteral implements Literal {
+/**
+ * Base class for all literals. All value accessors throw an exception by default.
+ */
+public abstract class AbstractLiteral implements Literal, Serializable {
 
     protected IRI datatype;
 

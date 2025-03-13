@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.api.model.impl.basic.BasicIRI;
  *
  * Because of the declaration of several Literal datatype, it is made to implement the CoreDatatype interface.
  */
-public enum RDF implements CoreDatatype, Vocabulary {
+public enum RDF implements Vocabulary {
     HTML("HTML"),
     langString("langString"),
     PlainLiteral("PlainLiteral"),
@@ -47,5 +47,10 @@ public enum RDF implements CoreDatatype, Vocabulary {
     @Override
     public String getNamespace() {
         return "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    }
+
+    @Override
+    public String getPreferredPrefix() {
+        return "rdf";
     }
 }

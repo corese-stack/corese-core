@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.api.model.impl.basic.literal;
 
 import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.api.model.base.CoreDatatype;
 import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -111,7 +112,7 @@ public class BasicDurationTest {
     @Test
     public void getDatatype() {
         BasicDuration basicDuration = BasicDuration.parse("P2DT3H4M");
-        assertEquals(XSD.xsdDuration.getIRI().stringValue(), basicDuration.getDatatype().stringValue());
+        assertEquals(CoreDatatype.XSD.DURATION.getIRI().stringValue(), basicDuration.getDatatype().stringValue());
     }
 
     @Test
@@ -205,14 +206,14 @@ public class BasicDurationTest {
     @Test
     public void getCoreDatatype() {
         BasicDuration basicDuration = BasicDuration.parse("P2D");
-        assertEquals(XSD.xsdDuration, basicDuration.getCoreDatatype());
+        assertEquals(CoreDatatype.XSD.DURATION, basicDuration.getCoreDatatype());
     }
 
     @Test
     public void setCoreDatatype() {
         assertThrows(IncorrectOperationException.class, () -> {
             BasicDuration basicDuration = BasicDuration.parse("P2DT3H4M");
-            basicDuration.setCoreDatatype(XSD.xsdInteger);
+            basicDuration.setCoreDatatype(CoreDatatype.XSD.INTEGER);
         });
     }
 

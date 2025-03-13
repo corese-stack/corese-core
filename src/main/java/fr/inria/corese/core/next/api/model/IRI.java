@@ -1,4 +1,9 @@
 package fr.inria.corese.core.next.api.model;
+
+/**
+ * Represents an IRI
+ * @see <a href="https://www.w3.org/TR/rdf11-concepts/#section-IRIs">RDF 1.1 Concepts and Abstract Syntax: Internationalized Resource Identifiers (IRIs)</a>
+ */
 public interface IRI extends Resource {
 
 	/**

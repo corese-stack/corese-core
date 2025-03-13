@@ -5,9 +5,9 @@ import fr.inria.corese.core.next.api.exception.IncorrectDatatypeException;
 import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
+import fr.inria.corese.core.next.api.model.base.CoreDatatype.XSD;
 import fr.inria.corese.core.next.api.model.impl.corese.CoreseIRI;
 import fr.inria.corese.core.next.api.model.impl.literal.AbstractTemporalPointLiteral;
-import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -48,7 +48,7 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
 
     public CoreseDate(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
-        if(coreDatatype != null && coreDatatype != XSD.xsdDate) {
+        if(coreDatatype != null && coreDatatype != XSD.DATE) {
             throw new IncorrectDatatypeException("Cannot create CoreseDate with a non-date CoreDatatype.");
         }
     }
@@ -129,7 +129,7 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
 
     @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.xsdDate;
+        return XSD.DATE;
     }
 
     @Override

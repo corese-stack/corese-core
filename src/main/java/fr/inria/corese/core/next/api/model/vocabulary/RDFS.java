@@ -36,4 +36,9 @@ public enum RDFS implements Vocabulary {
     public IRI getIRI() {
         return this.iri;
     }
+
+    @Override
+    public String getPreferredPrefix() {
+        return "rdfs";
+    }
 }

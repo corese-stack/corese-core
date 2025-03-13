@@ -3,11 +3,11 @@ package fr.inria.corese.core.next.api.model.impl.corese;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.next.api.model.*;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
+import fr.inria.corese.core.next.api.model.base.CoreDatatype.XSD;
 import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDate;
 import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDatetime;
 import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDuration;
 import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseTime;
-import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,13 +58,13 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(String label, IRI datatype) {
-        if (XSD.xsdDate.getIRI().equals(datatype)) {
+        if (XSD.DATE.getIRI().equals(datatype)) {
             return new CoreseDate(label);
-        } else if (XSD.xsdDateTime.getIRI().equals(datatype)) {
+        } else if (XSD.DATETIME.getIRI().equals(datatype)) {
             return new CoreseDatetime(label);
-        } else if (XSD.xsdTime.getIRI().equals(datatype)) {
+        } else if (XSD.TIME.getIRI().equals(datatype)) {
             return new CoreseTime(label);
-        } else if (XSD.xsdDuration.getIRI().equals(datatype)) {
+        } else if (XSD.DURATION.getIRI().equals(datatype)) {
             return new CoreseDuration(label);
         }
         return null;
@@ -72,13 +72,13 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(String label, CoreDatatype datatype) {
-        if (XSD.xsdDate.equals(datatype)) {
+        if (XSD.DATE.equals(datatype)) {
             return new CoreseDate(label);
-        } else if (XSD.xsdDateTime.equals(datatype)) {
+        } else if (XSD.DATETIME.equals(datatype)) {
             return new CoreseDatetime(label);
-        } else if (XSD.xsdTime.equals(datatype)) {
+        } else if (XSD.TIME.equals(datatype)) {
             return new CoreseTime(label);
-        } else if (XSD.xsdDuration.equals(datatype)) {
+        } else if (XSD.DURATION.equals(datatype)) {
             return new CoreseDuration(label);
         }
         return null;
@@ -86,13 +86,13 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(String label, IRI datatype, CoreDatatype coreDatatype) {
-        if (XSD.xsdDate.equals(coreDatatype)) {
+        if (XSD.DATE.equals(coreDatatype)) {
             return new CoreseDate(label, datatype, coreDatatype);
-        } else if (XSD.xsdDateTime.equals(coreDatatype)) {
+        } else if (XSD.DATETIME.equals(coreDatatype)) {
             return new CoreseDatetime(label, datatype, coreDatatype);
-        } else if (XSD.xsdTime.equals(coreDatatype)) {
+        } else if (XSD.TIME.equals(coreDatatype)) {
             return new CoreseTime(label, datatype, coreDatatype);
-        } else if (XSD.xsdDuration.equals(coreDatatype)) {
+        } else if (XSD.DURATION.equals(coreDatatype)) {
             return new CoreseDuration(label, datatype, coreDatatype);
         }
         return null;
@@ -165,7 +165,6 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(TemporalAmount value) {
-        logger.debug("Creating a Literal from TemporalAmount");
         return new CoreseDuration(value);
     }
 

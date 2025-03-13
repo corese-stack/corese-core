@@ -35,7 +35,6 @@ public interface Model extends Set<Statement>, Serializable {
     Set<Value> objects();
 
     default Set<Resource> contexts() {
-//        Set<Resource> subjects = stream().map(st -> st.getContext()).collect(Collectors.toSet());
         Set<Resource> subjects = null;
         return subjects;
     }

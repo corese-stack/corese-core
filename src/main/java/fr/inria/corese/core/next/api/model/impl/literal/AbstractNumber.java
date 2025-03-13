@@ -9,7 +9,7 @@ public abstract class AbstractNumber extends AbstractLiteral implements Comparab
     }
 
     /**
-     * Comprison using double value
+     * Comparison using double value
      * @param abstractNumber
      * @return
      */

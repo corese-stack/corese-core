@@ -6,7 +6,12 @@ import fr.inria.corese.core.next.api.model.util.IRIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractIRI implements IRI, Comparable<IRI> {
+import java.io.Serializable;
+
+/**
+ * Base class for IRI implementations. Includes base functionality for IRI handling.
+ */
+public abstract class AbstractIRI implements IRI, Comparable<IRI>, Serializable {
     private static final Logger logger = LoggerFactory.getLogger(AbstractIRI.class);
 
     private final String namespace;
