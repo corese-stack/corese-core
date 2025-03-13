@@ -2,6 +2,9 @@ package fr.inria.corese.core.next.api.model;
 
 import java.io.Serializable;
 
+/**
+ * Represents a namespace with a prefix and the start of an IRI as its name.
+ */
 public interface Namespace extends Serializable, Comparable<Namespace> {
 
     String getPrefix();

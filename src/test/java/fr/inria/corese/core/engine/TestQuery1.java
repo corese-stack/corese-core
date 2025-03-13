@@ -5922,30 +5922,25 @@ public class TestQuery1 {
     public void testGT() throws LoadException, EngineException {
         Graph g = createGraph();
         Load ld = Load.create(g);
-        File localRDFFile = new File(localRDF);
-        File localRDFSFile = new File(localRDFS);
 
         ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
         ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
-        String t1 = "template { st:apply-templates-with-graph(st:turtle, \"file://" + localRDFFile.getAbsolutePath() + "\")} where {}";
-        String t2 = "template { st:apply-templates-with-graph(st:turtle, \"file://" + localRDFSFile.getAbsolutePath() + "\")} where {}";
+        String t1 = "template { st:apply-templates-with-graph(st:turtle, rdf:)} where {}";
+        String t2 = "template { st:apply-templates-with-graph(st:turtle, rdfs:)} where {}";
         String t3 = "template { st:apply-templates-with(st:turtle)} where {}";
 
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(t1);
         String str = normalizeLineEndings(map.getTemplateStringResult());
-        //// System.out.println(str);
         assertEquals(6202, str.length());
 
         map = exec.query(t2);
         str = normalizeLineEndings(map.getTemplateStringResult());
-        // System.out.println(str);
-        assertEquals(3872, str.length()); // TODO: need a more robust test
+        assertEquals(3849, str.length()); // TODO: need a more robust test
 
         map = exec.query(t3);
         str = normalizeLineEndings(map.getTemplateStringResult());
-        //// System.out.println(str);
         assertEquals(9859, str.length()); // TODO: need a more robust test
     }
 
@@ -5984,15 +5979,16 @@ public class TestQuery1 {
 
     @Test
     public void testTrig() throws LoadException, EngineException {
+        Property.set(LOAD_IN_DEFAULT_GRAPH, true);
         Graph g = Graph.create(true);
         Load ld = Load.create(g);
         ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
         ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        Property.set(LOAD_IN_DEFAULT_GRAPH, false);
 
         Transformer pp = Transformer.create(g, Transformer.TRIG);
-        String str = pp.transform();
-
-        assertTrue(str.length() >= 15084);
+        String str = normalizeLineEndings(pp.transform());
+        assertEquals(14928, str.length()); // @Todo: need a more robust test
     }
 
     @Test

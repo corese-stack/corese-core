@@ -2,6 +2,9 @@ package fr.inria.corese.core.next.api.model;
 
 import java.io.Serializable;
 
+/**
+ * Super interface of all elements of an RDF model (statements, nodes, etc).
+ */
 public interface Value extends Serializable {
 
 	default boolean isBNode() {

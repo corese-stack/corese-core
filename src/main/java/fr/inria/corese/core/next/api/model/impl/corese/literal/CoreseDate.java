@@ -5,28 +5,29 @@ import fr.inria.corese.core.next.api.exception.IncorrectDatatypeException;
 import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
+import fr.inria.corese.core.next.api.model.base.CoreDatatype.XSD;
 import fr.inria.corese.core.next.api.model.impl.corese.CoreseIRI;
 import fr.inria.corese.core.next.api.model.impl.literal.AbstractTemporalPointLiteral;
-import fr.inria.corese.core.next.api.model.vocabulary.XSD;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Optional;
 
 public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
 
     private final fr.inria.corese.core.sparql.datatype.CoreseDate coreseObject;
-    private final IRI datatype;
 
     public CoreseDate(IDatatype coreseObject) {
-        super();
+        super(new CoreseIRI(coreseObject.getDatatypeURI()));
         if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseDate) {
             this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseDate) coreseObject;
-            this.datatype = new CoreseIRI(coreseObject.getDatatypeURI());
         } else {
             throw new IncorrectOperationException("Cannot create CoreseDate from a non-date Corese object.");
         }
@@ -37,7 +38,19 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
     }
 
     public CoreseDate(Date date) {
-        this(DateFormat.getDateInstance().format(date));
+        this((new SimpleDateFormat("yyyy-MM-dd" )).format(date));
+    }
+
+    public CoreseDate(String value, IRI datatype) {
+        this(new fr.inria.corese.core.sparql.datatype.CoreseDate(value));
+        this.datatype = datatype;
+    }
+
+    public CoreseDate(String value, IRI datatype, CoreDatatype coreDatatype) {
+        this(value, datatype);
+        if(coreDatatype != null && coreDatatype != XSD.DATE) {
+            throw new IncorrectDatatypeException("Cannot create CoreseDate with a non-date CoreDatatype.");
+        }
     }
 
     public CoreseDate(String date) {
@@ -110,8 +123,13 @@ public class CoreseDate extends AbstractTemporalPointLiteral implements CoreseDa
     }
 
     @Override
+    public TemporalAccessor temporalAccessorValue() {
+        return this.coreseObject.getCalendar().toGregorianCalendar().toZonedDateTime();
+    }
+
+    @Override
     public CoreDatatype getCoreDatatype() {
-        return XSD.xsdDate;
+        return XSD.DATE;
     }
 
     @Override

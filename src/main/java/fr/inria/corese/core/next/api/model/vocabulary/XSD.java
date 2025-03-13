@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.api.model.impl.basic.BasicIRI;
  *
  * Because a lot of the datatype names are also Java keywords, the names are exceptions to the naming convention.
  */
-public enum XSD implements CoreDatatype, Vocabulary {
+public enum XSD implements Vocabulary {
 
     xsdBoolean("boolean"),
     xsdInteger("integer"),
@@ -63,6 +63,11 @@ public enum XSD implements CoreDatatype, Vocabulary {
     @Override
     public String getNamespace() {
         return "http://www.w3.org/2001/XMLSchema#";
+    }
+
+    @Override
+    public String getPreferredPrefix() {
+        return "xsd";
     }
 
 }
