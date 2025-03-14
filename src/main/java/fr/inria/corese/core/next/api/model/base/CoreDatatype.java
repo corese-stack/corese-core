@@ -69,6 +69,16 @@ public interface CoreDatatype {
         NON_POSITIVE_INTEGER(fr.inria.corese.core.next.api.model.vocabulary.XSD.xsdNonPositiveInteger.getIRI()),
 
         /**
+         * Integer numbers >0
+         */
+        POSITIVE_INTEGER(fr.inria.corese.core.next.api.model.vocabulary.XSD.xsdPositiveInteger.getIRI()),
+
+        /**
+         * Integer numbers <0
+         */
+        NEGATIVE_INTEGER(fr.inria.corese.core.next.api.model.vocabulary.XSD.xsdNegativeInteger.getIRI()),
+
+        /**
          * 0…18446744073709551615 (64 bit)
          */
         UNSIGNED_LONG(fr.inria.corese.core.next.api.model.vocabulary.XSD.xsdUnsignedLong.getIRI()),
