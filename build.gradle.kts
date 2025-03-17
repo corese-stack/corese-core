@@ -59,6 +59,7 @@ repositories {
 
 // Define dependencies
 dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     val jersey_version = "3.0.4"
     val semargl_version = "0.7.1"
 

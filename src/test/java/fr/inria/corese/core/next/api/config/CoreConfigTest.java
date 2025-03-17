@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class CoreConfigTest {
-
     @Test
     public void instantiationTest(){
         Assert.assertEquals("INFO", CoreConfig.getInstance().logLevel);
