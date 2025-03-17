@@ -1,65 +1,55 @@
 package fr.inria.corese.core.kgram.api.query;
 
-import fr.inria.corese.core.kgram.api.core.DatatypeValueFactory;
-import java.util.List;
-
-import fr.inria.corese.core.kgram.api.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.core.*;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.core.SparqlException;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Interface for the Connector that produces candidate edges for KGRAM
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
- *
  */
 public interface Producer {
 
-    public static final int DEFAULT = 0;
-    public static final int SKIP_DUPLICATE_TEST = 1;
+    int DEFAULT = 0;
+    int SKIP_DUPLICATE_TEST = 1;
     // Producer delivers from Path of from Provenance Graph
-    public static final int EXTENSION = 2;
+    int EXTENSION = 2;
 
     /**
      * KGRAM calls this method before executing a query. It enables to
      * initialize the Producer
-     *
      */
     default void init(Query q) {
     }
 
-    ;
-	default void start(Query q) {
+    default void start(Query q) {
     }
 
-    ;
-	default void finish(Query q) {
+    default void finish(Query q) {
     }
 
-    ;
-	
-	/**
-	 * A hook to tune Producer
-	 */
+    int getMode();
+
+    /**
+     * A hook to tune Producer
+     */
     void setMode(int n);
-
-    public int getMode();
 
     /**
      * Return all graph nodes that are known by the Producer. Should return
      * graph nodes that are member of from (if any).
      *
      * @param gNode The graph query node
-     * @param from The from named node list (may be empty)
-     * @param env The binding environment
+     * @param from  The from named node list (may be empty)
+     * @param env   The binding environment
      * @return graph nodes
      */
     Iterable<Node> getGraphNodes(Node gNode, List<Node> from, Environment env);
@@ -69,8 +59,8 @@ public interface Producer {
      * from (if any)
      *
      * @param gNode The graph query node
-     * @param from The from named node list (may be empty)
-     * @param env The binding environment
+     * @param from  The from named node list (may be empty)
+     * @param env   The binding environment
      * @return true if the node is a graph node
      */
     boolean isGraphNode(Node gNode, List<Node> from, Environment env);
@@ -85,10 +75,10 @@ public interface Producer {
      * nevertheless bindings are checked afterwards in KGRAM.
      *
      * @param gNode The query graph node if any
-     * @param from The from named if gNode is not null, otherwise the from (from
-     * may be empty)
+     * @param from  The from named if gNode is not null, otherwise the from (from
+     *              may be empty)
      * @param qEdge The query edge
-     * @param env The current mapping : query node -> target node
+     * @param env   The current mapping : query node -> target node
      * @return Candidate edge iterator
      */
     Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env);
@@ -96,16 +86,18 @@ public interface Producer {
     default Iterable<Edge> getEdges(Node s, Node p, Node o, List<Node> from) {
         return new ArrayList<>(0);
     }
-    
+
     default Edge insert(Node g, Node s, Node p, Node o) {
         return null;
     }
-    
+
     default Iterable<Edge> delete(Node g, Node s, Node p, Node o) {
         return null;
     }
-    
-    default boolean hasDataManager() { return false; }
+
+    default boolean hasDataManager() {
+        return false;
+    }
 
     //return IDatatype list of IDatatype edge
     // ldscript iterator
@@ -138,26 +130,25 @@ public interface Producer {
      * Return nodes for Zero length path
      *
      * @param gNode The graph node where to get nodes (may be null)
-     * @param from from or from named, may be empty
-     * @param edge Pseudo query edge for path
-     * @param env The binding environment
-     * @param exp either property name or a ! (pname | pname) or null
+     * @param from  from or from named, may be empty
+     * @param edge  Pseudo query edge for path
+     * @param env   The binding environment
+     * @param exp   either property name or a ! (pname | pname) or null
      * @param index of the node to return
      * @return Iterable of start nodes for exp
-     *
+     * <p>
      * SPARQL 1.1 requires: ZeroLengthPath match all nodes of (current) graph,
      * including Literals If the argument is a constant, it matches even if it
      * is not a node of the graph
-     *
      */
     Iterable<Node> getNodes(Node gNode, List<Node> from, Edge edge, Environment env,
-            List<Regex> exp, int index);
+                            List<Regex> exp, int index);
 
     /**
      * Return candidate edges for a path step for an elementary regex exp. Edge
      * start at start Node, start is the node at index. Hence start can be
      * edge.getNode(0) as well as edge.getNode(1)
-     *
+     * <p>
      * isInverse = true means consider also target edge nodes in reverse order
      * query: start = Bob ; ?a ^foaf:knows ?b target: Jack foaf:knows Bob return
      * edge above because we consider also Bob foaf:knows Jack This is
@@ -165,23 +156,24 @@ public interface Producer {
      * order
      *
      * @param gNode The start node of edges
-     * @param from from or from named, may be empty
+     * @param from  from or from named, may be empty
      * @param qEdge Pseudo query edge for path
-     * @param env The binding environment
-     * @param exp either property name or a ! (pname | pname)
-     * @param src current source if any
+     * @param env   The binding environment
+     * @param exp   either property name or a ! (pname | pname)
+     * @param src   current source if any
      * @param start The start node for current edge
      * @param index of the start node in edge exp.isInverse() authorize to
-     * consider nodes in reverse order (as if the symmetric relation would
-     * exist)
+     *              consider nodes in reverse order (as if the symmetric relation would
+     *              exist)
      * @return Iterable of start nodes for exp
      */
     Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env,
-            Regex exp, Node src, Node start, int index);
+                            Regex exp, Node src, Node start, int index);
 
-    /**
+    /*
      * ************** value to node *************
      */
+
     /**
      * Given a value from the filter language, return a Node that contains this
      * value use case: select fun(?x) as ?y
@@ -220,7 +212,7 @@ public interface Producer {
      * java.sql.ResultSet
      *
      * @param qNodes the query nodes to bind with values of object
-     * @param object
+     * @param value
      * @return Mappings
      */
     Mappings map(List<Node> qNodes, IDatatype value);
@@ -240,14 +232,14 @@ public interface Producer {
     // May return an object that implement the RDF graph
     Graph getGraph();
 
-    void setGraphNode(Node n);
-
     Node getGraphNode();
+
+    void setGraphNode(Node n);
 
     Edge copy(Edge ent);
 
     void close();
-    
+
     // generate fresh new blank node ID
     String blankNode();
 }

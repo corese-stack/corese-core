@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import static org.junit.Assert.assertEquals;
 
 public class ServiceTest {
-    private Logger logger = LoggerFactory.getLogger(ServiceTest.class);
+    private final Logger logger = LoggerFactory.getLogger(ServiceTest.class);
     private Service service;
     @Before
     public void setUp() {

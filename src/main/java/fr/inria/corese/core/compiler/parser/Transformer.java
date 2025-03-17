@@ -1,79 +1,66 @@
 package fr.inria.corese.core.compiler.parser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
+import fr.inria.corese.core.compiler.api.QueryVisitor;
+import fr.inria.corese.core.compiler.eval.QuerySolver;
+import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
+import fr.inria.corese.core.compiler.federate.FederateVisitor;
+import fr.inria.corese.core.compiler.visitor.MetadataVisitor;
+import fr.inria.corese.core.kgram.api.core.*;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.*;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.visitor.ASTParser;
+import fr.inria.corese.core.sparql.triple.parser.visitor.ASTWalker;
+import fr.inria.corese.core.sparql.triple.parser.visitor.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.core.sparql.triple.cst.RDFS;
-import fr.inria.corese.core.sparql.triple.parser.*;
-import fr.inria.corese.core.compiler.api.QueryVisitor;
-import fr.inria.corese.core.sparql.triple.parser.Dataset;
-import fr.inria.corese.core.sparql.triple.parser.visitor.ASTWalker;
-import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
-import fr.inria.corese.core.kgram.api.core.*;
-import static fr.inria.corese.core.kgram.api.core.ExpType.NODE;
-import fr.inria.corese.core.kgram.core.Exp;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.kgram.core.Sorter;
-import fr.inria.corese.core.compiler.federate.FederateVisitor;
-import fr.inria.corese.core.compiler.eval.QuerySolver;
-import static fr.inria.corese.core.compiler.eval.QuerySolver.SPARQL_COMPLIANT_DEFAULT;
-import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
-import fr.inria.corese.core.compiler.visitor.MetadataVisitor;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.exceptions.SafetyException;
-import fr.inria.corese.core.sparql.triple.parser.visitor.ASTParser;
-import fr.inria.corese.core.sparql.triple.parser.visitor.Record;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import static fr.inria.corese.core.compiler.eval.QuerySolver.SPARQL_COMPLIANT_DEFAULT;
 
 /**
  * Compiler of SPARQL AST to KGRAM Exp Query Use Corese.Core.Sparql parser Use an
  * abstract compiler to generate target edge/node/filter implementations
- *
+ * <p>
  * sub query compiled as distinct edge/node to avoid inappropriate type
  * inference on nodes, except variable nodes which are shared
  *
  * @author Olivier Corby, Edelweiss, INRIA 2009
- *
  */
 public class Transformer implements ExpType {
-  
-    private static Logger logger = LoggerFactory.getLogger(Transformer.class);
-    private static final String LINKED_DATA_PATH_VISITOR = 
-            "fr.inria.corese.core.visitor.ldpath.LinkedDataPath";
+
     public static final String NL = "\n";
     public static final String ROOT = "?_kgram_";
     public static final String THIS = "?this";
+    public static final String FEDERATE = NSManager.KGRAM + "federate";
+    private static final Logger logger = LoggerFactory.getLogger(Transformer.class);
+    private static final String LINKED_DATA_PATH_VISITOR =
+            "fr.inria.corese.core.visitor.ldpath.LinkedDataPath";
     private static final String EXTENSION = Processor.KGEXTENSION;
     private static final String EXT_NAMESPACE = NSManager.KGEXT;
     private static final String EXT_NAMESPACE_QUERY = NSManager.KGEXTCONS;
-    public static final String FEDERATE = NSManager.KGRAM + "federate";
+
+    static {
+        create().init();
+    }
+
     int count = 0;
     CompilerFactory fac;
-    // ldscript function compiler
-    private FunctionCompiler functionCompiler;
     // edge and node compiler, see CompilerKgram
     Compiler compiler;
-    // QuerySolver for federated compiler 
-    private QuerySolver sparql;
-    // Visitor tune compiling
-    // @metadata: uncertainty, @ldpath: ldpath
-    // @visitor className: user defined visitor  
-    private List<QueryVisitor> visit;
     // Refine std query sorter
     // corese core SorterImpl take cardinality into account
     Sorter sort;
-    // use case: reuse federated visitor source selection
-    private Mappings mappings;
-    private ASTQuery ast;
     // Compiler to generate type checker
     Checker check;
     // table of type checker (check class/property definition)
@@ -81,20 +68,32 @@ public class Transformer implements ExpType {
     HashMap<Edge, Query> table;
     // list of nested subquery
     ArrayList<Query> subQueryList;
-    int ncount = 0, rcount = 0;
+    int ncount = 0;
+    int rcount = 0;
     boolean //fail = false,
-            isSPARQLCompliant = SPARQL_COMPLIANT_DEFAULT,
-            isSPARQL1 = true;
+            isSPARQLCompliant = SPARQL_COMPLIANT_DEFAULT;
+    boolean isSPARQL1 = true;
+    // deprecated
+    String namespaces;
+    // ldscript function compiler
+    private FunctionCompiler functionCompiler;
+    // QuerySolver for federated compiler
+    private QuerySolver sparql;
+    // Visitor tune compiling
+    // @metadata: uncertainty, @ldpath: ldpath
+    // @visitor className: user defined visitor
+    private List<QueryVisitor> visit;
+    // use case: reuse federated visitor source selection
+    private Mappings mappings;
+    private ASTQuery ast;
     // bind(exp as var) generated by compiler
-    // not used 
+    // not used
     private boolean isUseBind = false;
     private boolean isGenerateMain = true;
     private boolean isBGP = false;
     private boolean pathType = false;
-    // draft alternative interpreter not used 
+    // draft alternative interpreter not used
     private boolean algebra = false;
-    // deprecated
-    String namespaces;
     // deprecated
     private String base;
     // user defined from [named] dataset
@@ -105,10 +104,6 @@ public class Transformer implements ExpType {
     private BasicGraphPattern pragma;
     private int planner = Query.STD_PLAN;
     private int number = 0;
-
-    static {
-        create().init();
-    }
 
     Transformer() {
         table = new HashMap<>();
@@ -132,6 +127,10 @@ public class Transformer implements ExpType {
         return new Transformer();
     }
 
+    public static void removeLinkedFunction() {
+        FunctionCompiler.removeLinkedFunction();
+    }
+
     /**
      * Predefined extension functions for SPARQL functions (see Processor)
      * uri() -> rq:uri
@@ -152,14 +151,10 @@ public class Transformer implements ExpType {
         }
     }
 
-    public void setMetadata(Metadata m) {
-        metadata = m;
-    }
-    
     public void set(Sorter s) {
         sort = s;
     }
-    
+
     List<QueryVisitor> getCreateVisitorList() {
         if (getVisitorList() == null) {
             setVisitorList(new ArrayList<>());
@@ -167,7 +162,7 @@ public class Transformer implements ExpType {
         return getVisitorList();
     }
 
-    public void add(QueryVisitor v) {        
+    public void add(QueryVisitor v) {
         getCreateVisitorList().add(v);
     }
 
@@ -184,18 +179,17 @@ public class Transformer implements ExpType {
      */
     public Query transform(String squery, boolean isRule) throws EngineException {
         setAST(parse(squery, isRule));
-        Query q = transform(getAST());
-        return q;
+        return transform(getAST());
     }
-    
+
     /**
      * SPARQL parser
      * parse sparql query and return AST without compiling
-     */ 
+     */
     public ASTQuery parse(String squery) throws EngineException {
         return parse(squery, false);
     }
-    
+
     public ASTQuery parse(String squery, boolean isRule) throws EngineException {
         ASTQuery ast = ASTQuery.create(squery);
         ast.setRule(isRule);
@@ -208,12 +202,12 @@ public class Transformer implements ExpType {
         }
         // isLoad == true : parse Turtle document as sparql where query pattern
         // -> rdf graph considered as query graph
-        boolean isLoad = getDataset()!=null && getDataset().isLoad();
+        boolean isLoad = getDataset() != null && getDataset().isLoad();
         ParserSparql1.create(ast).setLoad(isLoad).parse();
-        if (getDataset()!=null && getDataset().getMetadata()!=null) {
+        if (getDataset() != null && getDataset().getMetadata() != null) {
             ast.addMetadata(getDataset().getMetadata());
         }
-        if (getMetadata()!=null) {
+        if (getMetadata() != null) {
             ast.addMetadata(getMetadata());
         }
         ASTParser walk = new ASTParser(ast).configure();
@@ -221,8 +215,8 @@ public class Transformer implements ExpType {
         ast.process(walk);
         return ast;
     }
-    
-    String getDefaultBase() {        
+
+    String getDefaultBase() {
         if (getDataset() != null && getDataset().getBase() != null) {
             return getDataset().getBase();
         }
@@ -269,7 +263,7 @@ public class Transformer implements ExpType {
         federate(ast);
         // visitor such as uncertainty, ldpath or user defined
         visit(ast);
-        
+
         template(ast);
 
         Query q = compile(ast);
@@ -282,31 +276,26 @@ public class Transformer implements ExpType {
         if (ast.getContext() != null) {
             q.setContext(ast.getContext());
         }
-//        if (ast.getTemplateVisitor() != null) {
-//            // visitor comes from ast defaultDataset   
-//            // Workflow Data record visitor in Dataset 
-//            // query(q, ds) -> ast.setDefaultDataset(ds)
-//            q.setTemplateVisitor(ast.getTemplateVisitor()); 
-//        }
+
         preprocessTemplateValues(q, ast);
         // compile select filters
-        q = transform(q, ast);       
-        getFunctionCompiler().compile(q, ast);               
-        error(q, ast);               
+        q = transform(q, ast);
+        getFunctionCompiler().compile(q, ast);
+        error(q, ast);
         metadata(ast, q);
         // safety exception
         validate(ast, q);
-        
+
         return q;
     }
-    
+
     /**
      * Check static safety exception
      */
     void validate(ASTQuery ast, Query q) throws EngineException {
         ASTWalker walker = new ASTWalker(ast);
         ast.process(walker);
-        
+
         if (!walker.getRecord().isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (Record rec : walker.getRecord()) {
@@ -315,12 +304,12 @@ public class Transformer implements ExpType {
             throw new SafetyException(sb.toString());
         }
     }
-    
-    
+
+
     public Query transform(Query q, ASTQuery ast) throws EngineException {
         compiler.setAST(ast);
 
-        if (ast.isConstruct() || ast.isDescribe() || ast.isInsert() ) {
+        if (ast.isConstruct() || ast.isDescribe() || ast.isInsert()) {
             construct(q, ast);
         }
 
@@ -345,9 +334,6 @@ public class Transformer implements ExpType {
         }
 
         q.setSort(ast.isSorted());
-        if (ast.isDebug()) {
-            q.setDebug(ast.isDebug());
-        }
         q.setCheck(ast.isCheck());
         q.setRelax(ast.isMore());
         q.setPlanProfile(getPlanProfile());
@@ -359,7 +345,7 @@ public class Transformer implements ExpType {
         filters(q);
         relax(q);
         new QueryProfile(q).profile();
-               
+
         q.setSubQueryList(subQueryList);
         if (getVisitorList() != null) {
             for (QueryVisitor v : getVisitorList()) {
@@ -369,46 +355,43 @@ public class Transformer implements ExpType {
 
         return q;
     }
-    
-    
+
+
     void metadata(ASTQuery ast, Query q) {
         Metadata meta = ast.getMetadata();
         if (meta != null) {
-            if (ast.hasMetadata(Metadata.TRACE)) {
-                System.out.println(ast.toString());
-            }
-            if (ast.hasMetadata(Metadata.TEST)) {
+            if (ast.hasMetadata(Metadata.Type.TEST)) {
                 q.setTest(true);
             }
-            if (ast.hasMetadata(Metadata.PARALLEL)) {
+            if (ast.hasMetadata(Metadata.Type.PARALLEL)) {
                 q.setParallel(true);
             }
-            if (ast.hasMetadata(Metadata.SEQUENCE)) {
+            if (ast.hasMetadata(Metadata.Type.SEQUENCE)) {
                 q.setParallel(false);
             }
-            if (ast.hasMetadata(Metadata.UPDATE)) {
+            if (ast.hasMetadata(Metadata.Type.UPDATE)) {
                 q.setDetail(true);
             }
-            if (meta.hasMetadata(Metadata.UNLOCK) || 
-                    (meta.getDatatypeValue(Metadata.LOCK) != null
-                    && !meta.getDatatypeValue(Metadata.LOCK).booleanValue())) {
+            if (meta.hasMetadata(Metadata.Type.UNLOCK) ||
+                    (meta.getDatatypeValue(Metadata.Type.LOCK) != null
+                            && !meta.getDatatypeValue(Metadata.Type.LOCK).booleanValue())) {
                 q.setLock(false);
             }
-            if (ast.hasMetadata(Metadata.PATH_TYPE)) {
+            if (ast.hasMetadata(Metadata.Type.PATH_TYPE)) {
                 q.setPathType(true);
             }
         }
         // @public @update event function ...
         if (QuerySolver.isVisitorable()
-         && ASTExtension.getSingleton().getMetadata(QuerySolverVisitor.UPDATE, QuerySolverVisitor.UPDATE_ARITY) != null) {
+                && ASTExtension.getSingleton().getMetadata(QuerySolverVisitor.UPDATE, QuerySolverVisitor.UPDATE_ARITY) != null) {
             q.setDetail(true);
-        } 
+        }
     }
-    
+
     @Deprecated
-    void toJava(ASTQuery ast) throws EngineException{
-        if (ast.hasMetadata(Metadata.COMPILE)){
-            String name = ast.getMetadata().getValue(Metadata.COMPILE);
+    void toJava(ASTQuery ast) throws EngineException {
+        if (ast.hasMetadata(Metadata.Type.COMPILE)) {
+            String name = ast.getMetadata().getValue(Metadata.Type.COMPILE);
             JavaCompiler jc = new JavaCompiler(name);
             try {
                 jc.compile(ast);
@@ -418,7 +401,7 @@ public class Transformer implements ExpType {
             }
         }
     }
-    
+
     void visit(ASTQuery ast) {
         visitor(ast);
         if (getVisitorList() != null) {
@@ -431,26 +414,25 @@ public class Transformer implements ExpType {
             }
         }
     }
-    
+
     /**
      * Metadata => Visitor
      */
     void visitor(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.METADATA)){
+        if (ast.hasMetadata(Metadata.Type.METADATA)) {
             add(new MetadataVisitor());
         }
-        if (ast.hasMetadata(Metadata.LDPATH)) {
-            ast.getMetadata().add(Metadata.VISITOR, LINKED_DATA_PATH_VISITOR);
+        if (ast.hasMetadata(Metadata.Type.LDPATH)) {
+            ast.getMetadata().add(Metadata.Type.VISITOR, LINKED_DATA_PATH_VISITOR);
         }
-        if (ast.hasMetadata(Metadata.VISITOR)) {
-            for (String name : ast.getMetadata().getValues(Metadata.VISITOR)) {
+        if (ast.hasMetadata(Metadata.Type.VISITOR)) {
+            for (String name : ast.getMetadata().getValues(Metadata.Type.VISITOR)) {
                 try {
                     Class visClass = Class.forName(name);
                     Object obj = visClass.getDeclaredConstructor().newInstance();
                     if (obj instanceof QueryVisitor) {
                         add((QueryVisitor) obj);
-                    }
-                    else {
+                    } else {
                         logger.error("Undefined QueryVisitor: " + name);
                     }
                 } catch (Exception ex) {
@@ -459,19 +441,20 @@ public class Transformer implements ExpType {
             }
         }
     }
-    
+
     /**
-     * use case: 
-     * @federate <s1> 
-     * @federate <s2> 
+     * use case:
+     *
+     * @federate <s1>
+     * @federate <s2>
      * select * where { }
      * Rewrite every triple t as: service <s1> <s2> { t }
      */
     void federate(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.FEDERATION) && !ast.hasMetadata(Metadata.FEDERATE)) {
+        if (ast.hasMetadata(Metadata.Type.FEDERATION) && !ast.hasMetadata(Metadata.Type.FEDERATE)) {
             add(new FederateVisitor(getSPARQLEngine()).setMappings(getMappings()));
         }
-        
+
         if (ast.getServiceList() != null && ast.getServiceList().size() > 1) {
             ast.defService((String) null);
             add(new FederateVisitor(getSPARQLEngine()).setMappings(getMappings()));
@@ -487,7 +470,7 @@ public class Transformer implements ExpType {
         }
         annotateLocal(ast);
     }
-    
+
     void context(ASTQuery ast) {
         if (ast.getContext().hasValue(Context.STL_METADATA)) {
             for (IDatatype meta : ast.getContext().get(Context.STL_METADATA).getValues()) {
@@ -495,21 +478,21 @@ public class Transformer implements ExpType {
             }
         }
     }
-    
-    void annotateLocal(ASTQuery ast){
-        if (ast.hasMetadata(Metadata.ALGEBRA)){
+
+    void annotateLocal(ASTQuery ast) {
+        if (ast.hasMetadata(Metadata.Type.ALGEBRA)) {
             // @algebra use case with @db
             setBGP(true);
             setAlgebra(true);
         }
-        if (ast.hasMetadata(Metadata.PATH_TYPE)){
+        if (ast.hasMetadata(Metadata.Type.PATH_TYPE)) {
             setPathType(true);
         }
     }
 
     /**
-     * when exist function xt:main(){} 
-     * -> 
+     * when exist function xt:main(){}
+     * ->
      * generate select (xt:main() as ?main)
      */
     void generateMain() {
@@ -554,8 +537,8 @@ public class Transformer implements ExpType {
         if (!t.getArg(1).isVariable()) {
             return false;
         }
-        for (Variable var : values.getVarList()) {
-            if (var.equals(t.getArg(1))) {
+        for (Variable variable : values.getVarList()) {
+            if (variable.equals(t.getArg(1))) {
                 return true;
             }
         }
@@ -573,11 +556,11 @@ public class Transformer implements ExpType {
             }
 
             ast.getTemplateGroup().compile(ast);
-            q.setTemplateGroup(Exp.create(FILTER, ast.getTemplateGroup()));
+            q.setTemplateGroup(Exp.create(Type.FILTER, ast.getTemplateGroup()));
 
             Term nl = Term.function(Processor.STL_NL);
             nl.compile(ast);
-            q.setTemplateNL(Exp.create(FILTER, nl));
+            q.setTemplateNL(Exp.create(Type.FILTER, nl));
 
             for (Variable var : ast.getArgList()) {
                 Node node = compiler.createNode(var);
@@ -586,7 +569,7 @@ public class Transformer implements ExpType {
             q.setPriority(ast.getPriority());
         }
     }
-    
+
     void error(Query q, ASTQuery ast) throws EngineException {
         if (ast.isFail()) {
             q.setFail(true);
@@ -597,24 +580,20 @@ public class Transformer implements ExpType {
         }
         getFunctionCompiler().undefinedFunction(q, ast, ast.getLevel());
     }
-    
-    
+
+
     public void imports(Query q, String path) throws EngineException {
-        getFunctionCompiler().imports(q,  q.getAST(), path);
+        getFunctionCompiler().imports(q, q.getAST(), path);
     }
-    
+
     public boolean getLinkedFunction(String label) throws EngineException {
         return getFunctionCompiler().getLinkedFunction(label);
     }
-        
+
     public boolean getLinkedFunctionBasic(String label) throws EngineException {
         return getFunctionCompiler().getLinkedFunctionBasic(label);
     }
-    
-    public static void removeLinkedFunction() {
-        FunctionCompiler.removeLinkedFunction();
-    }
-    
+
     /**
      * isDefine = true means export to Interpreter Use case: Transformation
      * st:profile does not export to Interpreter hence it uses isDefine = false
@@ -622,9 +601,6 @@ public class Transformer implements ExpType {
     public void definePublic(ASTExtension ext, Query q, boolean isDefine) {
         getFunctionCompiler().definePublic(ext, q, isDefine);
     }
-    
-
-
 
     void construct(Query q, ASTQuery ast) throws EngineException {
         validate(ast.getInsert(), ast);
@@ -632,15 +608,11 @@ public class Transformer implements ExpType {
         q.setConstruct(cons);
         if (ast.isInsert()) {
             q.setInsert(true);
-        }
-        else {
+        } else {
             q.setConstruct(true);
         }
-        //q.setConstruct(true);
         q.setConstructNodes(cons.getNodes());
     }
-
-
 
     /**
      * Subquery is a construct where
@@ -650,10 +622,9 @@ public class Transformer implements ExpType {
         t.setAlgebra(isAlgebra());
         return t.transform(ast);
     }
-    
+
     Query updateQuery(ASTQuery ast) throws EngineException {
-        Query q = constructQuery(ast);
-        return q;
+        return constructQuery(ast);
     }
 
     /**
@@ -684,13 +655,12 @@ public class Transformer implements ExpType {
 
         return q;
     }
-    
-    
+
     /**
      * For query and subquery Generate a new compiler for each (sub) query in
      * order to get fresh new nodes
      */
-    Query compile(ASTQuery ast) throws EngineException {        
+    Query compile(ASTQuery ast) throws EngineException {
         Exp ee = compile(ast.getBody(), false);
         Query q = Query.create(ee);
         q.setUseBind(isUseBind());
@@ -702,8 +672,7 @@ public class Transformer implements ExpType {
 
         return q;
     }
-    
-    
+
     /**
      * Compile AST statements into KGRAM statements Compile triple into Edge,
      * filter into Filter
@@ -714,7 +683,7 @@ public class Transformer implements ExpType {
 
     Exp compile(fr.inria.corese.core.sparql.triple.parser.Exp query, boolean opt, int level) throws EngineException {
         Exp exp = null;
-        int type = getType(query);
+        Type type = getType(query);
         opt = opt || isOption(type);
 
         switch (type) {
@@ -731,11 +700,9 @@ public class Transformer implements ExpType {
                 ASTQuery aa = query.getAST();
                 if (aa.isConstruct()) {
                     exp = constructQuery(aa);
-                } 
-                else if (aa.isUpdate()) {
+                } else if (aa.isUpdate()) {
                     exp = updateQuery(aa);
-                }
-                else {
+                } else {
                     exp = compileQuery(aa);
                 }
                 break;
@@ -761,7 +728,7 @@ public class Transformer implements ExpType {
 
             default:
 
-                /**
+                /*
                  * ************************
                  *
                  * Compile Body
@@ -789,24 +756,24 @@ public class Transformer implements ExpType {
                         }
                     }
                 }
-                
+
                 // PRAGMA: do it after loop above to have filter compiled
                 // bnode scope
                 query.validateBlank(getAST());
-                
+
                 exp = complete(exp, query, opt);
-                
-                if (isAlgebra() && exp.isBGP()){
+
+                if (isAlgebra() && exp.isBGP()) {
                     // possibly join arguments
                     // deprecated
                     exp.dispatch();
                 }
-                
+
         }
 
         exp.setNum(incrNumber());
         return exp;
-    }       
+    }
 
     Exp compileBind(ASTQuery ast, Binding b) throws EngineException {
         return compileBind(ast, b.getFilter(), b.getVariable());
@@ -815,11 +782,10 @@ public class Transformer implements ExpType {
     Exp compileBind(ASTQuery ast, Expression e, Variable var) throws EngineException {
         fr.inria.corese.core.kgram.api.core.Filter f = compileSelect(e, ast);
         Node node = compiler.createNode(var);
-        Exp exp = Exp.create(BIND);
+        Exp exp = Exp.create(Type.BIND);
         exp.setFilter(f);
         exp.setNode(node);
         exp.setFunctional(f.isFunctional());
-        //ast.setHasFunctional(f.isFunctional());
         function(null, exp, var);
         return exp;
     }
@@ -845,8 +811,8 @@ public class Transformer implements ExpType {
      */
     Exp compileService(Service service) throws EngineException {
         Node src = compile(service.getServiceName());
-        Exp node = Exp.create(NODE, src);
-              
+        Exp node = Exp.create(Type.NODE, src);
+
         fr.inria.corese.core.sparql.triple.parser.Exp body = service.get(0);
         ASTQuery aa;
 
@@ -866,7 +832,7 @@ public class Transformer implements ExpType {
         q.setService(true);
         q.setSilent(service.isSilent());
 
-        Exp exp = Exp.create(SERVICE, node, q);
+        Exp exp = Exp.create(Type.SERVICE, node, q);
         exp.setSilent(service.isSilent());
         exp.setGenerated(service.isGenerated());
 
@@ -893,7 +859,7 @@ public class Transformer implements ExpType {
         return q;
     }
 
-    Exp compileValues(Values val, boolean opt, int level) throws EngineException {
+    Exp compileValues(Values val, boolean opt, int level) {
         Exp exp = compileValues(val);
         if (exp == null) {
             getAST().setFail(true);
@@ -920,31 +886,28 @@ public class Transformer implements ExpType {
             }
         }
 
-        Exp bind = Exp.create(VALUES);
+        Exp bind = Exp.create(Type.VALUES);
         bind.setNodeList(lNode);
         bind.setMappings(lMap);
         return bind;
     }
-    
+
     // compile final values: select where {} values {}
-    void values(Query q, ASTQuery ast){
+    void values(Query q, ASTQuery ast) {
         if (ast.getValues() == null) {
             return;
         }
         compileValues(q, ast);
-        if (q.getValues() != null && isAlgebra()){
-            if (q.getBody().size() == 0){
+        if (q.getValues() != null && isAlgebra()) {
+            if (q.getBody().size() == 0) {
                 q.setBody(q.getValues());
-            }
-            else {
-                Exp exp = Exp.create(JOIN, Exp.create(BGP, q.getValues()), q.getBody());
-                q.setBody(Exp.create(BGP, exp));
+            } else {
+                Exp exp = Exp.create(Type.JOIN, Exp.create(Type.BGP, q.getValues()), q.getBody());
+                q.setBody(Exp.create(Type.BGP, exp));
             }
         }
     }
-    
 
-    
     void compileValues(Query q, ASTQuery ast) {
         Exp bind = compileValues(ast.getValues());
         if (bind == null) {
@@ -953,21 +916,16 @@ public class Transformer implements ExpType {
         } else {
             q.setValues(bind);
             if (ast.getValues().isMoved()) {
-                //q.setTemplateMappings(bind.getMappings());
                 q.getValues().setPostpone(true);
-            } 
-//            else {
-//                q.setMappings(bind.getMappings());
-//                q.setBindingNodes(bind.getNodeList());
-//            }
+            }
         }
     }
 
     List<Node> compileValuesNodes(Values values) {
         List<Node> lNode = new ArrayList<>();
 
-        for (Variable var : values.getVarList()) {
-            Node qNode = compiler.createNode(var);
+        for (Variable variable : values.getVarList()) {
+            Node qNode = compiler.createNode(variable);
             lNode.add(qNode);
         }
 
@@ -986,17 +944,16 @@ public class Transformer implements ExpType {
      */
     List<Node> compileValuesList(List<Constant> lVal) {
         List<Node> lNode = new ArrayList<>();
-        
+
         for (Constant val : lVal) {
             Node node = null;
             if (val != null) {
-                if (val.isTriple() && val.getTriple()!=null) {
+                if (val.isTriple() && val.getTriple() != null) {
                     Edge edge = compiler.compile(val.getTriple(), true, true);
                     if (edge.hasReferenceNode()) {
                         node = edge.getReferenceNode();
                     }
-                }
-                else {
+                } else {
                     node = compiler.createNode(val);
                 }
             }
@@ -1021,6 +978,10 @@ public class Transformer implements ExpType {
 
     public ASTQuery getAST() {
         return ast;
+    }
+
+    public void setAST(ASTQuery ast) {
+        this.ast = ast;
     }
 
     public Compiler getCompiler() {
@@ -1062,7 +1023,7 @@ public class Transformer implements ExpType {
     }
 
     void path(Query q, ASTQuery ast) throws EngineException {
-        if (ast.getRegexTest().size() > 0) {
+        if (!ast.getRegexTest().isEmpty()) {
             Node node = compiler.createNode(Variable.create(THIS));
             q.setPathNode(node);
         }
@@ -1076,7 +1037,7 @@ public class Transformer implements ExpType {
     void having(Query q, ASTQuery ast) throws EngineException {
         if (ast.getHaving() != null) {
             fr.inria.corese.core.kgram.api.core.Filter having = compileSelect(ast.getHaving(), ast);
-            q.setHaving(Exp.create(FILTER, having));
+            q.setHaving(Exp.create(Type.FILTER, having));
         }
     }
 
@@ -1095,16 +1056,16 @@ public class Transformer implements ExpType {
         if (ast.isSelectAll() || ast.isConstruct() || ast.isInsert()) {
             // select *
             // get nodes from query nodes and edges
-            select =  toExp(qCurrent.selectNodesFromPattern());  
+            select = toExp(qCurrent.selectNodesFromPattern());
         }
 
         qCurrent.setSelectFun(select);
 
-        for (Variable var : ast.getSelectVar()) {
+        for (Variable variable : ast.getSelectVar()) {
             // retrieve var node from query
-            String varName = var.getName();
-            Node node = getNode(qCurrent, var);
-            Exp exp = Exp.create(NODE, node);
+            String varName = variable.getName();
+            Node node = getNode(qCurrent, variable);
+            Exp exp = Exp.create(Type.NODE, node);
 
             // process filter if any
             Expression ee = ast.getExpression(varName);
@@ -1118,7 +1079,7 @@ public class Transformer implements ExpType {
                     exp.setFilter(f);
                     // create node in lNodes for var in filter f if needed
                     checkFilterVariables(qCurrent, f, select, lNodes);
-                    function(qCurrent, exp, var);
+                    function(qCurrent, exp, variable);
                     aggregate(qCurrent, exp, ee, select);
                 }
             }
@@ -1127,41 +1088,39 @@ public class Transformer implements ExpType {
 
             add(select, exp);
 
-            if (lNodes.contains(exp.getNode())) {
-                // undef variable of former exp is current exp as var
-                lNodes.remove(exp.getNode());
-            }
+            // undef variable of former exp is current exp as var
+            lNodes.remove(exp.getNode());
         }
 
         for (Node node : lNodes) {
             // additional variables for exp in select (exp as var)
-            Exp exp = Exp.create(NODE, node);
+            Exp exp = Exp.create(Type.NODE, node);
             exp.status(true);
             select.add(exp);
         }
 
         qCurrent.setSelect(selectNodeList(qCurrent));
-        
+
         return select;
     }
-    
-        // compute select node list from list Exp(node, exp)
+
+    // compute select node list from list Exp(node, exp)
     List<Node> selectNodeList(Query q) {
         List<Node> list = new ArrayList<>();
-        
+
         for (Exp ee : q.getSelectFun()) {
-            if (! list.contains(ee.getNode())) {
+            if (!list.contains(ee.getNode())) {
                 list.add(ee.getNode());
             }
         }
         return list;
     }
-      
-    
-     List<Exp> toExp(List<Node> lNode) {
+
+
+    List<Exp> toExp(List<Node> lNode) {
         List<Exp> lExp = new ArrayList<>();
         for (Node node : lNode) {
-            lExp.add(Exp.create(NODE, node));
+            lExp.add(Exp.create(Type.NODE, node));
         }
         return lExp;
     }
@@ -1229,13 +1188,13 @@ public class Transformer implements ExpType {
         }
     }
 
-    Node getNode(Query qCurrent, Variable var) {
+    Node getNode(Query qCurrent, Variable variable) {
         Node node = null;
         if (qCurrent != null) {
-            node = getProperAndSubSelectNode(qCurrent, var.getName());
+            node = getProperAndSubSelectNode(qCurrent, variable.getName());
         }
         if (node == null) {
-            node = compiler.createNode(var);
+            node = compiler.createNode(variable);
         }
         return node;
     }
@@ -1257,11 +1216,11 @@ public class Transformer implements ExpType {
     /**
      * If filter isFunctionnal() create it's query node list
      */
-    void function(Query qCurrent, Exp exp, Variable var) {
+    void function(Query qCurrent, Exp exp, Variable variable) {
         if (exp.getFilter().isFunctional()) {
-            if (var.getVariableList() != null) {
+            if (variable.getVariableList() != null) {
                 // sql() as (?x, ?y)
-                for (Variable vv : var.getVariableList()) {
+                for (Variable vv : variable.getVariableList()) {
                     Node qNode = getNode(qCurrent, vv);
                     exp.addNode(qNode);
                 }
@@ -1285,17 +1244,14 @@ public class Transformer implements ExpType {
             case ExprType.STL_DEFINE:
             case ExprType.FUNCTION:
             case ExprType.LET:
-            //return;
-            }
+        }
 
         List<String> lVar = f.getVariables();
         for (String name : lVar) {
             Node node = getProperAndSubSelectNode(query, name);
-            if (node == null) {
-                if (!containsExp(select, name) && !containsNode(lNodes, name)) {
-                    node = compiler.createNode(name);
-                    lNodes.add(node);
-                }
+            if ((node == null) && (!containsExp(select, name) && !containsNode(lNodes, name))) {
+                node = compiler.createNode(name);
+                lNodes.add(node);
             }
         }
     }
@@ -1354,7 +1310,7 @@ public class Transformer implements ExpType {
                     ast.addErrorMessage(ASTQuery.ORDER_GROUP_UNDEFINED, ee);
                     node = compiler.createNode(ee.getName());
                 }
-                Exp e = Exp.create(NODE, node);
+                Exp e = Exp.create(Type.NODE, node);
 
                 if (exp != null && exp.isAggregate()) {
                     // order by ?count
@@ -1366,7 +1322,7 @@ public class Transformer implements ExpType {
                 // TODO: check rewrite fun() as var
                 fr.inria.corese.core.kgram.api.core.Filter f = compile(ee);
                 Node node = createNode();
-                Exp exp = Exp.create(NODE, node);
+                Exp exp = Exp.create(Type.NODE, node);
                 exp.setFilter(f);
                 list.add(exp);
             }
@@ -1379,8 +1335,7 @@ public class Transformer implements ExpType {
      */
     Node createNode() {
         String name = getVarName();
-        Node node = compiler.createNode(name);
-        return node;
+        return compiler.createNode(name);
     }
 
     String getVarName() {
@@ -1396,26 +1351,21 @@ public class Transformer implements ExpType {
     }
 
     List<Node> sort(List<Node> list) {
-        Collections.sort(list, new Comparator<Node>() {
-            public int compare(Node o1, Node o2) {
-                return o1.compare(o2);
-            }
-        });
+        list.sort(Node::compare);
         return list;
     }
 
 
-    
     /**
-     * Add Exp rst into this exp 
+     * Add Exp rst into this exp
      * If this exp is BGP{e1 .. en}
      * return: BGP{JOIN{BGP{e1 .. en} rst}}
      */
-    void join(Exp exp, Exp rst, int type) {
-        if (exp.isBGPAnd() && exp.size() > 0) { 
+    void join(Exp exp, Exp rst, Type type) {
+        if (exp.isBGPAnd() && exp.size() > 0) {
             Exp fst = exp.get(0);
             if (exp.size() == 1) {
-                if (!fst.isBGPAnd()) { 
+                if (!fst.isBGPAnd()) {
                     fst = Exp.create(type, fst);
                 }
             } else {
@@ -1424,19 +1374,18 @@ public class Transformer implements ExpType {
                     fst.add(ee);
                 }
             }
-            Exp body = Exp.create(JOIN, fst, rst);
+            Exp body = Exp.create(Type.JOIN, fst, rst);
             exp.getExpList().clear();
             exp.add(body);
-        } 
-        else {
+        } else {
             exp.add(rst);
         }
     }
-    
-    int bgpType(){
-       return (isBGP()) ? BGP : AND;
+
+    Type bgpType() {
+        return (isBGP()) ? Type.BGP : Type.AND;
     }
-    
+
     Exp compileEdge(Triple t, boolean opt) throws EngineException {
         if (isPathType() && t.isType() && t.getObject().isConstant()) {
             return compilePathType(t);
@@ -1447,10 +1396,10 @@ public class Transformer implements ExpType {
 
     Exp basicCompileEdge(Triple t) throws EngineException {
         Edge r = compiler.compile(t, getAST().isInsertData());
-        Exp exp = Exp.create(EDGE, r);
+        Exp exp = Exp.create(Type.EDGE, r);
         if (t.isXPath()) {
             // deprecated ?x xpath() ?y
-            exp.setType(EVAL);
+            exp.setType(Type.EVAL);
             fr.inria.corese.core.kgram.api.core.Filter xpath = compiler.compile(t.getXPath());
             exp.setFilter(xpath);
         } else if (t.isPath()) {
@@ -1461,10 +1410,10 @@ public class Transformer implements ExpType {
 
         return exp;
     }
-    
+
 
     void path(Triple tt, Exp exp) throws EngineException {
-        exp.setType(PATH);
+        exp.setType(Type.PATH);
         Expression regex = tt.getRegex();
         if (regex == null) {
             // deprecated: there may be a match($path, regex)
@@ -1476,7 +1425,6 @@ public class Transformer implements ExpType {
     }
 
     /**
-     *
      * Generate rdf:type/rdfs:subClassOf*
      */
     Exp compilePathType(Triple t) throws EngineException {
@@ -1508,7 +1456,7 @@ public class Transformer implements ExpType {
             case GRAPH:
                 compileGraph(getAST(), exp, srcexp.getNamedGraph());
                 break;
-                
+
         }
 
         return exp;
@@ -1548,8 +1496,8 @@ public class Transformer implements ExpType {
     Exp compileGraph(Exp exp, Atom at) {
         Node src = compiler.createNode(at, getAST().isInsertData());
         // create a NODE kgram expression for graph ?g
-        Exp node = Exp.create(NODE, src);
-        Exp gnode = Exp.create(GRAPHNODE, node);
+        Exp node = Exp.create(Type.NODE, src);
+        Exp gnode = Exp.create(Type.GRAPHNODE, node);
         exp.add(0, gnode);
         return exp;
     }
@@ -1559,12 +1507,12 @@ public class Transformer implements ExpType {
         Exp exp;
 
         if (qvec.size() == 1) {
-            exp = Exp.create(FILTER, qvec.get(0));
+            exp = Exp.create(Type.FILTER, qvec.get(0));
             compileExist(qvec.get(0).getExp(), opt);
         } else {
-            exp = Exp.create(AND);
+            exp = Exp.create(Type.AND);
             for (fr.inria.corese.core.kgram.api.core.Filter qm : qvec) {
-                Exp f = Exp.create(FILTER, qm);
+                Exp f = Exp.create(Type.FILTER, qm);
                 compileExist(qm.getExp(), opt);
                 exp.add(f);
             }
@@ -1602,12 +1550,9 @@ public class Transformer implements ExpType {
             Term term = (Term) exp;
             Exp pat = compile(term.getExist(), opt);
             term.setPattern(pat);
-        } 
-        //else 
-        {
-            for (Expr ee : exp.getExpList()) {
-                compileExist(ee, opt);
-            }
+        }
+        for (Expr ee : exp.getExpList()) {
+            compileExist(ee, opt);
         }
     }
 
@@ -1642,7 +1587,7 @@ public class Transformer implements ExpType {
         Node n = e.getEdgeVariable();
 
         List<String> lVar = f.getVariables();
-        if (lVar.size() == 0) {
+        if (lVar.isEmpty()) {
             return;
         }
         if (n == null) {
@@ -1659,7 +1604,7 @@ public class Transformer implements ExpType {
             String mode = compiler.getMode(f);
             if (mode != null) {
                 exp.setObject(mode);
-                if (mode.indexOf("i") != -1) {
+                if (mode.contains("i")) {
                     regex = Term.function(Term.SEINV, ((Expression) regex));
                 }
             }
@@ -1675,7 +1620,7 @@ public class Transformer implements ExpType {
         }
     }
 
-    boolean isOption(int type) {
+    boolean isOption(Type type) {
         switch (type) {
             case OPTION:
             case OPTIONAL:
@@ -1688,50 +1633,47 @@ public class Transformer implements ExpType {
         }
     }
 
-    int getType(fr.inria.corese.core.sparql.triple.parser.Exp query) {
+    ExpType.Type getType(fr.inria.corese.core.sparql.triple.parser.Exp query) {
         if (query.isFilter()) {
-            return FILTER;
+            return ExpType.Type.FILTER;
         } else if (query.isTriple()) {
-            return EDGE;
+            return ExpType.Type.EDGE;
         } else if (query.isUnion()) {
-            return UNION;
+            return ExpType.Type.UNION;
         } else if (query.isJoin()) {
-            return JOIN;
+            return ExpType.Type.JOIN;
         } else if (query.isOption()) {
-            return OPTION;
+            return ExpType.Type.OPTION;
         } else if (query.isOptional()) {
-            return OPTIONAL;
+            return ExpType.Type.OPTIONAL;
         } else if (query.isMinus()) {
-            return MINUS;
+            return ExpType.Type.MINUS;
         } else if (query.isGraph()) {
-            return GRAPH;
+            return ExpType.Type.GRAPH;
         } else if (query.isService()) {
-            return SERVICE;
+            return ExpType.Type.SERVICE;
         } else if (query.isQuery()) {
-            return QUERY;
+            return ExpType.Type.QUERY;
         } else if (query.isBind()) {
-            return BIND;
+            return ExpType.Type.BIND;
         } else if (query.isValues()) {
-            return VALUES;
+            return ExpType.Type.VALUES;
         } else if (query.isBGP()) {
             return bgpType();
         } else if (query.isAnd()) {
-            return AND;
+            return ExpType.Type.AND;
         } else {
-            return EMPTY;
+            return ExpType.Type.EMPTY;
         }
     }
 
-    int cpType(int type) {
+    Type cpType(Type type) {
         switch (type) {
             default:
                 return type;
         }
     }
 
-    /**
-     * ************************************
-     */
     /**
      * Generate a complementary Query that checks: definition of class/property
      */
@@ -1759,14 +1701,14 @@ public class Transformer implements ExpType {
      * generate a blank node for each path (PathFinder)
      */
     void filters(Query q) throws EngineException {
-        ASTQuery ast =  q.getAST();
+        ASTQuery ast = q.getAST();
         Term t = Term.function(Processor.PATHNODE);
         q.setFilter(Query.PATHNODE, t.compile(ast));
     }
 
     @Deprecated
     void relax(Query q) {
-        ASTQuery ast =  q.getAST();
+        ASTQuery ast = q.getAST();
         for (Expression exp : ast.getRelax()) {
             if (exp.isConstant()) {
                 Constant p = exp.getConstant();
@@ -1776,7 +1718,7 @@ public class Transformer implements ExpType {
         }
     }
 
-    
+
     /**
      * check unbound variable in construct/insert/delete
      */
@@ -1785,7 +1727,7 @@ public class Transformer implements ExpType {
 
         for (fr.inria.corese.core.sparql.triple.parser.Exp ee : exp.getBody()) {
             boolean b = true;
-            
+
             if (ee.isTriple()) {
                 b = validate(ee.getTriple(), ast);
             } else if (ee.isGraph()) {
@@ -1846,13 +1788,13 @@ public class Transformer implements ExpType {
      * Must exp ee be joined with preceding statements ?
      */
     private boolean isJoinable(Exp exp, fr.inria.corese.core.sparql.triple.parser.Exp ee) {
-        return (isAlgebra()) ? isJoinableAlgebra(exp, ee) : isJoinableBasic(ee) ;        
+        return (isAlgebra()) ? isJoinableAlgebra(exp, ee) : isJoinableBasic(ee);
     }
-    
+
     private boolean isJoinableBasic(fr.inria.corese.core.sparql.triple.parser.Exp ee) {
         return ee.isBGP() || ee.isUnion() || ee.isGraph();
     }
-    
+
     private boolean isJoinableAlgebra(Exp exp, fr.inria.corese.core.sparql.triple.parser.Exp ee) {
         return ee.isBGP() || ee.isUnion();
     }
@@ -1869,53 +1811,45 @@ public class Transformer implements ExpType {
         return isUseBind;
     }
 
-   public void setUseBind(boolean isUseBind) {
+    public void setUseBind(boolean isUseBind) {
         this.isUseBind = isUseBind;
     }
 
-   public boolean isGenerateMain() {
+    public boolean isGenerateMain() {
         return isGenerateMain;
     }
 
-   public void setGenerateMain(boolean isGenerateMain) {
+    public void setGenerateMain(boolean isGenerateMain) {
         this.isGenerateMain = isGenerateMain;
     }
 
-   public QuerySolver getSPARQLEngine() {
+    public QuerySolver getSPARQLEngine() {
         return sparql;
     }
 
-   public void setSPARQLEngine(QuerySolver sparql) {
+    public void setSPARQLEngine(QuerySolver sparql) {
         this.sparql = sparql;
     }
 
-//   public List<Atom> getServiceList() {
-//        return serviceList;
-//    }
-//
-//   public void setServiceList(List<Atom> serviceList) {
-//        this.serviceList = serviceList;
-//    }
-
-   public FunctionCompiler getFunctionCompiler() {
+    public FunctionCompiler getFunctionCompiler() {
         return functionCompiler;
     }
 
-   public void setFunctionCompiler(FunctionCompiler functionCompiler) {
+    public void setFunctionCompiler(FunctionCompiler functionCompiler) {
         this.functionCompiler = functionCompiler;
     }
 
-   
+
     public int getNumber() {
         return number;
-    }
-    
-    int incrNumber() {
-        return number++;
     }
 
     public void setNumber(int number) {
         this.number = number;
+    }
+
+    int incrNumber() {
+        return number++;
     }
 
     public boolean isAlgebra() {
@@ -1933,7 +1867,7 @@ public class Transformer implements ExpType {
     public void setBGP(boolean BGP) {
         this.isBGP = BGP;
     }
-    
+
     public boolean isPathType() {
         return pathType;
     }
@@ -1941,17 +1875,21 @@ public class Transformer implements ExpType {
     public void setPathType(boolean pathType) {
         this.pathType = pathType;
     }
-    
+
     public BasicGraphPattern getPragma() {
         return pragma;
+    }
+
+    public void setPragma(BasicGraphPattern p) {
+        pragma = p;
     }
 
     public String getBase() {
         return base;
     }
 
-    public void setAST(ASTQuery ast) {
-        this.ast = ast;
+    public void setBase(String ns) {
+        base = ns;
     }
 
     public List<QueryVisitor> getVisitorList() {
@@ -1961,8 +1899,7 @@ public class Transformer implements ExpType {
     public void setVisitorList(List<QueryVisitor> visit) {
         this.visit = visit;
     }
-    
-    
+
     public boolean isSPARQLCompliant() {
         return isSPARQLCompliant;
     }
@@ -1973,18 +1910,6 @@ public class Transformer implements ExpType {
 
     public void setNamespaces(String ns) {
         namespaces = ns;
-    }
-
-    public void setPragma(BasicGraphPattern p) {
-        pragma = p;
-    }
-
-    public void setBase(String ns) {
-        base = ns;
-    }
-
-    public void setSPARQL1(boolean b) {
-        isSPARQL1 = b;
     }
 
     public Mappings getMappings() {
@@ -1998,6 +1923,10 @@ public class Transformer implements ExpType {
     public Metadata getMetadata() {
         return metadata;
     }
-    
+
+    public void setMetadata(Metadata m) {
+        metadata = m;
+    }
+
 
 }

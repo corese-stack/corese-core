@@ -1,14 +1,13 @@
 package fr.inria.corese.core.compiler.federate;
 
 import fr.inria.corese.core.sparql.triple.parser.Variable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
 /**
- *
  * @author Olivier Corby, Wimmics INRIA I3S, 2017
- *
  */
 public class Stack implements Iterable<Variable> {
 
@@ -17,23 +16,23 @@ public class Stack implements Iterable<Variable> {
     Stack() {
         stack = new ArrayList<Variable>();
     }
-    
-    Variable get(){
-        if (stack.isEmpty()){
+
+    Variable get() {
+        if (stack.isEmpty()) {
             return null;
         }
-        return stack.get(stack.size() -1);
+        return stack.get(stack.size() - 1);
     }
-    
-    void push(Variable var){
+
+    void push(Variable var) {
         stack.add(var);
     }
-    
-    void pop(){
-        stack.remove(stack.size() -1);
+
+    void pop() {
+        stack.remove(stack.size() - 1);
     }
-    
-    boolean isEmpty(){
+
+    boolean isEmpty() {
         return stack.isEmpty();
     }
 

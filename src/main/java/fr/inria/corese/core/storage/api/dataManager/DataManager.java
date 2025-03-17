@@ -56,12 +56,6 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
      * @param metaDataManager New MataDataManager.
      */
     default void setMetadataManager(MetadataManager metaDataManager) {
-    };
-
-    default void trace(String mes, Object... list) {
-        if (hasMetadataManager()) {
-            getMetadataManager().trace(mes, list);
-        }
     }
 
     // for init purpose, called by corese StorageFactory
@@ -107,7 +101,7 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
      * Only if the transactions are supported.
      */
     default void startReadTransaction() {
-    };
+    }
 
     /**
      * End a read transaction.
@@ -117,7 +111,7 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
      * Only if the transactions are supported.
      */
     default void endReadTransaction() {
-    };
+    }
 
     /**
      * Start a write transaction.
@@ -126,21 +120,21 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
      * Only if the transactions are supported.
      */
     default void startWriteTransaction() {
-    };
+    }
 
     /**
      * End a write transaction.
      * Only if the transactions are supported.
      */
     default void endWriteTransaction() {
-    };
+    }
 
     /**
      * Abort a transaction and undo the changes.
      * Only if the transactions are supported.
      */
     default void abortTransaction() {
-    };
+    }
 
     /**
      * Indicates whether this DataManage is in transaction or not.
@@ -150,7 +144,7 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
      */
     default boolean isInTransaction() {
         return this.isInReadTransaction() || this.isInWriteTransaction();
-    };
+    }
 
     /**
      * Indicates whether this DataManage is in read transaction or not.
@@ -160,7 +154,7 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
      */
     default boolean isInReadTransaction() {
         return false;
-    };
+    }
 
     /**
      * Indicates whether this DataManage is in write transaction or not.
@@ -170,8 +164,8 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
      */
     default boolean isInWriteTransaction() {
         return false;
-    };
-    
+    }
+
     default void startRuleEngine() {
     }
     

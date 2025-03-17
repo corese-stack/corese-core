@@ -1,8 +1,7 @@
 package fr.inria.corese.core.approximate.algorithm.impl;
 
-import fr.inria.corese.core.approximate.strategy.AlgType;
 import fr.inria.corese.core.approximate.algorithm.ISimAlgorithm;
-import fr.inria.corese.core.approximate.algorithm.Utils;
+import fr.inria.corese.core.approximate.strategy.AlgType;
 
 /**
  * Base Algorithm
@@ -12,14 +11,14 @@ import fr.inria.corese.core.approximate.algorithm.Utils;
  */
 public class BaseAlgorithm implements ISimAlgorithm {
 
-    private final AlgType type;
     public final static String OPTION_URI = "uri";
+    private final AlgType type;
 
     /**
      * Constructor with default type 'empty'
      */
     BaseAlgorithm() {
-        this(AlgType.empty);
+        this(AlgType.EMPTY);
     }
 
     /**

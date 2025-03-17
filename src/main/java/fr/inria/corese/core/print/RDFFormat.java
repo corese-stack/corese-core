@@ -360,9 +360,7 @@ public class RDFFormat {
         }
 
         if (with.size() > 0) {
-            if (!with.contains(gname.getLabel())) {
-                return false;
-            }
+            return with.contains(gname.getLabel());
         }
 
         return true;

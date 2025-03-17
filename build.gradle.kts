@@ -6,11 +6,23 @@ plugins {
     signing                                                     // Signs artifacts for Maven Central
     `maven-publish`                                             // Enables publishing to Maven repositories
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0" // Automates Nexus publishing
-    
+
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
     id("org.gradlex.extra-java-module-info") version "1.9"      // Module metadata for JARs without module info
     id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
+    id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
+}
+
+// SonarQube configuration
+sonar {
+    properties {
+        property("sonar.projectKey", "crs-core-new")
+        property("sonar.host.url", "https://sonarqube.inria.fr/sonarqube")
+        property("sonar.login", System.getenv("SONAR_TOKEN"))
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+        property("sonar.sourceEncoding", "UTF-8")
+    }
 }
 
 /////////////////////////
@@ -70,6 +82,7 @@ dependencies {
     implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                          // ShEx implementation for RDF validation
     implementation("org.glassfish.jersey.core:jersey-client:${jersey_version}")          // REST client for creating HTTP requests
     implementation("org.glassfish.jersey.inject:jersey-hk2:${jersey_version}")           // Dependency injection for Jersey
+    implementation("com.sun.activation:jakarta.activation:2.0.1")                        // JavaBeans Activation Framework for MIME data handling
     implementation("javax.xml.bind:jaxb-api:2.3.1")                                      // JAXB API for converting between Java objects and XML
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:${semargl_version}") // RDFa parser to extract RDF metadata from HTML
     implementation("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}") // Semargl core for RDF parsing and transformation
@@ -215,14 +228,14 @@ nexusPublishing {
 /////////////////////////
 
 // Set UTF-8 encoding for Java compilation tasks
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-Xlint:none")
 }
 
 // Configure Javadoc tasks with UTF-8 encoding and disable failure on error.
 // This ensures that Javadoc generation won't fail due to minor issues.
-tasks.withType<Javadoc>() {
+tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
     isFailOnError = false
 }

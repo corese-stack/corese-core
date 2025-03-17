@@ -9,6 +9,8 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.util.Property;
+import fr.inria.corese.core.util.Property.Value;
 
 /**
  * Helper class to aid the parsers (ex.jsonld, rdfa) for adding triples to
@@ -22,6 +24,7 @@ public class AddTripleHelper implements ILoadSerialization {
     private final static String JSONLD_BNODE_PREFIX = ":_";
 
     private Graph graph;
+    private Load load;
     Node source;
     Stack stack;
     NSManager nsm;
@@ -57,15 +60,16 @@ public class AddTripleHelper implements ILoadSerialization {
         }
     }
 
-    public AddTripleHelper(Graph graph) {
+    public AddTripleHelper(Graph graph, Load load) {
+        this.load = load;
         this.graph = graph;
         this.blank = new Hashtable<>();
         nsm = NSManager.create();
         this.stack = new Stack();
     }
 
-    public static AddTripleHelper create(Graph graph) {
-        return new AddTripleHelper(graph);
+    public static AddTripleHelper create(Graph graph, Load load) {
+        return new AddTripleHelper(graph, load);
     }
 
     @Override
@@ -78,6 +82,7 @@ public class AddTripleHelper implements ILoadSerialization {
         Node s = getSubject(subj);
         Node p = getProperty(pred);
         Node o = null;
+
         switch (literalType) {
             case NON_LITERAL:
                 o = getNode(obj);
@@ -91,6 +96,28 @@ public class AddTripleHelper implements ILoadSerialization {
 
         Edge e = create(source, s, p, o);
         addEdge(e);
+
+        // Handle owl:imports if applicable
+        handleOntologyImport(pred, obj);
+    }
+
+    /**
+     * Handles ontology imports when encountering an owl:imports triple.
+     * 
+     * This method checks if OWL auto-import is enabled and, if so, triggers the
+     * import for the given URI.
+     * 
+     * @param predicate The predicate of the triple.
+     * @param object    The object of the triple (import URI).
+     */
+    private void handleOntologyImport(String predicate, String object) {
+        if (!Property.getBooleanValue(Value.OWL_AUTO_IMPORT)) {
+            return;
+        }
+
+        if (Load.IMPORTS.equals(predicate)) {
+            load.imports(object);
+        }
     }
 
     // get the node of a literal according to the content, lang and type

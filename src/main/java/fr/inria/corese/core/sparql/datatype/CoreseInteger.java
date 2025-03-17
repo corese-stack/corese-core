@@ -27,7 +27,7 @@ public class CoreseInteger extends CoreseNumber {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(CoreseInteger.class);
+    private static final Logger logger = LoggerFactory.getLogger(CoreseInteger.class);
     public static final CoreseInteger ZERO = new CoreseInteger(0);
     public static final CoreseInteger ONE = new CoreseInteger(1);
     public static final CoreseInteger TWO = new CoreseInteger(2);
@@ -35,7 +35,7 @@ public class CoreseInteger extends CoreseNumber {
     public static final CoreseInteger FOUR = new CoreseInteger(4);
     public static final CoreseInteger FIVE = new CoreseInteger(5);
     static final CoreseURI datatype = new CoreseURI(RDF.xsdinteger);
-    static final int code = INTEGER;
+    static final IDatatype.Datatype code = IDatatype.Datatype.INTEGER;
     long lvalue;
 
     CoreseInteger() {}
@@ -70,7 +70,7 @@ public class CoreseInteger extends CoreseNumber {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
 

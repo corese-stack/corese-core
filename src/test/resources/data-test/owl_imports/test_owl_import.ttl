@@ -1,0 +1,16 @@
+@prefix : <http://example.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<http://example.org/ontology> a owl:Ontology ;
+    owl:imports <http://xmlns.com/foaf/0.1/> .
+
+:Person a owl:Class ;
+    rdfs:label "Person" ;
+    rdfs:subClassOf foaf:Person .
+
+:Student a owl:Class ;
+    rdfs:label "Student" ;
+    rdfs:subClassOf :Person .

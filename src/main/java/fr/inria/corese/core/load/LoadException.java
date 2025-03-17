@@ -68,9 +68,6 @@ public class LoadException extends Exception {
         else if (isSafetyException() && getSafetyException().getPath() != null) {
             str += "\n" + getSafetyException().getPath();
         }
-//        else {
-//            str += "\n" + "unknown location";
-//        }
         return str;
     }
     

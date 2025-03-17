@@ -2,46 +2,43 @@ package fr.inria.corese.core.rule;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.core.Mappings;
+
 import java.util.List;
 
-/**
- *
- */
-public class RuleError {  
+public class RuleError {
     private Rule rule;
     private List<Edge> edgeList;
     private Mappings map;
     private boolean edge = true;
-    
+
     RuleError(Rule r, List<Edge> list) {
         rule = r;
         edgeList = list;
         edge = true;
     }
-    
+
     RuleError(Rule r, Mappings m) {
         rule = r;
         map = m;
         edge = false;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getRule().getName()).append("\n");
-        
-        if (isEdge()){
-            for (Edge edge : getEdgeList()) {
-                sb.append(String.format("%s %s\n", edge.getProperty(), edge.getNode(1)));
+
+        if (isEdge()) {
+            for (Edge currentEdge : getEdgeList()) {
+                sb.append(String.format("%s %s\n", currentEdge.getProperty(), currentEdge.getNode(1)));
             }
             sb.append("\n");
-        }
-        else {
+        } else {
             sb.append(getMap());
         }
         return sb.toString();
     }
-    
+
     public Rule getRule() {
         return rule;
     }

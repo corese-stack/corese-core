@@ -22,7 +22,7 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 public class CoreseDouble extends CoreseNumber {
 
     static final CoreseURI datatype = new CoreseURI(RDF.xsddouble);
-    static final int code = DOUBLE;
+    static final IDatatype.Datatype code = IDatatype.Datatype.DOUBLE;
     protected double dvalue = 0;
 
     CoreseDouble() {}
@@ -49,7 +49,7 @@ public class CoreseDouble extends CoreseNumber {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
 

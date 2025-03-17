@@ -15,27 +15,27 @@ public interface ElementClause {
 	/**
 	 * the Atom is a constant?
 	 */
-	public boolean isConstant();
+    boolean isConstant();
 	
 	/**
 	 * the Atom is a variable?
 	 */
-	public boolean isVariable();
+    boolean isVariable();
 	
 	/**
 	 * value of the element
 	 */
-	public Constant getConstant();
+    Constant getConstant();
 	
-	public IDatatype getDatatypeValue();
+	IDatatype getDatatypeValue();
 	
 	/**
 	 * name of the element
 	 */
-	public Variable getVariable();
+    Variable getVariable();
 	
-	public Atom getAtom();
+	Atom getAtom();
 	
-	public String getName();
+	String getName();
 	
 }

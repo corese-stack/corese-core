@@ -25,7 +25,7 @@ public class ASTExtension implements Extension {
 
     private static ASTExtension singleton;
     public static int FUNCTION_PARAMETER_MAX = 20;
-    private static Logger logger = LoggerFactory.getLogger(ASTExtension.class);
+    private static final Logger logger = LoggerFactory.getLogger(ASTExtension.class);
     static final String NL = "\n";
     public static final String TYPE = ExpType.TYPE_METADATA;
     //FunMap map;
@@ -306,19 +306,10 @@ public class ASTExtension implements Extension {
     @Override
     public Function getMethod(String label, IDatatype type, IDatatype[] param) {
         if (getActualHierarchy() != null && param.length > 0) {
-            if (isDebug()) {
-                    System.out.println("ASTExtension: " + label + " " + type);
-            }
             for (String atype : getActualHierarchy().getSuperTypes(param[0],  type)) {
                 ASTExtension ext = getMethodExtension(atype);
-                if (isDebug()) {
-                    System.out.println("ASTExtension: " + label + " " + atype + " " + ext);
-                }
                 if (ext != null) {
                     Function exp = ext.get(label, param.length);
-                    if (isDebug()) {
-                        System.out.println("ASTExtension: " + label + " " + atype + " " + exp);
-                    }
                     if (exp != null) {
                         return exp;
                     }

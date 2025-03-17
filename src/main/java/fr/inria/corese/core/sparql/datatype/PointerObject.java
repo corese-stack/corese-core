@@ -2,6 +2,8 @@ package fr.inria.corese.core.sparql.datatype;
 
 import fr.inria.corese.core.kgram.api.core.Pointerable;
 
+import java.util.ArrayList;
+
 /**
  * Encapsulate an Object which is not a Pointerable
  * To be used in CoresePointer
@@ -22,7 +24,7 @@ public class PointerObject implements Pointerable {
     
     @Override
     public String getDatatypeLabel() {
-        return String.format("[%s:%s]", object.getClass().getName(), object.toString());
+        return String.format("[%s:%s]", object.getClass().getName(), object);
     }
     
     @Override
@@ -40,7 +42,7 @@ public class PointerObject implements Pointerable {
         if (object instanceof Iterable) {
             return (Iterable) object;
         }
-        return empty;
+        return new ArrayList<>();
     }
     
 }

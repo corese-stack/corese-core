@@ -1,8 +1,6 @@
 package fr.inria.corese.core.query;
 
-/**
- *
- */
+
 public class CompileServiceResult {
 
     private boolean bnode = false;

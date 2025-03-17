@@ -1,7 +1,8 @@
 package fr.inria.corese.core;
 
-import fr.inria.corese.core.producer.DataProducer;
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.producer.DataProducer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,14 +13,13 @@ import java.util.List;
  * Producer uses getDefault()
  * getDefault().iterate()
  * getNamed().iterate()
- * 
- * @author Olivier Corby, Wimmics INRIA I3S, 2016
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */
 public class DataStore {
 
+    private final ArrayList<Node> defaultGraphList;
     Graph graph;
-    private ArrayList<Node> defaultGraphList;
 
     DataStore(Graph g) {
         graph = g;
@@ -40,11 +40,11 @@ public class DataStore {
     public DataProducer getDefaultBasic() {
         return new DataProducer(graph);
     }
-    
+
     public DataProducer getDefaultUnion() {
         return new DataProducer(graph);
     }
-    
+
     public DataProducer getDefaultGraph() {
         return getDefaultBasic().from(graph.getNodeDefault());
     }
@@ -69,7 +69,7 @@ public class DataStore {
         }
         return this;
     }
-    
+
     public DataStore addDefaultGraph() {
         return addDefaultGraph(graph.getNodeDefault());
     }

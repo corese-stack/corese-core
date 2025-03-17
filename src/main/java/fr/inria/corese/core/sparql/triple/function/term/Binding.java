@@ -46,7 +46,6 @@ public class Binding implements Binder {
     
     static final String NL = "\n";
     public static final int UNBOUND = ExprType.UNBOUND;
-    public static boolean DEBUG_DEFAULT = false;
     public static boolean DYNAMIC_CAPTURE_DEFAULT = false;
     public static final String SLICE_SERVICE  = "?slice_service";
     public static final String SERVICE_REPORT = "?_service_report";
@@ -66,10 +65,8 @@ public class Binding implements Binder {
     HashMap<String, Variable>  globalVariable;
     private ProcessVisitor visitor;
     private AccessRight accessRight;
-    
-    private boolean debug = DEBUG_DEFAULT;
 
-    private static Logger logger = LoggerFactory.getLogger(Binding.class);
+    private static final Logger logger = LoggerFactory.getLogger(Binding.class);
     private boolean dynamicCapture = DYNAMIC_CAPTURE_DEFAULT;
     private boolean result;
     private boolean coalesce = false;
@@ -409,42 +406,15 @@ public class Binding implements Binder {
                     }
                 }
 
-                IDatatype dt = (withStatic)?getGlobalVariable(var.getLabel()):getBasicGlobalVariable(var.getLabel());
-                if (dt == null) {
-
-                    if (isDebug()) {
-                        logger.warn("Variable unbound: " + var);
-                        System.out.println(this);
-                    }
-                }
-                return dt;
+                return (withStatic)?getGlobalVariable(var.getLabel()):getBasicGlobalVariable(var.getLabel());
             }
             default:
-                IDatatype dt = valList.get(getIndex(var));
-                if (dt == null && isDebug()) {
-                    logger.warn("Variable unbound: " + var);
-                }
-                return dt;
+                return valList.get(getIndex(var));
         }
-    }
-
-    void trace(Expr exp, IDatatype[] value) {
-        System.out.print(pretty(count) + " " + pretty(level.size()) + " ");
-        System.out.print((exp.getFunction() == null) ? exp.getDefinition() : exp.getFunction() + " ");
-        for (IDatatype dt : value) {
-            System.out.print(" " + dt);
-        }
-        System.out.println();
     }
 
     String pretty(int n) {
         return "(" + ((n < 10) ? ("0" + n) : n) + ")";
-    }
-
-    void trace(Expr exp, IDatatype value) {
-        IDatatype[] aa = new IDatatype[1];
-        aa[0] = value;
-        trace(exp, aa);
     }
 
     // todo:  why not level ???
@@ -638,7 +608,6 @@ public class Binding implements Binder {
     }
     
     void shareContext(Binding b) {
-        setDebug(b.isDebug());
         setAccessLevel(b.getAccessLevel());
         setAccessRight(b.getAccessRight());
         if (b.getLog()!=null) {
@@ -700,43 +669,9 @@ public class Binding implements Binder {
         globalValue = m;
     }
 
-    /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * @param debug the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
     public int getCount() {
         return count;
     }
-
-//    @Override
-//    public void bind(Expr exp, Expr var, Node val) {
-//        bind(exp, var, (IDatatype) val);
-//    }
-
-//    @Override
-//    public void set(Expr exp, Expr var, Node val) {
-//        set(exp, var, (IDatatype) val);
-//    }
-//
-//    @Override
-//    public void set(Expr exp, List<Expr> lvar, Node[] value) {
-//        set(exp, lvar, (IDatatype[]) value);
-//    }
-
-//    @Override
-//    public void unset(Expr exp, Expr var, Node value) {
-//        unset(exp, var, (IDatatype) value);
-//    }
 
     /**
      * return(dt) LDScript function set boolean result field to true

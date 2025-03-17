@@ -19,7 +19,7 @@ import java.util.Map;
 public class ApproximateSearchEnv {
 
     private static int code = 0;
-    private int id;
+    private final int id;
     private final Map<Key, Map<Node, Value>> all;
     
     public ApproximateSearchEnv() {
@@ -100,9 +100,7 @@ public class ApproximateSearchEnv {
      */
     public Double aggregate(Environment env, Expr var, double sim) {
         List<Expr> lv = this.getVariables();
-        if (lv.contains(var)) {
-            lv.remove(var);
-        }
+        lv.remove(var);
 
         Double cb = (lv.isEmpty()) ? 1 : aggregate(env, lv);
         return cb * sim;
@@ -176,11 +174,8 @@ public class ApproximateSearchEnv {
                 return false;
             }
             final Key other = (Key) obj;
-            if (this.var != other.var && (this.var == null || !this.var.equals(other.var))) {
-                return false;
-            }
+            return this.var == other.var || (this.var != null && this.var.equals(other.var));
             //only that var is equal is ok
-            return true;
         }
 
         @Override

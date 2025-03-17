@@ -1,18 +1,17 @@
 package fr.inria.corese.core.sparql.compiler.java;
 
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.script.Let;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
 import fr.inria.corese.core.sparql.triple.parser.Processor;
 import fr.inria.corese.core.sparql.triple.parser.Term;
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.function.script.Let;
 
 /**
  * Add return statement if needed
- * 
- * @author Olivier Corby, Wimmics INRIA I3S, 2017
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2017
  */
 public class Rewrite {
 
@@ -28,11 +27,11 @@ public class Rewrite {
      * exp is the body of a function
      */
     Expression process(Expression exp) throws EngineException {
-        Expression res = rewrite(exp);                      
+        Expression res = rewrite(exp);
         res.compile(ast);
         return res;
     }
-    
+
     Expression rewrite(Expression exp) {
         if (exp.isTerm()) {
             switch (exp.oper()) {
@@ -44,8 +43,9 @@ public class Rewrite {
                 case ExprType.SEQUENCE:
                 case ExprType.RETURN:
                     break;
-                    
-                default: return doreturn(exp);
+
+                default:
+                    return doreturn(exp);
             }
         } else {
             // constant value
@@ -53,23 +53,22 @@ public class Rewrite {
         }
         return exp;
     }
-    
+
     Let let(Let exp) {
         if (exp.getBody().oper() == ExprType.IF) {
             return new Let(exp.getDeclaration(), rewriteif(exp.getBody()), false);
-        }
-        else if (jc.isReturnable(exp.getBody())) {
+        } else if (jc.isReturnable(exp.getBody())) {
             return new Let(exp.getDeclaration(), doreturn(exp.getBody()), false);
         }
         return exp;
     }
-    
+
     Expression doreturn(Expression exp) {
         return Term.function(Processor.RETURN, exp);
     }
 
     /**
-     * Rewrite the body of a if to conform to Java 
+     * Rewrite the body of a if to conform to Java
      * atom -> return (atom)
      * if (a, b, c) -> if (a, return(b), return(c))
      */
@@ -80,9 +79,10 @@ public class Rewrite {
                     return ifthenelse(exp);
                 case ExprType.LET:
                     return let(exp.getLet());
-                default: if (jc.isReturnable(exp)) {
-                    return doreturn(exp);
-                }
+                default:
+                    if (jc.isReturnable(exp)) {
+                        return doreturn(exp);
+                    }
             }
         } else {
             // constant value
@@ -92,7 +92,6 @@ public class Rewrite {
     }
 
     Expression ifthenelse(Expression exp) {
-        Term term = ast.ifThenElse(exp.getArg(0), rewriteif(exp.getArg(1)), rewriteif(exp.getArg(2)));
-        return term;
+        return ast.ifThenElse(exp.getArg(0), rewriteif(exp.getArg(1)), rewriteif(exp.getArg(2)));
     }
 }

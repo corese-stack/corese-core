@@ -1,8 +1,9 @@
 package fr.inria.corese.core.approximate.algorithm.impl;
 
-import fr.inria.corese.core.approximate.strategy.Priority;
-import fr.inria.corese.core.approximate.strategy.AlgType;
 import fr.inria.corese.core.approximate.algorithm.ISimAlgorithm;
+import fr.inria.corese.core.approximate.strategy.AlgType;
+import fr.inria.corese.core.approximate.strategy.Priority;
+
 import java.util.List;
 
 /**
@@ -27,11 +28,12 @@ public class CombinedAlgorithm extends BaseAlgorithm {
 
     /**
      * Construct a combined algorithm using given list of algorithms and weights
+     *
      * @param algs
-     * @param weights2 
+     * @param weights2
      */
     public CombinedAlgorithm(List<ISimAlgorithm> algs, double[] weights2) {
-        super(AlgType.mult);
+        super(AlgType.MULT);
         this.algs = algs;
         this.weights = weights2;
     }

@@ -1,17 +1,11 @@
 package fr.inria.corese.core.kgram.sorter.impl.qpv1;
 
-import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
-import fr.inria.corese.core.kgram.sorter.core.AbstractCostModel;
-import fr.inria.corese.core.kgram.sorter.core.QPGEdge;
-import fr.inria.corese.core.kgram.sorter.core.QPGNode;
-import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
-import fr.inria.corese.core.kgram.sorter.core.Const;
-import static fr.inria.corese.core.kgram.sorter.core.Const.OBJECT;
-import static fr.inria.corese.core.kgram.sorter.core.Const.PREDICATE;
-import static fr.inria.corese.core.kgram.sorter.core.Const.SUBJECT;
-import fr.inria.corese.core.kgram.sorter.core.IEstimate;
-import static fr.inria.corese.core.kgram.sorter.core.IEstimate.MAX_COST;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.sorter.core.*;
+
 import java.util.List;
+import static fr.inria.corese.core.kgram.sorter.core.Const.*;
+import static fr.inria.corese.core.kgram.sorter.core.IEstimate.MAX_COST;
 
 /**
  * Cost model for QPG edge 
@@ -33,7 +27,7 @@ public class QPGEdgeCostModel extends AbstractCostModel {
     public QPGEdgeCostModel(QPGEdge edge) {
         this.edge = edge;
         if (this.estimatable()) {
-            if(this.edge.get(0).getType()== EDGE &&this.edge.get(1).getType()== EDGE){
+            if(this.edge.get(0).getType()== ExpType.Type.EDGE &&this.edge.get(1).getType()== ExpType.Type.EDGE){
                 this.setJtype();
             }
             this.setNshare();
@@ -70,7 +64,7 @@ public class QPGEdgeCostModel extends AbstractCostModel {
         
         QPGNode node1 = edge.get(0), node2 = edge.get(1);
 
-        int tNode1 = node1.getType(), tNode2 = node2.getType();
+        ExpType.Type tNode1 = node1.getType(), tNode2 = node2.getType();
         //1. type of one of them is FILTER or VALUES or BIND, ne assign pas le weight
         if (!Const.evaluable(tNode1) && !Const.evaluable(tNode2)) {
             this.edge.setCost(MAX_COST);
@@ -84,7 +78,7 @@ public class QPGEdgeCostModel extends AbstractCostModel {
         }
         
         //2 The EDGE connects at least a GRAPH
-        if (tNode1 == GRAPH || tNode2 == GRAPH) {
+        if (tNode1 == ExpType.Type.GRAPH || tNode2 == ExpType.Type.GRAPH) {
             this.edge.setCost(1.0 / 3.0 * Nshare);
             return;
         }

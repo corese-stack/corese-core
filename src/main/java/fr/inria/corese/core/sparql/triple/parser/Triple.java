@@ -45,7 +45,7 @@ public class Triple extends Exp implements Pointerable {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(Triple.class);
+    private static final Logger logger = LoggerFactory.getLogger(Triple.class);
 
 //	final static String SDT = KeywordPP.SDT;
 //	final static String LANG = KeywordPP.LANG;
@@ -914,10 +914,7 @@ public class Triple extends Exp implements Pointerable {
 
     @Override
     public boolean validateDelete() {
-        if (subject.isBlankNode()||object.isBlankNode()) {
-            return false;
-        }
-        return true;
+        return !subject.isBlankNode() && !object.isBlankNode();
     }
 
     public boolean contains(Atom at) {

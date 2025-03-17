@@ -1,74 +1,71 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.triple.parser.Context;
-import fr.inria.corese.core.sparql.triple.parser.Metadata;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.compiler.eval.SQLResult;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
 import fr.inria.corese.core.kgram.api.core.Pointerable;
 import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.result.SPARQLResultParser;
 import fr.inria.corese.core.producer.DataProducer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.api.IDatatypeList;
-import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Implements unnest() statement values ?var { unnest(exp) } bind (unnest(?exp)
  * as ?var) bind (unnest(?exp) as (?x, ?y))
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
- *
  */
 public class Mapper {
-    static public Logger logger = LoggerFactory.getLogger(Mapper.class);
+    private static Logger logger = LoggerFactory.getLogger(Mapper.class);
 
     Producer p;
-    MapperSQL mapper;
+    MapperSQL mapperSQL;
 
     Mapper(Producer p) {
         this.p = p;
-        mapper = new MapperSQL(p);
+        mapperSQL = new MapperSQL(p);
 
     }
-    
+
     public Mappings map(List<Node> nodes, Object object, int n) {
         if (object instanceof IDatatype) {
-            return map(nodes, (IDatatype)object, n);
-        }
-        else {
+            return map(nodes, (IDatatype) object, n);
+        } else {
             return map(nodes, object);
         }
     }
-    
+
     public Mappings map(List<Node> nodes, IDatatype list, int n) {
         if (n <= 1) {
             return map(nodes, list);
-        }
-        else {
+        } else {
             Mappings map = new Mappings();
             for (IDatatype dt : list) {
-                Mappings res = map(nodes, dt, n-1);
+                Mappings res = map(nodes, dt, n - 1);
                 map.add(res);
             }
             return map;
         }
     }
-
 
 
     /**
@@ -79,36 +76,32 @@ public class Mapper {
             return map(nodes, dt.getValues());
         } else if (dt.isMap() || dt.isJSON() || dt.isXML()) {
             return map(nodes, dt.getValueList());
-        } 
-        else if (dt.isTripleWithEdge()) {
+        } else if (dt.isTripleWithEdge()) {
             return mapEdge(nodes, dt.getEdge());
-        }    
-        else if (dt.isPointer()) {
+        } else if (dt.isPointer()) {
             return map(nodes, dt.getPointerObject());
         } else if (dt.getNodeObject() != null) {
             return map(nodes, dt.getNodeObject());
         } else if (dt.isURI()) {
             return mapURI(nodes, dt);
-        } 
-        
-        else {
+        } else {
             return mapDT(nodes, dt);
         }
     }
-    
+
     Mappings mapEdge(List<Node> nodes, Edge edge) {
         ArrayList<IDatatype> list = new ArrayList<>();
         IDatatypeList dt = DatatypeMap.newList();
         dt.add(edge.getSubjectValue());
         dt.add(edge.getPredicateValue());
         dt.add(edge.getObjectValue());
-        if (edge.getGraphValue()!=null) {
+        if (edge.getGraphValue() != null) {
             dt.add(edge.getGraphValue());
         }
         list.add(dt);
         return map(nodes, list);
     }
-    
+
     public Mappings map(List<Node> nodes, Object object) {
         if (object instanceof IDatatype) {
             return map(nodes, (IDatatype) object);
@@ -117,7 +110,7 @@ public class Mapper {
         } else if (object instanceof Collection) {
             return map(nodes, (Collection<IDatatype>) object);
         } else if (object instanceof SQLResult) {
-            return mapper.sql(nodes, (SQLResult) object);
+            return mapperSQL.sql(nodes, (SQLResult) object);
         }
         return new Mappings();
     }
@@ -157,7 +150,7 @@ public class Mapper {
         varList.toArray(qNodes);
         Node[] nodes;
         Mappings map = new Mappings();
-        int size = varList.size();       
+        int size = varList.size();
         for (Edge ent : g.getEdges()) {
             nodes = new Node[size];
             if (size == 1) {
@@ -265,8 +258,6 @@ public class Mapper {
 
     /**
      * bind (unnest(exp) as ?x) bind (unnest(exp) as (?x, ?y)) eval(exp) = list
-     *
-     *
      */
     Mappings map(List<Node> varList, List<IDatatype> valueList) {
         Node[] qNodes = new Node[varList.size()];
@@ -274,16 +265,14 @@ public class Mapper {
         Mappings map = new Mappings();
         Mapping m;
         for (IDatatype dt : valueList) {
-            if (varList.size() > 1 && dt.isList() ) {
+            if (varList.size() > 1 && dt.isList()) {
                 // bind (((1 2)(3 4)) as (?x, ?y))
                 // ?x = 1 ; ?y = 2
                 Node[] val = new Node[dt.size()];
                 m = Mapping.create(qNodes, dt.getValues().toArray(val));
-            } 
-            else if (varList.size() > 1 && dt.isPointer() && dt.pointerType() == PointerType.TRIPLE) {
+            } else if (varList.size() > 1 && dt.isPointer() && dt.pointerType() == PointerType.TRIPLE) {
                 m = getMapping(dt.getPointerObject().getEdge(), qNodes);
-            }
-            else {
+            } else {
                 // bind (((1 2)(3 4)) as ?x)
                 // HINT: bind (((1 2)(3 4)) as (?x))
                 // ?x = (1 2)
@@ -310,7 +299,7 @@ public class Mapper {
     Mappings map(List<Node> list, Mappings map) {
         return map;
     }
-    
+
     /**
      * Try dt = URL of SPARQL Query Results XML Format
      */
@@ -341,6 +330,7 @@ public class Mapper {
     public List<Node> toNodeList(Object obj) {
         return toNodeList((IDatatype) obj);
     }
+
     public List<Node> toNodeList(IDatatype dt) {
         List<Node> list = new ArrayList<>();
         if (dt.isList()) {

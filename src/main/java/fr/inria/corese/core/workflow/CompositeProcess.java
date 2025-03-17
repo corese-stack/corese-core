@@ -5,36 +5,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
- *
  */
 public class CompositeProcess extends WorkflowProcess {
 
     List<WorkflowProcess> processList;
-    
-    CompositeProcess(){
+
+    CompositeProcess() {
         processList = new ArrayList<WorkflowProcess>();
     }
-    
-    CompositeProcess(List<WorkflowProcess> l){
+
+    CompositeProcess(List<WorkflowProcess> l) {
         processList = l;
     }
-    
-    public void insert(WorkflowProcess p){
+
+    public void insert(WorkflowProcess p) {
         processList.add(p);
     }
-    
-    public void insert(WorkflowProcess p, int n){
+
+    public void insert(WorkflowProcess p, int n) {
         processList.add(n, p);
     }
-     public WorkflowProcess getProcessLast(){
-         if (processList.isEmpty()){
-             return null;
-         }
+
+    public WorkflowProcess getProcessLast() {
+        if (processList.isEmpty()) {
+            return null;
+        }
         return processList.get(processList.size() - 1);
     }
-    
+
     /**
      * @return the processList
      */
@@ -49,8 +48,8 @@ public class CompositeProcess extends WorkflowProcess {
     public void setProcessList(List<WorkflowProcess> processList) {
         this.processList = processList;
     }
-    
-     @Override
+
+    @Override
     public void init(boolean b) {
         if (isVisitable(b)) {
             initialize();
@@ -59,13 +58,5 @@ public class CompositeProcess extends WorkflowProcess {
             }
         }
     }
-     
-    @Override
-    public void setRecDisplay(boolean b){
-        super.setDisplay(b);
-        for (WorkflowProcess p : getProcessList()){
-            p.setDisplay(b);
-        }
-    } 
-    
+
 }

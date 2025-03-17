@@ -22,7 +22,7 @@ public class CSVFormat extends QueryResultFormat {
     Query query;
     List<String> select;
 
-    private boolean isAsk;
+    private final boolean isAsk;
 
     CSVFormat(Mappings m) {
         lm = m;
@@ -96,7 +96,7 @@ public class CSVFormat extends QueryResultFormat {
     }
 
     StringBuilder values() {
-        StringBuilder str = new StringBuilder("");
+        StringBuilder str = new StringBuilder();
 
         for (Mapping map : lm) {
             boolean first = true;

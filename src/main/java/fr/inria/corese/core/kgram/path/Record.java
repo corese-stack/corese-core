@@ -48,7 +48,6 @@ public class Record extends ArrayList<Regex> {
 	
 	Regex pop(){
 		if (size() == 0){
-			System.out.println("** PP: pop empty");
 			return null;
 		}
 		Regex exp = get(size()-1);

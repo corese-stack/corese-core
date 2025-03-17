@@ -2,40 +2,39 @@ package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Query;
 
 /**
- * Draft check if query may succeed on graph PRAGMA: 
+ * Draft check if query may succeed on graph PRAGMA:
  * no RDFS entailments, simple RDF match
- * @author Olivier Corby, Wimmics INRIA I3S, 2018
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
 public class QueryCheck {
-    
+
     Graph graph;
-    
-    
+
+
     public QueryCheck(Graph g) {
         graph = g;
     }
-    
+
     public boolean check(Query q) {
         return check(q, q.getBody());
     }
-        
+
     boolean check(Query q, Exp exp) {
         switch (exp.type()) {
 
-            case ExpType.EDGE:
+            case EDGE:
                 Edge edge = exp.getEdge();
                 Node pred = edge.getEdgeNode();
-                Node var = edge.getEdgeVariable();
+                Node edgeEdgeVariable = edge.getEdgeVariable();
 
-                if (var == null) {
+                if (edgeEdgeVariable == null) {
 
                     if (graph.getPropertyNode(pred) == null) {
                         // graph does not contain this property: fail now
@@ -60,11 +59,11 @@ public class QueryCheck {
                             return false;
                         }
                     }
-                } else if (q.getBindingNodes().contains(var) && q.getValues().getMappings() != null) {
+                } else if (q.getBindingNodes().contains(edgeEdgeVariable) && q.getValues().getMappings() != null) {
                     // property variable with bindings: check the bindings
                     for (Mapping map : q.getValues().getMappings()) {
 
-                        Node node = map.getNode(var);
+                        Node node = map.getNode(edgeEdgeVariable);
                         if (node != null && graph.getPropertyNode(node) != null) {
                             // graph  contain a property
                             return true;
@@ -76,7 +75,7 @@ public class QueryCheck {
 
                 break;
 
-            case ExpType.UNION:
+            case UNION:
 
                 for (Exp ee : exp.getExpList()) {
                     if (check(q, ee)) {
@@ -85,8 +84,8 @@ public class QueryCheck {
                 }
                 return false;
 
-            case ExpType.AND:
-            case ExpType.GRAPH:
+            case AND:
+            case GRAPH:
 
                 for (Exp ee : exp.getExpList()) {
                     boolean b = check(q, ee);
@@ -99,6 +98,5 @@ public class QueryCheck {
         return true;
     }
 
-    
 
 }

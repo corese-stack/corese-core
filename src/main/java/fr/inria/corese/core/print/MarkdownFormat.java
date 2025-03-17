@@ -19,13 +19,13 @@ public class MarkdownFormat extends QueryResultFormat {
     static final String SEP = " | ";
 
     // The mappings to format
-    private Mappings mappings;
+    private final Mappings mappings;
     // The variables to display
     private List<String> select;
     // The maximum width of each variable
-    private Map<String, Integer> maxWidthMap;
+    private final Map<String, Integer> maxWidthMap;
 
-    private boolean isAsk;
+    private final boolean isAsk;
 
     /**
      * Constructor

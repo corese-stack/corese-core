@@ -53,9 +53,7 @@ public class DataFilterBoolean extends DataFilter {
                 
             case 2: df = list.get(1);
                 if (df.isBoolean()){
-                    if (df.setFilter(f)){
-                       return true;
-                    }
+                    return df.setFilter(f);
                 }
                 return false;
         }

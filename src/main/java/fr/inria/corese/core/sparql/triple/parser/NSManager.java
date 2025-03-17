@@ -1,6 +1,13 @@
 package fr.inria.corese.core.sparql.triple.parser;
 
-import static fr.inria.corese.core.kgram.api.core.PointerType.NSMANAGER;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
+import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -12,15 +19,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.inria.corese.core.kgram.api.core.ExpType;
-import fr.inria.corese.core.kgram.api.core.PointerType;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.core.sparql.triple.cst.RDFS;
+import static fr.inria.corese.core.kgram.api.core.PointerType.NSMANAGER;
 
 /**
  * <p>
@@ -54,7 +53,7 @@ public class NSManager extends ASTObject {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(NSManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(NSManager.class);
     public static final String FPPN = "ftp://ftp-sop.inria.fr/wimmics/soft/pprint/";
     public static final String XSD = RDFS.XSD;
     public static final String XSI = "http://www.w3.org/2001/XMLSchema-instance#";
@@ -297,11 +296,8 @@ public class NSManager extends ASTObject {
 
         def.put(SPIN, SPIN_PREF);
         def.put(FOAF, FOAF_PREF);
-        // def.put("http://dbpedia.org/ontology/", "dbo");
         def.put("http://www.w3.org/2004/02/skos/core#", "skos");
         def.put(DCTERM, "dc");
-        // def.put(DBPEDIAFR, "db");
-        // def.put(DBPEDIA, "dbe");
 
         def.put(KGRAM, KPREF);
         def.put(KGEXT, KEPREF);
@@ -426,7 +422,7 @@ public class NSManager extends ASTObject {
      * Returns the prefix of the namespace
      */
     public String getPrefix(String ns) {
-        return (String) tns.get(ns);
+        return tns.get(ns);
     }
 
     void defPrefix(String prefix, String ns) {
@@ -696,10 +692,10 @@ public class NSManager extends ASTObject {
             String uri = toPrefixURI(label, !force, display);
             dt = DatatypeMap.newStringBuilder(uri);
         } else if (dt.isLiteral()) {
-            if ((dt.getCode() == IDatatype.INTEGER
+            if ((dt.getCode() == IDatatype.Datatype.INTEGER
                     && dt.getDatatypeURI().equals(fr.inria.corese.core.sparql.datatype.XSD.xsdinteger)
                     && (!(label.startsWith("0") && label.length() > 1)))
-                    || (dt.getCode() == IDatatype.BOOLEAN && (label.equals("true") || label.equals("false")))) {
+                    || (dt.getCode() == IDatatype.Datatype.BOOLEAN && (label.equals("true") || label.equals("false")))) {
                 // print string value as is
             } else {
                 // add quotes around string, add lang tag if any

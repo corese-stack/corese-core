@@ -22,7 +22,6 @@ public class BrokerDistanceDataManager extends BrokerDistance {
     static final String PREDICATE = "select ?p where {values ?p {<%s>} ?x ?p ?y} limit 1";
 
     private DataManager dataManager;
-    private boolean debug = false;
 
     BrokerDistanceDataManager(Graph g, DataManager man) {
         setGraph(g);
@@ -36,8 +35,6 @@ public class BrokerDistanceDataManager extends BrokerDistance {
         try {
             Mappings map = exec.query(q);
             Node res = map.getNode("?p");
-            if (isDebug())
-                System.out.println("DM property: " + name + " " + res);
             return res;
         } catch (EngineException ex) {
             Distance.logger.error(ex.getMessage());
@@ -54,8 +51,6 @@ public class BrokerDistanceDataManager extends BrokerDistance {
             try {
                 Mappings map = exec.query(q);
                 Node res = map.getNode("?o");
-                if (isDebug())
-                    System.out.println("DM top: " + name + " " + res);
                 if (res != null) {
                     return res;
                 }
@@ -75,8 +70,6 @@ public class BrokerDistanceDataManager extends BrokerDistance {
         try {
             Mappings map = exec.query(q);
             List<Node> list = map.getNodeValueList("?y");
-            if (isDebug())
-                System.out.println("DM top level list: " + predicate + " " + list);
             return list;
         } catch (EngineException ex) {
             Distance.logger.error(ex.getMessage());
@@ -99,8 +92,6 @@ public class BrokerDistanceDataManager extends BrokerDistance {
                 list.add(n);
             }
         }
-        if (isDebug())
-            System.out.println("DM node list: " + node + " " + list);
         return list;
     }
 
@@ -110,14 +101,6 @@ public class BrokerDistanceDataManager extends BrokerDistance {
 
     public void setDataManager(DataManager dataManager) {
         this.dataManager = dataManager;
-    }
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
 }

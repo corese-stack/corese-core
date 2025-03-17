@@ -8,9 +8,9 @@ import fr.inria.corese.core.approximate.strategy.AlgType;
  * @author Fuqi Song, Wimmics Inria I3S
  * @date 13 oct. 2015
  */
-public class ClassHierarchy extends BaseAlgorithm{
+public class ClassHierarchy extends BaseAlgorithm {
 
     public ClassHierarchy() {
-        super(AlgType.ch);
+        super(AlgType.CH);
     }
 }

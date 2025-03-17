@@ -1,6 +1,7 @@
 package fr.inria.corese.core.kgram.core;
 
 import fr.inria.corese.core.kgram.api.core.Node;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,12 +32,12 @@ public class ExpHandler {
         this();
         setExist(exist).setInSubScope(inSubScope).setBind(bind).setBlank(blank);
     }
-    
+
     public ExpHandler(boolean exist, boolean inSubScope, boolean bind) {
         this();
         setExist(exist).setInSubScope(inSubScope).setBind(bind);
     }
-    
+
     public ExpHandler(boolean inSubScope, boolean bind) {
         this();
         setInSubScope(inSubScope).setBind(bind);
@@ -55,17 +56,17 @@ public class ExpHandler {
             addDistinct(node);
         }
     }
-    
+
     void addDistinct(Node node) {
-        if (! getNodeList().contains(node)) {
+        if (!getNodeList().contains(node)) {
             getNodeList().add(node);
         }
     }
-    
+
     // add select nodes that are not already in node list
-    public List<Node> getNodes(){
+    public List<Node> getNodes() {
         for (Node selectNode : getSelectNodeList()) {
-            if (!getNodeList().contains(selectNode)) {                                                 
+            if (!getNodeList().contains(selectNode)) {
                 getNodeList().add(overloadSelectNodeByExistNode(selectNode));
             }
         }
@@ -76,29 +77,30 @@ public class ExpHandler {
                 addDistinct(existNode);
             }
         }
-        
+
         return getNodeList();
     }
-    
-   /**
-    * use case: 
-    * select * where { 
-    * {select * where {?x foaf:knows ?y}} 
-    * filter exists {?x foaf:knows ?y} } 
-    * 
-    * lNode = {} lSelNode = {?x, ?y} lExistNode = {?x, ?y} 
-    * overload select nodes of subquery by exists nodes
-    * @hint: this code would be useful if nodes ?y and ?y were different 
-    * currently they are the same, hence it is useless
-    */    
+
+    /**
+     * use case:
+     * select * where {
+     * {select * where {?x foaf:knows ?y}}
+     * filter exists {?x foaf:knows ?y} }
+     * <p>
+     * lNode = {} lSelNode = {?x, ?y} lExistNode = {?x, ?y}
+     * overload select nodes of subquery by exists nodes
+     *
+     * @hint: this code would be useful if nodes ?y and ?y were different
+     * currently they are the same, hence it is useless
+     */
     Node overloadSelectNodeByExistNode(Node node) {
-        if (getExistNodeList().contains(node)) {            
+        if (getExistNodeList().contains(node)) {
             return get(getExistNodeList(), node);
         } else {
             return node;
         }
     }
-    
+
     Node get(List<Node> lNode, Node node) {
         for (Node qNode : lNode) {
             if (qNode.equals(node)) {
@@ -136,13 +138,13 @@ public class ExpHandler {
         return inSubScope;
     }
 
-    boolean isInSubScopeSample() {
-        return isInSubScope() && !isAll();
-    }
-
     public ExpHandler setInSubScope(boolean inSubScope) {
         this.inSubScope = inSubScope;
         return this;
+    }
+
+    boolean isInSubScopeSample() {
+        return isInSubScope() && !isAll();
     }
 
     public boolean isBind() {

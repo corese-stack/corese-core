@@ -10,16 +10,13 @@ package fr.inria.corese.core.compiler.parser;
 public class CompilerFacKgram implements CompilerFactory {
 
 
-  public CompilerFacKgram() {
-  }
+    public CompilerFacKgram() {
+    }
 
-  public CompilerFacKgram(boolean b) {
-  }
-
-  @Override
-  public Compiler newInstance() {
-    return new CompilerKgram();
-  }
+    @Override
+    public Compiler newInstance() {
+        return new CompilerKgram();
+    }
 
 
 }

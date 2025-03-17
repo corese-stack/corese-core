@@ -23,11 +23,11 @@ public class RDFaLoader {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(RDFaLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(RDFaLoader.class);
 
     private Reader reader;
     private InputStream is;
-    private String base;
+    private final String base;
 
     RDFaLoader(InputStream r, String base) {
         this.is = r;

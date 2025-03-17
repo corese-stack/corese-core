@@ -8,8 +8,9 @@ package fr.inria.corese.core.approximate.algorithm;
  */
 public class Utils {
 
-    private final static boolean SHOW_MSG = !true;
-
+    private Utils() {
+    }
+    
     /**
      * Format a double using default format "##.####"
      *

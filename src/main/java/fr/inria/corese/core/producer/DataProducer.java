@@ -277,11 +277,6 @@ public class DataProducer extends GraphObject
         return this;
     }
 
-    public DataProducer access(byte n) {
-        setFilter(new DataFilter(ExprType.EDGE_ACCESS, n));
-        return this;
-    }
-
     public DataProducer access(AccessRight ac) {
         setFilter(new DataFilter(ExprType.EDGE_ACCESS, ac));
         return this;
@@ -596,9 +591,6 @@ public class DataProducer extends GraphObject
         return skipEdgeMetadata;
     }
 
-    /**
-     * @param edgeMetadata the edgeMetadata to set
-     */
     public DataProducer setSkipEdgeMetadata(boolean b) {
         this.skipEdgeMetadata = b;
         return this;
@@ -640,14 +632,14 @@ public class DataProducer extends GraphObject
     /**
      * @param filter the filter to set
      */
-    public void setFilter(DataFilter f) {
-        if (filter == null || f == null) {
-            filter = f;
-        } else if (filter.isBoolean()) {
-            filter.setFilter(f);
+    public void setFilter(DataFilter filter) {
+        if (this.filter == null || filter == null) {
+            this.filter = filter;
+        } else if (this.filter.isBoolean()) {
+            this.filter.setFilter(filter);
         } else {
             // use case: filter = from(g1)
-            filter = new DataFilterAnd(filter, f);
+            this.filter = new DataFilterAnd(this.filter, filter);
         }
     }
 

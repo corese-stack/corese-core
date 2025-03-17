@@ -2,6 +2,7 @@ package fr.inria.corese.core.approximate.ext;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseStringLiteral;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.ExprType;
@@ -10,7 +11,6 @@ import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.approximate.algorithm.ISimAlgorithm;
 import fr.inria.corese.core.approximate.algorithm.SimAlgorithmFactory;
-import static fr.inria.corese.core.approximate.algorithm.Utils.format;
 import fr.inria.corese.core.approximate.algorithm.impl.BaseAlgorithm;
 import fr.inria.corese.core.query.PluginImpl;
 
@@ -22,37 +22,29 @@ import fr.inria.corese.core.query.PluginImpl;
  */
 public class AppxSearchPlugin implements ExprType {
 
-    static final IDatatype TRUE = PluginImpl.TRUE;
-    static final IDatatype FALSE = PluginImpl.FALSE;
+    static final IDatatype TRUE = DatatypeMap.TRUE;
+    static final IDatatype FALSE = DatatypeMap.FALSE;
     private final PluginImpl plugin;
 
     public AppxSearchPlugin(PluginImpl p) {
         this.plugin = p;
     }
 
-    public IDatatype eval(Expr exp, Environment env, Producer p) {
-        switch (exp.oper()) {
-            case APP_SIM:
-                ApproximateSearchEnv appxEnv = env.getAppxSearchEnv();
-                double d = appxEnv.aggregate(env);
-                IDatatype sim = plugin.getValue(d);
-                return sim;
-            default:
-                return null;
+    public IDatatype evaluate(Expr exp, Environment env, Producer p) {
+        if (exp.oper() == APP_SIM) {
+            ApproximateSearchEnv appxEnv = env.getAppxSearchEnv();
+            double d = appxEnv.aggregate(env);
+            return plugin.getValue(d);
         }
+        return null;
     }
 
-    public IDatatype eval(Expr exp, Environment env, Producer p, Object[] args) {
+    public IDatatype evaluate(Expr exp, Environment env, Producer p, Object[] args) {
         IDatatype[] param = (IDatatype[]) args;
-        switch (exp.oper()) {
-            
-            case APPROXIMATE:
-                //0. check parameters
-                return eval(exp, env, param);
-                
-            default:
-                return null;
+        if (exp.oper() == APPROXIMATE) {//0. check parameters
+            return evaluate(exp, env, param);
         }
+        return null;
     }
 
     // Use approximate as a filter function
@@ -80,11 +72,11 @@ public class AppxSearchPlugin implements ExprType {
         //0. initialize
         String s1 = stringValue(dt1);
         String s2 = stringValue(dt2);   
-        Expr var = exp.getExp(0);
+        Expr variableExpr = exp.getExp(0);
         ApproximateSearchEnv appxEnv = env.getAppxSearchEnv();
 
         Double combinedSim;
-        Double singleSim = appxEnv.getSimilarity(var, dt1, algs);//check appx env to see if already computed
+        Double singleSim = appxEnv.getSimilarity(variableExpr, dt1, algs);//check appx env to see if already computed
 
         boolean notExisted = (singleSim == null);
 
@@ -97,14 +89,14 @@ public class AppxSearchPlugin implements ExprType {
                 ISimAlgorithm alg = SimAlgorithmFactory.createCombined(algs, false);
                 singleSim = alg.calculate(s1, s2, parameter);
             }
-            combinedSim = appxEnv.aggregate(env, var, singleSim);
+            combinedSim = appxEnv.aggregate(env, variableExpr, singleSim);
         }
 
         //3 finalize
         boolean filtered = combinedSim > threshold;
 
         if (notExisted) {
-            appxEnv.add(var, dt2, dt1, algs, singleSim);
+            appxEnv.add(variableExpr, dt2, dt1, algs, singleSim);
         }
         return filtered ? TRUE : FALSE;
     }
@@ -118,7 +110,7 @@ public class AppxSearchPlugin implements ExprType {
         args[3] = threshold
         args[4] = false|true.
     */
-    private IDatatype eval(Expr exp, Environment env, IDatatype[] args) {
+    private IDatatype evaluate(Expr exp, Environment env, IDatatype[] args) {
         if (args.length != 4) {
             return FALSE;
         }
@@ -159,16 +151,12 @@ public class AppxSearchPlugin implements ExprType {
 
     }
     
-    boolean match(int c1, int c2){
+    boolean match(IDatatype.Datatype c1, IDatatype.Datatype c2){
         if (c1 == c2){
             return true;
         }
-        if ((c1 == IDatatype.STRING && c2 == IDatatype.LITERAL) ||
-            (c2 == IDatatype.STRING && c1 == IDatatype.LITERAL)){
-            return true;
-        }
-        
-        return false;
+        return (c1 == IDatatype.Datatype.STRING && c2 == IDatatype.Datatype.LITERAL) ||
+                (c2 == IDatatype.Datatype.STRING && c1 == IDatatype.Datatype.LITERAL);
     }
   
 }

@@ -1,6 +1,5 @@
 package fr.inria.corese.core.approximate.strategy;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,23 +12,24 @@ import java.util.List;
 public enum StrategyType {
 
     //URI
-    URI_LEX, 
+    URI_LEX,
     URI_WN,
     URI_EQUALITY,
-    PROPERTY_EQUALITY, 
-    
+    PROPERTY_EQUALITY,
+
     //class hierarchy
     CLASS_HIERARCHY,
-    
+
     //literal
-    LITERAL_WN, 
-    LITERAL_LEX; 
-        
+    LITERAL_WN,
+    LITERAL_LEX;
+
     /**
      * Return all values
-     * @return 
+     *
+     * @return
      */
     public static List<StrategyType> allValues() {
         return Arrays.asList(StrategyType.values());
-    }   
+    }
 }

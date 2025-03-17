@@ -51,7 +51,7 @@ public class GetSetContext extends TemplateFunction {
                     return param[1];
                 }
                 else {
-                    c.set(param[0], (IDatatype)null);
+                    c.set(param[0], null);
                     return TRUE;
                 }
                                 

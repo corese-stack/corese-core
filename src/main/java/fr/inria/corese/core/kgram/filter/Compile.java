@@ -3,11 +3,7 @@ package fr.inria.corese.core.kgram.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.core.kgram.api.core.Expr;
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.api.core.Filter;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.api.core.*;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Query;
 
@@ -62,11 +58,6 @@ public class Compile implements ExprType {
 	
 	public boolean check(Exp exp1, Exp exp2){
 		return checker.check(exp1.getFilter().getExp(), exp2.getFilter().getExp());
-	}
-	
-	public void test(Regex exp){
-		if (exp instanceof Expr)
-			checker.test((Expr) exp);
 	}
 
 	/**
@@ -140,9 +131,9 @@ public class Compile implements ExprType {
 			// compute Node list corresponding to variables
 			List<Node> lNode = query.getNodes(exp);
 			if (lNode.size()==2){
-				Exp bind = Exp.create(Exp.OPT_BIND);
+				Exp bind = Exp.create(ExpType.Type.OPT_BIND);
 				for (Node qNode : lNode){
-					Exp var = Exp.create(Exp.NODE, qNode);
+					Exp var = Exp.create(ExpType.Type.NODE, qNode);
 					bind.add(var);
 				}
 				exp.add(bind);
@@ -150,7 +141,7 @@ public class Compile implements ExprType {
 		}
 		// ?x = 'constant'
 		else if (matcher.match(new Pattern(TERM, EQ, VARIABLE, CONSTANT), ee)){ 
-			Exp bind = buildCst(exp, Exp.OPT_BIND);
+			Exp bind = buildCst(exp, ExpType.Type.OPT_BIND);
 			if (bind != null){
 				exp.add(bind);		
 			}
@@ -159,14 +150,14 @@ public class Compile implements ExprType {
 	
 
 	
-	Exp buildCst(Exp exp, int type){
+	Exp buildCst(Exp exp, ExpType.Type type){
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
 		Node node = query.getProperAndSubSelectNode(ff.getVariables().get(0));
 		if (node != null){
 			// variable ?x
-			Exp bind = Exp.create(type, Exp.create(Exp.NODE, node));
-			List<Expr> list = new ArrayList<Expr>();
+			Exp bind = Exp.create(type, Exp.create(ExpType.Type.NODE, node));
+			List<Expr> list = new ArrayList<>();
 			list.add(getConstants(ee).get(0));
 			bind.setObject(list);
 			return bind;
@@ -174,12 +165,12 @@ public class Compile implements ExprType {
 		return null;
 	}
 	
-	Exp buildVar(Exp exp, int type){
+	Exp buildVar(Exp exp, ExpType.Type type){
 		List<Node> lNode = query.getNodes(exp);
 		if (lNode.size()==2){
 			Exp bind = Exp.create(type);
 			for (Node node : lNode){			
-				bind.add(Exp.create(Exp.NODE, node));
+				bind.add(Exp.create(ExpType.Type.NODE, node));
 			}
 			return bind;
 		}
@@ -196,14 +187,14 @@ public class Compile implements ExprType {
 		Expr ee = ff.getExp();
 		Pattern pat = new Pattern(TERM, GL, VARIABLE, CONSTANT);
 		if (matcher.match(pat, ee)){
-			Exp  test = buildCst(exp, Exp.TEST);
+			Exp  test = buildCst(exp, ExpType.Type.TEST);
 			if (test!=null)
 				exp.add(test);
 		}
 		else {
 			pat = new Pattern(TERM, GL, VARIABLE, VARIABLE);
 			if (matcher.match(pat, ee)){
-				Exp  test = buildVar(exp, Exp.TEST);
+				Exp  test = buildVar(exp, ExpType.Type.TEST);
 				if (test!=null)
 					exp.add(test);
 			}
@@ -224,7 +215,7 @@ public class Compile implements ExprType {
 			Node node = query.getProperAndSubSelectNode(ff.getVariables().get(0));
 			if (node != null){
 				List<Expr> list = getConstants(ee);
-				Exp bind = Exp.create(Exp.OPT_BIND, Exp.create(Exp.NODE, node));
+				Exp bind = Exp.create(ExpType.Type.OPT_BIND, Exp.create(ExpType.Type.NODE, node));
 				bind.setObject(list);
 				exp.add(bind);
 			}
@@ -256,7 +247,7 @@ public class Compile implements ExprType {
 
         Node node = query.getProperAndSubSelectNode(lvar.get(0));
         if (node != null) {
-            Exp bind = Exp.create(Exp.OPT_BIND, Exp.create(Exp.NODE, node));
+            Exp bind = Exp.create(ExpType.Type.OPT_BIND, Exp.create(ExpType.Type.NODE, node));
             bind.setObject(list);
             exp.add(bind);
         }
@@ -301,7 +292,7 @@ public class Compile implements ExprType {
 	List<Expr> getConstants(Expr exp, List<Expr> list){
 		switch (exp.type()){
 		
-		case CONSTANT:  			//System.out.println(exp);
+		case CONSTANT:
 			list.add(exp); break;
 			
 		case VARIABLE: break;

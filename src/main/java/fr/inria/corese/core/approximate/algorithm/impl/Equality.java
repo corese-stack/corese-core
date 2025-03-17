@@ -1,7 +1,6 @@
 package fr.inria.corese.core.approximate.algorithm.impl;
 
-import fr.inria.corese.core.approximate.algorithm.Utils;
-import static fr.inria.corese.core.approximate.strategy.AlgType.eq;
+import static fr.inria.corese.core.approximate.strategy.AlgType.EQ;
 
 /**
  * Equality.java
@@ -12,7 +11,7 @@ import static fr.inria.corese.core.approximate.strategy.AlgType.eq;
 public class Equality extends BaseAlgorithm {
 
     public Equality() {
-        super(eq);
+        super(EQ);
     }
 
     @Override

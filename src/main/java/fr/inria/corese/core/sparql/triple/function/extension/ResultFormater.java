@@ -57,7 +57,7 @@ public class ResultFormater extends TermEval {
 
         switch (oper()) {
             case XT_JSON:
-                if (dt.getCode() == IDatatype.STRING || dt.getCode() == IDatatype.LITERAL) {
+                if (dt.getCode() == IDatatype.Datatype.STRING || dt.getCode() == IDatatype.Datatype.LITERAL) {
                     return DatatypeMap.json(dt.stringValue());
                 }
                 else if (dt.isXML()) {
@@ -67,10 +67,10 @@ public class ResultFormater extends TermEval {
 
             case XT_XML: 
                 switch (dt.getCode()) {
-                    case IDatatype.STRING:
-                    case IDatatype.LITERAL:
-                    case IDatatype.XMLLITERAL:
-                    case IDatatype.URI:
+                    case STRING:
+                    case LITERAL:
+                    case XMLLITERAL:
+                    case URI:
                     return parseXML(dt);
                 }
                 break;

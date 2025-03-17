@@ -38,7 +38,7 @@ public class Distance {
     // class step is: 1 / 2^n
     public static double CSTEP = 2;
 
-    private static int FIRST_STEP = 5;
+    private static final int FIRST_STEP = 5;
 
     private Graph graph;
     private DataManager dataManager;
@@ -590,9 +590,7 @@ public class Distance {
         }
         if (hasEquiv) {
             double dd = distance(node, equivAs, ta, tb);
-            if (dd != -1) {
-                return dd;
-            }
+            return dd;
         }
         return -1;
     }

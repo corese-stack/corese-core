@@ -31,7 +31,7 @@ public class LoadTurtle {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(LoadTurtle.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoadTurtle.class);
 
     SparqlCorese parser;
     Creator create;

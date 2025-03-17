@@ -726,7 +726,7 @@ public interface SparqlCoreseConstants {
     "<DOUBLE>",
     "<EXPONENT>",
     "\"\\\"\\\"\\\"\"",
-    "\"\\\'\\\'\\\'\"",
+          "\"\\'\\'\\'\"",
     "<ECHAR>",
     "<STRING_LITERAL1>",
     "<STRING_LITERAL2>",

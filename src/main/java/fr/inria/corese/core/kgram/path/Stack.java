@@ -40,9 +40,8 @@ public class Stack {
 	boolean loop(Step st, Path path){
 		int index = steps.lastIndexOf(st);
 		if (index == -1) return false;
-		if (sizes.get(index) == path.size()) return true;
-		return false;
-	}
+        return sizes.get(index) == path.size();
+    }
 	
 	int size(Step st){
 		int index = steps.lastIndexOf(st);

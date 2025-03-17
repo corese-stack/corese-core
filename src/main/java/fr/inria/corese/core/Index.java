@@ -1,114 +1,114 @@
 package fr.inria.corese.core;
 
 
-
 import fr.inria.corese.core.index.NodeManager;
 import fr.inria.corese.core.index.PredicateList;
-import fr.inria.corese.core.kgram.api.core.Node;
-import java.util.List;
 import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+
+import java.util.List;
 
 /**
- * Interface for Index for Graph 
- * 
- * @author Olivier Corby, Edelweiss INRIA 2010
+ * Interface for Index for Graph
  *
+ * @author Olivier Corby, Edelweiss INRIA 2010
  */
 public interface Index {
-    
-        String toRDF();
 
-	int getIndex();
-	
-	int size();
-        
-        int cardinality();
+    String toRDF();
 
-	int duplicate();
+    int getIndex();
 
-	void index();
-        
-        void compact();
-                
-        void index(Node pred);
+    int size();
 
-	void indexNode();
+    int cardinality();
 
-        void indexNodeManager();       
-        
-        void setByIndex(boolean b);
-        
-        void declareUpdate(boolean b);
+    int duplicate();
 
-	Iterable<Node> getProperties();
-	
-	Iterable<Node> getSortedProperties();
-	PredicateList  getSortedPredicates();
-        
-        int nbProperties();
-	        
-        boolean same(Node n1, Node n2);
+    void index();
 
-	Edge add(Edge edge);
-	
-	Edge add(Edge edge, boolean duplicate);
-        
-        void add(Node p, List<Edge> list);
+    void compact();
 
-        Edge delete(Edge edge);
-        
-        Edge delete(Node pred, Edge edge);
+    void index(Node pred);
 
-	void delete(Node pred);
-        
-        Edge find(Edge edge);
+    void indexNode();
 
-	boolean exist(Edge edge);
-        
-        boolean exist(Node p, Node n1, Node n2);
+    void indexNodeManager();
 
-	void declare(Edge edge);
-        
-        void declare(Edge edge, boolean duplicate);        
-	
-	int size(Node pred);
-        
-        Iterable<Edge> getSortedEdges(Node node);
+    void setByIndex(boolean b);
 
-	Iterable<Edge> getEdges();
-        
-        Iterable<Edge> get(Node pred);
+    void declareUpdate(boolean b);
 
-	Iterable<Edge> getEdges(Node pred, Node node);
-        
-        Iterable<Edge> getEdges(Node pred, Node node, int position);
+    Iterable<Node> getProperties();
 
-	Iterable<Edge> getEdges(Node pred, Node node, Node node2);
-        
-        NodeManager getNodeManager();
-        
-        void finishUpdate();
-                	
-	// ************** Update
-	
-	
-	void clear();
-        
-        void clean();
-        
-        void clearCache();
+    Iterable<Node> getSortedProperties();
 
-	void clearIndex(Node pred);
+    PredicateList getSortedPredicates();
 
-        void clear(Node gNode);
-	
-	void copy(Node g1, Node g2);
+    int nbProperties();
 
-	void add(Node g1, Node g2);
-	
-	void move(Node g1, Node g2);
+    boolean same(Node n1, Node n2);
 
-	void setDuplicateEntailment(boolean value);
+    Edge add(Edge edge);
+
+    Edge add(Edge edge, boolean duplicate);
+
+    void add(Node p, List<Edge> list);
+
+    Edge delete(Edge edge);
+
+    Edge delete(Node pred, Edge edge);
+
+    void delete(Node pred);
+
+    Edge find(Edge edge);
+
+    boolean exist(Edge edge);
+
+    boolean exist(Node p, Node n1, Node n2);
+
+    void declare(Edge edge);
+
+    void declare(Edge edge, boolean duplicate);
+
+    int size(Node pred);
+
+    Iterable<Edge> getSortedEdges(Node node);
+
+    Iterable<Edge> getEdges();
+
+    Iterable<Edge> get(Node pred);
+
+    Iterable<Edge> getEdges(Node pred, Node node);
+
+    Iterable<Edge> getEdges(Node pred, Node node, int position);
+
+    Iterable<Edge> getEdges(Node pred, Node node, Node node2);
+
+    NodeManager getNodeManager();
+
+    void finishUpdate();
+
+    // ************** Update
+
+
+    void clear();
+
+    void clean();
+
+    void clearCache();
+
+    void clearIndex(Node pred);
+
+    void clear(Node gNode);
+
+    void copy(Node g1, Node g2);
+
+    void add(Node g1, Node g2);
+
+    void move(Node g1, Node g2);
+
+    void setDuplicateEntailment(boolean value);
 
 
 }

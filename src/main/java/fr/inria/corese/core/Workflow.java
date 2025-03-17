@@ -1,37 +1,34 @@
 package fr.inria.corese.core;
 
+import fr.inria.corese.core.api.Engine;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.logic.Entailment;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.api.Engine;
-import fr.inria.corese.core.logic.Entailment;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 /**
- *
  * Manage a set of inference engines Loop until no inference is performed It is
  * automatically called when isUpdate==true to perform inference and restore
  * consistency
- *
  */
 public class Workflow implements Engine {
-    private static Logger logger = LoggerFactory.getLogger(Workflow.class);
+    private static final Logger logger = LoggerFactory.getLogger(Workflow.class);
 
     Graph graph;
     ArrayList<Engine> engines;
+    boolean isIdle = true;
+    boolean isActivate = true;
+    boolean isClearEntailment = false;
     // RDFS entailment
     private Entailment inference;
-    boolean isDebug = false,
-            isIdle = true,
-            isActivate = true,
-            isClearEntailment = false;
 
     Workflow(Graph g) {
-        engines = new ArrayList<Engine>();
+        engines = new ArrayList<>();
         graph = g;
     }
 
@@ -48,10 +45,6 @@ public class Workflow implements Engine {
 
     public void removeEngine(Engine e) {
         engines.remove(e);
-    }
-
-    public void setDebug(boolean b) {
-        isDebug = b;
     }
 
     public void setClearEntailment(boolean b) {
@@ -82,15 +75,15 @@ public class Workflow implements Engine {
         }
         return b;
     }
-    
+
     boolean isAvailable() {
-        return isBasicAvailable() && engines.size() > 0;
+        return isBasicAvailable() && !engines.isEmpty();
     }
-    
-     boolean isBasicAvailable() {
-        return isActivate && isIdle ;
+
+    boolean isBasicAvailable() {
+        return isActivate && isIdle;
     }
-    
+
     EventManager getEventManager() {
         return graph.getEventManager();
     }
@@ -115,7 +108,7 @@ public class Workflow implements Engine {
                         isSuccess = true;
                         count++;
                     }
-               }
+                }
             }
         }
 
@@ -127,16 +120,12 @@ public class Workflow implements Engine {
      * Run engine and submitted engines until no inference is performed
      */
     boolean run(Engine e) throws EngineException {
-        int size = 0;
+
         boolean isSuccess = false;
         int count = 2;
 
         while (count > 1) {
             count = 0;
-
-            if (isDebug) {
-                System.out.println("** W run: " + e.getClass().getName());
-            }
 
             if (e.isActivate()) {
                 boolean b = e.process();
@@ -199,26 +188,26 @@ public class Workflow implements Engine {
     }
 
     @Override
-    public void setActivate(boolean b) {
-        isActivate = b;
-    }
-
-    @Override
     public boolean isActivate() {
         return isActivate;
     }
 
     @Override
-    public int type() {
-        return WORKFLOW_ENGINE;
+    public void setActivate(boolean b) {
+        isActivate = b;
+    }
+
+    @Override
+    public Type type() {
+        return Type.WORKFLOW_ENGINE;
     }
 
     public void clear() {
         engines.clear();
     }
 
-    public void removeEngine(int type) {
-        for (int i = 0; i < engines.size();) {
+    public void removeEngine(Type type) {
+        for (int i = 0; i < engines.size(); ) {
             if (engines.get(i).type() == type) {
                 engines.remove(engines.get(i));
             } else {
@@ -227,7 +216,7 @@ public class Workflow implements Engine {
         }
     }
 
-    public void setActivate(int type, boolean b) {
+    public void setActivate(Type type, boolean b) {
 
         for (Engine e : engines) {
             if (e.type() == type) {

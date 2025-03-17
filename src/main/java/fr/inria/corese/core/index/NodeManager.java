@@ -6,6 +6,8 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.sparql.api.IDatatype.NodeKind;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manage a table of list of properties for each node
@@ -26,14 +28,13 @@ import java.util.HashMap;
 public class NodeManager {
 
     private Graph graph;
-    private ArrayList<PredicateTable> predicateTableList;
+    private List<PredicateTable> predicateTableList;
     // in some case content is obsolete
     private boolean active = true;
     // safety to switch off
     private boolean available = true;
     private int count = 0;
     private int index =0;
-    private boolean debug = false;
     // record position of node in edge list
     private boolean position = true;
     private static final String NL = "\n";
@@ -127,8 +128,7 @@ public class NodeManager {
     }
         
     // edge subList for node starts at begin
-    void add(Node node, Node predicate, int begin, int end) {        
-        //System.out.println("NM: " + node + "(" + begin + ", " + end + ")");
+    void add(Node node, Node predicate, int begin, int end) {
         if (isEffective()) {
             PredicateList list = get(node);
             if (list == null) {
@@ -147,9 +147,6 @@ public class NodeManager {
         else if (isAvailable() && ! graph.isIndexable()) {
             synchronized (getGraph()) {
                 getGraph().getIndex(getIndex()).indexNodeManager();
-            }
-            if (debug) {
-                System.out.println("NMP create: " + getIndex() + " " + node + " " + getPredicateList(node));
             }
             return getPredicateList(node);
         } 
@@ -209,16 +206,6 @@ public class NodeManager {
     public void setAvailable(boolean available) {
         this.available = available;
     }
-
-     
-    public boolean isDebug() {
-        return debug;
-    }
-
-   
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
     
     public String display() {
         return display(Integer.MAX_VALUE);
@@ -255,15 +242,15 @@ public class NodeManager {
     }
     
     // one map per kind of Node
-    public HashMap<Node, PredicateList> getPredicateTable(Node node) {        
+    public Map<Node, PredicateList> getPredicateTable(Node node) {
         return getPredicateTableList().get(node.getNodeKind().getIndex());
     }
 
-    public ArrayList<PredicateTable> getPredicateTableList() {
+    public List<PredicateTable> getPredicateTableList() {
         return predicateTableList;
     }
 
-    public void setPredicateTableList(ArrayList<PredicateTable> predicateTableList) {
+    public void setPredicateTableList(List<PredicateTable> predicateTableList) {
         this.predicateTableList = predicateTableList;
     }
 

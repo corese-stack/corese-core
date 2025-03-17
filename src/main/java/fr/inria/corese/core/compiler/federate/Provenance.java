@@ -37,30 +37,15 @@ public class Provenance {
     void init(List<Service> serviceList) {
         for (Service serv : serviceList) {
             if (serv.getServiceName().isVariable()) {
-                Variable var = serv.getServiceName().getVariable();
-                varList.add(var);
-                table.put(var, serv.getVariables());
+                Variable variable = serv.getServiceName().getVariable();
+                varList.add(variable);
+                table.put(variable, serv.getVariables());
             }
         }
     }
     
     HashMap<Variable, List<Variable>> getProvenance() {
         return table;
-    }
-    
-    
-    void display() {
-        for (Mapping m : map) {
-            for (Variable var : varList) {
-                System.out.println(var + " " + m.getValue(var.getLabel()));
-                for (Variable name : table.get(var)) {
-                    if (!name.equals(var) && m.getValue(name.getLabel()) != null) {
-                        System.out.println(name + " " + m.getValue(name.getLabel()));
-                    }
-                }
-            }
-            System.out.println("__");
-        }
     }
     
     void aggregate() {
@@ -74,8 +59,8 @@ public class Provenance {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Mapping m : getServers()) {
-            for (Variable var : getVariables()) {
-                DatatypeValue res = m.getValue(var.getLabel());
+            for (Variable variable : getVariables()) {
+                DatatypeValue res = m.getValue(variable.getLabel());
                 if (res != null) {
                     sb.append(res.stringValue()).append(NL);
                 }
@@ -100,8 +85,8 @@ public class Provenance {
     
     public List<Node> getServerNames(Mapping m) {
         ArrayList<Node> list = new ArrayList<>();
-        for (Variable var : getVariables()) {
-            Node n = m.getNode(var.getLabel());
+        for (Variable variable : getVariables()) {
+            Node n = m.getNode(variable.getLabel());
             if (n != null) {
                 list.add(n);
             }
@@ -110,10 +95,10 @@ public class Provenance {
     }
     
     List<Node> getNodeList() {
-        List<Node> list = new ArrayList<Node>();
+        List<Node> list = new ArrayList<>();
         for (Mapping m : map) {
-            for (Variable var : varList) {
-                Node node = m.getQueryNode(var.getLabel());
+            for (Variable variable : varList) {
+                Node node = m.getQueryNode(variable.getLabel());
                 if (node != null && ! list.contains(node)) {
                     list.add(node);
                 }

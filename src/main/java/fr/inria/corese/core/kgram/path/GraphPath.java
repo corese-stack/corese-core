@@ -13,9 +13,9 @@ public class GraphPath extends Thread {
 	
 
 	//private Buffer buf;
-	private Buffer mbuf;
-	private Environment mem;
-	private PathFinder finder;
+	private final Buffer mbuf;
+	private final Environment mem;
+	private final PathFinder finder;
 
 
 	

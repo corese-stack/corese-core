@@ -16,7 +16,7 @@ import fr.inria.corese.core.kgram.api.core.Node;
 public class CanonicalizedDataset {
 
     private final Graph dataset;
-    private Map<Node, String> blankNodesToIdentifiers = new LinkedHashMap<>();
+    private final Map<Node, String> blankNodesToIdentifiers = new LinkedHashMap<>();
     private Map<String, String> issuedIdentifierMap = new LinkedHashMap<>();
 
     /////////////////

@@ -33,7 +33,6 @@ public class QuerySolverVisitorRuleUser extends QuerySolverVisitorRule {
     
     @Override
     public IDatatype init() {
-        System.out.println("User defined Rule Visitor");
         mapInference.clear();
         setEntailment(true);
         count = 0;
@@ -64,12 +63,6 @@ public class QuerySolverVisitorRuleUser extends QuerySolverVisitorRule {
     @Override
     public IDatatype entailment(Query q, List<Edge> construct, List<Edge> where) { 
         incr(mapInference, q);
-        System.out.println("rule: " + q.getID());
-        System.out.println("entailment: " + mapInference.get(q));
-        
-        System.out.println("construct: " + construct);
-        System.out.println("where:     " + where);
-        System.out.println();
         return DatatypeMap.TRUE;
     }
 

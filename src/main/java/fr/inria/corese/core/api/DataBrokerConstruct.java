@@ -1,8 +1,5 @@
 package fr.inria.corese.core.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Query;
@@ -14,6 +11,9 @@ import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.update.Basic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Broker between GraphManager and graph DataManager for sparql query construct
  * and sparql update Refined by core.producer.DataBrokerConstructLocal for
@@ -23,7 +23,6 @@ import fr.inria.corese.core.sparql.triple.update.Basic;
 public interface DataBrokerConstruct extends DataBroker {
 
     default void startRuleEngine() {
-        // System.out.println("DataBrokerConstruct startRuleEngine");
     }
 
     default void endRuleEngine() {
@@ -73,7 +72,7 @@ public interface DataBrokerConstruct extends DataBroker {
      * IDatatype dt = t.getDatatypeValue()
      * dt.isTriple() == true|false
      * dt.getEdge() = s p o t
-     * 
+     * <p>
      * operation find, insert, delete may have as argument a rdf star edge
      * where subject/object may be a reference node and/or edge may have reference
      * node

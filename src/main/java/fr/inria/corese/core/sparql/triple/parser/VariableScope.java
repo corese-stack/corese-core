@@ -15,8 +15,8 @@ public class VariableScope {
         // Variable surely bound: left part of optional, common var in union branchs
         // former getVariables()
         SUBSCOPE
-    };
-    
+    }
+
     public static final VariableScope inscope  = inscope();
     public static final VariableScope subscope = subscope();
     public static final VariableScope allscope = allscope();

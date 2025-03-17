@@ -24,7 +24,7 @@ public class TSVFormat extends CSVFormat {
             if (dt.isNumber()) {
                 return dt.getLabel();
             }
-            if (dt.getCode() == IDatatype.LITERAL && !dt.hasLang()) {
+            if (dt.getCode() == IDatatype.Datatype.LITERAL && !dt.hasLang()) {
                 // untyped plain literal
                 return QUOTE + dt.getLabel() + QUOTE;
             }

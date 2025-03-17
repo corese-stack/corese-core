@@ -42,10 +42,7 @@ public class WrappedNode {
             return false;
         }
         final WrappedNode other = (WrappedNode) obj;
-        if (this.node != other.node && (this.node == null || !this.node.getLabel().equals(other.node.getLabel()))) {
-            return false;
-        }
-        return true;
+        return this.node == other.node || (this.node != null && this.node.getLabel().equals(other.node.getLabel()));
     }
 
     @Override

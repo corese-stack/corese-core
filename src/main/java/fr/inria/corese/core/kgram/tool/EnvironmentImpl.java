@@ -19,7 +19,7 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 public class EnvironmentImpl implements Environment {
-	Query query;
+	protected Query query;
 	
 	public EnvironmentImpl(){
 	}

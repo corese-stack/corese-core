@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html
+    prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns# owl: http://www.w3.org/2002/07/owl# rdfs: http://www.w3.org/2000/01/rdf-schema# foaf: http://xmlns.com/foaf/0.1/">
+
+<head>
+    <title>RDFa Example</title>
+</head>
+
+<body>
+    <div about="http://example.org/ontology" typeof="owl:Ontology">
+        <link property="owl:imports" href="http://xmlns.com/foaf/0.1/" />
+    </div>
+
+    <div about="http://example.org/ontology#Person" typeof="owl:Class">
+        <span property="rdfs:label">Person</span>
+        <link property="rdfs:subClassOf" href="http://xmlns.com/foaf/0.1/Person" />
+    </div>
+
+    <div about="http://example.org/ontology#Student" typeof="owl:Class">
+        <span property="rdfs:label">Student</span>
+        <link property="rdfs:subClassOf" href="http://example.org/ontology#Person" />
+    </div>
+</body>
+
+</html>

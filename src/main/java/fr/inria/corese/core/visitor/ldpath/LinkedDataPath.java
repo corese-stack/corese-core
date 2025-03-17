@@ -61,7 +61,6 @@ public class LinkedDataPath implements QueryVisitor {
     private int endpointLength = 0;
     int maxQuery = Integer.MAX_VALUE;
     private int timeout = 10000;
-    boolean trace = !true;
 
     // find links between local and endpoint
     private List<String> localList;
@@ -108,16 +107,10 @@ public class LinkedDataPath implements QueryVisitor {
     @Override
     public void visit(ASTQuery ast) {
         try {
-            ast.getMetadata().remove(Metadata.VISITOR);
+            ast.getMetadata().remove(Metadata.Type.VISITOR);
             ldp(ast);
             result.process();            
-        } catch (IOException ex) {
-            Logger.getLogger(LinkedDataPath.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (EngineException ex) {
-            Logger.getLogger(LinkedDataPath.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(LinkedDataPath.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (LoadException ex) {
+        } catch (IOException | EngineException | InterruptedException | LoadException ex) {
             Logger.getLogger(LinkedDataPath.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -152,10 +145,6 @@ public class LinkedDataPath implements QueryVisitor {
         metadata(ast);
         result = new Result(ast);
         result.setLinkedDataPath(this);
-        if (ast.isDebug()) {
-            ast.setDebug(false);
-            trace = true;
-        }
         exec = QueryProcess.create(graph);
     }
     
@@ -164,16 +153,15 @@ public class LinkedDataPath implements QueryVisitor {
     }
     
     void metadata(ASTQuery ast) {
-        if (ast.getMetadata() != null && ast.getMetadata().hasValue(Metadata.LDPATH)) {
-            List<String> list = ast.getMetadata().getValues(Metadata.LDPATH);
-            ast.getMetadata().remove(Metadata.LDPATH);
+        if (ast.getMetadata() != null && ast.getMetadata().hasValue(Metadata.Type.LDPATH)) {
+            List<String> list = ast.getMetadata().getValues(Metadata.Type.LDPATH);
+            ast.getMetadata().remove(Metadata.Type.LDPATH);
             String uri = list.get(0);
             int n = getLength(uri);
             if (n != -1) {
                 setPathLength(n);
                 uri = clean(uri);
             }
-            System.out.println("LDP first: " + getPathLength() + " " + uri);
             getLocalList().add(uri);
             if (list.size() > 1) {
                 String uri2 = list.get(1);
@@ -182,58 +170,50 @@ public class LinkedDataPath implements QueryVisitor {
                     setEndpointPathLength(n);
                     uri2 = clean(uri2);
                 }
-                System.out.println("LDP remote: " + getEndpointPathLength() + " " + uri2);
                 getEndpointList().add(uri2);
             }
         }
-        if (ast.hasMetadata(Metadata.ACCEPT)) {
-            setAccept(ast.getMetadata().getValues(Metadata.ACCEPT));
-            System.out.println("Accept: " + getAccept());
+        if (ast.hasMetadata(Metadata.Type.ACCEPT)) {
+            setAccept(ast.getMetadata().getValues(Metadata.Type.ACCEPT));
         }
-        if (ast.hasMetadata(Metadata.REJECT)) {
-            setReject(ast.getMetadata().getValues(Metadata.REJECT));
-            System.out.println("Reject: " + getReject());
+        if (ast.hasMetadata(Metadata.Type.REJECT)) {
+            setReject(ast.getMetadata().getValues(Metadata.Type.REJECT));
         }
-        if (ast.hasMetadata(Metadata.OPTION)) {
-            processOption(ast.getMetadata().getValues(Metadata.OPTION));
-            System.out.println("Option: " + getOption());
+        if (ast.hasMetadata(Metadata.Type.OPTION)) {
+            processOption(ast.getMetadata().getValues(Metadata.Type.OPTION));
         }
         if (ast.getMetadata().hasMetadata(TIMEOUT)) {
             setTimeout(ast.getMetadata().getDatatypeValue(TIMEOUT).intValue());
-            System.out.println("Timeout: " + getTimeout());
         }
         if (ast.getMetadata().hasMetadata(SPLIT)) {
             setMaxQuery(ast.getMetadata().getDatatypeValue(SPLIT).intValue());
-            System.out.println("Split: " + getMaxQuery());
         }
         if (ast.getMetadata().hasMetadata(SLICE)) {
             int slice = ast.getMetadata().getDatatypeValue(SLICE).intValue();
             ProcessVisitorDefault.SLICE_DEFAULT_VALUE = slice;
-            System.out.println("Slice: " + slice);
         }
         if (ast.hasMetadata(GRAPH)) {
             graphList = ast.getMetadata().getValues(GRAPH);
-            System.out.println("Graph: " + graphList);
         }
-        if (ast.hasMetadata(Metadata.SKIP)) {
+        if (ast.hasMetadata(Metadata.Type.SKIP)) {
             skip(ast);
         }
-        if (ast.hasMetadata(Metadata.DEBUG)) {
-            ast.getMetadata().remove(Metadata.DEBUG);
+        if (ast.hasMetadata(Metadata.Type.DEBUG)) {
+            ast.getMetadata().remove(Metadata.Type.DEBUG);
         }
-        if (ast.hasMetadata(Metadata.FILE)) {
-            setFile(ast.getMetadata().getValue(Metadata.FILE));
+        if (ast.hasMetadata(Metadata.Type.FILE)) {
+            setFile(ast.getMetadata().getValue(Metadata.Type.FILE));
         }
-        if (ast.hasMetadata(Metadata.DETAIL)) {
+        if (ast.hasMetadata(Metadata.Type.DETAIL)) {
             detail = true;
         }
-        if (ast.hasMetadata(Metadata.NEW)) {
+        if (ast.hasMetadata(Metadata.Type.NEW)) {
             test = true;
         }
     }
     
     void skip(ASTQuery ast) {
-        for (String name : ast.getMetadata().getValues(Metadata.SKIP)) {
+        for (String name : ast.getMetadata().getValues(Metadata.Type.SKIP)) {
            switch (name) {
                case AGGREGATE: setAggregate(false); break;
                case DATATYPE:  setDatatype(false); break;
@@ -310,9 +290,6 @@ public class LinkedDataPath implements QueryVisitor {
     
     
     void step(ASTQuery ast, int i, int varIndex) throws EngineException {
-        if (trace) {
-            System.out.println(ast);
-        }
         ASTQuery ast2 = astq.step(ast, varIndex);
         Mappings map = exec.query(ast2);
         result.record(ast2, map);
@@ -338,23 +315,16 @@ public class LinkedDataPath implements QueryVisitor {
     void process(ASTQuery ast, int i, int varIndex) throws InterruptedException, EngineException {
         // add: ?s ?p ?v
         ASTQuery ast1 = astq.variable(ast, varIndex);
-        if (trace) {
-            System.out.println(ast1);
-        }
         complete(ast1);
         Mappings map = exec.query(ast1);
-        if (trace) {
-            System.out.println(map);
-        }
         List<Constant> list = getPropertyList(map);
         process(ast1, list, i, varIndex);
     }
     
     void complete(ASTQuery a) {
-        if (getAST().getMetaValue(Metadata.LIMIT)!=null) {
-            System.out.println("limit: " + getAST().getMetadata().getDatatypeValue(Metadata.LIMIT));
-            a.getMetadata().add(Metadata.LIMIT, getAST().getMetadata().getDatatypeValue(Metadata.LIMIT));
-            a.setLimit(getAST().getMetadata().getDatatypeValue(Metadata.LIMIT).intValue());
+        if (getAST().getMetaValue(Metadata.Type.LIMIT)!=null) {
+            a.getMetadata().add(Metadata.Type.LIMIT, getAST().getMetadata().getDatatypeValue(Metadata.Type.LIMIT));
+            a.setLimit(getAST().getMetadata().getDatatypeValue(Metadata.Type.LIMIT).intValue());
         }       
     }
 
@@ -410,7 +380,6 @@ public class LinkedDataPath implements QueryVisitor {
         if (! subList.isEmpty()) {
             newList.add(subList);
         }
-        //System.out.println("split: " + newList);
         return newList;
     }
 
@@ -427,11 +396,6 @@ public class LinkedDataPath implements QueryVisitor {
             
             //  named graph
             astq.complete(ast2);
-            
-            if (trace) {
-                System.out.println("first endpoint");
-                System.out.println(ast2);
-            }
 
             // predicates are processed in parallel threads
             QueryProcessThread qp = new QueryProcessThread(graph, ast2, p);
@@ -441,13 +405,8 @@ public class LinkedDataPath implements QueryVisitor {
             if (!getEndpointList().isEmpty()) {
                 // try link with second remote endpoint
 
-                //ASTQuery serv = endpoint(ast2, varIndex+1);
                 ASTQuery serv = endpoint(astq.property(ast1, p, varIndex), varIndex+1);
-                if (trace) {
-                    System.out.println("second endpoint");
-                    System.out.println(serv);
-                }
-                //ProcessVisitorDefault.SLICE_DEFAULT_VALUE = 50;
+
                 QueryProcessThread qpe = new QueryProcessThread(graph, serv, p);
                 qpe.setJoin(true);
                 plist.add(qpe);
@@ -455,10 +414,7 @@ public class LinkedDataPath implements QueryVisitor {
             }
             else if (getGraph(1) != null) {
                 ASTQuery aa = astq.graphPathObject(astq.property(ast1, p, varIndex), getGraph(0), getGraph(1), varIndex+1);
-                if (trace) {
-                    System.out.println("second graph");
-                    System.out.println(aa);
-                }
+
                 QueryProcessThread qpe = new QueryProcessThread(graph, aa, p);
                 qpe.setJoin(true);
                 plist.add(qpe);
@@ -470,13 +426,9 @@ public class LinkedDataPath implements QueryVisitor {
             qp.join(timeout);
             Mappings mm = qp.getMappings();
             if (qp.isJoin() && mm != null) {
-                if (trace) System.out.println("Endpoint result: \n" + mm.get(0));
                 if (detail && hasCount(mm)) {
                     detail(ast1, qp.getPredicate(), varIndex);
                 }
-            }
-            if (trace) {
-                System.out.println(String.format("%s/%s: nb res: %s", j++, plist.size(), (mm == null) ? "" : mm.size()));
             }
             result.record(qp.getAST(), mm);
         }
@@ -489,11 +441,7 @@ public class LinkedDataPath implements QueryVisitor {
      */
     public void join(ASTQuery ast, int varIndex) {
         ASTQuery serv = endpoint(ast, varIndex);
-        if (trace) {
-            System.out.println(serv);
-        }
-        //if (trace) System.out.println(serv);
-        //ProcessVisitorDefault.SLICE_DEFAULT_VALUE = 50;
+
         QueryProcessThread qpe = new QueryProcessThread(graph, serv, null);
         qpe.process();
         Mappings mm = qpe.getMappings();
@@ -548,10 +496,8 @@ public class LinkedDataPath implements QueryVisitor {
     void detail(ASTQuery ast1, Constant p, int i) {
         ASTQuery ast2 = astq.property(ast1, p, i);
         ASTQuery aa = endpoint(ast2, i + 1, false);
-        System.out.println(aa);
         QueryProcessThread qpe = new QueryProcessThread(graph, aa, p);
         qpe.process();
-        System.out.println(qpe.getMappings());
     }
     
     boolean acceptable(Constant p) {
@@ -611,9 +557,7 @@ public class LinkedDataPath implements QueryVisitor {
                 continue;
             }
             ASTQuery ast2 = astq.propertyVariable(ast, p, varIndex);
-            if (trace) {
-                System.out.println(ast2);
-            }
+
             QueryProcessThread qp = new QueryProcessThread(graph, ast2, p);
             plist.add(qp);
             qp.start();
@@ -623,9 +567,7 @@ public class LinkedDataPath implements QueryVisitor {
         for (QueryProcessThread qp : plist) {
             qp.join(timeout);
             Mappings mm = qp.getMappings();
-            if (trace) {
-                System.out.println(String.format("%s/%s: %s", j++, plist.size(), mm));
-            }
+
             if (mm != null && mm.size() > 0) {
                 mapList.add(mm);
             }
@@ -653,7 +595,7 @@ public class LinkedDataPath implements QueryVisitor {
 
     ASTQuery federate(ASTQuery ast, List<String> list) {
         if (!list.isEmpty()) {
-            Metadata meta = new Metadata().add(Metadata.FEDERATE, list.get(0));
+            Metadata meta = new Metadata().add(Metadata.Type.FEDERATE, list.get(0));
             ast.addMetadata(meta);
         }
         return ast;
@@ -713,10 +655,6 @@ public class LinkedDataPath implements QueryVisitor {
      */
     public void setLocalList(List<String> localList) {
         this.localList = localList;
-    }
-    
-    public void setDebug(boolean b) {
-        trace  = b;
     }
     
     /**

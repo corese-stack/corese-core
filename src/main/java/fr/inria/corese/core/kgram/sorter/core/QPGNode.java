@@ -1,13 +1,8 @@
 package fr.inria.corese.core.kgram.sorter.core;
 
+import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.sorter.impl.qpv1.QPGNodeCostModel;
 import fr.inria.corese.core.kgram.api.core.Edge;
-import static fr.inria.corese.core.kgram.api.core.ExpType.BIND;
-import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
-import static fr.inria.corese.core.kgram.api.core.ExpType.FILTER;
-import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
-import static fr.inria.corese.core.kgram.api.core.ExpType.NODE;
-import static fr.inria.corese.core.kgram.api.core.ExpType.VALUES;
 import fr.inria.corese.core.kgram.api.core.Filter;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Exp;
@@ -29,7 +24,7 @@ public class QPGNode {
 
     // the expression that the node encapsulates
     private final Exp exp;
-    private final int type;
+    private final ExpType.Type type;
     private QPGNodeCostModel costModel = null;
     private double cost = -1;
     //the nested QPG in a QPG node, ex, GRAPH
@@ -51,7 +46,7 @@ public class QPGNode {
         return this.exp;
     }
 
-    public int getType() {
+    public ExpType.Type getType() {
         return this.type;
     }
 
@@ -71,7 +66,7 @@ public class QPGNode {
      * @return
      */
     public Node getExpNode(int i) {
-        if (this.type != EDGE) {
+        if (this.type != ExpType.Type.EDGE) {
             return null;
         }
 
@@ -103,8 +98,8 @@ public class QPGNode {
     }
 
     public List<String> shared(QPGNode bpn1, QPGNode bpn2) {
-        int type1 = bpn1.exp.type();
-        int type2 = bpn2.exp.type();
+        ExpType.Type type1 = bpn1.exp.type();
+        ExpType.Type type2 = bpn2.exp.type();
 
         switch (type1) {
             case EDGE:
@@ -119,7 +114,7 @@ public class QPGNode {
                         return this.isShared(bpn2.exp.getNodeList(), bpn1.exp.getEdge());
                     case BIND:
                         return this.isShared(bpn2.exp.getFilter(), bpn1.exp.getEdge());
-                    default: ;
+                    default:
                 }
                 break;
             case GRAPH:
@@ -139,7 +134,7 @@ public class QPGNode {
                         else {
                             return this.isShared(bpn2.exp.getNode(), bpn1.exp);
                         }
-                    default:;
+                    default:
                 }
             case BIND:
                 switch (type2) {
@@ -154,7 +149,7 @@ public class QPGNode {
                         else {
                             return this.compare(bpn2.exp.getNode(), bpn1.exp.getNode());
                         }
-                    default:;
+                    default:
                 }
             default:
                 break;
@@ -239,10 +234,10 @@ public class QPGNode {
         List<Node> l = new ArrayList<Node>();
         for (Exp e : graph) {
             for (Exp ee : e) {
-                if (ee.type() == NODE) {
+                if (ee.type() == ExpType.Type.NODE) {
                     l.add(ee.getNode());
                 }
-                if (ee.type() == EDGE) {
+                if (ee.type() == ExpType.Type.EDGE) {
                     l.addAll(getVariablesInEdge(ee.getEdge()));
                 }
             }

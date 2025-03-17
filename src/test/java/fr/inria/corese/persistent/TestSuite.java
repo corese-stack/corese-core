@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
  */
 public class TestSuite {
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         testSpeedInSingleFiles();
         //testCorrectness();
         //testSpeed();
@@ -52,14 +52,6 @@ public class TestSuite {
         };
 
         new TestSuite(Test2, 1000, Test2.length).test();
-//        
-//        int[] buffer_size = {1 * MB, 2 * MB, 4 * MB, 8 * MB, 16 * MB, 32 * MB};
-//        for (int c : buffer_size) {
-//            System.out.println("\n======= " + convert(c, true) + " ========");
-//            //Parameters.BUF_SIZE = c;
-//            
-//            new TestSuite(Test1, 100, Test1.length).test();
-//        }
 
     }
 
@@ -79,9 +71,9 @@ public class TestSuite {
         "R. (ms):   "
     };
 
-    private int[][] tests;
-    private int numOfTests;
-    private int runTimes;
+    private final int[][] tests;
+    private final int numOfTests;
+    private final int runTimes;
     private int fileSize = -1;
 
     public TestSuite(int[][] tests, int runTimes, int numOfTests) {
@@ -143,8 +135,6 @@ public class TestSuite {
                 sb.append(bytesAll + NL + NL);
             }
         }
-
-        System.out.println(sb);
     }
 
     public static String convert(long bytes, boolean precise) {

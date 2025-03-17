@@ -5,9 +5,9 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 public interface SKOS {
     
-    public static String NS = NSManager.SKOS;
+    String NS = NSManager.SKOS;
     
-    public static String BROADER  = NS + "broader";  // has for broader = subConceptOf
-    public static String NARROWER = NS + "narrower"; // has for narrower
+    String BROADER  = NS + "broader";  // has for broader = subConceptOf
+    String NARROWER = NS + "narrower"; // has for narrower
     
 }
