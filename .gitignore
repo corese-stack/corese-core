@@ -29,6 +29,7 @@ Thumbs.db
 # Gradle files
 .gradle/
 build/
+gradle/gradle-daemon-jvm.properties
 
 # Maven files
 .mvn/
