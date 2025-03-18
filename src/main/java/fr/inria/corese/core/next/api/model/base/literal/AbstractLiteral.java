@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.model.impl.literal;
+package fr.inria.corese.core.next.api.model.base.literal;
 
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.Literal;

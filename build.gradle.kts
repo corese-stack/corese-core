@@ -71,7 +71,6 @@ repositories {
 
 // Define dependencies
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     val jersey_version = "3.0.4"
     val semargl_version = "0.7.1"
 
@@ -87,7 +86,8 @@ dependencies {
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:${semargl_version}") // RDFa parser to extract RDF metadata from HTML
     implementation("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}") // Semargl core for RDF parsing and transformation
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                          // JSON-LD processing for Linked Data in JSON format
-    implementation("junit:junit:4.13.2")                                                 // JUnit framework for unit testing in Java
+    testImplementation("junit:junit:4.13.2")                                             // JUnit framework for unit testing in Java
+//    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     implementation("com.typesafe:config:1.4.3")                                          // Typesafe config
     api("org.slf4j:slf4j-api:2.0.9")                                                     // Simple Logging Facade for Java (SLF4J)
     testImplementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3")

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import fr.inria.corese.core.next.impl.inmemory.BasicIRI;
+import fr.inria.corese.core.next.impl.inmemory.InMemoryModel;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

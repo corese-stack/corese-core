@@ -63,8 +63,4 @@ public interface ValueFactory {
 
 	Statement createStatement(Resource subject, IRI predicate, Value object, Resource context);
 
-	default Triple createTriple(Resource subject, IRI predicate, Value object) {
-		throw new UnsupportedOperationException();
-	}
-
 }

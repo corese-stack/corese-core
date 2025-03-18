@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.model.impl;
+package fr.inria.corese.core.next.impl.temp;
 
 import fr.inria.corese.core.kgram.api.core.Node;
 

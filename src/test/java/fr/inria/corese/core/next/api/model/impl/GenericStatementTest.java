@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.api.model.impl;
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.Resource;
 import fr.inria.corese.core.next.api.model.Statement;
+import fr.inria.corese.core.next.impl.inmemory.BasicIRI;
+import fr.inria.corese.core.next.api.model.base.GenericStatement;
 import org.junit.Before;
 import org.junit.Test;
 

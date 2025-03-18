@@ -2,8 +2,7 @@ package fr.inria.corese.core.next.api.model.vocabulary;
 
 import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
-import fr.inria.corese.core.next.api.model.impl.BasicIRI;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.next.impl.inmemory.BasicIRI;
 
 /**
  * Defines the XSD vocabulary.

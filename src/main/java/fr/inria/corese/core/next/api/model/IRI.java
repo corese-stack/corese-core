@@ -10,13 +10,15 @@ public interface IRI extends Resource {
 	}
 
 	/**
-	 *
+	 * The first section of the complete name of the IRI
+	 * ex : http://xmlns.com/foaf/0.1/
 	 * @return the namespace of the IRI
 	 */
 	String getNamespace();
 
 	/**
-	 *
+	 * The last section of the complete name of the IRI
+	 * ex : Person
 	 * @return the local name of the IRI
 	 */
 	String getLocalName();

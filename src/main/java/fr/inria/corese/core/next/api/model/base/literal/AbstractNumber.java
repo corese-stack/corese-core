@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.model.impl.literal;
+package fr.inria.corese.core.next.api.model.base.literal;
 
 public class AbstractNumber extends AbstractLiteral implements Comparable<AbstractNumber> {
     /**

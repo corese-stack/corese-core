@@ -1,6 +1,5 @@
-package fr.inria.corese.core.next.api.model.util;
+package fr.inria.corese.core.next.impl.common.util;
 
-import fr.inria.corese.core.next.api.model.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
