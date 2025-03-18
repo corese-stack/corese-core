@@ -33,7 +33,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-core"
-    const val version = "4.6.2"
+    const val version = "4.6.3"
 
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."

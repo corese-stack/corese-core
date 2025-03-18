@@ -145,11 +145,11 @@ System.out.println(ResultFormat.create(map, ResultFormat.format.CSV_FORMAT).toSt
 Other supported formats:
 
 ```java
-System.out.println(ResultFormat.create(map, ResultFormat.format.XML_FORMAT).toString());
-System.out.println(ResultFormat.create(map, ResultFormat.format.JSON_FORMAT).toString());
-System.out.println(ResultFormat.create(map, ResultFormat.format.CSV_FORMAT).toString());
-System.out.println(ResultFormat.create(map, ResultFormat.format.TSV_FORMAT).toString());
-System.out.println(ResultFormat.create(map, ResultFormat.format.MARKDOWN_FORMAT).toString());
+ResultFormat.format.XML_FORMAT
+ResultFormat.format.JSON_FORMAT
+ResultFormat.format.CSV_FORMAT
+ResultFormat.format.TSV_FORMAT
+ResultFormat.format.MARKDOWN_FORMAT
 ```
 
 ### 3.2. SPARQL Ask query
@@ -200,14 +200,14 @@ System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FOR
 Other supported formats:
 
 ```java
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.RDF_XML_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TURTLE_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.JSONLD_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.NTRIPLES_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.NQUADS_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.RDFC10_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.RDFC10_SHA384_FORMAT).toString());
+ResultFormat.format.RDF_XML_FORMAT
+ResultFormat.format.TURTLE_FORMAT
+ResultFormat.format.TRIG_FORMAT
+ResultFormat.format.JSONLD_FORMAT
+ResultFormat.format.NTRIPLES_FORMAT
+ResultFormat.format.NQUADS_FORMAT
+ResultFormat.format.RDFC10_FORMAT
+ResultFormat.format.RDFC10_SHA384_FORMAT
 ```
 
 ### **3.4. SPARQL UPDATE Query**
@@ -238,14 +238,14 @@ System.out.println(ResultFormat.create(graph, ResultFormat.format.TURTLE_FORMAT)
 Other supported formats:
 
 ```java
-System.out.println(ResultFormat.create(graph, ResultFormat.format.RDF_XML_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.TURTLE_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.TRIG_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.JSONLD_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.NTRIPLES_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.NQUADS_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.RDFC10_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.RDFC10_SHA384_FORMAT).toString());
+ResultFormat.format.RDF_XML_FORMAT
+ResultFormat.format.TURTLE_FORMAT
+ResultFormat.format.TRIG_FORMAT
+ResultFormat.format.JSONLD_FORMAT
+ResultFormat.format.NTRIPLES_FORMAT
+ResultFormat.format.NQUADS_FORMAT
+ResultFormat.format.RDFC10_FORMAT
+ResultFormat.format.RDFC10_SHA384_FORMAT
 ```
 
 ## **4. Shapes Constraint Language (SHACL)**
