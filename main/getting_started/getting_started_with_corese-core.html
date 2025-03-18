@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Getting started with corese-core &#8212; Corese</title>
+    <title>Getting Started with Corese-Core &#8212; Corese</title>
   
   
   
@@ -430,28 +430,27 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="getting-started-with-corese-core">
-<h1>Getting started with corese-core<a class="headerlink" href="#getting-started-with-corese-core" title="Link to this heading">#</a></h1>
-<p>This tutorial show how to use the corese-core library through simple examples of the main features.
-We assume a basic knowledge in Java programming and in semantic web.</p>
-<p>The first part describes how to create, load and export a Graph.
-The second part show how to query a graph with <a class="reference external" href="https://www.w3.org/TR/sparql11-query/">SPARQL</a>.
-The third part details how to validate a graph with the <a class="reference external" href="https://www.w3.org/TR/shacl/">Shapes Constraint Language (SHACL)</a>.
-The fourth part shows how to transforme a graph with the extension language <a class="reference external" href="https://files.inria.fr/corese/doc/sttl.html">SPARQL Template Transformation Language (STTL)</a>.
-The fifth part details how to apply a set of rules on a graph using the <a class="reference external" href="https://files.inria.fr/corese/doc/rule.html">SPARQL Rule</a> extension language.
-Finally, the sixth part describes how to define and use functions with the <a class="reference external" href="https://files.inria.fr/corese/doc/ldscript.html">LDScript</a> extension language.</p>
+<h1>Getting Started with Corese-Core<a class="headerlink" href="#getting-started-with-corese-core" title="Link to this heading">#</a></h1>
+<p>This tutorial shows how to use the Corese-Core library through simple examples of its main features.
+We assume a basic knowledge of Java programming and the Semantic Web.</p>
+<ul class="simple">
+<li><p>The first section describes how to create, load, and export a Graph.</p></li>
+<li><p>The second section shows how to query a graph using <a class="reference external" href="https://www.w3.org/TR/sparql11-query/">SPARQL</a>.</p></li>
+<li><p>The third section details how to validate a graph using the <a class="reference external" href="https://www.w3.org/TR/shacl/">Shapes Constraint Language (SHACL)</a>.</p></li>
+<li><p>The fourth section shows how to transform a graph using the extension language <a class="reference external" href="https://files.inria.fr/corese/doc/sttl.html">SPARQL Template Transformation Language (STTL)</a>.</p></li>
+<li><p>The fifth section details how to apply a set of rules on a graph using the <a class="reference external" href="https://files.inria.fr/corese/doc/rule.html">SPARQL Rule</a> extension language.</p></li>
+<li><p>Finally, the sixth section describes how to define and use functions with the <a class="reference external" href="https://files.inria.fr/corese/doc/ldscript.html">LDScript</a> extension language.</p></li>
+</ul>
 <section id="installation">
-<h2>1. Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
-<p>Installations instructions are available on the <a class="reference internal" href="../install.html"><span class="std std-doc">installation page</span></a>.</p>
+<h2><strong>1. Installation</strong><a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<p>Installation instructions are available on the <a class="reference internal" href="../install.html"><span class="std std-doc">installation page</span></a>.</p>
 </section>
 <section id="graph">
-<h2>2. Graph<a class="headerlink" href="#graph" title="Link to this heading">#</a></h2>
-<p>This section describes how to create a graph manually, load a graph from file and serialize a graph to file.</p>
-<section id="build-a-graph-by-program">
-<h3>2.1. Build a Graph by program<a class="headerlink" href="#build-a-graph-by-program" title="Link to this heading">#</a></h3>
-<blockquote>
-<div><p>It is also possible to use the <a class="reference external" href="https://notes.inria.fr/s/OB038LBLV#11-build-a-corese-model-manually">RDF4J Model API</a> to create and manipulate a graph.</p>
-</div></blockquote>
-<p>The example shows how to create the RDF graph bellow:</p>
+<h2><strong>2. Graph</strong><a class="headerlink" href="#graph" title="Link to this heading">#</a></h2>
+<p>This section describes how to create a graph manually, load a graph from a file, and serialize a graph to a file.</p>
+<section id="build-a-graph-programmatically">
+<h3><strong>2.1. Build a Graph Programmatically</strong><a class="headerlink" href="#build-a-graph-programmatically" title="Link to this heading">#</a></h3>
+<p>The example below shows how to create the following RDF graph:</p>
 <div class="mermaid">
             graph LR;
     classDef IRI fill:#FEAE65,stroke-width:0px
@@ -459,8 +458,8 @@ Finally, the sixth part describes how to define and use functions with the <a cl
 
     iri:EdithPiaf([&quot;ex:EdithPiaf&quot;])
     iri:Singer([&quot;ex:Singer&quot;])
-    dt:Edith[&quot;''Edith''&quot;]
-    dt:Piaf[&quot;''Piaf''&quot;]
+    dt:Edith([&quot;''Edith''&quot;])
+    dt:Piaf([&quot;''Piaf''&quot;])
 
     class iri:EdithPiaf,iri:Singer IRI
     class dt:Edith,dt:Piaf DT
@@ -468,174 +467,135 @@ Finally, the sixth part describes how to define and use functions with the <a cl
     iri:EdithPiaf--rdf:type--&gt;iri:Singer;
     iri:EdithPiaf--ex:firstName--&gt;dt:Edith;
     iri:EdithPiaf--ex:lastName--&gt;dt:Piaf;
-        </div><p>This graph represents three statements :</p>
+        </div><p>This graph represents three statements:</p>
 <ul class="simple">
-<li><p>Edith Piaf is a singer</p></li>
-<li><p>Edith Piaf’s first name is Edith</p></li>
-<li><p>Edith Piaf’s last name is Piaf</p></li>
+<li><p>Edith Piaf is a singer.</p></li>
+<li><p>Edith Piaf’s first name is Edith.</p></li>
+<li><p>Edith Piaf’s last name is Piaf.</p></li>
 </ul>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Define the namespace ex</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Define the namespace &#39;ex&#39;</span>
 <span class="n">String</span><span class="w"> </span><span class="n">ex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;http://example.org/&quot;</span><span class="p">;</span>
 
 <span class="c1">// Create a new empty Graph</span>
 <span class="n">Graph</span><span class="w"> </span><span class="n">graph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Graph</span><span class="p">.</span><span class="na">create</span><span class="p">();</span>
 
-<span class="c1">// Create and add IRIs to Graph</span>
+<span class="c1">// Create and add IRIs to the Graph</span>
 <span class="n">Node</span><span class="w"> </span><span class="n">edithPiafIRI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addResource</span><span class="p">(</span><span class="n">ex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;EdithPiaf&quot;</span><span class="p">);</span>
 <span class="n">Node</span><span class="w"> </span><span class="n">singerIRI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addResource</span><span class="p">(</span><span class="n">ex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;Singer&quot;</span><span class="p">);</span>
 
-<span class="c1">// Create and add properties to Graph</span>
+<span class="c1">// Create and add properties to the Graph</span>
 <span class="n">Node</span><span class="w"> </span><span class="n">rdfTypeProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addProperty</span><span class="p">(</span><span class="n">RDF</span><span class="p">.</span><span class="na">TYPE</span><span class="p">);</span>
 <span class="n">Node</span><span class="w"> </span><span class="n">firstNameProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addProperty</span><span class="p">(</span><span class="n">ex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;firstName&quot;</span><span class="p">);</span>
 <span class="n">Node</span><span class="w"> </span><span class="n">lastNameProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addProperty</span><span class="p">(</span><span class="n">ex</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;lastName&quot;</span><span class="p">);</span>
 
-<span class="c1">// Create and add datatypes to Graph</span>
-<span class="n">Node</span><span class="w"> </span><span class="n">edithDatatype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addLiteral</span><span class="p">(</span><span class="s">&quot;Edith&quot;</span><span class="p">);</span>
-<span class="n">Node</span><span class="w"> </span><span class="n">piafDatatype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addLiteral</span><span class="p">(</span><span class="s">&quot;Piaf&quot;</span><span class="p">);</span>
+<span class="c1">// Create and add literals to the Graph</span>
+<span class="n">Node</span><span class="w"> </span><span class="n">edithLiteral</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addLiteral</span><span class="p">(</span><span class="s">&quot;Edith&quot;</span><span class="p">);</span>
+<span class="n">Node</span><span class="w"> </span><span class="n">piafLiteral</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">graph</span><span class="p">.</span><span class="na">addLiteral</span><span class="p">(</span><span class="s">&quot;Piaf&quot;</span><span class="p">);</span>
 
-<span class="c1">// Add first statement : Edith Piaf is an Singer</span>
+<span class="c1">// Add statements to the graph</span>
 <span class="n">graph</span><span class="p">.</span><span class="na">addEdge</span><span class="p">(</span><span class="n">edithPiafIRI</span><span class="p">,</span><span class="w"> </span><span class="n">rdfTypeProperty</span><span class="p">,</span><span class="w"> </span><span class="n">singerIRI</span><span class="p">);</span>
-<span class="c1">// Add second statement : Edith Piaf&#39;s first name is Edith</span>
-<span class="n">graph</span><span class="p">.</span><span class="na">addEdge</span><span class="p">(</span><span class="n">edithPiafIRI</span><span class="p">,</span><span class="w"> </span><span class="n">firstNameProperty</span><span class="p">,</span><span class="w"> </span><span class="n">edithDatatype</span><span class="p">);</span>
-<span class="c1">// Add third statement : Edith Piaf&#39;s last name is Piaf</span>
-<span class="n">graph</span><span class="p">.</span><span class="na">addEdge</span><span class="p">(</span><span class="n">edithPiafIRI</span><span class="p">,</span><span class="w"> </span><span class="n">lastNameProperty</span><span class="p">,</span><span class="w"> </span><span class="n">piafDatatype</span><span class="p">);</span>
+<span class="n">graph</span><span class="p">.</span><span class="na">addEdge</span><span class="p">(</span><span class="n">edithPiafIRI</span><span class="p">,</span><span class="w"> </span><span class="n">firstNameProperty</span><span class="p">,</span><span class="w"> </span><span class="n">edithLiteral</span><span class="p">);</span>
+<span class="n">graph</span><span class="p">.</span><span class="na">addEdge</span><span class="p">(</span><span class="n">edithPiafIRI</span><span class="p">,</span><span class="w"> </span><span class="n">lastNameProperty</span><span class="p">,</span><span class="w"> </span><span class="n">piafLiteral</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
-<section id="load-graph-from-file">
-<h3>2.2. Load Graph from file<a class="headerlink" href="#load-graph-from-file" title="Link to this heading">#</a></h3>
+<section id="load-a-graph-from-a-file">
+<h3><strong>2.2. Load a Graph from a File</strong><a class="headerlink" href="#load-a-graph-from-a-file" title="Link to this heading">#</a></h3>
 <p>This example shows how to load a graph from a file.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Create a new empty Graph</span>
 <span class="n">Graph</span><span class="w"> </span><span class="n">graph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Graph</span><span class="p">.</span><span class="na">create</span><span class="p">();</span>
 
 <span class="c1">// Create loader and parse file</span>
-<span class="n">Load</span><span class="w"> </span><span class="n">ld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
-<span class="n">ld</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;input graph file path&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TURTLE_FORMAT</span><span class="p">);</span>
+<span class="n">Load</span><span class="w"> </span><span class="n">loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
+<span class="n">loader</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;input_graph_file.ttl&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TURTLE_FORMAT</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Corese Loader can load formats :</p>
+<p>Corese Loader supports the following formats:</p>
 <ul class="simple">
-<li><p>RDF/XML (.rdf) <code class="docutils literal notranslate"><span class="pre">Load.format.RDFXML_FORMAT</span></code></p></li>
-<li><p>TURTLE (.ttl) <code class="docutils literal notranslate"><span class="pre">Load.format.TURTLE_FORMAT</span></code></p></li>
-<li><p>TRIG (.trig) <code class="docutils literal notranslate"><span class="pre">Load.format.TRIG_FORMAT</span></code></p></li>
-<li><p>JSONLD (.jsonld) <code class="docutils literal notranslate"><span class="pre">Load.format.JSONLD_FORMAT</span></code></p></li>
-<li><p>NTRIPLES (.nt) <code class="docutils literal notranslate"><span class="pre">Load.format.NT_FORMAT</span></code></p></li>
-<li><p>NQUADS (.nq) <code class="docutils literal notranslate"><span class="pre">Load.format.NQUADS_FORMAT</span></code></p></li>
-<li><p>RDFa (.html) <code class="docutils literal notranslate"><span class="pre">Load.format.RDFA_FORMAT</span></code></p></li>
+<li><p>RDF/XML (<code class="docutils literal notranslate"><span class="pre">Load.format.RDFXML_FORMAT</span></code>)</p></li>
+<li><p>Turtle (<code class="docutils literal notranslate"><span class="pre">Load.format.TURTLE_FORMAT</span></code>)</p></li>
+<li><p>TriG (<code class="docutils literal notranslate"><span class="pre">Load.format.TRIG_FORMAT</span></code>)</p></li>
+<li><p>JSON-LD (<code class="docutils literal notranslate"><span class="pre">Load.format.JSONLD_FORMAT</span></code>)</p></li>
+<li><p>N-Triples (<code class="docutils literal notranslate"><span class="pre">Load.format.NT_FORMAT</span></code>)</p></li>
+<li><p>N-Quads (<code class="docutils literal notranslate"><span class="pre">Load.format.NQUADS_FORMAT</span></code>)</p></li>
+<li><p>RDFa (<code class="docutils literal notranslate"><span class="pre">Load.format.RDFA_FORMAT</span></code>)</p></li>
 </ul>
 </section>
-<section id="export-graph-to-file">
-<h3>2.3. Export Graph to file<a class="headerlink" href="#export-graph-to-file" title="Link to this heading">#</a></h3>
-<p>This example shows how to serialize a graph in file, here in TURTLE format.</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been define previously</span>
+<section id="export-a-graph-to-a-file">
+<h3><strong>2.3. Export a Graph to a File</strong><a class="headerlink" href="#export-a-graph-to-a-file" title="Link to this heading">#</a></h3>
+<p>This example shows how to serialize a graph into a file in Turtle format.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Assuming &#39;graph&#39; is previously defined</span>
 
 <span class="c1">// Create exporter</span>
 <span class="n">ResultFormat</span><span class="w"> </span><span class="n">exporter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span><span class="w"> </span><span class="n">ResultFormatDef</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TURTLE_FORMAT</span><span class="p">);</span>
 <span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exporter</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
 
-<span class="c1">// Write result in file</span>
-<span class="n">FileWriter</span><span class="w"> </span><span class="n">writer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileWriter</span><span class="p">(</span><span class="s">&quot;output file path&quot;</span><span class="p">);</span>
-<span class="n">writer</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
-<span class="n">writer</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="c1">// Write result to a file</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">FileWriter</span><span class="w"> </span><span class="n">writer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileWriter</span><span class="p">(</span><span class="s">&quot;output_graph.ttl&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">writer</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>Corese can serialize graphs in the following formats:</p>
+<p>Corese can serialize graphs into the following formats:</p>
 <ul class="simple">
-<li><p>RDF/XML <code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.RDF_XML_FORMAT</span></code></p></li>
-<li><p>TURTLE <code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.TURTLE_FORMAT</span></code></p></li>
-<li><p>TRIG <code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.TRIG_FORMAT</span></code></p></li>
-<li><p>JSONLD <code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.JSONLD_FORMAT</span></code></p></li>
-<li><p>NTRIPLES <code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.</span></code></p></li>
-<li><p>NQUADS <code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.NQUADS_FORMAT</span></code></p></li>
-<li><p>Canonical RDF SHA-256 <code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.RDFC10_SHA256_FORMAT</span></code></p></li>
-<li><p>Canonical RDF SHA-384 <code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.RDFC10_SHA384_FORMAT</span></code></p></li>
+<li><p>RDF/XML (<code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.RDF_XML_FORMAT</span></code>)</p></li>
+<li><p>Turtle (<code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.TURTLE_FORMAT</span></code>)</p></li>
+<li><p>TriG (<code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.TRIG_FORMAT</span></code>)</p></li>
+<li><p>JSON-LD (<code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.JSONLD_FORMAT</span></code>)</p></li>
+<li><p>N-Triples (<code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.NTRIPLES_FORMAT</span></code>)</p></li>
+<li><p>N-Quads (<code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.NQUADS_FORMAT</span></code>)</p></li>
+<li><p>Canonical RDF SHA-256 (<code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.RDFC10_FORMAT</span></code>)</p></li>
+<li><p>Canonical RDF SHA-384 (<code class="docutils literal notranslate"><span class="pre">ResultFormatDef.format.RDFC10_SHA384_FORMAT</span></code>)</p></li>
 </ul>
 </section>
 </section>
-<section id="sparql-protocol-and-rdf-query-language">
-<h2>3. SPARQL Protocol and RDF Query Language<a class="headerlink" href="#sparql-protocol-and-rdf-query-language" title="Link to this heading">#</a></h2>
-<p>This section describes how to query a graph with <a class="reference external" href="https://www.w3.org/TR/sparql11-query/">SPARQL</a> in Corese.</p>
-<section id="sparql-select-query">
-<h3>3.1. SPARQL Select query<a class="headerlink" href="#sparql-select-query" title="Link to this heading">#</a></h3>
-<p>This example shows how to execute a SPARQL SELECT query, print and export results.</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been define previously</span>
+<section id="sparql-queries">
+<h2><strong>3. SPARQL Queries</strong><a class="headerlink" href="#sparql-queries" title="Link to this heading">#</a></h2>
+<p>This section describes how to query a graph using <a class="reference external" href="https://www.w3.org/TR/sparql11-query/">SPARQL</a> in Corese.</p>
+<section id="executing-a-sparql-select-query">
+<h3><strong>3.1. Executing a SPARQL SELECT Query</strong><a class="headerlink" href="#executing-a-sparql-select-query" title="Link to this heading">#</a></h3>
+<p>This example shows how to execute a SPARQL <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> query and retrieve results.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been defined previously</span>
 
-<span class="c1">// Sparql query</span>
+<span class="c1">// Load and execute SPARQL query</span>
 <span class="n">QueryProcess</span><span class="w"> </span><span class="n">exec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryProcess</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
 <span class="n">Mappings</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exec</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="s">&quot;select * where { ?s ?p ?o }&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>Example of how to get a variable value in the results:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Iterate on each result</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Mapping</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">map</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// Get the value of the variable ?o</span>
-<span class="w">    </span><span class="n">IDatatype</span><span class="w"> </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="na">getValue</span><span class="p">(</span><span class="s">&quot;?o&quot;</span><span class="p">);</span>
 
-<span class="w">    </span><span class="c1">// Test and convert the value to java type</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="na">isURI</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">uriLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">getLabel</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="na">isBlank</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">BNLabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">getLabel</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="na">isBoolean</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="kt">boolean</span><span class="w"> </span><span class="n">boolResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">booleanValue</span><span class="p">();</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">dt</span><span class="p">.</span><span class="na">isNumber</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">intResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">intValue</span><span class="p">();</span>
-<span class="w">            </span><span class="kt">double</span><span class="w"> </span><span class="n">doubleResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">doubleValue</span><span class="p">();</span>
-<span class="w">            </span><span class="kt">float</span><span class="w"> </span><span class="n">floatResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">floatValue</span><span class="p">();</span>
-<span class="w">            </span><span class="n">BigDecimal</span><span class="w"> </span><span class="n">bigDecimalResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">decimalValue</span><span class="p">();</span>
-<span class="w">            </span><span class="kt">long</span><span class="w"> </span><span class="n">longResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">longValue</span><span class="p">();</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">stringResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">stringValue</span><span class="p">();</span>
-<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">stringLangResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dt</span><span class="p">.</span><span class="na">getLang</span><span class="p">();</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
+<span class="c1">// Print results in Markdown format</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">map</span><span class="p">,</span><span class="w"> </span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">CSV_FORMAT</span><span class="p">).</span><span class="na">toString</span><span class="p">());</span>
 </pre></div>
 </div>
-<p>Print list of variables in the result:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">map</span><span class="p">.</span><span class="na">getSelect</span><span class="p">());</span>
-<span class="c1">// Exemple: [&quot;?s&quot;, &quot;?p&quot;, &quot;?o&quot;]</span>
-</pre></div>
-</div>
-<p>Print results:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Mapping</span><span class="w"> </span><span class="n">m</span><span class="p">:</span><span class="w"> </span><span class="n">map</span><span class="p">){</span>
-<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Export result in XML:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ResultFormat</span><span class="w"> </span><span class="n">result_xml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">map</span><span class="p">);</span>
-<span class="n">result_xml</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&quot;output file path&quot;</span><span class="p">);</span>
+<p>Other supported formats:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">XML_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">JSON_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">CSV_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TSV_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">MARKDOWN_FORMAT</span>
 </pre></div>
 </div>
 </section>
 <section id="sparql-ask-query">
 <h3>3.2. SPARQL Ask query<a class="headerlink" href="#sparql-ask-query" title="Link to this heading">#</a></h3>
-<p>This example shows how to execute a SPARQL ASK query and print results.</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been define previously</span>
+<p>This example shows how to execute a SPARQL <code class="docutils literal notranslate"><span class="pre">ASK</span></code> query and print results.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been defined previously</span>
 
-<span class="c1">// Sparql query</span>
+<span class="c1">// Load and execute SPARQL query</span>
 <span class="n">QueryProcess</span><span class="w"> </span><span class="n">exec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryProcess</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
-<span class="n">Mappings</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exec</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="s">&quot;ask { ?person foaf:name ?name. }&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>Print results:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// if the mappings is empty then the result is false</span>
+<span class="n">Mappings</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exec</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="s">&quot;src/main/resources/query_ask.rq&quot;</span><span class="p">);</span>
+
+<span class="c1">// Print boolean result</span>
+<span class="c1">// if the mappings is empty then the result is false</span>
 <span class="c1">// if the mappings is not empty then the result is true</span>
-<span class="n">system</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="o">!</span><span class="n">map</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">());</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="o">!</span><span class="n">map</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">());</span>
 </pre></div>
 </div>
 </section>
 <section id="sparql-construct-query">
-<h3>3.3. SPARQL Construct query<a class="headerlink" href="#sparql-construct-query" title="Link to this heading">#</a></h3>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been define previously</span>
+<h3><strong>3.3. SPARQL CONSTRUCT Query</strong><a class="headerlink" href="#sparql-construct-query" title="Link to this heading">#</a></h3>
+<p>This example shows how to execute a SPARQL <code class="docutils literal notranslate"><span class="pre">CONSTRUCT</span></code> query and retrieve results.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been defined previously</span>
 
-<span class="c1">// Sparql query</span>
+<span class="c1">// Load and execute SPARQL query</span>
 <span class="n">QueryProcess</span><span class="w"> </span><span class="n">exec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryProcess</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
 <span class="n">Mappings</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exec</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
 <span class="s">    prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span>
@@ -647,65 +607,82 @@ Finally, the sixth part describes how to define and use functions with the <a cl
 <span class="s">    where {</span>
 <span class="s">        ?person foaf:name ?name.</span>
 <span class="s">    }</span>
-<span class="s">    &quot;&quot;&quot;</span>
-<span class="p">);</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">);</span>
+
+<span class="c1">// Get result graph</span>
+<span class="n">Graph</span><span class="w"> </span><span class="n">resultGraph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Graph</span><span class="p">)</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">getGraph</span><span class="p">();</span>
+
+<span class="c1">// Print results in TriG format</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">resultGraph</span><span class="p">,</span><span class="w"> </span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TRIG_FORMAT</span><span class="p">).</span><span class="na">toString</span><span class="p">());</span>
 </pre></div>
 </div>
-<p>Print graph result of a construct-where query :</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Graph</span><span class="w"> </span><span class="n">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Graph</span><span class="p">)</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">getGraph</span><span class="p">();</span>
-<span class="n">Graph</span><span class="w"> </span><span class="n">result_graph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Graph</span><span class="p">)</span><span class="w"> </span><span class="n">map</span><span class="p">.</span><span class="na">getGraph</span><span class="p">();</span>
-<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">result_graph</span><span class="p">.</span><span class="na">display</span><span class="p">());</span>
-</pre></div>
-</div>
-<p>Export result in XML:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Export result in XML</span>
-<span class="n">ResultFormat</span><span class="w"> </span><span class="n">result_xml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">map</span><span class="p">);</span>
-<span class="n">result_xml</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&quot;output file path&quot;</span><span class="p">);</span>
+<p>Other supported formats:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">RDF_XML_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TURTLE_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TRIG_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">JSONLD_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">NTRIPLES_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">NQUADS_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">RDFC10_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">RDFC10_SHA384_FORMAT</span>
 </pre></div>
 </div>
 </section>
 <section id="sparql-update-query">
-<h3>3.4. SPARQL Update query<a class="headerlink" href="#sparql-update-query" title="Link to this heading">#</a></h3>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been define previously</span>
+<h3><strong>3.4. SPARQL UPDATE Query</strong><a class="headerlink" href="#sparql-update-query" title="Link to this heading">#</a></h3>
+<p>This example shows how to execute a SPARQL <code class="docutils literal notranslate"><span class="pre">UPDATE</span></code> query.</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been defined previously</span>
 
-<span class="c1">// Sparql query</span>
+<span class="c1">// SPARQL query</span>
 <span class="n">QueryProcess</span><span class="w"> </span><span class="n">exec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryProcess</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
 <span class="n">exec</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">    prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span>
-<span class="s">    prefix vcard: &lt;http://www.w3.org/2001/vcard-rdf/3.0#&gt;</span>
+<span class="s">    PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;</span>
+<span class="s">    PREFIX vcard: &lt;http://www.w3.org/2001/vcard-rdf/3.0#&gt;</span>
 
-<span class="s">    insert {</span>
+<span class="s">    INSERT {</span>
 <span class="s">        ?person vcard:FN ?name</span>
 <span class="s">    }</span>
-<span class="s">    where {</span>
+<span class="s">    WHERE {</span>
 <span class="s">        ?person foaf:name ?name.</span>
 <span class="s">    }</span>
-<span class="s">    &quot;&quot;&quot;</span>
-<span class="p">);</span>
+<span class="s">&quot;&quot;&quot;</span><span class="p">);</span>
+
+<span class="c1">// Print updated graph in Turtle format</span>
+<span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span><span class="w"> </span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TURTLE_FORMAT</span><span class="p">).</span><span class="na">toString</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>Other supported formats:</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">RDF_XML_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TURTLE_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TRIG_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">JSONLD_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">NTRIPLES_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">NQUADS_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">RDFC10_FORMAT</span>
+<span class="n">ResultFormat</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">RDFC10_SHA384_FORMAT</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="shapes-constraint-language-shacl">
-<h2>4. Shapes Constraint Language (SHACL)<a class="headerlink" href="#shapes-constraint-language-shacl" title="Link to this heading">#</a></h2>
-<p>This section show how to validate a graph with the <a class="reference external" href="https://www.w3.org/TR/shacl/">Shapes Constraint Language (SHACL) in <em>Corese</em></a>.
-The example below shows us how to load a shapes graph (SHACL file), check the validity of the data graph and finally print results.</p>
+<h2><strong>4. Shapes Constraint Language (SHACL)</strong><a class="headerlink" href="#shapes-constraint-language-shacl" title="Link to this heading">#</a></h2>
+<p>This section shows how to validate a graph using <a class="reference external" href="https://www.w3.org/TR/shacl/">SHACL</a>.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Load data graph</span>
 <span class="n">Graph</span><span class="w"> </span><span class="n">dataGraph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Graph</span><span class="p">.</span><span class="na">create</span><span class="p">();</span>
-<span class="n">Load</span><span class="w"> </span><span class="n">ld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">dataGraph</span><span class="p">);</span>
-<span class="n">ld</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;input graph file path&quot;</span><span class="p">);</span>
+<span class="n">Load</span><span class="w"> </span><span class="n">loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">dataGraph</span><span class="p">);</span>
+<span class="n">loader</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;data.ttl&quot;</span><span class="p">);</span>
 
 <span class="c1">// Load shape graph</span>
 <span class="n">Graph</span><span class="w"> </span><span class="n">shapeGraph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Graph</span><span class="p">.</span><span class="na">create</span><span class="p">();</span>
-<span class="n">ld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">shapeGraph</span><span class="p">);</span>
-<span class="n">ld</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;input shape file path.ttl&quot;</span><span class="p">);</span>
+<span class="n">loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">shapeGraph</span><span class="p">);</span>
+<span class="n">loader</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;shapes.ttl&quot;</span><span class="p">);</span>
 
-<span class="c1">// Evaluation</span>
+<span class="c1">// Validate the data</span>
 <span class="n">Shacl</span><span class="w"> </span><span class="n">shacl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Shacl</span><span class="p">(</span><span class="n">dataGraph</span><span class="p">,</span><span class="w"> </span><span class="n">shapeGraph</span><span class="p">);</span>
 <span class="n">Graph</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shacl</span><span class="p">.</span><span class="na">eval</span><span class="p">();</span>
 
-<span class="c1">// print results</span>
-<span class="n">ResultFormat</span><span class="w"> </span><span class="n">exporter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span><span class="w"> </span><span class="n">ResultFormatDef</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TURTLE_FORMAT</span><span class="p">);</span>
+<span class="c1">// Print results</span>
+<span class="n">ResultFormat</span><span class="w"> </span><span class="n">exporter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ResultFormat</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="w"> </span><span class="n">ResultFormatDef</span><span class="p">.</span><span class="na">format</span><span class="p">.</span><span class="na">TURTLE_FORMAT</span><span class="p">);</span>
 <span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">exporter</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span>
 </pre></div>
 </div>
@@ -726,11 +703,8 @@ The example below shows us how to load a shapes graph (SHACL file), check the va
     <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="nn">ex</span><span class="p">:</span><span class="nt">Person</span> <span class="p">.</span>
 
 <span class="nn">ex</span><span class="p">:</span><span class="nt">Haribo</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="nn">ex</span><span class="p">:</span><span class="nt">Company</span> <span class="p">.</span>
-
 <span class="nn">ex</span><span class="p">:</span><span class="nt">KitKat</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="nn">ex</span><span class="p">:</span><span class="nt">Company</span> <span class="p">.</span>
-
 <span class="nn">ex</span><span class="p">:</span><span class="nt">Twitch</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="nn">ex</span><span class="p">:</span><span class="nt">Company</span> <span class="p">.</span>
-
 <span class="nn">ex</span><span class="p">:</span><span class="nt">UntypedCompany</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="nn">ex</span><span class="p">:</span><span class="nt">Company</span> <span class="p">.</span>
 </pre></div>
 </div>
@@ -769,10 +743,10 @@ The example below shows us how to load a shapes graph (SHACL file), check the va
 </section>
 <section id="sparql-template-transformation-language-sttl">
 <h2>5. SPARQL Template Transformation Language (STTL)<a class="headerlink" href="#sparql-template-transformation-language-sttl" title="Link to this heading">#</a></h2>
-<p>This sections shows how to transforme a graph with a subset of the extension language <a class="reference external" href="https://files.inria.fr/corese/doc/sttl.html">SPARQL Template Transformation Language (STTL)</a>.</p>
-<section id="transform-a-graph-in-a-visual-html-format">
-<h3>5.1. Transform a graph in a visual HTML format<a class="headerlink" href="#transform-a-graph-in-a-visual-html-format" title="Link to this heading">#</a></h3>
-<p>This example detail how load a data graph from a file, transforme it in a visual HTML format and export the result in a file.</p>
+<p>This section shows how to transform a graph using a subset of the <a class="reference external" href="https://files.inria.fr/corese/doc/sttl.html">SPARQL Template Transformation Language (STTL)</a>.</p>
+<section id="transform-a-graph-into-a-visual-html-format">
+<h3>5.1. Transform a graph into a visual HTML format<a class="headerlink" href="#transform-a-graph-into-a-visual-html-format" title="Link to this heading">#</a></h3>
+<p>This example details how to load a data graph from a file, transform it into a visual HTML format, and export the result to a file.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Open template file</span>
 <span class="n">Path</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;input template file path&quot;</span><span class="p">);</span>
 <span class="n">String</span><span class="w"> </span><span class="n">sttl_query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">readString</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
@@ -809,9 +783,8 @@ where {
 order by ?s ?p ?o
 </pre></div>
 </div>
-<p><strong>Result :</strong></p>
+<p><strong>Result:</strong></p>
 <div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-
 <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
         <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
@@ -831,7 +804,6 @@ order by ?s ?p ?o
         <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
     <span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </pre></div>
 </div>
@@ -861,7 +833,7 @@ order by ?s ?p ?o
 </section>
 </section>
 <section id="sparql-rule">
-<h2>6. SPARQL Rule<a class="headerlink" href="#sparql-rule" title="Link to this heading">#</a></h2>
+<h2>6. <strong>SPARQL Rule</strong><a class="headerlink" href="#sparql-rule" title="Link to this heading">#</a></h2>
 <p>This section details how to apply a set of rules on a graph using the <a class="reference external" href="https://files.inria.fr/corese/doc/rule.html">SPARQL Rule extension language</a>.</p>
 <section id="load-rules-from-a-file">
 <h3>6.1. Load rules from a file<a class="headerlink" href="#load-rules-from-a-file" title="Link to this heading">#</a></h3>
@@ -871,14 +843,12 @@ order by ?s ?p ?o
 <span class="n">Load</span><span class="w"> </span><span class="n">dataLoader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">dataGraph</span><span class="p">);</span>
 <span class="n">dataLoader</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;input graph file path&quot;</span><span class="p">);</span>
 
-
 <span class="c1">// Create and load rules into a rules engine</span>
 <span class="n">RuleEngine</span><span class="w"> </span><span class="n">ruleEngine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RuleEngine</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">dataGraph</span><span class="p">);</span>
 <span class="n">RuleLoad</span><span class="w"> </span><span class="n">ruleLoader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RuleLoad</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">ruleEngine</span><span class="p">);</span>
 <span class="n">ruleLoader</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;input rules file path.rul&quot;</span><span class="p">);</span>
 
-
-<span class="c1">// Apply rules on graph</span>
+<span class="c1">// Apply rules on the graph</span>
 <span class="n">ruleEngine</span><span class="p">.</span><span class="na">process</span><span class="p">();</span>
 </pre></div>
 </div>
@@ -900,8 +870,8 @@ order by ?s ?p ?o
     iri:daniel--ex:isMarriedTo--&gt;iri:elise;
         </div><p><strong>Rules file:</strong></p>
 <ul class="simple">
-<li><p>Symmetry : <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">exist</span> <span class="pre">X➝Y</span> <span class="pre">then</span> <span class="pre">Y➝X</span></code></p></li>
-<li><p>Transitivity : <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">X➝Y➝Z</span> <span class="pre">then</span> <span class="pre">X➝Z</span></code></p></li>
+<li><p>Symmetry: <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">X➝Y</span> <span class="pre">then</span> <span class="pre">Y➝X</span></code></p></li>
+<li><p>Transitivity: <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">X➝Y➝Z</span> <span class="pre">then</span> <span class="pre">X➝Z</span></code></p></li>
 </ul>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
 
@@ -939,35 +909,32 @@ order by ?s ?p ?o
 <span class="cp">            ]]&gt;</span>
 <span class="w">        </span><span class="nt">&lt;/body&gt;</span>
 <span class="w">    </span><span class="nt">&lt;/rule&gt;</span>
-
 <span class="nt">&lt;/rdf:RDF&gt;</span>
 </pre></div>
 </div>
 <p><strong>Result graph:</strong></p>
 <div class="mermaid">
             graph LR;
-    classDef IRI fill:#FEAE65,stroke-width:0px
+    classDef IRI fill:#FEAE65,stroke-width:0px;
 
-    iri:alice([&quot;ex:Alice&quot;])
-    iri:bob([&quot;ex:Bob&quot;])
-    iri:camille([&quot;ex:Camille&quot;])
-    iri:daniel([&quot;ex:Daniel&quot;])
-    iri:elise([&quot;ex:Elise&quot;])
+    iri_alice[&quot;ex:Alice&quot;];
+    iri_bob[&quot;ex:Bob&quot;];
+    iri_camille[&quot;ex:Camille&quot;];
+    iri_daniel[&quot;ex:Daniel&quot;];
+    iri_elise[&quot;ex:Elise&quot;];
 
-    class iri:alice,iri:bob,iri:camille,iri:daniel,iri:elise IRI
+    class iri_alice,iri_bob,iri_camille,iri_daniel,iri_elise IRI;
 
-    iri:alice--ex:friend--&gt;iri:bob;
-    iri:bob--ex:friend--&gt;iri:camille;
-    iri:alice-.ex:friend.-&gt;iri:camille;
-    iri:daniel--ex:isMarriedTo.-&gt;iri:elise;
-    iri:elise-.ex:isMarriedTo.-&gt;iri:daniel;
-
-    linkStyle 4,2 stroke:#a3ddcb,stroke-width:3px;
+    iri_alice -- ex:friend --&gt; iri_bob;
+    iri_bob -- ex:friend --&gt; iri_camille;
+    iri_alice -. ex:friend .-&gt; iri_camille;
+    iri_daniel -- ex:isMarriedTo --&gt; iri_elise;
+    iri_elise -. ex:isMarriedTo .-&gt; iri_daniel;
         </div></section>
 <section id="owl-rules">
 <h3>6.2. OWL Rules<a class="headerlink" href="#owl-rules" title="Link to this heading">#</a></h3>
 <p>The example below shows the application of OWL RL rules.</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been define previously</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// We assume that the &#39;graph&#39; variable has been defined previously</span>
 
 <span class="c1">// Apply rules</span>
 <span class="n">RuleEngine</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RuleEngine</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
@@ -982,7 +949,7 @@ order by ?s ?p ?o
 <p>This section describes how to define and use functions with the <a class="reference external" href="https://files.inria.fr/corese/doc/ldscript.html">LDScript extension language</a>.</p>
 <section id="fibonacci-function-call-from-java">
 <h3>7.1. Fibonacci function call from Java<a class="headerlink" href="#fibonacci-function-call-from-java" title="Link to this heading">#</a></h3>
-<p>This example shows how to define and compute the twelfth number of the Fibonnacci sequence.</p>
+<p>This example shows how to define and compute the twelfth number of the Fibonacci sequence.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Open LDScript file</span>
 <span class="n">Path</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;input LDScript file path.rq&quot;</span><span class="p">);</span>
 <span class="n">String</span><span class="w"> </span><span class="n">ldScript</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">readString</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
@@ -991,7 +958,7 @@ order by ?s ?p ?o
 <span class="n">QueryProcess</span><span class="w"> </span><span class="n">exec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryProcess</span><span class="p">.</span><span class="na">create</span><span class="p">();</span>
 <span class="n">exec</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span><span class="n">ldScript</span><span class="p">);</span>
 
-<span class="c1">// Compute the twelfth number of the Fibonnacci sequence</span>
+<span class="c1">// Compute the twelfth number of the Fibonacci sequence</span>
 <span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;http://ns.inria.fr/fibonacci&quot;</span><span class="p">;</span>
 <span class="n">IDatatype</span><span class="w"> </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exec</span><span class="p">.</span><span class="na">funcall</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">DatatypeMap</span><span class="p">.</span><span class="na">newInstance</span><span class="p">(</span><span class="mi">25</span><span class="p">));</span>
 
@@ -1030,33 +997,31 @@ order by ?s ?p ?o
 <span class="s">select ?name ?area</span>
 <span class="s">where {</span>
 <span class="s">    ?city rdf:type ex:city ;</span>
-<span class="s">            ex:name ?name ;</span>
-<span class="s">            ex:area ?area .</span>
+<span class="s">          ex:name ?name ;</span>
+<span class="s">          ex:area ?area .</span>
 <span class="s">    filter(?area &gt; fun:toSquareKm(40))</span>
 <span class="s">}</span>
 
-<span class="s"># Convert square mile to square Kilometer</span>
+<span class="s"># Convert square mile to square kilometer</span>
 <span class="s">function fun:toSquareKm(squareMile) {</span>
 <span class="s">    return (squareMile * 2.59)</span>
 <span class="s">}</span>
 <span class="s">&quot;&quot;&quot;</span><span class="p">;</span>
-
 
 <span class="c1">// Load graph</span>
 <span class="n">Graph</span><span class="w"> </span><span class="n">graph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Graph</span><span class="p">.</span><span class="na">create</span><span class="p">();</span>
 <span class="n">Load</span><span class="w"> </span><span class="n">ld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
 <span class="n">ld</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="s">&quot;input file path&quot;</span><span class="p">);</span>
 
-<span class="c1">// Sparql query</span>
+<span class="c1">// SPARQL query</span>
 <span class="n">QueryProcess</span><span class="w"> </span><span class="n">exec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">QueryProcess</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">graph</span><span class="p">);</span>
 <span class="n">Mappings</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exec</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="n">check_query</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
 <section id="advanced-example">
-<h3>7.3. Advanced example<a class="headerlink" href="#advanced-example" title="Link to this heading">#</a></h3>
-<p>The java program below computes the percentage of people subscribed to social networks of city compared to its number of inhabitants.
-Data is collected from Wikidata.</p>
+<h3>7.3. Advanced Example<a class="headerlink" href="#advanced-example" title="Link to this heading">#</a></h3>
+<p>The following Java program computes the percentage of people subscribed to social networks in a city compared to its total number of inhabitants. The data is collected from Wikidata.</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// Open LDScript file</span>
 <span class="n">Path</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;input LDScript file path.rq&quot;</span><span class="p">);</span>
 <span class="n">String</span><span class="w"> </span><span class="n">ldScript</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">readString</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
@@ -1073,7 +1038,7 @@ Data is collected from Wikidata.</p>
 <span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">dt</span><span class="p">);</span>
 </pre></div>
 </div>
-<p><strong>Input LDScript file path:</strong></p>
+<p><strong>Input LDScript File:</strong></p>
 <div class="highlight-rq notranslate"><div class="highlight"><pre><span></span>prefix fun: &lt;http://ns.inria.fr/&gt;
 
 prefix wd: &lt;http://www.wikidata.org/entity/&gt;
@@ -1082,7 +1047,6 @@ prefix wikibase: &lt;http://wikiba.se/ontology#&gt;
 prefix bd: &lt;http://www.bigdata.com/rdf#&gt;
 prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
-
 @public
 function fun:percentage(sub, total) {
     return (sub / total * 100)
@@ -1090,7 +1054,6 @@ function fun:percentage(sub, total) {
 
 @public
 function fun:citypopulationsocialmedia() {
-
     query(
         select ?city ?citylabel ?population ?socialmediafolower where {
             service &lt;https://query.wikidata.org/sparql&gt; {
@@ -1119,7 +1082,7 @@ function fun:main() {
             },
             fun:citypopulationsocialmedia()
         ),
-        function(x,y)  {
+        function(x,y) {
             let ((x_name, x_value) = x, (y_name, y_value) = y) {
                 if (x_value &lt; y_value, 1, if(x=y, o, -1))
             }
@@ -1178,26 +1141,26 @@ function fun:main() {
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">1. Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graph">2. Graph</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-a-graph-by-program">2.1. Build a Graph by program</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-graph-from-file">2.2. Load Graph from file</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export-graph-to-file">2.3. Export Graph to file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation"><strong>1. Installation</strong></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graph"><strong>2. Graph</strong></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-a-graph-programmatically"><strong>2.1. Build a Graph Programmatically</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-a-graph-from-a-file"><strong>2.2. Load a Graph from a File</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export-a-graph-to-a-file"><strong>2.3. Export a Graph to a File</strong></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-protocol-and-rdf-query-language">3. SPARQL Protocol and RDF Query Language</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-select-query">3.1. SPARQL Select query</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-queries"><strong>3. SPARQL Queries</strong></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#executing-a-sparql-select-query"><strong>3.1. Executing a SPARQL SELECT Query</strong></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-ask-query">3.2. SPARQL Ask query</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-construct-query">3.3. SPARQL Construct query</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-update-query">3.4. SPARQL Update query</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-construct-query"><strong>3.3. SPARQL CONSTRUCT Query</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-update-query"><strong>3.4. SPARQL UPDATE Query</strong></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shapes-constraint-language-shacl">4. Shapes Constraint Language (SHACL)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shapes-constraint-language-shacl"><strong>4. Shapes Constraint Language (SHACL)</strong></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-template-transformation-language-sttl">5. SPARQL Template Transformation Language (STTL)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transform-a-graph-in-a-visual-html-format">5.1. Transform a graph in a visual HTML format</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transform-a-graph-into-a-visual-html-format">5.1. Transform a graph into a visual HTML format</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-rule">6. SPARQL Rule</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparql-rule">6. <strong>SPARQL Rule</strong></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-rules-from-a-file">6.1. Load rules from a file</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#owl-rules">6.2. OWL Rules</a></li>
 </ul>
@@ -1205,7 +1168,7 @@ function fun:main() {
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ldscript">7. LDScript</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fibonacci-function-call-from-java">7.1. Fibonacci function call from Java</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ldscript-in-sparql">7.2. LDScript in SPARQL</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-example">7.3. Advanced example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-example">7.3. Advanced Example</a></li>
 </ul>
 </li>
 </ul>

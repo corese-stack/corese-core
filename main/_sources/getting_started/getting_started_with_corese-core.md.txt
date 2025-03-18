@@ -1,28 +1,26 @@
-# Getting started with corese-core
+# Getting Started with Corese-Core
 
-This tutorial show how to use the corese-core library through simple examples of the main features.
-We assume a basic knowledge in Java programming and in semantic web.
+This tutorial shows how to use the Corese-Core library through simple examples of its main features.
+We assume a basic knowledge of Java programming and the Semantic Web.
 
-The first part describes how to create, load and export a Graph.
-The second part show how to query a graph with [SPARQL](https://www.w3.org/TR/sparql11-query/).
-The third part details how to validate a graph with the [Shapes Constraint Language (SHACL)](https://www.w3.org/TR/shacl/).
-The fourth part shows how to transforme a graph with the extension language [SPARQL Template Transformation Language (STTL)](https://files.inria.fr/corese/doc/sttl.html).
-The fifth part details how to apply a set of rules on a graph using the [SPARQL Rule](https://files.inria.fr/corese/doc/rule.html) extension language.
-Finally, the sixth part describes how to define and use functions with the [LDScript](https://files.inria.fr/corese/doc/ldscript.html) extension language.
+- The first section describes how to create, load, and export a Graph.
+- The second section shows how to query a graph using [SPARQL](https://www.w3.org/TR/sparql11-query/).
+- The third section details how to validate a graph using the [Shapes Constraint Language (SHACL)](https://www.w3.org/TR/shacl/).
+- The fourth section shows how to transform a graph using the extension language [SPARQL Template Transformation Language (STTL)](https://files.inria.fr/corese/doc/sttl.html).
+- The fifth section details how to apply a set of rules on a graph using the [SPARQL Rule](https://files.inria.fr/corese/doc/rule.html) extension language.
+- Finally, the sixth section describes how to define and use functions with the [LDScript](https://files.inria.fr/corese/doc/ldscript.html) extension language.
 
-## 1. Installation
+## **1. Installation**
 
-Installations instructions are available on the [installation page](../install.md).
+Installation instructions are available on the [installation page](../install.md).
 
-## 2. Graph
+## **2. Graph**
 
-This section describes how to create a graph manually, load a graph from file and serialize a graph to file.
+This section describes how to create a graph manually, load a graph from a file, and serialize a graph to a file.
 
-### 2.1. Build a Graph by program
+### **2.1. Build a Graph Programmatically**
 
-> It is also possible to use the [RDF4J Model API](https://notes.inria.fr/s/OB038LBLV#11-build-a-corese-model-manually) to create and manipulate a graph.
-
-The example shows how to create the RDF graph bellow:
+The example below shows how to create the following RDF graph:
 
 ```mermaid
 graph LR;
@@ -31,8 +29,8 @@ graph LR;
 
     iri:EdithPiaf(["ex:EdithPiaf"])
     iri:Singer(["ex:Singer"])
-    dt:Edith["''Edith''"]
-    dt:Piaf["''Piaf''"]
+    dt:Edith(["''Edith''"])
+    dt:Piaf(["''Piaf''"])
 
     class iri:EdithPiaf,iri:Singer IRI
     class dt:Edith,dt:Piaf DT
@@ -42,41 +40,39 @@ graph LR;
     iri:EdithPiaf--ex:lastName-->dt:Piaf;
 ```
 
-This graph represents three statements :
+This graph represents three statements:
 
-- Edith Piaf is a singer
-- Edith Piaf's first name is Edith
-- Edith Piaf's last name is Piaf
+- Edith Piaf is a singer.
+- Edith Piaf's first name is Edith.
+- Edith Piaf's last name is Piaf.
 
 ```java
-// Define the namespace ex
+// Define the namespace 'ex'
 String ex = "http://example.org/";
 
 // Create a new empty Graph
 Graph graph = Graph.create();
 
-// Create and add IRIs to Graph
+// Create and add IRIs to the Graph
 Node edithPiafIRI = graph.addResource(ex + "EdithPiaf");
 Node singerIRI = graph.addResource(ex + "Singer");
 
-// Create and add properties to Graph
+// Create and add properties to the Graph
 Node rdfTypeProperty = graph.addProperty(RDF.TYPE);
 Node firstNameProperty = graph.addProperty(ex + "firstName");
 Node lastNameProperty = graph.addProperty(ex + "lastName");
 
-// Create and add datatypes to Graph
-Node edithDatatype = graph.addLiteral("Edith");
-Node piafDatatype = graph.addLiteral("Piaf");
+// Create and add literals to the Graph
+Node edithLiteral = graph.addLiteral("Edith");
+Node piafLiteral = graph.addLiteral("Piaf");
 
-// Add first statement : Edith Piaf is an Singer
+// Add statements to the graph
 graph.addEdge(edithPiafIRI, rdfTypeProperty, singerIRI);
-// Add second statement : Edith Piaf's first name is Edith
-graph.addEdge(edithPiafIRI, firstNameProperty, edithDatatype);
-// Add third statement : Edith Piaf's last name is Piaf
-graph.addEdge(edithPiafIRI, lastNameProperty, piafDatatype);
+graph.addEdge(edithPiafIRI, firstNameProperty, edithLiteral);
+graph.addEdge(edithPiafIRI, lastNameProperty, piafLiteral);
 ```
 
-### 2.2. Load Graph from file
+### **2.2. Load a Graph from a File**
 
 This example shows how to load a graph from a file.
 
@@ -85,146 +81,102 @@ This example shows how to load a graph from a file.
 Graph graph = Graph.create();
 
 // Create loader and parse file
-Load ld = Load.create(graph);
-ld.parse("input graph file path", Load.format.TURTLE_FORMAT);
+Load loader = Load.create(graph);
+loader.parse("input_graph_file.ttl", Load.format.TURTLE_FORMAT);
 ```
 
-Corese Loader can load formats :
+Corese Loader supports the following formats:
 
-- RDF/XML (.rdf) `Load.format.RDFXML_FORMAT`
-- TURTLE (.ttl) `Load.format.TURTLE_FORMAT`
-- TRIG (.trig) `Load.format.TRIG_FORMAT`
-- JSONLD (.jsonld) `Load.format.JSONLD_FORMAT`
-- NTRIPLES (.nt) `Load.format.NT_FORMAT`
-- NQUADS (.nq) `Load.format.NQUADS_FORMAT`
-- RDFa (.html) `Load.format.RDFA_FORMAT`
+- RDF/XML (`Load.format.RDFXML_FORMAT`)
+- Turtle (`Load.format.TURTLE_FORMAT`)
+- TriG (`Load.format.TRIG_FORMAT`)
+- JSON-LD (`Load.format.JSONLD_FORMAT`)
+- N-Triples (`Load.format.NT_FORMAT`)
+- N-Quads (`Load.format.NQUADS_FORMAT`)
+- RDFa (`Load.format.RDFA_FORMAT`)
 
-### 2.3. Export Graph to file
+### **2.3. Export a Graph to a File**
 
-This example shows how to serialize a graph in file, here in TURTLE format.
+This example shows how to serialize a graph into a file in Turtle format.
 
 ```java
-// We assume that the 'graph' variable has been define previously
+// Assuming 'graph' is previously defined
 
 // Create exporter
 ResultFormat exporter = ResultFormat.create(graph, ResultFormatDef.format.TURTLE_FORMAT);
 String result = exporter.toString();
 
-// Write result in file
-FileWriter writer = new FileWriter("output file path");
-writer.write(result);
-writer.close();
+// Write result to a file
+try (FileWriter writer = new FileWriter("output_graph.ttl")) {
+    writer.write(result);
+}
 ```
 
-Corese can serialize graphs in the following formats:
+Corese can serialize graphs into the following formats:
 
-- RDF/XML `ResultFormatDef.format.RDF_XML_FORMAT`
-- TURTLE `ResultFormatDef.format.TURTLE_FORMAT`
-- TRIG `ResultFormatDef.format.TRIG_FORMAT`
-- JSONLD `ResultFormatDef.format.JSONLD_FORMAT`
-- NTRIPLES `ResultFormatDef.format.`
-- NQUADS `ResultFormatDef.format.NQUADS_FORMAT`
-- Canonical RDF SHA-256 `ResultFormatDef.format.RDFC10_SHA256_FORMAT`
-- Canonical RDF SHA-384 `ResultFormatDef.format.RDFC10_SHA384_FORMAT`
+- RDF/XML (`ResultFormatDef.format.RDF_XML_FORMAT`)
+- Turtle (`ResultFormatDef.format.TURTLE_FORMAT`)
+- TriG (`ResultFormatDef.format.TRIG_FORMAT`)
+- JSON-LD (`ResultFormatDef.format.JSONLD_FORMAT`)
+- N-Triples (`ResultFormatDef.format.NTRIPLES_FORMAT`)
+- N-Quads (`ResultFormatDef.format.NQUADS_FORMAT`)
+- Canonical RDF SHA-256 (`ResultFormatDef.format.RDFC10_FORMAT`)
+- Canonical RDF SHA-384 (`ResultFormatDef.format.RDFC10_SHA384_FORMAT`)
 
-## 3. SPARQL Protocol and RDF Query Language
+## **3. SPARQL Queries**
 
-This section describes how to query a graph with [SPARQL](https://www.w3.org/TR/sparql11-query/) in Corese.
+This section describes how to query a graph using [SPARQL](https://www.w3.org/TR/sparql11-query/) in Corese.
 
-### 3.1. SPARQL Select query
+### **3.1. Executing a SPARQL SELECT Query**
 
-This example shows how to execute a SPARQL SELECT query, print and export results.
+This example shows how to execute a SPARQL `SELECT` query and retrieve results.
 
 ```java
-// We assume that the 'graph' variable has been define previously
+// We assume that the 'graph' variable has been defined previously
 
-// Sparql query
+// Load and execute SPARQL query
 QueryProcess exec = QueryProcess.create(graph);
 Mappings map = exec.query("select * where { ?s ?p ?o }");
+
+// Print results in Markdown format
+System.out.println(ResultFormat.create(map, ResultFormat.format.CSV_FORMAT).toString());
 ```
 
-Example of how to get a variable value in the results:
+Other supported formats:
 
 ```java
-// Iterate on each result
-for (Mapping m : map) {
-    // Get the value of the variable ?o
-    IDatatype dt = m.getValue("?o");
-
-    // Test and convert the value to java type
-    if (dt.isURI()) {
-        String uriLabel = dt.getLabel();
-    }
-    else if (dt.isBlank()) {
-        String BNLabel = dt.getLabel();
-    }
-    else {
-        if (dt.isBoolean()) {
-            boolean boolResult = dt.booleanValue();
-        }
-        else if (dt.isNumber()) {
-            int intResult = dt.intValue();
-            double doubleResult = dt.doubleValue();
-            float floatResult = dt.floatValue();
-            BigDecimal bigDecimalResult = dt.decimalValue();
-            long longResult = dt.longValue();
-        }
-        else {
-            String stringResult = dt.stringValue();
-            String stringLangResult = dt.getLang();
-        }
-    }
-}
-```
-
-Print list of variables in the result:
-
-```java
-System.out.println(map.getSelect());
-// Exemple: ["?s", "?p", "?o"]
-```
-
-Print results:
-
-```java
-for (Mapping m: map){
-    System.out.println(m);
-}
-```
-
-Export result in XML:
-
-```java
-ResultFormat result_xml = ResultFormat.create(map);
-result_xml.write("output file path");
+ResultFormat.format.XML_FORMAT
+ResultFormat.format.JSON_FORMAT
+ResultFormat.format.CSV_FORMAT
+ResultFormat.format.TSV_FORMAT
+ResultFormat.format.MARKDOWN_FORMAT
 ```
 
 ### 3.2. SPARQL Ask query
 
-This example shows how to execute a SPARQL ASK query and print results.
+This example shows how to execute a SPARQL `ASK` query and print results.
 
 ```java
-// We assume that the 'graph' variable has been define previously
+// We assume that the 'graph' variable has been defined previously
 
-// Sparql query
+// Load and execute SPARQL query
 QueryProcess exec = QueryProcess.create(graph);
-Mappings map = exec.query("ask { ?person foaf:name ?name. }");
-```
+Mappings map = exec.query("src/main/resources/query_ask.rq");
 
-Print results:
-
-```java
+// Print boolean result
 // if the mappings is empty then the result is false
 // if the mappings is not empty then the result is true
-system.out.println(!map.isEmpty());
+System.out.println(!map.isEmpty());
 ```
 
-### 3.3. SPARQL Construct query
+### **3.3. SPARQL CONSTRUCT Query**
+
+This example shows how to execute a SPARQL `CONSTRUCT` query and retrieve results.
 
 ```java
-// We assume that the 'graph' variable has been define previously
+// We assume that the 'graph' variable has been defined previously
 
-// Sparql query
+// Load and execute SPARQL query
 QueryProcess exec = QueryProcess.create(graph);
 Mappings map = exec.query("""
     prefix foaf: <http://xmlns.com/foaf/0.1/>
@@ -236,69 +188,87 @@ Mappings map = exec.query("""
     where {
         ?person foaf:name ?name.
     }
-    """
-);
+    """);
+
+// Get result graph
+Graph resultGraph = (Graph) map.getGraph();
+
+// Print results in TriG format
+System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString());
 ```
 
-Print graph result of a construct-where query :
+Other supported formats:
 
 ```java
-Graph g = (Graph) map.getGraph();
-Graph result_graph = (Graph) map.getGraph();
-System.out.println(result_graph.display());
+ResultFormat.format.RDF_XML_FORMAT
+ResultFormat.format.TURTLE_FORMAT
+ResultFormat.format.TRIG_FORMAT
+ResultFormat.format.JSONLD_FORMAT
+ResultFormat.format.NTRIPLES_FORMAT
+ResultFormat.format.NQUADS_FORMAT
+ResultFormat.format.RDFC10_FORMAT
+ResultFormat.format.RDFC10_SHA384_FORMAT
 ```
 
-Export result in XML:
+### **3.4. SPARQL UPDATE Query**
+
+This example shows how to execute a SPARQL `UPDATE` query.
 
 ```java
-// Export result in XML
-ResultFormat result_xml = ResultFormat.create(map);
-result_xml.write("output file path");
-```
+// We assume that the 'graph' variable has been defined previously
 
-### 3.4. SPARQL Update query
-
-```java
-// We assume that the 'graph' variable has been define previously
-
-// Sparql query
+// SPARQL query
 QueryProcess exec = QueryProcess.create(graph);
 exec.query("""
-    prefix foaf: <http://xmlns.com/foaf/0.1/>
-    prefix vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
 
-    insert {
+    INSERT {
         ?person vcard:FN ?name
     }
-    where {
+    WHERE {
         ?person foaf:name ?name.
     }
-    """
-);
+""");
+
+// Print updated graph in Turtle format
+System.out.println(ResultFormat.create(graph, ResultFormat.format.TURTLE_FORMAT).toString());
 ```
 
-## 4. Shapes Constraint Language (SHACL)
+Other supported formats:
 
-This section show how to validate a graph with the [Shapes Constraint Language (SHACL) in _Corese_](https://www.w3.org/TR/shacl/).
-The example below shows us how to load a shapes graph (SHACL file), check the validity of the data graph and finally print results.
+```java
+ResultFormat.format.RDF_XML_FORMAT
+ResultFormat.format.TURTLE_FORMAT
+ResultFormat.format.TRIG_FORMAT
+ResultFormat.format.JSONLD_FORMAT
+ResultFormat.format.NTRIPLES_FORMAT
+ResultFormat.format.NQUADS_FORMAT
+ResultFormat.format.RDFC10_FORMAT
+ResultFormat.format.RDFC10_SHA384_FORMAT
+```
+
+## **4. Shapes Constraint Language (SHACL)**
+
+This section shows how to validate a graph using [SHACL](https://www.w3.org/TR/shacl/).
 
 ```java
 // Load data graph
 Graph dataGraph = Graph.create();
-Load ld = Load.create(dataGraph);
-ld.parse("input graph file path");
+Load loader = Load.create(dataGraph);
+loader.parse("data.ttl");
 
 // Load shape graph
 Graph shapeGraph = Graph.create();
-ld = Load.create(shapeGraph);
-ld.parse("input shape file path.ttl");
+loader = Load.create(shapeGraph);
+loader.parse("shapes.ttl");
 
-// Evaluation
+// Validate the data
 Shacl shacl = new Shacl(dataGraph, shapeGraph);
 Graph result = shacl.eval();
 
-// print results
-ResultFormat exporter = ResultFormat.create(graph, ResultFormatDef.format.TURTLE_FORMAT);
+// Print results
+ResultFormat exporter = ResultFormat.create(result, ResultFormatDef.format.TURTLE_FORMAT);
 System.out.println(exporter.toString());
 ```
 
@@ -321,11 +291,8 @@ ex:Calvin ex:ssn "648-67-6545" ;
     rdf:type ex:Person .
 
 ex:Haribo rdf:type ex:Company .
-
 ex:KitKat rdf:type ex:Company .
-
 ex:Twitch rdf:type ex:Company .
-
 ex:UntypedCompany rdf:type ex:Company .
 ```
 
@@ -367,11 +334,11 @@ ex:PersonShape
 
 ## 5. SPARQL Template Transformation Language (STTL)
 
-This sections shows how to transforme a graph with a subset of the extension language [SPARQL Template Transformation Language (STTL)](https://files.inria.fr/corese/doc/sttl.html).
+This section shows how to transform a graph using a subset of the [SPARQL Template Transformation Language (STTL)](https://files.inria.fr/corese/doc/sttl.html).
 
-### 5.1. Transform a graph in a visual HTML format
+### 5.1. Transform a graph into a visual HTML format
 
-This example detail how load a data graph from a file, transforme it in a visual HTML format and export the result in a file.
+This example details how to load a data graph from a file, transform it into a visual HTML format, and export the result to a file.
 
 ```java
 // Open template file
@@ -412,11 +379,10 @@ where {
 order by ?s ?p ?o
 ```
 
-**Result :**
+**Result:**
 
 ```html
 <html>
-
 <body>
     <table>
         <tr>
@@ -436,7 +402,6 @@ order by ?s ?p ?o
         </tr>
     </table>
 </body>
-
 </html>
 ```
 
@@ -446,7 +411,7 @@ order by ?s ?p ?o
 | <http://example.org/EdithPiaf> | <http://example.org/lastName>                     | Piaf                        |
 | <http://example.org/EdithPiaf> | <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> | <http://example.org/Singer> |
 
-## 6. SPARQL Rule
+## 6. **SPARQL Rule**
 
 This section details how to apply a set of rules on a graph using the [SPARQL Rule extension language](https://files.inria.fr/corese/doc/rule.html).
 
@@ -460,14 +425,12 @@ Graph dataGraph = Graph.create();
 Load dataLoader = Load.create(dataGraph);
 dataLoader.parse("input graph file path");
 
-
 // Create and load rules into a rules engine
 RuleEngine ruleEngine = RuleEngine.create(dataGraph);
 RuleLoad ruleLoader = RuleLoad.create(ruleEngine);
 ruleLoader.parse("input rules file path.rul");
 
-
-// Apply rules on graph
+// Apply rules on the graph
 ruleEngine.process();
 ```
 
@@ -492,8 +455,8 @@ graph LR;
 
 **Rules file:**
 
-- Symmetry : `if exist X➝Y then Y➝X`
-- Transitivity : `if X➝Y➝Z then X➝Z`
+- Symmetry: `if X➝Y then Y➝X`
+- Transitivity: `if X➝Y➝Z then X➝Z`
 
 ```xml
 <?xml version="1.0"?>
@@ -532,32 +495,28 @@ graph LR;
             ]]>
         </body>
     </rule>
-
 </rdf:RDF>
-
 ```
 
 **Result graph:**
 
 ```mermaid
 graph LR;
-    classDef IRI fill:#FEAE65,stroke-width:0px
+    classDef IRI fill:#FEAE65,stroke-width:0px;
 
-    iri:alice(["ex:Alice"])
-    iri:bob(["ex:Bob"])
-    iri:camille(["ex:Camille"])
-    iri:daniel(["ex:Daniel"])
-    iri:elise(["ex:Elise"])
+    iri_alice["ex:Alice"];
+    iri_bob["ex:Bob"];
+    iri_camille["ex:Camille"];
+    iri_daniel["ex:Daniel"];
+    iri_elise["ex:Elise"];
 
-    class iri:alice,iri:bob,iri:camille,iri:daniel,iri:elise IRI
+    class iri_alice,iri_bob,iri_camille,iri_daniel,iri_elise IRI;
 
-    iri:alice--ex:friend-->iri:bob;
-    iri:bob--ex:friend-->iri:camille;
-    iri:alice-.ex:friend.->iri:camille;
-    iri:daniel--ex:isMarriedTo.->iri:elise;
-    iri:elise-.ex:isMarriedTo.->iri:daniel;
-
-    linkStyle 4,2 stroke:#a3ddcb,stroke-width:3px;
+    iri_alice -- ex:friend --> iri_bob;
+    iri_bob -- ex:friend --> iri_camille;
+    iri_alice -. ex:friend .-> iri_camille;
+    iri_daniel -- ex:isMarriedTo --> iri_elise;
+    iri_elise -. ex:isMarriedTo .-> iri_daniel;
 ```
 
 ### 6.2. OWL Rules
@@ -565,7 +524,7 @@ graph LR;
 The example below shows the application of OWL RL rules.
 
 ```java
-// We assume that the 'graph' variable has been define previously
+// We assume that the 'graph' variable has been defined previously
 
 // Apply rules
 RuleEngine engine = RuleEngine.create(graph);
@@ -579,7 +538,7 @@ This section describes how to define and use functions with the [LDScript extens
 
 ### 7.1. Fibonacci function call from Java
 
-This example shows how to define and compute the twelfth number of the Fibonnacci sequence.
+This example shows how to define and compute the twelfth number of the Fibonacci sequence.
 
 ```java
 // Open LDScript file
@@ -590,7 +549,7 @@ String ldScript = Files.readString(path, StandardCharsets.UTF_8);
 QueryProcess exec = QueryProcess.create();
 exec.compile(ldScript);
 
-// Compute the twelfth number of the Fibonnacci sequence
+// Compute the twelfth number of the Fibonacci sequence
 String name = "http://ns.inria.fr/fibonacci";
 IDatatype dt = exec.funcall(name, DatatypeMap.newInstance(25));
 
@@ -632,32 +591,30 @@ prefix fun: <http://ns.inria.fr/>
 select ?name ?area
 where {
     ?city rdf:type ex:city ;
-            ex:name ?name ;
-            ex:area ?area .
+          ex:name ?name ;
+          ex:area ?area .
     filter(?area > fun:toSquareKm(40))
 }
 
-# Convert square mile to square Kilometer
+# Convert square mile to square kilometer
 function fun:toSquareKm(squareMile) {
     return (squareMile * 2.59)
 }
 """;
-
 
 // Load graph
 Graph graph = Graph.create();
 Load ld = Load.create(graph);
 ld.parse("input file path");
 
-// Sparql query
+// SPARQL query
 QueryProcess exec = QueryProcess.create(graph);
 Mappings map = exec.query(check_query);
 ```
 
-### 7.3. Advanced example
+### 7.3. Advanced Example
 
-The java program below computes the percentage of people subscribed to social networks of city compared to its number of inhabitants.
-Data is collected from Wikidata.
+The following Java program computes the percentage of people subscribed to social networks in a city compared to its total number of inhabitants. The data is collected from Wikidata.
 
 ```java
 // Open LDScript file
@@ -676,7 +633,7 @@ IDatatype dt = exec.funcall(name);
 System.out.println(dt);
 ```
 
-**Input LDScript file path:**
+**Input LDScript File:**
 
 ```rq
 prefix fun: <http://ns.inria.fr/>
@@ -687,7 +644,6 @@ prefix wikibase: <http://wikiba.se/ontology#>
 prefix bd: <http://www.bigdata.com/rdf#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-
 @public
 function fun:percentage(sub, total) {
     return (sub / total * 100)
@@ -695,7 +651,6 @@ function fun:percentage(sub, total) {
 
 @public
 function fun:citypopulationsocialmedia() {
-
     query(
         select ?city ?citylabel ?population ?socialmediafolower where {
             service <https://query.wikidata.org/sparql> {
@@ -724,7 +679,7 @@ function fun:main() {
             },
             fun:citypopulationsocialmedia()
         ),
-        function(x,y)  {
+        function(x,y) {
             let ((x_name, x_value) = x, (y_name, y_value) = y) {
                 if (x_value < y_value, 1, if(x=y, o, -1))
             }

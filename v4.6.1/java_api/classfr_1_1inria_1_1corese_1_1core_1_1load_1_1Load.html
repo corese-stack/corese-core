@@ -689,6 +689,19 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core4load4Load7importsE6String">
+<span id="_CPPv3N2fr5inria6corese4core4load4Load7importsE6String"></span><span id="_CPPv2N2fr5inria6corese4core4load4Load7importsE6String"></span><span id="fr::inria::corese::core::load::Load::imports__String"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load_1afe7549cf9c821c596fa8b710b7169d74"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">imports</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">String</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">uri</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core4load4Load7importsE6String" title="Link to this definition">#</a><br /></dt>
+<dd><p>Imports an RDF resource from the given URI if it has not been loaded yet. </p>
+<p>This method ensures that the URI is not imported multiple times by checking the <code class="docutils literal notranslate"><span class="pre">importedURIs</span></code> map. If the URI is new, it is added to the map and processed using <code class="docutils literal notranslate"><span class="pre">basicImport(uri)</span></code>.</p>
+<p>The current <code class="docutils literal notranslate"><span class="pre">BuildImpl</span></code> instance is temporarily saved and restored after the import to maintain consistency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uri</strong> – The URI of the RDF resource to import. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core4load4Load17isRenameBlankNodeEv">
 <span id="_CPPv3N2fr5inria6corese4core4load4Load17isRenameBlankNodeEv"></span><span id="_CPPv2N2fr5inria6corese4core4load4Load17isRenameBlankNodeEv"></span><span id="fr::inria::corese::core::load::Load::isRenameBlankNode"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load_1a5126eccfd7eb8c9ad40cc26779b9e73f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">boolean</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRenameBlankNode</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core4load4Load17isRenameBlankNodeEv" title="Link to this definition">#</a><br /></dt>
 <dd></dd></dl>
@@ -948,6 +961,11 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load_1abd18c950d44adb54895e27d7e059a467"></span><span class="sig-name descname"><span class="pre">static</span> <span class="pre">final</span> <span class="pre">String</span> <span class="pre">IMPORTS</span>&#160;&#160; <span class="pre">=</span> <span class="pre">NSManager.OWL</span> <span class="pre">+</span> <span class="pre">&quot;imports&quot;</span></span></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N2fr5inria6corese4core4load4Load11LOAD_FORMATE">
 <span id="_CPPv3N2fr5inria6corese4core4load4Load11LOAD_FORMATE"></span><span id="_CPPv2N2fr5inria6corese4core4load4Load11LOAD_FORMATE"></span><span id="fr::inria::corese::core::load::Load::LOAD_FORMAT__String"></span><span class="target" id="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Load_1a8209c2701fe20b70b36d40a49e91f483"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">String</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LOAD_FORMAT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">ALL_FORMAT_STR</span></span><a class="headerlink" href="#_CPPv4N2fr5inria6corese4core4load4Load11LOAD_FORMATE" title="Link to this definition">#</a><br /></dt>
 <dd></dd></dl>
@@ -1046,6 +1064,7 @@ document.write(`
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core4load4Load9setSourceE6String"><code class="docutils literal notranslate"><span class="pre">Load::setSource()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core4load4Load8loadRuleE6Reader6String"><code class="docutils literal notranslate"><span class="pre">Load::loadRule()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core4load4Load13loadRuleBasicE6Reader6String"><code class="docutils literal notranslate"><span class="pre">Load::loadRuleBasic()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core4load4Load7importsE6String"><code class="docutils literal notranslate"><span class="pre">Load::imports()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core4load4Load17isRenameBlankNodeEv"><code class="docutils literal notranslate"><span class="pre">Load::isRenameBlankNode()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core4load4Load18setRenameBlankNodeE7boolean"><code class="docutils literal notranslate"><span class="pre">Load::setRenameBlankNode()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N2fr5inria6corese4core4load4Load4loadE11InputStream6String"><code class="docutils literal notranslate"><span class="pre">Load::load()</span></code></a></li>
