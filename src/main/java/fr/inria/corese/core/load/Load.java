@@ -1,6 +1,30 @@
 package fr.inria.corese.core.load;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.locks.Lock;
+
+import org.semarglproject.rdf.core.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
 import com.github.jsonldjava.core.JsonLdError;
+
 import fr.com.hp.hpl.jena.rdf.arp.ARP;
 import fr.com.hp.hpl.jena.rdf.arp.RDFListener;
 import fr.inria.corese.core.Graph;
@@ -22,25 +46,16 @@ import fr.inria.corese.core.sparql.exceptions.QueryLexicalException;
 import fr.inria.corese.core.sparql.exceptions.QuerySyntaxException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import fr.inria.corese.core.sparql.triple.function.term.TermEval;
-import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.LoadTurtle;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.util.HTTPHeaders;
 import fr.inria.corese.core.workflow.SemanticWorkflow;
 import fr.inria.corese.core.workflow.WorkflowParser;
-import org.semarglproject.rdf.core.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.locks.Lock;
 
 /**
  * Translate an RDF/XML document into a Graph use ARP
@@ -53,7 +68,7 @@ public class Load
     public static final Logger logger = LoggerFactory.getLogger(Load.class);
     // URL file protocol
     static final String FILE = "file";
-    static final String IMPORTS = NSManager.OWL + "imports";
+    public static final String IMPORTS = NSManager.OWL + "imports";
     public static String LOAD_FORMAT = ALL_FORMAT_STR;
     private static Loader.format DEFAULT_FORMAT = Loader.format.RDFXML_FORMAT;
     // true: load files into kg:default graph when no named graph is given
@@ -67,9 +82,9 @@ public class Load
     // load transformation
     QueryEngine qengine;
     // prevent loop in owl:import
-    HashMap<String, String> loaded;
+    HashMap<String, String> importedURIs;
     // RDF/XML triple builder
-    BuildImpl build;
+    RdfxmlTripleCreator build;
     // list of namespace of predicate to exclude from load
     ArrayList<String> exclude;
     // RDF graph
@@ -150,7 +165,7 @@ public class Load
     void set(Graph g) {
         setGraph(g);
         log = g.getLog();
-        loaded = new HashMap<>();
+        importedURIs = new HashMap<>();
     }
 
     public void exclude(String ns) {
@@ -418,7 +433,8 @@ public class Load
     }
 
     // TODO: clean arg order
-    public void parse(InputStream stream, String path, String name, String base, Loader.format format) throws LoadException {
+    public void parse(InputStream stream, String path, String name, String base, Loader.format format)
+            throws LoadException {
 
         try {
             Reader read = reader(stream);
@@ -575,7 +591,8 @@ public class Load
         loadString(str, name, name, name, format);
     }
 
-    public void loadString(String str, String path, String name, String base, Loader.format format) throws LoadException {
+    public void loadString(String str, String path, String name, String base, Loader.format format)
+            throws LoadException {
         parse(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), path, name, base, format);
     }
 
@@ -683,7 +700,8 @@ public class Load
 
             case UNDEF_FORMAT:
             default:
-                parse(stream, path, base, name, (DEFAULT_FORMAT == Loader.format.UNDEF_FORMAT) ? Loader.format.RDFXML_FORMAT : DEFAULT_FORMAT);
+                parse(stream, path, base, name,
+                        (DEFAULT_FORMAT == Loader.format.UNDEF_FORMAT) ? Loader.format.RDFXML_FORMAT : DEFAULT_FORMAT);
         }
     }
 
@@ -724,7 +742,7 @@ public class Load
         String save = getNamedGraphURI();
         setNamedGraphURI(name);
 
-        BuildImpl buildRDFXML = BuildImpl.create(getGraph(), this);
+        RdfxmlTripleCreator buildRDFXML = RdfxmlTripleCreator.create(getGraph(), this);
         buildRDFXML.setSource(name);
         if (name == null) {
             buildRDFXML.setSource(namedGraphURI);
@@ -783,7 +801,7 @@ public class Load
     }
 
     void loadTurtle(Reader stream, String path, String base, String name, boolean nquad) throws LoadException {
-        CreateImpl cr = CreateImpl.create(getGraph(), this);
+        TurtleSparqlTripleCreator cr = TurtleSparqlTripleCreator.create(getGraph(), this);
         cr.graph(Constant.create(name));
         cr.setRenameBlankNode(renameBlankNode);
         cr.setLimit(getLimit());
@@ -812,7 +830,7 @@ public class Load
 
     // load RDFa
     void loadRDFa(Reader stream, String path, String base, String name) throws LoadException {
-        CoreseRDFaTripleSink sink = new CoreseRDFaTripleSink(getGraph(), null);
+        CoreseRDFaTripleSink sink = new CoreseRDFaTripleSink(getGraph(), getDataManager(), null, this);
         sink.setHelper(renameBlankNode, getLimit());
 
         RDFaLoader loader = RDFaLoader.create(stream, base);
@@ -828,7 +846,7 @@ public class Load
     // load JSON-LD
     void loadJsonld(Reader stream, String path, String base, String name) throws LoadException {
 
-        CoreseJsonTripleCallback callback = new CoreseJsonTripleCallback(getGraph(), getDataManager(), name);
+        CoreseJsonTripleCallback callback = new CoreseJsonTripleCallback(getGraph(), getDataManager(), name, this);
         callback.setHelper(renameBlankNode, getLimit());
         JsonldLoader loader = JsonldLoader.create(stream, base);
         try {
@@ -925,30 +943,33 @@ public class Load
         load.parse(read);
     }
 
-    // rdf/xml
-    void imports(String uri) {
-        if (!loaded.containsKey(uri)) {
-            loaded.put(uri, uri);
-
-            BuildImpl save = build;
-            try {
-                basicImport(uri);
-            } catch (LoadException ex) {
-                logger.error(ex.getMessage());
-            }
-            build = save;
+    /**
+     * Imports an RDF resource from the given URI if it has not been loaded yet.
+     * 
+     * This method ensures that the URI is not imported multiple times by checking
+     * the `importedURIs` map. If the URI is new, it is added to the map and
+     * processed using `basicImport(uri)`.
+     * 
+     * The current `BuildImpl` instance is temporarily saved and restored after
+     * the import to maintain consistency.
+     * 
+     * @param uri The URI of the RDF resource to import.
+     */
+    public void imports(String uri) {
+        if (importedURIs.containsKey(uri)) {
+            return;
         }
-    }
 
-    // turtle
-    void parseImport(String uri) throws LoadException {
-        if (!loaded.containsKey(uri)) {
-            loaded.put(uri, uri);
-            // in case of rdf/xml->turtle->rdf/xml
-            BuildImpl save = build;
+        importedURIs.put(uri, uri);
+        RdfxmlTripleCreator previousBuild = build;
+
+        try {
             basicImport(uri);
-            build = save;
+        } catch (LoadException ex) {
+            logger.error(ex.getMessage());
         }
+
+        build = previousBuild;
     }
 
     // RDF owl:imports <fun.rq>
@@ -962,7 +983,7 @@ public class Load
                     throw LoadException.create(ex, uri);
                 }
             }
-            break;
+                break;
 
             default:
                 parse(uri);
@@ -1123,7 +1144,8 @@ public class Load
     }
 
     @Deprecated
-    public void load(InputStream stream, String path, String source, String base, Loader.format format) throws LoadException {
+    public void load(InputStream stream, String path, String source, String base, Loader.format format)
+            throws LoadException {
         parse(stream, path, source, base, format);
     }
 

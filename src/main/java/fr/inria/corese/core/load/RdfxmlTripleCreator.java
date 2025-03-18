@@ -2,23 +2,28 @@ package fr.inria.corese.core.load;
 
 import java.util.Hashtable;
 
-import fr.com.hp.hpl.jena.rdf.arp.ALiteral;
-import fr.com.hp.hpl.jena.rdf.arp.AResource;
-import fr.com.hp.hpl.jena.rdf.arp.StatementHandler;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.Graph;
-import static fr.inria.corese.core.load.Load.IMPORTS;
-import fr.inria.corese.core.kgram.api.core.Edge;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import fr.com.hp.hpl.jena.rdf.arp.ALiteral;
+import fr.com.hp.hpl.jena.rdf.arp.AResource;
+import fr.com.hp.hpl.jena.rdf.arp.StatementHandler;
+import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.util.Property;
+import fr.inria.corese.core.util.Property.Value;
+
 /**
- * Graph creation Methods are public, Design to be refined
- *
- * @author Olivier Corby, Edelweiss INRIA 2011
- *
+ * Implementation of RDF graph construction from RDF/XML sources.
+ * This class extends TripleCreatorBase and handles the parsing of RDF/XML
+ * using the RDF ARP parser. It transforms RDF statements into graph nodes
+ * and edges and processes them accordingly.
+ * 
+ * Additionally, it manages blank nodes, named graph URIs, and supports
+ * automatic OWL ontology imports when enabled.
  */
-public class BuildImpl extends CreateTriple 
+public class RdfxmlTripleCreator extends TripleCreatorBase
         implements Build, StatementHandler, org.xml.sax.ErrorHandler {
 
     private Node graphNode;
@@ -28,17 +33,17 @@ public class BuildImpl extends CreateTriple
     private String namedGraphURI;
     private Node node;
 
-    public BuildImpl() {
+    public RdfxmlTripleCreator() {
     }
 
-    BuildImpl(Graph g, Load ld) {
+    RdfxmlTripleCreator(Graph g, Load ld) {
         super(g, ld);
         graph = g;
         blank = new Hashtable<>();
     }
 
-    public static BuildImpl create(Graph g, Load ld) {
-        return new BuildImpl(g, ld);
+    public static RdfxmlTripleCreator create(Graph g, Load ld) {
+        return new RdfxmlTripleCreator(g, ld);
     }
 
     @Override
@@ -55,16 +60,36 @@ public class BuildImpl extends CreateTriple
         }
     }
 
+    /**
+     * Processes a statement with the given subject, predicate, and object
+     * resources.
+     * If the predicate URI is accepted, it creates nodes for the subject,
+     * predicate,
+     * and object, constructs an edge, and processes it. Additionally, if the
+     * predicate
+     * URI equals the IMPORTS constant and the OWL_AUTO_IMPORT property is enabled,
+     * it imports the object URI.
+     *
+     * @param subj the subject resource of the statement
+     * @param pred the predicate resource of the statement
+     * @param obj  the object resource of the statement
+     */
     @Override
     public void statement(AResource subj, AResource pred, AResource obj) {
         if (accept(pred.getURI())) {
+            // Create nodes for subject, predicate, and object
             Node subject = getSubject(subj);
             Node predicate = getProperty(pred);
             Node value = getNode(obj);
+
+            // Construct an edge and process it
             Edge edge = getEdge(getGraphNode(), subject, predicate, value);
             process(getGraphNode(), edge);
-            
-            if (pred.getURI().equals(IMPORTS)) {
+
+            // If the predicate URI equals IMPORTS and OWL_AUTO_IMPORT is enabled, import
+            // the object URI
+            if (pred.getURI().equals(Load.IMPORTS)
+                    && Property.getBooleanValue(Value.OWL_AUTO_IMPORT)) {
                 getLoad().imports(obj.getURI());
             }
         }
@@ -74,19 +99,18 @@ public class BuildImpl extends CreateTriple
     public void setSource(String src) {
         basicSetSource(src);
     }
-    
+
     public String getSource() {
         return getNamedGraphURI();
     }
-    
-        
+
     void basicSetSource(String src) {
         if (getNamedGraphURI() == null || !src.equals(getNamedGraphURI())) {
             setNamedGraphURI(src);
             setGraphNode(addGraph(src));
         }
     }
-    
+
     @Override
     public void start() {
         super.start();
@@ -150,8 +174,6 @@ public class BuildImpl extends CreateTriple
         return id;
     }
 
- 
-
     public int nbBlank() {
         return blank.size();
     }
@@ -179,9 +201,7 @@ public class BuildImpl extends CreateTriple
     public void setLoad(Load load) {
         this.load = load;
     }
-    
-    
-       
+
     @Override
     public void error(SAXParseException exception) throws SAXException {
     }
@@ -193,6 +213,5 @@ public class BuildImpl extends CreateTriple
     @Override
     public void warning(SAXParseException exception) throws SAXException {
     }
-    
 
 }

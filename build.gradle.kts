@@ -21,7 +21,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-core"
-    const val version = "4.6.2"
+    const val version = "4.6.3"
 
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
@@ -69,6 +69,7 @@ dependencies {
     implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                          // ShEx implementation for RDF validation
     implementation("org.glassfish.jersey.core:jersey-client:${jersey_version}")          // REST client for creating HTTP requests
     implementation("org.glassfish.jersey.inject:jersey-hk2:${jersey_version}")           // Dependency injection for Jersey
+    implementation("com.sun.activation:jakarta.activation:2.0.1")                        // JavaBeans Activation Framework for MIME data handling
     implementation("javax.xml.bind:jaxb-api:2.3.1")                                      // JAXB API for converting between Java objects and XML
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:${semargl_version}") // RDFa parser to extract RDF metadata from HTML
     implementation("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}") // Semargl core for RDF parsing and transformation

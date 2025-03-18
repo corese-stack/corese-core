@@ -1,0 +1,36 @@
+{
+    "@context": {
+        "@base": "http://example.org/ontology",
+        "@vocab": "http://example.org/ontology#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "foaf": "http://xmlns.com/foaf/0.1/"
+    },
+    "@graph": [
+        {
+            "@id": "http://example.org/ontology",
+            "@type": "owl:Ontology",
+            "owl:imports": {
+                "@id": "http://xmlns.com/foaf/0.1/"
+            }
+        },
+        {
+            "@id": "http://example.org/ontology#Person",
+            "@type": "owl:Class",
+            "rdfs:label": "Person",
+            "rdfs:subClassOf": {
+                "@id": "http://xmlns.com/foaf/0.1/Person"
+            }
+        },
+        {
+            "@id": "http://example.org/ontology#Student",
+            "@type": "owl:Class",
+            "rdfs:label": "Student",
+            "rdfs:subClassOf": {
+                "@id": "http://example.org/ontology#Person"
+            }
+        }
+    ]
+}

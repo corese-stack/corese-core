@@ -6,11 +6,12 @@ import com.github.jsonldjava.core.JsonLdTripleCallback;
 import com.github.jsonldjava.core.RDFDataset;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.load.AddTripleHelper;
 import fr.inria.corese.core.load.AddTripleHelperDataManager;
 import fr.inria.corese.core.load.ILoadSerialization;
+import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Implementation of interface from Jsonld-java (json-ld parser) for adding
@@ -29,14 +30,14 @@ public class CoreseJsonTripleCallback implements JsonLdTripleCallback {
     private final static String JSONLD_DEFAULT_GRAPH = "@default";
     private final static String JSONLD_BNODE_PREFIX = ":_";
 
-    public CoreseJsonTripleCallback(Graph graph, DataManager man, String source) {
+    public CoreseJsonTripleCallback(Graph graph, DataManager man, String source, Load load) {
         this.graph = graph;
         this.source = source;
         setDataManager(man);
         if (man == null) {
-            helper = AddTripleHelper.create(graph);
+            helper = AddTripleHelper.create(graph, load);
         } else {
-            helper = new AddTripleHelperDataManager(graph, man);
+            helper = new AddTripleHelperDataManager(graph, man, load);
         }
     }
 
