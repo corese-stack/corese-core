@@ -12,6 +12,7 @@ To install the dependencies to build the documentation:
 pip install -r docs/requirements.txt
 
 ```
+
 ## Documentation generation
 
 Following that, the corese-core documentation can be generated through a single call to sphinx-multiversion from the root directory of corese-core:
@@ -22,14 +23,14 @@ sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${s
 
 ## Switcher generation
 
-- To navigate between versions by means of the switcher (the dropdown list indicating the available version), the switcher.json object must be generated. 
-- To improve navigability, a landing page must also be generated to redirect to the latest version of the documentation. 
+- To navigate between versions by means of the switcher (the dropdown list indicating the available version), the switcher.json object must be generated.
+- To improve navigability, a landing page must also be generated to redirect to the latest version of the documentation.
 
 To this end a script must be executed and write the output to the output html directory:
 
 ```shell
-./docs/switcher_generator.sh build/html/switcher.json build/html/index.html
-./docs/switcher_generator.sh docs/source/_static/switcher.json build/html/index.html
+./docs/switcher_generator.sh build/html/switcher.json build/html/index.html          # Production
+./docs/switcher_generator.sh docs/source/_static/switcher.json build/html/index.html # Local testing
 ```
 
 Both sphinx-multiversion and switcher_generator work on tags following the ```^v[0-9]+\.[0-9]+\.[0-9]+$``` syntax and ordered by refname.
