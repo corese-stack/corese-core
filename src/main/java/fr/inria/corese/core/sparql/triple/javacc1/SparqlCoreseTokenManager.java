@@ -18,10 +18,11 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 @SuppressWarnings ("unused")
 public class SparqlCoreseTokenManager implements SparqlCoreseConstants {
         void CommonTokenAction(Token token) {
+                //System.out.println(token+" ");
         }
 
   /** Debug output. */
-  public  java.io.PrintStream debugStream = System.err;
+  public  java.io.PrintStream debugStream = System.out;
   /** Set debug output. */
   public  void setDebugStream(java.io.PrintStream ds) { debugStream = ds; }
 private int jjStopAtPos(int pos, int kind)
@@ -4426,7 +4427,9 @@ private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, lo
       case 0:
          return ((jjbitVec2[i2] & l2) != 0L);
       default :
-          return (jjbitVec0[i1] & l1) != 0L;
+         if ((jjbitVec0[i1] & l1) != 0L)
+            return true;
+         return false;
    }
 }
 private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2)
@@ -4450,7 +4453,9 @@ private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, lo
       case 255:
          return ((jjbitVec10[i2] & l2) != 0L);
       default :
-          return (jjbitVec3[i1] & l1) != 0L;
+         if ((jjbitVec3[i1] & l1) != 0L)
+            return true;
+         return false;
    }
 }
 private static final boolean jjCanMove_2(int hiByte, int i1, int i2, long l1, long l2)
@@ -4474,7 +4479,9 @@ private static final boolean jjCanMove_2(int hiByte, int i1, int i2, long l1, lo
       case 255:
          return ((jjbitVec10[i2] & l2) != 0L);
       default :
-          return (jjbitVec3[i1] & l1) != 0L;
+         if ((jjbitVec3[i1] & l1) != 0L)
+            return true;
+         return false;
    }
 }
 
@@ -4709,7 +4716,7 @@ static final long[] jjtoMore = {
     private final int[] jjrounds = new int[180];
     private final int[] jjstateSet = new int[2 * 180];
     private final StringBuilder jjimage = new StringBuilder();
-    private final StringBuilder image = jjimage;
+    private StringBuilder image = jjimage;
     private int jjimageLen;
     private int lengthOfMatch;
     protected int curChar;
