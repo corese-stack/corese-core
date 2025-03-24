@@ -1,11 +1,10 @@
 package fr.inria.corese.core.next.api.model;
 
-import fr.inria.corese.core.next.api.model.base.CoreDatatype;
+import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.DateTimeException;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.Optional;

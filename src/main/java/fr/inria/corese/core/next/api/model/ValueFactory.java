@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.api.model;
 
-import fr.inria.corese.core.next.api.model.base.CoreDatatype;
+import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;

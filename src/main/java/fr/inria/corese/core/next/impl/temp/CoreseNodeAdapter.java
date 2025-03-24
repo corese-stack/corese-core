@@ -1,0 +1,18 @@
+package fr.inria.corese.core.next.impl.temp;
+
+import fr.inria.corese.core.kgram.api.core.Node;
+
+/**
+ * Wrapper for objects that are represented as Node in Corese code, e.g. IRI, Literal, etc.
+ * Intended to be used to be able to pass Corese objects to the API and vice-versa
+ *
+ */
+public interface CoreseNodeAdapter {
+
+     /**
+      *
+      * @return should return a Corese node that a guaranteed kind, i.e. Literal IRI, etc
+      */
+     Node getCoreseNode();
+
+}
