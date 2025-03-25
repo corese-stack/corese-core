@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.temp;
 
 import fr.inria.corese.core.next.api.model.*;
+import fr.inria.corese.core.next.api.model.base.literal.AbstractLiteral;
 import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype.XSD;
 import fr.inria.corese.core.next.impl.temp.literal.*;
@@ -66,28 +67,32 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
         }
 
         // Numeric types
-        else if(XSD.INTEGER.getIRI().equals(datatype)) {
-            return new CoreseInteger(Long.parseLong(label));
+        else if(AbstractLiteral.isIriOfIntegerCoreDatatype(datatype)) {
+            return new CoreseInteger(new BigInteger(label));
+        } else if(AbstractLiteral.isIriOfDecimalCoreDatatype(datatype)) {
+            return new CoreseDecimal(new BigDecimal(label));
         }
         return null;
     }
 
     @Override
-    public Literal createLiteral(String label, CoreDatatype datatype) {
+    public Literal createLiteral(String label, CoreDatatype coreDatatype) {
         // Temporal types
-        if (XSD.DATE.equals(datatype)) {
+        if (XSD.DATE.equals(coreDatatype)) {
             return new CoreseDate(label);
-        } else if (XSD.DATETIME.equals(datatype)) {
+        } else if (XSD.DATETIME.equals(coreDatatype)) {
             return new CoreseDatetime(label);
-        } else if (XSD.TIME.equals(datatype)) {
+        } else if (XSD.TIME.equals(coreDatatype)) {
             return new CoreseTime(label);
-        } else if (XSD.DURATION.equals(datatype)) {
+        } else if (XSD.DURATION.equals(coreDatatype)) {
             return new CoreseDuration(label);
         }
 
         // Numeric types
-        else if(XSD.INTEGER.equals(datatype)) {
-            return new CoreseInteger(Long.parseLong(label));
+        else if(AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
+            return new CoreseInteger(label, coreDatatype.getIRI(), coreDatatype);
+        } else if(AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
+            return new CoreseDecimal(label, coreDatatype.getIRI(), coreDatatype);
         }
         return null;
     }
@@ -106,8 +111,10 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
         }
 
         // Numeric types
-        else if(XSD.INTEGER.equals(coreDatatype)) {
+        else if(AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
             return new CoreseInteger(label, datatype, coreDatatype);
+        } else if(AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
+            return new CoreseDecimal(label, datatype, coreDatatype);
         }
         return null;
     }
@@ -119,42 +126,42 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(byte value) {
-        return null;
+        return new CoreseInteger(value);
     }
 
     @Override
     public Literal createLiteral(short value) {
-        return null;
+        return new CoreseInteger(value);
     }
 
     @Override
     public Literal createLiteral(int value) {
-        return null;
+        return new CoreseInteger(value);
     }
 
     @Override
     public Literal createLiteral(long value) {
-        return null;
+        return new CoreseInteger(value);
     }
 
     @Override
     public Literal createLiteral(float value) {
-        return null;
+        return new CoreseDecimal(value);
     }
 
     @Override
     public Literal createLiteral(double value) {
-        return null;
+        return new CoreseDecimal(value);
     }
 
     @Override
     public Literal createLiteral(BigDecimal bigDecimal) {
-        return null;
+        return new CoreseDecimal(bigDecimal);
     }
 
     @Override
     public Literal createLiteral(BigInteger bigInteger) {
-        return null;
+        return new CoreseInteger(bigInteger);
     }
 
     @Override

@@ -380,13 +380,16 @@ public abstract class ValueFactoryTest {
 
     @Test
     public void testCreateLiteralByte() {
+        byte b = 64;
+        Literal literal = this.valueFactory.createLiteral(b);
+        assertEquals(b, literal.byteValue());
     }
 
     @Test
     public void testCreateLiteralShort() {
-        byte b = 64;
-        Literal literal = this.valueFactory.createLiteral(b);
-        assertEquals(b, literal.byteValue());
+        short s = 7851;
+        Literal literal = this.valueFactory.createLiteral(s);
+        assertEquals(s, literal.shortValue());
     }
 
     @Test

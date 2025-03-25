@@ -6,8 +6,11 @@ import fr.inria.corese.core.next.api.model.base.literal.AbstractLiteral;
 import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseDouble;
 
+import java.math.BigDecimal;
+
 /**
- * Super class for all numeric literal containing floating points
+ * Super class for all numeric literal containing floating points in the XD datatype hierarchy
+ * @ImplNotes Against the XSD hierarchy, the legacy Corese super class for floating point numbers is CoreseDouble, the legacy CoreseDecimal inherits from CoreseDouble. This class is a wrapper for CoreseDouble, and is used to represent the XSD decimal datatype.
  */
 public class CoreseDecimal extends AbstractCoreseNumber {
 
@@ -33,15 +36,24 @@ public class CoreseDecimal extends AbstractCoreseNumber {
 
     public CoreseDecimal(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
-        if(AbstractLiteral.decimalXSDCoreDatatypes.contains(coreDatatype)) {
-            this.setCoreDatatype(coreDatatype);
-        } else {
+        if(! AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
             throw new IncorrectDatatypeException("Cannot create CoreseDecimal with a non-integer CoreDatatype.");
         }
+    }
+
+    public CoreseDecimal(BigDecimal bigDecimal) {
+        super(new CoreseDouble(bigDecimal.doubleValue()), CoreDatatype.XSD.DECIMAL.getIRI());
     }
 
     @Override
     public CoreDatatype getCoreDatatype() {
         return CoreDatatype.XSD.DECIMAL;
+    }
+
+    @Override
+    protected void setCoreDatatype(CoreDatatype coreDatatype) {
+        if(! AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
+            throw new IncorrectDatatypeException("Cannot set a non-decimal CoreDatatype for a CoreseDecimal.");
+        }
     }
 }

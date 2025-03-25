@@ -41,14 +41,6 @@ public abstract class AbstractCoreseNumberTest {
     }
 
     @Test
-    public void setCoreDatatype() {
-        AbstractCoreseNumber coreseNumber = createNumber("15");
-        assertThrows(IncorrectOperationException.class, () -> {
-            coreseNumber.setCoreDatatype(CoreDatatype.XSD.INTEGER);
-        });
-    }
-
-    @Test
     public void byteValue() {
         AbstractCoreseNumber coreseNumber = createNumber("16");
         assertEquals(16, coreseNumber.byteValue());

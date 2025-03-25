@@ -11,6 +11,9 @@ import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/**
+ * Super class for all the numeric based literal in the XSD datatype hierarchy.
+ */
 public abstract class AbstractCoreseNumber extends AbstractLiteral implements CoreseDatatypeAdapter {
 
     private final CoreseNumber coreseObject;
@@ -79,11 +82,6 @@ public abstract class AbstractCoreseNumber extends AbstractLiteral implements Co
     @Override
     public String stringValue() {
         return this.coreseObject.getLabel();
-    }
-
-    @Override
-    public void setCoreDatatype(CoreDatatype coreDatatype) {
-        throw new IncorrectOperationException("Cannot set core datatype for this numeric object.");
     }
 
 }

@@ -20,52 +20,49 @@ public abstract class AbstractLiteral implements Literal, Serializable {
 
     protected IRI datatype;
 
-    protected static List<CoreDatatype> numericXSDCoreDatatypes = List.of(
-            CoreDatatype.XSD.INTEGER,
-            CoreDatatype.XSD.DECIMAL,
-            CoreDatatype.XSD.BYTE,
-            CoreDatatype.XSD.SHORT,
-            CoreDatatype.XSD.INT,
-            CoreDatatype.XSD.LONG,
-            CoreDatatype.XSD.UNSIGNED_BYTE,
-            CoreDatatype.XSD.UNSIGNED_SHORT,
-            CoreDatatype.XSD.UNSIGNED_INT,
-            CoreDatatype.XSD.UNSIGNED_LONG,
-            CoreDatatype.XSD.POSITIVE_INTEGER,
-            CoreDatatype.XSD.NEGATIVE_INTEGER,
-            CoreDatatype.XSD.NON_NEGATIVE_INTEGER,
-            CoreDatatype.XSD.NON_POSITIVE_INTEGER,
-            CoreDatatype.XSD.FLOAT,
-            CoreDatatype.XSD.DOUBLE
+    protected static List<IRI> integerXSDCoreDatatypeIRIs = List.of(
+            CoreDatatype.XSD.INTEGER.getIRI(),
+            CoreDatatype.XSD.BYTE.getIRI(),
+            CoreDatatype.XSD.SHORT.getIRI(),
+            CoreDatatype.XSD.INT.getIRI(),
+            CoreDatatype.XSD.LONG.getIRI(),
+            CoreDatatype.XSD.UNSIGNED_BYTE.getIRI(),
+            CoreDatatype.XSD.UNSIGNED_SHORT.getIRI(),
+            CoreDatatype.XSD.UNSIGNED_INT.getIRI(),
+            CoreDatatype.XSD.UNSIGNED_LONG.getIRI(),
+            CoreDatatype.XSD.POSITIVE_INTEGER.getIRI(),
+            CoreDatatype.XSD.NEGATIVE_INTEGER.getIRI(),
+            CoreDatatype.XSD.NON_NEGATIVE_INTEGER.getIRI(),
+            CoreDatatype.XSD.NON_POSITIVE_INTEGER.getIRI()
     );
 
-    protected static List<CoreDatatype> integerXSDCoreDatatypes = List.of(
-            CoreDatatype.XSD.INTEGER,
-            CoreDatatype.XSD.BYTE,
-            CoreDatatype.XSD.SHORT,
-            CoreDatatype.XSD.INT,
-            CoreDatatype.XSD.LONG,
-            CoreDatatype.XSD.UNSIGNED_BYTE,
-            CoreDatatype.XSD.UNSIGNED_SHORT,
-            CoreDatatype.XSD.UNSIGNED_INT,
-            CoreDatatype.XSD.UNSIGNED_LONG,
-            CoreDatatype.XSD.POSITIVE_INTEGER,
-            CoreDatatype.XSD.NEGATIVE_INTEGER,
-            CoreDatatype.XSD.NON_NEGATIVE_INTEGER,
-            CoreDatatype.XSD.NON_POSITIVE_INTEGER
-    );
-
-    protected static List<CoreDatatype> decimalXSDCoreDatatypes = List.of(
-            CoreDatatype.XSD.DECIMAL,
-            CoreDatatype.XSD.FLOAT,
-            CoreDatatype.XSD.DOUBLE
+    protected static List<IRI> decimalXSDCoreDatatypeIRIs = List.of(
+            CoreDatatype.XSD.DECIMAL.getIRI(),
+            CoreDatatype.XSD.FLOAT.getIRI(),
+            CoreDatatype.XSD.DOUBLE.getIRI()
     );
 
     protected AbstractLiteral(IRI datatype) {
         this.datatype = datatype;
     }
 
-    public abstract void setCoreDatatype(CoreDatatype coreDatatype);
+    public static boolean isIntegerCoreDatatype(CoreDatatype coreDatatype) {
+        return integerXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
+    }
+
+    public static boolean isIriOfIntegerCoreDatatype(IRI iri) {
+        return integerXSDCoreDatatypeIRIs.contains(iri);
+    }
+
+    public static boolean isDecimalCoreDatatype(CoreDatatype coreDatatype) {
+        return decimalXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
+    }
+
+    public static boolean isIriOfDecimalCoreDatatype(IRI iri) {
+        return decimalXSDCoreDatatypeIRIs.contains(iri);
+    }
+
+    protected abstract void setCoreDatatype(CoreDatatype coreDatatype);
 
     @Override
     public boolean isLiteral() {
