@@ -16,7 +16,7 @@ import java.math.BigInteger;
  */
 public abstract class AbstractCoreseNumber extends AbstractLiteral implements CoreseDatatypeAdapter {
 
-    private final CoreseNumber coreseObject;
+    protected final CoreseNumber coreseObject;
 
     protected AbstractCoreseNumber(CoreseNumber coreseObject, IRI datatype) {
         super(datatype);
@@ -82,6 +82,19 @@ public abstract class AbstractCoreseNumber extends AbstractLiteral implements Co
     @Override
     public String stringValue() {
         return this.coreseObject.getLabel();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AbstractCoreseNumber)) return false;
+        AbstractCoreseNumber that = (AbstractCoreseNumber) o;
+        return this.coreseObject.equals(that.coreseObject);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.coreseObject.hashCode();
     }
 
 }
