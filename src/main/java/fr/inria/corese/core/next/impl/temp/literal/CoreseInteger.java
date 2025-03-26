@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.api.model.IRI;
 import fr.inria.corese.core.next.api.model.base.literal.AbstractLiteral;
 import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -54,5 +55,40 @@ public class CoreseInteger extends AbstractCoreseNumber {
         if(! AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
             throw new IncorrectOperationException("Cannot set a non-integer CoreDatatype for a CoreseInteger.");
         }
+    }
+
+    @Override
+    public byte byteValue() {
+        return (byte) this.coreseObject.longValue();
+    }
+
+    @Override
+    public int intValue() {
+        return (int) this.coreseObject.longValue();
+    }
+
+    @Override
+    public long longValue() {
+        return this.coreseObject.longValue();
+    }
+
+    @Override
+    public short shortValue() {
+        return (short) this.coreseObject.longValue();
+    }
+
+    @Override
+    public double doubleValue() {
+        return this.coreseObject.longValue();
+    }
+
+    @Override
+    public BigInteger integerValue() {
+        return BigInteger.valueOf(this.coreseObject.longValue());
+    }
+
+    @Override
+    public BigDecimal decimalValue() {
+        return BigDecimal.valueOf(this.coreseObject.longValue());
     }
 }

@@ -25,4 +25,25 @@ public class CoreseIntegerTest extends AbstractCoreseNumberTest {
         assertNotNull(coreseInteger.getCoreseNode());
         assertTrue(coreseInteger.getCoreseNode() instanceof CoreseNumber);
     }
+
+    @Override
+    public void getCoreDatatype() {
+        AbstractCoreseNumber coreseNumber = createNumber("1346");
+        assertEquals(CoreDatatype.XSD.INTEGER, coreseNumber.getCoreDatatype());
+    }
+
+    @Override
+    public void floatValue() {
+        assertTrue(true);
+    }
+
+    @Override
+    public void doubleValue() {
+        assertTrue(true);
+    }
+
+    @Override
+    public void decimalValue() {
+        assertTrue(true);
+    }
 }

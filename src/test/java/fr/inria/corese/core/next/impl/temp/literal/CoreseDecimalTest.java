@@ -1,9 +1,12 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
+import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
+import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.math.BigDecimal;
+
+import static org.junit.Assert.*;
 
 public class CoreseDecimalTest  extends AbstractCoreseNumberTest {
     @Override
@@ -16,5 +19,33 @@ public class CoreseDecimalTest  extends AbstractCoreseNumberTest {
         CoreseDecimal coreseDecimal = new CoreseDecimal(1.0);
         assertNotNull(coreseDecimal.getCoreseNode());
         assertTrue(coreseDecimal.getCoreseNode() instanceof CoreseNumber);
+    }
+
+    @Override
+    @Test
+    public void getCoreDatatype() {
+        AbstractCoreseNumber coreseNumber = createNumber("13.46");
+        assertEquals(CoreDatatype.XSD.DECIMAL, coreseNumber.getCoreDatatype());
+    }
+
+    @Override
+    @Test
+    public void floatValue() {
+        AbstractCoreseNumber coreseNumber = createNumber("110.220");
+        assertEquals((float) 110.220, coreseNumber.floatValue(), 0.0);
+    }
+
+    @Override
+    @Test
+    public void doubleValue() {
+        AbstractCoreseNumber coreseNumber = createNumber("111.222");
+        assertEquals(111.222, coreseNumber.doubleValue(), 0.0);
+    }
+
+    @Override
+    @Test
+    public void decimalValue() {
+        AbstractCoreseNumber coreseNumber = createNumber("113.224");
+        assertEquals(BigDecimal.valueOf(113.224), coreseNumber.decimalValue());
     }
 }

@@ -40,24 +40,16 @@ public abstract class AbstractCoreseNumber extends AbstractLiteral implements Co
     }
 
     @Override
-    public byte byteValue() {
-        return (byte) this.coreseObject.longValue();
-    }
+    public abstract byte byteValue();
 
     @Override
-    public int intValue() {
-        return this.coreseObject.intValue();
-    }
+    public abstract int intValue();
 
     @Override
-    public long longValue() {
-        return this.coreseObject.longValue();
-    }
+    public abstract long longValue();
 
     @Override
-    public short shortValue() {
-        return (short) this.coreseObject.longValue();
-    }
+    public abstract short shortValue();
 
     @Override
     public float floatValue() {
@@ -65,19 +57,13 @@ public abstract class AbstractCoreseNumber extends AbstractLiteral implements Co
     }
 
     @Override
-    public double doubleValue() {
-        return this.coreseObject.doubleValue();
-    }
+    public abstract double doubleValue();
 
     @Override
-    public BigInteger integerValue() {
-        return BigInteger.valueOf(this.coreseObject.longValue());
-    }
+    public abstract BigInteger integerValue();
 
     @Override
-    public BigDecimal decimalValue() {
-        return BigDecimal.valueOf(this.coreseObject.doubleValue());
-    }
+    public abstract BigDecimal decimalValue();
 
     @Override
     public String stringValue() {

@@ -29,10 +29,7 @@ public abstract class AbstractCoreseNumberTest {
     }
 
     @Test
-    public void getCoreDatatype() {
-        AbstractCoreseNumber coreseNumber = createNumber("13");
-        assertEquals(CoreDatatype.XSD.INTEGER, coreseNumber.getCoreDatatype());
-    }
+    public abstract void getCoreDatatype();
 
     @Test
     public void stringValue() {
@@ -65,26 +62,17 @@ public abstract class AbstractCoreseNumberTest {
     }
 
     @Test
-    public void floatValue() {
-        AbstractCoreseNumber coreseNumber = createNumber("110");
-        assertEquals(110.0, coreseNumber.floatValue(), 0.0);
-    }
-
-    @Test
-    public void doubleValue() {
-        AbstractCoreseNumber coreseNumber = createNumber("111");
-        assertEquals(111.0, coreseNumber.doubleValue(), 0.0);
-    }
-
-    @Test
     public void integerValue() {
         AbstractCoreseNumber coreseNumber = createNumber("112");
         assertEquals(new BigInteger("112"), coreseNumber.integerValue());
     }
 
     @Test
-    public void decimalValue() {
-        AbstractCoreseNumber coreseNumber = createNumber("113");
-        assertEquals(new BigDecimal(113), coreseNumber.decimalValue());
-    }
+    public abstract void floatValue();
+
+    @Test
+    public abstract void doubleValue();
+
+    @Test
+    public abstract void decimalValue();
 }

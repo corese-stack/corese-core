@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseDouble;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * Super class for all numeric literal containing floating points in the XD datatype hierarchy
@@ -55,5 +56,40 @@ public class CoreseDecimal extends AbstractCoreseNumber {
         if(! AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
             throw new IncorrectDatatypeException("Cannot set a non-decimal CoreDatatype for a CoreseDecimal.");
         }
+    }
+
+    @Override
+    public byte byteValue() {
+        return (byte) this.doubleValue();
+    }
+
+    @Override
+    public int intValue() {
+        return (int) this.doubleValue();
+    }
+
+    @Override
+    public long longValue() {
+        return (long) this.doubleValue();
+    }
+
+    @Override
+    public short shortValue() {
+        return (short) this.doubleValue();
+    }
+
+    @Override
+    public double doubleValue() {
+        return this.coreseObject.doubleValue();
+    }
+
+    @Override
+    public BigInteger integerValue() {
+        return BigInteger.valueOf(this.longValue());
+    }
+
+    @Override
+    public BigDecimal decimalValue() {
+        return BigDecimal.valueOf(this.doubleValue());
     }
 }
