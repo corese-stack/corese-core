@@ -77,6 +77,10 @@ graph.addEdge(edithPiafIRI, lastNameProperty, piafLiteral);
 This example shows how to load a graph from a file.
 
 ```java
+import fr.inria.corese.core.Graph ;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.api.Loader;
+
 // Create a new empty Graph
 Graph graph = Graph.create();
 
