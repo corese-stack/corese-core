@@ -82,18 +82,18 @@ Graph graph = Graph.create();
 
 // Create loader and parse file
 Load loader = Load.create(graph);
-loader.parse("input_graph_file.ttl", Load.format.TURTLE_FORMAT);
+loader.parse("input_graph_file.ttl", Loader.format.TURTLE_FORMAT);
 ```
 
 Corese Loader supports the following formats:
 
-- RDF/XML (`Load.format.RDFXML_FORMAT`)
-- Turtle (`Load.format.TURTLE_FORMAT`)
-- TriG (`Load.format.TRIG_FORMAT`)
-- JSON-LD (`Load.format.JSONLD_FORMAT`)
-- N-Triples (`Load.format.NT_FORMAT`)
-- N-Quads (`Load.format.NQUADS_FORMAT`)
-- RDFa (`Load.format.RDFA_FORMAT`)
+- RDF/XML (`Loader.format.RDFXML_FORMAT`)
+- Turtle (`Loader.format.TURTLE_FORMAT`)
+- TriG (`Loader.format.TRIG_FORMAT`)
+- JSON-LD (`Loader.format.JSONLD_FORMAT`)
+- N-Triples (`Loader.format.NT_FORMAT`)
+- N-Quads (`Loader.format.NQUADS_FORMAT`)
+- RDFa (`Loader.format.RDFA_FORMAT`)
 
 ### **2.3. Export a Graph to a File**
 
