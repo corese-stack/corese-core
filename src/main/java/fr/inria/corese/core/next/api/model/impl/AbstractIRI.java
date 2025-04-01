@@ -65,4 +65,9 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI>, Serializable 
         AbstractIRI that = (AbstractIRI) o;
         return this.stringValue().equals(that.stringValue());
     }
+
+    @Override
+    public int hashCode() {
+        return stringValue().hashCode();
+    }
 }

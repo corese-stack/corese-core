@@ -10,7 +10,16 @@ import fr.inria.corese.core.sparql.api.IDatatype;
  */
 public interface CoreDatatype {
 
+    CoreDatatype NONE = DefaultDatatype.NONE;
+
     IRI getIRI();
+
+    static CoreDatatype from(IRI datatype) {
+        if (datatype == null) {
+            return CoreDatatype.NONE;
+        }
+        return CoreDatatypeHelper.getDatatypeMap().getOrDefault(datatype, CoreDatatype.NONE);
+    }
 
     enum XSD implements CoreDatatype {
         /**
