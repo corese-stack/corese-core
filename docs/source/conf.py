@@ -17,9 +17,8 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 #sys.path.insert(0, pathlib.Path(__file__).parents[2].joinpath('code').resolve().as_posix())
 
 
-project = 'CORESE'
-copyright = '2024, WIMMICS'
-author = 'WIMMICS'
+project = 'Corese'
+author = 'Wimmics'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
