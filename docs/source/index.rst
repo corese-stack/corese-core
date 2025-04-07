@@ -58,10 +58,10 @@ Corese-Core is a Java library that provides the core functionalities of Corese. 
       Corese offers several interfaces
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       * `corese-core <https://corese-stack.github.io/corese-core/>`_: Java library to process RDF data and use Corese features via an API.
-      * `corese-server  <https://corese-stack.github.io/corese-server/>`_: Tool to easily create, configure and manage SPARQL endpoints.
+      * `corese-server <https://corese-stack.github.io/corese-server/>`_: Tool to easily create, configure and manage SPARQL endpoints.
       * `corese-gui <https://corese-stack.github.io/corese-gui/>`_: Graphical interface that allows an easy and visual use of Corese features.
+      * `corese-command <https://corese-stack.github.io/corese-command/>`_: Command Line Interface for Corese that allows users to interact with Corese features from the terminal.
       * `corese-python (beta) <https://corese-stack.github.io/corese-python/>`_: Python wrapper for accessing and manipulating RDF data with Corese features using py4j.
-      * `corese-command (beta)  <https://corese-stack.github.io/corese-command/>`_: Command Line Interface for Corese that allows users to interact with Corese features from the terminal.
 
 .. raw:: html
 
