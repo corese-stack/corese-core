@@ -12,6 +12,7 @@ plugins {
     id("org.gradlex.extra-java-module-info") version "1.9"      // Module metadata for JARs without module info
     id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
     id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
+    id("com.intershop.gradle.javacc") version "5.0.0"           // JavaCC plugin for parsing JavaCC files
 }
 
 // SonarQube configuration
@@ -24,6 +25,30 @@ sonar {
         property("sonar.sourceEncoding", "UTF-8")
     }
 }
+
+// JavaCC configuration
+javacc {
+    configs {
+        register("sparqlCorese") {
+            inputFile = file("src/main/java/fr/inria/corese/core/sparql/triple/javacc1/sparql_corese.jj")
+            packageName = "fr.inria.corese.core.sparql.triple.javacc1"
+        }
+    }
+}
+
+// Ajoute les fichiers générés par JavaCC comme source Java
+sourceSets {
+    main {
+        java {
+            srcDir("$buildDir/generated-src/javacc")
+        }
+    }
+}
+
+tasks.named("compileJava") {
+    dependsOn("javaccSparqlCorese")
+}
+
 
 /////////////////////////
 // Project metadata    //
