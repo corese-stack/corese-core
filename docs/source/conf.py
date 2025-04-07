@@ -63,7 +63,7 @@ html_css_files = [
 html_js_files = []
 
 # Project logo, to place at the top of the sidebar.
-html_logo = "_static/logo/corese-core_doc_light.svg"
+html_logo = "_static/logo/corese-core_doc_bar.svg"
 
 # Icon to put in the browser tab.
 html_favicon = "_static/logo/corese-core_doc_fav.svg"
@@ -82,8 +82,9 @@ html_theme_options = {
          "image_light": "_static/logo/corese-core_doc_light.svg",
          "image_dark": "_static/logo/corese-core_doc_dark.svg"
      },
+    "theme_switcher": True,
     "navbar_center": [ "navbar-nav" ],
-    "navbar_end": ["navbar-icon-links", "version-switcher"],
+    "navbar_end": ["theme-switcher", "navbar-icon-links", "version-switcher"],
     "icon_links": [
         {
             "name": "GitHub",
