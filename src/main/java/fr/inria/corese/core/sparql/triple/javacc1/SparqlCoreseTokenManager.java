@@ -17,9 +17,9 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 /** Token Manager. */
 @SuppressWarnings ("unused")
 public class SparqlCoreseTokenManager implements SparqlCoreseConstants {
-        void CommonTokenAction(Token token) {
-                //System.out.println(token+" ");
-        }
+ void CommonTokenAction(Token token) {
+  //System.out.println(token+" ");
+ }
 
   /** Debug output. */
   public  java.io.PrintStream debugStream = System.out;
