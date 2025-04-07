@@ -1,5 +1,13 @@
 # Corese Changelog
 
+## Version 4.6.4 – 
+
+### Changed
+
+- Updated and corrected documentation:
+  - Fixed typos in the Getting Started guide.
+  - Add imports to the Getting Started guide.
+
 ## Version 4.6.3 – 2025-02-20
 
 ### Added
