@@ -16,6 +16,12 @@ plugins {
 }
 
 // SonarQube configuration
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+val currentDate: String = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+
 sonar {
     properties {
         property("sonar.projectKey", "crs-core-new")
@@ -23,6 +29,7 @@ sonar {
         property("sonar.login", System.getenv("SONAR_TOKEN"))
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
         property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.projectDate", currentDate)
     }
 }
 
