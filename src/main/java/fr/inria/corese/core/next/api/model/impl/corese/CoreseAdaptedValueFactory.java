@@ -1,13 +1,9 @@
 package fr.inria.corese.core.next.api.model.impl.corese;
 
-import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.next.api.model.*;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype;
 import fr.inria.corese.core.next.api.model.base.CoreDatatype.XSD;
-import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDate;
-import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDatetime;
-import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseDuration;
-import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseTime;
+import fr.inria.corese.core.next.api.model.impl.corese.literal.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +96,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(boolean value) {
-        return null;
+        return new CoreseBoolean(value);
     }
 
     @Override
