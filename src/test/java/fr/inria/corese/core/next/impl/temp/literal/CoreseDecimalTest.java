@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ public class CoreseDecimalTest  extends AbstractCoreseNumberTest {
     @Test
     public void getCoreDatatype() {
         AbstractCoreseNumber coreseNumber = createNumber("13.46");
-        assertEquals(CoreDatatype.XSD.DECIMAL, coreseNumber.getCoreDatatype());
+        assertEquals(XSD.DECIMAL, coreseNumber.getCoreDatatype());
     }
 
     @Override

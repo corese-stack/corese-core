@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.temp.literal;
 
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
-import fr.inria.corese.core.next.api.base.model.literal.XSD;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.exception.IncorrectDatatypeException;
 import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;

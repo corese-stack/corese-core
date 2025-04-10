@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.base.model.literal;
+package fr.inria.corese.core.next.impl.common.literal;
 
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
@@ -16,7 +16,9 @@ public enum XSD implements CoreDatatype {
     BYTE(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdByte.getIRI()),
     FLOAT(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdFloat.getIRI()),
     DOUBLE(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdDouble.getIRI()),
+    NEGATIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdNegativeInteger.getIRI()),
     NON_NEGATIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdNonNegativeInteger.getIRI()),
+    POSITIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdPositiveInteger.getIRI()),
     NON_POSITIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdNonPositiveInteger.getIRI()),
     UNSIGNED_LONG(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdUnsignedLong.getIRI()),
     UNSIGNED_INT(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdUnsignedInt.getIRI()),

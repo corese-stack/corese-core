@@ -2,9 +2,9 @@ package fr.inria.corese.core.next.api.model;
 
 import fr.inria.corese.core.next.api.Literal;
 import fr.inria.corese.core.next.api.ValueFactory;
+import fr.inria.corese.core.next.impl.common.BasicIRI;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.impl.basic.BasicIRI;
-import fr.inria.corese.core.next.api.base.vocabulary.XSD;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,20 +56,20 @@ public abstract class ValueFactoryTest {
         // Temporal point
         // // Datetime
         String fullXSDDateTimeString = "2021-01-01T23:59:59";
-        Literal fullXSDDateTime = this.valueFactory.createLiteral(fullXSDDateTimeString, XSD.xsdDateTime.getIRI());
+        Literal fullXSDDateTime = this.valueFactory.createLiteral(fullXSDDateTimeString, XSD.DATETIME.getIRI());
         assertEquals(fullXSDDateTimeString, fullXSDDateTime.stringValue());
         // // Date
         String fullXSDDateString = "2021-01-01";
-        Literal fullXSDDate = this.valueFactory.createLiteral(fullXSDDateString, XSD.xsdDate.getIRI());
+        Literal fullXSDDate = this.valueFactory.createLiteral(fullXSDDateString, XSD.DATE.getIRI());
         assertEquals(fullXSDDateString, fullXSDDate.stringValue());
         // // Time
         String fullXSDTimeString = "23:59:59";
-        Literal fullXSDTime = this.valueFactory.createLiteral(fullXSDTimeString, XSD.xsdTime.getIRI());
+        Literal fullXSDTime = this.valueFactory.createLiteral(fullXSDTimeString, XSD.TIME.getIRI());
         assertEquals(fullXSDTimeString, fullXSDTime.stringValue());
 
         // Duration
         String fullXSDDurationString = "P100DT23H";
-        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString, XSD.xsdDuration.getIRI());
+        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString, XSD.DURATION.getIRI());
         assertEquals(fullXSDDurationString, fullXSDDuration.stringValue());
     }
 
@@ -78,34 +78,34 @@ public abstract class ValueFactoryTest {
         // Temporal point
         // // Datetime
         String fullXSDDateTimeString = "2021-01-01T23:59:59";
-        Literal fullXSDDateTimeGoodDatatype = this.valueFactory.createLiteral(fullXSDDateTimeString, fr.inria.corese.core.next.api.base.model.literal.XSD.DATETIME.getIRI(), fr.inria.corese.core.next.api.base.model.literal.XSD.DATETIME);
+        Literal fullXSDDateTimeGoodDatatype = this.valueFactory.createLiteral(fullXSDDateTimeString, XSD.DATETIME.getIRI(), XSD.DATETIME);
         assertEquals(fullXSDDateTimeString, fullXSDDateTimeGoodDatatype.stringValue());
         assertNotNull(fullXSDDateTimeGoodDatatype.temporalAccessorValue());
-        Literal fullXSDDateTimeBadDatatype = this.valueFactory.createLiteral(fullXSDDateTimeString,new BasicIRI("http://example.com/test"), fr.inria.corese.core.next.api.base.model.literal.XSD.DATETIME);
+        Literal fullXSDDateTimeBadDatatype = this.valueFactory.createLiteral(fullXSDDateTimeString,new BasicIRI("http://example.com/test"), XSD.DATETIME);
         assertEquals(fullXSDDateTimeString, fullXSDDateTimeBadDatatype.stringValue());
         assertNotNull(fullXSDDateTimeBadDatatype.temporalAccessorValue());
 
         // // Date
         String fullXSDDateString = "2021-01-01";
-        Literal fullXSDDateGoodDatatype = this.valueFactory.createLiteral(fullXSDDateString, fr.inria.corese.core.next.api.base.model.literal.XSD.DATE.getIRI(), fr.inria.corese.core.next.api.base.model.literal.XSD.DATE);
+        Literal fullXSDDateGoodDatatype = this.valueFactory.createLiteral(fullXSDDateString, XSD.DATE.getIRI(), XSD.DATE);
         assertEquals(fullXSDDateString, fullXSDDateGoodDatatype.stringValue());
         assertNotNull(fullXSDDateGoodDatatype.temporalAccessorValue());
-        Literal fullXSDDateBadDatatype = this.valueFactory.createLiteral(fullXSDDateString,new BasicIRI("http://example.com/test"), fr.inria.corese.core.next.api.base.model.literal.XSD.DATE);
+        Literal fullXSDDateBadDatatype = this.valueFactory.createLiteral(fullXSDDateString,new BasicIRI("http://example.com/test"), XSD.DATE);
         assertEquals(fullXSDDateString, fullXSDDateBadDatatype.stringValue());
         assertNotNull(fullXSDDateBadDatatype.temporalAccessorValue());
 
         // // Time
         String fullXSDTimeString = "23:59:59";
-        Literal fullXSDTimeGoodDatatype = this.valueFactory.createLiteral(fullXSDTimeString, fr.inria.corese.core.next.api.base.model.literal.XSD.TIME.getIRI(), fr.inria.corese.core.next.api.base.model.literal.XSD.TIME);
+        Literal fullXSDTimeGoodDatatype = this.valueFactory.createLiteral(fullXSDTimeString, XSD.TIME.getIRI(), XSD.TIME);
         assertEquals(fullXSDTimeString, fullXSDTimeGoodDatatype.stringValue());
         assertNotNull(fullXSDTimeGoodDatatype.temporalAccessorValue());
-        Literal fullXSDTimeBadDatatype = this.valueFactory.createLiteral(fullXSDTimeString,new BasicIRI("http://example.com/test"), fr.inria.corese.core.next.api.base.model.literal.XSD.TIME);
+        Literal fullXSDTimeBadDatatype = this.valueFactory.createLiteral(fullXSDTimeString,new BasicIRI("http://example.com/test"), XSD.TIME);
         assertEquals(fullXSDTimeString, fullXSDTimeBadDatatype.stringValue());
         assertNotNull(fullXSDTimeBadDatatype.temporalAccessorValue());
 
         // Duration
         String fullXSDDurationString = "P100DT23H";
-        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString, fr.inria.corese.core.next.api.base.model.literal.XSD.DURATION.getIRI());
+        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString, XSD.DURATION.getIRI());
         assertEquals(fullXSDDurationString, fullXSDDuration.stringValue());
 
 

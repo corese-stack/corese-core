@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.base.model.literal.XSD;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import org.junit.Test;
 
 import javax.xml.datatype.DatatypeFactory;

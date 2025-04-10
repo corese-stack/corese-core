@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 import org.junit.Test;
 
 import java.math.BigDecimal;

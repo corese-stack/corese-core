@@ -1,11 +1,8 @@
 package fr.inria.corese.core.next.api;
 
-import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.api.model.Literal;
-import fr.inria.corese.core.next.api.model.ValueFactory;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.common.BasicIRI;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,102 +56,102 @@ public abstract class ValueFactoryTest {
         // Temporal point
         // // Datetime
         String fullXSDDateTimeString = "2021-01-01T23:59:59";
-        Literal fullXSDDateTime = this.valueFactory.createLiteral(fullXSDDateTimeString, XSD.xsdDateTime.getIRI());
+        Literal fullXSDDateTime = this.valueFactory.createLiteral(fullXSDDateTimeString, XSD.DATETIME.getIRI());
         assertEquals(fullXSDDateTimeString, fullXSDDateTime.stringValue());
         // // Date
         String fullXSDDateString = "2021-01-01";
-        Literal fullXSDDate = this.valueFactory.createLiteral(fullXSDDateString, XSD.xsdDate.getIRI());
+        Literal fullXSDDate = this.valueFactory.createLiteral(fullXSDDateString, XSD.DATE.getIRI());
         assertEquals(fullXSDDateString, fullXSDDate.stringValue());
         // // Time
         String fullXSDTimeString = "23:59:59";
-        Literal fullXSDTime = this.valueFactory.createLiteral(fullXSDTimeString, XSD.xsdTime.getIRI());
+        Literal fullXSDTime = this.valueFactory.createLiteral(fullXSDTimeString, XSD.TIME.getIRI());
         assertEquals(fullXSDTimeString, fullXSDTime.stringValue());
 
         // Duration
         String fullXSDDurationString = "P100DT23H";
-        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString, XSD.xsdDuration.getIRI());
+        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString, XSD.DURATION.getIRI());
         assertEquals(fullXSDDurationString, fullXSDDuration.stringValue());
 
         // Number
 
         // // Integer
         String integerString = "-42";
-        Literal integerLiteral = this.valueFactory.createLiteral(integerString, XSD.xsdInteger.getIRI());
+        Literal integerLiteral = this.valueFactory.createLiteral(integerString, XSD.INTEGER.getIRI());
         assertEquals(Integer.parseInt(integerString), integerLiteral.intValue());
 
         // // NonNegativeInteger
         String nonNegativeIntegerString = "42";
-        Literal nonnegativeIntegerLiteral = this.valueFactory.createLiteral(nonNegativeIntegerString, XSD.xsdNonNegativeInteger.getIRI());
+        Literal nonnegativeIntegerLiteral = this.valueFactory.createLiteral(nonNegativeIntegerString, XSD.NON_NEGATIVE_INTEGER.getIRI());
         assertEquals(Integer.parseInt(nonNegativeIntegerString), nonnegativeIntegerLiteral.intValue());
 
         // // NonPositiveInteger
         String nonPositiveIntegerString = "-42";
-        Literal nonPositiveIntegerLiteral = this.valueFactory.createLiteral(nonPositiveIntegerString, XSD.xsdPositiveInteger.getIRI());
+        Literal nonPositiveIntegerLiteral = this.valueFactory.createLiteral(nonPositiveIntegerString, XSD.NON_POSITIVE_INTEGER.getIRI());
         assertEquals(Integer.parseInt(nonPositiveIntegerString), nonPositiveIntegerLiteral.intValue());
 
         // // PositiveInteger
         String positiveIntegerString = "42";
-        Literal positiveIntegerLiteral = this.valueFactory.createLiteral(positiveIntegerString, XSD.xsdPositiveInteger.getIRI());
+        Literal positiveIntegerLiteral = this.valueFactory.createLiteral(positiveIntegerString, XSD.POSITIVE_INTEGER.getIRI());
         assertEquals(Integer.parseInt(positiveIntegerString), positiveIntegerLiteral.intValue());
 
         // // NegativeInteger
         String negativeIntegerString = "-42";
-        Literal negativeIntegerLiteral = this.valueFactory.createLiteral(negativeIntegerString, XSD.xsdNegativeInteger.getIRI());
+        Literal negativeIntegerLiteral = this.valueFactory.createLiteral(negativeIntegerString, XSD.NEGATIVE_INTEGER.getIRI());
         assertEquals(Integer.parseInt(negativeIntegerString), negativeIntegerLiteral.intValue());
 
         // // Int
         String intString = "-42";
-        Literal intLiteral = this.valueFactory.createLiteral(intString, XSD.xsdInt.getIRI());
+        Literal intLiteral = this.valueFactory.createLiteral(intString, XSD.INT.getIRI());
         assertEquals(Integer.parseInt(intString), intLiteral.intValue());
 
         // // UnsignedInt
         String unsignedIntString = "42";
-        Literal unsignedIntLiteral = this.valueFactory.createLiteral(unsignedIntString, XSD.xsdUnsignedInt.getIRI());
+        Literal unsignedIntLiteral = this.valueFactory.createLiteral(unsignedIntString, XSD.UNSIGNED_INT.getIRI());
         assertEquals(Integer.parseInt(unsignedIntString), unsignedIntLiteral.intValue());
 
         // // Long
         String longString = "-1234567890123456789";
-        Literal longLiteral = this.valueFactory.createLiteral(longString, XSD.xsdLong.getIRI());
+        Literal longLiteral = this.valueFactory.createLiteral(longString, XSD.LONG.getIRI());
         assertEquals(Long.parseLong(longString), longLiteral.longValue());
 
         // // UnsignedLong
         String unsignedLongString = "1234567890123456789";
-        Literal unsignedLongLiteral = this.valueFactory.createLiteral(unsignedLongString, XSD.xsdUnsignedLong.getIRI());
+        Literal unsignedLongLiteral = this.valueFactory.createLiteral(unsignedLongString, XSD.UNSIGNED_LONG.getIRI());
         assertEquals(Long.parseLong(unsignedLongString), unsignedLongLiteral.longValue());
 
         // // Decimal
         String decimalString = "1234567890123456789.1234567890123456789";
-        Literal decimalLiteral = this.valueFactory.createLiteral(decimalString, XSD.xsdDecimal.getIRI());
+        Literal decimalLiteral = this.valueFactory.createLiteral(decimalString, XSD.DECIMAL.getIRI());
         assertEquals(Double.parseDouble(decimalString), decimalLiteral.doubleValue(), 0);
 
         // // short
         String shortString = "7851";
-        Literal shortLiteral = this.valueFactory.createLiteral(shortString, XSD.xsdShort.getIRI());
+        Literal shortLiteral = this.valueFactory.createLiteral(shortString, XSD.SHORT.getIRI());
         assertEquals(Short.parseShort(shortString), shortLiteral.shortValue());
 
         // // UnsignedShort
         String unsignedShortString = "7851";
-        Literal unsignedShortLiteral = this.valueFactory.createLiteral(unsignedShortString, XSD.xsdUnsignedShort.getIRI());
+        Literal unsignedShortLiteral = this.valueFactory.createLiteral(unsignedShortString, XSD.UNSIGNED_SHORT.getIRI());
         assertEquals(Short.parseShort(unsignedShortString), unsignedShortLiteral.shortValue());
 
         // // Byte
         String byteString = "-64";
-        Literal byteLiteral = this.valueFactory.createLiteral(byteString, XSD.xsdByte.getIRI());
+        Literal byteLiteral = this.valueFactory.createLiteral(byteString, XSD.BYTE.getIRI());
         assertEquals(Byte.parseByte(byteString), byteLiteral.byteValue());
 
         // // UnsignedByte
         String unsignedByteString = "64";
-        Literal unsignedByteLiteral = this.valueFactory.createLiteral(unsignedByteString, XSD.xsdUnsignedByte.getIRI());
+        Literal unsignedByteLiteral = this.valueFactory.createLiteral(unsignedByteString, XSD.UNSIGNED_BYTE.getIRI());
         assertEquals(Byte.parseByte(unsignedByteString), unsignedByteLiteral.byteValue());
 
         // // float
         String floatString = "345.2345";
-        Literal floatLiteral = this.valueFactory.createLiteral(floatString, XSD.xsdFloat.getIRI());
+        Literal floatLiteral = this.valueFactory.createLiteral(floatString, XSD.FLOAT.getIRI());
         assertEquals(Float.parseFloat(floatString), floatLiteral.floatValue(), 0);
 
         // // double
         String doubleString = "345678.3456789";
-        Literal doubleLiteral = this.valueFactory.createLiteral(doubleString, XSD.xsdDouble.getIRI());
+        Literal doubleLiteral = this.valueFactory.createLiteral(doubleString, XSD.DOUBLE.getIRI());
         assertEquals(Double.parseDouble(doubleString), doubleLiteral.doubleValue(), 0);
     }
 
@@ -163,130 +160,130 @@ public abstract class ValueFactoryTest {
         // Temporal point
         // // Datetime
         String fullXSDDateTimeString = "2021-01-01T23:59:59";
-        Literal fullXSDDateTimeGoodDatatype = this.valueFactory.createLiteral(fullXSDDateTimeString, CoreDatatype.XSD.DATETIME.getIRI(), CoreDatatype.XSD.DATETIME);
+        Literal fullXSDDateTimeGoodDatatype = this.valueFactory.createLiteral(fullXSDDateTimeString, XSD.DATETIME.getIRI(), XSD.DATETIME);
         assertEquals(fullXSDDateTimeString, fullXSDDateTimeGoodDatatype.stringValue());
         assertNotNull(fullXSDDateTimeGoodDatatype.temporalAccessorValue());
-        Literal fullXSDDateTimeBadDatatype = this.valueFactory.createLiteral(fullXSDDateTimeString,new BasicIRI("http://example.com/test"), CoreDatatype.XSD.DATETIME);
+        Literal fullXSDDateTimeBadDatatype = this.valueFactory.createLiteral(fullXSDDateTimeString,new BasicIRI("http://example.com/test"), XSD.DATETIME);
         assertEquals(fullXSDDateTimeString, fullXSDDateTimeBadDatatype.stringValue());
         assertNotNull(fullXSDDateTimeBadDatatype.temporalAccessorValue());
 
         // // Date
         String fullXSDDateString = "2021-01-01";
-        Literal fullXSDDateGoodDatatype = this.valueFactory.createLiteral(fullXSDDateString, CoreDatatype.XSD.DATE.getIRI(), CoreDatatype.XSD.DATE);
+        Literal fullXSDDateGoodDatatype = this.valueFactory.createLiteral(fullXSDDateString, XSD.DATE.getIRI(), XSD.DATE);
         assertEquals(fullXSDDateString, fullXSDDateGoodDatatype.stringValue());
         assertNotNull(fullXSDDateGoodDatatype.temporalAccessorValue());
-        Literal fullXSDDateBadDatatype = this.valueFactory.createLiteral(fullXSDDateString,new BasicIRI("http://example.com/test"), CoreDatatype.XSD.DATE);
+        Literal fullXSDDateBadDatatype = this.valueFactory.createLiteral(fullXSDDateString,new BasicIRI("http://example.com/test"), XSD.DATE);
         assertEquals(fullXSDDateString, fullXSDDateBadDatatype.stringValue());
         assertNotNull(fullXSDDateBadDatatype.temporalAccessorValue());
 
         // // Time
         String fullXSDTimeString = "23:59:59";
-        Literal fullXSDTimeGoodDatatype = this.valueFactory.createLiteral(fullXSDTimeString, CoreDatatype.XSD.TIME.getIRI(), CoreDatatype.XSD.TIME);
+        Literal fullXSDTimeGoodDatatype = this.valueFactory.createLiteral(fullXSDTimeString, XSD.TIME.getIRI(), XSD.TIME);
         assertEquals(fullXSDTimeString, fullXSDTimeGoodDatatype.stringValue());
         assertNotNull(fullXSDTimeGoodDatatype.temporalAccessorValue());
-        Literal fullXSDTimeBadDatatype = this.valueFactory.createLiteral(fullXSDTimeString,new BasicIRI("http://example.com/test"), CoreDatatype.XSD.TIME);
+        Literal fullXSDTimeBadDatatype = this.valueFactory.createLiteral(fullXSDTimeString,new BasicIRI("http://example.com/test"), XSD.TIME);
         assertEquals(fullXSDTimeString, fullXSDTimeBadDatatype.stringValue());
         assertNotNull(fullXSDTimeBadDatatype.temporalAccessorValue());
 
         // Duration
         String fullXSDDurationString = "P100DT23H";
-        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString, CoreDatatype.XSD.DURATION.getIRI(), CoreDatatype.XSD.DURATION);
+        Literal fullXSDDuration = this.valueFactory.createLiteral(fullXSDDurationString, XSD.DURATION.getIRI(), XSD.DURATION);
         assertEquals(fullXSDDurationString, fullXSDDuration.stringValue());
 
         // Numbers
 
         // // Integer
         String integerString = "1234567890";
-        Literal integerLiteral = this.valueFactory.createLiteral(integerString, CoreDatatype.XSD.INTEGER);
+        Literal integerLiteral = this.valueFactory.createLiteral(integerString, XSD.INTEGER);
         assertEquals(integerString, integerLiteral.stringValue());
         assertEquals(Integer.parseInt(integerString), integerLiteral.intValue());
 
         // // Decimal
         String decimalString = "1234567890123456789.1234567890123456789";
-        Literal decimalLiteral = this.valueFactory.createLiteral(decimalString, CoreDatatype.XSD.DECIMAL.getIRI(), CoreDatatype.XSD.DECIMAL);
+        Literal decimalLiteral = this.valueFactory.createLiteral(decimalString, XSD.DECIMAL.getIRI(), XSD.DECIMAL);
         assertEquals(decimalString, decimalLiteral.stringValue());
         assertEquals(new BigDecimal(decimalString), decimalLiteral.decimalValue());
 
         // // Long
         String longString = "1234567890123456789";
-        Literal longLiteral = this.valueFactory.createLiteral(longString, CoreDatatype.XSD.LONG);
+        Literal longLiteral = this.valueFactory.createLiteral(longString, XSD.LONG);
         assertEquals(longString, longLiteral.stringValue());
         assertEquals(Long.parseLong(longString), longLiteral.longValue());
 
         // // Short
         String shortString = "7851";
-        Literal shortLiteral = this.valueFactory.createLiteral(shortString, CoreDatatype.XSD.SHORT);
+        Literal shortLiteral = this.valueFactory.createLiteral(shortString, XSD.SHORT);
         assertEquals(shortString, shortLiteral.stringValue());
         assertEquals(Short.parseShort(shortString), shortLiteral.shortValue());
 
         // // UnsignedShort
         String unsignedShortString = "7851";
-        Literal unsignedShortLiteral = this.valueFactory.createLiteral(unsignedShortString, CoreDatatype.XSD.UNSIGNED_SHORT);
+        Literal unsignedShortLiteral = this.valueFactory.createLiteral(unsignedShortString, XSD.UNSIGNED_SHORT);
         assertEquals(unsignedShortString, unsignedShortLiteral.stringValue());
         assertEquals(Short.parseShort(unsignedShortString), unsignedShortLiteral.shortValue());
 
         // // Byte
         String byteString = "127";
-        Literal byteLiteral = this.valueFactory.createLiteral(byteString, CoreDatatype.XSD.BYTE);
+        Literal byteLiteral = this.valueFactory.createLiteral(byteString, XSD.BYTE);
         assertEquals(byteString, byteLiteral.stringValue());
         assertEquals(Byte.parseByte(byteString), byteLiteral.byteValue());
 
         // // UnsignedByte
         String unsignedByteString = "64";
-        Literal unsignedByteLiteral = this.valueFactory.createLiteral(unsignedByteString, CoreDatatype.XSD.UNSIGNED_BYTE);
+        Literal unsignedByteLiteral = this.valueFactory.createLiteral(unsignedByteString, XSD.UNSIGNED_BYTE);
         assertEquals(unsignedByteString, unsignedByteLiteral.stringValue());
         assertEquals(Byte.parseByte(unsignedByteString), unsignedByteLiteral.byteValue());
 
         // // Float
         String floatString = "345678.3456789";
-        Literal floatLiteral = this.valueFactory.createLiteral(floatString, CoreDatatype.XSD.FLOAT);
+        Literal floatLiteral = this.valueFactory.createLiteral(floatString, XSD.FLOAT);
         assertEquals(floatString, floatLiteral.stringValue());
         assertEquals(Float.parseFloat(floatString), floatLiteral.floatValue(), 0);
 
         // // Double
         String doubleString = "345678.3456789";
-        Literal doubleLiteral = this.valueFactory.createLiteral(doubleString, CoreDatatype.XSD.DOUBLE);
+        Literal doubleLiteral = this.valueFactory.createLiteral(doubleString, XSD.DOUBLE);
         assertEquals(doubleString, doubleLiteral.stringValue());
         assertEquals(Double.parseDouble(doubleString), doubleLiteral.doubleValue(), 0);
 
         // // Int
         String intString = "1234567890";
-        Literal intLiteral = this.valueFactory.createLiteral(intString, CoreDatatype.XSD.INT);
+        Literal intLiteral = this.valueFactory.createLiteral(intString, XSD.INT);
         assertEquals(intString, intLiteral.stringValue());
 
         // // Non negative integer
         String nonNegativeIntegerString = "1234567890";
-        Literal nonNegativeIntegerLiteral = this.valueFactory.createLiteral(nonNegativeIntegerString, CoreDatatype.XSD.NON_NEGATIVE_INTEGER);
+        Literal nonNegativeIntegerLiteral = this.valueFactory.createLiteral(nonNegativeIntegerString, XSD.NON_NEGATIVE_INTEGER);
         assertEquals(nonNegativeIntegerString, nonNegativeIntegerLiteral.stringValue());
         assertEquals(Long.parseLong(nonNegativeIntegerString), nonNegativeIntegerLiteral.longValue());
 
         // // Non positive integer
         String nonPositiveIntegerString = "-1234567890";
-        Literal nonPositiveIntegerLiteral = this.valueFactory.createLiteral(nonPositiveIntegerString, CoreDatatype.XSD.NON_POSITIVE_INTEGER);
+        Literal nonPositiveIntegerLiteral = this.valueFactory.createLiteral(nonPositiveIntegerString, XSD.NON_POSITIVE_INTEGER);
         assertEquals(nonPositiveIntegerString, nonPositiveIntegerLiteral.stringValue());
         assertEquals(Long.parseLong(nonPositiveIntegerString), nonPositiveIntegerLiteral.longValue());
 
         // // Positive integer
         String positiveIntegerString = "1234567890";
-        Literal positiveIntegerLiteral = this.valueFactory.createLiteral(positiveIntegerString, CoreDatatype.XSD.POSITIVE_INTEGER);
+        Literal positiveIntegerLiteral = this.valueFactory.createLiteral(positiveIntegerString, XSD.POSITIVE_INTEGER);
         assertEquals(positiveIntegerString, positiveIntegerLiteral.stringValue());
         assertEquals(Long.parseLong(positiveIntegerString), positiveIntegerLiteral.longValue());
 
         // // Negative integer
         String negativeIntegerString = "-1234567890";
-        Literal negativeIntegerLiteral = this.valueFactory.createLiteral(negativeIntegerString, CoreDatatype.XSD.NEGATIVE_INTEGER);
+        Literal negativeIntegerLiteral = this.valueFactory.createLiteral(negativeIntegerString, XSD.NEGATIVE_INTEGER);
         assertEquals(negativeIntegerString, negativeIntegerLiteral.stringValue());
         assertEquals(Long.parseLong(negativeIntegerString), negativeIntegerLiteral.longValue());
 
         // // Unsigned long
         String unsignedLongString = "1234567890123456789";
-        Literal unsignedLongLiteral = this.valueFactory.createLiteral(unsignedLongString, CoreDatatype.XSD.UNSIGNED_LONG);
+        Literal unsignedLongLiteral = this.valueFactory.createLiteral(unsignedLongString, XSD.UNSIGNED_LONG);
         assertEquals(unsignedLongString, unsignedLongLiteral.stringValue());
         assertEquals(Long.parseLong(unsignedLongString), unsignedLongLiteral.longValue());
 
         // // Unsigned int
         String unsignedIntString = "1234567890";
-        Literal unsignedIntLiteral = this.valueFactory.createLiteral(unsignedIntString, CoreDatatype.XSD.UNSIGNED_INT);
+        Literal unsignedIntLiteral = this.valueFactory.createLiteral(unsignedIntString, XSD.UNSIGNED_INT);
         assertEquals(unsignedIntString, unsignedIntLiteral.stringValue());
         assertEquals(Integer.parseInt(unsignedIntString), unsignedIntLiteral.intValue());
     }
@@ -297,79 +294,79 @@ public abstract class ValueFactoryTest {
 
         // // Integer
         String integerString = "1234567890";
-        Literal integerLiteral = this.valueFactory.createLiteral(integerString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.INTEGER);
+        Literal integerLiteral = this.valueFactory.createLiteral(integerString, new BasicIRI("http://example.com/test"), XSD.INTEGER);
         assertEquals(integerString, integerLiteral.stringValue());
         assertEquals(Integer.parseInt(integerString), integerLiteral.intValue());
 
         // // Non Negative Integer
         String nonNegativeIntegerString = "1234567890";
-        Literal nonNegativeIntegerLiteral = this.valueFactory.createLiteral(nonNegativeIntegerString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.NON_NEGATIVE_INTEGER);
+        Literal nonNegativeIntegerLiteral = this.valueFactory.createLiteral(nonNegativeIntegerString, new BasicIRI("http://example.com/test"), XSD.NON_NEGATIVE_INTEGER);
         assertEquals(nonNegativeIntegerString, nonNegativeIntegerLiteral.stringValue());
         assertEquals(Long.parseLong(nonNegativeIntegerString), nonNegativeIntegerLiteral.longValue());
 
         // // Non Positive Integer
         String nonPositiveIntegerString = "-1234567890";
-        Literal nonPositiveIntegerLiteral = this.valueFactory.createLiteral(nonPositiveIntegerString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.NON_POSITIVE_INTEGER);
+        Literal nonPositiveIntegerLiteral = this.valueFactory.createLiteral(nonPositiveIntegerString, new BasicIRI("http://example.com/test"), XSD.NON_POSITIVE_INTEGER);
         assertEquals(nonPositiveIntegerString, nonPositiveIntegerLiteral.stringValue());
         assertEquals(Long.parseLong(nonPositiveIntegerString), nonPositiveIntegerLiteral.longValue());
 
         // // Positive Integer
         String positiveIntegerString = "1234567890";
-        Literal positiveIntegerLiteral = this.valueFactory.createLiteral(positiveIntegerString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.POSITIVE_INTEGER);
+        Literal positiveIntegerLiteral = this.valueFactory.createLiteral(positiveIntegerString, new BasicIRI("http://example.com/test"), XSD.POSITIVE_INTEGER);
         assertEquals(positiveIntegerString, positiveIntegerLiteral.stringValue());
         assertEquals(Integer.parseInt(positiveIntegerString), positiveIntegerLiteral.intValue());
 
         // // Negative Integer
         String negativeIntegerString = "-1234567890";
-        Literal negativeIntegerLiteral = this.valueFactory.createLiteral(negativeIntegerString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.NEGATIVE_INTEGER);
+        Literal negativeIntegerLiteral = this.valueFactory.createLiteral(negativeIntegerString, new BasicIRI("http://example.com/test"), XSD.NEGATIVE_INTEGER);
         assertEquals(negativeIntegerString, negativeIntegerLiteral.stringValue());
         assertEquals(Integer.parseInt(negativeIntegerString), negativeIntegerLiteral.intValue());
 
         // // Long
         String longString = "1234567890123456789";
-        Literal longLiteral = this.valueFactory.createLiteral(longString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.LONG);
+        Literal longLiteral = this.valueFactory.createLiteral(longString, new BasicIRI("http://example.com/test"), XSD.LONG);
         assertEquals(longString, longLiteral.stringValue());
         assertEquals(Long.parseLong(longString), longLiteral.longValue());
 
         // // Decimal
         String decimalString = "1234567890123456789.1234567890123456789";
-        Literal decimalLiteral = this.valueFactory.createLiteral(decimalString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.DECIMAL);
+        Literal decimalLiteral = this.valueFactory.createLiteral(decimalString, new BasicIRI("http://example.com/test"), XSD.DECIMAL);
         assertEquals(decimalString, decimalLiteral.stringValue());
         assertEquals(new BigDecimal(decimalString), decimalLiteral.decimalValue());
 
         // // Int
         String intString = "1234567890";
-        Literal intLiteral = this.valueFactory.createLiteral(intString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.INT);
+        Literal intLiteral = this.valueFactory.createLiteral(intString, new BasicIRI("http://example.com/test"), XSD.INT);
         assertEquals(intString, intLiteral.stringValue());
         assertEquals(Integer.parseInt(intString), intLiteral.intValue());
 
         // // Unsigned Int
         String unsignedIntString = "1234567890";
-        Literal unsignedIntLiteral = this.valueFactory.createLiteral(unsignedIntString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.UNSIGNED_INT);
+        Literal unsignedIntLiteral = this.valueFactory.createLiteral(unsignedIntString, new BasicIRI("http://example.com/test"), XSD.UNSIGNED_INT);
         assertEquals(unsignedIntString, unsignedIntLiteral.stringValue());
         assertEquals(Integer.parseInt(unsignedIntString), unsignedIntLiteral.intValue());
 
         // // Short
         String shortString = "7851";
-        Literal shortLiteral = this.valueFactory.createLiteral(shortString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.SHORT);
+        Literal shortLiteral = this.valueFactory.createLiteral(shortString, new BasicIRI("http://example.com/test"), XSD.SHORT);
         assertEquals(shortString, shortLiteral.stringValue());
         assertEquals(Short.parseShort(shortString), shortLiteral.shortValue());
 
         // // UnsignedShort
         String unsignedShortString = "7851";
-        Literal unsignedShortLiteral = this.valueFactory.createLiteral(unsignedShortString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.UNSIGNED_SHORT);
+        Literal unsignedShortLiteral = this.valueFactory.createLiteral(unsignedShortString, new BasicIRI("http://example.com/test"), XSD.UNSIGNED_SHORT);
         assertEquals(unsignedShortString, unsignedShortLiteral.stringValue());
         assertEquals(Short.parseShort(unsignedShortString), unsignedShortLiteral.shortValue());
 
         // // Byte
         String byteString = "127";
-        Literal byteLiteral = this.valueFactory.createLiteral(byteString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.BYTE);
+        Literal byteLiteral = this.valueFactory.createLiteral(byteString, new BasicIRI("http://example.com/test"), XSD.BYTE);
         assertEquals(byteString, byteLiteral.stringValue());
         assertEquals(Byte.parseByte(byteString), byteLiteral.byteValue());
 
         // // UnsignedByte
         String unsignedByteString = "64";
-        Literal unsignedByteLiteral = this.valueFactory.createLiteral(unsignedByteString, new BasicIRI("http://example.com/test"), CoreDatatype.XSD.UNSIGNED_BYTE);
+        Literal unsignedByteLiteral = this.valueFactory.createLiteral(unsignedByteString, new BasicIRI("http://example.com/test"), XSD.UNSIGNED_BYTE);
         assertEquals(unsignedByteString, unsignedByteLiteral.stringValue());
         assertEquals(Byte.parseByte(unsignedByteString), unsignedByteLiteral.byteValue());
     }

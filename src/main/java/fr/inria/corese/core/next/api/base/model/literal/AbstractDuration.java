@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.api.base.model.literal;
 
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 
 import java.time.DateTimeException;
 import java.time.temporal.TemporalAmount;

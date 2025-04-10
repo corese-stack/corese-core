@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.api.Literal;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.api.base.model.literal.XSD;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,12 +61,12 @@ public class BasicDuration extends AbstractDuration {
      */
     @Override
     public String stringValue() {
-        return String.format("\"{0}^^<{1}>\"", this.temporalAmount.toString(), this.datatype.stringValue());
+        return String.format("\"%s\"^^<%s>", this.temporalAmount.toString(), this.datatype.stringValue());
     }
 
     @Override
     public String getLabel() {
-        return this.stringValue();
+        return this.temporalAmount.toString();
     }
 
     @Override

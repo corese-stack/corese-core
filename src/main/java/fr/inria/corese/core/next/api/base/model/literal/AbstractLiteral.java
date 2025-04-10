@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.api.base.model.literal;
 
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Literal;

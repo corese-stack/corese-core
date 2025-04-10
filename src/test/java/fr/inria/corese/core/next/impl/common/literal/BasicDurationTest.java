@@ -1,16 +1,7 @@
-<<<<<<<< HEAD:src/test/java/fr/inria/corese/core/next/impl/common/literal/BasicDurationTest.java
 package fr.inria.corese.core.next.impl.common.literal;
 
-import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
-========
-package fr.inria.corese.core.next.impl.basic.literal;
-
-import fr.inria.corese.core.next.api.base.model.literal.XSD;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
->>>>>>>> feature/temporal_literal:src/test/java/fr/inria/corese/core/next/impl/basic/literal/BasicDurationTest.java
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,14 +40,14 @@ public class BasicDurationTest {
         BasicDuration durationP7 = BasicDuration.parse(positiveExample7);
         BasicDuration durationP8 = BasicDuration.parse(positiveExample8);
 
-        assertEquals(Period.of(1, 2, 3).toString(), durationP1.stringValue());
-        assertEquals(Duration.ofHours(1).plusMinutes(2).plusSeconds(3).plusNanos(400000000).toString(), durationP2.stringValue());
-        assertEquals(Period.of(1347, 0, 0).toString(), durationP3.stringValue());
-        assertEquals(Period.of(0, 1347, 0).toString(), durationP4.stringValue());
-        assertEquals(positiveExample5, durationP5.stringValue());
-        assertEquals(Period.of(0, 1347, 0).toString(), durationP6.stringValue());
-        assertEquals(Period.of(0, 1347, 0).toString(), durationP7.stringValue());
-        assertEquals(positiveExample8, durationP8.stringValue());
+        assertEquals(Period.of(1, 2, 3).toString(), durationP1.getLabel());
+        assertEquals(Duration.ofHours(1).plusMinutes(2).plusSeconds(3).plusNanos(400000000).toString(), durationP2.getLabel());
+        assertEquals(Period.of(1347, 0, 0).toString(), durationP3.getLabel());
+        assertEquals(Period.of(0, 1347, 0).toString(), durationP4.getLabel());
+        assertEquals(positiveExample5, durationP5.getLabel());
+        assertEquals(Period.of(0, 1347, 0).toString(), durationP6.getLabel());
+        assertEquals(Period.of(0, 1347, 0).toString(), durationP7.getLabel());
+        assertEquals(positiveExample8, durationP8.getLabel());
 
         assertThrows(IncorrectFormatException.class, () -> BasicDuration.parse(negativeExample1));
         assertThrows(IncorrectFormatException.class, () -> BasicDuration.parse(negativeExample2));
@@ -101,7 +92,7 @@ public class BasicDurationTest {
     @Test
     public void stringValue() {
         BasicDuration basicDuration = BasicDuration.parse("P2DT3H4M");
-        assertEquals("P2DT3H4M", basicDuration.stringValue());
+        assertEquals("\"P2DT3H4M\"^^<http://www.w3.org/2001/XMLSchema#duration>", basicDuration.stringValue());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 import org.junit.Test;
 
@@ -29,7 +28,7 @@ public class CoreseIntegerTest extends AbstractCoreseNumberTest {
     @Override
     public void getCoreDatatype() {
         AbstractCoreseNumber coreseNumber = createNumber("1346");
-        assertEquals(CoreDatatype.XSD.INTEGER, coreseNumber.getCoreDatatype());
+        assertEquals(XSD.INTEGER, coreseNumber.getCoreDatatype());
     }
 
     @Override

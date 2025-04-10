@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.impl.exception.IncorrectDatatypeException;
 import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.api.base.model.literal.XSD;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.temp.CoreseIRI;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractTemporalPointLiteral;
 import fr.inria.corese.core.sparql.api.IDatatype;
