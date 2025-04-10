@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.api.model.impl.corese;
 
 import fr.inria.corese.core.next.api.model.ValueFactoryTest;
+import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import org.junit.Before;
 import org.junit.Test;
 

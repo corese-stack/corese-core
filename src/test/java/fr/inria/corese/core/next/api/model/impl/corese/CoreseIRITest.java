@@ -1,8 +1,9 @@
 package fr.inria.corese.core.next.api.model.impl.corese;
 
-import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.api.model.IRI;
+import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.model.IRITest;
+import fr.inria.corese.core.next.impl.temp.CoreseIRI;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
