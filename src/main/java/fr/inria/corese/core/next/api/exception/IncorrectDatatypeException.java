@@ -5,6 +5,8 @@ package fr.inria.corese.core.next.api.exception;
  */
 public class IncorrectDatatypeException extends CoreseException {
 
+    private static final long serialVersionUID = 787967948679775083L;
+
     public IncorrectDatatypeException(String s) {
         super(s);
     }

@@ -7,10 +7,20 @@ import java.io.Serializable;
  */
 public interface Namespace extends Serializable, Comparable<Namespace> {
 
+    /**
+     * @return The prefix of the namespace.
+     */
     String getPrefix();
 
+    /**
+     * @return The name of the namespace, which is the start of an IRI.
+     */
     String getName();
 
+    /**
+     * @param o
+     * @return true if o is a Namespace and has the same prefix and name as this Namespace.
+     */
     @Override
     boolean equals(Object o);
 

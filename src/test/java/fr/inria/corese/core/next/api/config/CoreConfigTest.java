@@ -7,6 +7,6 @@ public class CoreConfigTest {
 
     @Test
     public void instantiationTest(){
-        Assert.assertEquals("INFO", CoreConfig.getInstance().logLevel);
+        Assert.assertEquals("INFO", CoreConfig.getInstance().getLogLevel());
     }
 }

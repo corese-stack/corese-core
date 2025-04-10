@@ -1,9 +1,11 @@
 package fr.inria.corese.core.next.api.exception;
 
 /**
- * Used for any error raised from parsing of a string in a standard format
+ * Used for any error raised from parsing of a string that should have been in a standard format (i.e RDF/XML, Turtle, JSON-LD, etc.)
  */
 public class IncorrectFormatException extends CoreseException {
+
+    private static final long serialVersionUID = -5769394449085722803L;
 
     public IncorrectFormatException(String message) {
         super(message);

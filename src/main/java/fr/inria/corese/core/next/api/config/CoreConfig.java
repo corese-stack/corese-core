@@ -6,17 +6,31 @@ import com.typesafe.config.*;
  * Configuration class for Corese Core
  */
 public class CoreConfig {
-    public static CoreConfig instance = null;
+    private static CoreConfig instance = null;
 
-    Config conf;
-    String logLevel;
+    private final Config config;
+    private final String logLevel;
+
     private CoreConfig(){
-        conf = ConfigFactory.load().getConfig("core");
-        logLevel = conf.getString("log.level");
+        config = ConfigFactory.load().getConfig("core");
+        logLevel = config.getString("log.level");
     }
+
+    /**
+     * Get the singleton instance of CoreConfig
+     * @return the singleton instance of CoreConfig
+     */
     public static CoreConfig getInstance() {
         if(instance==null) { instance = new CoreConfig(); }
         return instance;
+    }
+
+    /**
+     * Get the log level from the configuration
+     * @return the log level
+     */
+    public String getLogLevel() {
+        return logLevel;
     }
 
 }
