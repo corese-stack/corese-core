@@ -6,6 +6,12 @@ import fr.inria.corese.core.next.api.model.impl.corese.CoreseIRI;
 import fr.inria.corese.core.next.api.model.impl.literal.AbstractLiteral;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
+/**
+ * xsd:boolean
+ * The type xsd:boolean represents logical yes/no values. The valid values for xsd:boolean are true, false, 0, and 1.
+ * Values that are capitalized (e.g. TRUE) or abbreviated (e.g. T) are not valid.
+ */
+
 public class CoreseBoolean extends AbstractLiteral {
 
     private final fr.inria.corese.core.sparql.datatype.CoreseBoolean coreseObject;
