@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.impl.temp;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.api.model.base.AbstractIRI;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.base.model.AbstractIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseURI;
 

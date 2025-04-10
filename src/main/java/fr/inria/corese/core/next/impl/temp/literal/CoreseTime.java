@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype.XSD;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.api.base.model.literal.XSD;
 
 /**
  * There are no dedicated implementation to represent xsd:time in Corese.

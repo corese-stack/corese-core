@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
+import fr.inria.corese.core.next.api.base.model.literal.XSD;
 import org.junit.Test;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -20,8 +20,8 @@ public class CoreseDateTest {
         CoreseDate newAPICoreseDate = new CoreseDate(coreseDate);
 
         assertEquals(calendar, newAPICoreseDate.calendarValue());
-        assertEquals(CoreDatatype.XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
-        assertEquals(CoreDatatype.XSD.DATE, newAPICoreseDate.getCoreDatatype());
+        assertEquals(XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
+        assertEquals(XSD.DATE, newAPICoreseDate.getCoreDatatype());
     }
 
     /**
@@ -33,8 +33,8 @@ public class CoreseDateTest {
         CoreseDate newAPICoreseDate = new CoreseDate("2000-01-15T00:00:00");
 
         assertEquals(calendar.toXMLFormat(), newAPICoreseDate.calendarValue().toXMLFormat());
-        assertEquals(CoreDatatype.XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
-        assertEquals(CoreDatatype.XSD.DATE, newAPICoreseDate.getCoreDatatype());
+        assertEquals(XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
+        assertEquals(XSD.DATE, newAPICoreseDate.getCoreDatatype());
     }
 
     /**
@@ -46,8 +46,8 @@ public class CoreseDateTest {
         CoreseDate newAPICoreseDate = new CoreseDate(calendar);
 
         assertEquals(calendar.toXMLFormat(), newAPICoreseDate.calendarValue().toXMLFormat()); // Converted to string format because of freak Xerces cast exception
-        assertEquals(CoreDatatype.XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
-        assertEquals(CoreDatatype.XSD.DATE, newAPICoreseDate.getCoreDatatype());
+        assertEquals(XSD.DATE.getIRI().stringValue(), newAPICoreseDate.getDatatype().stringValue());
+        assertEquals(XSD.DATE, newAPICoreseDate.getCoreDatatype());
     }
 
     /**

@@ -73,9 +73,13 @@ target/
 *.coverage
 *.reports
 
+# Generated files
+gradle/gradle-daemon-jvm.properties
+
 ## #################################################################
 ## Miscellaneous ignores
 ## #################################################################
 
 # Other build directories and generated files
 /bin/
+

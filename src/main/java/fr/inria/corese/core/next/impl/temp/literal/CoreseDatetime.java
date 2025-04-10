@@ -1,13 +1,13 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.api.exception.IncorrectDatatypeException;
-import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype.XSD;
+import fr.inria.corese.core.next.impl.exception.IncorrectDatatypeException;
+import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.api.base.model.literal.XSD;
 import fr.inria.corese.core.next.impl.temp.CoreseIRI;
-import fr.inria.corese.core.next.api.model.base.literal.AbstractTemporalPointLiteral;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractTemporalPointLiteral;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;

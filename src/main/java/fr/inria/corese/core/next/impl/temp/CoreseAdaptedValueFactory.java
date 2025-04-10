@@ -1,10 +1,12 @@
 package fr.inria.corese.core.next.impl.temp;
 
-import fr.inria.corese.core.next.api.model.*;
-import fr.inria.corese.core.next.api.model.base.literal.AbstractLiteral;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype.XSD;
-import fr.inria.corese.core.next.impl.temp.literal.*;
+import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.base.model.literal.XSD;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseDate;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseDatetime;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseDuration;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
