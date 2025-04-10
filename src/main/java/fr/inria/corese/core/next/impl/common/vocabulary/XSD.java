@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.impl.common.vocabulary;
 
-import fr.inria.corese.core.next.api.model.IRI;
+import fr.inria.corese.core.next.api.IRI ;
 import fr.inria.corese.core.next.impl.common.BasicIRI;
 
 /**

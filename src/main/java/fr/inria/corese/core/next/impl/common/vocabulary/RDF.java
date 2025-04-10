@@ -1,14 +1,8 @@
-<<<<<<<< HEAD:src/main/java/fr/inria/corese/core/next/impl/common/vocabulary/RDF.java
 package fr.inria.corese.core.next.impl.common.vocabulary;
 
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.impl.common.BasicIRI;
-========
-package fr.inria.corese.core.next.api.base.vocabulary;
-
 import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.impl.basic.BasicIRI;
->>>>>>>> feature/temporal_literal:src/main/java/fr/inria/corese/core/next/api/base/vocabulary/RDF.java
+import fr.inria.corese.core.next.impl.common.BasicIRI;
+import fr.inria.corese.core.next.impl.common.vocabulary.Vocabulary;
 
 /**
  * Defines the RDF vocabulary.

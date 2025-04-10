@@ -1,12 +1,6 @@
-<<<<<<<< HEAD:src/main/java/fr/inria/corese/core/next/api/model/base/literal/AbstractDuration.java
-package fr.inria.corese.core.next.api.model.base.literal;
-
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype.XSD;
-========
 package fr.inria.corese.core.next.api.base.model.literal;
 
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
->>>>>>>> feature/temporal_literal:src/main/java/fr/inria/corese/core/next/api/base/model/literal/AbstractDuration.java
 
 import java.time.DateTimeException;
 import java.time.temporal.TemporalAmount;

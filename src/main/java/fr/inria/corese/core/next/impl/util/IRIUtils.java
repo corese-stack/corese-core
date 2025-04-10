@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/fr/inria/corese/core/next/impl/common/util/IRIUtils.java
-package fr.inria.corese.core.next.impl.common.util;
-========
 package fr.inria.corese.core.next.impl.util;
->>>>>>>> feature/temporal_literal:src/main/java/fr/inria/corese/core/next/impl/util/IRIUtils.java
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

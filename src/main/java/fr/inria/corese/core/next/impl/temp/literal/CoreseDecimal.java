@@ -1,9 +1,10 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.exception.IncorrectDatatypeException;
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.api.model.base.literal.AbstractLiteral;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
+import fr.inria.corese.core.next.api.base.model.literal.XSD;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.exception.IncorrectDatatypeException;
 import fr.inria.corese.core.sparql.datatype.CoreseDouble;
 
 import java.math.BigDecimal;
@@ -16,11 +17,11 @@ import java.math.BigInteger;
 public class CoreseDecimal extends AbstractCoreseNumber {
 
     public CoreseDecimal(double value) {
-        super(new CoreseDouble(value), CoreDatatype.XSD.DECIMAL.getIRI());
+        super(new CoreseDouble(value), XSD.DECIMAL.getIRI());
     }
 
     public CoreseDecimal(CoreseDouble coreseObject) {
-        super(coreseObject, CoreDatatype.XSD.DECIMAL.getIRI());
+        super(coreseObject, XSD.DECIMAL.getIRI());
     }
 
     public CoreseDecimal(CoreseDouble coreseObject, IRI datatype) {
@@ -43,12 +44,12 @@ public class CoreseDecimal extends AbstractCoreseNumber {
     }
 
     public CoreseDecimal(BigDecimal bigDecimal) {
-        super(new CoreseDouble(bigDecimal.doubleValue()), CoreDatatype.XSD.DECIMAL.getIRI());
+        super(new CoreseDouble(bigDecimal.doubleValue()), XSD.DECIMAL.getIRI());
     }
 
     @Override
     public CoreDatatype getCoreDatatype() {
-        return CoreDatatype.XSD.DECIMAL;
+        return XSD.DECIMAL;
     }
 
     @Override

@@ -1,16 +1,9 @@
-<<<<<<<< HEAD:src/main/java/fr/inria/corese/core/next/api/model/base/AbstractIRI.java
-package fr.inria.corese.core.next.api.model.base;
 
-import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.impl.common.util.IRIUtils;
-========
 package fr.inria.corese.core.next.api.base.model;
 
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.impl.util.IRIUtils;
->>>>>>>> feature/temporal_literal:src/main/java/fr/inria/corese/core/next/api/base/model/AbstractIRI.java
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

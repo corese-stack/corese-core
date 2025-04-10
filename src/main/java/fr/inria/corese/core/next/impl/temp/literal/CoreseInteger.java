@@ -1,10 +1,11 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.exception.IncorrectDatatypeException;
-import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.api.model.base.literal.AbstractLiteral;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
+import fr.inria.corese.core.next.api.base.model.literal.XSD;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.exception.IncorrectDatatypeException;
+import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -15,11 +16,11 @@ import java.math.BigInteger;
 public class CoreseInteger extends AbstractCoreseNumber {
 
     public CoreseInteger(long value) {
-        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(value), CoreDatatype.XSD.INTEGER.getIRI());
+        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(value), XSD.INTEGER.getIRI());
     }
 
     public CoreseInteger(fr.inria.corese.core.sparql.datatype.CoreseInteger coreseObject) {
-        super(coreseObject, CoreDatatype.XSD.INTEGER.getIRI());
+        super(coreseObject, XSD.INTEGER.getIRI());
     }
 
     public CoreseInteger(fr.inria.corese.core.sparql.datatype.CoreseInteger coreseObject, IRI datatype) {
@@ -42,12 +43,12 @@ public class CoreseInteger extends AbstractCoreseNumber {
     }
 
     public CoreseInteger(BigInteger bigInteger) {
-        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(bigInteger.longValue()), CoreDatatype.XSD.INTEGER.getIRI());
+        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(bigInteger.longValue()), XSD.INTEGER.getIRI());
     }
 
     @Override
     public CoreDatatype getCoreDatatype() {
-        return CoreDatatype.XSD.INTEGER;
+        return XSD.INTEGER;
     }
 
     @Override

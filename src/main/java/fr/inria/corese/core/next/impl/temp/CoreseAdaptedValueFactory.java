@@ -1,12 +1,10 @@
 package fr.inria.corese.core.next.impl.temp;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
 import fr.inria.corese.core.next.api.base.model.literal.XSD;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseDate;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseDatetime;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseDuration;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseTime;
+import fr.inria.corese.core.next.impl.temp.literal.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,16 +201,16 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Statement createStatement(Resource subject, IRI predicate, Value object) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Triple createTriple(Resource subject, IRI predicate, Value object) {
-        return ValueFactory.super.createTriple(subject, predicate, object);
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

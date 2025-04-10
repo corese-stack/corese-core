@@ -1,13 +1,4 @@
-<<<<<<<< HEAD:src/main/java/fr/inria/corese/core/next/impl/common/literal/BasicDuration.java
 package fr.inria.corese.core.next.impl.common.literal;
-
-import fr.inria.corese.core.next.api.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype;
-import fr.inria.corese.core.next.api.model.base.literal.CoreDatatype.XSD;
-import fr.inria.corese.core.next.api.model.base.literal.AbstractDuration;
-========
-package fr.inria.corese.core.next.impl.basic.literal;
 
 import fr.inria.corese.core.next.api.Literal;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
@@ -15,7 +6,6 @@ import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.api.base.model.literal.XSD;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractDuration;
->>>>>>>> feature/temporal_literal:src/main/java/fr/inria/corese/core/next/impl/basic/literal/BasicDuration.java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

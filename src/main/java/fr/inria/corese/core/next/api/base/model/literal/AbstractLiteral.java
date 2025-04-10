@@ -1,17 +1,9 @@
-<<<<<<<< HEAD:src/main/java/fr/inria/corese/core/next/api/model/base/literal/AbstractLiteral.java
-package fr.inria.corese.core.next.api.model.base.literal;
-
-import fr.inria.corese.core.next.api.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.api.model.Literal;
-========
 package fr.inria.corese.core.next.api.base.model.literal;
 
 import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Literal;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
->>>>>>>> feature/temporal_literal:src/main/java/fr/inria/corese/core/next/api/base/model/literal/AbstractLiteral.java
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.Serializable;
@@ -27,43 +19,39 @@ import java.util.Optional;
  */
 public abstract class AbstractLiteral implements Literal, Serializable {
 
-    protected final IRI datatype;
+    protected IRI datatype;
 
-<<<<<<<< HEAD:src/main/java/fr/inria/corese/core/next/api/model/base/literal/AbstractLiteral.java
     protected static List<IRI> integerXSDCoreDatatypeIRIs = List.of(
-            CoreDatatype.XSD.INTEGER.getIRI(),
-            CoreDatatype.XSD.BYTE.getIRI(),
-            CoreDatatype.XSD.SHORT.getIRI(),
-            CoreDatatype.XSD.INT.getIRI(),
-            CoreDatatype.XSD.LONG.getIRI(),
-            CoreDatatype.XSD.UNSIGNED_BYTE.getIRI(),
-            CoreDatatype.XSD.UNSIGNED_SHORT.getIRI(),
-            CoreDatatype.XSD.UNSIGNED_INT.getIRI(),
-            CoreDatatype.XSD.UNSIGNED_LONG.getIRI(),
-            CoreDatatype.XSD.POSITIVE_INTEGER.getIRI(),
-            CoreDatatype.XSD.NEGATIVE_INTEGER.getIRI(),
-            CoreDatatype.XSD.NON_NEGATIVE_INTEGER.getIRI(),
-            CoreDatatype.XSD.NON_POSITIVE_INTEGER.getIRI()
+            XSD.INTEGER.getIRI(),
+            XSD.BYTE.getIRI(),
+            XSD.SHORT.getIRI(),
+            XSD.INT.getIRI(),
+            XSD.LONG.getIRI(),
+            XSD.UNSIGNED_BYTE.getIRI(),
+            XSD.UNSIGNED_SHORT.getIRI(),
+            XSD.UNSIGNED_INT.getIRI(),
+            XSD.UNSIGNED_LONG.getIRI(),
+            XSD.POSITIVE_INTEGER.getIRI(),
+            XSD.NEGATIVE_INTEGER.getIRI(),
+            XSD.NON_NEGATIVE_INTEGER.getIRI(),
+            XSD.NON_POSITIVE_INTEGER.getIRI()
     );
 
     protected static List<IRI> decimalXSDCoreDatatypeIRIs = List.of(
-            CoreDatatype.XSD.DECIMAL.getIRI(),
-            CoreDatatype.XSD.FLOAT.getIRI(),
-            CoreDatatype.XSD.DOUBLE.getIRI()
+            XSD.DECIMAL.getIRI(),
+            XSD.FLOAT.getIRI(),
+            XSD.DOUBLE.getIRI()
     );
 
-========
     /**
      * Constructor for AbstractLiteral.
      *
      * @param datatype the datatype of the literal
      */
->>>>>>>> feature/temporal_literal:src/main/java/fr/inria/corese/core/next/api/base/model/literal/AbstractLiteral.java
     protected AbstractLiteral(IRI datatype) {
         this.datatype = datatype;
     }
 
-<<<<<<<< HEAD:src/main/java/fr/inria/corese/core/next/api/model/base/literal/AbstractLiteral.java
     public static boolean isIntegerCoreDatatype(CoreDatatype coreDatatype) {
         return integerXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
     }
@@ -79,16 +67,12 @@ public abstract class AbstractLiteral implements Literal, Serializable {
     public static boolean isIriOfDecimalCoreDatatype(IRI iri) {
         return decimalXSDCoreDatatypeIRIs.contains(iri);
     }
-
-    protected abstract void setCoreDatatype(CoreDatatype coreDatatype);
-========
     /**
      * Sets the core datatype of the literal.
      *
      * @param coreDatatype the CoreDatatype to set
      */
-    public abstract void setCoreDatatype(CoreDatatype coreDatatype);
->>>>>>>> feature/temporal_literal:src/main/java/fr/inria/corese/core/next/api/base/model/literal/AbstractLiteral.java
+    protected abstract void setCoreDatatype(CoreDatatype coreDatatype);
 
     @Override
     public boolean isLiteral() {
