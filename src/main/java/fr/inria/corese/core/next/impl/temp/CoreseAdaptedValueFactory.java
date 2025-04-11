@@ -102,7 +102,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(boolean value) {
-        return null;
+        return new CoreseBoolean(value);
     }
 
     @Override
