@@ -1,12 +1,13 @@
 package fr.inria.corese.core.next.api.model.impl.corese;
 
-import fr.inria.corese.core.next.api.model.IRI;
-import fr.inria.corese.core.next.api.model.Literal;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.impl.common.literal.RDF;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.api.model.ValueFactoryTest;
-import fr.inria.corese.core.next.api.model.base.CoreDatatype;
-import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseLanguageTaggedString;
-import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseTyped;
-import fr.inria.corese.core.sparql.datatype.CoreseDatatype;
+import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedString;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
     public void setUp() {
         this.valueFactory = new CoreseAdaptedValueFactory();
         stringTestValue = "String value";
-        xsdStringIRI = CoreDatatype.XSD.STRING.getIRI();
+        xsdStringIRI = XSD.STRING.getIRI();
     }
 
     @Test
@@ -44,7 +45,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(CoreDatatype.XSD.STRING, literal.getCoreDatatype());
+        assertEquals(XSD.STRING, literal.getCoreDatatype());
     }
 
     @Test
@@ -58,7 +59,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         assertTrue(literal instanceof CoreseLanguageTaggedString);
         assertEquals(stringTestValue, literal.getLabel());
         assertEquals(testLanguage, literal.getLanguage().orElse(null));
-        assertEquals(CoreDatatype.RDF.LANGSTRING, literal.getCoreDatatype());
+        assertEquals(RDF.LANGSTRING, literal.getCoreDatatype());
     }
 
     @Test
@@ -69,28 +70,28 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(CoreDatatype.XSD.STRING, literal.getCoreDatatype());
+        assertEquals(XSD.STRING, literal.getCoreDatatype());
     }
 
     @Test
     public void testCreateLiteralWithCoreDatatype() {
         // Test createLiteral with CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, CoreDatatype.XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, XSD.STRING);
 
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(CoreDatatype.XSD.STRING, literal.getCoreDatatype());
+        assertEquals(XSD.STRING, literal.getCoreDatatype());
     }
 
     @Test
     public void testCreateLiteralWithDatatypeIRIAndCoreDatatype() {
         // Test createLiteral with IRI datatype and CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, CoreDatatype.XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSD.STRING);
 
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(CoreDatatype.XSD.STRING, literal.getCoreDatatype());
+        assertEquals(XSD.STRING, literal.getCoreDatatype());
     }
 }
