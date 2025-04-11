@@ -16,6 +16,12 @@ public abstract class AbstractCoreseNumber extends AbstractLiteral implements Co
 
     protected final CoreseNumber coreseObject;
 
+    /**
+     * Constructor for AbstractCoreseNumber.
+     *
+     * @param coreseObject the CoreseNumber object
+     * @param datatype     the datatype of the literal
+     */
     protected AbstractCoreseNumber(CoreseNumber coreseObject, IRI datatype) {
         super(datatype);
         this.coreseObject = coreseObject;

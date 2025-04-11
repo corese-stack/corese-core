@@ -20,6 +20,12 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI>, Serializable 
     private final String namespace;
     private final String localName;
 
+    /**
+     * Constructor for AbstractIRI.
+     *
+     * @param fullIRI the full IRI string
+     * @throws IncorrectFormatException if the IRI format is incorrect
+     */
     protected AbstractIRI(String fullIRI) {
         if(! IRIUtils.isStandardIRI(fullIRI)) {
             throw new IncorrectFormatException("IRI '"+ fullIRI +"' must be a valid IRI");
@@ -28,7 +34,17 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI>, Serializable 
         this.localName = IRIUtils.guessLocalName(fullIRI);
     }
 
+    /**
+     * Constructor for AbstractIRI with namespace and local name.
+     *
+     * @param namespace the namespace of the IRI
+     * @param localName the local name of the IRI
+     * @throws IncorrectFormatException if the IRI format is incorrect
+     */
     protected AbstractIRI(String namespace, String localName) {
+        if(! IRIUtils.isStandardIRI(namespace + localName)) {
+            throw new IncorrectFormatException("IRI '"+ namespace + localName +"' must be a valid IRI");
+        }
         this.namespace = namespace;
         this.localName = localName;
     }

@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.common.vocabulary;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.impl.common.BasicIRI;
 import fr.inria.corese.core.next.impl.common.vocabulary.Vocabulary;
+import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 
 /**
  * Defines the RDF vocabulary.
@@ -36,6 +37,12 @@ public enum RDF implements Vocabulary {
 
     private final IRI iri;
 
+    /**
+     * Constructor for the RDF vocabulary enum.
+     *
+     * @param localName the local name of the IRI
+     * @throws IncorrectFormatException if the namespace and the local name do not form a correct IRI
+     */
     RDF(String localName) {
         this.iri = new BasicIRI(getNamespace(), localName);
     }

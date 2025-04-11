@@ -5,6 +5,9 @@ package fr.inria.corese.core.next.api;
  */
 public interface Resource extends Value {
 
+	/**
+	 * @return true
+	 */
 	@Override
 	default boolean isResource() {
 		return true;

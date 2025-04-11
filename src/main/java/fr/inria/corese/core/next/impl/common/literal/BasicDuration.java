@@ -30,6 +30,9 @@ public class BasicDuration extends AbstractDuration {
     private static final Logger logger = LoggerFactory.getLogger(BasicDuration.class);
     private final XSDDuration temporalAmount;
 
+    /**
+     * A list of temporal units that contains all ChronoUnit covered by the XSD duration.
+     */
     private static final List<TemporalUnit> UNITS = new ArrayList<>(EnumSet.of(
             YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS, NANOS
     ));
@@ -326,10 +329,16 @@ public class BasicDuration extends AbstractDuration {
             return builder.toString();
         }
 
+        /**
+         * Sets the duration to negative.
+         */
         public void setNegative() {
             this.isNegative = true;
         }
 
+        /**
+         * @return true if the duration is negative, false otherwise.
+         */
         public boolean isNegative() {
             return this.isNegative;
         }

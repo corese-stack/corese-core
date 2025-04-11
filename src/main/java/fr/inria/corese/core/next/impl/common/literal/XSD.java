@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
 
 /**
- * Enumeration representing XML Schema Datatypes (XSD) to be used as core datatype in literals.
+ * Enumeration of the XML Schema Datatypes (XSD) to be used as core datatype in literals.
  */
 public enum XSD implements CoreDatatype {
     BOOLEAN(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdBoolean.getIRI()),

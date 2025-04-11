@@ -7,9 +7,18 @@ import fr.inria.corese.core.next.api.IRI;
  */
 public interface Vocabulary {
 
+    /**
+     * @return the IRI of this vocabulary element
+     */
     IRI getIRI();
 
+    /**
+     * @return the namespace of this vocabulary
+     */
     String getNamespace();
 
+    /**
+     * @return the preferred prefix of this vocabulary
+     */
     String getPreferredPrefix();
 }

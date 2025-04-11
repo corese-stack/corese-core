@@ -9,6 +9,11 @@ public class IncorrectDatatypeException extends CoreseException {
 
     private static final long serialVersionUID = 787967948679775083L;
 
+    /**
+     * Constructor for IncorrectDatatypeException.
+     *
+     * @param s the error message
+     */
     public IncorrectDatatypeException(String s) {
         super(s);
     }

@@ -10,9 +10,18 @@ import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
 
 import java.time.temporal.TemporalAmount;
 
+/**
+ * CoreseDuration class that represents a duration literal in the Corese framework.
+ * @ImplNote Legacy corese do not have a class dedicated to the storage of duration. The object is stored as a string literal.
+ */
 public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAdapter {
     private CoreseUndefLiteral coreseObject;
 
+    /**
+     * Constructor for CoreseDuration.
+     *
+     * @param coreseObject  the CoreseUndefLiteral object
+     */
     public CoreseDuration(IDatatype coreseObject) {
         if (coreseObject instanceof CoreseUndefLiteral) {
             this.coreseObject = (CoreseUndefLiteral) coreseObject;
@@ -21,14 +30,33 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
         }
     }
 
+    /**
+     * Constructor for CoreseDuration.
+     *
+     * @param duration the duration in string format
+     */
     public CoreseDuration(String duration) {
         this(new CoreseUndefLiteral(duration, XSD.DURATION.getIRI().stringValue()));
     }
 
+    /**
+     * Constructor for CoreseDuration.
+     *
+     * @param value the duration value
+     * @param datatype the datatype IRI
+     */
     public CoreseDuration(String value, IRI datatype) {
         this(new CoreseUndefLiteral(value, datatype.stringValue()));
     }
 
+    /**
+     * Constructor for CoreseDuration.
+     *
+     * @param value the duration value
+     * @param datatype the datatype IRI
+     * @param coreDatatype the core datatype
+     * @throws UnsupportedOperationException if the core datatype is not xsd:duration
+     */
     public CoreseDuration(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
         if(coreDatatype != null && coreDatatype != XSD.DURATION) {
@@ -36,6 +64,11 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
         }
     }
 
+    /**
+     * Constructor for CoreseDuration.
+     *
+     * @param duration the duration as a TemporalAmount
+     */
     public CoreseDuration(TemporalAmount duration) {
         this(duration.toString());
     }

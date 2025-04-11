@@ -9,18 +9,37 @@ public class IncorrectFormatException extends CoreseException {
 
     private static final long serialVersionUID = -5769394449085722803L;
 
+    /**
+     * Constructor for IncorrectFormatException.
+     *
+     * @param message the error message
+     */
     public IncorrectFormatException(String message) {
         super(message);
     }
 
+    /**
+     * Constructor for IncorrectFormatException with a cause.
+     *
+     * @param message the error message
+     * @param cause   the cause of the exception
+     */
     public IncorrectFormatException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructor for IncorrectFormatException with a cause.
+     *
+     * @param cause the cause of the exception
+     */
     public IncorrectFormatException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Default constructor for IncorrectFormatException.
+     */
     public IncorrectFormatException() {
         super();
     }

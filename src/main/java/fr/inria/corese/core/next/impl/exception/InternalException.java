@@ -9,10 +9,20 @@ public class InternalException extends CoreseException {
 
     private static final long serialVersionUID = -3689791112856069766L;
 
+    /**
+     * Constructor for InternalException.
+     *
+     * @param e the cause of the exception
+     */
     public InternalException(Exception e) {
         super(e);
     }
 
+    /**
+     * Constructor for InternalException with a message.
+     *
+     * @param s the error message
+     */
     public InternalException(String s) {
         super(s);
     }

@@ -53,18 +53,34 @@ public abstract class AbstractLiteral implements Literal, Serializable {
         this.datatype = datatype;
     }
 
+    /**
+     * @param coreDatatype a CoreDatatype
+     * @return true if the given core datatype is an integer core datatype, e.g xsd;integer, xsd:int, xsd:byte, etc, false otherwise
+     */
     public static boolean isIntegerCoreDatatype(CoreDatatype coreDatatype) {
         return integerXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
     }
 
+    /**
+     * @param iri an IRI
+     * @return true if the given IRI is an integer core datatype, e.g xsd;integer, xsd:int, xsd:byte, etc, false otherwise
+     */
     public static boolean isIriOfIntegerCoreDatatype(IRI iri) {
         return integerXSDCoreDatatypeIRIs.contains(iri);
     }
 
+    /**
+     * @param coreDatatype a CoreDatatype
+     * @return true if the given core datatype is a decimal core datatype, e.g xsd;decimal, xsd:float, xsd:double, etc, false otherwise
+     */
     public static boolean isDecimalCoreDatatype(CoreDatatype coreDatatype) {
         return decimalXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
     }
 
+    /**
+     * @param iri an IRI
+     * @return true if the given IRI is a decimal core datatype, e.g xsd;decimal, xsd:float, xsd:double, etc, false otherwise
+     */
     public static boolean isIriOfDecimalCoreDatatype(IRI iri) {
         return decimalXSDCoreDatatypeIRIs.contains(iri);
     }

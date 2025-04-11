@@ -7,6 +7,11 @@ import fr.inria.corese.core.next.api.IRI;
  */
 public abstract class AbstractTemporalPointLiteral extends AbstractLiteral implements Comparable<AbstractTemporalPointLiteral> {
 
+    /**
+     * Constructor for AbstractTemporalPointLiteral.
+     *
+     * @param datatype the datatype of the temporal point literal
+     */
     protected AbstractTemporalPointLiteral(IRI datatype) {
         super(datatype);
     }
