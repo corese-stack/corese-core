@@ -1,8 +1,7 @@
-package fr.inria.corese.core.next.api.model.impl.basic.literal;
+package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.api.model.base.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.next.api.model.impl.corese.literal.CoreseBoolean;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -29,8 +28,8 @@ public class CoreseBooleanTest {
         assertEquals("false", falseBoolean.stringValue());
 
         // Test that coreDatatype is set to XSD.BOOLEAN
-        assertEquals(CoreDatatype.XSD.BOOLEAN.getIRI(), trueBoolean.getDatatype());
-        assertEquals(CoreDatatype.XSD.BOOLEAN.getIRI(), falseBoolean.getDatatype());
+        assertEquals(XSD.BOOLEAN.getIRI(), trueBoolean.getDatatype());
+        assertEquals(XSD.BOOLEAN.getIRI(), falseBoolean.getDatatype());
     }
 
     @Test
@@ -42,7 +41,7 @@ public class CoreseBooleanTest {
         // Test that the CoreseBoolean is created correctly
         assertTrue(coreseBoolean.booleanValue());
         assertEquals("true", coreseBoolean.getLabel());
-        assertEquals(CoreDatatype.XSD.BOOLEAN.getIRI(), coreseBoolean.getDatatype());
+        assertEquals(XSD.BOOLEAN.getIRI(), coreseBoolean.getDatatype());
     }
 
     @Test
