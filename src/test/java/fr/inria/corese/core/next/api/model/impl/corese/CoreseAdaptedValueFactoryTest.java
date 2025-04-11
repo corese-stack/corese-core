@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.api.model.ValueFactoryTest;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedString;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
 import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         Literal literal = valueFactory.createLiteral(stringTestValue, testLanguage);
 
         assertNotNull(literal);
-        assertTrue(literal instanceof CoreseLanguageTaggedString);
+        assertTrue(literal instanceof CoreseLanguageTaggedStringLiteral);
         assertEquals(stringTestValue, literal.getLabel());
         assertEquals(testLanguage, literal.getLanguage().orElse(null));
         assertEquals(RDF.LANGSTRING, literal.getCoreDatatype());

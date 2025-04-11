@@ -49,7 +49,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Literal createLiteral(String label, String language) {
-        return new CoreseLanguageTaggedString(label, language);
+        return new CoreseLanguageTaggedStringLiteral(label, language);
     }
 
     @Override

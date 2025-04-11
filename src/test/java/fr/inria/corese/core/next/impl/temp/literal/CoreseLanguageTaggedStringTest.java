@@ -22,7 +22,7 @@ public class CoreseLanguageTaggedStringTest {
     public void testConstructorWithIDatatype() {
         // Create a mock CoreseLiteral with value and language
         IDatatype coreseLiteral = new CoreseLiteral(testValue, testLanguage);
-        CoreseLanguageTaggedString coreseLanguageTaggedString = new CoreseLanguageTaggedString(coreseLiteral);
+        CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(coreseLiteral);
         // Test that the coreseObject is correctly assigned
         assertEquals(testValue, coreseLanguageTaggedString.getLabel());
         assertEquals(testLanguage, coreseLanguageTaggedString.getLanguage().orElse(null));
@@ -32,7 +32,7 @@ public class CoreseLanguageTaggedStringTest {
 
     @Test
     public void testConstructorWithValueAndLanguage() {
-        CoreseLanguageTaggedString coreseLanguageTaggedString = new CoreseLanguageTaggedString(testValue, testLanguage);
+        CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
 
         // Test that the value and language are correctly assigned
         assertEquals(testValue, coreseLanguageTaggedString.getLabel());
@@ -43,14 +43,14 @@ public class CoreseLanguageTaggedStringTest {
 
     @Test
     public void testGetLabel() {
-        CoreseLanguageTaggedString coreseLanguageTaggedString = new CoreseLanguageTaggedString(testValue, testLanguage);
+        CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the label (value) is correctly returned
         assertEquals(testValue, coreseLanguageTaggedString.getLabel());
     }
 
     @Test
     public void testGetLanguage() {
-        CoreseLanguageTaggedString coreseLanguageTaggedString = new CoreseLanguageTaggedString(testValue, testLanguage);
+        CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the language is correctly returned as an Optional
         assertTrue(coreseLanguageTaggedString.getLanguage().isPresent());
         assertEquals(testLanguage, coreseLanguageTaggedString.getLanguage().get());
@@ -58,21 +58,21 @@ public class CoreseLanguageTaggedStringTest {
 
     @Test
     public void testGetValue() {
-        CoreseLanguageTaggedString coreseLanguageTaggedString = new CoreseLanguageTaggedString(testValue, testLanguage);
+        CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the value is correctly returned
         assertEquals(testValue, coreseLanguageTaggedString.getValue());
     }
 
     @Test
     public void testGetCoreDatatype() {
-        CoreseLanguageTaggedString coreseLanguageTaggedString = new CoreseLanguageTaggedString(testValue, testLanguage);
+        CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the CoreDatatype is correctly returned (should be RDF.LANGSTRING)
         assertEquals(RDF.LANGSTRING, coreseLanguageTaggedString.getCoreDatatype());
     }
 
     @Test
     public void testGetDatatype() {
-        CoreseLanguageTaggedString coreseLanguageTaggedString = new CoreseLanguageTaggedString(testValue, testLanguage);
+        CoreseLanguageTaggedStringLiteral coreseLanguageTaggedString = new CoreseLanguageTaggedStringLiteral(testValue, testLanguage);
         // Test that the datatype IRI is correctly returned
         assertEquals(RDF.LANGSTRING.getIRI(), coreseLanguageTaggedString.getDatatype());
     }
