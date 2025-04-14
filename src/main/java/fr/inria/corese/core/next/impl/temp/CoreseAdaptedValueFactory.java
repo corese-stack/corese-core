@@ -69,7 +69,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(String label) {
-        return null;
+        return new CoreseTyped(label);
     }
 
     /**
@@ -79,7 +79,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(String label, String language) {
-        return null;
+        return new CoreseLanguageTaggedStringLiteral(label, language);
     }
 
     /**
@@ -107,8 +107,18 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
             return new CoreseDecimal(new BigDecimal(label));
         }
 
-        // String literal with unkwown datatype
-        return null;
+        // Boolean types
+        else if (XSD.BOOLEAN.getIRI().equals(datatype)) {
+            return new CoreseBoolean(Boolean.parseBoolean(label));
+        }
+
+        // String literals
+        else if (XSD.STRING.getIRI().equals(datatype)) {
+            return new CoreseTyped(label);
+        }
+
+        // unknown datatype
+        return new CoreseTyped(label, datatype);
     }
 
     /**
@@ -136,7 +146,17 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
         } else if(AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
             return new CoreseDecimal(label, coreDatatype.getIRI(), coreDatatype);
         }
-        return null;
+
+        // Boolean types
+        else if (XSD.BOOLEAN.equals(coreDatatype)) {
+            return new CoreseBoolean(Boolean.parseBoolean(label));
+        }
+
+        // String literals
+        else if (XSD.STRING.equals(coreDatatype)) {
+            return new CoreseTyped(label);
+        }
+        return new CoreseTyped(label, coreDatatype.getIRI(), coreDatatype);
     }
 
     /**
@@ -165,7 +185,12 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
         } else if(AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
             return new CoreseDecimal(label, datatype, coreDatatype);
         }
-        return null;
+
+        // String literals
+        else if (XSD.STRING.equals(coreDatatype)) {
+            return new CoreseTyped(label, datatype, coreDatatype);
+        }
+        return new CoreseTyped(label, datatype, coreDatatype);
     }
 
     /**
@@ -175,7 +200,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
      */
     @Override
     public Literal createLiteral(boolean value) {
-        return null;
+        return new CoreseBoolean(value);
     }
 
     /**

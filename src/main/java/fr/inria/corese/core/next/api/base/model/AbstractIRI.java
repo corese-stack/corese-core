@@ -1,5 +1,3 @@
-package fr.inria.corese.core.next.api.model.impl;
-
 package fr.inria.corese.core.next.api.base.model;
 
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;

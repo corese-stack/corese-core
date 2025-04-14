@@ -53,6 +53,16 @@ public enum XSD implements CoreDatatype {
     DOUBLE(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdDouble.getIRI()),
 
     /**
+     * Integer numbers >0
+     */
+    POSITIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdPositiveInteger.getIRI()),
+
+    /**
+     * Integer numbers <0
+     */
+    NEGATIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdNegativeInteger.getIRI()),
+
+    /**
      * Integer numbers ≥0
      */
     NON_NEGATIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdNonNegativeInteger.getIRI()),
