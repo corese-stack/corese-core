@@ -1,3 +1,4 @@
+package fr.inria.corese.core.next.api.model.impl;
 
 package fr.inria.corese.core.next.api.base.model;
 
