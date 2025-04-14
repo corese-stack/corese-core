@@ -1,9 +1,8 @@
 package fr.inria.corese.core.next.api.model.impl.basic;
 
-import fr.inria.corese.core.next.api.model.IRI;
+import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.model.IRITest;
-import fr.inria.corese.core.next.api.model.impl.basic.BasicIRI;
-import org.junit.Test;
+import fr.inria.corese.core.next.impl.common.BasicIRI;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
