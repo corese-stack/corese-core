@@ -1,4 +1,5 @@
 name: Publish Maven Central
+run-name: ${{ github.actor }} triggered Maven Central release on ${{ github.ref_name }}
 
 on:
   push:
