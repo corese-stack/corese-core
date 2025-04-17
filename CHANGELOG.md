@@ -7,6 +7,7 @@
 - Updated and corrected documentation:
   - Fixed typos in the Getting Started guide.
   - Add imports to the Getting Started guide.
+- Improved GitHub Actions log messages for the documentation workflow (`run-name` is now clearer).
 
 ### Fixed
 
