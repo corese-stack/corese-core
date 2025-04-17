@@ -8,6 +8,10 @@
   - Fixed typos in the Getting Started guide.
   - Add imports to the Getting Started guide.
 
+### Fixed
+
+- QNAME parsing error with local names starting with digits and hyphens (e.g. `prefix:2-Systeme-ZBS...`). ([#133](https://github.com/.../issues/133))
+
 ## Version 4.6.3 – 2025-02-20
 
 ### Added
