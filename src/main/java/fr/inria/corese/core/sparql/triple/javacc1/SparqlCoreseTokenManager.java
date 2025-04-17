@@ -17,9 +17,9 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 /** Token Manager. */
 @SuppressWarnings ("unused")
 public class SparqlCoreseTokenManager implements SparqlCoreseConstants {
-        void CommonTokenAction(Token token) {
-                //System.out.println(token+" ");
-        }
+ void CommonTokenAction(Token token) {
+  //System.out.println(token+" ");
+ }
 
   /** Debug output. */
   public  java.io.PrintStream debugStream = System.out;
@@ -3477,7 +3477,7 @@ private int jjMoveNfa_0(int startState, int curPos)
                   { jjCheckNAddTwoStates(142, 143); }
                   break;
                case 142:
-                  if ((0x3ff000000000000L & l) == 0L)
+                  if ((0x3ff200000000000L & l) == 0L)
                      break;
                   if (kind > 10)
                      kind = 10;
