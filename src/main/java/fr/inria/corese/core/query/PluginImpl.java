@@ -6,7 +6,6 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.Graph.TreeNode;
 import fr.inria.corese.core.GraphStore;
 import fr.inria.corese.core.api.Loader;
-import fr.inria.corese.core.approximate.ext.AppxSearchPlugin;
 import fr.inria.corese.core.compiler.eval.ProxyInterpreter;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitorBasic;
@@ -19,8 +18,11 @@ import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Memory;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.load.LoadFormat;
+import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.load.Service;
-import fr.inria.corese.core.load.*;
 import fr.inria.corese.core.load.result.SPARQLResultParser;
 import fr.inria.corese.core.logic.Distance;
 import fr.inria.corese.core.logic.RDFS;
@@ -104,8 +106,6 @@ public class PluginImpl
     int index = 0;
     // Plugin for Transformer functions
     private PluginTransform pt;
-    // Plugin for approximate search
-    private AppxSearchPlugin approximateSearch;
 
     public PluginImpl() {
         init();
@@ -123,9 +123,7 @@ public class PluginImpl
     }
 
     void init() {
-        pt = new PluginTransform(this);
-        setApproximateSearch(new AppxSearchPlugin(this));
-    }
+        pt = new PluginTransform(this);    }
 
     @Override
     public void setMode(Evaluator.Mode mode) {
@@ -240,21 +238,6 @@ public class PluginImpl
     @Override
     public IDatatype format(IDatatype[] ldt) {
         return getPluginTransform().format(ldt);
-    }
-
-    // function xt:approximate
-    // xt:approximate(var, val, algo, threshold)
-    // algo: jw --jaro winckler ng --ngram wn eq
-    @Override
-    public IDatatype approximate(Expr exp, Environment env, Producer p, IDatatype[] param) {
-        return getApproximateSearch().evaluate(exp, env, p, param);
-    }
-
-    // function xt:sim
-    // compute similarity of solution ?
-    @Override
-    public IDatatype approximate(Expr exp, Environment env, Producer p) {
-        return getApproximateSearch().evaluate(exp, env, p);
     }
 
     // function xt:depth
@@ -1163,14 +1146,6 @@ public class PluginImpl
     @Override
     public GraphProcessor getGraphProcessor() {
         return this;
-    }
-
-    public AppxSearchPlugin getApproximateSearch() {
-        return approximateSearch;
-    }
-
-    public void setApproximateSearch(AppxSearchPlugin approximateSearch) {
-        this.approximateSearch = approximateSearch;
     }
 
 }

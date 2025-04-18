@@ -1,7 +1,7 @@
 # Getting Started with Corese-Core
 
 This tutorial shows how to use the Corese-Core library through simple examples of its main features.
-We assume a basic knowledge of Java programming and the Semantic Web.
+We assume basic knowledge of Java programming and the Semantic Web.
 
 - The first section describes how to create, load, and export a Graph.
 - The second section shows how to query a graph using [SPARQL](https://www.w3.org/TR/sparql11-query/).
@@ -40,36 +40,43 @@ graph LR;
     iri:EdithPiaf--ex:lastName-->dt:Piaf;
 ```
 
-This graph represents three statements:
+This graph represents three RDF statements:
 
 - Edith Piaf is a singer.
 - Edith Piaf's first name is Edith.
 - Edith Piaf's last name is Piaf.
 
 ```java
-// Define the namespace 'ex'
-String ex = "http://example.org/";
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.logic.RDF;
 
-// Create a new empty Graph
-Graph graph = Graph.create();
+public class Example {
+    public static void main(String[] args) {
+        // Define the namespace 'ex'
+        String ex = "http://example.org/";
 
-// Create and add IRIs to the Graph
-Node edithPiafIRI = graph.addResource(ex + "EdithPiaf");
-Node singerIRI = graph.addResource(ex + "Singer");
+        // Create a new empty Graph
+        Graph graph = Graph.create();
 
-// Create and add properties to the Graph
-Node rdfTypeProperty = graph.addProperty(RDF.TYPE);
-Node firstNameProperty = graph.addProperty(ex + "firstName");
-Node lastNameProperty = graph.addProperty(ex + "lastName");
+        // Create and add IRIs to the Graph
+        Node edithPiafIRI = graph.addResource(ex + "EdithPiaf");
+        Node singerIRI = graph.addResource(ex + "Singer");
 
-// Create and add literals to the Graph
-Node edithLiteral = graph.addLiteral("Edith");
-Node piafLiteral = graph.addLiteral("Piaf");
+        // Create and add properties to the Graph
+        Node rdfTypeProperty = graph.addProperty(RDF.TYPE);
+        Node firstNameProperty = graph.addProperty(ex + "firstName");
+        Node lastNameProperty = graph.addProperty(ex + "lastName");
 
-// Add statements to the graph
-graph.addEdge(edithPiafIRI, rdfTypeProperty, singerIRI);
-graph.addEdge(edithPiafIRI, firstNameProperty, edithLiteral);
-graph.addEdge(edithPiafIRI, lastNameProperty, piafLiteral);
+        // Create and add literals to the Graph
+        Node edithLiteral = graph.addLiteral("Edith");
+        Node piafLiteral = graph.addLiteral("Piaf");
+
+        // Add statements to the graph
+        graph.addEdge(edithPiafIRI, rdfTypeProperty, singerIRI);
+        graph.addEdge(edithPiafIRI, firstNameProperty, edithLiteral);
+        graph.addEdge(edithPiafIRI, lastNameProperty, piafLiteral);
+    }
+}
 ```
 
 ### **2.2. Load a Graph from a File**
@@ -77,38 +84,67 @@ graph.addEdge(edithPiafIRI, lastNameProperty, piafLiteral);
 This example shows how to load a graph from a file.
 
 ```java
-// Create a new empty Graph
-Graph graph = Graph.create();
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
 
-// Create loader and parse file
-Load loader = Load.create(graph);
-loader.parse("input_graph_file.ttl", Load.format.TURTLE_FORMAT);
+public class Example {
+    public static void main(String[] args) throws LoadException {
+
+        // Create a new empty Graph
+        Graph graph = Graph.create();
+
+        // Create loader and parse file
+        Load loader = Load.create(graph);
+        loader.parse("input_graph_file.ttl", Loader.format.TURTLE_FORMAT);
+    }
+}
 ```
 
 Corese Loader supports the following formats:
 
-- RDF/XML (`Load.format.RDFXML_FORMAT`)
-- Turtle (`Load.format.TURTLE_FORMAT`)
-- TriG (`Load.format.TRIG_FORMAT`)
-- JSON-LD (`Load.format.JSONLD_FORMAT`)
-- N-Triples (`Load.format.NT_FORMAT`)
-- N-Quads (`Load.format.NQUADS_FORMAT`)
-- RDFa (`Load.format.RDFA_FORMAT`)
+- RDF/XML (`Loader.format.RDFXML_FORMAT`)
+- Turtle (`Loader.format.TURTLE_FORMAT`)
+- TriG (`Loader.format.TRIG_FORMAT`)
+- JSON-LD (`Loader.format.JSONLD_FORMAT`)
+- N-Triples (`Loader.format.NT_FORMAT`)
+- N-Quads (`Loader.format.NQUADS_FORMAT`)
+- RDFa (`Loader.format.RDFA_FORMAT`)
 
 ### **2.3. Export a Graph to a File**
 
 This example shows how to serialize a graph into a file in Turtle format.
 
 ```java
-// Assuming 'graph' is previously defined
+import java.io.FileWriter;
+import java.io.IOException;
 
-// Create exporter
-ResultFormat exporter = ResultFormat.create(graph, ResultFormatDef.format.TURTLE_FORMAT);
-String result = exporter.toString();
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.print.ResultFormat;
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
 
-// Write result to a file
-try (FileWriter writer = new FileWriter("output_graph.ttl")) {
-    writer.write(result);
+public class Example {
+    public static void main(String[] args) throws IOException {
+
+        // Create a new empty Graph
+        Graph graph = Graph.create();
+
+        // Add some triples to the graph
+        String ex = "http://example.org/";
+        Node edithPiafIRI = graph.addResource(ex + "EdithPiaf");
+        Node firstNameProperty = graph.addProperty(ex + "firstName");
+        Node edithLiteral = graph.addLiteral("Edith");
+        graph.addEdge(edithPiafIRI, firstNameProperty, edithLiteral);
+
+        // Create exporter
+        ResultFormat exporter = ResultFormat.create(graph, ResultFormatDef.format.TURTLE_FORMAT);
+        String result = exporter.toString();
+
+        // Write result to a file
+        try (FileWriter writer = new FileWriter("output_graph.ttl")) {
+            writer.write(result);
+        }
+    }
 }
 ```
 
@@ -132,41 +168,77 @@ This section describes how to query a graph using [SPARQL](https://www.w3.org/TR
 This example shows how to execute a SPARQL `SELECT` query and retrieve results.
 
 ```java
-// We assume that the 'graph' variable has been defined previously
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.print.ResultFormat;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Load and execute SPARQL query
-QueryProcess exec = QueryProcess.create(graph);
-Mappings map = exec.query("select * where { ?s ?p ?o }");
+public class Example {
+    public static void main(String[] args) throws EngineException {
 
-// Print results in Markdown format
-System.out.println(ResultFormat.create(map, ResultFormat.format.CSV_FORMAT).toString());
+        // Create a new empty Graph
+        Graph graph = Graph.create();
+
+        // Add some triples to the graph
+        String ex = "http://example.org/";
+        Node edithPiafIRI = graph.addResource(ex + "EdithPiaf");
+        Node firstNameProperty = graph.addProperty(ex + "firstName");
+        Node edithLiteral = graph.addLiteral("Edith");
+        graph.addEdge(edithPiafIRI, firstNameProperty, edithLiteral);
+
+        // Load and execute SPARQL query
+        QueryProcess exec = QueryProcess.create(graph);
+        Mappings map = exec.query("select * where { ?s ?p ?o }");
+
+        // Print results in Markdown format
+        System.out.println(ResultFormat.create(map, ResultFormat.format.CSV_FORMAT).toString());
+    }
+}
 ```
 
 Other supported formats:
 
 ```java
-System.out.println(ResultFormat.create(map, ResultFormat.format.XML_FORMAT).toString());
-System.out.println(ResultFormat.create(map, ResultFormat.format.JSON_FORMAT).toString());
-System.out.println(ResultFormat.create(map, ResultFormat.format.CSV_FORMAT).toString());
-System.out.println(ResultFormat.create(map, ResultFormat.format.TSV_FORMAT).toString());
-System.out.println(ResultFormat.create(map, ResultFormat.format.MARKDOWN_FORMAT).toString());
+ResultFormat.format.XML_FORMAT
+ResultFormat.format.JSON_FORMAT
+ResultFormat.format.CSV_FORMAT
+ResultFormat.format.TSV_FORMAT
+ResultFormat.format.MARKDOWN_FORMAT
 ```
 
-### 3.2. SPARQL Ask query
+### 3.2. SPARQL ASK Query
 
 This example shows how to execute a SPARQL `ASK` query and print results.
 
 ```java
-// We assume that the 'graph' variable has been defined previously
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Load and execute SPARQL query
-QueryProcess exec = QueryProcess.create(graph);
-Mappings map = exec.query("src/main/resources/query_ask.rq");
+public class Example {
+    public static void main(String[] args) throws EngineException {
 
-// Print boolean result
-// if the mappings is empty then the result is false
-// if the mappings is not empty then the result is true
-System.out.println(!map.isEmpty());
+        // Create a new empty Graph
+        Graph graph = Graph.create();
+
+        // Add some triples to the graph
+        String ex = "http://example.org/";
+        Node edithPiafIRI = graph.addResource(ex + "EdithPiaf");
+        Node firstNameProperty = graph.addProperty(ex + "firstName");
+        Node edithLiteral = graph.addLiteral("Edith");
+        graph.addEdge(edithPiafIRI, firstNameProperty, edithLiteral);
+
+        // Load and execute SPARQL query
+        QueryProcess exec = QueryProcess.create(graph);
+        Mappings map = exec.query("PREFIX ex: <http://example.org/> SELECT ?x WHERE { ex:EdithPiaf ex:firstName ?x }");
+
+        // Print boolean result
+        // If the mapping is empty, the result is false; otherwise, it is true.
+        System.out.println(!map.isEmpty());
+    }
+}
 ```
 
 ### **3.3. SPARQL CONSTRUCT Query**
@@ -174,40 +246,57 @@ System.out.println(!map.isEmpty());
 This example shows how to execute a SPARQL `CONSTRUCT` query and retrieve results.
 
 ```java
-// We assume that the 'graph' variable has been defined previously
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.print.ResultFormat;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Load and execute SPARQL query
-QueryProcess exec = QueryProcess.create(graph);
-Mappings map = exec.query("""
-    prefix foaf: <http://xmlns.com/foaf/0.1/>
-    prefix vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+public class Example {
+    public static void main(String[] args) throws EngineException {
 
-    construct {
-        ?person vcard:FN ?name
+        // Create a new empty Graph
+        Graph graph = Graph.create();
+
+        // Add some triples to the graph
+        Load loader = Load.create(graph);
+        loader.parse("input_graph_file.ttl", Loader.format.TURTLE_FORMAT);
+
+        // Load and execute SPARQL query
+        QueryProcess exec = QueryProcess.create(graph);
+        Mappings map = exec.query("""
+                prefix foaf: <http://xmlns.com/foaf/0.1/>
+                prefix vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+
+                construct {
+                    ?person vcard:FN ?name
+                }
+                where {
+                    ?person foaf:name ?name.
+                }
+                """);
+
+        // Get result graph
+        Graph resultGraph = (Graph) map.getGraph();
+
+        // Print results in TriG format
+        System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString());
     }
-    where {
-        ?person foaf:name ?name.
-    }
-    """);
-
-// Get result graph
-Graph resultGraph = (Graph) map.getGraph();
-
-// Print results in TriG format
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString());
+}
 ```
 
 Other supported formats:
 
 ```java
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.RDF_XML_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TURTLE_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.JSONLD_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.NTRIPLES_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.NQUADS_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.RDFC10_FORMAT).toString());
-System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.RDFC10_SHA384_FORMAT).toString());
+ResultFormat.format.RDF_XML_FORMAT
+ResultFormat.format.TURTLE_FORMAT
+ResultFormat.format.TRIG_FORMAT
+ResultFormat.format.JSONLD_FORMAT
+ResultFormat.format.NTRIPLES_FORMAT
+ResultFormat.format.NQUADS_FORMAT
+ResultFormat.format.RDFC10_FORMAT
+ResultFormat.format.RDFC10_SHA384_FORMAT
 ```
 
 ### **3.4. SPARQL UPDATE Query**
@@ -215,37 +304,54 @@ System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.RDFC10_S
 This example shows how to execute a SPARQL `UPDATE` query.
 
 ```java
-// We assume that the 'graph' variable has been defined previously
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.print.ResultFormat;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// SPARQL query
-QueryProcess exec = QueryProcess.create(graph);
-exec.query("""
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+public class Example {
+    public static void main(String[] args) throws EngineException {
 
-    INSERT {
-        ?person vcard:FN ?name
+        // Create a new empty Graph
+        Graph graph = Graph.create();
+
+        // Add some triples to the graph
+        Load loader = Load.create(graph);
+        loader.parse("input_graph_file.ttl", Loader.format.TURTLE_FORMAT);
+
+        // Load and execute SPARQL query
+        QueryProcess exec = QueryProcess.create(graph);
+        exec.query("""
+                    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                    PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#>
+
+                    INSERT {
+                        ?person vcard:FN ?name
+                    }
+                    WHERE {
+                        ?person foaf:name ?name.
+                    }
+                """);
+
+        // Print updated graph in Turtle format
+        System.out.println(ResultFormat.create(graph, ResultFormat.format.TURTLE_FORMAT).toString());
     }
-    WHERE {
-        ?person foaf:name ?name.
-    }
-""");
-
-// Print updated graph in Turtle format
-System.out.println(ResultFormat.create(graph, ResultFormat.format.TURTLE_FORMAT).toString());
+}
 ```
 
 Other supported formats:
 
 ```java
-System.out.println(ResultFormat.create(graph, ResultFormat.format.RDF_XML_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.TURTLE_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.TRIG_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.JSONLD_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.NTRIPLES_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.NQUADS_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.RDFC10_FORMAT).toString());
-System.out.println(ResultFormat.create(graph, ResultFormat.format.RDFC10_SHA384_FORMAT).toString());
+ResultFormat.format.RDF_XML_FORMAT
+ResultFormat.format.TURTLE_FORMAT
+ResultFormat.format.TRIG_FORMAT
+ResultFormat.format.JSONLD_FORMAT
+ResultFormat.format.NTRIPLES_FORMAT
+ResultFormat.format.NQUADS_FORMAT
+ResultFormat.format.RDFC10_FORMAT
+ResultFormat.format.RDFC10_SHA384_FORMAT
 ```
 
 ## **4. Shapes Constraint Language (SHACL)**
@@ -253,23 +359,34 @@ System.out.println(ResultFormat.create(graph, ResultFormat.format.RDFC10_SHA384_
 This section shows how to validate a graph using [SHACL](https://www.w3.org/TR/shacl/).
 
 ```java
-// Load data graph
-Graph dataGraph = Graph.create();
-Load loader = Load.create(dataGraph);
-loader.parse("data.ttl");
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.print.ResultFormat;
+import fr.inria.corese.core.shacl.Shacl;
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Load shape graph
-Graph shapeGraph = Graph.create();
-loader = Load.create(shapeGraph);
-loader.parse("shapes.ttl");
+public class Example {
+    public static void main(String[] args) throws LoadException, EngineException {
+        // Load data graph
+        Graph dataGraph = Graph.create();
+        Load loader = Load.create(dataGraph);
+        loader.parse("data.ttl");
 
-// Validate the data
-Shacl shacl = new Shacl(dataGraph, shapeGraph);
-Graph result = shacl.eval();
+        // Load shape graph
+        Graph shapeGraph = Graph.create();
+        loader = Load.create(shapeGraph);
+        loader.parse("shapes.ttl");
 
-// Print results
-ResultFormat exporter = ResultFormat.create(result, ResultFormatDef.format.TURTLE_FORMAT);
-System.out.println(exporter.toString());
+        // Validate the data
+        Shacl shacl = new Shacl(dataGraph, shapeGraph);
+        Graph result = shacl.eval();
+
+        // Print results
+        ResultFormat exporter = ResultFormat.create(result, ResultFormatDef.format.TURTLE_FORMAT);
+        System.out.println(exporter.toString());
+    }
+}
 ```
 
 **Input graph file path:**
@@ -341,22 +458,38 @@ This section shows how to transform a graph using a subset of the [SPARQL Templa
 This example details how to load a data graph from a file, transform it into a visual HTML format, and export the result to a file.
 
 ```java
-// Open template file
-Path path = Path.of("input template file path");
-String sttl_query = Files.readString(path, StandardCharsets.UTF_8);
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-// Load data graph
-Graph dataGraph = Graph.create();
-Load ld = Load.create(dataGraph);
-ld.parse("input graph file path");
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.print.ResultFormat;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Apply STTL query
-QueryProcess exec = QueryProcess.create(dataGraph);
-Mappings map = exec.query(sttl_query);
+public class Example {
+    public static void main(String[] args) throws LoadException, EngineException, IOException {
+        // Open template file
+        Path path = Path.of("input template file path");
+        String sttl_query = Files.readString(path, StandardCharsets.UTF_8);
 
-// Export result
-ResultFormat result_xml = ResultFormat.create(map);
-result_xml.write("output file path");
+        // Load data graph
+        Graph dataGraph = Graph.create();
+        Load ld = Load.create(dataGraph);
+        ld.parse("input graph file path");
+
+        // Apply STTL query
+        QueryProcess exec = QueryProcess.create(dataGraph);
+        Mappings map = exec.query(sttl_query);
+
+        // Export result
+        ResultFormat result_xml = ResultFormat.create(map);
+        result_xml.write("output file path");
+    }
+}
 ```
 
 **Input template file:**
@@ -420,18 +553,28 @@ This section details how to apply a set of rules on a graph using the [SPARQL Ru
 The example below shows the application of two rules (symmetry and transitivity) on a simple graph.
 
 ```java
-// Create and load data in a graph
-Graph dataGraph = Graph.create();
-Load dataLoader = Load.create(dataGraph);
-dataLoader.parse("input graph file path");
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.load.RuleLoad;
+import fr.inria.corese.core.rule.RuleEngine;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Create and load rules into a rules engine
-RuleEngine ruleEngine = RuleEngine.create(dataGraph);
-RuleLoad ruleLoader = RuleLoad.create(ruleEngine);
-ruleLoader.parse("input rules file path.rul");
+public class Example {
+    public static void main(String[] args) throws LoadException, EngineException {
+        // Create and load data in a graph
+        Graph dataGraph = Graph.create();
+        Load dataLoader = Load.create(dataGraph);
+        dataLoader.parse("input graph file path");
 
-// Apply rules on the graph
-ruleEngine.process();
+        // Create and load rules into a rules engine
+        RuleEngine ruleEngine = RuleEngine.create(dataGraph);
+        RuleLoad ruleLoader = RuleLoad.create(ruleEngine);
+        ruleLoader.parse("input rules file path.rul");
+
+        // Apply rules on the graph
+        ruleEngine.process();
+    }
+}
 ```
 
 **Original graph:**
@@ -524,12 +667,27 @@ graph LR;
 The example below shows the application of OWL RL rules.
 
 ```java
-// We assume that the 'graph' variable has been defined previously
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.rule.RuleEngine;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Apply rules
-RuleEngine engine = RuleEngine.create(graph);
-engine.setProfile(RuleEngine.OWL_RL);
-engine.process();
+public class Example {
+    public static void main(String[] args) throws LoadException, EngineException {
+        // Create a new empty Graph
+        Graph graph = Graph.create();
+
+        // Add some triples to the graph
+        Load loader = Load.create(graph);
+        loader.parse("input_graph_file.ttl", Loader.format.TURTLE_FORMAT);
+
+        // Apply rules
+        RuleEngine engine = RuleEngine.create(graph);
+        engine.setProfile(RuleEngine.OWL_RL);
+        engine.process();
+    }
+}
 ```
 
 ## 7. LDScript
@@ -541,20 +699,34 @@ This section describes how to define and use functions with the [LDScript extens
 This example shows how to define and compute the twelfth number of the Fibonacci sequence.
 
 ```java
-// Open LDScript file
-Path path = Path.of("input LDScript file path.rq");
-String ldScript = Files.readString(path, StandardCharsets.UTF_8);
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-// Compile LDScript
-QueryProcess exec = QueryProcess.create();
-exec.compile(ldScript);
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Compute the twelfth number of the Fibonacci sequence
-String name = "http://ns.inria.fr/fibonacci";
-IDatatype dt = exec.funcall(name, DatatypeMap.newInstance(25));
+public class Example {
+    public static void main(String[] args) throws EngineException, IOException {
+        // Open LDScript file
+        Path path = Path.of("input LDScript file path.rq");
+        String ldScript = Files.readString(path, StandardCharsets.UTF_8);
 
-// Print result
-System.out.println(dt);
+        // Compile LDScript
+        QueryProcess exec = QueryProcess.create();
+        exec.compile(ldScript);
+
+        // Compute the twelfth number of the Fibonacci sequence
+        String name = "http://ns.inria.fr/fibonacci";
+        IDatatype dt = exec.funcall(name, DatatypeMap.newInstance(12));
+
+        // Print result
+        System.out.println(dt);
+    }
+}
 ```
 
 **Input LDScript file path:**
@@ -583,33 +755,44 @@ prefix fun: <http://ns.inria.fr/>
 This example shows how to call an LDScript function from a SPARQL query.
 
 ```java
-String check_query = """
-prefix ex: <http://example.com/city/>
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-prefix fun: <http://ns.inria.fr/>
+import java.io.IOException;
 
-select ?name ?area
-where {
-    ?city rdf:type ex:city ;
-          ex:name ?name ;
-          ex:area ?area .
-    filter(?area > fun:toSquareKm(40))
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+
+public class Example {
+    public static void main(String[] args) throws EngineException, IOException {
+        String check_query = """
+                prefix ex: <http://example.com/city/>
+                prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                prefix fun: <http://ns.inria.fr/>
+
+                select ?name ?area
+                where {
+                    ?city rdf:type ex:city ;
+                          ex:name ?name ;
+                          ex:area ?area .
+                    filter(?area > fun:toSquareKm(40))
+                }
+
+                # Convert square mile to square kilometer
+                function fun:toSquareKm(squareMile) {
+                    return (squareMile * 2.59)
+                }
+                """;
+
+        // Load graph
+        Graph graph = Graph.create();
+        Load ld = Load.create(graph);
+        ld.parse("input file path");
+
+        // SPARQL query
+        QueryProcess exec = QueryProcess.create(graph);
+        Mappings map = exec.query(check_query);
+    }
 }
-
-# Convert square mile to square kilometer
-function fun:toSquareKm(squareMile) {
-    return (squareMile * 2.59)
-}
-""";
-
-// Load graph
-Graph graph = Graph.create();
-Load ld = Load.create(graph);
-ld.parse("input file path");
-
-// SPARQL query
-QueryProcess exec = QueryProcess.create(graph);
-Mappings map = exec.query(check_query);
 ```
 
 ### 7.3. Advanced Example
@@ -617,20 +800,33 @@ Mappings map = exec.query(check_query);
 The following Java program computes the percentage of people subscribed to social networks in a city compared to its total number of inhabitants. The data is collected from Wikidata.
 
 ```java
-// Open LDScript file
-Path path = Path.of("input LDScript file path.rq");
-String ldScript = Files.readString(path, StandardCharsets.UTF_8);
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-// Compile LDScript
-QueryProcess exec = QueryProcess.create();
-exec.compile(ldScript);
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
-// Execute program
-String name = "http://ns.inria.fr/main";
-IDatatype dt = exec.funcall(name);
+public class Example {
+    public static void main(String[] args) throws EngineException, IOException {
+        // Open LDScript file
+        Path path = Path.of("input LDScript file path.rq");
+        String ldScript = Files.readString(path, StandardCharsets.UTF_8);
 
-// Print result
-System.out.println(dt);
+        // Compile LDScript
+        QueryProcess exec = QueryProcess.create();
+        exec.compile(ldScript);
+
+        // Execute program
+        String name = "http://ns.inria.fr/main";
+        IDatatype dt = exec.funcall(name);
+
+        // Print result
+        System.out.println(dt);
+    }
+}
 ```
 
 **Input LDScript File:**
@@ -652,10 +848,10 @@ function fun:percentage(sub, total) {
 @public
 function fun:citypopulationsocialmedia() {
     query(
-        select ?city ?citylabel ?population ?socialmediafolower where {
+        select ?city ?citylabel ?population ?socialmediafollower where {
             service <https://query.wikidata.org/sparql> {
                 ?city wdt:P31 wd:Q1549591;
-                wdt:P8687 ?socialmediafolower;
+                wdt:P8687 ?socialmediafollower;
                 wdt:P1082 ?population.
                 optional {
                     ?city rdfs:label ?citylabel
@@ -663,7 +859,7 @@ function fun:citypopulationsocialmedia() {
                 }
             }
         }
-        order by desc (?socialmediafolower)
+        order by desc (?socialmediafollower)
         limit 100
     )
 }
@@ -673,8 +869,8 @@ function fun:main() {
     xt:sort(
         maplist (
             function(x) {
-                let ((citylabel population socialmediafolower) = x) {
-                    return (xt:list(citylabel, fun:percentage(socialmediafolower, population)))
+                let ((citylabel population socialmediafollower) = x) {
+                    return (xt:list(citylabel, fun:percentage(socialmediafollower, population)))
                 }
             },
             fun:citypopulationsocialmedia()

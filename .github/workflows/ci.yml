@@ -11,6 +11,7 @@ on:
       - "main"
       - "develop"
       - "feature/corese-next"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -24,11 +25,14 @@ jobs:
 
     env:
       PACKAGE_TOKEN: ${{ secrets.JLS_TOKEN }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
-      - name: Checkout of head
+      - name: Checkout sources
         id: ci-sources-checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 21
         id: ci-java-setup
@@ -37,6 +41,16 @@ jobs:
           java-version: 21
           distribution: 'temurin'
 
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Gradle build
         id: ci-gradle-build
         run: ./gradlew clean assemble
@@ -44,8 +58,14 @@ jobs:
       - name: Gradle tests
         run: ./gradlew test
 
-      - name: Run Coverage
+      - name: Generate JaCoCo Coverage Report
         run: ./gradlew jacocoTestReport
+
+      - name: SonarQube analysis
+        run: |
+          ./gradlew sonar -Dsonar.projectKey=crs-core-new \
+                          -Dsonar.host.url=https://sonarqube.inria.fr/sonarqube \
+                          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Add coverage to PR
         id: jacoco
@@ -58,7 +78,7 @@ jobs:
           min-coverage-changed-files: 60
           update-comment: true
 
-      - name: Get the Coverage info
+      - name: Display Coverage info
         run: |
           echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
           echo "Changed Files coverage ${{ steps.jacoco.outputs.coverage-changed-files }}"
@@ -70,8 +90,8 @@ jobs:
           files: |
             build/test-results/**/*.xml
 
-      - name: Get test artifacts
-        if: ${{ failure() }}
+      - name: Archive test artifacts
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: Package

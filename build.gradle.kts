@@ -6,12 +6,56 @@ plugins {
     signing                                                     // Signs artifacts for Maven Central
     `maven-publish`                                             // Enables publishing to Maven repositories
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0" // Automates Nexus publishing
-    
+
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
     id("org.gradlex.extra-java-module-info") version "1.9"      // Module metadata for JARs without module info
     id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
+    id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
+    id("com.intershop.gradle.javacc") version "5.0.0"           // JavaCC plugin for parsing JavaCC files
 }
+
+// SonarQube configuration
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+val currentDate: String = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+
+sonar {
+    properties {
+        property("sonar.projectKey", "crs-core-new")
+        property("sonar.host.url", "https://sonarqube.inria.fr/sonarqube")
+        property("sonar.login", System.getenv("SONAR_TOKEN"))
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.projectDate", currentDate)
+    }
+}
+
+// JavaCC configuration
+javacc {
+    configs {
+        register("sparqlCorese") {
+            inputFile = file("src/main/java/fr/inria/corese/core/sparql/triple/javacc1/sparql_corese.jj")
+            packageName = "fr.inria.corese.core.sparql.triple.javacc1"
+        }
+    }
+}
+
+// Ajoute les fichiers générés par JavaCC comme source Java
+sourceSets {
+    main {
+        java {
+            srcDir("$buildDir/generated-src/javacc")
+        }
+    }
+}
+
+tasks.named("compileJava") {
+    dependsOn("javaccSparqlCorese")
+}
+
 
 /////////////////////////
 // Project metadata    //
@@ -21,7 +65,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-core"
-    const val version = "4.6.2"
+    const val version = "4.6.3"
 
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
