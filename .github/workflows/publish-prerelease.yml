@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - develop
-      - feature/ci-pre-release
 
 jobs:
   prerelease:
