@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.api.model;
 
+import fr.inria.corese.core.next.api.BNode;
 import fr.inria.corese.core.next.api.Literal;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
@@ -40,6 +41,14 @@ public abstract class ValueFactoryTest {
 
     @Test
     public void testCreateBNode() {
+        String nodeId = "corese123";
+        BNode nodesCorese123 = this.valueFactory.createBNode(nodeId);
+        BNode nodesCoreseRandom = this.valueFactory.createBNode();
+
+        assertNotNull(nodesCorese123);
+        assertNotNull(nodesCoreseRandom);
+        assertNotNull(nodesCoreseRandom.getID());
+        assertEquals(nodesCorese123.getID(), "corese123");
     }
 
     @Test
