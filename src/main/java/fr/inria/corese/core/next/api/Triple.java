@@ -7,10 +7,19 @@ public interface Triple extends Resource {
 		return true;
 	}
 
+	/**
+	 * @return the subject of this triple
+	 */
 	Resource getSubject();
 
+	/**
+	 * @return the predicate of this triple
+	 */
 	IRI getPredicate();
 
+	/**
+	 * @return the object of this triple
+	 */
 	Value getObject();
 
 	@Override

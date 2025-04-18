@@ -1,9 +1,10 @@
 package fr.inria.corese.core.next.api.base.model.literal;
 
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,11 +22,74 @@ public abstract class AbstractLiteral implements Literal, Serializable {
 
     protected IRI datatype;
 
+    protected static List<IRI> integerXSDCoreDatatypeIRIs = List.of(
+            XSD.INTEGER.getIRI(),
+            XSD.BYTE.getIRI(),
+            XSD.SHORT.getIRI(),
+            XSD.INT.getIRI(),
+            XSD.LONG.getIRI(),
+            XSD.UNSIGNED_BYTE.getIRI(),
+            XSD.UNSIGNED_SHORT.getIRI(),
+            XSD.UNSIGNED_INT.getIRI(),
+            XSD.UNSIGNED_LONG.getIRI(),
+            XSD.POSITIVE_INTEGER.getIRI(),
+            XSD.NEGATIVE_INTEGER.getIRI(),
+            XSD.NON_NEGATIVE_INTEGER.getIRI(),
+            XSD.NON_POSITIVE_INTEGER.getIRI()
+    );
+
+    protected static List<IRI> decimalXSDCoreDatatypeIRIs = List.of(
+            XSD.DECIMAL.getIRI(),
+            XSD.FLOAT.getIRI(),
+            XSD.DOUBLE.getIRI()
+    );
+
+    /**
+     * Constructor for AbstractLiteral.
+     *
+     * @param datatype the datatype of the literal
+     */
     protected AbstractLiteral(IRI datatype) {
         this.datatype = datatype;
     }
 
-    public abstract void setCoreDatatype(CoreDatatype coreDatatype);
+    /**
+     * @param coreDatatype a CoreDatatype
+     * @return true if the given core datatype is an integer core datatype, e.g xsd;integer, xsd:int, xsd:byte, etc, false otherwise
+     */
+    public static boolean isIntegerCoreDatatype(CoreDatatype coreDatatype) {
+        return integerXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
+    }
+
+    /**
+     * @param iri an IRI
+     * @return true if the given IRI is an integer core datatype, e.g xsd;integer, xsd:int, xsd:byte, etc, false otherwise
+     */
+    public static boolean isIriOfIntegerCoreDatatype(IRI iri) {
+        return integerXSDCoreDatatypeIRIs.contains(iri);
+    }
+
+    /**
+     * @param coreDatatype a CoreDatatype
+     * @return true if the given core datatype is a decimal core datatype, e.g xsd;decimal, xsd:float, xsd:double, etc, false otherwise
+     */
+    public static boolean isDecimalCoreDatatype(CoreDatatype coreDatatype) {
+        return decimalXSDCoreDatatypeIRIs.contains(coreDatatype.getIRI());
+    }
+
+    /**
+     * @param iri an IRI
+     * @return true if the given IRI is a decimal core datatype, e.g xsd;decimal, xsd:float, xsd:double, etc, false otherwise
+     */
+    public static boolean isIriOfDecimalCoreDatatype(IRI iri) {
+        return decimalXSDCoreDatatypeIRIs.contains(iri);
+    }
+    /**
+     * Sets the core datatype of the literal.
+     *
+     * @param coreDatatype the CoreDatatype to set
+     */
+    protected abstract void setCoreDatatype(CoreDatatype coreDatatype);
 
     @Override
     public boolean isLiteral() {

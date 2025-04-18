@@ -1,3 +1,6 @@
+/**
+ * Enumeration of the XML Schema Datatypes (XSD) to be used as core datatype in literals.
+ */
 package fr.inria.corese.core.next.impl.common.literal;
 
 import fr.inria.corese.core.next.api.IRI;
@@ -48,6 +51,16 @@ public enum XSD implements CoreDatatype {
      * 64-bit floating point numbers incl. ±Inf, ±0, NaN
      */
     DOUBLE(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdDouble.getIRI()),
+
+    /**
+     * Integer numbers >0
+     */
+    POSITIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdPositiveInteger.getIRI()),
+
+    /**
+     * Integer numbers <0
+     */
+    NEGATIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdNegativeInteger.getIRI()),
 
     /**
      * Integer numbers ≥0

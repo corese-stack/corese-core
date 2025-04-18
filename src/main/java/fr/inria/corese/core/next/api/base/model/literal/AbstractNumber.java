@@ -2,19 +2,18 @@ package fr.inria.corese.core.next.api.base.model.literal;
 
 import fr.inria.corese.core.next.api.IRI;
 
+/**
+ * Abstract class representing a number literal in RDF.
+ */
 public abstract class AbstractNumber extends AbstractLiteral implements Comparable<AbstractNumber> {
-    
-    protected AbstractNumber(IRI datatype) {
-        super(datatype);
-    }
+
 
     /**
-     * Comparison using double value
-     * @param abstractNumber
-     * @return
+     * Constructor for AbstractNumber.
+     *
+     * @param datatype the datatype of the number literal
      */
-    @Override
-    public int compareTo(AbstractNumber abstractNumber) {
-        return Double.compare(this.doubleValue(), abstractNumber.doubleValue());
+    protected AbstractNumber(IRI datatype) {
+        super(datatype);
     }
 }

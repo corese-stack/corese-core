@@ -30,6 +30,9 @@ public class BasicDuration extends AbstractDuration {
     private static final Logger logger = LoggerFactory.getLogger(BasicDuration.class);
     private final XSDDuration temporalAmount;
 
+    /**
+     * A list of temporal units that contains all ChronoUnit covered by the XSD duration.
+     */
     private static final List<TemporalUnit> UNITS = new ArrayList<>(EnumSet.of(
             YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS, NANOS
     ));
@@ -43,22 +46,30 @@ public class BasicDuration extends AbstractDuration {
                         "((?<hour>\\d+)H)?" +
                         "((?<minute>\\d+)M)?" +
                         "((?<second>\\d+)" +
-                        "(\\.(?<nano>\\d+)?)+S)?" +
+                        "(\\.(?<nano>\\d*[1-9]+\\d*)?)+S)?" +
                     ")?"
     );
 
+    /**
+     * Constructor for BasicDuration.
+     *
+     * @param temporalAmount  the {@link TemporalAmount} representing the duration
+     */
     public BasicDuration(TemporalAmount temporalAmount) {
         this.temporalAmount = new XSDDuration(temporalAmount);
     }
 
+    /**
+     * The string value of the duration. Uses the string representation of the {@link TemporalAmount} to create a string representation of the duration.
+     */
     @Override
     public String stringValue() {
-        return this.temporalAmount.toString();
+        return String.format("\"%s\"^^<%s>", this.temporalAmount.toString(), this.datatype.stringValue());
     }
 
     @Override
     public String getLabel() {
-        return this.stringValue();
+        return this.temporalAmount.toString();
     }
 
     @Override
@@ -76,6 +87,11 @@ public class BasicDuration extends AbstractDuration {
         throw new IncorrectOperationException("Cannot set the core datatype of a duration.");
     }
 
+    /**
+     * Creates a new {@link BasicDuration} object from a string representation of a duration. Uses a regular expression to parse the string and extract the duration components.
+     * @param durationString the string representation of the duration. Expectes a string in the format "PnYnMnDTnHnMnS" where n is a number and P, Y, M, D, T, H, M, S are the duration components.
+     * @return a new {@link BasicDuration} object representing the duration
+     */
     public static BasicDuration parse(String durationString) {
         Matcher matcher = DURATION_PATTERN.matcher(durationString);
         XSDDuration xsdDuration = new XSDDuration();
@@ -134,16 +150,25 @@ public class BasicDuration extends AbstractDuration {
     /**
      * A class to represent a duration as defined in the XSD specification.
      * The specificity of this class compared to existing ones in Java is that a duration can be negative and that it can have a precision from years to nanoseconds.
+     * This class is necessary to be able to represent a duration in a way that is compatible with the XSD specification.
      */
     private static class XSDDuration implements TemporalAmount {
         private final Map<ChronoUnit, Long> values;
         private boolean isNegative;
 
+        /**
+         * Default constructor for XSDDuration.
+         */
         public XSDDuration() {
             this.values = new EnumMap<>(ChronoUnit.class);
             this.isNegative = false;
         }
 
+        /**
+         * Constructor for XSDDuration.
+         *
+         * @param temporalAmount  the {@link TemporalAmount} representing the duration
+         */
         public XSDDuration(TemporalAmount temporalAmount) {
             this();
             for(TemporalUnit unit : temporalAmount.getUnits()) {
@@ -155,7 +180,7 @@ public class BasicDuration extends AbstractDuration {
         }
 
         /**
-         * @param temporalUnit Expected to be a ChronoUnit.
+         * @param temporalUnit Expected to be a ChronoUnit, see {@link ChronoUnit}.
          * @return 0 by default.
          */
         @Override
@@ -163,6 +188,11 @@ public class BasicDuration extends AbstractDuration {
             return values.getOrDefault(temporalUnit, 0L);
         }
 
+        /**
+         * Sets the value of the given temporal unit.
+         * @param temporalUnit the temporal unit to set, see {@link ChronoUnit}.
+         * @param value the value to set
+         */
         private void set(ChronoUnit temporalUnit, long value) {
             values.put(temporalUnit, value);
         }
@@ -260,33 +290,33 @@ public class BasicDuration extends AbstractDuration {
 
             builder.append("P");
 
-            if(values.containsKey(YEARS) && get(YEARS) != 0) {
+            if(get(YEARS) != 0) {
                 builder.append(get(YEARS)).append("Y");
             }
 
-            if(values.containsKey(MONTHS) && get(MONTHS) != 0) {
+            if(get(MONTHS) != 0) {
                 builder.append(get(MONTHS)).append("M");
             }
 
-            if(values.containsKey(DAYS) && get(DAYS) != 0) {
+            if(get(DAYS) != 0) {
                 builder.append(get(DAYS)).append("D");
             }
 
-            if((values.containsKey(HOURS) || values.containsKey(MINUTES) || values.containsKey(SECONDS) || values.containsKey(NANOS)) && (get(HOURS) != 0 || get(MINUTES) != 0 || get(SECONDS) != 0 || get(NANOS) != 0)) {
+            if(get(HOURS) != 0 || get(MINUTES) != 0 || get(SECONDS) != 0 || get(NANOS) != 0) {
                 builder.append("T");
 
-                if(values.containsKey(HOURS) && get(HOURS) != 0) {
+                if(get(HOURS) != 0) {
                     builder.append(get(HOURS)).append("H");
                 }
 
-                if(values.containsKey(MINUTES) && get(MINUTES) != 0) {
+                if(get(MINUTES) != 0) {
                     builder.append(get(MINUTES)).append("M");
                 }
 
-                if(values.containsKey(SECONDS) && get(SECONDS) != 0 || values.containsKey(NANOS) && get(NANOS) != 0) {
+                if(get(SECONDS) != 0 || get(NANOS) != 0) {
                     builder.append(get(SECONDS));
 
-                    if(values.containsKey(NANOS) && get(NANOS) != 0) {
+                    if(get(NANOS) != 0) {
                         String nanosString = String.valueOf(get(NANOS));
                         nanosString = nanosString.replaceAll("0+$", ""); // removing the zeros at the end
                         builder.append(".").append(nanosString);
@@ -299,10 +329,16 @@ public class BasicDuration extends AbstractDuration {
             return builder.toString();
         }
 
+        /**
+         * Sets the duration to negative.
+         */
         public void setNegative() {
             this.isNegative = true;
         }
 
+        /**
+         * @return true if the duration is negative, false otherwise.
+         */
         public boolean isNegative() {
             return this.isNegative;
         }

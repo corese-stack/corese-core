@@ -4,11 +4,18 @@ import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 
 import java.time.DateTimeException;
+import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
 import java.util.*;
 
+/**
+ * Abstract class representing a duration literal in RDF.
+ */
 public abstract class AbstractDuration extends AbstractLiteral implements Comparable<AbstractDuration> {
 
+    /**
+     * Constructor for AbstractDuration.
+     */
     protected AbstractDuration() {
         super(XSD.DURATION.getIRI());
     }
@@ -30,6 +37,9 @@ public abstract class AbstractDuration extends AbstractLiteral implements Compar
         SortedSet<TemporalUnit> otherTUnits = new TreeSet<>(Comparator.comparing(TemporalUnit::getDuration));
         otherTUnits.addAll(o.temporalAmountValue().getUnits());
 
+        TemporalAmount thisTemporalAmount = this.temporalAmountValue();
+        TemporalAmount otherTemporalAmount = o.temporalAmountValue();
+
         // Check if the temporal amounts have some units in common
         Set<TemporalUnit> intersection = new HashSet<>(theseTUnits);
         intersection.retainAll(otherTUnits);
@@ -48,13 +58,13 @@ public abstract class AbstractDuration extends AbstractLiteral implements Compar
             long thisValue = 0;
             long otherValue = 0;
             try {
-                thisValue = this.temporalAmountValue().get(tu);
+                thisValue = thisTemporalAmount.get(tu);
             } catch (DateTimeException e) {
                 // This unit is not present in this object, so it must be present in o, making o larger
                 return -1;
             }
             try {
-                otherValue = o.temporalAmountValue().get(tu);
+                otherValue = otherTemporalAmount.get(tu);
             } catch (DateTimeException e) {
                 // This unit is not present in o, so it must be present in this object, making this object larger
                 return 1;
@@ -67,6 +77,11 @@ public abstract class AbstractDuration extends AbstractLiteral implements Compar
         return 0;
     }
 
+    /**
+     * Check if two temporal literals are equal.
+     * @param obj the object to compare with
+     * @return true if compareTo returns 0, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if(obj == this) {
@@ -81,7 +96,11 @@ public abstract class AbstractDuration extends AbstractLiteral implements Compar
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.temporalAmountValue());
+        int hash = 7;
+        hash = 31 * hash + (this.datatype == null ? 0 : this.datatype.hashCode());
+        hash = 31 * hash + (this.getCoreDatatype() == null ? 0 : this.getCoreDatatype().hashCode());
+        hash = 31 * hash + (this.temporalAmountValue() == null ? 0 : this.temporalAmountValue().hashCode());
+        return hash;
     }
 
 }

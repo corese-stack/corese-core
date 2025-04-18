@@ -173,17 +173,30 @@ public interface ValueFactory {
 
 	/**
 	 * Create a statement with the given subject, predicate and object.
-	 * @param subject Resource
-	 * @param predicate
-	 * @param object
-	 * @return
+	 * @param subject Resource subject of the statement
+	 * @param predicate IRI predicate of the statement
+	 * @param object Value object of the statement
+	 * @return Statement without context
 	 */
 	Statement createStatement(Resource subject, IRI predicate, Value object);
 
+	/**
+	 *  Create a statement with the given subject, predicate, object and context.
+	 * @param subject Resource subject of the statement
+	 * @param predicate IRI predicate of the statement
+	 * @param object Value object of the statement
+	 * @param context Resource context of the statement
+	 * @return Statement with context
+	 */
 	Statement createStatement(Resource subject, IRI predicate, Value object, Resource context);
 
-	default Triple createTriple(Resource subject, IRI predicate, Value object) {
-		throw new UnsupportedOperationException();
-	}
+	/**
+	 * Create a triple with the given subject, predicate and object.
+	 * @param subject Resource subject of the triple
+	 * @param predicate IRI predicate of the triple
+	 * @param object Value object of the triple
+	 * @return Triple
+	 */
+	Triple createTriple(Resource subject, IRI predicate, Value object);
 
 }

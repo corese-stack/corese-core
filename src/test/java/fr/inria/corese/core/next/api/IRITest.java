@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.model;
+package fr.inria.corese.core.next.api;
 
 import fr.inria.corese.core.next.api.IRI;
 import org.junit.Test;

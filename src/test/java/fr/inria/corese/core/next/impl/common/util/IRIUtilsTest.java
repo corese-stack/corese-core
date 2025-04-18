@@ -1,6 +1,5 @@
-package fr.inria.corese.core.next.api.util;
+package fr.inria.corese.core.next.impl.common.util;
 
-import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 

@@ -13,16 +13,31 @@ public class CoreseIRI extends AbstractIRI implements CoreseNodeAdapter {
 
     private final Node node;
 
+    /**
+     * Constructor for CoreseIRI.
+     *
+     * @param fullIRI the full IRI string
+     */
     public CoreseIRI(String fullIRI) {
         super(fullIRI);
         this.node = new CoreseURI(fullIRI);
     }
 
+    /**
+     * Constructor for CoreseIRI.
+     *
+     * @param iri the IRI object
+     */
     public CoreseIRI(IRI iri) {
         super(iri.stringValue());
         this.node = new CoreseURI(iri.stringValue());
     }
 
+    /**
+     * Constructor for CoreseIRI.
+     *
+     * @param node the Corese Node object
+     */
     public CoreseIRI(Node node) {
         super(node.getLabel());
         if(node.isConstant() && ! node.isBlank() && node.getNodeKind() == IDatatype.NodeKind.URI ) {
@@ -32,6 +47,12 @@ public class CoreseIRI extends AbstractIRI implements CoreseNodeAdapter {
         }
     }
 
+    /**
+     * Constructor for CoreseIRI.
+     *
+     * @param namespace the namespace of the IRI
+     * @param localName the local name of the IRI
+     */
     public CoreseIRI(String namespace, String localName) {
         super(namespace, localName);
         this.node = new CoreseURI(namespace + localName);

@@ -7,130 +7,135 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Abstract class that implements the Model interface.
+ * This class provides default implementations for the methods in the Model interface,
+ * throwing UnsupportedOperationException for methods that are not supported.
+ */
 public abstract class AbstractModel implements Model {
 
     @Override
     public Model unmodifiable() {
-        return null;
+        throw new UnsupportedOperationException("Unmodifiable model not supported");
     }
 
     @Override
     public Namespace setNamespace(String prefix, String name) {
-        return null;
+        throw new UnsupportedOperationException("Setting namespace not supported");
     }
 
     @Override
     public void setNamespace(Namespace namespace) {
-
+        throw new UnsupportedOperationException("Setting namespace not supported");
     }
 
     @Override
     public Optional<Namespace> removeNamespace(String prefix) {
-        return Optional.empty();
+        throw new UnsupportedOperationException("Removing namespace not supported");
     }
 
     @Override
     public boolean contains(Resource subj, IRI pred, Value obj, Resource... contexts) {
-        return false;
+        throw new UnsupportedOperationException("Contains operation not supported");
     }
 
     @Override
     public boolean add(Resource subj, IRI pred, Value obj, Resource... contexts) {
-        return false;
+        throw new UnsupportedOperationException("Add operation not supported");
     }
 
     @Override
     public boolean clear(Resource... context) {
-        return false;
+        throw new UnsupportedOperationException("Clear operation not supported");
     }
 
     @Override
     public boolean remove(Resource subj, IRI pred, Value obj, Resource... contexts) {
-        return false;
+        throw new UnsupportedOperationException("Remove operation not supported");
     }
 
     @Override
     public Model filter(Resource subj, IRI pred, Value obj, Resource... contexts) {
-        return null;
+        throw new UnsupportedOperationException("Filter operation not supported");
     }
 
     @Override
     public Set<Resource> subjects() {
-        return null;
+        throw new UnsupportedOperationException("Subjects operation not supported");
     }
 
     @Override
     public Set<IRI> predicates() {
-        return null;
+        throw new UnsupportedOperationException("Predicates operation not supported");
     }
 
     @Override
     public Set<Value> objects() {
-        return null;
+        throw new UnsupportedOperationException("Objects operation not supported");
     }
 
     @Override
     public int size() {
-        return 0;
+        throw new UnsupportedOperationException("Size operation not supported");
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        throw new UnsupportedOperationException("IsEmpty operation not supported");
     }
 
     @Override
     public boolean contains(Object o) {
-        return false;
+        throw new UnsupportedOperationException("Contains operation not supported");
     }
 
     @Override
     public Iterator<Statement> iterator() {
-        return null;
+        throw new UnsupportedOperationException("Iterator operation not supported");
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        throw new UnsupportedOperationException("ToArray operation not supported");
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        throw new UnsupportedOperationException("ToArray operation not supported");
     }
 
     @Override
     public boolean add(Statement statement) {
-        return false;
+        throw new UnsupportedOperationException("Add operation not supported");
     }
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        throw new UnsupportedOperationException("Remove operation not supported");
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException("ContainsAll operation not supported");
     }
 
     @Override
     public boolean addAll(Collection<? extends Statement> c) {
-        return false;
+        throw new UnsupportedOperationException("AddAll operation not supported");
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException("RetainAll operation not supported");
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException("RemoveAll operation not supported");
     }
 
     @Override
     public void clear() {
-
+        throw new UnsupportedOperationException("Clear operation not supported");
     }
 }

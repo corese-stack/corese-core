@@ -1,8 +1,9 @@
 package fr.inria.corese.core.next.impl.temp;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.temp.literal.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,9 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
 
+/**
+ * Factory for all the Corese adapted values.
+ */
 public class CoreseAdaptedValueFactory implements ValueFactory {
 
     private static Logger logger = LoggerFactory.getLogger(CoreseAdaptedValueFactory.class);
@@ -22,38 +26,70 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
     public CoreseAdaptedValueFactory() {
     }
 
+    /**
+     * @param iri Valid IRI string
+     * @return  A new CoreseIRI object
+     */
     @Override
     public IRI createIRI(String iri) {
         return new CoreseIRI(iri);
     }
 
+    /**
+     * @param namespace Valid namespace string
+     * @param localName Valid local name string
+     * @return  A new CoreseIRI object
+     */
     @Override
     public IRI createIRI(String namespace, String localName) {
         return new CoreseIRI(namespace, localName);
     }
 
+    /**
+     *
+     * @return a new CoreseBNode object with a randomly selected ID
+     */
     @Override
     public BNode createBNode() {
         return null;
     }
 
+    /**
+     * @param nodeID Valid node ID string
+     * @return  A new CoreseBNode object with the given ID
+     */
     @Override
     public BNode createBNode(String nodeID) {
         return null;
     }
 
+    /**
+     * @param label Valid label string
+     * @return  A new CoreseDatatypeAdapter object with the given label
+     */
     @Override
     public Literal createLiteral(String label) {
         return new CoreseTyped(label);
     }
 
+    /**
+     * @param label Valid label string
+     * @param language Valid language string
+     * @return  A new CoreseDatatypeAdapter object with the given label and language
+     */
     @Override
     public Literal createLiteral(String label, String language) {
         return new CoreseLanguageTaggedStringLiteral(label, language);
     }
 
+    /**
+     * @param label Valid label string
+     * @param datatype Valid datatype IRI
+     * @return  A new CoreseDatatypeAdapter object with the given label and datatype. The core datatype of the literal will be deterimined by the datatype IRI if possible. Otherwise, a string literal will be created.
+     */
     @Override
     public Literal createLiteral(String label, IRI datatype) {
+        // Temporal types
         if (XSD.DATE.getIRI().equals(datatype)) {
             return new CoreseDate(label);
         } else if (XSD.DATETIME.getIRI().equals(datatype)) {
@@ -62,30 +98,77 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
             return new CoreseTime(label);
         } else if (XSD.DURATION.getIRI().equals(datatype)) {
             return new CoreseDuration(label);
-        } else if (XSD.STRING.getIRI().equals(datatype)) {
+        }
+
+        // Numeric types
+        else if(AbstractLiteral.isIriOfIntegerCoreDatatype(datatype)) {
+            return new CoreseInteger(new BigInteger(label));
+        } else if(AbstractLiteral.isIriOfDecimalCoreDatatype(datatype)) {
+            return new CoreseDecimal(new BigDecimal(label));
+        }
+
+        // Boolean types
+        else if (XSD.BOOLEAN.getIRI().equals(datatype)) {
+            return new CoreseBoolean(Boolean.parseBoolean(label));
+        }
+
+        // String literals
+        else if (XSD.STRING.getIRI().equals(datatype)) {
             return new CoreseTyped(label);
         }
-        return null;
+
+        // unknown datatype
+        return new CoreseTyped(label, datatype);
     }
 
+    /**
+     * Creates a literal with the given label and datatype.
+     * @param label Lexical value
+     * @param coreDatatype he core datatype of the literal that will also serves as it datatype IRI
+     * @return a new CoreseDatatypeAdapter object with the given label and core datatype.
+     */
     @Override
-    public Literal createLiteral(String label, CoreDatatype datatype) {
-        if (XSD.DATE.equals(datatype)) {
+    public Literal createLiteral(String label, CoreDatatype coreDatatype) {
+        // Temporal types
+        if (XSD.DATE.equals(coreDatatype)) {
             return new CoreseDate(label);
-        } else if (XSD.DATETIME.equals(datatype)) {
+        } else if (XSD.DATETIME.equals(coreDatatype)) {
             return new CoreseDatetime(label);
-        } else if (XSD.TIME.equals(datatype)) {
+        } else if (XSD.TIME.equals(coreDatatype)) {
             return new CoreseTime(label);
-        } else if (XSD.DURATION.equals(datatype)) {
+        } else if (XSD.DURATION.equals(coreDatatype)) {
             return new CoreseDuration(label);
-        } else if (XSD.STRING.equals(datatype)) {
-        return new CoreseTyped(label);
-    }
-        return null;
+        }
+
+        // Numeric types
+        else if(AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
+            return new CoreseInteger(label, coreDatatype.getIRI(), coreDatatype);
+        } else if(AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
+            return new CoreseDecimal(label, coreDatatype.getIRI(), coreDatatype);
+        }
+
+        // Boolean types
+        else if (XSD.BOOLEAN.equals(coreDatatype)) {
+            return new CoreseBoolean(Boolean.parseBoolean(label));
+        }
+
+        // String literals
+        else if (XSD.STRING.equals(coreDatatype)) {
+            return new CoreseTyped(label);
+        }
+        return new CoreseTyped(label, coreDatatype.getIRI(), coreDatatype);
     }
 
+    /**
+     * Creates a literal with the given label, datatype and core datatype.
+     * @param label Lexical value
+     * @param datatype Datatype IRI
+     * @param coreDatatype The core datatype of the literal that will also serves as it datatype IRI
+     * @return a new CoreseDatatypeAdapter object with the given label, datatype and core datatype. The core datatype will be used even if there is a mismatch with the datatype IRI.
+     */
     @Override
     public Literal createLiteral(String label, IRI datatype, CoreDatatype coreDatatype) {
+        // Temporal types
         if (XSD.DATE.equals(coreDatatype)) {
             return new CoreseDate(label, datatype, coreDatatype);
         } else if (XSD.DATETIME.equals(coreDatatype)) {
@@ -94,57 +177,117 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
             return new CoreseTime(label, datatype, coreDatatype);
         } else if (XSD.DURATION.equals(coreDatatype)) {
             return new CoreseDuration(label, datatype, coreDatatype);
-        } else if (XSD.STRING.equals(coreDatatype)) {
+        }
+
+        // Numeric types
+        else if(AbstractLiteral.isIntegerCoreDatatype(coreDatatype)) {
+            return new CoreseInteger(label, datatype, coreDatatype);
+        } else if(AbstractLiteral.isDecimalCoreDatatype(coreDatatype)) {
+            return new CoreseDecimal(label, datatype, coreDatatype);
+        }
+
+        // String literals
+        else if (XSD.STRING.equals(coreDatatype)) {
             return new CoreseTyped(label, datatype, coreDatatype);
         }
-        return null;
+        return new CoreseTyped(label, datatype, coreDatatype);
     }
 
+    /**
+     *
+     * @param value boolean value
+     * @return a new CoreseDatatypeAdapter object with the given boolean value
+     */
     @Override
     public Literal createLiteral(boolean value) {
         return new CoreseBoolean(value);
     }
 
+    /**
+     * Creates a literal with the given byte value.
+     * @param value byte value
+     * @return a new CoreseInteger object with the given byte value
+     */
     @Override
     public Literal createLiteral(byte value) {
-        return null;
+        return new CoreseInteger(value);
     }
 
+    /**
+     * Creates a literal with the given short value.
+     * @param value short value
+     * @return a new CoreseInteger object with the given short value
+     */
     @Override
     public Literal createLiteral(short value) {
-        return null;
+        return new CoreseInteger(value);
     }
 
+    /**
+     * Creates a literal with the given int value.
+     * @param value int value
+     * @return a new CoreseInteger object with the given int value
+     */
     @Override
     public Literal createLiteral(int value) {
-        return null;
+        return new CoreseInteger(value);
     }
 
+    /**
+     * Creates a literal with the given long value.
+     * @param value long value
+     * @return a new CoreseInteger object with the given long value
+     */
     @Override
     public Literal createLiteral(long value) {
-        return null;
+        return new CoreseInteger(value);
     }
 
+    /**
+     * Creates a literal with the given float value.
+     * @param value float value
+     * @return a new CoreseDecimal object with the given float value
+     */
     @Override
     public Literal createLiteral(float value) {
-        return null;
+        return new CoreseDecimal(value);
     }
 
+    /**
+     * Creates a literal with the given double value.
+     * @param value double value
+     * @return a new CoreseDecimal object with the given double value
+     */
     @Override
     public Literal createLiteral(double value) {
-        return null;
+        return new CoreseDecimal(value);
     }
 
+    /**
+     * Creates a literal with the given BigDecimal value.
+     * @param bigDecimal BigDecimal value
+     * @return a new CoreseDecimal object with the given BigDecimal value
+     */
     @Override
     public Literal createLiteral(BigDecimal bigDecimal) {
-        return null;
+        return new CoreseDecimal(bigDecimal);
     }
 
+    /**
+     * Creates a literal with the given BigInteger value.
+     * @param bigInteger BigInteger value
+     * @return a new CoreseInteger object with the given BigInteger value
+     */
     @Override
     public Literal createLiteral(BigInteger bigInteger) {
-        return null;
+        return new CoreseInteger(bigInteger);
     }
 
+    /**
+     * Creates a literal with the given TemporalAccessor value.
+     * @param value TemporalAccessor value
+     * @return a new CoreseDatatypeAdapter object with the given TemporalAccessor value. Depending of the value, the most adequate literal type will be used among CoreseDate, CoreseTime, CoreseDatetime.
+     */
     @Override
     public Literal createLiteral(TemporalAccessor value) {
         if(value.isSupported(ChronoField.HOUR_OF_DAY) && value.isSupported(ChronoField.MINUTE_OF_HOUR) && value.isSupported(ChronoField.SECOND_OF_MINUTE)) {
@@ -170,11 +313,21 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
         return new CoreseDuration(value);
     }
 
+    /**
+     * Creates a literal with the given XMLGregorianCalendar value.
+     * @param calendar XMLGregorianCalendar value
+     * @return a new CoreseDatetime object with the given XMLGregorianCalendar value
+     */
     @Override
     public Literal createLiteral(XMLGregorianCalendar calendar) {
         return new CoreseDatetime(calendar);
     }
 
+    /**
+     * Creates a literal with the given Date value.
+     * @param date Date value
+     * @return a new CoreseDate object with the given Date value
+     */
     @Override
     public Literal createLiteral(Date date) {
         return new CoreseDate(date);
@@ -182,16 +335,16 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
 
     @Override
     public Statement createStatement(Resource subject, IRI predicate, Value object) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Triple createTriple(Resource subject, IRI predicate, Value object) {
-        return ValueFactory.super.createTriple(subject, predicate, object);
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
