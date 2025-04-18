@@ -320,8 +320,8 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
             return newResource(result);
         }
         try {
-            return newInstance(Integer.valueOf(result));
-        } catch (Exception e) {
+            return newInstance(Integer.parseInt(result));
+        } catch (Exception ignored) {
         }
         return newInstance(result);
     }

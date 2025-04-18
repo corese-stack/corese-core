@@ -2,6 +2,8 @@ package fr.inria.corese.core.sparql.datatype;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 public class CoreseDateTime extends CoreseDate {
 	static IDatatype.Datatype code = IDatatype.Datatype.DATETIME;
 
@@ -13,6 +15,10 @@ public class CoreseDateTime extends CoreseDate {
 
 	public CoreseDateTime()  {
 		super();
+	}
+
+	public CoreseDateTime(XMLGregorianCalendar calendar) {
+		super(calendar);
 	}
 
 	@Override
