@@ -2948,9 +2948,9 @@ String Q_IRI_ref() : { Token t; String s; }
 
 TOKEN_MGR_DECLS:{
 		
-	void CommonTokenAction(Token token) {
-		//System.out.println(token+" ");
-	}
+    void CommonTokenAction(Token token) {
+        //System.out.println(token+" ");
+    }
 }
 
 // Comments and whitespace
@@ -2962,16 +2962,29 @@ TOKEN: { <#WS: " " | "\t" | "\n" | "\r" | "\f"> }
 SPECIAL_TOKEN :
 { <SINGLE_LINE_COMMENT: "#" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > }
 
-// Main tokens */
-
-TOKEN:
+TOKEN :
 {
+    /* ---------- Helpers for PN_LOCAL, escapes, and %hh ---------- */
+
+    < #PERCENT2 : "%" ["0"-"9","A"-"F","a"-"f"] ["0"-"9","A"-"F","a"-"f"] >
+|
+    < #ESC     : "\\" ( "_" | "~" | "." | "-" | "!" | "$" | "&" | "'" | "(" | ")"
+                       | "*" | "+" | "," | ";" | "=" | "/" | "?" | "#" | "@" | "%" ) >
+|
+    < #PLX            : <ESC> | <PERCENT2> >
+|
+    < #PN_LOCAL_START : <NCNAME> | "_" | ":" | ["0"-"9"] | <PLX> >
+|
+    < #PN_LOCAL_CONT  : <PN_LOCAL_START> | "-" | "." >
+
+    /* ---------------------- Public Tokens ---------------------- */
+|
    // Includes # for relative URIs
-   <Q_IRIref: "<" (~[">","<","\u0000"-"\u0020"])* ">" > 
-   
+    <Q_IRIref: "<" (~[">","<","\u0000"-"\u0020"])* ">" >
+
 | <QNAME_NS: (<NCNAME_PREFIX>)? ":" >
 
-| <QNAME: (<NCNAME_PREFIX>)? ":" (["0"-"9"] | "-")* (<NCNAME>)? >
+| <QNAME: (<NCNAME_PREFIX>)? ":"<PN_LOCAL_START> (<PN_LOCAL_CONT>)* >
 
 | <BLANK_NODE_LABEL:   "_:"   ( ["0"-"9"]  | <BLANKNAME> )   ( (<BLANKNAME> | ".")* <BLANKNAME> ) ?   >
 
@@ -2983,7 +2996,7 @@ TOKEN:
 | <APREFIX:  "@prefix">
 | <ATLIST:   "@list" >
 | <ATPATH:   "@path" >
-| <LANGTAG: <AT> (<A2Z>)+("-" (<A2ZN>)+)* >	
+| <LANGTAG: <AT> (<A2Z>)+("-" (<A2ZN>)+)* >
 | <#A2Z: ["a"-"z","A"-"Z"]>
 | <#A2ZN: ["a"-"z","A"-"Z","0"-"9"]>
 }
