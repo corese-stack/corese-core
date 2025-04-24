@@ -3477,7 +3477,7 @@ private int jjMoveNfa_0(int startState, int curPos)
                   { jjCheckNAddTwoStates(142, 143); }
                   break;
                case 142:
-                  if ((0x3ff200000000000L & l) == 0L)
+                  if ((0x3ff600000000000L & l) == 0L)
                      break;
                   if (kind > 10)
                      kind = 10;
@@ -4103,6 +4103,13 @@ private int jjMoveNfa_0(int startState, int curPos)
                   if ((0x7fffffe87fffffeL & l) != 0L)
                      { jjCheckNAdd(141); }
                   break;
+               case 142:
+                  if (curChar != 95)
+                     break;
+                  if (kind > 10)
+                     kind = 10;
+                  { jjAddStates(90, 91); }
+                  break;
                case 143:
                   if ((0x7fffffe87fffffeL & l) == 0L)
                      break;
@@ -4120,7 +4127,7 @@ private int jjMoveNfa_0(int startState, int curPos)
                   break;
                case 146:
                   if (curChar == 92)
-                     { jjAddStates(90, 91); }
+                     { jjAddStates(92, 93); }
                   break;
                case 147:
                   if ((0x4000000080000001L & l) != 0L)
@@ -4148,15 +4155,15 @@ private int jjMoveNfa_0(int startState, int curPos)
                   break;
                case 162:
                   if ((0x2000000020L & l) != 0L)
-                     { jjAddStates(92, 93); }
+                     { jjAddStates(94, 95); }
                   break;
                case 169:
                   if ((0x2000000020L & l) != 0L)
-                     { jjAddStates(94, 95); }
+                     { jjAddStates(96, 97); }
                   break;
                case 173:
                   if ((0x2000000020L & l) != 0L)
-                     { jjAddStates(96, 97); }
+                     { jjAddStates(98, 99); }
                   break;
                default : break;
             }
@@ -4417,8 +4424,8 @@ static final int[] jjnextStates = {
    86, 87, 89, 106, 107, 108, 110, 111, 113, 131, 132, 136, 137, 139, 140, 144, 
    145, 146, 148, 149, 151, 166, 167, 172, 173, 31, 32, 41, 136, 137, 138, 139, 
    140, 141, 6, 7, 12, 13, 10, 14, 15, 11, 17, 18, 10, 11, 48, 50, 
-   59, 66, 68, 77, 85, 90, 99, 109, 114, 123, 147, 153, 163, 164, 170, 171, 
-   174, 175, 
+   59, 66, 68, 77, 85, 90, 99, 109, 114, 123, 142, 143, 147, 153, 163, 164, 
+   170, 171, 174, 175, 
 };
 private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)
 {
