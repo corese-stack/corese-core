@@ -62,20 +62,28 @@ dependencies {
     val jersey_version = "3.0.4"
     val semargl_version = "0.7.1"
 
-    api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                                          // RDF parser to handle RDF/XML files
-    implementation("org.apache.commons:commons-text:1.10.0")                             // Text manipulation utilities (Apache Commons)
-    implementation("commons-lang:commons-lang:2.4")                                      // Basic functions for handling strings and objects
-    implementation("org.json:json:20240303")                                             // JSON processing for reading, writing, and manipulating JSON objects
-    implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                          // ShEx implementation for RDF validation
-    implementation("org.glassfish.jersey.core:jersey-client:${jersey_version}")          // REST client for creating HTTP requests
-    implementation("org.glassfish.jersey.inject:jersey-hk2:${jersey_version}")           // Dependency injection for Jersey
-    implementation("com.sun.activation:jakarta.activation:2.0.1")                        // JavaBeans Activation Framework for MIME data handling
-    implementation("javax.xml.bind:jaxb-api:2.3.1")                                      // JAXB API for converting between Java objects and XML
-    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:${semargl_version}") // RDFa parser to extract RDF metadata from HTML
-    implementation("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}") // Semargl core for RDF parsing and transformation
-    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                          // JSON-LD processing for Linked Data in JSON format
-    implementation("junit:junit:4.13.2")                                                 // JUnit framework for unit testing in Java
-    api("org.slf4j:slf4j-api:2.0.9")                                                     // Simple Logging Facade for Java (SLF4J)
+    // === Public API (Corese-Core users must see these classes) ===
+    api("org.slf4j:slf4j-api:2.0.9")                          // Exposed: Logging API
+
+    // === Internal implementations ===
+    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")               // Exposed: RDF/XML parser
+    implementation("org.apache.commons:commons-text:1.10.0")  // Used internally (text manipulation)
+    implementation("commons-lang:commons-lang:2.4")           // Used internally (basic utilities)
+    implementation("org.json:json:20240303")                  // Used internally (JSON)
+    implementation("fr.inria.lille.shexjava:shexjava-core:1.0") // Used internally (ShEx validation)
+    implementation("org.glassfish.jersey.core:jersey-client:$jersey_version") // Internal HTTP client
+    implementation("org.glassfish.jersey.inject:jersey-hk2:$jersey_version")  // Internal Jersey injection
+    implementation("com.sun.activation:jakarta.activation:2.0.1")             // Internal MIME handling
+    implementation("javax.xml.bind:jaxb-api:2.3.1")                            // Internal XML binding
+    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parsing
+    implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // RDF core parser
+    implementation("com.github.jsonld-java:jsonld-java:0.13.4") // Internal JSON-LD parser
+
+    // === For tests ===
+    testImplementation("junit:junit:4.13.2")                  // Unit testing framework
+
+    // === For viewing logs during development (DO NOT include in production) ===
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.9")
 }
 
 // Configure extra Java module information for dependencies without module-info

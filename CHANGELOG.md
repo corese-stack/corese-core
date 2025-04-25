@@ -9,6 +9,7 @@
   - Add imports to the Getting Started guide.
 - Improved GitHub Actions log messages for the documentation workflow (`run-name` is now clearer).
 - Added new GitHub Actions workflow to automatically publish a development pre-release (`dev-prerelease`) on pushes to the `develop` branch.
+- Added `slf4j-simple` as a development-only runtime dependency.
 
 ### Fixed
 
