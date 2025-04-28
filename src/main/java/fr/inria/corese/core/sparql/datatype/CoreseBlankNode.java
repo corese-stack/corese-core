@@ -125,5 +125,5 @@ public class CoreseBlankNode extends CoreseResource {
         final CoreseBlankNode other = (CoreseBlankNode) obj;
         return getLabel().equals(other.getLabel());
     }
-   
+
 }
