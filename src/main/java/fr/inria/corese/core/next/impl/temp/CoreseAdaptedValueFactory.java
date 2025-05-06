@@ -15,6 +15,8 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Factory for all the Corese adapted values.
@@ -22,6 +24,8 @@ import java.util.Date;
 public class CoreseAdaptedValueFactory implements ValueFactory {
 
     private static Logger logger = LoggerFactory.getLogger(CoreseAdaptedValueFactory.class);
+
+    private final AtomicLong nodeID = new AtomicLong(ThreadLocalRandom.current().nextLong());
 
     public CoreseAdaptedValueFactory() {
     }
@@ -51,7 +55,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
      */
     @Override
     public BNode createBNode() {
-        return null;
+        return new CoreseBNode(Long.toHexString(Math.abs(nodeID.getAndIncrement())));
     }
 
     /**
@@ -60,7 +64,7 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
      */
     @Override
     public BNode createBNode(String nodeID) {
-        return null;
+        return new CoreseBNode(nodeID);
     }
 
     /**
