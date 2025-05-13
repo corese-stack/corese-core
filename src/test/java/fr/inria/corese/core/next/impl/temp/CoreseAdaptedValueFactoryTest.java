@@ -9,12 +9,12 @@ import fr.inria.corese.core.next.api.model.ValueFactoryTest;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
 import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
 
@@ -25,7 +25,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
     private IRI predicate;
     private Resource context;
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         this.valueFactory = new CoreseAdaptedValueFactory();

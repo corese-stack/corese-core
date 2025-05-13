@@ -1,3 +1,6 @@
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 plugins {
     // Core Gradle plugins
     `java-library`                                              // For creating reusable Java libraries
@@ -16,9 +19,6 @@ plugins {
 }
 
 // SonarQube configuration
-
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 val currentDate: String = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
 
@@ -125,7 +125,9 @@ dependencies {
     implementation("com.typesafe:config:1.4.3")                                        // Typesafe config
 
     // === For tests ===
-    testImplementation("junit:junit:4.13.2")                                           // Unit testing framework
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.0") // Use the latest stable version
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.12.0") // Use the latest stable version
+    testImplementation("org.junit.vintage:junit-vintage-engine:5.12.0") // Use the latest stable version
 
     // === For viewing logs during development (DO NOT include in production) ===
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging

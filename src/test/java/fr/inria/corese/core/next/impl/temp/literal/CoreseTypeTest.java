@@ -9,17 +9,17 @@ import fr.inria.corese.core.next.impl.temp.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseLiteral;
 import fr.inria.corese.core.sparql.datatype.CoreseString;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreseTypeTest {
     private String testValue;
     private IRI testDatatypeIRI;
     private CoreDatatype testCoreDatatype;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         testValue = "Test String";
         testDatatypeIRI = XSD.STRING.getIRI();

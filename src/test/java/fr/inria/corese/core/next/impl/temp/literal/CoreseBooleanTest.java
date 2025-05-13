@@ -2,9 +2,9 @@ package fr.inria.corese.core.next.impl.temp.literal;
 
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreseBooleanTest {
 

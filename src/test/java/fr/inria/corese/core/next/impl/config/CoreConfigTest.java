@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.impl.config;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class CoreConfigTest {
 
     @Test
     public void instantiationTest(){
-        Assert.assertEquals("INFO", CoreConfig.getInstance().getLogLevel());
+        assertEquals("INFO", CoreConfig.getInstance().getLogLevel());
     }
 }

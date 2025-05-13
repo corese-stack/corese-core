@@ -4,10 +4,10 @@ import fr.inria.corese.core.next.api.IRITest;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.impl.temp.CoreseIRI;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CoreseIRITest extends IRITest {
 

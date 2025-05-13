@@ -3,8 +3,8 @@ package fr.inria.corese.core.next.api;
 import fr.inria.corese.core.next.impl.common.BasicIRI;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -20,13 +20,13 @@ import java.time.Period;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class ValueFactoryTest {
 
     protected ValueFactory valueFactory;
 
-    @Before
+    @BeforeEach
     public abstract void setUp();
 
     @Test
