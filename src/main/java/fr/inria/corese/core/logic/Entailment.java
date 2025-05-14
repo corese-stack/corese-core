@@ -23,7 +23,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  * rdfs:domain rdfs:range rdfs:subPropertyOf rdfs:subClassOf
  * owl:SymmetricProperty owl:inverseOf
  *
- * subPropertyOf & subClassOf are not transitive in the graph but their
+ * subPropertyOf &amp; subClassOf are not transitive in the graph but their
  * instances are typed according to transitivity
  *
  * @author Olivier Corby, Edelweiss INRIA 2010

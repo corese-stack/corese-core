@@ -44,7 +44,6 @@ public interface Node extends Pointerable, Comparable {
     /**
      * Query nodes have an index computed by KGRAM
      *
-     * @return
      */
     void setIndex(int n);
 

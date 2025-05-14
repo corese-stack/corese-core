@@ -412,7 +412,7 @@ public class PathFinder {
     }
 
     /**
-     * init at creation time, no need to change. pmax comes from pathLength() <=
+     * init at creation time, no need to change. pmax comes from pathLength() &lt;=
      * pmax
      */
     public void init(Regex exp, Object smode, int pmin, int pmax) {

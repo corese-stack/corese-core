@@ -213,8 +213,8 @@ public class Rule {
     }
 
     /**
-     * this = x type c2        :- x type c1        & c1 subclassof c2
-     * r    = c1 subclassof c3 :- c1 subclassof c2 & c2 subclassof c3
+     * this = x type c2        :- x type c1        &amp; c1 subclassof c2
+     * r    = c1 subclassof c3 :- c1 subclassof c2 &amp; c2 subclassof c3
      */
     public boolean isPseudoTransitive(Rule r) {
         if (isPseudoTransitive() && r.isTransitive()) {

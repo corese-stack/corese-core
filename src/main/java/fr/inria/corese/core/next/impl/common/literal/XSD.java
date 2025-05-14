@@ -58,7 +58,7 @@ public enum XSD implements CoreDatatype {
     POSITIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdPositiveInteger.getIRI()),
 
     /**
-     * Integer numbers <0
+     * Integer numbers &lt;0
      */
     NEGATIVE_INTEGER(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdNegativeInteger.getIRI()),
 
@@ -178,7 +178,7 @@ public enum XSD implements CoreDatatype {
     TOKEN(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdToken.getIRI()),
 
     /**
-     * Language tags per <a href="https://www.rfc-editor.org/rfc/rfc5646">rfc5646</>
+     * Language tags per &lt;a href="https://www.rfc-editor.org/rfc/rfc5646">rfc5646&lt;/>
      */
     LANGUAGE(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdLanguage.getIRI()),
 

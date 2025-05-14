@@ -12,13 +12,13 @@ import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
- * Semantic distance & similarity with Corese 2.4 Algorithm Extended to property
+ * Semantic distance &amp; similarity with Corese 2.4 Algorithm Extended to property
  * hierarchy distance: kg:pSimilarity
  *
  * PRAGMA: need a graph with Node set/get Depth need a root class, default is
  * rdfs:Resource or owl:Thing
  *
- * If a class is not subClassOf root, depth simulate to 1 Exploit owl:sameAs &
+ * If a class is not subClassOf root, depth simulate to 1 Exploit owl:sameAs &amp;
  * owl:equivalentClass/Property
  *
  * Generalized to property hierarchy with a step of 1/8^n instead of 1/2^n steps

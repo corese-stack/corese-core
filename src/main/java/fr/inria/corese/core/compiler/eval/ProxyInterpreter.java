@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Evaluator of operators & functions of filter language
+ * Evaluator of operators &amp; functions of filter language
  * implemented by fr.inria.corese.core.query.PluginImpl
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010

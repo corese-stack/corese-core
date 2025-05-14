@@ -706,7 +706,7 @@ public class PluginImpl
     /**
      * rdf star
      * triple(s, p, o)
-     * filter bind <<s p o>>
+     * filter bind &lt;&lt;s p o&gt;&gt;
      */
     // @todo DataManager
     @Override

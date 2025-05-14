@@ -35,9 +35,9 @@ import fr.inria.corese.core.Graph;
  *   extension-element-prefixes="server"
  *   
  * Exec query using this code:
- *   <xsl:variable name='res'  select='server:sparql($engine, $query)' />
+ *   &lt;xsl:variable name='res'  select='server:sparql($engine, $query)' />
  * 
- * Olivier Corby & Fabien Gandon, Edelweiss INRIA 2011
+ * Olivier Corby &amp; Fabien Gandon, Edelweiss INRIA 2011
  * 
  */
 public class XSLTQuery {

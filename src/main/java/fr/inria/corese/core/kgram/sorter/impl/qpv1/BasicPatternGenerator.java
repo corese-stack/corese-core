@@ -23,7 +23,7 @@ public class BasicPatternGenerator {
     private final static int TRIPLE_LEN = 3, PATTERN_LEN = 8;
 
     /**
-     * Generate the default basic pattern orders using Np < Ns < No
+     * Generate the default basic pattern orders using Np &lt; Ns &lt; No
      *
      * @return
      */

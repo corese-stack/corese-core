@@ -527,8 +527,8 @@ public class Expression extends TopExp
     }
 
     /**
-     * Translate some terms like : different(?x ?y ?z) -> (?x != ?y && ?y != ?z
-     * && ?x != ?z)
+     * Translate some terms like : different(?x ?y ?z) -> (?x != ?y &amp;&amp; ?y != ?z
+     * &amp;&amp; ?x != ?z)
      */
     public Expression process() {
         return this;
@@ -548,7 +548,7 @@ public class Expression extends TopExp
     /**
      * ***********************************************************
      *
-     * KGRAM Filter & Exp
+     * KGRAM Filter &amp; Exp
      *
      */
     @Override

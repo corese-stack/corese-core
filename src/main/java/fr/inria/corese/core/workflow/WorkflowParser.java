@@ -33,8 +33,8 @@ import java.util.List;
 /**
  * Parse a graph that describes a Workflow
  * [] a sw:Workflow ; sw:body ( [ a
- * sw:Query ; sw:uri <q1.rq>] [ a sw:Rule ; sw:uri sw:owlrl ] [ a sw:Workflow ;
- * sw:uri <wf.ttl> ] [ a sw:Template ; sw:uri st:turtle ] )] .
+ * sw:Query ; sw:uri &lt;q1.rq&gt;] [ a sw:Rule ; sw:uri sw:owlrl ] [ a sw:Workflow ;
+ * sw:uri &lt;wf.ttl&gt; ] [ a sw:Template ; sw:uri st:turtle ] )] .
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */

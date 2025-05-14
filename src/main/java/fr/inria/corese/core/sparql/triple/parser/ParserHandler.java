@@ -274,7 +274,7 @@ public class ParserHandler {
     }
 
     /**
-     * <<s p o>>
+     * &lt;&lt;s p o>>
      * return Constant cst(dt) with:
      * dt=bnode triple reference isTriple() == true
      * when sparql: cst.triple = triple(s p o)
@@ -319,7 +319,7 @@ public class ParserHandler {
 
     /**
      * Generate ref st:
-     * <<s p o>> q v
+     * &lt;&lt;s p o>> q v
      * triple(s p o ref) . ref q v
      */
     public Atom createTripleReference(ASTQuery ast) {

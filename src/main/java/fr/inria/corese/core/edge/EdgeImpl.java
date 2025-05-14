@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Graph Edge with n nodes (not only triple)
  * RDF star triple with reference node t
- * g <<s p o t>>
+ * g &lt;&lt;s p o t>>
  *
  * @author Olivier Corby, Edelweiss INRIA 2010
  */
