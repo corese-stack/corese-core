@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.temp;
 
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.api.model.ValueFactoryTest;
@@ -20,12 +21,18 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
     private String stringTestValue;
     private IRI xsdStringIRI;
 
+    private Resource subject;
+    private IRI predicate;
+    private Resource context;
+
     @Before
     @Override
     public void setUp() {
         this.valueFactory = new CoreseAdaptedValueFactory();
         stringTestValue = "String value";
         xsdStringIRI = XSD.STRING.getIRI();
+        subject = new CoreseIRI("http://corese.com/subject");
+        predicate = new CoreseIRI("http://corese.com/predicate");
     }
 
     @Test
@@ -93,5 +100,29 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
         assertEquals(XSD.STRING, literal.getCoreDatatype());
+    }
+
+    @Test
+    public void testCreateStatementWithoutContext() {
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSD.STRING);
+        CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal);
+        assertNotNull(statement);
+        assertEquals(subject, statement.getSubject());
+        assertEquals(predicate, statement.getPredicate());
+        assertEquals(literal, statement.getObject());
+        assertNull(statement.getContext());
+    }
+
+    @Test
+    public void testCreateStatementWithContext() {
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSD.STRING);
+
+        CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal, context);
+
+        assertNotNull(statement);
+        assertEquals(subject, statement.getSubject());
+        assertEquals(predicate, statement.getPredicate());
+        assertEquals(literal, statement.getObject());
+        assertEquals(context, statement.getContext());
     }
 }
