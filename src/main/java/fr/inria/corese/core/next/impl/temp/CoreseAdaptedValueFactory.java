@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.exception.InternalException;
 import fr.inria.corese.core.next.impl.temp.literal.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -333,14 +334,52 @@ public class CoreseAdaptedValueFactory implements ValueFactory {
         return new CoreseDate(date);
     }
 
+    /**
+     * Creates a {@link Statement} with a subject, predicate, and object, and no context.
+     * This method is used to create a simple RDF-like statement where the context is not provided.
+     * @param subject the subject of the statement (cannot be null)
+     * @param predicate the predicate of the statement (cannot be null)
+     * @param object the object of the statement (cannot be null)
+     * @return a new {@link CoreseStatement} with the given subject, predicate, and object, and no context
+     * @throws InternalException if any of the parameters are {@code null}
+     */
     @Override
     public Statement createStatement(Resource subject, IRI predicate, Value object) {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        if (subject == null) {
+            throw new InternalException("Subject cannot be null");
+        }
+        if (predicate == null) {
+            throw new InternalException("Predicate cannot be null");
+        }
+        if (object == null) {
+            throw new InternalException("Object cannot be null");
+        }
+        return new CoreseStatement(subject, predicate, object, null);
     }
 
+    /**
+     * Creates a {@link Statement} with a subject, predicate, object, and context.
+     * This method is used to create an RDF-like statement with a specified context (graph).
+     * @param subject the subject of the statement (cannot be null)
+     * @param predicate the predicate of the statement (cannot be null)
+     * @param object the object of the statement (cannot be null)
+     * @param context the context (graph) of the statement (can be null)
+     * @return a new {@link CoreseStatement} with the given subject, predicate, object, and context
+     * @throws InternalException if any of the parameters are {@code null}
+     */
     @Override
     public Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (subject == null) {
+            throw new InternalException("Subject cannot be null");
+        }
+        if (predicate == null) {
+            throw new InternalException("Predicate cannot be null");
+        }
+        if (object == null) {
+            throw new InternalException("Object cannot be null");
+        }
+        return new CoreseStatement(subject, predicate, object, context);
     }
 
     @Override
