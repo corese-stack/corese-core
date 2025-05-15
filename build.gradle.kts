@@ -325,6 +325,10 @@ tasks.jacocoTestReport {
 // This ensures that test coverage reports are always generated after tests.
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+    systemProperty("java.util.logging.config.file", "src/test/resources/logging.properties")
     finalizedBy(tasks.jacocoTestReport)
 }
 

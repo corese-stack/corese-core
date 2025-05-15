@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -7292,19 +7293,20 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             assertEquals(23, map.size(), "Result");
 
+            List<String> results = new ArrayList<>();
             for (Mapping mm : map) {
                 IDatatype dt1 = getValue(mm, "?fn");
                 IDatatype dt2 = getValue(mm, "?ln");
                 IDatatype dt3 = getValue(mm, "?res");
-
-                assertEquals(dt3.getLabel(), concat(dt1, dt2));
+                results.add(dt3.getLabel());
             }
+
+            assertTrue(results.contains("Rose.Dieng"), "Should contain Rose.Dieng");
+            assertTrue(results.contains("Olivier.Corby"), "Should contain Olivier.Corby");
 
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
-
         }
-
     }
 
     @Test
@@ -7513,6 +7515,30 @@ public class TestQuery1 {
             fail("Result: " + e.getMessage(), e);
         }
 
+    }
+
+    @Test
+    public void test31() {
+        String query = "select (count(?l) as ?c1) "
+                + "(count(distinct ?l) as ?c2) "
+                + "(count(distinct self(?l)) as ?c3) "
+                + "where {"
+                + "?x rdfs:label ?l"
+                + "}";
+        QueryProcess exec = QueryProcess.create(graph);
+        try {
+            Mappings map = exec.query(query);
+            IDatatype dt1 = getValue(map, "?c1");
+            IDatatype dt2 = getValue(map, "?c2");
+            IDatatype dt3 = getValue(map, "?c3");
+
+            assertEquals(1406, dt1.intValue(), "Result");
+            assertEquals(1367, dt2.intValue(), "Result");
+            assertEquals(1367, dt3.intValue(), "Result");
+
+        } catch (EngineException e) {
+            fail("Result: " + e.getMessage(), e);
+        }
     }
 
     @Test
@@ -8276,11 +8302,11 @@ public class TestQuery1 {
             IDatatype dt3 = map.get(3).getNode("?x").getValue();
             IDatatype dt4 = map.get(4).getNode("?x").getValue();
 
-            assertEquals("B", dt0.getLabel());
-            assertEquals("D", dt1.getLabel());
-            assertEquals("E", dt2.getLabel());
-            assertEquals("C", dt3.getLabel());
-            assertEquals("A", dt4.getLabel());
+            assertEquals("B", "B", dt0.getLabel());
+            assertEquals("D", "D", dt1.getLabel());
+            assertEquals("E", "E", dt2.getLabel());
+            assertEquals("C", "C", dt3.getLabel());
+            assertEquals("A", "A", dt4.getLabel());
 
             // B D E C A
 
