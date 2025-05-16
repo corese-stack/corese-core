@@ -8202,8 +8202,8 @@ public class TestQuery1 {
     }
 
     @Test
-    public void test59() {
-
+    public void test59() throws Exception {
+        // Arrange
         Graph graph = createGraph();
         QueryProcess exec = QueryProcess.create(graph);
 
@@ -8217,25 +8217,17 @@ public class TestQuery1 {
 
         String query = "select * where {?x ?p ?y}";
 
-        try {
-            Mappings map = exec.query(init);
-            map = exec.query(query);
-            XMLFormat f = XMLFormat.create(map);
+        // Act
+        Mappings map = exec.query(init);
+        map = exec.query(query);
 
-            XMLResult xml = XMLResult.create(exec.getProducer());
-            xml.parseString(f.toString());
-            assertEquals(5, map.size(), "Result");
+        // Assert
+        assertEquals(5, map.size(), "Should return 5 triples");
 
-        } catch (EngineException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        // Vérification XML (si nécessaire)
+        String xmlResult = XMLFormat.create(map).toString();
+        assertNotNull(xmlResult, "XML result should not be null");
+        assertTrue(xmlResult.contains("<sparql"), "Should contain SPARQL XML result format");
     }
 
     // @Test

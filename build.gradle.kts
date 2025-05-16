@@ -47,7 +47,7 @@ javacc {
 sourceSets {
     main {
         java {
-            srcDir("$buildDir/generated-src/javacc")
+            srcDir(layout.buildDirectory.dir("generated-src/javacc"))
         }
     }
 }
