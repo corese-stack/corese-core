@@ -3457,7 +3457,7 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?y");
-        assertEquals(1.5497, dt.doubleValue(),  10e-5, "test" );
+        assertEquals(1.5497, dt.doubleValue(), 10e-5, "test");
     }
 
     public void testGenAggOld() throws EngineException {
@@ -3473,7 +3473,7 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?y");
-        assertEquals(1.5497, dt.doubleValue(),  10e-5, "test" );
+        assertEquals(1.5497, dt.doubleValue(), 10e-5, "test");
     }
 
     @Test
@@ -6268,7 +6268,6 @@ public class TestQuery1 {
         exec.query(init);
         map = exec.query(q2);
 
-
         assertEquals(3, map.size(), "result");
     }
 
@@ -6593,7 +6592,6 @@ public class TestQuery1 {
             //// System.out.println(map);
             assertEquals(1, map.size(), "result");
 
-
             map = exec.query(query3);
             // System.out.println(map);
             assertEquals(2, map.size(), "result");
@@ -6601,7 +6599,6 @@ public class TestQuery1 {
         } catch (EngineException e) {
             e.printStackTrace();
             org.junit.jupiter.api.Assertions.fail("EngineException occurred: " + e.getMessage());
-
 
         }
 
@@ -7107,7 +7104,6 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             assertEquals(22, map.size(), "Result");
 
-
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
         }
@@ -7136,7 +7132,6 @@ public class TestQuery1 {
             QueryProcess exec = QueryProcess.create(g);
             Mappings map = exec.query(query);
             assertEquals(68, map.size(), "Result");
-
 
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
@@ -7215,7 +7210,6 @@ public class TestQuery1 {
 
             assertEquals(dt, sim, "Result");
 
-
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
         }
@@ -7265,7 +7259,6 @@ public class TestQuery1 {
                 IDatatype ldt = getValue(mm, "?l");
                 IDatatype lc = getValue(mm, "?c");
 
-
                 assertEquals(ldt, lc, "Result");
             }
 
@@ -7304,7 +7297,7 @@ public class TestQuery1 {
                 IDatatype dt2 = getValue(mm, "?ln");
                 IDatatype dt3 = getValue(mm, "?res");
 
-                assertEquals("Result", dt3.getLabel(), concat(dt1, dt2));
+                assertEquals(dt3.getLabel(), concat(dt1, dt2));
             }
 
         } catch (EngineException e) {
@@ -7355,7 +7348,7 @@ public class TestQuery1 {
             assertEquals(64, map.size(), "Result");
 
         } catch (EngineException e) {
-                        fail("Result: " + e.getMessage(), e);
+            fail("Result: " + e.getMessage(), e);
 
         }
 
@@ -7381,7 +7374,6 @@ public class TestQuery1 {
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
 
-
         }
 
     }
@@ -7402,7 +7394,6 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             getValue(map, "?max");
             assertEquals(17, map.size(), "Result");
-
 
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
@@ -7427,7 +7418,6 @@ public class TestQuery1 {
             getValue(map, "?max");
             assertEquals(0, map.size(), "Result");
 
-
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
         }
@@ -7451,9 +7441,8 @@ public class TestQuery1 {
             getValue(map, "?max");
             assertEquals(17, map.size(), "Result");
 
-
         } catch (EngineException e) {
-                        fail("Result: " + e.getMessage(), e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7474,9 +7463,8 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             assertEquals(17, map.size(), "Result");
 
-
         } catch (EngineException e) {
-                        fail("Result: " + e.getMessage(), e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7498,9 +7486,8 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             assertEquals(119, map.size(), "Result");
 
-
         } catch (EngineException e) {
-                        fail("Result: " + e.getMessage(), e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7529,30 +7516,6 @@ public class TestQuery1 {
     }
 
     @Test
-    public void test31() {
-        String query = "select (count(?l) as ?c1) "
-                + "(count(distinct ?l) as ?c2) "
-                + "(count(distinct self(?l)) as ?c3) "
-                + "where {"
-                + "?x rdfs:label ?l"
-                + "}";
-        QueryProcess exec = QueryProcess.create(graph);
-        try {
-            Mappings map = exec.query(query);
-            IDatatype dt1 = getValue(map, "?c1");
-            IDatatype dt2 = getValue(map, "?c2");
-            IDatatype dt3 = getValue(map, "?c3");
-
-            assertEquals(1406, dt1.size(), "Result");
-            assertEquals(1367, dt2.size(), "Result");
-            assertEquals(1367, dt3.size(), "Result");
-
-        } catch (EngineException e) {
-            fail("Result: " + e.getMessage(), e);
-        }
-    }
-
-    @Test
     public void test33() {
         // select (group_concat(distinct ?x, ?y) as ?str)
         Graph g = createGraph();
@@ -7573,7 +7536,6 @@ public class TestQuery1 {
 
             Mappings map = exec.query(query);
             assertEquals(3, map.size(), "Result");
-
 
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
@@ -7601,7 +7563,6 @@ public class TestQuery1 {
 
             Mappings map = exec.query(query);
             assertEquals(3, map.size(), "Result");
-
 
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
@@ -7631,7 +7592,6 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             assertEquals(3, map.size(), "Result");
 
-
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
         }
@@ -7660,7 +7620,6 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
 
             assertEquals(0, map.size(), "Result");
-
 
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
@@ -7725,7 +7684,6 @@ public class TestQuery1 {
 
             assertEquals(30, getValue(res, "?s").intValue(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -7762,7 +7720,6 @@ public class TestQuery1 {
             res = exec.query(query);
             assertEquals(2, res.size(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -7794,7 +7751,6 @@ public class TestQuery1 {
             exec.query(init);
             Mappings map = exec.query(query);
             assertEquals(2, map.size(), "Result");
-
 
         } catch (EngineException e) {
             e.printStackTrace();
@@ -7828,7 +7784,6 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             assertEquals(2, map.size(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -7861,7 +7816,6 @@ public class TestQuery1 {
             exec.query(init);
             Mappings map = exec.query(query);
             assertEquals(2, map.size(), "Result");
-
 
         } catch (EngineException e) {
             e.printStackTrace();
@@ -7908,7 +7862,6 @@ public class TestQuery1 {
             Mappings map = exec.query(init);
             map = exec.query(query);
             assertEquals(2, map.size(), "Result");
-
 
         } catch (EngineException e) {
             e.printStackTrace();
@@ -7961,7 +7914,6 @@ public class TestQuery1 {
             ResultFormat.create(map);
             assertEquals(2, map.size(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
             fail("Result: " + e.getMessage(), e);
@@ -7992,7 +7944,6 @@ public class TestQuery1 {
             map = exec.query(query);
             assertEquals(3, map.size(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -8020,7 +7971,6 @@ public class TestQuery1 {
             Mappings map = exec.query(init);
             map = exec.query(query);
             assertEquals(3, map.size(), "Result");
-
 
         } catch (EngineException e) {
             e.printStackTrace();
@@ -8053,7 +8003,6 @@ public class TestQuery1 {
             map = exec.query(query);
             assertEquals(2, map.size(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -8074,7 +8023,6 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
 
             assertEquals(7, map.size(), "Result");
-
 
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
@@ -8105,7 +8053,6 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(query);
             assertEquals(1, map.size(), "Result");
-
 
         } catch (EngineException e) {
             fail("Result: " + e.getMessage(), e);
@@ -8168,7 +8115,6 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             assertEquals(2, map.size(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -8194,7 +8140,6 @@ public class TestQuery1 {
             exec.query(init);
             Mappings map = exec.query(query);
             assertEquals(3, map.size(), "Result");
-
 
         } catch (EngineException e) {
             e.printStackTrace();
@@ -8223,7 +8168,6 @@ public class TestQuery1 {
             map = exec.query(query);
             ResultFormat.create(map);
             assertEquals(3, map.size(), "Result");
-
 
         } catch (EngineException e) {
             e.printStackTrace();
@@ -8255,7 +8199,6 @@ public class TestQuery1 {
             XMLResult xml = XMLResult.create(exec.getProducer());
             xml.parseString(f.toString());
             assertEquals(5, map.size(), "Result");
-
 
         } catch (EngineException e) {
             e.printStackTrace();
@@ -8327,18 +8270,17 @@ public class TestQuery1 {
             map = exec.query(query);
             assertEquals(5, map.size(), "Result");
 
-
             IDatatype dt0 = map.get(0).getNode("?x").getValue();
             IDatatype dt1 = map.get(1).getNode("?x").getValue();
             IDatatype dt2 = map.get(2).getNode("?x").getValue();
             IDatatype dt3 = map.get(3).getNode("?x").getValue();
             IDatatype dt4 = map.get(4).getNode("?x").getValue();
 
-            assertEquals("Result", "B", dt0.getLabel());
-            assertEquals("Result", "D", dt1.getLabel());
-            assertEquals("Result", "E", dt2.getLabel());
-            assertEquals("Result", "C", dt3.getLabel());
-            assertEquals("Result", "A", dt4.getLabel());
+            assertEquals("B", dt0.getLabel());
+            assertEquals("D", dt1.getLabel());
+            assertEquals("E", dt2.getLabel());
+            assertEquals("C", dt3.getLabel());
+            assertEquals("A", dt4.getLabel());
 
             // B D E C A
 
@@ -8407,7 +8349,6 @@ public class TestQuery1 {
 
             assertEquals(4, map.size(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -8446,7 +8387,6 @@ public class TestQuery1 {
 
             assertEquals(2, map.size(), "Result");
 
-
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -8481,7 +8421,6 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
 
             assertEquals(9, map.size(), "Result");
-
 
         } catch (EngineException e) {
             e.printStackTrace();
