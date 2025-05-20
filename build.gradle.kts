@@ -125,9 +125,9 @@ dependencies {
     implementation("com.typesafe:config:1.4.3")                                        // Typesafe config
 
     // === For tests ===
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.0") // Use the latest stable version
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.12.0") // Use the latest stable version
-    testImplementation("org.junit.vintage:junit-vintage-engine:5.12.0") // Use the latest stable version
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit 5 BOM for dependency management
+    testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit 5 for unit testing
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")               // JUnit 5 runtime for launching tests
 
     // === For viewing logs during development (DO NOT include in production) ===
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging
@@ -318,10 +318,7 @@ tasks.jacocoTestReport {
 // Set the test task to be followed by Jacoco report generation.
 // This ensures that test coverage reports are always generated after tests.
 tasks.test {
-    // testLogging {
-    //     events("passed", "skipped", "failed") // Affiche les résultats des tests
-    //     showStandardStreams = true           // Affiche les sorties console des tests
-    // }
+    useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
 }
 

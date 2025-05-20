@@ -13,9 +13,6 @@ module fr.inria.corese.corese_core {
     requires org.json; //
     requires org.apache.commons.lang3;
     requires org.slf4j;
-    requires jsonld.java;
-    requires commons.lang; //
-    requires typesafe.config; //
 
     exports fr.inria.corese.core.load;
     exports fr.inria.corese.core.load.result;
