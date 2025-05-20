@@ -29,7 +29,6 @@ sonar {
         property("sonar.login", System.getenv("SONAR_TOKEN"))
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
         property("sonar.sourceEncoding", "UTF-8")
-        property("sonar.projectDate", currentDate)
     }
 }
 
