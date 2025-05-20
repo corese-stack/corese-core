@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
 import fr.inria.corese.core.next.impl.common.literal.XSD;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CoreseDatetimeTest {
 

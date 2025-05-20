@@ -1,3 +1,6 @@
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 plugins {
     // Core Gradle plugins
     `java-library`                                              // For creating reusable Java libraries
@@ -17,9 +20,6 @@ plugins {
 
 // SonarQube configuration
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 val currentDate: String = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
 
 sonar {
@@ -29,7 +29,6 @@ sonar {
         property("sonar.login", System.getenv("SONAR_TOKEN"))
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
         property("sonar.sourceEncoding", "UTF-8")
-        property("sonar.projectDate", currentDate)
     }
 }
 
@@ -125,7 +124,9 @@ dependencies {
     implementation("com.typesafe:config:1.4.3")                                        // Typesafe config
 
     // === For tests ===
-    testImplementation("junit:junit:4.13.2")                                           // Unit testing framework
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit 5 BOM for dependency management
+    testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit 5 for unit testing
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")               // JUnit 5 runtime for launching tests
 
     // === For viewing logs during development (DO NOT include in production) ===
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging
@@ -316,10 +317,7 @@ tasks.jacocoTestReport {
 // Set the test task to be followed by Jacoco report generation.
 // This ensures that test coverage reports are always generated after tests.
 tasks.test {
-    // testLogging {
-    //     events("passed", "skipped", "failed") // Affiche les résultats des tests
-    //     showStandardStreams = true           // Affiche les sorties console des tests
-    // }
+    useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
 }
 

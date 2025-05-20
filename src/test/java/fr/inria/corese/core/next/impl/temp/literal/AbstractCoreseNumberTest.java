@@ -1,11 +1,11 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AbstractCoreseNumberTest {
 

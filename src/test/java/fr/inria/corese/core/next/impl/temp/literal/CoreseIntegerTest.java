@@ -2,12 +2,12 @@ package fr.inria.corese.core.next.impl.temp.literal;
 
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreseIntegerTest extends AbstractCoreseNumberTest {
 

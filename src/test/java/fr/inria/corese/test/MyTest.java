@@ -8,7 +8,7 @@ import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.Date;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  *

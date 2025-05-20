@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.impl.common.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IRIUtilsTest {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IRIUtilsTest.class);

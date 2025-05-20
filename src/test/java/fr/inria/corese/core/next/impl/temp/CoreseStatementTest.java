@@ -1,5 +1,13 @@
 package fr.inria.corese.core.next.impl.temp;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import fr.inria.corese.core.NodeImpl;
 import fr.inria.corese.core.edge.EdgeImpl;
 import fr.inria.corese.core.kgram.api.core.Edge;
@@ -9,10 +17,6 @@ import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Value;
 import fr.inria.corese.core.next.impl.temp.literal.CoreseInteger;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class CoreseStatementTest {
     private Resource subject;
@@ -25,7 +29,7 @@ public class CoreseStatementTest {
     private Node subjectNode;
     private Node objectNode;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         subject = new CoreseIRI("http://corese.com/subject");
         predicate = new CoreseIRI("http://corese.com/predicate");
@@ -59,9 +63,11 @@ public class CoreseStatementTest {
         assertNull(statement.getContext());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCoreseStatementFromEdgeWithNullEdge() {
-        new CoreseStatement(null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CoreseStatement(null);
+        });
     }
 
     @Test
@@ -80,4 +86,3 @@ public class CoreseStatementTest {
         assertNotNull(statement.getCoreseEdge());
     }
 }
-

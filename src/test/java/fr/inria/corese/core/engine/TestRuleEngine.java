@@ -1,16 +1,15 @@
 package fr.inria.corese.core.engine;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.Date;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.compiler.eval.QuerySolver;
-import fr.inria.corese.core.EdgeFactory;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphStore;
 import fr.inria.corese.core.api.Engine;
@@ -36,7 +35,7 @@ public class TestRuleEngine {
     static Engine rengine;
     static RuleEngine fengine;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() throws EngineException {
         QuerySolver.definePrefix("c", "http://www.inria.fr/acacia/comma#");
 
@@ -59,7 +58,7 @@ public class TestRuleEngine {
         QueryProcess.create(graph);
     }
 
-    @AfterClass
+    @AfterAll
     static public void finish() {
     }
 
@@ -124,8 +123,7 @@ public class TestRuleEngine {
             re.process();
             Mappings map = exec.query(query);
 
-            assertEquals("Result", 1, map.size());
-
+            assertEquals(1, map.size(), "Result");
         } catch (EngineException e) {
             e.printStackTrace();
         }
@@ -410,9 +408,9 @@ public class TestRuleEngine {
         Mappings map;
         try {
             map = exec.query(query);
-            assertEquals("Result", 4, map.size());
+            assertEquals(4, map.size(), "Result");
         } catch (EngineException e) {
-            assertEquals("Result", 4, e);
+            assertEquals("Result", e.getMessage());
         }
     }
 
@@ -431,13 +429,11 @@ public class TestRuleEngine {
         Mappings map;
         try {
             map = exec.query(query);
-            assertEquals("Result", 4, map.size());
-
+            assertEquals(4, map.size(), "Result");
             map = exec.query(ent);
-            // System.out.println(map);
 
         } catch (EngineException e) {
-            assertEquals("Result", 4, e);
+            assertEquals("Result", e.getMessage());
         }
     }
 
@@ -452,7 +448,8 @@ public class TestRuleEngine {
 
         qe.process();
 
-        assertEquals("Result", 1, g.size());
+        assertEquals(1, g.size(), "Result");
+
     }
 
     @Test
@@ -471,13 +468,11 @@ public class TestRuleEngine {
         Mappings map;
         try {
             map = exec.query(query);
-            assertEquals("Result", 4, map.size());
-
+            assertEquals(4, map.size(), "Result");
             map = exec.query(ent);
-            // System.out.println(map);
 
         } catch (EngineException e) {
-            assertEquals("Result", 4, e);
+            assertEquals("Result", e.getMessage());
         }
     }
 
