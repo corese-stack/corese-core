@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.api.base.model;
 
-import java.io.Serial;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +16,7 @@ import fr.inria.corese.core.next.api.Namespace;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.impl.temp.ModelNamespace;
 
 /**
  * Abstract class that implements the Model interface.
@@ -41,38 +41,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         return existing.get();
-    }
-
-    /**
-     * Internal implementation of the {@link Namespace} interface used by
-     * {@link AbstractModel}.
-     * <p>
-     * Represents a simple, immutable namespace binding (prefix → URI).
-     * Only used when adding a namespace via {@code setNamespace(prefix, uri)}.
-     * </p>
-     */
-    private static class ModelNamespace extends AbstractNamespace {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
-        private final String prefix;
-        private final String namespaceURI;
-
-        ModelNamespace(String prefix, String namespaceURI) {
-            this.prefix = prefix;
-            this.namespaceURI = namespaceURI;
-        }
-
-        @Override
-        public String getPrefix() {
-            return prefix;
-        }
-
-        @Override
-        public String getName() {
-            return namespaceURI;
-        }
     }
 
     @Override
