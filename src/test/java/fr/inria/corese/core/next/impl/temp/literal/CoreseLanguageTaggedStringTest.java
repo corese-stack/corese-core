@@ -3,16 +3,16 @@ package fr.inria.corese.core.next.impl.temp.literal;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseLiteral;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreseLanguageTaggedStringTest {
 
     private String testValue;
     private String testLanguage;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         testValue = "Hello";
         testLanguage = "en";
