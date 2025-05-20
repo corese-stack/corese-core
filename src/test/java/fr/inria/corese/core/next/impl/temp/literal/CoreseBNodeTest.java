@@ -1,8 +1,11 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import fr.inria.corese.core.sparql.datatype.CoreseBlankNode;
 
 public class CoreseBNodeTest {
@@ -13,7 +16,7 @@ public class CoreseBNodeTest {
     private CoreseBNode coreseBNodeFromCoreseObject;
     private CoreseBNode coreseBNodeFromStringId;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         coreseBNodeFromCoreseObject = new CoreseBNode(coreseBlankNode);
         coreseBNodeFromStringId = new CoreseBNode(BNODE_ID);
