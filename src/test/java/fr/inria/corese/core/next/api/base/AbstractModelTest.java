@@ -34,7 +34,7 @@ class AbstractModelTest {
 
     /**
      * Méthode d'initialisation exécutée avant chaque test.
-     * Crée une nouvelle instance de ConcreteModel et initialise les objets de test (sujets, prédicats, etc.).
+     * Crée une nouvelle instance de ConcreteModel et initialise les objets de test (sujets, prédicats, object.).
      */
     @BeforeEach
     void setUp() {
