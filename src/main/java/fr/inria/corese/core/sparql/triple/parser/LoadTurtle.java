@@ -63,7 +63,7 @@ public class LoadTurtle {
             LoadTurtle p = new LoadTurtle(read, cr, file);
             return p;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Échec de l'opération", e);
         }
         return null;
     }
@@ -96,7 +96,7 @@ public class LoadTurtle {
             parser.setASTQuery(ast);
             parser.set(c);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Échec de l'opération", e);
         }
     }
 

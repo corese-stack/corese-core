@@ -520,7 +520,7 @@ public class RuleEngine implements Engine, Graphable {
         try {
             defRule(rule);
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Une erreur s'est produite", e);
         }
     }
 

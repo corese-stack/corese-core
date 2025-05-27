@@ -255,7 +255,7 @@ public class RuleLoad {
             try {
                 engine.defRule(rule);
             } catch (EngineException e) {
-                e.printStackTrace();
+                logger.error("Une erreur s'est produite", e);
             }
         }
     }

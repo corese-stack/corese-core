@@ -423,7 +423,7 @@ public class Access {
     public static void setMode(Mode m) {
         mode = m;
         singleton.initMode();
-        //System.out.println(singleton);
+        //logger.info("setMode : ", singleton);
     }
     
     public static boolean isServerMode() {

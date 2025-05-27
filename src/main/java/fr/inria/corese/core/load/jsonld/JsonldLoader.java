@@ -59,7 +59,7 @@ public class JsonldLoader {
             JsonldLoader p = new JsonldLoader(read, file);
             return p;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Une erreur s'est produite", e);
         }
         return null;
     }

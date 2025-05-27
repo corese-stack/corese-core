@@ -110,7 +110,9 @@ dependencies {
 
     // === Public API (Corese-Core users must see these classes) ===
     api("org.slf4j:slf4j-api:2.0.9")                                                   // Exposed: Logging API
-
+    // Implémentation Log4j2
+    implementation("org.apache.logging.log4j:log4j-core:2.20.0")
+    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0")
     // === Internal implementations ===
     implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // Exposed: RDF/XML parser
     implementation("org.apache.commons:commons-text:1.10.0")                           // Used internally (text manipulation)

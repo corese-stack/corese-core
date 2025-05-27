@@ -567,7 +567,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
     }
 
     public void walk(Walker walker) {
-        //System.out.println("walk stmt: " + this);
+        //logger.debug("walk stmt: {}" , this);
         walker.enter(this);
         for (Exp exp : getBody()) {
             exp.walk(walker);

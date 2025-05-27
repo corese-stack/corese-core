@@ -623,7 +623,7 @@ public class Transformer implements TransformProcessor {
         try {
             qe.defQuery(t);
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Échec de l'opération", e);
         }
     }
 

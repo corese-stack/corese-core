@@ -32,6 +32,8 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.api.Walker;
 import fr.inria.corese.core.sparql.triple.parser.visitor.ExpressionVisitorVariable;
 import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Title: Corese</p>
@@ -48,6 +50,8 @@ import java.util.Collection;
  */
 public class Expression extends TopExp
         implements Regex, Filter, Expr, Pointerable {
+
+    private static final Logger logger = LoggerFactory.getLogger(Expression.class);
 
     public enum Type {
         STDFILTER, ENDFILTER, POSFILTER, BOUND
@@ -901,7 +905,7 @@ public class Expression extends TopExp
     }
     
     public void walk(Walker walker) {
-        //System.out.println("walk exp: " + this);
+        //logger.debug("walk exp: {}" , this);
         walker.enter(this);
         for (Expression exp : getArgs()) {
             exp.walk(walker);

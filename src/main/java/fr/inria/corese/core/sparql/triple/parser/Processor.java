@@ -1493,13 +1493,13 @@ public class Processor {
 		} 
 		catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Échec de l'opération", e);
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Échec de l'opération", e);
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Échec de l'opération", e);
 		}
                 catch (NullPointerException ex){
                     
