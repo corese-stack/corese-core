@@ -13,7 +13,7 @@ import fr.inria.corese.core.sparql.triple.api.Walker;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
+
 //import static java.util.logging.Level.ALL;
 
 /**
@@ -290,7 +290,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
             }
             return exp;
         } catch (InstantiationException | IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Exp.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Une erreur inattendue est survenue", ex);
         }
         return this;
     }

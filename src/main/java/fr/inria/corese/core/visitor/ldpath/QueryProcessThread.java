@@ -6,8 +6,9 @@ import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class QueryProcessThread extends Thread {
 
-    
+    private static final Logger logger = LoggerFactory.getLogger(QueryProcessThread.class);
     QueryProcess exec;
     ASTQuery ast;
     Mappings map;
@@ -43,7 +44,7 @@ public class QueryProcessThread extends Thread {
         try {
             map = exec.query(ast);
         } catch (EngineException ex) {
-            Logger.getLogger(QueryProcessThread.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Une erreur inattendue est survenue", ex);
         }
     }
     

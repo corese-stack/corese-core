@@ -12,8 +12,9 @@ import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Call Corese Java function with parameters as IDatatype values
@@ -23,6 +24,8 @@ import java.util.logging.Logger;
  *
  */
 public class JavaDScall extends JavaFunction {
+
+    private static final Logger logger = LoggerFactory.getLogger(JavaDScall.class);
     
     String javaName;
 
@@ -56,7 +59,7 @@ public class JavaDScall extends JavaFunction {
             IDatatype res = DatatypeMap.getValue(obj);
             return res;
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(Javacall.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Une erreur inattendue est survenue", ex);
         }
         return null;
 

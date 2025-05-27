@@ -16,13 +16,16 @@ import fr.inria.corese.core.sparql.datatype.function.XPathFun;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.function.term.TermEval;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class ResultFormater extends TermEval {
+
+    private static final Logger logger = LoggerFactory.getLogger(ResultFormater.class);
 
     public ResultFormater() {
     }
@@ -101,7 +104,7 @@ public class ResultFormater extends TermEval {
             IDatatype res = DatatypeMap.newXMLObject(dt.getLabel(), node); 
             return res;
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            Logger.getLogger(ResultFormater.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Une erreur inattendue est survenue", ex);
         }
         return null;
     }

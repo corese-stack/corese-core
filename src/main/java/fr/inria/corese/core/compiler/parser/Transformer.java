@@ -1686,8 +1686,7 @@ public class Transformer implements ExpType {
                 qq = tr.transform(aa);
                 add(edge, qq);
             } catch (EngineException ex) {
-                java.util.logging.Logger.getLogger(Transformer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
+                logger.error("Une erreur inattendue est survenue", ex);            }
         }
     }
 

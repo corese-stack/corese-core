@@ -151,7 +151,7 @@ public class QuerySolverVisitorRule extends QuerySolverVisitorBasic {
             }
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            java.util.logging.Logger.getLogger(QueryProcess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("Une erreur inattendue est survenue", ex);
             logger.error("Undefined Visitor: " + name);
         }
 

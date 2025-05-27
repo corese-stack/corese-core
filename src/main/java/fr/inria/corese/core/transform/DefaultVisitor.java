@@ -10,8 +10,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Transformer Visitor to be used in a transformation
@@ -26,6 +27,8 @@ import java.util.logging.Logger;
  *
  */
 public class DefaultVisitor implements TemplateVisitor {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultVisitor.class);
     static final String STL         = NSManager.STL;
     static final String TRACE       = STL + "trace";
     static final String GRAPH       = STL + "graph";
@@ -187,7 +190,7 @@ public class DefaultVisitor implements TemplateVisitor {
                     sb.append(NL).append(NL);
                 }
             } catch (EngineException ex) {
-                Logger.getLogger(DefaultVisitor.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("Une erreur inattendue est survenue", ex);
             }
 
         }

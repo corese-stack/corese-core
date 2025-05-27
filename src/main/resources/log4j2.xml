@@ -30,8 +30,8 @@
         <!-- Custom application logger -->
         <Logger name="fr.inria.corese" level="debug" additivity="false">
             <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="Console"/>
         </Logger>
-
         <Root level="info">
             <AppenderRef ref="FileAppender"/>
             <AppenderRef ref="Console"/>

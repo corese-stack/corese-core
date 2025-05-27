@@ -27,7 +27,7 @@ import static fr.inria.corese.core.kgram.api.core.ExprType.SUBJECT;
 import static fr.inria.corese.core.kgram.api.core.ExprType.TRIPLE;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.HashMap;
-import java.util.logging.Level;
+
 
 public class Processor {
 	private static final Logger logger = LoggerFactory.getLogger(Processor.class);
@@ -1475,7 +1475,7 @@ public class Processor {
                 setMethod(className.getMethod(methodName, aclasses));
                 setCorrect(true);
             } catch (InvocationTargetException | ClassNotFoundException | SecurityException | NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-                java.util.logging.Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, e);
+				logger.error("Une erreur inattendue est survenue", e);
             }
            
     }
