@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 /**
- * Classe de test pour AbstractModel.
- * Utilise une implémentation concrète interne pour tester les fonctionnalités
- * par défaut fournies par AbstractModel.
+ * Test class for AbstractModel.
+ * Uses an internal concrete implementation to test the default functionalities
+ * provided by AbstractModel.
  */
 class AbstractModelTest {
 
@@ -33,8 +33,8 @@ class AbstractModelTest {
     private Resource context2;
 
     /**
-     * Méthode d'initialisation exécutée avant chaque test.
-     * Crée une nouvelle instance de ConcreteModel et initialise les objets de test (sujets, prédicats, object.).
+     * Initialization method executed before each test.
+     * Creates a new instance of ConcreteModel and initializes test objects (subjects, predicates, objects).
      */
     @BeforeEach
     void setUp() {
@@ -55,10 +55,10 @@ class AbstractModelTest {
 
 
     /**
-     * Teste la méthode unmodifiable().
+     * Tests the unmodifiable() method.
      */
     @Test
-    @DisplayName("unmodifiable() doit retourner un modèle en lecture seule")
+    @DisplayName("unmodifiable() should return a read-only model")
     void testUnmodifiable() {
         Model unmodifiable = model.unmodifiable();
         assertNotNull(unmodifiable);
@@ -66,10 +66,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode setNamespace(String prefix, String name).
+     * Tests the setNamespace(String prefix, String name) method.
      */
     @Test
-    @DisplayName("setNamespace(String, String) doit ajouter ou mettre à jour un namespace")
+    @DisplayName("setNamespace(String, String) should add or update a namespace")
     void testSetNamespaceWithStringArgs() {
         model.setNamespace("ex", "http://example.org/ns/");
         Optional<Namespace> ns = model.getNamespace("ex");
@@ -89,10 +89,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode setNamespace(Namespace namespace).
+     * Tests the setNamespace(Namespace namespace) method.
      */
     @Test
-    @DisplayName("setNamespace(Namespace) doit ajouter un namespace")
+    @DisplayName("setNamespace(Namespace) should add a namespace")
     void testSetNamespaceWithNamespaceObject() {
         Namespace newNs = new CreateNamespace("geosparql", "http://example.org/ont/geosparql#");
         model.setNamespace(newNs);
@@ -104,10 +104,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode getNamespaces().
+     * Tests the getNamespaces() method.
      */
     @Test
-    @DisplayName("getNamespaces() doit retourner tous les namespaces définis")
+    @DisplayName("getNamespaces() should return all defined namespaces")
     void testGetNamespaces() {
         model.setNamespace("ex1", "http://example.org/ns1/");
         model.setNamespace("ex2", "http://example.org/ns2/");
@@ -120,10 +120,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode removeNamespace().
+     * Tests the removeNamespace() method.
      */
     @Test
-    @DisplayName("removeNamespace() doit supprimer un namespace et retourner un Optional du namespace supprimé")
+    @DisplayName("removeNamespace() should remove a namespace and return an Optional of the removed namespace")
     void testRemoveNamespace() {
         Namespace testNs = new CreateNamespace("ex", "http://example.org/ns/");
         model.setNamespace("ex", "http://example.org/ns/");
@@ -132,7 +132,7 @@ class AbstractModelTest {
         Optional<Namespace> removedNs = model.removeNamespace("ex");
         assertTrue(removedNs.isPresent());
 
-        // Comparaison
+        // Comparison
         assertEquals(testNs.getPrefix(), removedNs.get().getPrefix());
         assertEquals(testNs.getName(), removedNs.get().getName());
 
@@ -144,10 +144,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode clearNamespaces().
+     * Tests the clearNamespaces() method.
      */
     @Test
-    @DisplayName("clearNamespaces() doit supprimer tous les namespaces")
+    @DisplayName("clearNamespaces() should remove all namespaces")
     void testClearNamespaces() {
         model.setNamespace("ex1", "http://example.org/ns1/");
         model.setNamespace("ex2", "http://example.org/ns2/");
@@ -159,10 +159,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste l'ajout d'une déclaration et sa présence via contains(Statement).
+     * Tests adding a statement and its presence via contains(Statement).
      */
     @Test
-    @DisplayName("add() et contains() doivent fonctionner pour les déclarations")
+    @DisplayName("add() and contains() should work for statements")
     void testAddAndContainsStatement() {
         Statement stmt = new SimpleStatement(subject1, predicate1, object1, null);
 
@@ -175,10 +175,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la suppression d'une déclaration via remove(Object).
+     * Tests removing a statement via remove(Object).
      */
     @Test
-    @DisplayName("remove() doit supprimer une déclaration existante")
+    @DisplayName("remove() should remove an existing statement")
     void testRemoveStatement() {
         Statement stmt = new SimpleStatement(subject1, predicate1, object1, null);
         model.add(stmt);
@@ -190,10 +190,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode isEmpty().
+     * Tests the isEmpty() method.
      */
     @Test
-    @DisplayName("isEmpty() doit refléter l'état vide ou non vide du modèle")
+    @DisplayName("isEmpty() should reflect the empty or non-empty state of the model")
     void testIsEmpty() {
         assertTrue(model.isEmpty());
         model.add(subject1, predicate1, object1);
@@ -203,10 +203,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la vue subjects().
+     * Tests the subjects() view.
      */
     @Test
-    @DisplayName("subjects() doit retourner un ensemble unique de sujets et gérer les suppressions")
+    @DisplayName("subjects() should return a unique set of subjects and handle removals")
     void testSubjectsView() {
         model.add(subject1, predicate1, object1);
         model.add(subject2, predicate1, object1);
@@ -225,10 +225,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la vue predicates().
+     * Tests the predicates() view.
      */
     @Test
-    @DisplayName("predicates() doit retourner un ensemble unique de prédicats")
+    @DisplayName("predicates() should return a unique set of predicates")
     void testPredicatesView() {
         model.add(subject1, predicate1, object1);
         model.add(subject1, predicate2, object1);
@@ -241,10 +241,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la vue objects().
+     * Tests the objects() view.
      */
     @Test
-    @DisplayName("objects() doit retourner un ensemble unique d'objets")
+    @DisplayName("objects() should return a unique set of objects")
     void testObjectsView() {
         model.add(subject1, predicate1, object1);
         model.add(subject1, predicate1, object2);
@@ -257,10 +257,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la vue contexts().
+     * Tests the contexts() view.
      */
     @Test
-    @DisplayName("contexts() doit retourner un ensemble unique de contextes (y compris null)")
+    @DisplayName("contexts() should return a unique set of contexts (including null)")
     void testContextsView() {
         model.add(subject1, predicate1, object1, context1);
         model.add(subject1, predicate1, object1, context2);
@@ -274,10 +274,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode getStatements() pour filtrer les déclarations.
+     * Tests the getStatements() method to filter statements.
      */
     @Test
-    @DisplayName("getStatements() doit filtrer les déclarations par critère")
+    @DisplayName("getStatements() should filter statements by criteria")
     void testFilterStatements() {
         Statement stmt1 = new SimpleStatement(subject1, predicate1, object1, context1);
         Statement stmt2 = new SimpleStatement(subject1, predicate2, object2, context1);
@@ -311,10 +311,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode clear() avec un ou plusieurs contextes spécifiés.
+     * Tests the clear() method with one or more specified contexts.
      */
     @Test
-    @DisplayName("clear(contextes) doit supprimer les déclarations dans les contextes spécifiés")
+    @DisplayName("clear(contexts) should remove statements in the specified contexts")
     void testClearWithContext() {
         Statement stmt1 = new SimpleStatement(subject1, predicate1, object1, context1);
         Statement stmt2 = new SimpleStatement(subject1, predicate1, object1, context2);
@@ -338,10 +338,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste les méthodes addAll() et removeAll().
+     * Tests the addAll() and removeAll() methods.
      */
     @Test
-    @DisplayName("addAll() et removeAll() doivent gérer les collections de déclarations")
+    @DisplayName("addAll() and removeAll() should handle collections of statements")
     void testAddAllAndRemoveAll() {
         Statement stmt1 = new SimpleStatement(subject1, predicate1, object1, null);
         Statement stmt2 = new SimpleStatement(subject2, predicate2, object2, null);
@@ -359,10 +359,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste la méthode retainAll().
+     * Tests the retainAll() method.
      */
     @Test
-    @DisplayName("retainAll() doit conserver uniquement les déclarations spécifiées")
+    @DisplayName("retainAll() should keep only the specified statements")
     void testRetainAll() {
         Statement stmt1 = new SimpleStatement(subject1, predicate1, object1, null);
         Statement stmt2 = new SimpleStatement(subject2, predicate2, object2, null);
@@ -383,10 +383,10 @@ class AbstractModelTest {
     }
 
     /**
-     * Teste les méthodes toArray() et toArray(T[]).
+     * Tests the toArray() and toArray(T[]) methods.
      */
     @Test
-    @DisplayName("toArray() doit retourner un tableau des déclarations")
+    @DisplayName("toArray() should return an array of statements")
     void testToArray() {
         Statement stmt1 = new SimpleStatement(subject1, predicate1, object1, null);
         Statement stmt2 = new SimpleStatement(subject2, predicate2, object2, null);
@@ -405,16 +405,16 @@ class AbstractModelTest {
 
         Statement[] smallArray = new Statement[1];
         Statement[] result = model.toArray(smallArray);
-        assertNotSame(smallArray, result);
+        assertNotSame(smallArray, result); // Should return a new array if the provided array is too small
         assertEquals(2, result.length);
     }
 
     /**
-     * Teste la méthode getStatements() pour filtrer les déclarations.
-     * Vérifie que le filtrage fonctionne correctement avec différents critères.
+     * Tests the getStatements() method to filter statements.
+     * Verifies that filtering works correctly with different criteria.
      */
     @Test
-    @DisplayName("getStatements() doit filtrer les déclarations par critère (y compris filtrage par objet seul)")
+    @DisplayName("getStatements() should filter statements by criteria (including filtering by object only)")
     void testFilterStatementsExtended() {
         Statement stmt1 = new SimpleStatement(subject1, predicate1, object1, context1);
         Statement stmt2 = new SimpleStatement(subject1, predicate2, object2, context1);
@@ -426,24 +426,20 @@ class AbstractModelTest {
         model.add(stmt3);
         model.add(stmt4);
 
-        // Filtrage par sujet et contexte
         Model filteredBySubjectAndContext = model.filter(subject1, null, null, context1);
         assertEquals(2, filteredBySubjectAndContext.size());
         assertTrue(filteredBySubjectAndContext.contains(stmt1));
         assertTrue(filteredBySubjectAndContext.contains(stmt2));
 
-        // Filtrage par sujet et prédicat
         Model filteredBySubjectAndPredicate = model.filter(subject1, predicate1, null);
         assertEquals(1, filteredBySubjectAndPredicate.size());
         assertFalse(filteredBySubjectAndPredicate.contains(stmt1));
         assertTrue(filteredBySubjectAndPredicate.contains(stmt4));
 
-        // Filtrage par contexte null
         Model filteredByNullContext = model.filter(null, null, null, null);
         assertEquals(1, filteredByNullContext.size());
         assertTrue(filteredByNullContext.contains(stmt4));
 
-        // NOUVEAU TEST: Filtrage par objet seul
         Model filteredByObject = model.filter(null, null, object1);
         assertEquals(1, filteredByObject.size());
         assertFalse(filteredByObject.contains(stmt1));
@@ -453,9 +449,9 @@ class AbstractModelTest {
     }
 
     /**
-     * Classe concrète interne qui hérite de AbstractModel.
-     * Cette implémentation est nécessaire car AbstractModel est abstraite et ne peut pas être instanciée directement.
-     * Elle utilise un LinkedHashSet pour stocker les déclarations, ce qui est simple et préserve l'ordre d'insertion.
+     * Internal concrete class that inherits from AbstractModel.
+     * This implementation is necessary because AbstractModel is abstract and cannot be instantiated directly.
+     * It uses a LinkedHashSet to store statements, which is simple and preserves insertion order.
      */
     private static class ConcreteModel extends AbstractModel {
         private final Set<Statement> statements = new LinkedHashSet<>();
@@ -510,7 +506,7 @@ class AbstractModelTest {
             }
         }
 
-        // Crée une nouvelle instance de ConcreteModel pour contenir les résultats filtrés
+        // Creates a new instance of ConcreteModel to hold the filtered results
         @Override
         public Model filter(Resource subject, IRI predicate, Value object, Resource... contexts) {
 
@@ -522,7 +518,6 @@ class AbstractModelTest {
                     filteredModel.add(stmt);
                 }
             }
-            // Retourne le nouveau modèle filtré
             return filteredModel;
         }
 
@@ -550,18 +545,16 @@ class AbstractModelTest {
 
         @Override
         public void clear() {
-
-            // Vide les statements
+            // Clears statements
             statements.clear();
-
-            // Vide les namespaces
+            // Clears namespaces
             namespaces.clear();
         }
 
     }
 
     /**
-     * Implémentation simplifiée de l'interface Statement pour les tests.
+     * Simplified implementation of the Statement interface for testing.
      */
     private static class SimpleStatement implements Statement {
 
@@ -600,7 +593,7 @@ class AbstractModelTest {
     }
 
     /**
-     * Implémentation simplifiée des interfaces Resource, IRI, Value, Namespace pour les tests.
+     * Simplified implementation of the Resource, IRI, Value, Namespace interfaces for testing.
      */
     private static class CreateResource implements Resource {
         private final String uri;
@@ -617,8 +610,8 @@ class AbstractModelTest {
     }
 
     /**
-     * Implémentation simplifiée de l'interface IRI pour les tests.
-     * Hérite de Resource et Value, et implémente les méthodes spécifiques à IRI.
+     * Simplified implementation of the IRI interface for testing.
+     * Inherits from Resource and Value, and implements IRI-specific methods.
      */
     private static class CreateIRI implements IRI {
         private final String uriString;
@@ -634,8 +627,7 @@ class AbstractModelTest {
 
         @Override
         public String getNamespace() {
-            // Logique pour extraire la partie "namespace" de l'IRI
-            // Cherche le dernier '#' ou '/' comme délimiteur
+
             int hashIdx = uriString.lastIndexOf('#');
             int slashIdx = uriString.lastIndexOf('/');
             int splitIdx = Math.max(hashIdx, slashIdx);
@@ -643,15 +635,11 @@ class AbstractModelTest {
             if (splitIdx > -1) {
                 return uriString.substring(0, splitIdx + 1);
             }
-            // Retourne une chaîne vide si aucun délimiteur commun n'est trouvé,
-            // ou si l'IRI est juste un nom local sans préfixe de namespace évident.
             return "";
         }
 
         @Override
         public String getLocalName() {
-            // Logique pour extraire la partie "nom local" de l'IRI
-            // Cherche le dernier '#' ou '/' comme délimiteur
             int hashIdx = uriString.lastIndexOf('#');
             int slashIdx = uriString.lastIndexOf('/');
             int splitIdx = Math.max(hashIdx, slashIdx);
@@ -659,14 +647,13 @@ class AbstractModelTest {
             if (splitIdx > -1) {
                 return uriString.substring(splitIdx + 1);
             }
-            // Si pas de délimiteur, l'URI entière est considérée comme le nom local
             return uriString;
         }
 
     }
 
     /**
-     * Implémentation simplifiée de l'interface Value pour les tests, représentant un littéral.
+     * Simplified implementation of the Value interface for testing, representing a literal.
      */
     private static class CreateValue implements Value {
         private final String literal;
@@ -683,12 +670,12 @@ class AbstractModelTest {
     }
 
     /**
-     * Implémentation simplifiée de l'interface Namespace pour les tests.
-     * Implémente Comparable pour permettre le tri et la comparaison.
+     * Simplified implementation of the Namespace interface for testing.
+     * Implements Comparable to allow sorting and comparison.
      */
     private static class CreateNamespace implements Namespace {
         private final String prefix;
-        // L'URI du namespace
+
         private final String name;
 
         public CreateNamespace(String prefix, String name) {
@@ -708,12 +695,12 @@ class AbstractModelTest {
 
         @Override
         public int compareTo(Namespace other) {
-            // Compare d'abord par le préfixe pour un ordre stable
+
             int prefixComparison = this.getPrefix().compareTo(other.getPrefix());
             if (prefixComparison != 0) {
                 return prefixComparison;
             }
-            // Si les préfixes sont égaux, compare par le nom (URI)
+
             return this.getName().compareTo(other.getName());
         }
     }

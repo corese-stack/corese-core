@@ -66,7 +66,7 @@ class CoreseModelTest {
 
     @BeforeEach
     void setUp() {
-        // Initialise l'instance de CoreseModel pour les tests
+        // Initializes the CoreseModel instance for testing
         coreseModel = new CoreseModel(mockCoreseGraph, new HashSet<>());
 
         when(mockValueConverter.toCoreseNode(mockSubjectIRI)).thenReturn(mockSubjectNode);
@@ -125,40 +125,40 @@ class CoreseModelTest {
         when(mockContextResource.stringValue()).thenReturn("http://example.org/graphContext");
     }
 
-    // Tests du Constructeur
+    // Constructor Tests
 
     /**
-     * Teste que le constructeur par défaut crée un modèle vide,
-     * sans aucune déclaration ni espace de noms.
+     * Tests that the default constructor creates an empty model,
+     * without any statements or namespaces.
      */
     @Test
-    @DisplayName("Devrait créer un modèle vide avec le constructeur par défaut")
+    @DisplayName("Should create an empty model with the default constructor")
     void testDefaultConstructor() {
         CoreseModel newModel = new CoreseModel();
 
-        assertEquals(0, newModel.size(), "Le constructeur par défaut devrait créer un modèle vide.");
-        assertTrue(newModel.getNamespaces().isEmpty(), "Le constructeur par défaut devrait créer un modèle sans espace de noms.");
+        assertEquals(0, newModel.size(), "The default constructor should create an empty model.");
+        assertTrue(newModel.getNamespaces().isEmpty(), "The default constructor should create a model without namespaces.");
     }
 
     /**
-     * Teste que le constructeur prenant un argument 'Graph' crée un modèle utilisant le graphe fourni
-     * et s'initialise sans espace de noms.
+     * Tests that the constructor taking a 'Graph' argument creates a model using the provided graph
+     * and initializes without namespaces.
      */
     @Test
-    @DisplayName("Devrait créer un modèle avec le graphe donné et des espaces de noms vides avec le constructeur Graph")
+    @DisplayName("Should create a model with the given graph and empty namespaces with the Graph constructor")
     void testGraphConstructor() {
         CoreseModel newModel = new CoreseModel(mockCoreseGraph);
 
-        assertEquals(mockCoreseGraph, newModel.getCoreseGraph(), "Le constructeur Graph devrait utiliser le graphe fourni.");
-        assertTrue(newModel.getNamespaces().isEmpty(), "Le constructeur Graph devrait créer un modèle sans espace de noms par défaut.");
+        assertEquals(mockCoreseGraph, newModel.getCoreseGraph(), "The Graph constructor should use the provided graph.");
+        assertTrue(newModel.getNamespaces().isEmpty(), "The Graph constructor should create a model without default namespaces.");
     }
 
     /**
-     * Teste que le constructeur prenant à la fois un Graph et un Set d'espaces de noms
-     * initialise correctement le modèle avec les deux.
+     * Tests that the constructor taking both a Graph and a Set of namespaces
+     * correctly initializes the model with both.
      */
     @Test
-    @DisplayName("Devrait créer un modèle avec le graphe et les espaces de noms donnés avec le constructeur complet")
+    @DisplayName("Should create a model with the given graph and namespaces with the full constructor")
     void testFullConstructor() {
         Set<Namespace> testNamespaces = new HashSet<>();
         Namespace ns1 = mock(Namespace.class);
@@ -168,17 +168,17 @@ class CoreseModelTest {
 
         CoreseModel newModel = new CoreseModel(mockCoreseGraph, testNamespaces);
 
-        assertEquals(mockCoreseGraph, newModel.getCoreseGraph(), "Le constructeur complet devrait utiliser le graphe fourni.");
-        assertEquals(1, newModel.getNamespaces().size(), "Le constructeur complet devrait définir les espaces de noms fournis.");
-        assertTrue(newModel.getNamespaces().contains(ns1), "Le constructeur complet devrait inclure l'espace de noms fourni.");
+        assertEquals(mockCoreseGraph, newModel.getCoreseGraph(), "The full constructor should use the provided graph.");
+        assertEquals(1, newModel.getNamespaces().size(), "The full constructor should set the provided namespaces.");
+        assertTrue(newModel.getNamespaces().contains(ns1), "The full constructor should include the provided namespace.");
     }
 
     /**
-     * Teste que le constructeur qui ne prend qu'un Set d'espaces de noms
-     * initialise correctement le modèle avec ces espaces de noms et un graphe vide (sans déclarations).
+     * Tests that the constructor taking only a Set of namespaces
+     * correctly initializes the model with these namespaces and an empty graph (no statements).
      */
     @Test
-    @DisplayName("Devrait créer un modèle avec les espaces de noms donnés et un graphe vide avec le constructeur Namespaces")
+    @DisplayName("Should create a model with the given namespaces and an empty graph with the Namespaces constructor")
     void testConstructor_FromNamespaces() {
         Set<Namespace> initialNamespaces = new HashSet<>();
         Namespace ns1 = mock(Namespace.class);
@@ -193,21 +193,21 @@ class CoreseModelTest {
 
         CoreseModel newModel = new CoreseModel(initialNamespaces);
 
-        assertEquals(0, newModel.size(), "Le modèle créé avec les espaces de noms devrait être vide en termes de déclarations.");
-        assertEquals(initialNamespaces.size(), newModel.getNamespaces().size(), "Le modèle devrait contenir le nombre d'espaces de noms fourni.");
-        assertTrue(newModel.getNamespaces().containsAll(initialNamespaces), "Le modèle devrait contenir tous les espaces de noms fournis.");
-        assertTrue(initialNamespaces.containsAll(newModel.getNamespaces()), "Le modèle ne devrait pas contenir d'espaces de noms supplémentaires.");
+        assertEquals(0, newModel.size(), "The model created with namespaces should be empty in terms of statements.");
+        assertEquals(initialNamespaces.size(), newModel.getNamespaces().size(), "The model should contain the number of provided namespaces.");
+        assertTrue(newModel.getNamespaces().containsAll(initialNamespaces), "The model should contain all provided namespaces.");
+        assertTrue(initialNamespaces.containsAll(newModel.getNamespaces()), "The model should not contain additional namespaces.");
     }
 
 
     /**
-     * Teste que le constructeur prenant une collection de Statements copie correctement
-     * ces déclarations dans le nouveau modèle.
+     * Tests that the constructor taking a collection of Statements correctly copies
+     * these statements into the new model.
      */
     @Test
-    @DisplayName("Devrait créer un modèle en copiant les déclarations d'une collection")
+    @DisplayName("Should create a model by copying statements from a collection")
     void testConstructorFromStatements() {
-        // Configure les déclarations mock pour avoir des propriétés de base
+        // Configure mock statements to have basic properties
         when(statement0.getSubject()).thenReturn(mockSubjectIRI);
         when(statement0.getPredicate()).thenReturn(mockPredicateIRI);
         when(statement0.getObject()).thenReturn(mockObjectValue);
@@ -220,17 +220,17 @@ class CoreseModelTest {
 
         CoreseModel newModel = new CoreseModel(statements);
 
-        assertEquals(2, newModel.size(), "Le modèle devrait contenir 2 déclarations après la construction à partir de la collection.");
+        assertEquals(2, newModel.size(), "The model should contain 2 statements after construction from the collection.");
     }
 
-    // Tests d'ajout
+    // Add Tests
 
     /**
-     * Teste que l'ajout d'une déclaration sans contexte appelle avec succès
-     * la méthode addEdge du graphe et retourne true.
+     * Tests that adding a statement without context successfully calls
+     * the graph's addEdge method and returns true.
      */
     @Test
-    @DisplayName("Devrait ajouter une déclaration sans contexte avec succès")
+    @DisplayName("Should successfully add a statement without context")
     void testAddStatementWithoutContext() {
 
         IRI realSubjectIRI = new CoreseIRI("http://example.org/realSubject");
@@ -241,17 +241,17 @@ class CoreseModelTest {
 
         boolean added = coreseModel.add(realSubjectIRI, realPredicateIRI, realObjectIRI);
 
-        assertTrue(added, "La déclaration devrait être ajoutée avec succès sans contexte.");
+        assertTrue(added, "The statement should be added successfully without context.");
         verify(mockCoreseGraph, times(1)).addEdge(any(Node.class), any(Node.class), any(Node.class));
         verify(mockCoreseGraph, never()).addEdge(any(Node.class), any(Node.class), any(Node.class), any(Node.class));
     }
 
     /**
-     * Teste que l'ajout d'une déclaration avec un seul contexte appelle avec succès
-     * la méthode addEdge du graphe(avec contexte) et retourne true.
+     * Tests that adding a statement with a single context successfully calls
+     * the graph's addEdge method (with context) and returns true.
      */
     @Test
-    @DisplayName("Devrait ajouter une déclaration avec un seul contexte avec succès")
+    @DisplayName("Should successfully add a statement with a single context")
     void testAddStatementWithSingleContext() {
 
         IRI realSubject = new CoreseIRI("http://example.org/realSubjectWithContext");
@@ -263,19 +263,19 @@ class CoreseModelTest {
 
         boolean added = coreseModel.add(realSubject, realPredicate, realObject, realContext);
 
-        assertTrue(added, "La déclaration devrait être ajoutée avec succès avec un seul contexte.");
+        assertTrue(added, "The statement should be added successfully with a single context.");
         verify(mockCoreseGraph, times(1)).addEdge(any(Node.class), any(Node.class), any(Node.class), any(Node.class));
         verify(mockCoreseGraph, never()).addEdge(any(Node.class), any(Node.class), any(Node.class));
     }
 
 
     /**
-     * Teste que l'ajout d'une déclaration avec plusieurs contextes
-     * entraîne plusieurs appels à la méthode addEdge du graphe(un pour chaque contexte)
-     * et retourne true.
+     * Tests that adding a statement with multiple contexts
+     * results in multiple calls to the graph's addEdge method (one for each context)
+     * and returns true.
      */
     @Test
-    @DisplayName("Devrait ajouter une déclaration avec plusieurs contextes avec succès")
+    @DisplayName("Should successfully add a statement with multiple contexts")
     void testAddStatementWithMultipleContexts() {
 
         IRI realSubject = new CoreseIRI("http://example.org/realSubjectMultiContext");
@@ -288,18 +288,18 @@ class CoreseModelTest {
 
         boolean added = coreseModel.add(realSubject, realPredicate, realObject, realContext1, realContext2);
 
-        assertTrue(added, "La déclaration devrait être ajoutée avec succès avec plusieurs contextes.");
+        assertTrue(added, "The statement should be added successfully with multiple contexts.");
 
         verify(mockCoreseGraph, times(2)).addEdge(any(Node.class), any(Node.class), any(Node.class), any(Node.class));
         verify(mockCoreseGraph, never()).addEdge(any(Node.class), any(Node.class), any(Node.class));
     }
 
     /**
-     * Teste que la méthode add retourne false si aucun changement n'a eu lieu
-     * (par exemple, si la déclaration existe déjà dans le graphe).
+     * Tests that the add method returns false if no change occurred
+     * (e.g., if the statement already exists in the graph).
      */
     @Test
-    @DisplayName("Devrait retourner false si aucun changement n'est survenu lors de l'ajout (déclaration existante)")
+    @DisplayName("Should return false if no change occurred during add (existing statement)")
     void testAddStatementNoChange() {
 
         IRI realSubject = new CoreseIRI("http://example.org/realSubjectNoChange");
@@ -310,21 +310,21 @@ class CoreseModelTest {
 
         boolean added = coreseModel.add(realSubject, realPredicate, realObject);
 
-        assertFalse(added, "La méthode add devrait retourner false si aucun changement n'est survenu.");
+        assertFalse(added, "The add method should return false if no change occurred.");
 
         verify(mockCoreseGraph, times(1)).addEdge(any(Node.class), any(Node.class), any(Node.class));
         verify(mockCoreseGraph, never()).addEdge(any(Node.class), any(Node.class), any(Node.class), any(Node.class));
     }
 
-    //Tests de Contient
+    // Contains Tests
 
     /**
-     * Teste que le modèle retourne true si une déclaration existante sans contexte est présente.
-     * Vérifie également que la méthode de recherche
-     * est appelée correctement.
+     * Tests that the model returns true if an existing statement without context is present.
+     * Also verifies that the search method
+     * is called correctly.
      */
     @Test
-    @DisplayName("Devrait retourner true si le modèle contient une déclaration existante sans contexte")
+    @DisplayName("Should return true if the model contains an existing statement without context")
     void testContainsExistingStatementWithoutContext() {
         fr.inria.corese.core.kgram.api.core.Edge mockReturnedEdge = mock(fr.inria.corese.core.kgram.api.core.Edge.class);
         List<fr.inria.corese.core.kgram.api.core.Edge> edges = List.of(mockReturnedEdge);
@@ -338,7 +338,7 @@ class CoreseModelTest {
         when(mockCoreseGraph.getEdgeFactory()).thenReturn(mock(fr.inria.corese.core.EdgeFactory.class));
         when(mockCoreseGraph.getEdgeFactory().copy(any(fr.inria.corese.core.kgram.api.core.Edge.class))).thenReturn(mockReturnedEdge);
 
-        // Appelle la méthode contains
+        // Call the contains method
         boolean contains = coreseModel.contains(realSubject, realPredicate, realObject);
 
         assertTrue(contains, "Le modèle devrait contenir la déclaration sans contexte.");
@@ -346,11 +346,11 @@ class CoreseModelTest {
     }
 
     /**
-     * Teste que le modèle retourne false si la déclaration n'est pas présente.
-     * Vérifie que la méthode de recherche est bien appelée.
+     * Tests that the model returns false if the statement is not present.
+     * Verifies that the search method is called correctly.
      */
     @Test
-    @DisplayName("Devrait retourner false si le modèle ne contient pas la déclaration")
+    @DisplayName("Should return false if the model does not contain the statement")
     void testContainsStatementNotPresent() {
 
         IRI realSubject = new CoreseIRI("http://example.org/subjectNotFound");
@@ -370,12 +370,12 @@ class CoreseModelTest {
 
 
     /**
-     * Teste que le modèle retourne true si une déclaration existante avec un contexte spécifique est trouvée.
-     * Vérifie que la méthode de recherche
-     * est appelée avec le contexte.
+     * Tests that the model returns true if an existing statement with a specific context is found.
+     * Verifies that the search method
+     * is called with the context.
      */
     @Test
-    @DisplayName("Devrait retourner true si le modèle contient une déclaration existante avec un contexte spécifique")
+    @DisplayName("Should return true if the model contains an existing statement with a specific context")
     void testContainsExistingStatementWithContext() {
         fr.inria.corese.core.kgram.api.core.Edge mockReturnedEdge = mock(fr.inria.corese.core.kgram.api.core.Edge.class);
         List<fr.inria.corese.core.kgram.api.core.Edge> edges = List.of(mockReturnedEdge);
@@ -383,7 +383,7 @@ class CoreseModelTest {
         IRI realSubject = new CoreseIRI("http://example.org/subjectWithSpecificContext");
         IRI realPredicate = new CoreseIRI("http://example.org/predicateWithSpecificContext");
         IRI realObject = new CoreseIRI("http://example.org/objectWithSpecificContext");
-        Resource realContext = new CoreseIRI("http://example.org/specificGraphContext"); // Supposant que le contexte est un IRI
+        Resource realContext = new CoreseIRI("http://example.org/specificGraphContext"); // Assuming the context is an IRI
 
         when(mockCoreseGraph.getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), any(Node.class)))
                 .thenReturn(edges);
@@ -392,17 +392,17 @@ class CoreseModelTest {
 
         boolean contains = coreseModel.contains(realSubject, realPredicate, realObject, realContext);
 
-        assertTrue(contains, "Le modèle devrait contenir la déclaration avec le contexte spécifié.");
+        assertTrue(contains, "The model should contain the statement with the specified context.");
         verify(mockCoreseGraph, times(1)).getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), any(Node.class));
     }
 
 
     /**
-     * Teste que le modèle retourne false si un triple non existant est recherché.
-     * Vérifie que la méthode de recherche est appelée.
+     * Tests that the model returns false if a non-existent triple is searched for.
+     * Verifies that the search method is called.
      */
     @Test
-    @DisplayName("Devrait retourner false si le modèle ne contient pas un triple non existant")
+    @DisplayName("Should return false if the model does not contain a non-existent triple")
     void testContainsNonExistingTriple() {
         CoreseAdaptedValueFactory vf = new CoreseAdaptedValueFactory();
 
