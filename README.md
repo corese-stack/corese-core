@@ -59,3 +59,6 @@ We value contributions and feedback from the community! Here’s how you can eng
 
 - **Mailing List:** <corese-users@inria.fr>
 - **Join the Mailing List:** Send an email to <corese-users-request@inria.fr> with the subject: `subscribe`
+
+## Logging
+- **Logging Strategy :** [Draft](https://notes.inria.fr/VaqGIaELRb6SwBI3sPvNRA?view)
