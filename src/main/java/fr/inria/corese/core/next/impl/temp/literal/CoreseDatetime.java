@@ -1,24 +1,27 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.impl.exception.IncorrectDatatypeException;
-import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.impl.temp.CoreseIRI;
-import fr.inria.corese.core.next.api.base.model.literal.AbstractTemporalPointLiteral;
-import fr.inria.corese.core.sparql.api.IDatatype;
-
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.temporal.TemporalAccessor;
 import java.util.Optional;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractTemporalPointLiteral;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.exception.IncorrectDatatypeException;
+import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.impl.temp.CoreseIRI;
+import fr.inria.corese.core.sparql.api.IDatatype;
+
 /**
- * CoreseDatetime class that represents a date and time literal in the Corese framework.
- * It extends the AbstractTemporalPointLiteral class and implements the CoreseDatatypeAdapter interface.
+ * CoreseDatetime class that represents a date and time literal in the Corese
+ * framework.
+ * It extends the AbstractTemporalPointLiteral class and implements the
+ * CoreseDatatypeAdapter interface.
  */
 public class CoreseDatetime extends AbstractTemporalPointLiteral implements CoreseDatatypeAdapter {
     private final fr.inria.corese.core.sparql.datatype.CoreseDateTime coreseObject;
@@ -26,7 +29,7 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
     /**
      * Constructor for CoreseDatetime.
      *
-     * @param coreseObject  the CoreseDateTime object
+     * @param coreseObject the CoreseDateTime object
      */
     public CoreseDatetime(IDatatype coreseObject) {
         super(new CoreseIRI(coreseObject.getDatatypeURI()));
@@ -58,7 +61,7 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
     /**
      * Constructor for CoreseDatetime.
      *
-     * @param value   the date and time value
+     * @param value    the date and time value
      * @param datatype the datatype of the literal
      */
     public CoreseDatetime(String value, IRI datatype) {
@@ -71,12 +74,15 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
      *
      * @param value        the date and time value
      * @param datatype     the datatype of the literal
-     * @param coreDatatype the core datatype. Must be xsd:dateTime, xsd:time, or xsd:date.
+     * @param coreDatatype the core datatype. Must be xsd:dateTime, xsd:time, or
+     *                     xsd:date.
      */
     public CoreseDatetime(String value, IRI datatype, CoreDatatype coreDatatype) {
         this(value, datatype);
-        if(coreDatatype != null && coreDatatype != XSD.DATETIME && coreDatatype != XSD.TIME && coreDatatype != XSD.DATE) {
-            throw new IncorrectDatatypeException("Cannot create CoreseDatetime with a core datatype other than xsd:dateTime or xsd:time.");
+        if (coreDatatype != null && coreDatatype != XSD.DATETIME && coreDatatype != XSD.TIME
+                && coreDatatype != XSD.DATE) {
+            throw new IncorrectDatatypeException(
+                    "Cannot create CoreseDatetime with a core datatype other than xsd:dateTime or xsd:time.");
         }
     }
 
@@ -96,7 +102,8 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
     }
 
     /**
-     * @throws IncorrectOperationException as Datetime cannot be converted to boolean
+     * @throws IncorrectOperationException as Datetime cannot be converted to
+     *                                     boolean
      */
     @Override
     public boolean booleanValue() {
@@ -144,7 +151,8 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
     }
 
     /**
-     * @throws IncorrectOperationException as Datetime cannot be converted to BigDecimal
+     * @throws IncorrectOperationException as Datetime cannot be converted to
+     *                                     BigDecimal
      */
     @Override
     public BigDecimal decimalValue() {
@@ -152,7 +160,8 @@ public class CoreseDatetime extends AbstractTemporalPointLiteral implements Core
     }
 
     /**
-     * @throws IncorrectOperationException as Datetime cannot be converted to BigInteger
+     * @throws IncorrectOperationException as Datetime cannot be converted to
+     *                                     BigInteger
      */
     @Override
     public float floatValue() {

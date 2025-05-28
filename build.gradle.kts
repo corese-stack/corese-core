@@ -128,6 +128,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit 5 for unit testing
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")               // JUnit 5 runtime for launching tests
 
+    testImplementation("org.mockito:mockito-core:5.5.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
+
     // === For viewing logs during development (DO NOT include in production) ===
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging
 }
