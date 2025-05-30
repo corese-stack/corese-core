@@ -14,6 +14,10 @@ module fr.inria.corese.corese_core {
     requires org.apache.commons.lang3;
     requires org.slf4j;
 
+    // Modules RDF4J
+    requires rdf4j.rio.api;
+    requires rdf4j.model.api;
+
     exports fr.inria.corese.core.load;
     exports fr.inria.corese.core.load.result;
     exports fr.inria.corese.core;
