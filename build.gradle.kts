@@ -149,7 +149,12 @@ extraJavaModuleInfo {
     automaticModule("com.github.jsonld-java:jsonld-java", "jsonld.java")               // Module for JSON-LD Java
     automaticModule("commons-lang:commons-lang", "commons.lang")                       // Module for Commons Lang
     automaticModule("fr.inria.lille.shexjava:shexjava-core", "shexjava.core")          // Module for ShexJava core
-    automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model")                    // Module for RDF4J model
+    // Nouveaux modules RDF4J
+    automaticModule("org.eclipse.rdf4j:rdf4j-rio-api", "rdf4j.rio.api")
+    automaticModule("org.eclipse.rdf4j:rdf4j-rio-turtle", "org.eclipse.rdf4j.rio.turtle")
+    automaticModule("org.eclipse.rdf4j:rdf4j-rio-jsonld", "org.eclipse.rdf4j.rio.jsonld")
+    automaticModule("org.eclipse.rdf4j:rdf4j-rio-rdfxml", "org.eclipse.rdf4j.rio.rdfxml")
+    automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model.api")
 }
 
 
