@@ -23,16 +23,9 @@ import java.util.Set;
  */
 public class Rdf4jSerializationUtil {
 
-    /**
-     * A unmodifiable map to quickly look up {@link RDFFormat} instances
-     * based on common string identifiers (case-insensitive).
-     */
+
     private static final Map<String, RDFFormat> FORMAT_MAP = initFormatMap();
 
-    /**
-     * The default {@link WriterConfig} used for serialization,
-     * configured for pretty-printing.
-     */
     private static final WriterConfig DEFAULT_CONFIG = createDefaultConfig();
 
     /**
@@ -189,17 +182,4 @@ public class Rdf4jSerializationUtil {
         }
     }
 
-    /**
-     * Creates a custom {@link WriterConfig} instance with a specified pretty-printing setting.
-     * This method can be used if a serialization operation requires different settings
-     * than the {@link #DEFAULT_CONFIG}.
-     *
-     * @param prettyPrint A boolean indicating whether pretty-printing should be enabled.
-     * @return A new {@link WriterConfig} instance configured with the specified pretty-printing setting.
-     */
-    public static WriterConfig createCustomConfig(boolean prettyPrint) {
-        WriterConfig config = new WriterConfig();
-        config.set(BasicWriterSettings.PRETTY_PRINT, prettyPrint);
-        return config;
-    }
 }

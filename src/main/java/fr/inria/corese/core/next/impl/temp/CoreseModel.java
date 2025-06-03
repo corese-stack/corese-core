@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.impl.temp;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,11 +22,17 @@ import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.Value;
 import fr.inria.corese.core.next.api.base.model.AbstractModel;
+import fr.inria.corese.core.next.api.base.model.serialization.Rdf4jSerializationUtil;
+
+import org.eclipse.rdf4j.model.impl.TreeModel;
+
 
 /**
  * CoreseModel provides an implementation of the RDF Model interface
  * backed by a Corese Graph instance. It supports basic RDF operations
  * such as add, remove, contains, filtering, and namespace management.
+ * This class has been extended to include a method for serializing
+ * its content into various RDF4J formats using Rdf4jSerializationUtil.
  */
 public class CoreseModel extends AbstractModel {
 
@@ -139,6 +147,8 @@ public class CoreseModel extends AbstractModel {
         for (Node coreseContext : coreseContexts) {
             if (coreseContext != null) {
                 changed |= this.addEdgeToGraph(coreseSubj, coresePred, coreseObj, coreseContext);
+            } else {
+                changed |= this.addEdgeToGraph(coreseSubj, coresePred, coreseObj, null);
             }
         }
         return changed;
@@ -228,7 +238,8 @@ public class CoreseModel extends AbstractModel {
 
     @Override
     public Iterator<Statement> iterator() {
-        return getFilterIterator(null, null, null);
+
+        return getFilterIterator(null, null, null, (Resource[]) null);
     }
 
     @Override
@@ -294,7 +305,7 @@ public class CoreseModel extends AbstractModel {
     /**
      * Add one statement ({@code subj}, {@code pred}, {@code obj}, {@code context})
      * in the Corese graph.
-     * 
+     *
      * @param subject   Subject of the statement.
      * @param predicate Predicate of the statement.
      * @param object    Object of the statement.
@@ -327,7 +338,7 @@ public class CoreseModel extends AbstractModel {
      * specified, statements with a context matching one of these will match. Note:
      * to match statements without an associated context, specify the value null and
      * explicitly cast it to type Resource.
-     * 
+     *
      * @param subject   The subject of the statements to match, null to match
      *                  statements with any subject.
      * @param predicate The Predicate of the statements to match, null to match
@@ -394,4 +405,50 @@ public class CoreseModel extends AbstractModel {
         return new CoreseModelIterator(statements.iterator());
     }
 
+    /**
+     * Serializes this CoreseModel to the specified OutputStream in a given RDF4J format.
+     * This method first converts the CoreseModel's statements into an
+     * org.eclipse.rdf4j.model.Model, then uses Rdf4jSerializationUtil for serialization.
+     *
+     * @param outputStream The OutputStream to write the serialized data to. Must not be null.
+     * @param formatString The string identifier of the desired RDF format (e.g., "turtle", "jsonld", "rdfxml"). Must not be null.
+     * @throws IOException              If an I/O error occurs during serialization or if an unsupported Corese value type is encountered.
+     * @throws IllegalArgumentException If the provided formatString is not recognized by Rdf4jSerializationUtil.
+     * @throws NullPointerException     If outputStream or formatString is null.
+     */
+    public void serializeToRdf4jFormat(OutputStream outputStream, String formatString) throws IOException {
+        Objects.requireNonNull(outputStream, "OutputStream cannot be null");
+        Objects.requireNonNull(formatString, "Format string cannot be null");
+
+
+        org.eclipse.rdf4j.model.Model rdf4jModel = new TreeModel();
+
+        for (fr.inria.corese.core.next.api.Namespace ns : this.getNamespaces()) {
+            rdf4jModel.setNamespace(ns.getPrefix(), ns.getName());
+        }
+
+
+        for (Statement coreseStatement : this) {
+
+
+            org.eclipse.rdf4j.model.Resource rdf4jSubject = (org.eclipse.rdf4j.model.Resource) converter.valuetoRdf4jValue(converter.toCoreseNode(coreseStatement.getSubject()).getDatatypeValue());
+            org.eclipse.rdf4j.model.IRI rdf4jPredicate = (org.eclipse.rdf4j.model.IRI) converter.valuetoRdf4jValue(converter.toCoreseNode(coreseStatement.getPredicate()).getDatatypeValue());
+            org.eclipse.rdf4j.model.Value rdf4jObject = converter.valuetoRdf4jValue(converter.toCoreseNode(coreseStatement.getObject()).getDatatypeValue());
+
+            org.eclipse.rdf4j.model.Resource rdf4jContext = null;
+            if (coreseStatement.getContext() != null) {
+                rdf4jContext = converter.resourcetoRdf4jValueContext(converter.toCoreseNode(coreseStatement.getContext()).getDatatypeValue());
+            }
+
+
+            if (rdf4jContext != null) {
+                rdf4jModel.add(rdf4jSubject, rdf4jPredicate, rdf4jObject, rdf4jContext);
+            } else {
+                rdf4jModel.add(rdf4jSubject, rdf4jPredicate, rdf4jObject);
+            }
+        }
+
+
+        Rdf4jSerializationUtil.serialize(rdf4jModel, outputStream, formatString);
+    }
 }
