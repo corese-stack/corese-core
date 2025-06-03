@@ -12,8 +12,6 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
-import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
-
 
 /**
  * Utility class for converting between Corese-compatible Node objects
@@ -182,29 +180,35 @@ public class CoreseValueConverter {
             return rdf4jFactory.createBNode(dt.getLabel());
         }
         if (dt.isLiteral()) {
-
-            boolean hasValidLangTag = dt.getLang() != null && !dt.getLang().isEmpty() && !dt.getLang().contains(COLON);
-            boolean isRdfLangStringDatatype = dt.getDatatypeURI() != null && dt.getDatatypeURI().equals(RDF.LANGSTRING.stringValue());
-            if (isRdfLangStringDatatype && hasValidLangTag) {
-                return rdf4jFactory.createLiteral(dt.getLabel(), dt.getLang());
-            }
-
-            boolean isImplicitXsdString = dt.getDatatypeURI() != null && dt.getDatatypeURI().equals(XMLSchema.STRING.stringValue());
-            if (dt.getDatatypeURI() != null && !isRdfLangStringDatatype) {
-                return rdf4jFactory.createLiteral(dt.getLabel(), rdf4jFactory.createIRI(dt.getDatatypeURI()));
-            }
-
-            if (isImplicitXsdString || (dt.getLang() != null && dt.getLang().contains(HTTP_SCHEME_PREFIX)) || !hasValidLangTag) {
-                return rdf4jFactory.createLiteral(dt.getLabel());
-            }
-            if (dt.getLang() != null) {
-                return rdf4jFactory.createLiteral(dt.getLabel(), dt.getLang());
-            }
-            return rdf4jFactory.createLiteral(dt.getLabel());
+            return convertLiteralToRdf4jValue(dt);
         }
 
         throw new IllegalArgumentException("Unsupported Corese IDatatype type for conversion to RDF4J Value: " + dt.getClass());
     }
 
+    /**
+     * Helper method to convert a Corese IDatatype representing a literal
+     * into an RDF4J Literal, handling various cases including problematic ones.
+     *
+     * @param dt The Corese IDatatype (must be a literal)
+     * @return The corresponding RDF4J Literal
+     */
+    private org.eclipse.rdf4j.model.Literal convertLiteralToRdf4jValue(IDatatype dt) {
 
+        boolean hasLang = dt.getLang() != null && !dt.getLang().isEmpty();
+        boolean langContainsColon = hasLang && dt.getLang().contains(COLON);
+        boolean langContainsHttpPrefix = hasLang && dt.getLang().contains(HTTP_SCHEME_PREFIX);
+        boolean isRdfLangString = dt.getDatatypeURI() != null && dt.getDatatypeURI().equals(RDF.LANGSTRING.stringValue());
+
+
+        if (isRdfLangString && hasLang && !langContainsColon && !langContainsHttpPrefix) {
+            return rdf4jFactory.createLiteral(dt.getLabel(), dt.getLang());
+        }
+
+        if (dt.getDatatypeURI() != null && !isRdfLangString) {
+            return rdf4jFactory.createLiteral(dt.getLabel(), rdf4jFactory.createIRI(dt.getDatatypeURI()));
+        }
+
+        return rdf4jFactory.createLiteral(dt.getLabel());
+    }
 }
