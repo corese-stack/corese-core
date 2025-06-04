@@ -3,12 +3,11 @@ package fr.inria.corese.core.next.impl.temp;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Namespace;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
+import org.eclipse.rdf4j.rio.Rio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,14 @@ import org.mockito.Mock;
 import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
+import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.util.Models;
+import org.eclipse.rdf4j.model.impl.LinkedHashModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,13 +32,20 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class CoreseModelTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(CoreseModelTest.class);
+
+
     private CoreseModel coreseModel;
+
+    @Mock
+    private CoreseAdaptedValueFactory valueFactory;
 
     @Mock
     private Model model;
@@ -62,12 +76,14 @@ class CoreseModelTest {
     private Statement statement0;
     @Mock
     private Statement statement1;
-
+    @Mock
+    private CoreseValueConverter coreseValueConverter;
 
     @BeforeEach
     void setUp() {
         // Initializes the CoreseModel instance for testing
         coreseModel = new CoreseModel(mockCoreseGraph, new HashSet<>());
+        valueFactory = new CoreseAdaptedValueFactory();
 
         when(mockValueConverter.toCoreseNode(mockSubjectIRI)).thenReturn(mockSubjectNode);
         when(mockValueConverter.toCoreseNode(mockPredicateIRI)).thenReturn(mockPredicateNode);
@@ -338,7 +354,7 @@ class CoreseModelTest {
         when(mockCoreseGraph.getEdgeFactory()).thenReturn(mock(fr.inria.corese.core.EdgeFactory.class));
         when(mockCoreseGraph.getEdgeFactory().copy(any(fr.inria.corese.core.kgram.api.core.Edge.class))).thenReturn(mockReturnedEdge);
 
-        // Call the contains method
+
         boolean contains = coreseModel.contains(realSubject, realPredicate, realObject);
 
         assertTrue(contains, "Le modèle devrait contenir la déclaration sans contexte.");
@@ -416,5 +432,153 @@ class CoreseModelTest {
 
         assertFalse(coreseModel.contains(georgeBrassens, rdfType, singer), "Le modèle ne devrait pas contenir un triple non existant.");
         verify(mockCoreseGraph, times(0)).getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), eq(null));
+    }
+
+
+
+    /**
+     * Tests that the `serializeToRdf4jFormat` method throws a `NullPointerException`
+     * when a `null` `OutputStream` is provided.
+     */
+    @Test
+    void testSerializeThrowsOnNullOutputStream() {
+        assertThrows(NullPointerException.class, () -> {
+            coreseModel.serializeToRdf4jFormat(null, "turtle");
+        });
+    }
+    /**
+     * Tests that the `serializeToRdf4jFormat` method throws an `IllegalArgumentException`
+     * when an unknown or unsupported RDF format string is provided.
+     */
+    @Test
+    void testSerializeThrowsOnUnknownFormat() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            coreseModel.serializeToRdf4jFormat(os, "unsupported-format");
+        });
+    }
+
+    /**
+     * Tests the serialization of a CoreseModel to Turtle format.
+     * It adds a statement to a concrete CoreseModel, serializes it to Turtle,
+     * and then parses the output back into an RDF4J Model to verify isomorphism
+     * with the expected RDF4J Model. It also checks for specific string content
+     * in the Turtle output.
+     *
+     * @throws IOException if an I/O error occurs during serialization or parsing.
+     */
+    @Test
+    void testSerializeToTurtleFormat() throws IOException {
+        Resource subject = valueFactory.createIRI("http://example.org/subject");
+        IRI predicate = valueFactory.createIRI("http://example.org/predicate");
+
+
+        fr.inria.corese.core.next.api.Value object = valueFactory.createLiteral("Test literal");
+
+        org.eclipse.rdf4j.model.ValueFactory rdf4jFactory = SimpleValueFactory.getInstance();
+
+        CoreseModel concreteModel = new CoreseModel();
+        concreteModel.add(subject, predicate, object);
+
+        Model expectedRdf4jModel = new LinkedHashModel();
+        expectedRdf4jModel.add(
+                rdf4jFactory.createIRI(subject.stringValue()),
+                rdf4jFactory.createIRI(predicate.stringValue()),
+                rdf4jFactory.createLiteral(object.stringValue())
+        );
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        concreteModel.serializeToRdf4jFormat(outputStream, "turtle");
+
+        String output = outputStream.toString("UTF-8");
+        assertNotNull(output);
+        logger.info("testSerializeToTurtleFormat {} ", output);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(output.getBytes("UTF-8"));
+        Model parsedModel = Rio.parse(inputStream, "", RDFFormat.TURTLE);
+
+        assertTrue(Models.isomorphic(expectedRdf4jModel, parsedModel), "Le modèle Turtle sérialisé et re-parsé doit être isomorphe à l'original.");
+        assertTrue(output.contains("subject"), "La sortie devrait contenir 'subject'");
+        assertTrue(output.contains("predicate"), "La sortie devrait contenir 'predicate'");
+
+        assertTrue(output.contains("\"Test literal\""), "La sortie devrait contenir le littéral simple correctement.");
+        assertFalse(output.contains("@"), "La sortie ne devrait pas contenir de balise de langue");
+        assertFalse(output.contains("^^"), "La sortie ne devrait pas contenir de type de données explicite");
+    }
+
+    /**
+     * Tests the serialization of a CoreseModel to JSON-LD format.
+     * It adds a statement to a concrete CoreseModel, serializes it to JSON-LD,
+     * and then parses the output back into an RDF4J Model to verify isomorphism
+     * with the expected RDF4J Model. It also checks for specific string content
+     * in the JSON-LD output.
+     *
+     * @throws IOException if an I/O error occurs during serialization or parsing.
+     */
+    @Test
+    void testSerializeToJsonLdFormat() throws IOException {
+        Resource subject = valueFactory.createIRI("http://example.org/subject");
+        IRI predicate = valueFactory.createIRI("http://example.org/predicate");
+        fr.inria.corese.core.next.api.Value object = valueFactory.createLiteral("Test literal");
+        org.eclipse.rdf4j.model.ValueFactory rdf4jFactory = SimpleValueFactory.getInstance();
+
+
+        CoreseModel concreteModel = new CoreseModel();
+        concreteModel.add(subject, predicate, object);
+
+        Model expectedRdf4jModel = new LinkedHashModel();
+        expectedRdf4jModel.add(
+                rdf4jFactory.createIRI(subject.stringValue()),
+                rdf4jFactory.createIRI(predicate.stringValue()),
+                rdf4jFactory.createLiteral(object.stringValue(), rdf4jFactory.createIRI(XMLSchema.STRING.stringValue()))
+        );
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+
+        concreteModel.serializeToRdf4jFormat(outputStream, "jsonld");
+
+        String output = outputStream.toString("UTF-8");
+        assertNotNull(output);
+
+        logger.info("testSerializeToJsonLdFormat  {}" , output);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(output.getBytes("UTF-8"));
+
+        Model parsedModel = Rio.parse(inputStream, "", RDFFormat.JSONLD);
+
+        assertTrue(Models.isomorphic(expectedRdf4jModel, parsedModel), "Le modèle JSON-LD sérialisé et re-parsé doit être isomorphe à l'original.");
+        assertTrue(output.contains("http://example.org/subject"), "La sortie JSON-LD devrait contenir 'http://example.org/subject'");
+        assertTrue(output.contains("http://example.org/predicate"), "La sortie JSON-LD devrait contenir 'http://example.org/predicate'");
+        assertTrue(output.contains("Test literal"), "La sortie JSON-LD devrait contenir 'Test literal'");
+    }
+    /**
+     * Tests the serialization of a simple CoreseModel to RDF/XML format.
+     * It adds a basic statement to the model and then attempts to serialize it,
+     * checking for the presence of key RDF/XML elements in the output.
+     *
+     * @throws IOException if an I/O error occurs during serialization.
+     */
+    @Test
+    void testSerializeToRDFXMLFormat() throws IOException {
+
+        coreseModel.add(
+                valueFactory.createIRI("http://example.org/a"),
+                valueFactory.createIRI("http://example.org/b"),
+                valueFactory.createLiteral("c")
+        );
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+
+        coreseModel.serializeToRdf4jFormat(outputStream, "rdfxml");
+
+        String output = outputStream.toString("UTF-8");
+        assertNotNull(output);
+        logger.info("testSerializeToRDFXMLFormat  {}" , output);
+        assertTrue(output.contains("rdf:RDF") || output.contains("rdf:Description"));
+
+
     }
 }
