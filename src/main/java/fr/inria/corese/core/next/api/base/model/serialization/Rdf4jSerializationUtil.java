@@ -17,7 +17,8 @@ import java.util.Set;
 /**
  * Utility class for serializing RDF4J {@link Model} objects to various RDF formats.
  * This class provides static methods to write RDF data to an {@link OutputStream}
- * in formats such as Turtle, JSON-LD, RDF/XML, and N-Triples, leveraging the RDF4J Rio API.
+ * in formats such as Turtle, JSON-LD, RDF/XML, N-Triples, and N-Quads,
+ * leveraging the RDF4J Rio API.
  * It handles common serialization configurations like pretty-printing and
  * provides dynamic format selection based on string identifiers.
  */
@@ -49,13 +50,21 @@ public class Rdf4jSerializationUtil {
         map.put("rdfxml", RDFFormat.RDFXML);
         map.put("xml", RDFFormat.RDFXML);
 
+        // Add N-Triples formats
+        map.put("ntriples", RDFFormat.NTRIPLES);
+        map.put("nt", RDFFormat.NTRIPLES);
+
+        // Add N-Quads formats
+        map.put("nquads", RDFFormat.NQUADS);
+        map.put("nq", RDFFormat.NQUADS);
+
+
         return Collections.unmodifiableMap(map);
     }
 
     /**
      * Creates and returns a default {@link WriterConfig} instance.
      * This configuration enables pretty-printing for human-readable output.
-     * Deprecated JSON-LD specific settings have been removed.
      *
      * @return A {@link WriterConfig} instance with default serialization settings.
      */
@@ -121,13 +130,41 @@ public class Rdf4jSerializationUtil {
         serialize(model, outputStream, RDFFormat.RDFXML);
     }
 
+    /**
+     * Serializes an RDF4J {@link Model} to the specified {@link OutputStream} in N-Triples format.
+     * The serialization uses the default writer configuration.
+     *
+     * @param model        The RDF4J {@link Model} to serialize. Must not be {@code null}.
+     * @param outputStream The {@link OutputStream} to write the serialized data to. Must not be {@code null}.
+     * @throws IOException          If an I/O error occurs during serialization.
+     * @throws NullPointerException If {@code model} or {@code outputStream} is {@code null}.
+     * @see #serialize(Model, OutputStream, RDFFormat)
+     */
+    public static void serializeToNTriples(Model model, OutputStream outputStream) throws IOException {
+        serialize(model, outputStream, RDFFormat.NTRIPLES);
+    }
+
+    /**
+     * Serializes an RDF4J {@link Model} to the specified {@link OutputStream} in N-Quads format.
+     * The serialization uses the default writer configuration.
+     *
+     * @param model        The RDF4J {@link Model} to serialize. Must not be {@code null}.
+     * @param outputStream The {@link OutputStream} to write the serialized data to. Must not be {@code null}.
+     * @throws IOException          If an I/O error occurs during serialization.
+     * @throws NullPointerException If {@code model} or {@code outputStream} is {@code null}.
+     * @see #serialize(Model, OutputStream, RDFFormat)
+     */
+    public static void serializeToNQuads(Model model, OutputStream outputStream) throws IOException {
+        serialize(model, outputStream, RDFFormat.NQUADS);
+    }
+
 
     /**
      * Resolves an {@link RDFFormat} from a given string identifier.
      * The lookup is case-insensitive.
      *
-     * @param formatString The string representing the desired RDF format (e.g., "turtle", "jsonld", "rdfxml", "ntriples").
-     *                     Must not be {@code null}.
+     * @param formatString The string representing the desired RDF format (e.g., "turtle", "jsonld", "rdfxml", "ntriples", "nquads").
+     * Must not be {@code null}.
      * @return The corresponding {@link RDFFormat} enum.
      * @throws IllegalArgumentException If the provided {@code formatString} is not recognized as a supported format.
      * @throws NullPointerException     If {@code formatString} is {@code null}.
@@ -149,10 +186,10 @@ public class Rdf4jSerializationUtil {
      *
      * @param model        The RDF4J {@link Model} to serialize. Must not be {@code null}.
      * @param outputStream The {@link OutputStream} to write the serialized data to. Must not be {@code null}.
-     * @param formatString The string identifier of the desired RDF format (e.g., "turtle", "jsonld", "rdfxml", "ntriples").
-     *                     Must not be {@code null}.
+     * @param formatString The string identifier of the desired RDF format (e.g., "turtle", "jsonld", "rdfxml", "ntriples", "nquads").
+     * Must not be {@code null}.
      * @throws IOException              If an I/O error occurs during serialization or if the underlying
-     *                                  {@link Rio #write(Model, OutputStream, RDFFormat, WriterConfig)} call fails.
+     * {@link Rio #write(Model, OutputStream, RDFFormat, WriterConfig)} call fails.
      * @throws IllegalArgumentException If the provided {@code formatString} is not recognized.
      * @throws NullPointerException     If {@code model}, {@code outputStream}, or {@code formatString} is {@code null}.
      */

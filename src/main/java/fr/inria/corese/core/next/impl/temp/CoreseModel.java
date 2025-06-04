@@ -411,7 +411,7 @@ public class CoreseModel extends AbstractModel {
      * org.eclipse.rdf4j.model.Model, then uses Rdf4jSerializationUtil for serialization.
      *
      * @param outputStream The OutputStream to write the serialized data to. Must not be null.
-     * @param formatString The string identifier of the desired RDF format (e.g., "turtle", "jsonld", "rdfxml"). Must not be null.
+     * @param formatString The string identifier of the desired RDF format (e.g., "turtle", "jsonld", "rdfxml", "NTriples","NQuads"). Must not be null.
      * @throws IOException              If an I/O error occurs during serialization or if an unsupported Corese value type is encountered.
      * @throws IllegalArgumentException If the provided formatString is not recognized by Rdf4jSerializationUtil.
      * @throws NullPointerException     If outputStream or formatString is null.
