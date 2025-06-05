@@ -24,12 +24,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Unit tests for the {@link Rdf4jSerializationUtil} class.
  * This class verifies the correct serialization of RDF4J Models
- * to various RDF formats (Turtle, JSON-LD, RDF/XML, N-Triples) and tests
+ * to various RDF formats (Turtle, JSON-LD, RDF/XML, N-Triples, N-Quads) and tests
  * the utility methods for format resolution and error handling.
  */
 class Rdf4jSerializationUtilTest {
 
     private static final Logger logger = LoggerFactory.getLogger(Rdf4jSerializationUtilTest.class);
+    private static final ValueFactory vf = SimpleValueFactory.getInstance();
 
 
     /**
@@ -41,7 +42,7 @@ class Rdf4jSerializationUtilTest {
      */
     @Test
     void testSerializeToTurtle() throws IOException, RDFParseException {
-        Model originalModel = createTestModel();
+        Model originalModel = createSimpleTestModel();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         Rdf4jSerializationUtil.serializeToTurtle(originalModel, out);
@@ -64,7 +65,7 @@ class Rdf4jSerializationUtilTest {
      */
     @Test
     void testSerializeToJsonLd() throws IOException, RDFParseException {
-        Model originalModel = createTestModel();
+        Model originalModel = createNamedGraphTestModel();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         Rdf4jSerializationUtil.serializeToJsonLd(originalModel, out);
@@ -86,7 +87,7 @@ class Rdf4jSerializationUtilTest {
      */
     @Test
     void testSerializeToRdfXml() throws IOException, RDFParseException {
-        Model originalModel = createTestModel();
+        Model originalModel = createSimpleTestModel(); // RDF/XML typically for default graph
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         Rdf4jSerializationUtil.serializeToRdfXml(originalModel, out);
@@ -99,6 +100,50 @@ class Rdf4jSerializationUtilTest {
         assertEquals(originalModel, reparsedModel, "The re-parsed RDF/XML model should be equal to the original model.");
     }
 
+    /**
+     * Tests the serialization of an RDF4J Model to N-Triples format.
+     * Verifies that the output can be parsed back into an equivalent model.
+     * N-Triples does not support named graphs, so only default graph statements are tested.
+     *
+     * @throws IOException If an I/O error occurs during serialization.
+     * @throws RDFParseException If the serialized output cannot be parsed.
+     */
+    @Test
+    void testSerializeToNTriples() throws IOException, RDFParseException {
+        Model originalModel = createSimpleTestModel(); // N-Triples does not support named graphs
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        Rdf4jSerializationUtil.serializeToNTriples(originalModel, out);
+
+        String result = out.toString();
+        logger.debug("testSerializeToNTriples Output:\n{}" , result);
+
+        ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
+        Model reparsedModel = Rio.parse(in, "", RDFFormat.NTRIPLES);
+        assertEquals(originalModel, reparsedModel, "The re-parsed N-Triples model should be equal to the original model.");
+    }
+
+    /**
+     * Tests the serialization of an RDF4J Model to N-Quads format.
+     * Verifies that the output can be parsed back into an equivalent model, including named graphs.
+     *
+     * @throws IOException If an I/O error occurs during serialization.
+     * @throws RDFParseException If the serialized output cannot be parsed.
+     */
+    @Test
+    void testSerializeToNQuads() throws IOException, RDFParseException {
+        Model originalModel = createNamedGraphTestModel(); // N-Quads supports named graphs
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        Rdf4jSerializationUtil.serializeToNQuads(originalModel, out);
+
+        String result = out.toString();
+        logger.debug("testSerializeToNQuads Output:\n{}" , result);
+
+        ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
+        Model reparsedModel = Rio.parse(in, "", RDFFormat.NQUADS);
+        assertEquals(originalModel, reparsedModel, "The re-parsed N-Quads model should be equal to the original model.");
+    }
 
 
     /**
@@ -110,7 +155,7 @@ class Rdf4jSerializationUtilTest {
      */
     @Test
     void testSerializeWithFormatString() throws IOException, RDFParseException {
-        Model originalModel = createTestModel();
+        Model originalModel = createSimpleTestModel();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         Rdf4jSerializationUtil.serialize(originalModel, out, "turtle");
@@ -133,6 +178,10 @@ class Rdf4jSerializationUtilTest {
         assertEquals(RDFFormat.TURTLE, Rdf4jSerializationUtil.getRdfFormat("TTL"));
         assertEquals(RDFFormat.JSONLD, Rdf4jSerializationUtil.getRdfFormat("jsonld"));
         assertEquals(RDFFormat.RDFXML, Rdf4jSerializationUtil.getRdfFormat("rdfxml"));
+        assertEquals(RDFFormat.NTRIPLES, Rdf4jSerializationUtil.getRdfFormat("ntriples"));
+        assertEquals(RDFFormat.NTRIPLES, Rdf4jSerializationUtil.getRdfFormat("nt"));
+        assertEquals(RDFFormat.NQUADS, Rdf4jSerializationUtil.getRdfFormat("nquads"));
+        assertEquals(RDFFormat.NQUADS, Rdf4jSerializationUtil.getRdfFormat("nq"));
     }
 
     /**
@@ -153,7 +202,7 @@ class Rdf4jSerializationUtilTest {
      */
     @Test
     void testNullChecks() {
-        Model model = createTestModel();
+        Model model = createSimpleTestModel();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 
@@ -178,23 +227,59 @@ class Rdf4jSerializationUtilTest {
         assertTrue(formats.contains("turtle"));
         assertTrue(formats.contains("jsonld"));
         assertTrue(formats.contains("rdfxml"));
-        assertEquals(6, formats.size());
+        assertTrue(formats.contains("ntriples"));
+        assertTrue(formats.contains("nquads"));
+        assertEquals(10, formats.size());
     }
 
     /**
-     * Creates a simple RDF4J Model for testing purposes.
-     * The model contains a single triple: ex:test rdf:type foaf:Person.
+     * Creates a simple RDF4J Model for testing purposes, containing only default graph statements.
      *
-     * @return A {@link Model} instance populated with test data.
+     * @return A {@link Model} instance populated with test data in the default graph.
      */
-    private Model createTestModel() {
-
-        ValueFactory vf = SimpleValueFactory.getInstance();
+    private Model createSimpleTestModel() {
         Model model = new LinkedHashModel();
         model.add(
                 vf.createIRI("http://example.org/test"),
                 RDF.TYPE,
                 FOAF.PERSON
+        );
+        model.add(
+                vf.createIRI("http://example.org/person1"),
+                FOAF.NAME,
+                vf.createLiteral("John Doe")
+        );
+        return model;
+    }
+
+    /**
+     * Creates an RDF4J Model for testing purposes, containing both default graph statements
+     * and statements in a named graph.
+     *
+     * @return A {@link Model} instance populated with test data, including named graph statements.
+     */
+    private Model createNamedGraphTestModel() {
+        Model model = new LinkedHashModel();
+
+        model.add(
+                vf.createIRI("http://example.org/test"),
+                RDF.TYPE,
+                FOAF.PERSON
+        );
+
+
+        org.eclipse.rdf4j.model.IRI graph1 = vf.createIRI("http://example.org/graph1");
+        model.add(
+                vf.createIRI("http://example.org/anotherSubject"),
+                FOAF.NAME,
+                vf.createLiteral("Another Person"),
+                graph1
+        );
+
+        model.add(
+                vf.createIRI("http://example.org/person2"),
+                FOAF.AGE,
+                vf.createLiteral(30)
         );
         return model;
     }
