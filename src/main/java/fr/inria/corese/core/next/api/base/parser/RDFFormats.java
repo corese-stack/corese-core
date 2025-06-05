@@ -1,4 +1,4 @@
-package main.java.fr.inria.corese.core.next.api.base.parser;
+package fr.inria.corese.core.next.api.base.parser;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -50,9 +50,9 @@ public enum RDFFormats implements RDFFormat {
             true,
             false);
 
-    public static final boolean DEFAULT_SUPPORTS_NAMESPACES = true;
-    public static final boolean DEFAULT_SUPPORTS_CONTEXTS = true;
-    public static final boolean DEFAULT_SUPPORTS_RDF_STAR = false;
+    private static final boolean DEFAULT_SUPPORTS_NAMESPACES = true;
+    private static final boolean DEFAULT_SUPPORTS_CONTEXTS = true;
+    private static final boolean DEFAULT_SUPPORTS_RDF_STAR = false;
 
     /**
      * The file format human-readable name.
