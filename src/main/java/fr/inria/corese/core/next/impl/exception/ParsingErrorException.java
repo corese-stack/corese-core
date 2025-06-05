@@ -1,4 +1,4 @@
-package main.java.fr.inria.corese.core.next.impl.exception;
+package fr.inria.corese.core.next.impl.exception;
 
 public class ParsingErrorException extends RuntimeException {
 
