@@ -1,4 +1,4 @@
-package main.java.fr.inria.corese.core.next.api.base.parser;
+package fr.inria.corese.core.next.api.base.parser;
 
 import java.nio.charset.Charset;
 import java.util.*;
