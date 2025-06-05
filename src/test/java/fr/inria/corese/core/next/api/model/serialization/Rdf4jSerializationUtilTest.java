@@ -37,7 +37,7 @@ class Rdf4jSerializationUtilTest {
      * Tests the serialization of an RDF4J Model to Turtle format.
      * Verifies that the output can be parsed back into an equivalent model.
      *
-     * @throws IOException If an I/O error occurs during serialization.
+     * @throws IOException       If an I/O error occurs during serialization.
      * @throws RDFParseException If the serialized output cannot be parsed.
      */
     @Test
@@ -48,7 +48,7 @@ class Rdf4jSerializationUtilTest {
         Rdf4jSerializationUtil.serializeToTurtle(originalModel, out);
 
         String result = out.toString();
-        logger.debug("testSerializeToTurtle Output:\n{}" , result);
+        logger.debug("testSerializeToTurtle Output:\n{}", result);
 
 
         ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
@@ -60,7 +60,7 @@ class Rdf4jSerializationUtilTest {
      * Tests the serialization of an RDF4J Model to JSON-LD format.
      * Verifies that the output can be parsed back into an equivalent model.
      *
-     * @throws IOException If an I/O error occurs during serialization.
+     * @throws IOException       If an I/O error occurs during serialization.
      * @throws RDFParseException If the serialized output cannot be parsed.
      */
     @Test
@@ -71,7 +71,7 @@ class Rdf4jSerializationUtilTest {
         Rdf4jSerializationUtil.serializeToJsonLd(originalModel, out);
 
         String result = out.toString();
-        logger.debug("testSerializeToJsonLd Output:\n{}" , result);
+        logger.debug("testSerializeToJsonLd Output:\n{}", result);
 
         ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
         Model reparsedModel = Rio.parse(in, "", RDFFormat.JSONLD);
@@ -82,67 +82,22 @@ class Rdf4jSerializationUtilTest {
      * Tests the serialization of an RDF4J Model to RDF/XML format.
      * Verifies that the output can be parsed back into an equivalent model.
      *
-     * @throws IOException If an I/O error occurs during serialization.
+     * @throws IOException       If an I/O error occurs during serialization.
      * @throws RDFParseException If the serialized output cannot be parsed.
      */
     @Test
     void testSerializeToRdfXml() throws IOException, RDFParseException {
-        Model originalModel = createSimpleTestModel(); // RDF/XML typically for default graph
+        Model originalModel = createSimpleTestModel();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         Rdf4jSerializationUtil.serializeToRdfXml(originalModel, out);
 
         String result = out.toString();
-        logger.debug("testSerializeToRdfXml Output:\n{}" , result);
+        logger.debug("testSerializeToRdfXml Output:\n{}", result);
 
         ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
         Model reparsedModel = Rio.parse(in, "", RDFFormat.RDFXML);
         assertEquals(originalModel, reparsedModel, "The re-parsed RDF/XML model should be equal to the original model.");
-    }
-
-    /**
-     * Tests the serialization of an RDF4J Model to N-Triples format.
-     * Verifies that the output can be parsed back into an equivalent model.
-     * N-Triples does not support named graphs, so only default graph statements are tested.
-     *
-     * @throws IOException If an I/O error occurs during serialization.
-     * @throws RDFParseException If the serialized output cannot be parsed.
-     */
-    @Test
-    void testSerializeToNTriples() throws IOException, RDFParseException {
-        Model originalModel = createSimpleTestModel(); // N-Triples does not support named graphs
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        Rdf4jSerializationUtil.serializeToNTriples(originalModel, out);
-
-        String result = out.toString();
-        logger.debug("testSerializeToNTriples Output:\n{}" , result);
-
-        ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
-        Model reparsedModel = Rio.parse(in, "", RDFFormat.NTRIPLES);
-        assertEquals(originalModel, reparsedModel, "The re-parsed N-Triples model should be equal to the original model.");
-    }
-
-    /**
-     * Tests the serialization of an RDF4J Model to N-Quads format.
-     * Verifies that the output can be parsed back into an equivalent model, including named graphs.
-     *
-     * @throws IOException If an I/O error occurs during serialization.
-     * @throws RDFParseException If the serialized output cannot be parsed.
-     */
-    @Test
-    void testSerializeToNQuads() throws IOException, RDFParseException {
-        Model originalModel = createNamedGraphTestModel(); // N-Quads supports named graphs
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        Rdf4jSerializationUtil.serializeToNQuads(originalModel, out);
-
-        String result = out.toString();
-        logger.debug("testSerializeToNQuads Output:\n{}" , result);
-
-        ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
-        Model reparsedModel = Rio.parse(in, "", RDFFormat.NQUADS);
-        assertEquals(originalModel, reparsedModel, "The re-parsed N-Quads model should be equal to the original model.");
     }
 
 
@@ -150,7 +105,7 @@ class Rdf4jSerializationUtilTest {
      * Tests the generic serialization method using a format string, specifically for Turtle.
      * Verifies that the output can be parsed back into an equivalent model.
      *
-     * @throws IOException If an I/O error occurs during serialization.
+     * @throws IOException       If an I/O error occurs during serialization.
      * @throws RDFParseException If the serialized output cannot be parsed.
      */
     @Test
@@ -161,7 +116,7 @@ class Rdf4jSerializationUtilTest {
         Rdf4jSerializationUtil.serialize(originalModel, out, "turtle");
 
         String result = out.toString();
-        logger.debug("testSerializeWithFormatString (Turtle) Output:\n{}" , result);
+        logger.debug("testSerializeWithFormatString (Turtle) Output:\n{}", result);
 
         ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
         Model reparsedModel = Rio.parse(in, "", RDFFormat.TURTLE);
@@ -230,6 +185,51 @@ class Rdf4jSerializationUtilTest {
         assertTrue(formats.contains("ntriples"));
         assertTrue(formats.contains("nquads"));
         assertEquals(10, formats.size());
+    }
+
+    /**
+     * Tests the serialization of an RDF4J Model to N-Triples format.
+     * Verifies that the output can be parsed back into an equivalent model.
+     * N-Triples does not support named graphs, so only default graph statements are tested.
+     *
+     * @throws IOException       If an I/O error occurs during serialization.
+     * @throws RDFParseException If the serialized output cannot be parsed.
+     */
+    @Test
+    void testSerializeToNTriples() throws IOException, RDFParseException {
+        Model originalModel = createSimpleTestModel(); // N-Triples does not support named graphs
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        Rdf4jSerializationUtil.serializeToNTriples(originalModel, out);
+
+        String result = out.toString();
+        logger.debug("testSerializeToNTriples Output:\n{}", result);
+
+        ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
+        Model reparsedModel = Rio.parse(in, "", RDFFormat.NTRIPLES);
+        assertEquals(originalModel, reparsedModel, "The re-parsed N-Triples model should be equal to the original model.");
+    }
+
+    /**
+     * Tests the serialization of an RDF4J Model to N-Quads format.
+     * Verifies that the output can be parsed back into an equivalent model, including named graphs.
+     *
+     * @throws IOException       If an I/O error occurs during serialization.
+     * @throws RDFParseException If the serialized output cannot be parsed.
+     */
+    @Test
+    void testSerializeToNQuads() throws IOException, RDFParseException {
+        Model originalModel = createNamedGraphTestModel(); // N-Quads supports named graphs
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        Rdf4jSerializationUtil.serializeToNQuads(originalModel, out);
+
+        String result = out.toString();
+        logger.debug("testSerializeToNQuads Output:\n{}", result);
+
+        ByteArrayInputStream in = new ByteArrayInputStream(result.getBytes());
+        Model reparsedModel = Rio.parse(in, "", RDFFormat.NQUADS);
+        assertEquals(originalModel, reparsedModel, "The re-parsed N-Quads model should be equal to the original model.");
     }
 
     /**
