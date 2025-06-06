@@ -57,7 +57,7 @@ public class ParserHandler {
             int n)
             throws ParseException {
         for (Expression object : objectList) {
-            createTripleWithAnnotation(ast, stack, subject.getAtom(), predicate, object.getAtom());
+            n = createTripleWithAnnotation(ast, stack, subject.getAtom(), predicate, object.getAtom(), n);
         }
         return stack;
     }
@@ -67,7 +67,7 @@ public class ParserHandler {
      * we may have s p o whith o.reference = t and o.annotation = (t q v)
      * create triple s p o t and add its annotation t q v after triple in stack
      */
-    Exp createTripleWithAnnotation(ASTQuery ast, Exp stack, Atom subject, Atom predicate, Atom object)
+    int createTripleWithAnnotation(ASTQuery ast, Exp stack, Atom subject, Atom predicate, Atom object, int n)
             throws ParseException {
 
         boolean turtleLoaderStatus = isTurtleLoader();
@@ -88,15 +88,18 @@ public class ParserHandler {
         if (isTurtleLoader()) {
             // edge created in graph
             processTurtleAnnotation(ast, object);
+        } else
+        // triple created in stack
+        if (object.getAnnotation() == null) {
+            stack.add(n++, triple);
         } else {
-            // triple created in stack
-            stack.add(triple); // stack.add(n++, triple);
+            stack.add(triple);
             processSparqlAnnotation(ast, stack, triple, object);
         }
 
         setTurtleLoader(turtleLoaderStatus);
 
-        return stack;
+        return n;
     }
 
     /**
