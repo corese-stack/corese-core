@@ -1,12 +1,12 @@
 package fr.inria.corese.core.index;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import static fr.inria.corese.core.index.EdgeManagerIndexer.ITERATE_SUBLIST;
+import static fr.inria.corese.core.index.EdgeManagerIndexer.RECORD_END;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.inria.corese.core.index.EdgeManagerIndexer.ITERATE_SUBLIST;
-import static fr.inria.corese.core.index.EdgeManagerIndexer.RECORD_END;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * List of predicates of a given Node in NodeManager
@@ -106,6 +106,9 @@ public class PredicateList {
 
     int getPosition(int n) {
         if (isPosition) {
+            if (getPositionList().isEmpty()) {
+                return -1;
+            }
             return getPositionList().get(n);
         }
         return -1;
@@ -129,7 +132,6 @@ public class PredicateList {
         return -3;
     }
 
-
     int findPosition(Node predicate, int first, int last) {
         if (first >= last) {
             return first;
@@ -143,7 +145,6 @@ public class PredicateList {
             }
         }
     }
-
 
     void add(Node node, Node predicate, int begin, int end) {
         getPredicateList().add(predicate);
