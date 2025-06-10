@@ -8224,7 +8224,7 @@ public class TestQuery1 {
         // Assert
         assertEquals(5, map.size(), "Should return 5 triples");
 
-        // Vérification XML (si nécessaire)
+        // XML verification (if necessary)
         String xmlResult = XMLFormat.create(map).toString();
         assertNotNull(xmlResult, "XML result should not be null");
         assertTrue(xmlResult.contains("<sparql"), "Should contain SPARQL XML result format");
@@ -8294,11 +8294,11 @@ public class TestQuery1 {
             IDatatype dt3 = map.get(3).getNode("?x").getValue();
             IDatatype dt4 = map.get(4).getNode("?x").getValue();
 
-            assertEquals("B", "B", dt0.getLabel());
-            assertEquals("D", "D", dt1.getLabel());
-            assertEquals("E", "E", dt2.getLabel());
-            assertEquals("C", "C", dt3.getLabel());
-            assertEquals("A", "A", dt4.getLabel());
+            assertEquals("B", dt0.getLabel());
+            assertEquals("D", dt1.getLabel());
+            assertEquals("E", dt2.getLabel());
+            assertEquals("C", dt3.getLabel());
+            assertEquals("A", dt4.getLabel());
 
             // B D E C A
 
