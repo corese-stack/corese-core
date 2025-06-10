@@ -17,8 +17,9 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Given query, endpoint URI and size
@@ -36,6 +37,8 @@ import java.util.logging.Logger;
  *
  */
 public class LinkedDataPath implements QueryVisitor {
+
+    private static final Logger logger = LoggerFactory.getLogger(LinkedDataPath.class);
     
     public static final String OPTION       = NSManager.USER;
     public static final String URI          = OPTION + "uri";
@@ -111,7 +114,7 @@ public class LinkedDataPath implements QueryVisitor {
             ldp(ast);
             result.process();            
         } catch (IOException | EngineException | InterruptedException | LoadException ex) {
-            Logger.getLogger(LinkedDataPath.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
     }
 
@@ -270,7 +273,7 @@ public class LinkedDataPath implements QueryVisitor {
     }
     
     public Result process(ASTQuery ast, int varIndex) throws EngineException, InterruptedException, IOException {
-        Logger.getLogger(LinkedDataPath.class.getName()).info("Start Linked Data Path Finder");
+        logger.info("Start Linked Data Path Finder");
         start(ast);
         federate(ast, getLocalList());
         if (getPathLength() == 0 && !getEndpointList().isEmpty()) {

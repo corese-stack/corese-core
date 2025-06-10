@@ -39,7 +39,7 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.util.Collection;
-import java.util.logging.Level;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,7 +164,7 @@ public class XMLResult {
             map.setQuery(q);
             map.init(q);
         } catch (EngineException ex) {
-            java.util.logging.Logger.getLogger(XMLResult.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
     }
 

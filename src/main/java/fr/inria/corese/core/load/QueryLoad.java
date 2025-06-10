@@ -294,7 +294,7 @@ public class QueryLoad extends Load {
             fq.flush();
             fr.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         } catch (IOException e) {
         }
         

@@ -1,10 +1,15 @@
 package fr.inria.corese.core.sparql.triple.parser;
 
+import fr.inria.corese.core.load.jsonld.JsonldLoader;
 import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
 import fr.inria.corese.core.sparql.triple.api.Walker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 public class Query extends Exp {
+    private static final Logger logger = LoggerFactory.getLogger(Query.class);
 
     ASTQuery ast;
 
@@ -50,7 +55,7 @@ public class Query extends Exp {
     
     @Override
     void getVariables(VariableScope sort, List<Variable> list) {
-        //System.out.println("query: "+ ast.getSelectVariables());
+//        logger.info("query: {} " , ast.getSelectVariables());
         switch (sort.getScope()) {
             case INSCOPE:
             case SUBSCOPE:  basicVariables(list); break;

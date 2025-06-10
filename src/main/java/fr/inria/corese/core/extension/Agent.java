@@ -8,8 +8,9 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Agent Java object accessible in LDScript with xt:agent() (see function/system.rq)
@@ -25,6 +26,8 @@ import java.util.logging.Logger;
  * .
  */
 public class Agent {
+
+    private static final Logger logger = LoggerFactory.getLogger(Agent.class);
 
     static final String NS = NSManager.USER;
     static final String ENTAILMENT = NS + "entailment";
@@ -108,7 +111,7 @@ public class Agent {
                 re.setProfile(RuleEngine.Profile.OWLRL);
                 re.process();
             } catch (EngineException | LoadException ex) {
-                Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error("An unexpected error has occurred", ex);
             }
         }
     }

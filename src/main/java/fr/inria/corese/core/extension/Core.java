@@ -18,7 +18,8 @@ import fr.inria.corese.core.transform.Transformer;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Super class for Java extension function class
@@ -32,6 +33,8 @@ import java.util.logging.Logger;
  * @author Olivier Corby, Wimmics INRIA I3S, 2017-2019
  */
 public class Core extends PluginImpl implements FunctionEvaluator {
+
+    private static final Logger logger = LoggerFactory.getLogger(Core.class);
 
     private static final String MSH = "http://ns.inria.fr/shacl/";
     static Class<IDatatype>[][] signature;
@@ -151,14 +154,14 @@ public class Core extends PluginImpl implements FunctionEvaluator {
                 Transformer t = Transformer.create(getGraph(x), Transformer.TURTLE);
                 return t.process();
             } catch (EngineException ex) {
-                Logger.getLogger(Core.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                logger.error("An unexpected error has occurred", ex);
             }
         } else {
             Transformer t = Transformer.create(getGraph(), Transformer.TURTLE);
             try {
                 return t.process(x);
             } catch (EngineException ex) {
-                Logger.getLogger(Core.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                logger.error("An unexpected error has occurred", ex);
             }
         }
         return x;
@@ -169,7 +172,7 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         try {
             return t.process(x);
         } catch (EngineException ex) {
-            Logger.getLogger(Core.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return x;
     }

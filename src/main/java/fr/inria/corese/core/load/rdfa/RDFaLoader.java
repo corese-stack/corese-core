@@ -56,7 +56,7 @@ public class RDFaLoader {
             RDFaLoader p = new RDFaLoader(read, file);
             return p;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         }
         return null;
     }

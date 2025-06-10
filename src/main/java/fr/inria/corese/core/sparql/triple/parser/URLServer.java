@@ -202,8 +202,7 @@ public class URLServer implements URLParam {
         String[] params = param.split("&");
         
         for (String str : params) {
-            //System.out.println("URL param: " + str);
-            String[] keyval = str.split("=");
+             String[] keyval = str.split("=");
             
             if (keyval.length>=2)   {
                 String key = keyval[0];

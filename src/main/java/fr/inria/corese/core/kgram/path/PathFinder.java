@@ -527,7 +527,7 @@ public class PathFinder {
      * memory the list of edges
      */
     private Mapping result(Path path, Node gNode, Node src, Node start, boolean isReverse) {
-        //if (edge.getIndex()==1)System.out.println(producer.getGraphNode(edge, edge) + " " + edge);
+        //if (edge.getIndex()==1)logger.debug(producer.getGraphNode(edge, edge) + " " + edge);
         Edge ee = edge;
         int length = 3;
         int ip = 2, is = 3;
@@ -765,7 +765,7 @@ public class PathFinder {
 
         Regex exp = stack.pop();
 
-        //System.out.println(exp.toString() + " " + start);
+        //logger.debug(exp.toString() + " " + start);
 
         switch (exp.retype()) {
 

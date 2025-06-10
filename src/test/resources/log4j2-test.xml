@@ -1,13 +1,40 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
-<Appenders>
-<Console name="Console" target="SYSTEM_OUT">
-<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-</Console>
-</Appenders>
-<Loggers>
-<Root level="debug">
-<AppenderRef ref="Console"/>
-</Root>
-</Loggers>
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss} %-5p %C{2}.%M:%L %x - %m%n</Property>
+        <Property name="LOG_DIR">logs</Property>
+        <Property name="LOG_FILE_NAME">corese-test.log</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console Appender for tests -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- Rolling File Appender for test logs -->
+        <RollingFile name="TestFileAppender"
+                     fileName="${LOG_DIR}/${LOG_FILE_NAME}"
+                     filePattern="${LOG_DIR}/corese-test-%d{yyyy-MM-dd}-%i.log.gz"
+                     includeLocation="true"
+                     filePermissions="rw-r-----">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Dedicated logger for test classes -->
+        <Logger name="fr.inria.corese" level="debug" additivity="false">
+            <AppenderRef ref="TestFileAppender"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Root level="warn">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
 </Configuration>

@@ -103,39 +103,40 @@ repositories {
     mavenCentral()  // Then, check Maven Central
 }
 
-// Define dependencies
 dependencies {
     val jersey_version = "3.1.3"
     val semargl_version = "0.7.1"
 
-    // === Public API (Corese-Core users must see these classes) ===
-    api("org.slf4j:slf4j-api:2.0.9")                                                   // Exposed: Logging API
+    // === Logging ===
+    api("org.slf4j:slf4j-api:2.0.9")                                                   // Logging API only (SLF4J)
+    implementation("org.apache.logging.log4j:log4j-core:2.20.0")                       // Log4j2 core for internal logging
+    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0")                   // SLF4J binding for Log4j2 (runtime)
 
-    // === Internal implementations ===
-    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // Exposed: RDF/XML parser
-    implementation("org.apache.commons:commons-text:1.10.0")                           // Used internally (text manipulation)
-    implementation("commons-lang:commons-lang:2.4")                                    // Used internally (basic utilities)
-    implementation("org.json:json:20240303")                                           // Used internally (JSON)
-    implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                        // Used internally (ShEx validation)
-    implementation("org.glassfish.jersey.core:jersey-client:$jersey_version")          // Internal HTTP client
-    implementation("org.glassfish.jersey.inject:jersey-hk2:$jersey_version")           // Internal Jersey injection
-    implementation("com.sun.activation:jakarta.activation:2.0.1")                      // Internal MIME handling
-    implementation("javax.xml.bind:jaxb-api:2.3.1")                                    // Internal XML binding
-    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parsing
-    implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // RDF core parser
-    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // Internal JSON-LD parser
-    implementation("com.typesafe:config:1.4.3")                                        // Typesafe config
+    // === Core dependencies ===
+    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
+    implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                        // ShEx validation engine
+    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parser (Semargl)
+    implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // Semargl core RDF parser
+    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
 
-    // === For tests ===
-    testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit 5 BOM for dependency management
-    testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit 5 for unit testing
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")               // JUnit 5 runtime for launching tests
+    // === HTTP and XML ===
+    implementation("org.glassfish.jersey.core:jersey-client:$jersey_version")          // HTTP client (Jersey)
+    implementation("org.glassfish.jersey.inject:jersey-hk2:$jersey_version")           // Dependency injection for Jersey
+    implementation("com.sun.activation:jakarta.activation:2.0.1")                      // MIME type handling (Jakarta Activation)
+    implementation("javax.xml.bind:jaxb-api:2.3.1")                                    // XML binding (JAXB)
 
-    testImplementation("org.mockito:mockito-core:5.5.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
+    // === Utilities ===
+    implementation("org.apache.commons:commons-text:1.10.0")                           // Text manipulation utilities (Commons Text)
+    implementation("commons-lang:commons-lang:2.4")                                    // General utilities (Commons Lang)
+    implementation("org.json:json:20240303")                                           // JSON processing
+    implementation("com.typesafe:config:1.4.3")                                        // Configuration library (Typesafe Config)
 
-    // === For viewing logs during development (DO NOT include in production) ===
-    runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging
+    // === Test dependencies ===
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit BOM for consistent test versions
+    testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit Jupiter API and engine
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")               // JUnit platform launcher (runtime)
+    testImplementation("org.mockito:mockito-core:5.5.0")                               // Mockito core for mocking in tests
+    testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")                      // Mockito integration with JUnit Jupiter
 }
 
 // Configure extra Java module information for dependencies without module-info

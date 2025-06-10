@@ -79,7 +79,7 @@ public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
             }
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            java.util.logging.Logger.getLogger(QueryProcess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
             logger.error("Undefined Visitor: " + name);
         }
 
@@ -109,7 +109,7 @@ public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
             }
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            java.util.logging.Logger.getLogger(QueryProcess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
             logger.error("Undefined Visitor: " + name);
         }
 

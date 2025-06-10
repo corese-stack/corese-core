@@ -13,12 +13,15 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author gaignard
  */
 public class ParsingTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(ParsingTest.class);
 
     public ParsingTest() {
     }
@@ -55,6 +58,6 @@ public class ParsingTest {
         ASTQuery ast = ASTQuery.create(query);
        // ast.setKgram(true);
         ParserSparql1.create(ast).parse();
-        System.out.println(ast);
+        logger.info("hello1 {} ", ast);
     }
 }

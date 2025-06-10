@@ -24,6 +24,8 @@ import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -41,6 +43,9 @@ import fr.inria.corese.core.Graph;
  * 
  */
 public class XSLTQuery {
+
+	private static final Logger logger = LoggerFactory.getLogger(XSLTQuery.class);
+
 	String xsl;
 	QuerySolver exec;
 	
@@ -81,10 +86,10 @@ public class XSLTQuery {
 		} 
 		catch (TransformerConfigurationException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Operation failure", e);
 		} catch (TransformerException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Operation failure", e);
 		}
 		return null;
 	}
@@ -122,7 +127,7 @@ public class XSLTQuery {
 		} 
 		catch (EngineException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Operation failure", e);
 		}
 		return null;
 	}
@@ -143,7 +148,7 @@ public class XSLTQuery {
 	      builder = fac.newDocumentBuilder();
 	    }
 	    catch (ParserConfigurationException l_pce) {
-	    	//l_pce.printStackTrace();
+	    	//l_pclogger.error("Operation failure", e);
 	    	//logger.error(l_pce);
 	    }
 
@@ -153,7 +158,7 @@ public class XSLTQuery {
 	      l_Doc.normalize();
 	    }
 	    catch (Exception l_e) {
-	    	//l_e.printStackTrace();
+	    	//l_logger.error("Operation failure", e);
 	    	//logger.error(l_e);
 	    }
 	    return (l_Doc);
