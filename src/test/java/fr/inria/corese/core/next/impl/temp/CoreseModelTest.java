@@ -1,10 +1,12 @@
 package fr.inria.corese.core.next.impl.temp;
 
+import fr.inria.corese.core.EdgeFactory;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
 import org.eclipse.rdf4j.rio.Rio;
@@ -25,13 +27,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -51,8 +55,7 @@ class CoreseModelTest {
     private Model model;
     @Mock
     private Graph mockCoreseGraph;
-    @Mock
-    private CoreseValueConverter mockValueConverter;
+
 
     @Mock
     private IRI mockSubjectIRI;
@@ -76,40 +79,33 @@ class CoreseModelTest {
     private Statement statement0;
     @Mock
     private Statement statement1;
-    @Mock
-    private CoreseValueConverter coreseValueConverter;
+
 
     @BeforeEach
     void setUp() {
-        // Initializes the CoreseModel instance for testing
+
         coreseModel = new CoreseModel(mockCoreseGraph, new HashSet<>());
         valueFactory = new CoreseAdaptedValueFactory();
 
-        when(mockValueConverter.toCoreseNode(mockSubjectIRI)).thenReturn(mockSubjectNode);
-        when(mockValueConverter.toCoreseNode(mockPredicateIRI)).thenReturn(mockPredicateNode);
-        when(mockValueConverter.toCoreseNode(mockObjectValue)).thenReturn(mockObjectNode);
-        when(mockValueConverter.toCoreseNode(mockContextResource)).thenReturn(mockContextNode);
-
-        when(mockValueConverter.toCoreseContextArray(any(Resource[].class))).thenAnswer(invocation -> {
-            Resource[] contexts = invocation.getArgument(0);
-            return Arrays.stream(contexts)
-                    .map(mockValueConverter::toCoreseNode)
-                    .toArray(Node[]::new);
-        });
 
         when(mockCoreseGraph.addNode(any(Node.class))).thenAnswer(invocation -> {
+            Node originalNode = invocation.getArgument(0);
             Node node = mock(Node.class);
-            when(node.getLabel()).thenReturn(invocation.getArgument(0).toString());
+            when(node.getLabel()).thenReturn(originalNode.getLabel());
+            when(node.getDatatypeValue()).thenReturn(originalNode.getDatatypeValue());
             return node;
         });
         when(mockCoreseGraph.addProperty(anyString())).thenAnswer(invocation -> {
             Node node = mock(Node.class);
             when(node.getLabel()).thenReturn(invocation.getArgument(0));
+            when(node.getDatatypeValue()).thenReturn(DatatypeMap.createResource(invocation.getArgument(0)));
             return node;
         });
         when(mockCoreseGraph.addGraph(anyString())).thenAnswer(invocation -> {
             Node node = mock(Node.class);
             when(node.getLabel()).thenReturn(invocation.getArgument(0));
+
+            when(node.getDatatypeValue()).thenReturn(DatatypeMap.createResource(invocation.getArgument(0)));
             return node;
         });
         doNothing().when(mockCoreseGraph).init();
@@ -139,6 +135,9 @@ class CoreseModelTest {
         when(mockContextResource.isBNode()).thenReturn(false);
         when(mockContextResource.isLiteral()).thenReturn(false);
         when(mockContextResource.stringValue()).thenReturn("http://example.org/graphContext");
+
+        when(mockCoreseGraph.getEdgeFactory()).thenReturn(mock(EdgeFactory.class));
+        when(mockCoreseGraph.getEdgeFactory().copy(any(Edge.class))).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     // Constructor Tests
@@ -357,7 +356,7 @@ class CoreseModelTest {
 
         boolean contains = coreseModel.contains(realSubject, realPredicate, realObject);
 
-        assertTrue(contains, "Le modèle devrait contenir la déclaration sans contexte.");
+        assertTrue(contains, "The model should contain the statement without context.");
         verify(mockCoreseGraph, times(0)).getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), eq(null));
     }
 
@@ -380,7 +379,7 @@ class CoreseModelTest {
 
         boolean contains = coreseModel.contains(realSubject, realPredicate, realObject);
 
-        assertFalse(contains, "Le modèle ne devrait pas contenir la déclaration si elle n'est pas présente.");
+        assertFalse(contains, "The model should not contain the statement if it is not present.");
         verify(mockCoreseGraph, times(0)).getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), eq(null));
     }
 
@@ -399,7 +398,7 @@ class CoreseModelTest {
         IRI realSubject = new CoreseIRI("http://example.org/subjectWithSpecificContext");
         IRI realPredicate = new CoreseIRI("http://example.org/predicateWithSpecificContext");
         IRI realObject = new CoreseIRI("http://example.org/objectWithSpecificContext");
-        Resource realContext = new CoreseIRI("http://example.org/specificGraphContext"); // Assuming the context is an IRI
+        Resource realContext = new CoreseIRI("http://example.org/specificGraphContext");
 
         when(mockCoreseGraph.getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), any(Node.class)))
                 .thenReturn(edges);
@@ -430,10 +429,9 @@ class CoreseModelTest {
                 .thenReturn(List.of());
         when(mockCoreseGraph.getEdgeFactory()).thenReturn(mock(fr.inria.corese.core.EdgeFactory.class));
 
-        assertFalse(coreseModel.contains(georgeBrassens, rdfType, singer), "Le modèle ne devrait pas contenir un triple non existant.");
+        assertFalse(coreseModel.contains(georgeBrassens, rdfType, singer), "The model should not contain a non-existent triple.");
         verify(mockCoreseGraph, times(0)).getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), eq(null));
     }
-
 
 
     /**
@@ -446,6 +444,7 @@ class CoreseModelTest {
             coreseModel.serializeToRdf4jFormat(null, "turtle");
         });
     }
+
     /**
      * Tests that the `serializeToRdf4jFormat` method throws an `IllegalArgumentException`
      * when an unknown or unsupported RDF format string is provided.
@@ -498,13 +497,13 @@ class CoreseModelTest {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(output.getBytes("UTF-8"));
         Model parsedModel = Rio.parse(inputStream, "", RDFFormat.TURTLE);
 
-        assertTrue(Models.isomorphic(expectedRdf4jModel, parsedModel), "Le modèle Turtle sérialisé et re-parsé doit être isomorphe à l'original.");
-        assertTrue(output.contains("subject"), "La sortie devrait contenir 'subject'");
-        assertTrue(output.contains("predicate"), "La sortie devrait contenir 'predicate'");
+        assertTrue(Models.isomorphic(expectedRdf4jModel, parsedModel), "The serialized and re-parsed Turtle model must be isomorphic to the original.");
+        assertTrue(output.contains("subject"), "Output should contain 'subject'");
+        assertTrue(output.contains("predicate"), "Output should contain 'predicate'");
 
-        assertTrue(output.contains("\"Test literal\""), "La sortie devrait contenir le littéral simple correctement.");
-        assertFalse(output.contains("@"), "La sortie ne devrait pas contenir de balise de langue");
-        assertFalse(output.contains("^^"), "La sortie ne devrait pas contenir de type de données explicite");
+        assertTrue(output.contains("\"Test literal\""), "Output should contain the simple literal correctly.");
+        assertFalse(output.contains("@"), "Output should not contain a language tag");
+        assertFalse(output.contains("^^"), "Output should not contain an explicit datatype");
     }
 
     /**
@@ -542,17 +541,18 @@ class CoreseModelTest {
         String output = outputStream.toString("UTF-8");
         assertNotNull(output);
 
-        logger.info("testSerializeToJsonLdFormat  {}" , output);
+        logger.info("testSerializeToJsonLdFormat  {}", output);
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(output.getBytes("UTF-8"));
 
         Model parsedModel = Rio.parse(inputStream, "", RDFFormat.JSONLD);
 
-        assertTrue(Models.isomorphic(expectedRdf4jModel, parsedModel), "Le modèle JSON-LD sérialisé et re-parsé doit être isomorphe à l'original.");
-        assertTrue(output.contains("http://example.org/subject"), "La sortie JSON-LD devrait contenir 'http://example.org/subject'");
-        assertTrue(output.contains("http://example.org/predicate"), "La sortie JSON-LD devrait contenir 'http://example.org/predicate'");
-        assertTrue(output.contains("Test literal"), "La sortie JSON-LD devrait contenir 'Test literal'");
+        assertTrue(Models.isomorphic(expectedRdf4jModel, parsedModel), "The serialized and re-parsed JSON-LD model must be isomorphic to the original.");
+        assertTrue(output.contains("http://example.org/subject"), "JSON-LD output should contain 'http://example.org/subject'");
+        assertTrue(output.contains("http://example.org/predicate"), "JSON-LD output should contain 'http://example.org/predicate'");
+        assertTrue(output.contains("Test literal"), "JSON-LD output should contain 'Test literal'");
     }
+
     /**
      * Tests the serialization of a simple CoreseModel to RDF/XML format.
      * It adds a basic statement to the model and then attempts to serialize it,
@@ -576,9 +576,116 @@ class CoreseModelTest {
 
         String output = outputStream.toString("UTF-8");
         assertNotNull(output);
-        logger.info("testSerializeToRDFXMLFormat  {}" , output);
+        logger.info("testSerializeToRDFXMLFormat  {}", output);
         assertTrue(output.contains("rdf:RDF") || output.contains("rdf:Description"));
 
+
+    }
+
+    /**
+     * Tests the serialization of a CoreseModel to N-Triples format.
+     * It adds a statement to a concrete CoreseModel, serializes it to N-Triples,
+     * and then parses the output back into an RDF4J Model to verify isomorphism
+     * with the expected RDF4J Model. N-Triples does not support named graphs.
+     *
+     * @throws IOException if an I/O error occurs during serialization or parsing.
+     */
+    @Test
+    void testSerializeToNTriplesFormat() throws IOException {
+        Resource subject = valueFactory.createIRI("http://example.org/subjectNT");
+        IRI predicate = valueFactory.createIRI("http://example.org/predicateNT");
+        fr.inria.corese.core.next.api.Value object = valueFactory.createLiteral("Test literal NT");
+
+        org.eclipse.rdf4j.model.ValueFactory rdf4jFactory = SimpleValueFactory.getInstance();
+
+        CoreseModel concreteModel = new CoreseModel();
+        concreteModel.add(subject, predicate, object);
+
+        Model expectedRdf4jModel = new LinkedHashModel();
+        expectedRdf4jModel.add(
+                rdf4jFactory.createIRI(subject.stringValue()),
+                rdf4jFactory.createIRI(predicate.stringValue()),
+                rdf4jFactory.createLiteral(object.stringValue())
+        );
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        concreteModel.serializeToRdf4jFormat(outputStream, "ntriples");
+
+        String output = outputStream.toString("UTF-8");
+        assertNotNull(output);
+        logger.info("testSerializeToNTriplesFormat Output:\n{}", output);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(output.getBytes("UTF-8"));
+        Model parsedModel = Rio.parse(inputStream, "", RDFFormat.NTRIPLES);
+
+        assertTrue(Models.isomorphic(expectedRdf4jModel, parsedModel), "The serialized and re-parsed N-Triples model must be isomorphic to the original.");
+        assertTrue(output.contains("<http://example.org/subjectNT> <http://example.org/predicateNT> \"Test literal NT\" ."), "N-Triples output should contain the triple.");
+        assertFalse(output.contains("<http://example.org/graph"), "N-Triples output should not contain graph context.");
+    }
+
+
+    /**
+     * Tests the serialization of a CoreseModel to N-Quads format.
+     * It adds statements, including one with a context, and verifies
+     * the N-Quads output by parsing it back into an RDF4J Model and checking for isomorphism,
+     * as well as asserting specific string content in the output.
+     *
+     * @throws IOException if an I/O error occurs during serialization or parsing.
+     */
+    @Test
+    @DisplayName("Should correctly serialize a model with contexts to N-Quads format")
+    void testSerializeToNQuadsFormat() throws IOException {
+        CoreseModel concreteModel = new CoreseModel();
+        org.eclipse.rdf4j.model.ValueFactory rdf4jFactory = SimpleValueFactory.getInstance();
+
+        Resource subject1 = valueFactory.createIRI("http://example.org/subj1");
+        IRI predicate1 = valueFactory.createIRI("http://example.org/pred1");
+        Literal object1 = valueFactory.createLiteral("literal value 1");
+        Resource context1 = valueFactory.createIRI("http://example.org/graph1");
+        boolean added1 = concreteModel.add(subject1, predicate1, object1, context1);
+        assertTrue(added1, "First statement with context should be added successfully.");
+        logger.info("Model size after first add (with context): {}", concreteModel.size());
+
+        Resource subject2 = valueFactory.createIRI("http://example.org/subj2");
+        IRI predicate2 = valueFactory.createIRI("http://example.org/pred2");
+        Literal object2 = valueFactory.createLiteral("literal value 2", "en");
+        boolean added2 = concreteModel.add(subject2, predicate2, object2);
+        assertTrue(added2, "Second statement without context should be added successfully.");
+        logger.info("Model size after second add (no context): {}", concreteModel.size());
+        assertEquals(2, concreteModel.size(), "Model size should be 2 after adding both statements.");
+
+        concreteModel.forEach(stmt -> {
+            logger.info("  Statement: {} {} {} (Context: {})",
+                    stmt.getSubject().stringValue(),
+                    stmt.getPredicate().stringValue(),
+                    stmt.getObject().stringValue(),
+                    (stmt.getContext() != null ? stmt.getContext().stringValue() : "null"));
+        });
+
+
+        Model expectedRdf4jModel = new LinkedHashModel();
+        expectedRdf4jModel.add(
+                rdf4jFactory.createIRI(subject1.stringValue()),
+                rdf4jFactory.createIRI(predicate1.stringValue()),
+                rdf4jFactory.createLiteral(object1.stringValue()),
+                rdf4jFactory.createIRI(context1.stringValue())
+        );
+        expectedRdf4jModel.add(
+                rdf4jFactory.createIRI(subject2.stringValue()),
+                rdf4jFactory.createIRI(predicate2.stringValue()),
+                rdf4jFactory.createLiteral(object2.stringValue(), object2.getLanguage().orElse(null))
+        );
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        String formatString = "NQuads";
+
+
+        concreteModel.serializeToRdf4jFormat(outputStream, formatString);
+
+        String nquadsOutput = outputStream.toString(StandardCharsets.UTF_8.name());
+        assertNotNull(nquadsOutput);
+        assertFalse(nquadsOutput.isEmpty());
 
     }
 }
