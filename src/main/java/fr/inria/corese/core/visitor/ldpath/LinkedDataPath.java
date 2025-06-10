@@ -114,7 +114,7 @@ public class LinkedDataPath implements QueryVisitor {
             ldp(ast);
             result.process();            
         } catch (IOException | EngineException | InterruptedException | LoadException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
         }
     }
 

@@ -100,7 +100,7 @@ public class Data {
             return QuerySolverVisitorTransformer
                     .create(QueryProcess.create(getGraph(), getDataManager()).getCreateEval());
         } catch (EngineException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
             return null;
         }
     }

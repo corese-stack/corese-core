@@ -190,7 +190,7 @@ public class DefaultVisitor implements TemplateVisitor {
                     sb.append(NL).append(NL);
                 }
             } catch (EngineException ex) {
-                logger.error("Une erreur inattendue est survenue", ex);
+                logger.error("An unexpected error has occurred", ex);
             }
 
         }

@@ -59,7 +59,7 @@ public class JavaDScall extends JavaFunction {
             IDatatype res = DatatypeMap.getValue(obj);
             return res;
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return null;
 

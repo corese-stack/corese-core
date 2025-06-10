@@ -290,7 +290,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
             }
             return exp;
         } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return this;
     }

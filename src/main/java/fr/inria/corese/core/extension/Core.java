@@ -154,14 +154,14 @@ public class Core extends PluginImpl implements FunctionEvaluator {
                 Transformer t = Transformer.create(getGraph(x), Transformer.TURTLE);
                 return t.process();
             } catch (EngineException ex) {
-                logger.error("Une erreur inattendue est survenue", ex);
+                logger.error("An unexpected error has occurred", ex);
             }
         } else {
             Transformer t = Transformer.create(getGraph(), Transformer.TURTLE);
             try {
                 return t.process(x);
             } catch (EngineException ex) {
-                logger.error("Une erreur inattendue est survenue", ex);
+                logger.error("An unexpected error has occurred", ex);
             }
         }
         return x;
@@ -172,7 +172,7 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         try {
             return t.process(x);
         } catch (EngineException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return x;
     }

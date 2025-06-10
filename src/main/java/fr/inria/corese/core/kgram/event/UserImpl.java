@@ -75,7 +75,7 @@ public class UserImpl implements User {
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.error("Échec de l'opération", e);
+			logger.error("Operation failure", e);
 		}
 		return Event.STEP;
 

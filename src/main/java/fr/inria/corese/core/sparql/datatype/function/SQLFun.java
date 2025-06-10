@@ -29,13 +29,13 @@ public class SQLFun {
 				driver = Class.forName(dd.getLabel()).newInstance();
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
-				logger.error("Échec de l'opération", e);
+				logger.error("Operation failure", e);
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
-				logger.error("Échec de l'opération", e);
+				logger.error("Operation failure", e);
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
-				logger.error("Échec de l'opération", e);
+				logger.error("Operation failure", e);
 			}
 		}
 		return sql(uri, login, passwd, query);
@@ -53,13 +53,13 @@ public class SQLFun {
 					driver = Class.forName(DERBY_DRIVER).newInstance();
 				} catch (InstantiationException e) {
 					// TODO Auto-generated catch block
-					logger.error("Échec de l'opération", e);
+					logger.error("Operation failure", e);
 				} catch (IllegalAccessException e) {
 					// TODO Auto-generated catch block
-					logger.error("Échec de l'opération", e);
+					logger.error("Operation failure", e);
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
-					logger.error("Échec de l'opération", e);
+					logger.error("Operation failure", e);
 				}
 			}
         	Connection con = 
@@ -76,7 +76,7 @@ public class SQLFun {
         }
         catch (SQLException e) {
         	// TODO Auto-generated catch block
-        	logger.error("Échec de l'opération", e);
+        	logger.error("Operation failure", e);
         }  
         return null;
 	}

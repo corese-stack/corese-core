@@ -44,7 +44,7 @@ public class QueryProcessThread extends Thread {
         try {
             map = exec.query(ast);
         } catch (EngineException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
         }
     }
     

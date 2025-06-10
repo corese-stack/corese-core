@@ -5993,7 +5993,7 @@ public class TestQuery1 {
             //// logger.debug(g.display());
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
     }
 
@@ -6085,7 +6085,7 @@ public class TestQuery1 {
             ASTQuery ast = exec.getAST(map);
             assertEquals(0, ast.getConstruct().size());
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
     }
 
@@ -6111,7 +6111,7 @@ public class TestQuery1 {
             assertEquals(11, dt.intValue(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
     }
 
@@ -6520,7 +6520,7 @@ public class TestQuery1 {
             map2 = exec.query(query2, ds);
             assertEquals(2, map2.size(), "result");
         } catch (EngineException ex) {
-            logger.error("Échec de l'opération", ex);
+            logger.error("Operation failure", ex);
         }
 
     }
@@ -6600,7 +6600,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
             org.junit.jupiter.api.Assertions.fail("EngineException occurred: " + e.getMessage());
 
         }
@@ -6667,7 +6667,7 @@ public class TestQuery1 {
 
             assertTrue(node.getLabel().length() > 10, "result");
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -6701,7 +6701,7 @@ public class TestQuery1 {
 
             assertEquals(70, dt.getLabel().length(), "Results");
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7685,7 +7685,7 @@ public class TestQuery1 {
             assertEquals(0, res.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
     }
 
@@ -7713,7 +7713,7 @@ public class TestQuery1 {
             assertEquals(30, getValue(res, "?s").intValue(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7749,7 +7749,7 @@ public class TestQuery1 {
             assertEquals(2, res.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7781,7 +7781,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7813,7 +7813,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7846,7 +7846,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7892,7 +7892,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7943,7 +7943,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
             fail("Result: " + e.getMessage(), e);
 
         }
@@ -7973,7 +7973,7 @@ public class TestQuery1 {
             assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8001,7 +8001,7 @@ public class TestQuery1 {
             assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8032,7 +8032,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8144,7 +8144,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
     }
 
@@ -8170,7 +8170,7 @@ public class TestQuery1 {
             assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8198,7 +8198,7 @@ public class TestQuery1 {
             assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8260,7 +8260,7 @@ public class TestQuery1 {
     // assertEquals("Result", 1, map.size());
     // } catch (EngineException e) {
 
-    // logger.error("Échec de l'opération", e);
+    // logger.error("Operation failure", e);
     // }
     // }
 
@@ -8305,7 +8305,7 @@ public class TestQuery1 {
             // B D E C A
 
         } catch (EngineException e) {
-            logger.error("Une erreur s'est produite", e);
+            logger.error("An error has occurred", e);
         }
     }
 
@@ -8337,7 +8337,7 @@ public class TestQuery1 {
             assertEquals("Result", aa.getLabel(), vv.getLabel());
 
         } catch (EngineException e) {
-            logger.error("Une erreur s'est produite", e);
+            logger.error("An error has occurred", e);
         }
 
     }
@@ -8355,7 +8355,7 @@ public class TestQuery1 {
             ld.parse(data + "test/utf.ttl");
             ld.parse(data + "test/utf.rdf");
         } catch (LoadException e1) {
-            logger.error("Une erreur s'est produite", e1);
+            logger.error("An error has occurred", e1);
         }
 
         String query = "select * where {"
@@ -8370,7 +8370,7 @@ public class TestQuery1 {
             assertEquals(4, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Échec de l'opération", e);
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8408,7 +8408,7 @@ public class TestQuery1 {
             assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Une erreur s'est produite", e);
+            logger.error("An error has occurred", e);
         }
 
     }
@@ -8443,7 +8443,7 @@ public class TestQuery1 {
             assertEquals(9, map.size(), "Result");
 
         } catch (EngineException e) {
-            logger.error("Une erreur s'est produite", e);
+            logger.error("An error has occurred", e);
         }
 
     }

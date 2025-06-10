@@ -98,7 +98,7 @@ public class Result {
                 try {
                     process(map.getAST(), map, alist.size());
                 } catch (IOException ex) {
-                    logger.error("Une erreur inattendue est survenue", ex);                }
+                    logger.error("An unexpected error has occurred", ex);                }
             }
         }
     }

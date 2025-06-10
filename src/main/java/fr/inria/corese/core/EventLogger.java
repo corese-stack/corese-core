@@ -131,7 +131,7 @@ public class EventLogger {
         try {
             getQueryProcess().event(type, e, o);
         } catch (EngineException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);        }
+            logger.error("An unexpected error has occurred", ex);        }
     }
 
     /**
@@ -157,7 +157,7 @@ public class EventLogger {
                     }
             }
         } catch (EngineException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);        }
+            logger.error("An unexpected error has occurred", ex);        }
     }
 
     DatatypeValue insert(Edge edge) throws EngineException {
@@ -174,7 +174,7 @@ public class EventLogger {
             try {
                 exec.getCreateEval().setVisitor(new QuerySolverVisitor(exec.getCreateEval()));
             } catch (EngineException ex) {
-                logger.error("Une erreur inattendue est survenue", ex);            }
+                logger.error("An unexpected error has occurred", ex);            }
         }
         return exec;
     }

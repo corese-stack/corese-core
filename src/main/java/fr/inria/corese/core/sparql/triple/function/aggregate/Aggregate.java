@@ -48,7 +48,7 @@ public class Aggregate extends LDScript {
             fill(agg);
             return agg;
         } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return this;
     }

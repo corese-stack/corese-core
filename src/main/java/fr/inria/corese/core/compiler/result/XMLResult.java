@@ -133,7 +133,7 @@ public class XMLResult {
             map.setQuery(q);
             map.init(q);
         } catch (EngineException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
         }
     }
 

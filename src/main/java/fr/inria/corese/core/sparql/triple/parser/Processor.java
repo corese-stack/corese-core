@@ -1475,7 +1475,7 @@ public class Processor {
                 setMethod(className.getMethod(methodName, aclasses));
                 setCorrect(true);
             } catch (InvocationTargetException | ClassNotFoundException | SecurityException | NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException e) {
-				logger.error("Une erreur inattendue est survenue", e);
+				logger.error("An unexpected error has occurred", e);
             }
            
     }
@@ -1493,13 +1493,13 @@ public class Processor {
 		} 
 		catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
-			logger.error("Échec de l'opération", e);
+			logger.error("Operation failure", e);
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
-			logger.error("Échec de l'opération", e);
+			logger.error("Operation failure", e);
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
-			logger.error("Échec de l'opération", e);
+			logger.error("Operation failure", e);
 		}
                 catch (NullPointerException ex){
                     

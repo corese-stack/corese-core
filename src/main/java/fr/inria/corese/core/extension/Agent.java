@@ -111,7 +111,7 @@ public class Agent {
                 re.setProfile(RuleEngine.Profile.OWLRL);
                 re.process();
             } catch (EngineException | LoadException ex) {
-                logger.error("Une erreur inattendue est survenue", ex);
+                logger.error("An unexpected error has occurred", ex);
             }
         }
     }

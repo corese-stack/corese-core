@@ -53,7 +53,7 @@ public class TestRuleEngine {
             load.parse(data + "engine/rule/test2.brul");
             load.parse(data + "engine/rule/meta.rul", "meta.rul");
         } catch (LoadException e) {
-            logger.error("Une erreur s'est produite", e);
+            logger.error("An error has occurred", e);
         }
 
         fengine = load.getRuleEngine();
@@ -109,7 +109,7 @@ public class TestRuleEngine {
             re.defRule(rule);
             re.defRule(rule2);
         } catch (EngineException e1) {
-            logger.error("Une erreur s'est produite", e1);
+            logger.error("An error has occurred", e1);
         }
 
         String init = "prefix e: <htp://example.org/>" + "insert data {"
@@ -129,7 +129,7 @@ public class TestRuleEngine {
 
             assertEquals(1, map.size(), "Result");
         } catch (EngineException e) {
-            logger.error("Une erreur s'est produite", e);
+            logger.error("An error has occurred", e);
         }
 
     }
@@ -144,7 +144,7 @@ public class TestRuleEngine {
             ld.parse(data + "template/owl/data/primer.owl");
             ld.parse(data + "owlrule/owlrllite.rul");
         } catch (LoadException ex) {
-            logger.error("Une erreur s'est produite", ex);
+            logger.error("An error has occurred", ex);
 
         }
         RuleEngine re = ld.getRuleEngine();
@@ -176,7 +176,7 @@ public class TestRuleEngine {
             ld.parse(data + "template/owl/data/primer.owl");
             ld.parse(data + "owlrule/owlrllite.rul");
         } catch (LoadException ex) {
-            logger.error("Une erreur s'est produite", ex);
+            logger.error("An error has occurred", ex);
         }
         RuleEngine re = ld.getRuleEngine();
         re.process();
@@ -206,7 +206,7 @@ public class TestRuleEngine {
         try {
             ld.parse(data + "template/owl/data/primer.owl");
         } catch (LoadException ex) {
-            logger.error("Une erreur s'est produite", ex);
+            logger.error("An error has occurred", ex);
         }
         RuleEngine re = RuleEngine.create(gs);
         re.setProfile(RuleEngine.ProfileType.OWL_RL);
@@ -383,7 +383,7 @@ public class TestRuleEngine {
         try {
             ld.parse(data + "owlrule/owlrllite-junit.rul");
         } catch (LoadException e) {
-            logger.error("Une erreur s'est produite", e);
+            logger.error("An error has occurred", e);
         }
         RuleEngine re = ld.getRuleEngine();
         return re;

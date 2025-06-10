@@ -86,10 +86,10 @@ public class XSLTQuery {
 		} 
 		catch (TransformerConfigurationException e) {
 			// TODO Auto-generated catch block
-			logger.error("Échec de l'opération", e);
+			logger.error("Operation failure", e);
 		} catch (TransformerException e) {
 			// TODO Auto-generated catch block
-			logger.error("Échec de l'opération", e);
+			logger.error("Operation failure", e);
 		}
 		return null;
 	}
@@ -127,7 +127,7 @@ public class XSLTQuery {
 		} 
 		catch (EngineException e) {
 			// TODO Auto-generated catch block
-			logger.error("Échec de l'opération", e);
+			logger.error("Operation failure", e);
 		}
 		return null;
 	}
@@ -148,7 +148,7 @@ public class XSLTQuery {
 	      builder = fac.newDocumentBuilder();
 	    }
 	    catch (ParserConfigurationException l_pce) {
-	    	//l_pclogger.error("Échec de l'opération", e);
+	    	//l_pclogger.error("Operation failure", e);
 	    	//logger.error(l_pce);
 	    }
 
@@ -158,7 +158,7 @@ public class XSLTQuery {
 	      l_Doc.normalize();
 	    }
 	    catch (Exception l_e) {
-	    	//l_logger.error("Échec de l'opération", e);
+	    	//l_logger.error("Operation failure", e);
 	    	//logger.error(l_e);
 	    }
 	    return (l_Doc);

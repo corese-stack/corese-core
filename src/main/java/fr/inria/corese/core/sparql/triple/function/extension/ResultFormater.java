@@ -104,7 +104,7 @@ public class ResultFormater extends TermEval {
             IDatatype res = DatatypeMap.newXMLObject(dt.getLabel(), node); 
             return res;
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            logger.error("Une erreur inattendue est survenue", ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return null;
     }
