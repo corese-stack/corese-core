@@ -465,8 +465,8 @@ public class Triple extends Exp implements Pointerable {
     
     /**
      * When printing rdf star triple, terms that are nested triples are printed 
-     * as <<s p o>> except in one case: s p o {| q v |}
-     * <<s p o>> is printed by Atom toNestedTriple() 
+     * as &lt;&lt;s p o>> except in one case: s p o {| q v |}
+     * &lt;&lt;s p o>> is printed by Atom toNestedTriple()
      * called by Constant or Variable toString()
      * When printing AST, rdf star triples to be printed are selected by Exp isDisplayable()
      * hence we do not print here every physical triple in a BGP 

@@ -128,7 +128,7 @@ public class Core implements FunctionEvaluator {
 
     /**
      * This PluginImpl was created for executing a Method such as java:report()
-     * where java: = <function:// ...>
+     * where java: = &lt;function:// ...>
      * This PluginImpl contains Environment and Producer use case: JavaCompiler
      * external function
      */

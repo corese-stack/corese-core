@@ -12,7 +12,7 @@ plugins {
 
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
-    id("org.gradlex.extra-java-module-info") version "1.9"      // Module metadata for JARs without module info
+    id("org.gradlex.extra-java-module-info") version "1.11"      // Module metadata for JARs without module info
     id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
     id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
     id("com.intershop.gradle.javacc") version "5.0.0"           // JavaCC plugin for parsing JavaCC files
@@ -29,6 +29,7 @@ sonar {
         property("sonar.login", System.getenv("SONAR_TOKEN"))
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
         property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.projectDate", currentDate)
     }
 }
 
@@ -46,7 +47,7 @@ javacc {
 sourceSets {
     main {
         java {
-            srcDir("$buildDir/generated-src/javacc")
+            srcDir(layout.buildDirectory.dir("generated-src/javacc"))
         }
     }
 }
@@ -87,7 +88,9 @@ object Meta {
 java {
     withJavadocJar()                             // Include Javadoc JAR in publications
     withSourcesJar()                             // Include sources JAR in publications
-    sourceCompatibility = JavaVersion.VERSION_11 // Configure minimum Java version
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 /////////////////////////
@@ -102,7 +105,7 @@ repositories {
 
 // Define dependencies
 dependencies {
-    val jersey_version = "3.0.4"
+    val jersey_version = "3.1.3"
     val semargl_version = "0.7.1"
 
     // === Public API (Corese-Core users must see these classes) ===
@@ -321,6 +324,10 @@ tasks.jacocoTestReport {
 // This ensures that test coverage reports are always generated after tests.
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+    systemProperty("java.util.logging.config.file", "src/test/resources/logging.properties")
     finalizedBy(tasks.jacocoTestReport)
 }
 

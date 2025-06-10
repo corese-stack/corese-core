@@ -42,7 +42,7 @@ import java.util.Enumeration;
 
 /**
  * Generic Java Extension function public class
- * prefix fun: <function://fr.inria.corese.core.extension.Extension>
+ * prefix fun: &lt;function://fr.inria.corese.core.extension.Extension>
  * fun:test(xt:graph())
  * <p>
  * Provide access to query execution environment

@@ -25,7 +25,7 @@ import org.slf4j.MarkerFactory;
  * functions.<br>
  * It subsumes URI, Literal, xsd:string<br>
  * We can compare URI with URI, string and literal/XMLLiteral with string and
- * literal/XMLLiteral (they can be <= modulo lang)<br> e.g. : titi <=
+ * literal/XMLLiteral (they can be &lt;= modulo lang)<br> e.g. : titi &lt;=
  * toto@en<br> This class factorize util functions such as contains and plus
  * <br>
  *

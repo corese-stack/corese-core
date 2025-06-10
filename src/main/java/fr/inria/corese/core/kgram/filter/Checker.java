@@ -11,12 +11,12 @@ import fr.inria.corese.core.kgram.tool.Message;
 
 /**
  * Filter Exp Checker
- * 
+ *
  * Check presence of patterns that are always true or always false
  * Such as:
  * ?x != ?x
- * ?x > ?y && ?x < ?y
- * 
+ * ?x &gt; ?y &amp;&amp; ?x &lt; ?y
+ *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *
  */

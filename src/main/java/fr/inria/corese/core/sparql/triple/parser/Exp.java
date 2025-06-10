@@ -203,7 +203,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
     }
 
     /**
-     * Variables that are surely bound in this Exp left part of optional &
+     * Variables that are surely bound in this Exp left part of optional &amp;
      * minus, common variables of union branchs It is not the list of all
      * variables
      */

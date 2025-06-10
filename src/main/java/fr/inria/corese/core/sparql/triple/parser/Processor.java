@@ -1423,7 +1423,7 @@ public class Processor {
 	
 	/**
 	 * Load external method definition for ext:fun
-	 * prefix ext: <function://package.className>
+	 * prefix ext: &lt;function://package.className>
 	 * ext:fun() 
 	 */
         

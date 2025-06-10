@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * It has a singleton, hence each ag:fun() function call is performed on the same object
  * The singleton can be accessed in LDScript using xt:agent()
  * <p>
- * prefix ag: <function://fr.inria.corese.core.extension.Agent>
+ * prefix ag: &lt;function://fr.inria.corese.core.extension.Agent>
  * <p>
  * IDatatype ag:functionName(IDatatype arg)
  * <p>

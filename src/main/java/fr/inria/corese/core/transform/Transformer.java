@@ -1251,7 +1251,7 @@ public class Transformer implements TransformProcessor {
     }
 
     /**
-     * if prefix exists, return qname, else return URI as is (without <>)
+     * if prefix exists, return qname, else return URI as is (without &lt;>)
      */
     public IDatatype qnameURI(IDatatype dt) {
         String uri = nsm.toPrefix(dt.getLabel(), true);

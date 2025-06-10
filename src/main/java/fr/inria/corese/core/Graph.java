@@ -2626,7 +2626,7 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * resource & blank TODO: a node may have been deleted (by a delete triple)
+     * resource &amp; blank TODO: a node may have been deleted (by a delete triple)
      * but still be in the table
      */
     public Iterable<Node> getRBNodes() {

@@ -793,7 +793,7 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
     }
 
     /**
-     * Order of Datatypes & rdfs:Literal vs xsd:string
+     * Order of Datatypes &amp; rdfs:Literal vs xsd:string
      */
     public static void setSPARQLCompliant(boolean b) {
         SPARQLCompliant = b;

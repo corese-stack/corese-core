@@ -1036,7 +1036,7 @@ public class CoreseDatatype
     }
 
     /**
-     * Same datatype or String & Literal
+     * Same datatype or String &amp; Literal
      */
 //    boolean equivalentDatatype(IDatatype dt) {
 //        return getDatatype() == dt.getDatatype()
@@ -1249,7 +1249,7 @@ public class CoreseDatatype
     /**
      * **************************************************************
      * <p>
-     * IDatatype implements Node to be able to get rid of both Node & IDatatype
+     * IDatatype implements Node to be able to get rid of both Node &amp; IDatatype
      * objects IDatatype could be a node in graph directly (not used yet)
      * In addition, SPARQL statements such as bind that require a Node may use IDatatype
      * see ProducerImpl getNode()

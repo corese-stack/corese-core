@@ -387,7 +387,7 @@ public class QuerySorter implements ExpType {
     }
 
     /**
-     * Identify remarkable filter ?x < ?y ?x = ?y or ?x = cst or !bound() filter
+     * Identify remarkable filter ?x &lt; ?y ?x = ?y or ?x = cst or !bound() filter
      * is tagged
      */
     public List<Exp> findBindings(Exp exp) {
