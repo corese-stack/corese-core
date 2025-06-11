@@ -5,10 +5,12 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.base.exception.SerializationException;
 import fr.inria.corese.core.next.api.base.model.AbstractModel;
 import fr.inria.corese.core.next.api.base.model.serialization.RdfSerializationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
@@ -22,6 +24,7 @@ import java.util.*;
  */
 public class CoreseModel extends AbstractModel {
 
+    private static final Logger logger = LoggerFactory.getLogger(CoreseModel.class);
     // --- Fields ---
 
     /**
@@ -404,15 +407,16 @@ public class CoreseModel extends AbstractModel {
      *
      * @param outputStream The OutputStream to write the serialized data to. Must not be null.
      * @param formatString The string identifier of the desired RDF format (e.g., "turtle", "jsonld", "rdfxml", "ntriples", "nquads"). Must not be null.
-     * @throws IOException              If an I/O error occurs during serialization.
+     * @throws SerializationException              If an I/O error occurs during serialization.
      * @throws IllegalArgumentException If the provided formatString is not recognized by RdfSerializationUtil.
      * @throws NullPointerException     If outputStream or formatString is null.
      */
-    public void serializeToRdfFormat(OutputStream outputStream, String formatString) throws IOException {
-        Objects.requireNonNull(outputStream, "OutputStream cannot be null");
-        Objects.requireNonNull(formatString, "Format string cannot be null");
+    public void serializeToRdfFormat(OutputStream outputStream, String formatString) throws SerializationException {
 
-        // Directly use RdfSerializationUtil with the Corese Graph
-        RdfSerializationUtil.serialize(this.coreseGraph, outputStream, formatString);
+        try {
+            RdfSerializationUtil.serialize(this.coreseGraph, outputStream, formatString);
+        } catch (SerializationException e) {
+            logger.error("Export failed", e);
+        }
     }
 }

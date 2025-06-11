@@ -1,8 +1,12 @@
 package fr.inria.corese.core.next.api.base.model.serialization;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.next.api.base.exception.SerializationException;
 import fr.inria.corese.core.print.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -16,6 +20,9 @@ import java.util.Set;
  * Supports Turtle, JSON-LD, RDF/XML, N-Triples, and N-Quads formats.
  */
 public class RdfSerializationUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(RdfSerializationUtil.class);
+
     public enum Format {
         TURTLE, JSONLD, RDFXML, NTRIPLES, NQUADS
     }
@@ -71,38 +78,49 @@ public class RdfSerializationUtil {
         return format;
     }
 
-    // Serialization methods for each format
-    public static void serializeToNTriples(Graph graph, OutputStream out) throws IOException {
-        NTriplesFormat.create(graph).write(out);
-    }
+
 
     /**
      * Main serialization method
      */
-    public static void serialize(Graph graph, OutputStream out, String formatString) throws IOException {
-        Objects.requireNonNull(graph, "Graph cannot be null");
-        Objects.requireNonNull(out, "OutputStream cannot be null");
+    public static void serialize(Graph graph, OutputStream out, String formatString)
+            throws SerializationException {
+        try {
+            Objects.requireNonNull(graph, "Graph cannot be null");
+            Objects.requireNonNull(out, "OutputStream cannot be null");
 
-        Format format = getFormat(formatString);
+            Format format = getFormat(formatString);
 
-        switch (format) {
-            case TURTLE:
+            try (OutputStream bos = new BufferedOutputStream(out)) {
+                switch (format) {
+                    case NTRIPLES -> serializeToNTriples(graph, bos);
+                    case NQUADS -> serializeToNQuads(graph, bos);
+                    default -> throw new IllegalStateException("Unhandled format: " + format);
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Serialization failed for format: {}", formatString, e);
+            throw new SerializationException(
+                    String.format("Failed to serialize graph to %s", formatString), e);
+        }
+    }
 
-                break;
-            case JSONLD:
 
-                break;
-            case RDFXML:
+    // Serialization methods for each format
+    public static void serializeToNTriples(Graph graph, OutputStream out) throws SerializationException {
+        try {
+            NTriplesFormat.create(graph).write(out);
+        } catch (IOException e) {
+            throw new SerializationException("NTriples serialization failed", e);
+        }
+    }
 
-                break;
-            case NTRIPLES:
-                serializeToNTriples(graph, out);
-                break;
-            case NQUADS:
+    public static void serializeToNQuads(Graph graph, OutputStream out) throws SerializationException {
 
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported format: " + format);
+        try {
+            NQuadsFormat.create(graph).write(out);
+        } catch (IOException e) {
+            throw new SerializationException("NQuads serialization failed", e);
         }
     }
 }
