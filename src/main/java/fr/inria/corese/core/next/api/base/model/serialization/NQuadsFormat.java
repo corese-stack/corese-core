@@ -138,9 +138,8 @@ public class NQuadsFormat {
      * @throws IOException if an I/O error occurs.
      */
     private void writeResource(Writer writer, Resource resource) throws IOException {
-        if (resource.isBlank()) {
+        if (resource.isResource()) {
             writer.write(config.getBlankNodePrefix());
-            writer.write(resource.getID());
         } else {
             writeIRI(writer, (IRI) resource);
         }

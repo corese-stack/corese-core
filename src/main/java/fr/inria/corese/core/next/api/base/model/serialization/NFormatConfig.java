@@ -4,7 +4,7 @@ import java.util.Objects;
 
 /**
  * Configuration options for the {@link NTriplesFormat} serializer.
- * Use {@link NFormatConfig# Builder} to create instances.
+ * Use {@link NFormatConfig # Builder} to create instances.
  */
 public class NFormatConfig {
 
