@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.base.parser;
+package fr.inria.corese.core.next.api.parser;
 
 import java.io.InputStream;
 import java.io.Reader;

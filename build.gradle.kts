@@ -112,7 +112,7 @@ dependencies {
     implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // Exposed: RDF/XML parser
     implementation("org.apache.commons:commons-text:1.10.0")                           // Used internally (text manipulation)
     implementation("commons-lang:commons-lang:2.4")                                    // Used internally (basic utilities)
-    implementation("org.json:json:20240303")                                           // Used internally (JSON)
+    implementation("org.json:json:20250517")                                           // Used internally (JSON)
     implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                        // Used internally (ShEx validation)
     implementation("org.glassfish.jersey.core:jersey-client:$jersey_version")          // Internal HTTP client
     implementation("org.glassfish.jersey.inject:jersey-hk2:$jersey_version")           // Internal Jersey injection
@@ -120,8 +120,10 @@ dependencies {
     implementation("javax.xml.bind:jaxb-api:2.3.1")                                    // Internal XML binding
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parsing
     implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // RDF core parser
-    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // Internal JSON-LD parser
+    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // Legacy internal JSON-LD parser
     implementation("com.typesafe:config:1.4.3")                                        // Typesafe config
+    implementation("com.apicatalog:titanium-json-ld:1.6.0")                            // JSON-LD 1.1 parser
+    implementation("com.apicatalog:titanium-rdf-api:1.0.0")                            // RDF API for the JSON-LD parser
 
     // === For tests ===
     testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit 5 BOM for dependency management

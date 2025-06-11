@@ -1,6 +1,7 @@
-package fr.inria.corese.core.next.api.base.parser;
+package fr.inria.corese.core.next.api.parser;
 
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.ValueFactory;
 
 public interface RDFParserFactory {
 
@@ -11,6 +12,6 @@ public interface RDFParserFactory {
      * @param model  The model to which the parsed data will be added.
      * @return A new instance of an RDF parser for the specified format and model.
      */
-    RDFParser createRDFParser(RDFFormat format, Model model);
+    RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory);
 
 }
