@@ -27,12 +27,12 @@ public class NTriplesFormat {
     private static final String SPACE = " ";
 
     /**
-     * A constant string representing the prefix for blank nodes in N-Triples format.
+     * A constant string representing the end of a statement in N-Triples format (space, dot, newline).
      */
-    private static final String SPACE_POINT = " .";
+    private static final String SPACE_POINT = " .\n";
 
     private final Model model;
-    private NFormatConfig config;
+    private final FormatConfig config;
 
     /**
      * Constructs a new {@code NTriplesFormat} instance with the specified model and default configuration.
@@ -42,17 +42,17 @@ public class NTriplesFormat {
      */
     public NTriplesFormat(Model model) {
 
-        this(model, new NFormatConfig.Builder().build());
+        this(model, new FormatConfig.Builder().build());
     }
 
     /**
      * Constructs a new {@code NTriplesFormat} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link NFormatConfig} to use for serialization. Must not be null.
+     * @param config the {@link FormatConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NTriplesFormat(Model model, NFormatConfig config) {
+    public NTriplesFormat(Model model, FormatConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
     }
@@ -68,8 +68,9 @@ public class NTriplesFormat {
         try {
             for (Statement stmt : model) {
                 writeStatement(writer, stmt);
-                writer.write("\n");
+
             }
+            writer.flush();
         } catch (IOException e) {
             logger.error("An I/O error occurred during N-Triples serialization: {}", e.getMessage(), e);
             throw new SerializationException("Failed to write", "NTriples", e);
@@ -82,7 +83,7 @@ public class NTriplesFormat {
     /**
      * Writes a single {@link Statement} to the writer in N-Triples format.
      * The statement is written as "$subject $predicate $object ."
-     * If the statement has a context, it is written as "$subject $predicate $object $context ."
+     * N-Triples does not support contexts (named graphs). If a context is present, it's ignored and a warning is logged.
      *
      * @param writer the {@link Writer} to which the statement will be written.
      * @param stmt   the {@link Statement} to write.
@@ -97,8 +98,7 @@ public class NTriplesFormat {
 
         Resource context = stmt.getContext();
         if (context != null) {
-            writer.write(SPACE);
-            writeValue(writer, context);
+            logger.warn("N-Triples format does not support named graphs. Context '{}' will be ignored for statement: {}", context.stringValue(), stmt);
         }
 
         writer.write(SPACE_POINT);
@@ -106,12 +106,12 @@ public class NTriplesFormat {
 
     /**
      * Writes a single {@link Value} to the writer.
-     * Handles literals, resources (blank nodes and IRIs), and other value types by calling their {@code stringValue()} method.
+     * Handles literals, blank nodes, and IRIs.
      *
      * @param writer the {@link Writer} to which the value will be written.
      * @param value  the {@link Value} to write.
      * @throws IOException              if an I/O error occurs.
-     * @throws IllegalArgumentException if the provided value is null.
+     * @throws IllegalArgumentException if the provided value is null or an unsupported type.
      */
     private void writeValue(Writer writer, Value value) throws IOException {
         if (value == null) {
@@ -122,37 +122,43 @@ public class NTriplesFormat {
         if (value.isLiteral()) {
             writer.write(value.stringValue());
         } else if (value.isResource()) {
-            writeResource(writer, (Resource) value);
+            if (value.isIRI()) {
+                writeIRI(writer, (IRI) value);
+            } else if (value.isBNode()) {
+                writeBlankNode(writer, (Resource) value);
+            } else {
+                throw new IllegalArgumentException("Unsupported resource type for N-Triples serialization: " + value.getClass().getName());
+            }
         } else {
-            writer.write(value.stringValue());
-        }
-    }
 
-    /**
-     * Writes a {@link Resource} (either a blank node or an IRI) to the writer.
-     * Blank nodes are prefixed with "_:", and IRIs are written directly.
-     *
-     * @param writer   the {@link Writer} to which the resource will be written.
-     * @param resource the {@link Resource} to write.
-     * @throws IOException if an I/O error occurs.
-     */
-    private void writeResource(Writer writer, Resource resource) throws IOException {
-        if (resource.isResource()) {
-            writer.write(config.getBlankNodePrefix());
-        } else {
-            writeIRI(writer, (IRI) resource);
+            throw new IllegalArgumentException("Unsupported value type for N-Triples serialization: " + value.getClass().getName());
         }
     }
 
     /**
      * Writes an {@link IRI} to the writer.
-     * The IRI's string representation (including angle brackets if necessary) is written directly.
+     * The IRI's string representation must be enclosed in angle brackets for N-Triples.
      *
      * @param writer the {@link Writer} to which the IRI will be written.
      * @param iri    the {@link IRI} to write.
      * @throws IOException if an I/O error occurs.
      */
     private void writeIRI(Writer writer, IRI iri) throws IOException {
+        writer.write("<");
         writer.write(iri.stringValue());
+        writer.write(">");
+    }
+
+    /**
+     * Writes a blank node to the writer.
+     * Blank nodes are prefixed with "_:", and the identifier is appended.
+     *
+     * @param writer   the {@link Writer} to which the blank node will be written.
+     * @param blankNode the {@link Resource} representing the blank node.
+     * @throws IOException if an I/O error occurs.
+     */
+    private void writeBlankNode(Writer writer, Resource blankNode) throws IOException {
+        writer.write(config.getBlankNodePrefix());
+        writer.write(blankNode.stringValue());
     }
 }

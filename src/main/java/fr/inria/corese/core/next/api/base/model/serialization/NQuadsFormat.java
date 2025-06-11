@@ -2,19 +2,17 @@ package fr.inria.corese.core.next.api.base.model.serialization;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.exception.SerializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Serializes a Corese {@link Model} into N-Quads format.
- * This class provides a method to write the quads of a model to a given {@link Writer}
- * according to the N-Quads specification. It reuses the underlying serialization
- * logic for N-Triples but explicitly includes named graph information when present.
- * It can be configured using {@link NFormatConfig}.
+ * This class provides a method to write the statements (quads) of a model to a given {@link Writer}
+ * according to the N-Quads specification, including support for named graphs (contexts).
  */
 public class NQuadsFormat {
 
@@ -27,13 +25,14 @@ public class NQuadsFormat {
      * A constant string representing a single space character, used for separating elements in N-Quads output.
      */
     private static final String SPACE = " ";
+
     /**
-     * A constant string representing the prefix for blank nodes in N-Triples format.
+     * A constant string representing the end of a statement in N-Quads format (space, dot, newline).
      */
-    private static final String SPACE_POINT = " .";
+    private static final String SPACE_POINT = " .\n";
 
     private final Model model;
-    private final NFormatConfig config;
+    private final FormatConfig config;
 
     /**
      * Constructs a new {@code NQuadsFormat} instance with the specified model and default configuration.
@@ -42,25 +41,24 @@ public class NQuadsFormat {
      * @throws NullPointerException if the provided model is null.
      */
     public NQuadsFormat(Model model) {
-        this(model, new NFormatConfig.Builder().build());
+        this(model, new FormatConfig.Builder().build());
     }
 
     /**
      * Constructs a new {@code NQuadsFormat} instance with the specified model and custom configuration.
      *
      * @param model the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link NFormatConfig} to use for serialization. Must not be null.
+     * @param config the {@link FormatConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NQuadsFormat(Model model, NFormatConfig config) {
+    public NQuadsFormat(Model model, FormatConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
     }
 
     /**
      * Writes the model to the given writer in N-Quads format.
-     * Each quad in the model is written on a new line, terminated by a dot and a newline character.
-     * If a statement has no context, it is treated as belonging to the default graph.
+     * Each statement (quad) in the model is written on a new line, terminated by a dot and a newline character.
      *
      * @param writer the {@link Writer} to which the N-Quads output will be written.
      * @throws SerializationException if an I/O error occurs during writing or if invalid data is encountered.
@@ -68,9 +66,9 @@ public class NQuadsFormat {
     public void write(Writer writer) throws SerializationException {
         try {
             for (Statement stmt : model) {
-                writeQuad(writer, stmt); // Renamed for clarity in NQuads context
-                writer.write("\n");
+                writeStatement(writer, stmt);
             }
+            writer.flush();
         } catch (IOException e) {
             logger.error("An I/O error occurred during N-Quads serialization: {}", e.getMessage(), e);
             throw new SerializationException("Failed to write", "NQuads", e);
@@ -81,15 +79,15 @@ public class NQuadsFormat {
     }
 
     /**
-     * Writes a single {@link Statement} (treated as a quad) to the writer in N-Quads format.
-     * The quad is written as "$subject $predicate $object $context ."
-     * If the statement has no context, it is written as "$subject $predicate $object ."
+     * Writes a single {@link Statement} (quad) to the writer in N-Quads format.
+     * The statement is written as "$subject $predicate $object $context ." if a context is present,
+     * or "$subject $predicate $object ." if no context is present (default graph).
      *
-     * @param writer the {@link Writer} to which the quad will be written.
+     * @param writer the {@link Writer} to which the statement will be written.
      * @param stmt the {@link Statement} to write.
      * @throws IOException if an I/O error occurs.
      */
-    private void writeQuad(Writer writer, Statement stmt) throws IOException {
+    private void writeStatement(Writer writer, Statement stmt) throws IOException {
         writeValue(writer, stmt.getSubject());
         writer.write(SPACE);
         writeValue(writer, stmt.getPredicate());
@@ -107,12 +105,12 @@ public class NQuadsFormat {
 
     /**
      * Writes a single {@link Value} to the writer.
-     * Handles literals, resources (blank nodes and IRIs), and other value types by calling their {@code stringValue()} method.
+     * Handles literals, blank nodes, and IRIs.
      *
      * @param writer the {@link Writer} to which the value will be written.
      * @param value the {@link Value} to write.
-     * @throws IOException if an I/O error occurs.
-     * @throws IllegalArgumentException if the provided value is null.
+     * @throws IOException              if an I/O error occurs.
+     * @throws IllegalArgumentException if the provided value is null or an unsupported type.
      */
     private void writeValue(Writer writer, Value value) throws IOException {
         if (value == null) {
@@ -123,37 +121,42 @@ public class NQuadsFormat {
         if (value.isLiteral()) {
             writer.write(value.stringValue());
         } else if (value.isResource()) {
-            writeResource(writer, (Resource) value);
+            if (value.isIRI()) {
+                writeIRI(writer, (IRI) value);
+            } else if (value.isBNode()) {
+                writeBlankNode(writer, (Resource) value);
+            } else {
+                throw new IllegalArgumentException("Unsupported resource type for N-Quads serialization: " + value.getClass().getName());
+            }
         } else {
-            writer.write(value.stringValue());
-        }
-    }
-
-    /**
-     * Writes a {@link Resource} (either a blank node or an IRI) to the writer.
-     * Blank nodes are prefixed with the configured blank node prefix, and IRIs are written directly.
-     *
-     * @param writer the {@link Writer} to which the resource will be written.
-     * @param resource the {@link Resource} to write.
-     * @throws IOException if an I/O error occurs.
-     */
-    private void writeResource(Writer writer, Resource resource) throws IOException {
-        if (resource.isResource()) {
-            writer.write(config.getBlankNodePrefix());
-        } else {
-            writeIRI(writer, (IRI) resource);
+            throw new IllegalArgumentException("Unsupported value type for N-Quads serialization: " + value.getClass().getName());
         }
     }
 
     /**
      * Writes an {@link IRI} to the writer.
-     * The IRI's string representation (including angle brackets if necessary) is written directly.
+     * The IRI's string representation must be enclosed in angle brackets for N-Quads.
      *
      * @param writer the {@link Writer} to which the IRI will be written.
      * @param iri the {@link IRI} to write.
      * @throws IOException if an I/O error occurs.
      */
     private void writeIRI(Writer writer, IRI iri) throws IOException {
+        writer.write("<");
         writer.write(iri.stringValue());
+        writer.write(">");
+    }
+
+    /**
+     * Writes a blank node to the writer.
+     * Blank nodes are prefixed with "_:", and the identifier is appended.
+     *
+     * @param writer the {@link Writer} to which the blank node will be written.
+     * @param blankNode the {@link Resource} representing the blank node.
+     * @throws IOException if an I/O error occurs.
+     */
+    private void writeBlankNode(Writer writer, Resource blankNode) throws IOException {
+        writer.write(config.getBlankNodePrefix());
+        writer.write(blankNode.stringValue());
     }
 }

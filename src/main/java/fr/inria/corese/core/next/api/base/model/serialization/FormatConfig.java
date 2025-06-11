@@ -4,9 +4,9 @@ import java.util.Objects;
 
 /**
  * Configuration options for the {@link NTriplesFormat} serializer.
- * Use {@link NFormatConfig # Builder} to create instances.
+ * Use {@link FormatConfig # Builder} to create instances.
  */
-public class NFormatConfig {
+public class FormatConfig {
 
     private final String blankNodePrefix;
 
@@ -15,7 +15,7 @@ public class NFormatConfig {
      * Private constructor to enforce usage of the Builder.
      * @param builder The builder instance.
      */
-    private NFormatConfig(Builder builder) {
+    private FormatConfig(Builder builder) {
         this.blankNodePrefix = builder.blankNodePrefix;
 
     }
@@ -29,7 +29,7 @@ public class NFormatConfig {
     }
 
     /**
-     * Builder class for {@link NFormatConfig}.
+     * Builder class for {@link FormatConfig}.
      */
     public static class Builder {
 
@@ -52,11 +52,11 @@ public class NFormatConfig {
 
 
         /**
-         * Builds a new {@link NFormatConfig} instance.
+         * Builds a new {@link FormatConfig} instance.
          * @return A new NFormatConfig instance.
          */
-        public NFormatConfig build() {
-            return new NFormatConfig(this);
+        public FormatConfig build() {
+            return new FormatConfig(this);
         }
     }
 }
