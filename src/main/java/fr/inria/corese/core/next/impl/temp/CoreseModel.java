@@ -1,30 +1,16 @@
 package fr.inria.corese.core.next.impl.temp;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
 import fr.inria.corese.core.EdgeFactory;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Namespace;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.model.AbstractModel;
-import fr.inria.corese.core.next.api.base.model.serialization.Rdf4jSerializationUtil;
+import fr.inria.corese.core.next.api.base.model.serialization.RdfSerializationUtil;
 
-import org.eclipse.rdf4j.model.impl.TreeModel;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.*;
 
 
 /**
@@ -38,13 +24,19 @@ public class CoreseModel extends AbstractModel {
 
     // --- Fields ---
 
-    /** The underlying Corese graph. */
+    /**
+     * The underlying Corese graph.
+     */
     private final Graph coreseGraph;
 
-    /** Utility for converting RDF4J-like Values into Corese Nodes. */
+    /**
+     * Utility for converting RDF4J-like Values into Corese Nodes.
+     */
     private final CoreseValueConverter converter;
 
-    /** A set of RDF namespaces associated with this model. */
+    /**
+     * A set of RDF namespaces associated with this model.
+     */
     private final Set<Namespace> namespaces;
 
     // --- Constructors ---
@@ -275,7 +267,7 @@ public class CoreseModel extends AbstractModel {
     /**
      * Returns Corese edges matching the given subject, predicate, object, and
      * contexts.
-     *
+     * <p>
      * All parameters are Corese nodes (not RDF4J resources).
      * Null values are interpreted as wildcards.
      *
@@ -350,7 +342,7 @@ public class CoreseModel extends AbstractModel {
      *                  If one or more contexts are specified, statements with a
      *                  context matching one of these will match.
      * @return Corese model iterator on Statements that match the specified subject,
-     *         predicate, object and (optionally) context.
+     * predicate, object and (optionally) context.
      */
     private Iterator<Statement> getFilterIterator(Resource subject, IRI predicate, Value object, Resource... contexts) {
         this.coreseGraph.init();
@@ -406,49 +398,21 @@ public class CoreseModel extends AbstractModel {
     }
 
     /**
-     * Serializes this CoreseModel to the specified OutputStream in a given RDF4J format.
-     * This method first converts the CoreseModel's statements into an
-     * org.eclipse.rdf4j.model.Model, then uses Rdf4jSerializationUtil for serialization.
+     * Serializes this CoreseModel to the specified OutputStream in a given RDF format.
+     * This method directly uses the internal Corese Graph and the RdfSerializationUtil
+     * to perform the serialization, bypassing a conversion to an RDF4J model.
      *
      * @param outputStream The OutputStream to write the serialized data to. Must not be null.
-     * @param formatString The string identifier of the desired RDF format (e.g., "turtle", "jsonld", "rdfxml", "NTriples","NQuads"). Must not be null.
-     * @throws IOException              If an I/O error occurs during serialization or if an unsupported Corese value type is encountered.
-     * @throws IllegalArgumentException If the provided formatString is not recognized by Rdf4jSerializationUtil.
+     * @param formatString The string identifier of the desired RDF format (e.g., "turtle", "jsonld", "rdfxml", "ntriples", "nquads"). Must not be null.
+     * @throws IOException              If an I/O error occurs during serialization.
+     * @throws IllegalArgumentException If the provided formatString is not recognized by RdfSerializationUtil.
      * @throws NullPointerException     If outputStream or formatString is null.
      */
-    public void serializeToRdf4jFormat(OutputStream outputStream, String formatString) throws IOException {
+    public void serializeToRdfFormat(OutputStream outputStream, String formatString) throws IOException {
         Objects.requireNonNull(outputStream, "OutputStream cannot be null");
         Objects.requireNonNull(formatString, "Format string cannot be null");
 
-
-        org.eclipse.rdf4j.model.Model rdf4jModel = new TreeModel();
-
-        for (fr.inria.corese.core.next.api.Namespace ns : this.getNamespaces()) {
-            rdf4jModel.setNamespace(ns.getPrefix(), ns.getName());
-        }
-
-
-        for (Statement coreseStatement : this) {
-
-
-            org.eclipse.rdf4j.model.Resource rdf4jSubject = (org.eclipse.rdf4j.model.Resource) converter.valuetoRdf4jValue(converter.toCoreseNode(coreseStatement.getSubject()).getDatatypeValue());
-            org.eclipse.rdf4j.model.IRI rdf4jPredicate = (org.eclipse.rdf4j.model.IRI) converter.valuetoRdf4jValue(converter.toCoreseNode(coreseStatement.getPredicate()).getDatatypeValue());
-            org.eclipse.rdf4j.model.Value rdf4jObject = converter.valuetoRdf4jValue(converter.toCoreseNode(coreseStatement.getObject()).getDatatypeValue());
-
-            org.eclipse.rdf4j.model.Resource rdf4jContext = null;
-            if (coreseStatement.getContext() != null) {
-                rdf4jContext = converter.resourcetoRdf4jValueContext(converter.toCoreseNode(coreseStatement.getContext()).getDatatypeValue());
-            }
-
-
-            if (rdf4jContext != null) {
-                rdf4jModel.add(rdf4jSubject, rdf4jPredicate, rdf4jObject, rdf4jContext);
-            } else {
-                rdf4jModel.add(rdf4jSubject, rdf4jPredicate, rdf4jObject);
-            }
-        }
-
-
-        Rdf4jSerializationUtil.serialize(rdf4jModel, outputStream, formatString);
+        // Directly use RdfSerializationUtil with the Corese Graph
+        RdfSerializationUtil.serialize(this.coreseGraph, outputStream, formatString);
     }
 }

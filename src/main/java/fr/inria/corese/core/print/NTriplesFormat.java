@@ -1,8 +1,5 @@
 package fr.inria.corese.core.print;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
@@ -10,11 +7,20 @@ import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+
 /**
  * This class provides functionality to convert a Graph object to a string
  * in N-Triples format.
  */
 public class NTriplesFormat extends RDFFormat {
+    private static final String SPACE = " ";
+    private static final String OPEN_ANGLE = "<";
+    private static final String CLOSE_ANGLE = ">";
+    private static final String QUOTE = "\"";
+    private static final String BLANK_NODE_PREFIX = "_:";
 
     /**
      * The graph to be formatted.
@@ -43,7 +49,7 @@ public class NTriplesFormat extends RDFFormat {
 
     /**
      * Factory method to create a new NTriplesFormat instance.
-     * 
+     *
      * @param map the mappings to be formatted
      * @return a new NTriplesFormat instance
      */
@@ -61,15 +67,12 @@ public class NTriplesFormat extends RDFFormat {
         StringBuilder sb = new StringBuilder();
 
         for (Edge e : graph.getEdges()) {
-
-            // Create a new clean iterable (because corse iterable does not have a perfectly
-            // defined behavior for optimization reasons)
             Edge edge = this.graph.getEdgeFactory().copy(e);
 
             sb.append(printNode(edge.getNode(0)))
-                    .append(" ")
+                    .append(SPACE)
                     .append(printNode(edge.getEdgeNode()))
-                    .append(" ")
+                    .append(SPACE)
                     .append(printNode(edge.getNode(1)))
                     .append(" .\n");
         }
@@ -79,13 +82,13 @@ public class NTriplesFormat extends RDFFormat {
 
     /**
      * Writes the graph to an output stream in N-Triples format.
-     * 
+     *
      * @param out the output stream to write to
      * @throws IOException if an I/O error occurs
      */
     @Override
     public void write(OutputStream out) throws IOException {
-        out.write(this.toString().getBytes());
+        out.write(this.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -113,7 +116,7 @@ public class NTriplesFormat extends RDFFormat {
      * @return a string representation of the URI node
      */
     private String printURI(Node node) {
-        return "<" + node.getLabel() + ">";
+        return OPEN_ANGLE + node.getLabel() + CLOSE_ANGLE;
     }
 
     /**
@@ -128,11 +131,11 @@ public class NTriplesFormat extends RDFFormat {
         String datatype = node.getDatatypeValue().getDatatypeURI();
 
         if (language != null && !language.isEmpty()) {
-            return "\"" + label + "\"@" + language;
+            return QUOTE + label + "\"@" + language;
         } else if (datatype != null && !datatype.isEmpty() && !datatype.equals(RDF.xsdstring)) {
-            return "\"" + label + "\"^^<" + datatype + ">";
+            return QUOTE + label + "\"^^<" + datatype + CLOSE_ANGLE;
         } else {
-            return "\"" + label + "\"";
+            return QUOTE + label + QUOTE;
         }
     }
 
@@ -143,7 +146,8 @@ public class NTriplesFormat extends RDFFormat {
      * @return a string representation of the blank node
      */
     protected String printBlank(Node node) {
-        return node.getLabel();
+        // Les nœuds vides en N-Triples doivent commencer par "_:"
+        return BLANK_NODE_PREFIX + node.getLabel();
     }
 
     /**
@@ -156,7 +160,8 @@ public class NTriplesFormat extends RDFFormat {
         StringBuilder escaped = new StringBuilder();
         for (char ch : str.toCharArray()) {
             switch (ch) {
-                case '\\': // Backslash
+                // Backslash
+                case '\\':
                     escaped.append("\\\\");
                     break;
                 case '\"': // Double quote
@@ -191,5 +196,4 @@ public class NTriplesFormat extends RDFFormat {
         }
         return escaped.toString();
     }
-
 }
