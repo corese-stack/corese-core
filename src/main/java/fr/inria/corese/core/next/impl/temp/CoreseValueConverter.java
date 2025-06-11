@@ -10,8 +10,6 @@ import fr.inria.corese.core.next.api.Value;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
-import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 /**
  * Utility class for converting between Corese-compatible Node objects
@@ -22,13 +20,8 @@ public class CoreseValueConverter {
     // Factory for creating Corese-compatible Value instances
     private final ValueFactory factory = new CoreseAdaptedValueFactory();
 
-    private final org.eclipse.rdf4j.model.ValueFactory rdf4jFactory = SimpleValueFactory.getInstance();
-
     // Constant representing the default Corese graph context
     private static final Node DEFAULT_CORESE_CONTEXT = DatatypeMap.createResource(ExpType.DEFAULT_GRAPH);
-
-    private static final String HTTP_SCHEME_PREFIX = "http://";
-    private static final String COLON = ":";
 
     // --- Rdf4j to Corese conversion methods ---
 
@@ -88,7 +81,7 @@ public class CoreseValueConverter {
      */
     public Node[] toCoreseContextArray(Resource[] contexts) {
         if (contexts == null || (contexts.length == 1 && contexts[0] == null)) {
-            return new Node[]{DEFAULT_CORESE_CONTEXT};
+            return new Node[] { DEFAULT_CORESE_CONTEXT };
         }
         if (contexts.length == 0) {
             return new Node[0];
@@ -145,70 +138,4 @@ public class CoreseValueConverter {
         return DEFAULT_CORESE_CONTEXT.equals(node) ? null : (Resource) toRdf4jValue(node);
     }
 
-    /**
-     * Converts a Corese context node (which is an IDatatype) back to an RDF4J Resource.
-     *
-     * @param node Corese context node
-     * @return RDF4J Resource or null if it's the default context
-     */
-    public org.eclipse.rdf4j.model.Resource resourcetoRdf4jValueContext(Node node) {
-        if (node == null) {
-            return null;
-        }
-        if (DEFAULT_CORESE_CONTEXT.equals(node)) {
-            return null;
-        }
-
-        return (org.eclipse.rdf4j.model.Resource) valuetoRdf4jValue(node.getDatatypeValue());
-    }
-
-    /**
-     * Converts a Corese IDatatype to an RDF4J Value.
-     * This is the primary conversion logic from Corese internal value representation to RDF4J.
-     *
-     * @param dt Corese IDatatype to convert
-     * @return RDF4J Value equivalent
-     */
-    public org.eclipse.rdf4j.model.Value valuetoRdf4jValue(IDatatype dt) {
-        if (dt == null) {
-            return null;
-        }
-        if (dt.isURI()) {
-            return rdf4jFactory.createIRI(dt.getLabel());
-        }
-        if (dt.isBlank()) {
-            return rdf4jFactory.createBNode(dt.getLabel());
-        }
-        if (dt.isLiteral()) {
-            return convertLiteralToRdf4jValue(dt);
-        }
-
-        throw new IllegalArgumentException("Unsupported Corese IDatatype type for conversion to RDF4J Value: " + dt.getClass());
-    }
-
-    /**
-     * Helper method to convert a Corese IDatatype representing a literal
-     * into an RDF4J Literal, handling various cases including problematic ones.
-     *
-     * @param dt The Corese IDatatype (must be a literal)
-     * @return The corresponding RDF4J Literal
-     */
-    private org.eclipse.rdf4j.model.Literal convertLiteralToRdf4jValue(IDatatype dt) {
-
-        boolean hasLang = dt.getLang() != null && !dt.getLang().isEmpty();
-        boolean langContainsColon = hasLang && dt.getLang().contains(COLON);
-        boolean langContainsHttpPrefix = hasLang && dt.getLang().contains(HTTP_SCHEME_PREFIX);
-        boolean isRdfLangString = dt.getDatatypeURI() != null && dt.getDatatypeURI().equals(RDF.LANGSTRING.stringValue());
-
-
-        if (isRdfLangString && hasLang && !langContainsColon && !langContainsHttpPrefix) {
-            return rdf4jFactory.createLiteral(dt.getLabel(), dt.getLang());
-        }
-
-        if (dt.getDatatypeURI() != null && !isRdfLangString) {
-            return rdf4jFactory.createLiteral(dt.getLabel(), rdf4jFactory.createIRI(dt.getDatatypeURI()));
-        }
-
-        return rdf4jFactory.createLiteral(dt.getLabel());
-    }
 }
