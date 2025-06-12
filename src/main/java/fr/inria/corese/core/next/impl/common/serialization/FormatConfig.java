@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.base.model.serialization;
+package fr.inria.corese.core.next.impl.common.serialization;
 
 import java.util.Objects;
 

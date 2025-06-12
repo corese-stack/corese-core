@@ -1,6 +1,5 @@
-package fr.inria.corese.core.next.api.model.serialization;
+package fr.inria.corese.core.next.impl.common.serialization;
 
-import fr.inria.corese.core.next.api.base.model.serialization.FormatConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

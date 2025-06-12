@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.base.exception;
+package fr.inria.corese.core.next.impl.exception;
 
 /**
  * Exception levée lors d'échecs de sérialisation/désérialisation RDF.

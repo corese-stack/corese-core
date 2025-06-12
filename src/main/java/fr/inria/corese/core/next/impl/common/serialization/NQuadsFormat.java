@@ -1,7 +1,7 @@
-package fr.inria.corese.core.next.api.base.model.serialization;
+package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.exception.SerializationException;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
