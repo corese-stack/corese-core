@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.Objects;
 
@@ -61,10 +62,8 @@ public class NQuadsFormat {
             }
             writer.flush();
         } catch (IOException e) {
-            logger.error("An I/O error occurred during N-Quads serialization: {}", e.getMessage(), e);
             throw new SerializationException("Failed to write", "NQuads", e);
         } catch (IllegalArgumentException e) {
-            logger.error("Invalid data encountered during N-Quads serialization: {}", e.getMessage(), e);
             throw new SerializationException("Invalid data: " + e.getMessage(), "NQuads", e);
         }
     }
@@ -134,10 +133,16 @@ public class NQuadsFormat {
         writer.write(escapeLiteral(literal.stringValue()));
         writer.write(SerializationConstants.QUOTE);
 
+        // Gestion du langage
+        literal.getLanguage().ifPresent(lang -> {
+            try {
+                writer.write(SerializationConstants.AT_SIGN + lang);
+            } catch (IOException e) {
+                throw new UncheckedIOException("Error writing language tag", e);
+            }
+        });
 
-        if (literal.getLanguage().isPresent()) {
-            writer.write(SerializationConstants.AT_SIGN + literal.getLanguage().get());
-        } else {
+        if (!literal.getLanguage().isPresent()) {
             IRI datatype = literal.getDatatype();
             if (datatype != null && !datatype.stringValue().equals(SerializationConstants.XSD_STRING)) {
                 writer.write(SerializationConstants.DATATYPE_SEPARATOR);
