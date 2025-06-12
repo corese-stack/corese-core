@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.common.util;
 
 /**
  * Provides a collection of constant strings used during the serialization process
- * for various RDF formats like N-Triples and N-Quads. These constants aim to
+ * for various RDF formats. These constants aim to
  * centralize common literal values to ensure consistency and maintainability
  * across different serialization utilities.
  */
@@ -15,7 +15,7 @@ public class SerializationConstants {
     public static final String SPACE = " ";
 
     /**
-     * Represents the termination sequence for an RDF statement in N-Triples or N-Quads format:
+     * Represents the termination sequence for an RDF statement format:
      * a space, a dot, and a newline character (" .\n").
      */
     public static final String SPACE_POINT = " .\n";
@@ -27,26 +27,26 @@ public class SerializationConstants {
     public static final String POINT = ".";
 
     /**
-     * Represents the less-than sign ("<").
+     * Represents the less-than sign ("&lt;").
      * Used to enclose URIs in N-Triples and N-Quads.
      */
     public static final String LT = "<";
 
     /**
-     * Represents the greater-than sign (">").
-     * Used to enclose URIs in N-Triples and N-Quads.
+     * Represents the greater-than sign ("&gt;").
+     * Used to enclose URIs.
      */
     public static final String GT = ">";
 
     /**
      * Represents the standard prefix for blank nodes ("_:").
-     * Used to identify blank nodes in N-Triples and N-Quads.
+     * Used to identify blank nodes.
      */
     public static final String BNODE_PREFIX = "_:";
 
     /**
      * Represents a double-quote character ("\"").
-     * Used to enclose literal values in N-Triples and N-Quads.
+     * Used to enclose literal values.
      */
     public static final String QUOTE = "\"";
 
