@@ -37,8 +37,11 @@ public class FormatConfig {
 
         private String blankNodePrefix = "_:";
 
-
-        public Builder() {
+        /**
+         * Default constructor for the Builder.
+         * Initializes fields with default values.
+         */
+        Builder() {
 
         }
 
