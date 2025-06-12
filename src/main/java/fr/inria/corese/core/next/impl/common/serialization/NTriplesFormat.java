@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
@@ -21,15 +21,6 @@ public class NTriplesFormat {
      */
     private static final Logger logger = LoggerFactory.getLogger(NTriplesFormat.class);
 
-    /**
-     * A constant string representing a single space character, used for separating elements in N-Triples output.
-     */
-    private static final String SPACE = " ";
-
-    /**
-     * A constant string representing the end of a statement in N-Triples format (space, dot, newline).
-     */
-    private static final String SPACE_POINT = " .\n";
 
     private final Model model;
     private final FormatConfig config;
@@ -91,9 +82,9 @@ public class NTriplesFormat {
      */
     private void writeStatement(Writer writer, Statement stmt) throws IOException {
         writeValue(writer, stmt.getSubject());
-        writer.write(SPACE);
+        writer.write(SerializationConstants.SPACE);
         writeValue(writer, stmt.getPredicate());
-        writer.write(SPACE);
+        writer.write(SerializationConstants.SPACE);
         writeValue(writer, stmt.getObject());
 
         Resource context = stmt.getContext();
@@ -101,7 +92,7 @@ public class NTriplesFormat {
             logger.warn("N-Triples format does not support named graphs. Context '{}' will be ignored for statement: {}", context.stringValue(), stmt);
         }
 
-        writer.write(SPACE_POINT);
+        writer.write(SerializationConstants.SPACE_POINT);
     }
 
     /**
@@ -144,9 +135,9 @@ public class NTriplesFormat {
      * @throws IOException if an I/O error occurs.
      */
     private void writeIRI(Writer writer, IRI iri) throws IOException {
-        writer.write("<");
+        writer.write(SerializationConstants.LT);
         writer.write(iri.stringValue());
-        writer.write(">");
+        writer.write(SerializationConstants.GT);
     }
 
     /**

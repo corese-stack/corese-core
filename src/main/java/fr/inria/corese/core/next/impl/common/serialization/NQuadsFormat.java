@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +22,6 @@ public class NQuadsFormat {
      */
     private static final Logger logger = LoggerFactory.getLogger(NQuadsFormat.class);
 
-    /**
-     * A constant string representing a single space character, used for separating elements in N-Quads output.
-     */
-    private static final String SPACE = " ";
-
-    /**
-     * A constant string representing the end of a statement in N-Quads format (space, dot, newline).
-     */
-    private static final String SPACE_POINT = " .\n";
 
     private final Model model;
     private final FormatConfig config;
@@ -89,18 +81,18 @@ public class NQuadsFormat {
      */
     private void writeStatement(Writer writer, Statement stmt) throws IOException {
         writeValue(writer, stmt.getSubject());
-        writer.write(SPACE);
+        writer.write(SerializationConstants.SPACE);
         writeValue(writer, stmt.getPredicate());
-        writer.write(SPACE);
+        writer.write(SerializationConstants.SPACE);
         writeValue(writer, stmt.getObject());
 
         Resource context = stmt.getContext();
         if (context != null) {
-            writer.write(SPACE);
+            writer.write(SerializationConstants.SPACE);
             writeValue(writer, context);
         }
 
-        writer.write(SPACE_POINT);
+        writer.write(SerializationConstants.SPACE_POINT);
     }
 
     /**
@@ -142,9 +134,9 @@ public class NQuadsFormat {
      * @throws IOException if an I/O error occurs.
      */
     private void writeIRI(Writer writer, IRI iri) throws IOException {
-        writer.write("<");
+        writer.write(SerializationConstants.LT);
         writer.write(iri.stringValue());
-        writer.write(">");
+        writer.write(SerializationConstants.GT);
     }
 
     /**
