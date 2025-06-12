@@ -55,7 +55,7 @@ import static fr.inria.corese.core.rule.RuleEngine.Profile.*;
  * Focus on new triples using specific Graph Index sorted by timestamp
  * Eval transitive rule at saturation using specific Java code
  * Eval pseudo transitive rule just after it's transitive rule
- * (cf rdf:type & rdfs:subClassOf)
+ * (cf rdf:type &amp; rdfs:subClassOf)
  * <p>
  * OWL_RL profile load specific rule base
  *
@@ -520,7 +520,7 @@ public class RuleEngine implements Engine, Graphable {
         try {
             defRule(rule);
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         }
     }
 

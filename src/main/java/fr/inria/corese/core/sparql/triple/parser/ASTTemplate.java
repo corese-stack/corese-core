@@ -120,8 +120,8 @@ public class ASTTemplate {
     }
 
     /**
-     * vbox() if (type.equals(VBOX) && el.size() > 1){ // add NL between
-     * elements Term t = createFunction(nl); for (int i=1; i<el.size(); ){
+     * vbox() if (type.equals(VBOX) &amp;&amp; el.size() > 1){ // add NL between
+     * elements Term t = createFunction(nl); for (int i=1; i&lt;el.size(); ){
      * el.add(i, t); i += 2; } } @param s
      */
     public void setGroupSeparator(String s) {

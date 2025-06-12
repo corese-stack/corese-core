@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Evaluator of SPARQL query by KGRAM Ready to use Package with KGRAM and SPARQL
- * Parser & Transformer
+ * Parser &amp; Transformer
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */

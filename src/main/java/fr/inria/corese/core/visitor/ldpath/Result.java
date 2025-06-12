@@ -17,8 +17,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;;
 
 /**
  * Results managed in a table ASTQuery -> Mappings
@@ -27,6 +28,8 @@ import java.util.logging.Logger;
  *
  */
 public class Result {
+
+    private static final Logger logger = LoggerFactory.getLogger(Result.class);
     static final String NL = "\n";
     static final String LDP = "http://ns.inria.fr/ldpath/" ;
     static final String TTL = ".ttl";
@@ -95,8 +98,7 @@ public class Result {
                 try {
                     process(map.getAST(), map, alist.size());
                 } catch (IOException ex) {
-                    Logger.getLogger(Result.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                    logger.error("An unexpected error has occurred", ex);                }
             }
         }
     }

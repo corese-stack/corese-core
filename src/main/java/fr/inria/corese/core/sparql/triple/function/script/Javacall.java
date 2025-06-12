@@ -15,8 +15,9 @@ import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;;
 
 /**
  * Call Corese Java function with parameters as getObject() or
@@ -66,7 +67,7 @@ public class Javacall extends JavaFunction {
             IDatatype res = DatatypeMap.getValue(obj);
             return res;
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(Javacall.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return null;
 

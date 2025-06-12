@@ -11,8 +11,8 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Given a graph with a class hierarchy, emulate method inheritance
@@ -21,6 +21,8 @@ import java.util.logging.Logger;
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */
 public class ClassHierarchy extends DatatypeHierarchy {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClassHierarchy.class);
 
     private static final String queryObject =
             "select (aggregate(?c) as ?list) where { "
@@ -91,7 +93,8 @@ public class ClassHierarchy extends DatatypeHierarchy {
             IDatatype dt = map.getValue(LIST);
             return getList(dt);
         } catch (EngineException ex) {
-            Logger.getLogger(ClassHierarchy.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Failed to get super types for value: [REDACTED] with query: {}",
+                    "***", query, ex);
         }
         return new ArrayList<>(0);
     }

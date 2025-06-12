@@ -16,13 +16,16 @@ import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */
 public class Data {
+
+    private static final Logger logger = LoggerFactory.getLogger(Data.class);
 
     private Dataset dataset;
     private WorkflowProcess process;
@@ -97,7 +100,7 @@ public class Data {
             return QuerySolverVisitorTransformer
                     .create(QueryProcess.create(getGraph(), getDataManager()).getCreateEval());
         } catch (EngineException ex) {
-            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
             return null;
         }
     }

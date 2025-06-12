@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
+
 
 /**
  * SPARQL XML Results Format Parser into Mappings
@@ -133,7 +133,7 @@ public class XMLResult {
             map.setQuery(q);
             map.init(q);
         } catch (EngineException ex) {
-            java.util.logging.Logger.getLogger(XMLResult.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
     }
 

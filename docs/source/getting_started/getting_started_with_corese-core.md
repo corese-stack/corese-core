@@ -173,8 +173,14 @@ import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.print.ResultFormat;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Example {
+
+    private static final Logger logger = LoggerFactory.getLogger(Example.class);
+
     public static void main(String[] args) throws EngineException {
 
         // Create a new empty Graph
@@ -192,7 +198,7 @@ public class Example {
         Mappings map = exec.query("select * where { ?s ?p ?o }");
 
         // Print results in Markdown format
-        System.out.println(ResultFormat.create(map, ResultFormat.format.CSV_FORMAT).toString());
+        logger.info("Result : {}", ResultFormat.create(map, ResultFormat.format.CSV_FORMAT).toString());
     }
 }
 ```
@@ -216,8 +222,13 @@ import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Example {
+    private static final Logger logger = LoggerFactory.getLogger(Example.class);
+
     public static void main(String[] args) throws EngineException {
 
         // Create a new empty Graph
@@ -236,7 +247,7 @@ public class Example {
 
         // Print boolean result
         // If the mapping is empty, the result is false; otherwise, it is true.
-        System.out.println(!map.isEmpty());
+        logger.info("Result : {}", !map.isEmpty());
     }
 }
 ```
@@ -252,8 +263,14 @@ import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.print.ResultFormat;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Example {
+
+    private static final Logger logger = LoggerFactory.getLogger(Example.class);
+
     public static void main(String[] args) throws EngineException {
 
         // Create a new empty Graph
@@ -281,7 +298,7 @@ public class Example {
         Graph resultGraph = (Graph) map.getGraph();
 
         // Print results in TriG format
-        System.out.println(ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString());
+        logger.info("Result : {}", ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString());
     }
 }
 ```
@@ -310,8 +327,14 @@ import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.print.ResultFormat;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Example {
+
+    private static final Logger logger = LoggerFactory.getLogger(Example.class);
+
     public static void main(String[] args) throws EngineException {
 
         // Create a new empty Graph
@@ -336,7 +359,7 @@ public class Example {
                 """);
 
         // Print updated graph in Turtle format
-        System.out.println(ResultFormat.create(graph, ResultFormat.format.TURTLE_FORMAT).toString());
+        logger.info("Result : {}", ResultFormat.create(graph, ResultFormat.format.TURTLE_FORMAT).toString());
     }
 }
 ```
@@ -365,8 +388,14 @@ import fr.inria.corese.core.print.ResultFormat;
 import fr.inria.corese.core.shacl.Shacl;
 import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Example {
+
+    private static final Logger logger = LoggerFactory.getLogger(Example.class);
+
     public static void main(String[] args) throws LoadException, EngineException {
         // Load data graph
         Graph dataGraph = Graph.create();
@@ -384,7 +413,7 @@ public class Example {
 
         // Print results
         ResultFormat exporter = ResultFormat.create(result, ResultFormatDef.format.TURTLE_FORMAT);
-        System.out.println(exporter.toString());
+        logger.info("Result : {}", exporter.toString());
     }
 }
 ```
@@ -708,8 +737,14 @@ import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Example {
+
+    private static final Logger logger = LoggerFactory.getLogger(Example.class);
+
     public static void main(String[] args) throws EngineException, IOException {
         // Open LDScript file
         Path path = Path.of("input LDScript file path.rq");
@@ -724,7 +759,7 @@ public class Example {
         IDatatype dt = exec.funcall(name, DatatypeMap.newInstance(12));
 
         // Print result
-        System.out.println(dt);
+        logger.info("Result : {}", dt);
     }
 }
 ```
@@ -808,8 +843,14 @@ import java.nio.file.Path;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class Example {
+
+    private static final Logger logger = LoggerFactory.getLogger(Example.class);
+
     public static void main(String[] args) throws EngineException, IOException {
         // Open LDScript file
         Path path = Path.of("input LDScript file path.rq");
@@ -824,7 +865,7 @@ public class Example {
         IDatatype dt = exec.funcall(name);
 
         // Print result
-        System.out.println(dt);
+        logger.info("Result : {}", dt);
     }
 }
 ```

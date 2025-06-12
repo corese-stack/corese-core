@@ -322,7 +322,7 @@ public interface IDatatype
      *
      * @param dt another datatype
      * @return 0 if they are equals, an int > 0 if the datatype is greater than
-     * dt2, an int < 0 if the datatype is lesser
+     * dt2, an int &lt; 0 if the datatype is lesser
      */
     int compareTo(IDatatype dt);
 
@@ -438,13 +438,13 @@ public interface IDatatype
 
     /**
      * @param iod
-     * @return iod.getValue() < this.getValue() @throws Core seDatatypeException
+     * @return iod.getValue() &lt; this.getValue() @throws Core seDatatypeException
      */
     boolean less(IDatatype iod) throws CoreseDatatypeException;
 
     /**
      * @param iod
-     * @return iod.getValue() <= to this.getValue() @throws CoreseDa
+     * @return iod.getValue() &lt;= to this.getValue() @throws CoreseDa
      * tatypeException
      */
     boolean lessOrEqual(IDatatype iod)

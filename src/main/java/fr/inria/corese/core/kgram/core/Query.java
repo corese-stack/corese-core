@@ -1079,7 +1079,7 @@ public class Query extends Exp implements Graphable {
 
     /**
      * Check that select variables and expressions are compatible with group by
-     * & aggregates use case:
+     * &amp; aggregates use case:
      *
      * SELECT ?P (COUNT(?O) AS ?C) WHERE { ?S ?P ?O }
      *
@@ -1319,7 +1319,7 @@ public class Query extends Exp implements Graphable {
      * get node with going in select sub query 
      * go into its own select because
      * order by may reuse a select variable use case: transformer find node for
-     * select & group by
+     * select &amp; group by
      */
     public Node getProperAndSubSelectNode(String name) {
         return getExtNode(name, true);

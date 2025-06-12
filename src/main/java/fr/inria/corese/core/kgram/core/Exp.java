@@ -1484,7 +1484,7 @@ public class Exp extends PointerObject
     }
 
     /**
-     * this is FILTER with TEST ?x < ?y
+     * this is FILTER with TEST ?x &lt; ?y
      */
     public int oper() {
         return getFilter().getExp().oper();
@@ -1526,7 +1526,7 @@ public class Exp extends PointerObject
     }
 
     /**
-     * index of node in FILTER ?x < ?y
+     * index of node in FILTER ?x &lt; ?y
      */
     public int indexVar(Node node) {
         Expr ee = getFilter().getExp();

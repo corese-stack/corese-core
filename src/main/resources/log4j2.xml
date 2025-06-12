@@ -1,21 +1,40 @@
-<Configuration>
+<Configuration status="WARN">
     <Properties>
-        <Property name="pattern">%d{yyyy-MM-dd HH:mm:ss} %-5p %C{2}.%M:%L %x - %m%n</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss} %-5p %C{2}.%M:%L %x - %m%n</Property>
+        <Property name="LOG_DIR">logs</Property>
+        <Property name="LOG_FILE_NAME">corese.log</Property>
     </Properties>
+
     <Appenders>
+        <!-- Console Appender -->
         <Console name="Console" target="SYSTEM_OUT">
-            <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="ACCEPT" />
-            <PatternLayout pattern="${pattern}" />
+            <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
-        <Console name="ErrorConsole" target="SYSTEM_ERR">
-            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
-            <PatternLayout pattern="${pattern}" />
-        </Console>
+
+        <!-- Rolling File Appender -->
+        <RollingFile name="FileAppender"
+                     fileName="${LOG_DIR}/${LOG_FILE_NAME}"
+                     filePattern="${LOG_DIR}/corese-%d{yyyy-MM-dd}-%i.log.gz"
+                     includeLocation="true"
+                     filePermissions="rw-r-----">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="7"/>
+        </RollingFile>
     </Appenders>
+
     <Loggers>
-        <Root level="debug">
-            <!-- <AppenderRef ref="Console" /> -->
-            <AppenderRef ref="ErrorConsole" />
+        <!-- Custom application logger -->
+        <Logger name="fr.inria.corese" level="debug" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
 </Configuration>

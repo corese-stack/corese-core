@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * SPARQL Java extension functions
  * cs:test()
- * prefix cs: <http://ns.inria.fr/sparql-custom/>
+ * prefix cs: &lt;http://ns.inria.fr/sparql-custom/>
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2015
  */

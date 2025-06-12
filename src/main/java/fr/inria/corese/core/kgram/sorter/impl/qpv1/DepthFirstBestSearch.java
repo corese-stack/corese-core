@@ -11,7 +11,7 @@ import java.util.Map;
 import static fr.inria.corese.core.kgram.api.core.ExpType.*;
 
 /**
- * An implementation for sorting the triple pattern depth-first & best greedy
+ * An implementation for sorting the triple pattern depth-first &amp; best greedy
  * algorithm
  *
  * 1 start with the one with least cost, if there are more than 2 with same cost
@@ -21,7 +21,7 @@ import static fr.inria.corese.core.kgram.api.core.ExpType.*;
  *
  * 3 recursively search until all nodes have been visited
  *
- * 4 every time one node is added to visited, check FILTER & VALUES
+ * 4 every time one node is added to visited, check FILTER &amp; VALUES
  * ++ 4.1 now also check BIND 20Jan2015
  *
  * @author Fuqi Song, Wimmics Inria I3S

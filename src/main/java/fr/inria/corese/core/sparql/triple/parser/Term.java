@@ -26,8 +26,8 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Title: Corese</p>
@@ -39,6 +39,8 @@ import java.util.logging.Logger;
  * @author Olivier Corby & Olivier Savoie
  */
 public class Term extends Expression {
+
+    private static final Logger logger = LoggerFactory.getLogger(Term.class);
 
     public static final String NL = "\n";
     static final String RE_CHECK = "check";
@@ -1152,7 +1154,7 @@ public class Term extends Expression {
             }
             return t;
         } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(Term.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return this;
     }
@@ -1181,7 +1183,7 @@ public class Term extends Expression {
             complete(t);          
             return t;
         } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(Term.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return this;
     }

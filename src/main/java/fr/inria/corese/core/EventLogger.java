@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.logging.Level;
+
 
 /**
  * @author Olivier Corby, Wimmics INRIA I3S, 2017
@@ -131,8 +131,7 @@ public class EventLogger {
         try {
             getQueryProcess().event(type, e, o);
         } catch (EngineException ex) {
-            java.util.logging.Logger.getLogger(EventLogger.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            logger.error("An unexpected error has occurred", ex);        }
     }
 
     /**
@@ -158,8 +157,7 @@ public class EventLogger {
                     }
             }
         } catch (EngineException ex) {
-            java.util.logging.Logger.getLogger(EventLogger.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            logger.error("An unexpected error has occurred", ex);        }
     }
 
     DatatypeValue insert(Edge edge) throws EngineException {
@@ -176,8 +174,7 @@ public class EventLogger {
             try {
                 exec.getCreateEval().setVisitor(new QuerySolverVisitor(exec.getCreateEval()));
             } catch (EngineException ex) {
-                java.util.logging.Logger.getLogger(EventLogger.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                logger.error("An unexpected error has occurred", ex);            }
         }
         return exec;
     }

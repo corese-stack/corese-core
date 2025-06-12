@@ -129,7 +129,8 @@ public class Graph extends GraphObject implements
     Hashtable<String, Node> blank;
     // Triple Reference Node
     Hashtable<String, Node> triple;
-    // named graph id nodes: key -> named graph id Node (possibly not subject/object Node)
+    // named graph id nodes: key -> named graph id Node (possibly not subject/object
+    // Node)
     Hashtable<String, Node> graph;
     // property nodes: label -> property Node (possibly not subject/object Node)
     Hashtable<String, Node> property;
@@ -158,12 +159,13 @@ public class Graph extends GraphObject implements
     DataStore dataStore;
     List<EdgeChangeListener> edgeChangeListeners = new ArrayList<>();
     // List of subject/object/graph Index
-    // Index is HashMap: PredicateNode -> List of Edge with PredicateNode as predicate
+    // Index is HashMap: PredicateNode -> List of Edge with PredicateNode as
+    // predicate
     // In the Index, edge does not contain the predicate Node to spare memory
     // List of edge is sorted by Node index, each Node is allocated an integer index
     // Index of subject: edge list sorted by subject/object/graph
-    // Index of object:  edge list sorted by object/subject/graph
-    // Index of graph:   edge list sorted by graph/subject/object
+    // Index of object: edge list sorted by object/subject/graph
+    // Index of graph: edge list sorted by graph/subject/object
     private ArrayList<EdgeManagerIndexer> tables;
     // Index of subject with index=0
     private EdgeManagerIndexer subjectIndex;
@@ -226,17 +228,21 @@ public class Graph extends GraphObject implements
         setSubjectIndex(getIndex(0));
 
         // Note:
-        // nodeManager  allocate different Node to 1, 01, 1.0
-        // indexManager allocate same Node index to 1, 01 (and also 1.0 as corese default mode)
+        // nodeManager allocate different Node to 1, 01, 1.0
+        // indexManager allocate same Node index to 1, 01 (and also 1.0 as corese
+        // default mode)
         // Literals (all of them) comparator = CompareNode and compareTo()
-        // different Node allocated when different value or different datatype or different label
+        // different Node allocated when different value or different datatype or
+        // different label
         setLiteralNodeManager(Collections.synchronizedSortedMap(new TreeNode()));
         // Literal numbers and booleans to manage Node index:
         // comparator = CompareIndex and compare()
         // 1, 01, 1.0 have same index, 1 double has different index
         // same index means that SPARQL perform a join on nodes with same index
-        // when DatatypeMap.SPARQLCompliant = false (true), 1 and 1.0 have same (different) index
-        // corese default is false, which means that corese.core.sparql perform a join on 1 and 1.0 (which is not standard)
+        // when DatatypeMap.SPARQLCompliant = false (true), 1 and 1.0 have same
+        // (different) index
+        // corese default is false, which means that corese.core.sparql perform a join
+        // on 1 and 1.0 (which is not standard)
         setLiteralIndexManager(Collections.synchronizedSortedMap(new TreeNode(DatatypeMap.DATATYPE_ENTAILMENT)));
         // deprecated:
         vliteral = Collections.synchronizedMap(new HashMap<>());
@@ -934,9 +940,10 @@ public class Graph extends GraphObject implements
 
     /**
      * EventManager call init() before query execution
-     * First time: Index graph: edge list sorted and reduced, compute graph node index
-     * Next time:  recompute graph node index
-     * All time:   Perform entailment.
+     * First time: Index graph: edge list sorted and reduced, compute graph node
+     * index
+     * Next time: recompute graph node index
+     * All time: Perform entailment.
      */
     public synchronized void init() {
         getEventManager().start(Event.InitGraph, isIndexable());
@@ -1049,7 +1056,7 @@ public class Graph extends GraphObject implements
         if (size() == 0 || Property.getBooleanValue(Property.Value.GRAPH_INDEX_LOAD_SKIP)) {
             // graph is empty, optimize loading as if the graph were not indexed
             // because in this case, edges are added directly
-            //logger.info("Set graph as not indexed");
+            // logger.info("Set graph as not indexed");
             setIndexed(false);
         }
     }
@@ -1341,7 +1348,7 @@ public class Graph extends GraphObject implements
         for (EdgeManagerIndexer ei : getIndexList()) {
             ei.add(p, list);
         }
-        //getEventManager().process(Event.Insert);
+        // getEventManager().process(Event.Insert);
         for (Edge e : list) {
             getEventManager().process(Event.Insert, e);
         }
@@ -2074,14 +2081,14 @@ public class Graph extends GraphObject implements
 
     public void addGraphNode(Node gNode) {
         if (!containsCoreseNode(gNode)) {
-            //graph.put(gNode.getLabel(), gNode);
+            // graph.put(gNode.getLabel(), gNode);
             graph.put(getID(gNode), gNode);
             indexNode(gNode.getValue(), gNode);
         }
     }
 
     public boolean containsCoreseNode(Node node) {
-        //return graph.containsKey(node.getLabel());
+        // return graph.containsKey(node.getLabel());
         return graph.containsKey(getID(node));
     }
 
@@ -2380,7 +2387,7 @@ public class Graph extends GraphObject implements
             }
             Node val = first.getNode(1);
 
-            if (val.isBlank() && !val.isTriple()) {
+            if ((val.isBlank() || val.getDatatypeValue().isSkolem()) && !val.isTriple()) {
                 // may be a list
                 ArrayList<IDatatype> ll = reclist(val);
                 if (ll == null) {
@@ -2425,9 +2432,9 @@ public class Graph extends GraphObject implements
             case ILIST:
                 return ruleEdgeIndex;
         }
-//        if (n + 1 >= tables.size()) {
-//            //setIndex(n, new EdgeIndex(this, n));	
-//        }
+        // if (n + 1 >= tables.size()) {
+        // //setIndex(n, new EdgeIndex(this, n));
+        // }
         return getIndexList().get(n);
     }
 
@@ -2619,7 +2626,7 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * resource & blank TODO: a node may have been deleted (by a delete triple)
+     * resource &amp; blank TODO: a node may have been deleted (by a delete triple)
      * but still be in the table
      */
     public Iterable<Node> getRBNodes() {
@@ -2670,7 +2677,7 @@ public class Graph extends GraphObject implements
      * not exactly graph vertex with rdf star
      *
      * @note: consider nodes from nested triple
-     * although they are just quoted
+     *        although they are just quoted
      */
     public Iterable<Node> getNodeIterator() {
         MetaIterator<Node> meta = new MetaIterator<>();
@@ -2808,7 +2815,7 @@ public class Graph extends GraphObject implements
         }
     }
 
-    //check if store dt to file
+    // check if store dt to file
     boolean storable(IDatatype dt) {
 
         // check storage manager
@@ -3525,7 +3532,8 @@ public class Graph extends GraphObject implements
             return String.format("b%s", dt.getLabel());
         }
         // dates may also have same index but different labels, see isDate() above
-        // date with Z and date with +00:00 have same index (same value) but different labels
+        // date with Z and date with +00:00 have same index (same value) but different
+        // labels
         // they should have different ID
         if (dt.isDate()) {
             if (DatatypeMap.getTZ(dt).equals("Z")) {
@@ -3773,8 +3781,8 @@ public class Graph extends GraphObject implements
 
     /**
      * @Draft For each triple pattern: Search if there exists graph name,
-     * subject, property, object in the graph with similar URI
-     * mode=message&param=sv:distance~n => levenshtein distance <= n
+     *        subject, property, object in the graph with similar URI
+     *        mode=message&param=sv:distance~n => levenshtein distance <= n
      */
     public JSONObject match(ASTQuery ast) {
         return match(ast, 1);
@@ -3859,11 +3867,12 @@ public class Graph extends GraphObject implements
         TreeNode(boolean entailment) {
             super((entailment)
                     ? // with datatype entailment
-                    // index(1) = index(01) = index(1.0)
-                    // same value => same index
-                    // integer|decimal vs integer|decimal => same index
-                    // integer|decimal vs double|float    => different index
-                    new CompareWithDatatypeEntailment() :
+                      // index(1) = index(01) = index(1.0)
+                      // same value => same index
+                      // integer|decimal vs integer|decimal => same index
+                      // integer|decimal vs double|float => different index
+                    new CompareWithDatatypeEntailment()
+                    :
                     // without datatype entailment
                     // index(1) = index(01) != index(1.0)
                     // different datatype => different index
@@ -3880,7 +3889,8 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * Comparator for Node allocation where 1 and 01 have different Node with same Node index
+     * Comparator for Node allocation where 1 and 01 have different Node with same
+     * Node index
      * This Comparator enables to retrieve an occurrence of a given Literal
      * already existing in graph in such a way that two occurrences of same
      * Literal be represented by same Node It represents (1 integer) and (01

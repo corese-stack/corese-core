@@ -83,3 +83,6 @@ gradle/gradle-daemon-jvm.properties
 # Other build directories and generated files
 /bin/
 
+# Fichiers de logs
+logs/
+*.log
