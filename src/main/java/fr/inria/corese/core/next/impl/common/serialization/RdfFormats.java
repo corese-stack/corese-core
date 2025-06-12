@@ -38,6 +38,13 @@ public final class RdfFormats {
             true,
             true);
 
+    public static final RdfFormat NQUADS = new RdfFormat(
+            "N-Quads",
+            List.of("nq"),
+            List.of("application/n-quads"),
+            false,
+            true);
+
     /**
      * Finds a known RDF format by its name (case-insensitive).
      *
@@ -83,7 +90,7 @@ public final class RdfFormats {
      * Returns all known RDF formats.
      */
     public static List<RdfFormat> all() {
-        return List.of(TURTLE, NTRIPLES, JSONLD, RDFXML);
+        return List.of(TURTLE, NTRIPLES, JSONLD, RDFXML, NQUADS);
     }
 
 }

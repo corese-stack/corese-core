@@ -16,7 +16,7 @@ import java.util.Objects;
  * This class provides a method to write the statements of a model to a given {@link Writer}
  * according to the N-Triples specification.
  */
-public class NTriplesFormat {
+public class NTriplesFormat implements FormatSerializer {
 
     /**
      * Logger for this class, used for logging potential issues or information during serialization.
@@ -55,6 +55,7 @@ public class NTriplesFormat {
      * @param writer the {@link Writer} to which the N-Triples output will be written.
      * @throws SerializationException if an I/O error occurs during writing or if invalid data is encountered.
      */
+    @Override
     public void write(Writer writer) throws SerializationException {
         try {
             for (Statement stmt : model) {

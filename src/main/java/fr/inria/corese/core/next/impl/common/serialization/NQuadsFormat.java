@@ -16,7 +16,7 @@ import java.util.Objects;
  * This class provides a method to write the statements (quads) of a model to a given {@link Writer}
  * according to the N-Quads specification, including support for named graphs (contexts).
  */
-public class NQuadsFormat {
+public class NQuadsFormat implements FormatSerializer {
 
     /**
      * Logger for this class, used for logging potential issues or information during serialization.
@@ -55,6 +55,7 @@ public class NQuadsFormat {
      * @param writer the {@link Writer} to which the N-Quads output will be written.
      * @throws SerializationException if an I/O error occurs during writing or if invalid data is encountered.
      */
+    @Override
     public void write(Writer writer) throws SerializationException {
         try {
             for (Statement stmt : model) {
