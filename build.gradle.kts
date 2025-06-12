@@ -117,11 +117,8 @@ dependencies {
     implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                        // ShEx validation engine
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parser (Semargl)
     implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // Semargl core RDF parser
-    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
-    
-    // === JSON-LD ===
-    implementation("com.apicatalog:titanium-json-ld:1.6.0")                            // JSON-LD 1.1 parser
-    implementation("com.apicatalog:titanium-rdf-api:1.0.0")                            // RDF API for the JSON-LD parser
+    implementation("com.github.jsonld-java:jsonld-java:0.13.6")                        // Legacy JSON-LD processing
+
 
     // === HTTP and XML ===
     implementation("org.glassfish.jersey.core:jersey-client:$jersey_version")          // HTTP client (Jersey)
@@ -154,6 +151,9 @@ extraJavaModuleInfo {
     automaticModule("commons-lang:commons-lang", "commons.lang")                       // Module for Commons Lang
     automaticModule("fr.inria.lille.shexjava:shexjava-core", "shexjava.core")          // Module for ShexJava core
     automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model")                    // Module for RDF4J model
+    automaticModule("com.apicatalog:titanium-json-ld", "titanium.json.ld")             // Module for Titanium JSON-LD
+    automaticModule("com.apicatalog:titanium-rdf-api", "titanium.rdf.api")             // Module for Titanium RDF API
+
 }
 
 

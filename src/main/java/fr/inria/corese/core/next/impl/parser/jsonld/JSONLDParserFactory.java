@@ -8,6 +8,17 @@ import fr.inria.corese.core.next.api.parser.RDFParser;
 import fr.inria.corese.core.next.api.parser.RDFParserFactory;
 
 public class JSONLDParserFactory implements RDFParserFactory {
+
+    private static final JSONLDParserFactory INSTANCE = new JSONLDParserFactory();
+
+    public static JSONLDParserFactory getInstance() {
+        return INSTANCE;
+    }
+
+    private JSONLDParserFactory() {
+
+    }
+
     @Override
     public RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory) {
         if(format == RDFFormats.JSON_LD) {
