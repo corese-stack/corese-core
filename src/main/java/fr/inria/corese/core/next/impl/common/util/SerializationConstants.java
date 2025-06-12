@@ -49,11 +49,35 @@ public class SerializationConstants {
      * Used to enclose literal values.
      */
     public static final String QUOTE = "\"";
+    /**
+     * Represents a backslash character ("\\").
+     * Used for escaping special characters within string literals.
+     */
+    public static final String BACK_SLASH = "\\";
+
+    /**
+     * The URI string for the XML Schema `xsd:string` datatype:
+     * {@code http://www.w3.org/2001/XMLSchema#string}.
+     */
+    public static final String XSD_STRING = "http://www.w3.org/2001/XMLSchema#string";
+
+    /**
+     * The URI string for the RDF `rdf:langString` datatype:
+     * {@code http://www.w3.org/1999/02/22-rdf-syntax-ns#langString}.
+     */
+    public static final String RDF_LANGSTRING = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString";
+
+    // Nouvelle constante pour le préfixe de la balise de langue
+    public static final String AT_SIGN = "@";
+
+    // Nouvelle constante pour le séparateur de datatype
+    public static final String DATATYPE_SEPARATOR = "^^";
 
 
     /**
      * Private constructor to prevent instantiation of this utility class.
      * All members are static.
      */
-    private SerializationConstants() {}
+    private SerializationConstants() {
+    }
 }

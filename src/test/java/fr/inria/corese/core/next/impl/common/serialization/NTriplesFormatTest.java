@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Iterator;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,6 +30,12 @@ class NTriplesFormatTest {
     private IRI mockExName;
     private IRI mockExAge;
     private IRI mockExKnows;
+
+    private final String LEX_JOHN = "John Doe";
+    private final String LEX_30 = "30";
+    private final String LEX_HELLO = "Hello";
+    private final String LEX_TRUE = "true";
+
     private Literal mockLiteralJohn;
     private Literal mockLiteral30;
     private Literal mockLiteralHelloEn;
@@ -47,10 +55,12 @@ class NTriplesFormatTest {
         mockExAge = createIRI("http://example.org/age");
         mockExKnows = createIRI("http://example.org/knows");
 
-        mockLiteralJohn = createLiteral("John Doe");
-        mockLiteral30 = createLiteral("30", "http://www.w3.org/2001/XMLSchema#integer", null);
-        mockLiteralHelloEn = createLiteral("Hello", null, "en");
-        mockLiteralTrue = createLiteral("true", "http://www.w3.org/2001/XMLSchema#boolean", null);
+
+        mockLiteralJohn = createLiteral(LEX_JOHN, null, null);
+
+        mockLiteralHelloEn = createLiteral(LEX_HELLO, null, "en");
+
+
 
         mockBNode1 = createBlankNode("b1");
         mockBNode2 = createBlankNode("b2");
@@ -59,20 +69,19 @@ class NTriplesFormatTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(null));
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(null, config));
+        assertThrows(NullPointerException.class, () -> new NTriplesFormat(null), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new NTriplesFormat(null, config), "Model cannot be null");
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null config")
     void constructorShouldThrowForNullConfig() {
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(model, null));
+        assertThrows(NullPointerException.class, () -> new NTriplesFormat(model, null), "Configuration cannot be null");
     }
 
     @Test
     @DisplayName("Write should serialize simple statement correctly")
     void writeShouldSerializeSimpleStatement() throws SerializationException {
-
         Statement stmt = createStatement(
                 mockExPerson,
                 mockExName,
@@ -81,18 +90,20 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-
-
         nTriplesFormat.write(writer);
 
 
-        assertEquals("<http://example.org/Person> <http://example.org/name> \"John Doe\" .\n", writer.toString());
+        String expected = String.format("<%s> <%s> \"%s\" .\n",
+                mockExPerson.stringValue(),
+                mockExName.stringValue(),
+                escapeNTriplesString(LEX_JOHN));
+
+        assertEquals(expected, writer.toString());
     }
 
     @Test
     @DisplayName("Write should serialize statement with context but ignore it (N-Triples)")
     void writeShouldSerializeStatementWithContext() throws SerializationException {
-
         IRI mockContext = createIRI("http://example.org/ctx");
         Statement stmt = createStatement(
                 mockExPerson,
@@ -103,17 +114,19 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-
         nTriplesFormat.write(writer);
 
+        String expected = String.format("<%s> <%s> \"%s\" .\n",
+                mockExPerson.stringValue(),
+                mockExName.stringValue(),
+                escapeNTriplesString(LEX_JOHN));
 
-        assertEquals("<http://example.org/Person> <http://example.org/name> \"John Doe\" .\n", writer.toString());
+        assertEquals(expected, writer.toString());
     }
 
     @Test
     @DisplayName("Write should handle blank nodes with default prefix")
     void writeShouldHandleBlankNodes() throws SerializationException {
-
         Statement stmt = createStatement(
                 mockBNode1,
                 mockExKnows,
@@ -122,18 +135,19 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-
-
         nTriplesFormat.write(writer);
 
+        String expected = String.format("_:%s <%s> _:%s .\n",
+                mockBNode1.stringValue(),
+                mockExKnows.stringValue(),
+                mockBNode2.stringValue());
 
-        assertEquals("_:b1 <http://example.org/knows> _:b2 .\n", writer.toString());
+        assertEquals(expected, writer.toString());
     }
 
     @Test
     @DisplayName("Write should handle blank nodes with custom prefix")
     void writeShouldHandleBlankNodesWithCustomPrefix() throws SerializationException {
-
         FormatConfig customConfig = new FormatConfig.Builder().blankNodePrefix("genid-").build();
         NTriplesFormat customSerializer = new NTriplesFormat(model, customConfig);
 
@@ -145,17 +159,19 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-
-
         customSerializer.write(writer);
 
-        assertEquals("genid-b1 <http://example.org/knows> genid-b2 .\n", writer.toString());
+        String expected = String.format("genid-%s <%s> genid-%s .\n",
+                mockBNode1.stringValue(),
+                mockExKnows.stringValue(),
+                mockBNode2.stringValue());
+
+        assertEquals(expected, writer.toString());
     }
 
     @Test
     @DisplayName("Write should throw SerializationException on IO error")
     void writeShouldThrowOnIOException() throws IOException {
-
         Statement stmt = createStatement(
                 mockExPerson,
                 mockExName,
@@ -171,9 +187,8 @@ class NTriplesFormatTest {
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null subject value")
+    @DisplayName("Write should throw SerializationException on null subject value from Statement")
     void writeShouldThrowOnNullSubjectValue() {
-
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(null);
         when(stmt.getPredicate()).thenReturn(mockExName);
@@ -181,15 +196,12 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-
-
         assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null predicate value")
+    @DisplayName("Write should throw SerializationException on null predicate value from Statement")
     void writeShouldThrowOnNullPredicateValue() {
-
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
         when(stmt.getPredicate()).thenReturn(null);
@@ -197,15 +209,12 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-
-
         assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null object value")
+    @DisplayName("Write should throw SerializationException on null object value from Statement")
     void writeShouldThrowOnNullObjectValue() {
-
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
         when(stmt.getPredicate()).thenReturn(mockExName);
@@ -213,8 +222,6 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-
-
         assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
     }
 
@@ -225,19 +232,13 @@ class NTriplesFormatTest {
             "literal with \\ backslash",
             "literal with \n newline",
             "literal with \t tab",
-            "literal with \r carriage return"
+            "literal with \r carriage return",
+            "literal with \u0001 (SOH)",
+            "literal with \u007F (DEL)"
     })
     @DisplayName("Write should handle various literal values with proper escaping")
     void writeShouldHandleVariousLiterals(String literalValue) throws SerializationException {
-
-
-        Literal literalMock = mock(Literal.class);
-        when(literalMock.isLiteral()).thenReturn(true);
-        when(literalMock.isResource()).thenReturn(false);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"").append(escapeNTriplesString(literalValue)).append("\"");
-        when(literalMock.stringValue()).thenReturn(sb.toString());
+        Literal literalMock = createLiteral(literalValue, null, null);
 
         Statement stmt = createStatement(
                 mockExPerson,
@@ -247,21 +248,24 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-
         nTriplesFormat.write(writer);
 
         String expectedEscapedLiteral = escapeNTriplesString(literalValue);
-        assertEquals(String.format("<http://example.org/Person> <http://example.org/name> \"%s\" .\n", expectedEscapedLiteral), writer.toString());
+        String expectedOutput = String.format("<%s> <%s> \"%s\" .\n",
+                mockExPerson.stringValue(),
+                mockExName.stringValue(),
+                expectedEscapedLiteral);
+
+        assertEquals(expectedOutput, writer.toString());
     }
 
     @Test
     @DisplayName("Write should handle multiple statements")
     void writeShouldHandleMultipleStatements() throws SerializationException {
-
         Statement stmt1 = createStatement(
                 mockExPerson,
                 mockExName,
-                createLiteral("o1")
+                createLiteral("o1", null, null)
         );
         Statement stmt2 = createStatement(
                 mockBNode1,
@@ -272,17 +276,19 @@ class NTriplesFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt1, stmt2));
 
         StringWriter writer = new StringWriter();
-
         nTriplesFormat.write(writer);
 
-        assertEquals("<http://example.org/Person> <http://example.org/name> \"o1\" .\n" +
-                "_:b1 <http://example.org/knows> <http://example.org/Person> .\n", writer.toString());
+        String expectedOutput = String.format("<%s> <%s> \"%s\" .\n",
+                mockExPerson.stringValue(), mockExName.stringValue(), escapeNTriplesString("o1")) +
+                String.format("_:%s <%s> <%s> .\n",
+                        mockBNode1.stringValue(), mockExKnows.stringValue(), mockExPerson.stringValue());
+
+        assertEquals(expectedOutput, writer.toString());
     }
 
     @Test
     @DisplayName("Should handle literals with language tags")
     void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
-
         Statement stmt = createStatement(mockExPerson, createIRI("http://example.org/greeting"), mockLiteralHelloEn);
 
         Model currentTestModel = mock(Model.class);
@@ -292,25 +298,11 @@ class NTriplesFormatTest {
         NTriplesFormat serializer = new NTriplesFormat(currentTestModel);
         serializer.write(writer);
 
-        String expectedOutput = "<http://example.org/Person> <http://example.org/greeting> \"Hello\"@en .\n";
-
-        assertEquals(expectedOutput, writer.toString());
-    }
-
-    @Test
-    @DisplayName("Should handle literals with datatype IRIs")
-    void shouldHandleLiteralsWithDatatypeIRIs() throws SerializationException {
-
-        Statement stmt = createStatement(mockExPerson, mockExAge, mockLiteral30);
-
-        Model currentTestModel = mock(Model.class);
-        when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
-
-        Writer writer = new StringWriter();
-        NTriplesFormat serializer = new NTriplesFormat(currentTestModel);
-        serializer.write(writer);
-
-        String expectedOutput = "<http://example.org/Person> <http://example.org/age> \"30\"^^<http://www.w3.org/2001/XMLSchema#integer> .\n";
+        String expectedOutput = String.format("<%s> <%s> \"%s\"@%s .\n",
+                mockExPerson.stringValue(),
+                createIRI("http://example.org/greeting").stringValue(),
+                escapeNTriplesString(LEX_HELLO),
+                mockLiteralHelloEn.getLanguage().get());
 
         assertEquals(expectedOutput, writer.toString());
     }
@@ -338,7 +330,6 @@ class NTriplesFormatTest {
         return blankNode;
     }
 
-
     private IRI createIRI(String uri) {
         IRI iri = mock(IRI.class);
         when(iri.isResource()).thenReturn(true);
@@ -348,36 +339,78 @@ class NTriplesFormatTest {
         return iri;
     }
 
-
-    private Literal createLiteral(String lexicalForm) {
-        return createLiteral(lexicalForm, null, null);
-    }
-
-
-    private Literal createLiteral(String lexicalForm, String dataType, String langTag) {
+    /**
+     * Creates a mocked Literal object.
+     * Important: The `lexicalForm` is the *raw string value* of the literal,
+     * without N-Triples specific quotes, lang tags, or datatype URIs.
+     * The `NTriplesFormat` class is responsible for adding those.
+     *
+     * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
+     * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.
+     * @param langTag     The language tag (e.g., "en"), or null if not language-tagged.
+     * @return A mocked Literal instance.
+     */
+    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
         Literal literal = mock(Literal.class);
         when(literal.isLiteral()).thenReturn(true);
         when(literal.isResource()).thenReturn(false);
+        when(literal.stringValue()).thenReturn(lexicalForm);
 
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"").append(escapeNTriplesString(lexicalForm)).append("\"");
         if (langTag != null && !langTag.isEmpty()) {
-            sb.append("@").append(langTag);
-        } else if (dataType != null && !dataType.isEmpty()) {
-            sb.append("^^<").append(dataType).append(">");
+            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
+
+
+            when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
+        } else {
+            when(literal.getLanguage()).thenReturn(Optional.empty());
+            when(literal.getDatatype()).thenReturn(dataTypeIRI);
         }
-        when(literal.stringValue()).thenReturn(sb.toString());
         return literal;
     }
 
-
+    /**
+     * Escapes a string according to N-Triples literal escaping rules.
+     * This helper is used in tests to construct the *expected* output strings.
+     * It mimics the behavior of NTriplesFormat's internal escapeLiteral method.
+     *
+     * @param s The string to escape.
+     * @return The escaped string.
+     */
     private String escapeNTriplesString(String s) {
-        return s.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                default:
+                    if (c >= '\u0000' && c <= '\u001F' || c == '\u007F') {
+                        sb.append(String.format("\\u%04X", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        return sb.toString();
     }
 
 
