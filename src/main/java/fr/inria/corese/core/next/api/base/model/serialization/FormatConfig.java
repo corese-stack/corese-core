@@ -13,6 +13,7 @@ public class FormatConfig {
 
     /**
      * Private constructor to enforce usage of the Builder.
+     *
      * @param builder The builder instance.
      */
     private FormatConfig(Builder builder) {
@@ -22,6 +23,7 @@ public class FormatConfig {
 
     /**
      * Returns the prefix to use for blank nodes.
+     *
      * @return The blank node prefix.
      */
     public String getBlankNodePrefix() {
@@ -42,6 +44,7 @@ public class FormatConfig {
 
         /**
          * Sets the prefix to use for blank nodes. Default is "_:".
+         *
          * @param blankNodePrefix The desired blank node prefix.
          * @return The builder instance.
          */
@@ -53,6 +56,7 @@ public class FormatConfig {
 
         /**
          * Builds a new {@link FormatConfig} instance.
+         *
          * @return A new NFormatConfig instance.
          */
         public FormatConfig build() {
