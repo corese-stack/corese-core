@@ -28,18 +28,14 @@ class NTriplesFormatTest {
 
     private Resource mockExPerson;
     private IRI mockExName;
-    private IRI mockExAge;
     private IRI mockExKnows;
 
-    private final String LEX_JOHN = "John Doe";
-    private final String LEX_30 = "30";
-    private final String LEX_HELLO = "Hello";
-    private final String LEX_TRUE = "true";
+    private final String lexJohn = "John Doe";
+    private final String hello = "Hello";
 
     private Literal mockLiteralJohn;
-    private Literal mockLiteral30;
+
     private Literal mockLiteralHelloEn;
-    private Literal mockLiteralTrue;
     private Resource mockBNode1;
     private Resource mockBNode2;
 
@@ -52,15 +48,13 @@ class NTriplesFormatTest {
 
         mockExPerson = createIRI("http://example.org/Person");
         mockExName = createIRI("http://example.org/name");
-        mockExAge = createIRI("http://example.org/age");
+
         mockExKnows = createIRI("http://example.org/knows");
 
 
-        mockLiteralJohn = createLiteral(LEX_JOHN, null, null);
+        mockLiteralJohn = createLiteral(lexJohn, null, null);
 
-        mockLiteralHelloEn = createLiteral(LEX_HELLO, null, "en");
-
-
+        mockLiteralHelloEn = createLiteral(hello, null, "en");
 
         mockBNode1 = createBlankNode("b1");
         mockBNode2 = createBlankNode("b2");
@@ -93,10 +87,10 @@ class NTriplesFormatTest {
         nTriplesFormat.write(writer);
 
 
-        String expected = String.format("<%s> <%s> \"%s\" .\n",
+        String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
-                escapeNTriplesString(LEX_JOHN));
+                escapeNTriplesString(lexJohn)) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -116,10 +110,10 @@ class NTriplesFormatTest {
         StringWriter writer = new StringWriter();
         nTriplesFormat.write(writer);
 
-        String expected = String.format("<%s> <%s> \"%s\" .\n",
+        String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
-                escapeNTriplesString(LEX_JOHN));
+                escapeNTriplesString(lexJohn)) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -137,10 +131,10 @@ class NTriplesFormatTest {
         StringWriter writer = new StringWriter();
         nTriplesFormat.write(writer);
 
-        String expected = String.format("_:%s <%s> _:%s .\n",
+        String expected = String.format("_:%s <%s> _:%s",
                 mockBNode1.stringValue(),
                 mockExKnows.stringValue(),
-                mockBNode2.stringValue());
+                mockBNode2.stringValue()) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -161,10 +155,10 @@ class NTriplesFormatTest {
         StringWriter writer = new StringWriter();
         customSerializer.write(writer);
 
-        String expected = String.format("genid-%s <%s> genid-%s .\n",
+        String expected = String.format("genid-%s <%s> genid-%s",
                 mockBNode1.stringValue(),
                 mockExKnows.stringValue(),
-                mockBNode2.stringValue());
+                mockBNode2.stringValue()) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -251,10 +245,10 @@ class NTriplesFormatTest {
         nTriplesFormat.write(writer);
 
         String expectedEscapedLiteral = escapeNTriplesString(literalValue);
-        String expectedOutput = String.format("<%s> <%s> \"%s\" .\n",
+        String expectedOutput = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
-                expectedEscapedLiteral);
+                expectedEscapedLiteral) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
     }
@@ -278,10 +272,14 @@ class NTriplesFormatTest {
         StringWriter writer = new StringWriter();
         nTriplesFormat.write(writer);
 
-        String expectedOutput = String.format("<%s> <%s> \"%s\" .\n",
-                mockExPerson.stringValue(), mockExName.stringValue(), escapeNTriplesString("o1")) +
-                String.format("_:%s <%s> <%s> .\n",
-                        mockBNode1.stringValue(), mockExKnows.stringValue(), mockExPerson.stringValue());
+        String expectedOutput = String.format("<%s> <%s> \"%s\"",
+                mockExPerson.stringValue(),
+                mockExName.stringValue(),
+                escapeNTriplesString("o1")) + " .\n" +
+                String.format("_:%s <%s> <%s>",
+                        mockBNode1.stringValue(),
+                        mockExKnows.stringValue(),
+                        mockExPerson.stringValue()) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
     }
@@ -298,75 +296,15 @@ class NTriplesFormatTest {
         NTriplesFormat serializer = new NTriplesFormat(currentTestModel);
         serializer.write(writer);
 
-        String expectedOutput = String.format("<%s> <%s> \"%s\"@%s .\n",
+        String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
                 mockExPerson.stringValue(),
                 createIRI("http://example.org/greeting").stringValue(),
-                escapeNTriplesString(LEX_HELLO),
-                mockLiteralHelloEn.getLanguage().get());
+                escapeNTriplesString(hello),
+                mockLiteralHelloEn.getLanguage().get()) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
     }
 
-
-    private Statement createStatement(Resource subject, IRI predicate, Value object) {
-        return createStatement(subject, predicate, object, null);
-    }
-
-    private Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(subject);
-        when(stmt.getPredicate()).thenReturn(predicate);
-        when(stmt.getObject()).thenReturn(object);
-        when(stmt.getContext()).thenReturn(context);
-        return stmt;
-    }
-
-    private Resource createBlankNode(String id) {
-        Resource blankNode = mock(Resource.class);
-        when(blankNode.isResource()).thenReturn(true);
-        when(blankNode.isBNode()).thenReturn(true);
-        when(blankNode.isIRI()).thenReturn(false);
-        when(blankNode.stringValue()).thenReturn(id);
-        return blankNode;
-    }
-
-    private IRI createIRI(String uri) {
-        IRI iri = mock(IRI.class);
-        when(iri.isResource()).thenReturn(true);
-        when(iri.isIRI()).thenReturn(true);
-        when(iri.isBNode()).thenReturn(false);
-        when(iri.stringValue()).thenReturn(uri);
-        return iri;
-    }
-
-    /**
-     * Creates a mocked Literal object.
-     * Important: The `lexicalForm` is the *raw string value* of the literal,
-     * without N-Triples specific quotes, lang tags, or datatype URIs.
-     * The `NTriplesFormat` class is responsible for adding those.
-     *
-     * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
-     * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.
-     * @param langTag     The language tag (e.g., "en"), or null if not language-tagged.
-     * @return A mocked Literal instance.
-     */
-    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
-        Literal literal = mock(Literal.class);
-        when(literal.isLiteral()).thenReturn(true);
-        when(literal.isResource()).thenReturn(false);
-        when(literal.stringValue()).thenReturn(lexicalForm);
-
-        if (langTag != null && !langTag.isEmpty()) {
-            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
-
-
-            when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
-        } else {
-            when(literal.getLanguage()).thenReturn(Optional.empty());
-            when(literal.getDatatype()).thenReturn(dataTypeIRI);
-        }
-        return literal;
-    }
 
     /**
      * Escapes a string according to N-Triples literal escaping rules.
@@ -431,5 +369,66 @@ class NTriplesFormatTest {
         public Statement next() {
             return statements[index++];
         }
+    }
+
+
+    /**
+     * Creates a mocked Literal object.
+     * Important: The `lexicalForm` is the *raw string value* of the literal,
+     * without N-Triples specific quotes, lang tags, or datatype URIs.
+     * The `NTriplesFormat` class is responsible for adding those.
+     *
+     * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
+     * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.
+     * @param langTag     The language tag (e.g., "en"), or null if not language-tagged.
+     * @return A mocked Literal instance.
+     */
+    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
+        Literal literal = mock(Literal.class);
+        when(literal.isLiteral()).thenReturn(true);
+        when(literal.isResource()).thenReturn(false);
+        when(literal.stringValue()).thenReturn(lexicalForm);
+
+        if (langTag != null && !langTag.isEmpty()) {
+            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
+
+
+            when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
+        } else {
+            when(literal.getLanguage()).thenReturn(Optional.empty());
+            when(literal.getDatatype()).thenReturn(dataTypeIRI);
+        }
+        return literal;
+    }
+
+    private Statement createStatement(Resource subject, IRI predicate, Value object) {
+        return createStatement(subject, predicate, object, null);
+    }
+
+    private Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
+        Statement stmt = mock(Statement.class);
+        when(stmt.getSubject()).thenReturn(subject);
+        when(stmt.getPredicate()).thenReturn(predicate);
+        when(stmt.getObject()).thenReturn(object);
+        when(stmt.getContext()).thenReturn(context);
+        return stmt;
+    }
+
+    private Resource createBlankNode(String id) {
+        Resource blankNode = mock(Resource.class);
+        when(blankNode.isResource()).thenReturn(true);
+        when(blankNode.isBNode()).thenReturn(true);
+        when(blankNode.isIRI()).thenReturn(false);
+        when(blankNode.stringValue()).thenReturn(id);
+        return blankNode;
+    }
+
+    private IRI createIRI(String uri) {
+        IRI iri = mock(IRI.class);
+        when(iri.isResource()).thenReturn(true);
+        when(iri.isIRI()).thenReturn(true);
+        when(iri.isBNode()).thenReturn(false);
+        when(iri.stringValue()).thenReturn(uri);
+        return iri;
     }
 }
