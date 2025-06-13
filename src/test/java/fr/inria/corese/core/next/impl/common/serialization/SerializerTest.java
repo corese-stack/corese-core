@@ -53,7 +53,7 @@ class SerializerTest {
     @Test
     @DisplayName("serialize should throw NullPointerException for null writer")
     void serializeShouldThrowForNullWriter() {
-        assertThrows(NullPointerException.class, () -> serializer.serialize(null, RdfFormats.NTRIPLES), "Writer cannot be null");
+        assertThrows(NullPointerException.class, () -> serializer.serialize(null, RdfFormat.NTRIPLES), "Writer cannot be null");
     }
 
     @Test
@@ -68,7 +68,7 @@ class SerializerTest {
     @DisplayName("serialize should delegate to NTriplesFormat for NTRIPLES format")
     void serializeShouldDelegateToNTriplesFormat() throws SerializationException {
         try (MockedConstruction<NTriplesFormat> mockedNtConstructor = mockConstruction(NTriplesFormat.class)) {
-            serializer.serialize(mockWriter, RdfFormats.NTRIPLES);
+            serializer.serialize(mockWriter, RdfFormat.NTRIPLES);
 
             assertEquals(1, mockedNtConstructor.constructed().size(), "NTriplesFormat constructor should be called once");
 
@@ -82,7 +82,7 @@ class SerializerTest {
     @DisplayName("serialize should delegate to NQuadsFormat for NQUADS format")
     void serializeShouldDelegateToNQuadsFormat() throws SerializationException {
         try (MockedConstruction<NQuadsFormat> mockedNqConstructor = mockConstruction(NQuadsFormat.class)) {
-            serializer.serialize(mockWriter, RdfFormats.NQUADS);
+            serializer.serialize(mockWriter, RdfFormat.NQUADS);
 
             assertEquals(1, mockedNqConstructor.constructed().size(), "NQuadsFormat constructor should be called once");
             NQuadsFormat createdNqSerializer = mockedNqConstructor.constructed().get(0);
