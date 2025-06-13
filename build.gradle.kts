@@ -151,8 +151,6 @@ extraJavaModuleInfo {
     automaticModule("commons-lang:commons-lang", "commons.lang")                       // Module for Commons Lang
     automaticModule("fr.inria.lille.shexjava:shexjava-core", "shexjava.core")          // Module for ShexJava core
     automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model")                    // Module for RDF4J model
-    automaticModule("com.apicatalog:titanium-json-ld", "titanium.json.ld")             // Module for Titanium JSON-LD
-    automaticModule("com.apicatalog:titanium-rdf-api", "titanium.rdf.api")             // Module for Titanium RDF API
 
 }
 

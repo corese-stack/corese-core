@@ -28,7 +28,8 @@ public class JSONLDParser implements RDFParser {
     public JSONLDParser(Model model, ValueFactory factory) {
         this.model = model;
         this.valueFactory = factory;
-        commonOptions.setCompactArrays(true);
+        commonOptions.setCompactArrays(false);
+        commonOptions.setBase(null);
     }
 
     @Override
@@ -36,59 +37,78 @@ public class JSONLDParser implements RDFParser {
         return RDFFormats.JSON_LD;
     }
 
-    @Override
-    public void parse(InputStream in) throws ParsingErrorException {
+    private void parseFromJsonInput(Object input, String baseURI) {
         try {
-            Object input = JsonUtils.fromInputStream(in);
+            if(baseURI != null) {
+                commonOptions.setBase(baseURI);
+            }
             RDFDataset output = (RDFDataset)JsonLdProcessor.toRDF(input, this.commonOptions);
             logger.debug("JSON-LD output: {}", output);
             for(String gName: output.graphNames()) {
                 logger.debug("Graph name: {}", gName);
                 for(RDFDataset.Quad q : output.getQuads(gName)) {
-                   logger.debug("Quad: {}", q);
-                   Resource subject = null;
-                   if (q.getSubject().isIRI()) {
-                       subject = valueFactory.createIRI(q.getSubject().getValue());
-                   } else {
-                       subject = valueFactory.createBNode(q.getSubject().getValue());
-                   }
+                    logger.debug("Quad: {}", q);
+                    Resource subject = null;
+                    if (q.getSubject().isIRI()) {
+                        subject = valueFactory.createIRI(q.getSubject().getValue());
+                    } else {
+                        subject = valueFactory.createBNode(q.getSubject().getValue());
+                    }
 
                     IRI predicate = valueFactory.createIRI(q.getPredicate().getValue());
 
-                   Value object = null;
-                   if (q.getObject().isIRI()) {
-                       object = valueFactory.createIRI(q.getObject().getValue());
-                   } else if (q.getObject().isBlankNode()) {
-                       object = valueFactory.createBNode(q.getObject().getValue());
-                   } else {
-                       object = valueFactory.createLiteral(q.getObject().getValue());
-                   }
+                    Value object = null;
+                    if (q.getObject().isIRI()) {
+                        object = valueFactory.createIRI(q.getObject().getValue());
+                    } else if (q.getObject().isBlankNode()) {
+                        object = valueFactory.createBNode(q.getObject().getValue());
+                    } else {
+                        object = valueFactory.createLiteral(q.getObject().getValue());
+                    }
 
-                   if(gName.equals("@default")) {
-                       model.add(subject, predicate, object);
-                   } else {
-                       IRI graph = valueFactory.createIRI(gName);
-                       model.add(subject, predicate, object, graph);
-                   }
+                    if(gName.equals(jsonldjavadefaultGraphName)) {
+                        model.add(subject, predicate, object);
+                    } else {
+                        IRI graph = valueFactory.createIRI(gName);
+                        model.add(subject, predicate, object, graph);
+                    }
                 }
             }
+            if(baseURI != null) {
+                commonOptions.setBase(null);
+            }
+        } catch (JsonLdError e) {
+            throw new ParsingErrorException(e);
+        }
+    }
+
+    @Override
+    public void parse(InputStream in) throws ParsingErrorException {
+        parse(in, null);
+    }
+
+    @Override
+    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
+        try {
+            Object input = JsonUtils.fromInputStream(in);
+            parseFromJsonInput(input, baseURI);
         } catch (IOException | JsonLdError e) {
             throw new ParsingErrorException(e);
         }
     }
 
     @Override
-    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
-
-    }
-
-    @Override
     public void parse(Reader reader) throws ParsingErrorException {
-
+        parse(reader, null);
     }
 
     @Override
     public void parse(Reader reader, String baseURI) {
-
+        try {
+            Object input = JsonUtils.fromReader(reader);
+            parseFromJsonInput(input, baseURI);
+        } catch (IOException | JsonLdError e) {
+            throw new ParsingErrorException(e);
+        }
     }
 }
