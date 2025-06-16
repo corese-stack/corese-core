@@ -43,11 +43,8 @@ public class JSONLDParser implements RDFParser {
                 commonOptions.setBase(baseURI);
             }
             RDFDataset output = (RDFDataset)JsonLdProcessor.toRDF(input, this.commonOptions);
-            logger.debug("JSON-LD output: {}", output);
             for(String gName: output.graphNames()) {
-                logger.debug("Graph name: {}", gName);
                 for(RDFDataset.Quad q : output.getQuads(gName)) {
-                    logger.debug("Quad: {}", q);
                     Resource subject = null;
                     if (q.getSubject().isIRI()) {
                         subject = valueFactory.createIRI(q.getSubject().getValue());
@@ -62,8 +59,18 @@ public class JSONLDParser implements RDFParser {
                         object = valueFactory.createIRI(q.getObject().getValue());
                     } else if (q.getObject().isBlankNode()) {
                         object = valueFactory.createBNode(q.getObject().getValue());
+                    } else if(q.getObject().isLiteral()){
+                        String objectDatatype = q.getObject().getDatatype();
+                        String objectLanguage = q.getObject().getLanguage();
+                        if(objectLanguage != null) {
+                            object = valueFactory.createLiteral(q.getObject().getValue(), objectLanguage);
+                        } else if(objectDatatype != null) {
+                            object = valueFactory.createLiteral(q.getObject().getValue(), valueFactory.createIRI(objectDatatype));
+                        } else {
+                            object = valueFactory.createLiteral(q.getObject().getValue());
+                        }
                     } else {
-                        object = valueFactory.createLiteral(q.getObject().getValue());
+                        throw new ParsingErrorException("Unknown object type: " + q.getObject());
                     }
 
                     if(gName.equals(jsonldjavadefaultGraphName)) {

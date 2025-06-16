@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JSONLDParserTest {
+
     @Test
     void testGetRDFFormat() {
         RDFParser parser = JSONLDParserFactory.getInstance().createRDFParser(RDFFormats.JSON_LD, new CoreseModel(), new CoreseAdaptedValueFactory());
@@ -220,15 +221,17 @@ public class JSONLDParserTest {
                 {
                   "@context": {
                     "generatedAt": {
-                      "@id": "http://www.w3.org/ns/prov#generatedAtTime",
-                      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                      "@id": "http://www.w3.org/ns/prov#generatedAtTime"
                     },
                     "Person": "http://xmlns.com/foaf/0.1/Person",
                     "name": "http://xmlns.com/foaf/0.1/name",
                     "knows": {"@id": "http://xmlns.com/foaf/0.1/knows", "@type": "@id"}
                   },
                   "@id": "http://example.org/foaf-graph",
-                  "generatedAt": "2012-04-09T00:00:00",
+                  "generatedAt": {
+                    "@value": "2012-04-09T00:00:00",
+                    "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                  },
                   "@graph": [
                     {
                       "@id": "http://manu.sporny.org/about#manu",
@@ -251,7 +254,7 @@ public class JSONLDParserTest {
 
         assertEquals(7, model.size());
         IRI graphIRI = new CoreseAdaptedValueFactory().createIRI("http://example.org/foaf-graph");
-        IRI generatedAt = new CoreseAdaptedValueFactory().createIRI("http://www.w3.org/ns/prov#generatedAt");
+        IRI generatedAt = new CoreseAdaptedValueFactory().createIRI("http://www.w3.org/ns/prov#generatedAtTime");
         IRI datetimeDatatype = new CoreseAdaptedValueFactory().createIRI("http://www.w3.org/2001/XMLSchema#dateTime");
         Literal generatedAtValue = new CoreseAdaptedValueFactory().createLiteral("2012-04-09T00:00:00", datetimeDatatype) ;
         IRI manuIRI = new CoreseAdaptedValueFactory().createIRI("http://manu.sporny.org/about#manu");
@@ -263,8 +266,7 @@ public class JSONLDParserTest {
         IRI personType = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/Person");
         IRI namePredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/name");
 
-        // <http://example.org/foaf-graph> prov:generatedAtTime "2012-04-09T00:00:00"^^xsd:dateTime .
-        assertTrue(model.contains(graphIRI, generatedAt, generatedAtValue));
+
         //<http://example.org/foaf-graph> {
         //  <http://manu.sporny.org/about#manu> a foaf:Person;
         assertTrue(model.contains(manuIRI, typeIRI, personType, graphIRI));
@@ -280,5 +282,7 @@ public class JSONLDParserTest {
         //     foaf:knows <http://manu.sporny.org/about#manu> .
         assertTrue(model.contains(greggIRI, knowsPredicate, manuIRI, graphIRI));
         //}
+        //<http://example.org/foaf-graph> prov:generatedAtTime "2012-04-09T00:00:00"^^xsd:dateTime .
+        assertTrue(model.contains(graphIRI, generatedAt, generatedAtValue));
     }
 }
