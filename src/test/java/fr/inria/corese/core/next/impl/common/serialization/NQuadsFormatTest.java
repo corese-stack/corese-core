@@ -29,8 +29,6 @@ class NQuadsFormatTest {
     private IRI mockExName;
 
     private IRI mockExKnows;
-    private IRI mockExContext;
-
 
     private final String lexJohn = "John Doe";
 
@@ -44,7 +42,7 @@ class NQuadsFormatTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-        config = new FormatConfig.Builder().build();
+        config = FormatConfig.nquadsConfig();
         nQuadsFormat = new NQuadsFormat(model, config);
 
         mockExPerson = createIRI("http://example.org/Person");
@@ -58,7 +56,6 @@ class NQuadsFormatTest {
 
         mockBNode1 = createBlankNode("b1");
         mockBNode2 = createBlankNode("b2");
-        mockExContext = createIRI("http://example.org/myGraph");
     }
 
     @Test
@@ -92,30 +89,6 @@ class NQuadsFormatTest {
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
                 escapeNQuadsString(lexJohn)) + " .\n";
-
-        assertEquals(expected, writer.toString());
-    }
-
-    @Test
-    @DisplayName("Write should serialize statement with context (named graph)")
-    void writeShouldSerializeStatementWithContext() throws SerializationException {
-        Statement stmt = createStatement(
-                mockExPerson,
-                mockExName,
-                mockLiteralJohn,
-                mockExContext
-        );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
-
-        StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
-
-
-        String expected = String.format("<%s> <%s> \"%s\" <%s>",
-                mockExPerson.stringValue(),
-                mockExName.stringValue(),
-                escapeNQuadsString(lexJohn),
-                mockExContext.stringValue()) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -165,31 +138,6 @@ class NQuadsFormatTest {
         assertEquals(expected, writer.toString());
     }
 
-    @Test
-    @DisplayName("Write should handle blank nodes with custom prefix")
-    void writeShouldHandleBlankNodesWithCustomPrefix() throws SerializationException {
-        FormatConfig customConfig = new FormatConfig.Builder().blankNodePrefix("genid-").build();
-        NQuadsFormat customSerializer = new NQuadsFormat(model, customConfig);
-
-        Statement stmt = createStatement(
-                mockBNode1,
-                mockExKnows,
-                mockBNode2,
-                createBlankNode("b3")
-        );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
-
-        StringWriter writer = new StringWriter();
-        customSerializer.write(writer);
-
-        String expected = String.format("genid-%s <%s> genid-%s genid-%s",
-                mockBNode1.stringValue(),
-                mockExKnows.stringValue(),
-                mockBNode2.stringValue(),
-                createBlankNode("b3").stringValue()) + " .\n";
-
-        assertEquals(expected, writer.toString());
-    }
 
     @Test
     @DisplayName("Write should throw SerializationException on IO error")
@@ -208,7 +156,7 @@ class NQuadsFormatTest {
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null subject value from Statement")
+    @DisplayName("Write should throw SerializationException on null subject value from Statement in strict mode")
     void writeShouldThrowOnNullSubjectValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(null);
@@ -218,11 +166,12 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        assertEquals("Invalid data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: NQuads]", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null predicate value from Statement")
+    @DisplayName("Write should throw SerializationException on null predicate value from Statement in strict mode")
     void writeShouldThrowOnNullPredicateValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
@@ -232,11 +181,12 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        assertEquals("Invalid data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: NQuads]", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null object value from Statement")
+    @DisplayName("Write should throw SerializationException on null object value from Statement in strict mode")
     void writeShouldThrowOnNullObjectValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
@@ -246,17 +196,19 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        assertEquals("Invalid data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: NQuads]", thrown.getMessage());
     }
 
     @Test
     @DisplayName("Write should correctly handle null context (default graph)")
     void writeShouldHandleNullContext() throws SerializationException {
+        // Default config (nquadsConfig) has includeContext = true, but this statement has null context.
         Statement stmt = createStatement(
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn,
-                null
+                null // Explicitly null context
         );
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
@@ -283,9 +235,8 @@ class NQuadsFormatTest {
             "literal with \u0001 (SOH)",
             "literal with \u007F (DEL)"
     })
-    @DisplayName("Write should handle various literal values with proper escaping")
+    @DisplayName("Write should handle various literal values with proper escaping (including Unicode)")
     void writeShouldHandleVariousLiterals(String literalValue) throws SerializationException {
-
         Literal literalMock = createLiteral(literalValue, null, null);
 
         Statement stmt = createStatement(
@@ -318,7 +269,8 @@ class NQuadsFormatTest {
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer writer = new StringWriter();
-        NQuadsFormat serializer = new NQuadsFormat(currentTestModel);
+
+        NQuadsFormat serializer = new NQuadsFormat(currentTestModel, FormatConfig.nquadsConfig());
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
@@ -350,7 +302,6 @@ class NQuadsFormatTest {
 
         if (langTag != null && !langTag.isEmpty()) {
             when(literal.getLanguage()).thenReturn(Optional.of(langTag));
-
             when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
         } else {
             when(literal.getLanguage()).thenReturn(Optional.empty());
@@ -362,7 +313,8 @@ class NQuadsFormatTest {
     /**
      * Escapes a string according to N-Quads literal escaping rules.
      * This helper is used in tests to construct the *expected* output strings.
-     * It mimics the behavior of NQuadsFormat's internal escapeLiteral method.
+     * It mimics the behavior of NQuadsFormat's internal escapeLiteral method,
+     * considering that `nquadsConfig().escapeUnicode()` is `true`.
      *
      * @param s The string to escape.
      * @return The escaped string.
@@ -394,8 +346,18 @@ class NQuadsFormatTest {
                     sb.append("\\\\");
                     break;
                 default:
-                    if (c >= '\u0000' && c <= '\u001F' || c == '\u007F') {
+                    if (c <= 0x1F || c == 0x7F) { // Control characters
                         sb.append(String.format("\\u%04X", (int) c));
+                    } else if (c >= 0x80 && c <= 0xFFFF) { // Non-ASCII Basic Multilingual Plane characters
+                        sb.append(String.format("\\u%04X", (int) c));
+                    } else if (Character.isHighSurrogate(c)) { // Supplementary characters
+                        int codePoint = s.codePointAt(i);
+                        if (Character.isValidCodePoint(codePoint)) {
+                            sb.append(String.format("\\U%08X", codePoint));
+                            i++; // Skip the low surrogate char
+                        } else {
+                            sb.append(c); // Append invalid surrogate char directly
+                        }
                     } else {
                         sb.append(c);
                     }

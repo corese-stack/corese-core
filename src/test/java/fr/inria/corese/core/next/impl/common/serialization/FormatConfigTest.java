@@ -1,50 +1,70 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
+import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FormatConfigTest {
-
     @Test
-    @DisplayName("Builder should create FormatConfig with default blank node prefix")
-    void builderShouldCreateWithDefaultBlankNodePrefix() {
-         
-        FormatConfig config = new FormatConfig.Builder().build();
+    @DisplayName("ntriplesConfig() should return correct default config for N-Triples")
+    void ntriplesConfigReturnsCorrectConfig() {
+        FormatConfig config = FormatConfig.ntriplesConfig();
 
-         
-        assertNotNull(config, "FormatConfig should not be null");
-        assertEquals("_:", config.getBlankNodePrefix(), "Default blank node prefix should be '_:'");
+        assertFalse(config.usePrefixes());
+        assertFalse(config.autoDeclarePrefixes());
+        assertFalse(config.useCompactTriples());
+        assertFalse(config.useRdfTypeShortcut());
+        assertFalse(config.useCollections());
+        assertEquals(BlankNodeStyleEnum.NAMED, config.getBlankNodeStyle());
+        assertFalse(config.prettyPrint());
+        assertEquals("", config.getIndent());
+        assertEquals(0, config.getMaxLineLength());
+        assertFalse(config.groupBySubject());
+        assertFalse(config.sortSubjects());
+        assertFalse(config.sortPredicates());
+        assertEquals(LiteralDatatypePolicyEnum.ALWAYS_TYPED, config.getLiteralDatatypePolicy());
+        assertTrue(config.escapeUnicode());
+        assertTrue(config.trailingDot());
+        assertNull(config.getBaseIRI());
+        assertTrue(config.stableBlankNodeIds());
+        assertTrue(config.isStrictMode());
+        assertTrue(config.validateURIs());
+        assertFalse(config.includeContext());
+        assertEquals(SerializationConstants.DEFAULT_LINE_ENDING, config.getLineEnding());
+        assertTrue(config.getCustomPrefixes().isEmpty());
     }
 
     @Test
-    @DisplayName("Builder should create FormatConfig with custom blank node prefix")
-    void builderShouldCreateWithCustomBlankNodePrefix() {
-        String customPrefix = "genid-";
+    @DisplayName("nquadsConfig() should return correct default config for N-Quads")
+    void nquadsConfigReturnsCorrectConfig() {
+        FormatConfig config = FormatConfig.nquadsConfig();
 
-         
-        FormatConfig config = new FormatConfig.Builder()
-                .blankNodePrefix(customPrefix)
-                .build();
-
-         
-        assertNotNull(config, "FormatConfig should not be null");
-        assertEquals(customPrefix, config.getBlankNodePrefix(), "Blank node prefix should match the custom value");
+        assertFalse(config.usePrefixes());
+        assertFalse(config.autoDeclarePrefixes());
+        assertFalse(config.useCompactTriples());
+        assertFalse(config.useRdfTypeShortcut());
+        assertFalse(config.useCollections());
+        assertEquals(BlankNodeStyleEnum.NAMED, config.getBlankNodeStyle());
+        assertFalse(config.prettyPrint());
+        assertEquals("", config.getIndent());
+        assertEquals(0, config.getMaxLineLength());
+        assertFalse(config.groupBySubject());
+        assertFalse(config.sortSubjects());
+        assertFalse(config.sortPredicates());
+        assertEquals(LiteralDatatypePolicyEnum.ALWAYS_TYPED, config.getLiteralDatatypePolicy());
+        assertTrue(config.escapeUnicode());
+        assertTrue(config.trailingDot());
+        assertNull(config.getBaseIRI());
+        assertTrue(config.stableBlankNodeIds());
+        assertTrue(config.isStrictMode());
+        assertTrue(config.validateURIs());
+        assertTrue(config.includeContext());
+        assertEquals(SerializationConstants.DEFAULT_LINE_ENDING, config.getLineEnding());
+        assertTrue(config.getCustomPrefixes().isEmpty());
     }
 
-    @Test
-    @DisplayName("blankNodePrefix method in Builder should throw NullPointerException for null prefix")
-    void blankNodePrefixShouldThrowForNull() {
-
-        FormatConfig.Builder builder = new FormatConfig.Builder();
-
-
-        assertThrows(NullPointerException.class, () -> builder.blankNodePrefix(null),
-                "Setting a null blank node prefix should throw NullPointerException");
-    }
 
     @Test
     @DisplayName("FormatConfig constructor should be private and only accessible via builder")
@@ -52,5 +72,76 @@ class FormatConfigTest {
 
         FormatConfig config = new FormatConfig.Builder().build();
         assertNotNull(config);
+    }
+
+    @Test
+    @DisplayName("blankNodeStyle method in Builder should throw NullPointerException for null style")
+    void blankNodeStyleShouldThrowForNull() {
+        FormatConfig.Builder builder = new FormatConfig.Builder();
+        assertThrows(NullPointerException.class, () -> builder.blankNodeStyle(null),
+                "Setting a null blankNodeStyle should throw NullPointerException");
+    }
+
+    @Test
+    @DisplayName("indent method in Builder should throw NullPointerException for null indent")
+    void indentShouldThrowForNull() {
+        FormatConfig.Builder builder = new FormatConfig.Builder();
+        assertThrows(NullPointerException.class, () -> builder.indent(null),
+                "Setting a null indent should throw NullPointerException");
+    }
+
+    @Test
+    @DisplayName("lineEnding method in Builder should throw NullPointerException for null lineEnding")
+    void lineEndingShouldThrowForNull() {
+        FormatConfig.Builder builder = new FormatConfig.Builder();
+        assertThrows(NullPointerException.class, () -> builder.lineEnding(null),
+                "Setting a null lineEnding should throw NullPointerException");
+    }
+
+    @Test
+    @DisplayName("prefixOrdering method in Builder should throw NullPointerException for null prefixOrdering")
+    void prefixOrderingShouldThrowForNull() {
+        FormatConfig.Builder builder = new FormatConfig.Builder();
+        assertThrows(NullPointerException.class, () -> builder.prefixOrdering(null),
+                "Setting a null prefixOrdering should throw NullPointerException");
+    }
+
+    @Test
+    @DisplayName("Builder should create FormatConfig with all default values")
+    void builderShouldCreateWithAllDefaults() {
+        FormatConfig config = new FormatConfig.Builder().build();
+
+        assertNotNull(config, "FormatConfig should not be null");
+
+        // --- Syntax Sugar Defaults ---
+        assertTrue(config.usePrefixes(), "Default usePrefixes should be true");
+        assertTrue(config.autoDeclarePrefixes(), "Default autoDeclarePrefixes should be true");
+        assertEquals(PrefixOrderingEnum.ALPHABETICAL, config.getPrefixOrdering(), "Default prefixOrdering should be ALPHABETICAL");
+        assertTrue(config.getCustomPrefixes().isEmpty(), "Default customPrefixes map should be empty");
+        assertTrue(config.useCompactTriples(), "Default useCompactTriples should be true");
+        assertTrue(config.useRdfTypeShortcut(), "Default useRdfTypeShortcut should be true");
+        assertFalse(config.useCollections(), "Default useCollections should be false");
+        assertEquals(BlankNodeStyleEnum.NAMED, config.getBlankNodeStyle(), "Default blankNodeStyle should be NAMED");
+
+        // --- Pretty-Printing Defaults ---
+        assertTrue(config.prettyPrint(), "Default prettyPrint should be true");
+        assertEquals(SerializationConstants.DEFAULT_INDENTATION, config.getIndent(), "Default indent should be " + SerializationConstants.DEFAULT_INDENTATION);
+        assertEquals(80, config.getMaxLineLength(), "Default maxLineLength should be 80");
+        assertTrue(config.groupBySubject(), "Default groupBySubject should be true");
+        assertFalse(config.sortSubjects(), "Default sortSubjects should be false");
+        assertFalse(config.sortPredicates(), "Default sortPredicates should be false");
+
+        // --- Technical Output Defaults ---
+        assertEquals(LiteralDatatypePolicyEnum.MINIMAL, config.getLiteralDatatypePolicy(), "Default literalDatatypePolicy should be MINIMAL");
+        assertFalse(config.escapeUnicode(), "Default escapeUnicode should be false");
+        assertTrue(config.trailingDot(), "Default trailingDot should be true");
+        assertNull(config.getBaseIRI(), "Default baseIRI should be null");
+        assertFalse(config.stableBlankNodeIds(), "Default stableBlankNodeIds should be false");
+
+        // --- Validation & Context Defaults ---
+        assertTrue(config.isStrictMode(), "Default strictMode should be true");
+        assertTrue(config.validateURIs(), "Default validateURIs should be true");
+        assertFalse(config.includeContext(), "Default includeContext should be false");
+        assertEquals(SerializationConstants.DEFAULT_LINE_ENDING, config.getLineEnding(), "Default lineEnding should be " + SerializationConstants.DEFAULT_LINE_ENDING);
     }
 }

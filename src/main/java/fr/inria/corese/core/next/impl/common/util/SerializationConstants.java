@@ -72,8 +72,28 @@ public class SerializationConstants {
 
     // Nouvelle constante pour le séparateur de datatype
     public static final String DATATYPE_SEPARATOR = "^^";
+    // Used by NAMED BlankNodeStyle
+    public static final String DEFAULT_BLANK_NODE_PREFIX = "_:";
+    // Separator for predicate-object lists in Turtle/TriG
+    public static final String SEMICOLON = ";";
+    // Separator for object lists in Turtle/TriG
+    public static final String COMMA = ",";
+    // 2 spaces
+    public static final String DEFAULT_INDENTATION = "  ";
+
+    public static final String DEFAULT_LINE_ENDING = "\n";
 
 
+    // --- Keywords and Shortcuts ---
+    public static final String PREFIX_KEYWORD = "@prefix"; // Turtle/TriG prefix keyword
+
+    public static final String RDF_TYPE_SHORTCUT = "a";  // Shortcut for rdf:type in Turtle/TriG
+
+    public static final String COLON = ":";
+
+    public static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+
+    public static final String RDF_TYPE = RDF_NS + "type";
     /**
      * Private constructor to prevent instantiation of this utility class.
      * All members are static.
