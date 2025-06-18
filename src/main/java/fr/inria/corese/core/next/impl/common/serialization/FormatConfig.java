@@ -141,6 +141,9 @@ public class FormatConfig {
      */
     private final String lineEnding;
 
+
+    private final boolean useMultilineLiterals;
+
     /**
      * Private constructor to enforce usage of the Builder.
      *
@@ -178,7 +181,13 @@ public class FormatConfig {
         this.validateURIs = builder.validateURIs;
         this.includeContext = builder.includeContext;
         this.lineEnding = Objects.requireNonNull(builder.lineEnding, "Line ending cannot be null");
+
+        if (builder.escapeUnicode && builder.useMultilineLiterals) {
+            throw new IllegalArgumentException("Cannot enable both escapeUnicode and useMultilineLiterals");
+        }
+        this.useMultilineLiterals = builder.useMultilineLiterals;
     }
+
 
     // --- Builder Class ---
 
@@ -220,6 +229,7 @@ public class FormatConfig {
         private boolean validateURIs = true;
         private boolean includeContext = false;
         private String lineEnding = SerializationConstants.DEFAULT_LINE_ENDING;
+        private boolean useMultilineLiterals = true;
 
         /**
          * Default constructor initializes all options with their default values.
@@ -311,6 +321,11 @@ public class FormatConfig {
             return this;
         }
 
+        public Builder useMultilineLiterals(boolean useMultilineLiterals) {
+            this.useMultilineLiterals = useMultilineLiterals;
+            return this;
+        }
+
         // --- Builder Methods for Technical Output Options ---
 
         public Builder literalDatatypePolicy(LiteralDatatypePolicyEnum literalDatatypePolicy) {
@@ -388,7 +403,7 @@ public class FormatConfig {
                 .useCollections(false)
                 .blankNodeStyle(BlankNodeStyleEnum.NAMED) // N-Triples uses _:bnodeId
                 .prettyPrint(false) // N-Triples is usually not "pretty-printed" beyond newlines
-                .indent("") // No indentation
+                .indent(SerializationConstants.EMPTY_STRING) // No indentation
                 .maxLineLength(0) // No line length limit for simplicity (or can be set very high)
                 .groupBySubject(false) // Each triple on its own line
                 .sortSubjects(false) // Order not strictly defined
@@ -400,6 +415,7 @@ public class FormatConfig {
                 .stableBlankNodeIds(true) // Good for reproducible N-Triples tests
                 .strictMode(true) // Be strict for N-Triples validation
                 .validateURIs(true)
+                .useMultilineLiterals(false)
                 .includeContext(false) // N-Triples does not support contexts
                 .lineEnding(SerializationConstants.DEFAULT_LINE_ENDING)
                 .build();
@@ -420,7 +436,7 @@ public class FormatConfig {
                 .useCollections(false)
                 .blankNodeStyle(BlankNodeStyleEnum.NAMED)
                 .prettyPrint(false)
-                .indent("")
+                .indent(SerializationConstants.EMPTY_STRING)
                 .maxLineLength(0)
                 .groupBySubject(false)
                 .sortSubjects(false)
@@ -432,6 +448,7 @@ public class FormatConfig {
                 .stableBlankNodeIds(true)
                 .strictMode(true)
                 .validateURIs(true)
+                .useMultilineLiterals(false)
                 .includeContext(true) // N-Quads includes contexts by definition
                 .lineEnding(SerializationConstants.DEFAULT_LINE_ENDING)
                 .build();
@@ -445,10 +462,10 @@ public class FormatConfig {
      */
     public static FormatConfig turtleConfig() {
         Map<String, String> commonTurtlePrefixes = new HashMap<>();
-        commonTurtlePrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        commonTurtlePrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        commonTurtlePrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
+        commonTurtlePrefixes.put("rdf", SerializationConstants.RDF_NS);
+        commonTurtlePrefixes.put("rdfs", SerializationConstants.RDFS_NS);
+        commonTurtlePrefixes.put("xsd", SerializationConstants.XSD_NS);
+        commonTurtlePrefixes.put("owl", SerializationConstants.OWL_NS);
 
         return new Builder()
                 .usePrefixes(true)
@@ -457,8 +474,8 @@ public class FormatConfig {
                 .addCustomPrefixes(commonTurtlePrefixes) // Start with common prefixes
                 .useCompactTriples(true) // Enable ; and ,
                 .useRdfTypeShortcut(true) // Use 'a'
-                .useCollections(false) // Keep false for now due to complexity
-                .blankNodeStyle(BlankNodeStyleEnum.NAMED) // Default to NAMED, for now (shorthand is complex)
+                .useCollections(true) // Changed to true for comprehensive Turtle output
+                .blankNodeStyle(BlankNodeStyleEnum.ANONYMOUS)
                 .prettyPrint(true)
                 .indent(SerializationConstants.DEFAULT_INDENTATION)
                 .maxLineLength(80) // Standard line length
@@ -473,6 +490,7 @@ public class FormatConfig {
                 .strictMode(true)
                 .validateURIs(true)
                 .includeContext(false) // Turtle does not support contexts
+                .useMultilineLiterals(true)
                 .lineEnding(SerializationConstants.DEFAULT_LINE_ENDING)
                 .build();
     }
@@ -485,10 +503,10 @@ public class FormatConfig {
      */
     public static FormatConfig trigConfig() {
         Map<String, String> commonTriGPrefixes = new HashMap<>();
-        commonTriGPrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        commonTriGPrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        commonTriGPrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        commonTriGPrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
+        commonTriGPrefixes.put("rdf", SerializationConstants.RDF_NS);
+        commonTriGPrefixes.put("rdfs", SerializationConstants.RDFS_NS);
+        commonTriGPrefixes.put("xsd", SerializationConstants.XSD_NS);
+        commonTriGPrefixes.put("owl", SerializationConstants.OWL_NS);
 
         return new Builder()
                 .usePrefixes(true)
@@ -513,11 +531,23 @@ public class FormatConfig {
                 .strictMode(true)
                 .validateURIs(true)
                 .includeContext(true) // TriG includes contexts by definition
+                .useMultilineLiterals(true)
                 .lineEnding(SerializationConstants.DEFAULT_LINE_ENDING)
                 .build();
     }
 
+    public boolean shouldUseTripleQuotes(String literalValue) {
+        return useMultilineLiterals &&
+                (literalValue.contains(SerializationConstants.LINE_FEED) || literalValue.contains(SerializationConstants.CARRIAGE_RETURN));
+    }
 
+    public boolean shouldOptimizeOutput() {
+        return useCompactTriples || groupBySubject || prettyPrint;
+    }
+
+    public boolean shouldUseInlineBlankNodes() {
+        return blankNodeStyle == BlankNodeStyleEnum.ANONYMOUS && useCompactTriples;
+    }
     // --- Getters for all options ---
 
     public boolean usePrefixes() {
@@ -610,5 +640,9 @@ public class FormatConfig {
 
     public String getLineEnding() {
         return lineEnding;
+    }
+
+    public boolean useMultilineLiterals() {
+        return useMultilineLiterals;
     }
 }
