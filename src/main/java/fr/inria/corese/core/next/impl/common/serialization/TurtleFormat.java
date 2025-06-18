@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -285,7 +285,7 @@ public class TurtleFormat implements FormatSerializer {
             if (!handled && config.getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS && bNode.isBNode()) {
                 List<Statement> properties = model.stream()
                         .filter(stmt -> stmt.getSubject().equals(bNode))
-                        .collect(Collectors.toList());
+                        .toList();
 
                 if (!properties.isEmpty()) {
                     writeInlineBlankNode(writer, properties);
@@ -528,7 +528,7 @@ public class TurtleFormat implements FormatSerializer {
             final Resource finalCurrentForLambda = current;
             List<Statement> statements = model.stream()
                     .filter(stmt -> stmt.getSubject().equals(finalCurrentForLambda))
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (statements.size() != 2) {
                 current = null;
@@ -568,7 +568,6 @@ public class TurtleFormat implements FormatSerializer {
             return false;
         }
 
-        // Mark all blank nodes composing this list as consumed
         consumedBlankNodes.addAll(listBlankNodes);
 
         writer.write(SerializationConstants.OPEN_PARENTHESIS);
@@ -590,7 +589,7 @@ public class TurtleFormat implements FormatSerializer {
      * @return {@code true} if the value is a consumed blank node, {@code false} otherwise.
      */
     private boolean isConsumed(Value value) {
-        return value.isBNode() && consumedBlankNodes.contains((Resource) value);
+        return value.isBNode() && consumedBlankNodes.contains(value);
     }
 
     /**
@@ -603,8 +602,8 @@ public class TurtleFormat implements FormatSerializer {
         Set<Resource> precomputed = new HashSet<>();
         for (Statement stmt : model) {
             if (stmt.getSubject().isBNode()) {
-                Resource bNodeSubject = (Resource) stmt.getSubject();
-                // Check if it's a list
+                Resource bNodeSubject = stmt.getSubject();
+
                 if (config.useCollections() && isRDFListHead(bNodeSubject)) {
                     Resource current = bNodeSubject;
                     Set<Resource> listNodes = new HashSet<>();
@@ -616,18 +615,24 @@ public class TurtleFormat implements FormatSerializer {
                         final Resource finalCurrentForLambda = current;
                         List<Statement> listProps = model.stream()
                                 .filter(s -> s.getSubject().equals(finalCurrentForLambda))
-                                .collect(Collectors.toList());
+                                .toList();
+
                         if (listProps.size() != 2) {
                             isList = false;
                             break;
                         }
+
+                        Optional<Value> first = listProps.stream()
+                                .filter(s -> s.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST))
+                                .map(Statement::getObject)
+                                .findFirst();
 
                         Optional<Value> rest = listProps.stream()
                                 .filter(s -> s.getPredicate().stringValue().equals(SerializationConstants.RDF_REST))
                                 .map(Statement::getObject)
                                 .findFirst();
 
-                        if (!rest.isPresent()) {
+                        if (!first.isPresent() || !rest.isPresent()) {
                             isList = false;
                             break;
                         }
@@ -645,12 +650,11 @@ public class TurtleFormat implements FormatSerializer {
                         precomputed.addAll(listNodes);
                     }
                 }
-                // Check if it's a blank node with properties to include inline (style [] )
                 if (config.getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS) {
                     List<Statement> properties = model.stream()
                             .filter(s -> s.getSubject().equals(bNodeSubject))
-                            .collect(Collectors.toList());
-                    // Do not consider as inlineable if it's part of a list (already handled)
+                            .toList();
+
                     boolean isPartOfList = properties.stream().anyMatch(s ->
                             s.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST) ||
                                     s.getPredicate().stringValue().equals(SerializationConstants.RDF_REST)
@@ -664,6 +668,7 @@ public class TurtleFormat implements FormatSerializer {
         }
         return precomputed;
     }
+
 
     /**
      * Checks if a given blank node is the head of an RDF list.
@@ -702,23 +707,28 @@ public class TurtleFormat implements FormatSerializer {
      * @param prefix       The associated prefix.
      */
     private void addPrefixMapping(String namespaceURI, String prefix) {
+
         if (iriToPrefixMapping.containsKey(namespaceURI)) {
-            if (!iriToPrefixMapping.get(namespaceURI).equals(prefix)) {
+            if (!iriToPrefixMapping.get(namespaceURI).equals(prefix) && logger.isWarnEnabled()) {
                 logger.warn("Namespace URI '{}' is already mapped to prefix '{}'. Cannot map to new prefix '{}'.",
                         namespaceURI, iriToPrefixMapping.get(namespaceURI), prefix);
+
             }
             return;
         }
 
+
         if (prefixToIriMapping.containsKey(prefix)) {
-            if (!prefixToIriMapping.get(prefix).equals(namespaceURI)) {
+            if (!prefixToIriMapping.get(prefix).equals(namespaceURI) && logger.isWarnEnabled()) {
                 String originalNamespace = prefixToIriMapping.get(prefix);
                 logger.warn("Prefix '{}' is already mapped to namespace '{}'. Cannot map to new namespace '{}'. " +
                                 "A new unique prefix will be generated for '{}'.",
                         prefix, originalNamespace, namespaceURI, namespaceURI);
-                return;
+
             }
+            return;
         }
+
         iriToPrefixMapping.put(namespaceURI, prefix);
         prefixToIriMapping.put(prefix, namespaceURI);
     }
@@ -801,13 +811,13 @@ public class TurtleFormat implements FormatSerializer {
             base = base.substring(lastSegmentStart + 1);
         }
 
-        if (base.isEmpty()) { // If it's something like http://example.com/
+        if (base.isEmpty()) {
             try {
-                URL url = new URL(namespace);
-                base = url.getHost().replace(SerializationConstants.POINT, "");
-            } catch (MalformedURLException e) {
-                // Fallback
-                base = "p";
+                URI uri = new URI(namespace); // Utilisation de URI
+                base = uri.getHost().replace(SerializationConstants.POINT, SerializationConstants.EMPTY_STRING);
+            } catch (URISyntaxException e) { // Capture URISyntaxException
+                logger.warn("Malformed URI encountered while suggesting prefix: {}", namespace, e);
+                base = "p"; // Fallback
             }
         }
 
@@ -929,10 +939,8 @@ public class TurtleFormat implements FormatSerializer {
             throw new IllegalArgumentException("Value cannot be null in Turtle format when strictMode is enabled.");
         }
 
-        if (config.isStrictMode()) {
-            if (value.isLiteral()) {
-                validateLiteral((Literal) value);
-            }
+        if (config.isStrictMode() && value.isLiteral()) {
+            validateLiteral((Literal) value);
         }
     }
 
