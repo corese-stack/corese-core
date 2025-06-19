@@ -41,6 +41,8 @@ public class Serializer {
             formatSerializer = new NQuadsFormat(model, config);
         } else if (format.equals(RdfFormat.TURTLE)) {
             formatSerializer = new TurtleFormat(model, config);
+        } else if (format.equals(RdfFormat.TRIG)) {
+            formatSerializer = new TriGFormat(model, config);
         } else if (format.equals(RdfFormat.JSONLD)) {
             throw new UnsupportedOperationException("Serialization to " + format.getName() + " format is not yet implemented.");
         } else if (format.equals(RdfFormat.RDFXML)) {
