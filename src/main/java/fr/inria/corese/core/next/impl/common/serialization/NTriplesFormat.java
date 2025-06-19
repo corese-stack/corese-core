@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
@@ -328,12 +329,12 @@ public class NTriplesFormat implements FormatSerializer {
         IRI datatype = literal.getDatatype();
 
         if (literal.getLanguage().isPresent()) {
-            if (datatype == null || !datatype.stringValue().equals(SerializationConstants.RDF_LANGSTRING)) {
+            if (datatype == null || !datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
                 throw new IllegalArgumentException(
                         "Literal with language tag must use rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"));
             }
         } else {
-            if (datatype != null && datatype.stringValue().equals(SerializationConstants.RDF_LANGSTRING)) {
+            if (datatype != null && datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
                 throw new IllegalArgumentException(
                         "rdf:langString literal must have a language tag.");
             }

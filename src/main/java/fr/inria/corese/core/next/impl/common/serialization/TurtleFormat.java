@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.BlankNodeStyleEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
@@ -216,7 +217,7 @@ public class TurtleFormat implements FormatSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeStatement(Writer writer, Statement stmt) throws IOException {
-        String indent = config.prettyPrint() ? config.getIndent() : "";
+        String indent = config.prettyPrint() ? config.getIndent() : SerializationConstants.EMPTY_STRING;
         writer.write(indent);
 
         // Subject
@@ -817,9 +818,9 @@ public class TurtleFormat implements FormatSerializer {
 
         if (base.isEmpty()) {
             try {
-                URI uri = new URI(namespace); // Utilisation de URI
+                URI uri = new URI(namespace);
                 base = uri.getHost().replace(SerializationConstants.POINT, SerializationConstants.EMPTY_STRING);
-            } catch (URISyntaxException e) { // Capture URISyntaxException
+            } catch (URISyntaxException e) {
                 logger.warn("Malformed URI encountered while suggesting prefix: {}", namespace, e);
                 base = "p";
             }
@@ -959,12 +960,12 @@ public class TurtleFormat implements FormatSerializer {
         IRI datatype = literal.getDatatype();
 
         if (literal.getLanguage().isPresent()) {
-            if (datatype == null || !datatype.stringValue().equals(SerializationConstants.RDF_LANGSTRING)) {
+            if (datatype == null || !datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
                 throw new IllegalArgumentException(
                         "A literal with a language tag must use the rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"));
             }
         } else {
-            if (datatype != null && datatype.stringValue().equals(SerializationConstants.RDF_LANGSTRING)) {
+            if (datatype != null && datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
                 throw new IllegalArgumentException(
                         "An rdf:langString literal must have a language tag.");
             }

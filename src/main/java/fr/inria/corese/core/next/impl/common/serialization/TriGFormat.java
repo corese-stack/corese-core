@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.BlankNodeStyleEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
@@ -1048,12 +1049,12 @@ public class TriGFormat implements FormatSerializer {
         IRI datatype = literal.getDatatype();
 
         if (literal.getLanguage().isPresent()) {
-            if (datatype == null || !datatype.stringValue().equals(SerializationConstants.RDF_LANGSTRING)) {
+            if (datatype == null || !datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
                 throw new IllegalArgumentException(
                         "A literal with a language tag must use the rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"));
             }
         } else {
-            if (datatype != null && datatype.stringValue().equals(SerializationConstants.RDF_LANGSTRING)) {
+            if (datatype != null && datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
                 throw new IllegalArgumentException(
                         "An rdf:langString literal must have a language tag.");
             }

@@ -22,7 +22,6 @@ public final class SerializationConstants {
     public static final String RDF_FIRST = RDF_NS + "first";
     public static final String RDF_REST = RDF_NS + "rest";
     public static final String RDF_NIL = RDF_NS + "nil";
-    public static final String RDF_LANGSTRING = RDF_NS + "langString";
 
     public static final String XSD_STRING = XSD_NS + "string";
     public static final String XSD_INTEGER = XSD_NS + "integer";

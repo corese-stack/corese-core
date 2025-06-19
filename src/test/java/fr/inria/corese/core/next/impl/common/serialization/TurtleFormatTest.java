@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
@@ -210,7 +211,7 @@ class TurtleFormatTest {
         when(mockObject.getLanguage()).thenReturn(Optional.of("en"));
 
         IRI mockRdfLangString = mock(IRI.class);
-        when(mockRdfLangString.stringValue()).thenReturn(SerializationConstants.RDF_LANGSTRING);
+        when(mockRdfLangString.stringValue()).thenReturn(RDF.LANGSTRING.getIRI().stringValue());
         when(mockRdfLangString.isIRI()).thenReturn(true);
         when(mockRdfLangString.isResource()).thenReturn(true);
         when(mockObject.getDatatype()).thenReturn(mockRdfLangString);
@@ -616,7 +617,7 @@ class TurtleFormatTest {
         when(mockObject.isBNode()).thenReturn(false);
         when(mockObject.getLanguage()).thenReturn(Optional.empty());
         IRI mockRdfLangStringDatatype = mock(IRI.class);
-        when(mockRdfLangStringDatatype.stringValue()).thenReturn(SerializationConstants.RDF_LANGSTRING);
+        when(mockRdfLangStringDatatype.stringValue()).thenReturn(RDF.LANGSTRING.getIRI().stringValue());
         when(mockRdfLangStringDatatype.isIRI()).thenReturn(true);
         when(mockRdfLangStringDatatype.isResource()).thenReturn(true);
         when(mockObject.getDatatype()).thenReturn(mockRdfLangStringDatatype);
