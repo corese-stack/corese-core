@@ -37,14 +37,13 @@ public class Serializer {
 
         if (format.equals(RdfFormat.NTRIPLES)) {
             formatSerializer = new NTriplesFormat(model, config);
-        } else if (format.equals( RdfFormat.NQUADS)) {
+        } else if (format.equals(RdfFormat.NQUADS)) {
             formatSerializer = new NQuadsFormat(model, config);
-        } else if (format.equals( RdfFormat.TURTLE)) {
-
+        } else if (format.equals(RdfFormat.TURTLE)) {
+            formatSerializer = new TurtleFormat(model, config);
+        } else if (format.equals(RdfFormat.JSONLD)) {
             throw new UnsupportedOperationException("Serialization to " + format.getName() + " format is not yet implemented.");
-        } else if (format.equals( RdfFormat.JSONLD)) {
-            throw new UnsupportedOperationException("Serialization to " + format.getName() + " format is not yet implemented.");
-        } else if (format.equals( RdfFormat.RDFXML)) {
+        } else if (format.equals(RdfFormat.RDFXML)) {
             throw new UnsupportedOperationException("Serialization to " + format.getName() + " format is not yet implemented.");
         } else {
             throw new IllegalArgumentException("Unknown or unsupported RdfFormat: " + format.getName());

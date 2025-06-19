@@ -399,8 +399,8 @@ public class TurtleFormat implements FormatSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeInlineBlankNode(Writer writer, List<Statement> properties) throws IOException {
-        String currentIndent = config.prettyPrint() ? config.getIndent() : "";
-        String propIndent = config.prettyPrint() ? currentIndent + config.getIndent() : "";
+        String currentIndent = config.prettyPrint() ? config.getIndent() : SerializationConstants.EMPTY_STRING;
+        String propIndent = config.prettyPrint() ? currentIndent + config.getIndent() : SerializationConstants.EMPTY_STRING;
 
         writer.write(SerializationConstants.BLANK_NODE_START);
 
@@ -454,7 +454,7 @@ public class TurtleFormat implements FormatSerializer {
                 .forEach(stmt -> bySubject.computeIfAbsent(stmt.getSubject(), k -> new ArrayList<>()).add(stmt));
 
         for (Map.Entry<Resource, List<Statement>> subjectEntry : bySubject.entrySet()) {
-            String indent = config.prettyPrint() ? config.getIndent() : "";
+            String indent = config.prettyPrint() ? config.getIndent() : SerializationConstants.EMPTY_STRING;
             writer.write(indent);
             writeValue(writer, subjectEntry.getKey());
             writer.write(SerializationConstants.SPACE);
@@ -484,9 +484,9 @@ public class TurtleFormat implements FormatSerializer {
                 boolean firstObject = true;
                 for (Statement stmt : predicateEntry.getValue()) {
                     if (!firstObject) {
-                        writer.write(SerializationConstants.COMMA); // Object separator
+                        writer.write(SerializationConstants.COMMA);
                         if (config.prettyPrint()) {
-                            writer.write(config.getLineEnding() + indent + config.getIndent() + config.getIndent()); // Indentation for new object
+                            writer.write(config.getLineEnding() + indent + config.getIndent() + config.getIndent());
                         } else {
                             writer.write(SerializationConstants.SPACE);
                         }
@@ -817,18 +817,16 @@ public class TurtleFormat implements FormatSerializer {
                 base = uri.getHost().replace(SerializationConstants.POINT, SerializationConstants.EMPTY_STRING);
             } catch (URISyntaxException e) { // Capture URISyntaxException
                 logger.warn("Malformed URI encountered while suggesting prefix: {}", namespace, e);
-                base = "p"; // Fallback
+                base = "p";
             }
         }
 
-        // Convert to lowercase and remove non-alphanumeric characters
         base = base.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
-        if (base.isEmpty()) base = "p"; // General fallback
+        if (base.isEmpty()) base = "p";
 
         // Ensure uniqueness
         String candidate = base;
         int i = 0;
-        // Check if the prefix already exists and is mapped to *another* namespace
         while (prefixToIriMapping.containsKey(candidate) && !prefixToIriMapping.get(candidate).equals(namespace)) {
             candidate = base + (++i);
         }
@@ -899,7 +897,7 @@ public class TurtleFormat implements FormatSerializer {
      * @return The escaped string suitable for a multi-line Turtle literal.
      */
     private String escapeMultilineLiteral(String value) {
-        // In multi-line literals, only triple quotes need to be escaped
+
         return value.replace(SerializationConstants.QUOTE + SerializationConstants.QUOTE + SerializationConstants.QUOTE,
                 SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
                         SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
