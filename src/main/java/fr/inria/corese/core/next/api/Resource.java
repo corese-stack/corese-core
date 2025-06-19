@@ -1,7 +1,8 @@
 package fr.inria.corese.core.next.api;
 
 /**
- * Super interface of all resources of an RDF graph (statements, IRI, blank nodes) as defined for RDF 1.2.
+ * Super interface of all resources of an RDF graph (statements, IRI, blank
+ * nodes) as defined for RDF 1.2.
  */
 public interface Resource extends Value {
 
