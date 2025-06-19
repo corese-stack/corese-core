@@ -1,7 +1,12 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.verify;
+
+import java.io.Writer;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,12 +14,8 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockitoAnnotations;
 
-import java.io.Writer;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.verify;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 class SerializerTest {
 
@@ -33,7 +34,7 @@ class SerializerTest {
         serializer = new Serializer(mockModel, mockConfig);
     }
 
-    // --- Tests des constructeurs ---
+    // --- Constructor tests ---
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
@@ -48,21 +49,23 @@ class SerializerTest {
         assertThrows(NullPointerException.class, () -> new Serializer(mockModel, null), "FormatConfig cannot be null");
     }
 
-    // --- Tests des arguments de la méthode serialize ---
+    // --- Tests for the arguments of the serialize method ---
 
     @Test
     @DisplayName("serialize should throw NullPointerException for null writer")
     void serializeShouldThrowForNullWriter() {
-        assertThrows(NullPointerException.class, () -> serializer.serialize(null, RdfFormat.NTRIPLES), "Writer cannot be null");
+        assertThrows(NullPointerException.class, () -> serializer.serialize(null, RdfFormat.NTRIPLES),
+                "Writer cannot be null");
     }
 
     @Test
     @DisplayName("serialize should throw NullPointerException for null format")
     void serializeShouldThrowForNullFormat() {
-        assertThrows(NullPointerException.class, () -> serializer.serialize(mockWriter, null), "RdfFormat cannot be null");
+        assertThrows(NullPointerException.class, () -> serializer.serialize(mockWriter, null),
+                "RdfFormat cannot be null");
     }
 
-    // --- Tests de délégation de sérialisation ---
+    // --- Serialization delegation tests ---
 
     @Test
     @DisplayName("serialize should delegate to NTriplesFormat for NTRIPLES format")
@@ -70,7 +73,8 @@ class SerializerTest {
         try (MockedConstruction<NTriplesFormat> mockedNtConstructor = mockConstruction(NTriplesFormat.class)) {
             serializer.serialize(mockWriter, RdfFormat.NTRIPLES);
 
-            assertEquals(1, mockedNtConstructor.constructed().size(), "NTriplesFormat constructor should be called once");
+            assertEquals(1, mockedNtConstructor.constructed().size(),
+                    "NTriplesFormat constructor should be called once");
 
             NTriplesFormat createdNtSerializer = mockedNtConstructor.constructed().get(0);
 
@@ -90,6 +94,5 @@ class SerializerTest {
             verify(createdNqSerializer).write(mockWriter);
         }
     }
-
 
 }

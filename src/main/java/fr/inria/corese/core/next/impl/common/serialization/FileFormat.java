@@ -4,17 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents a general file format, including its name,
- * associated file extensions, and MIME types.
- *
- * This class is typically used to describe RDF serialization formats (e.g.,
- * Turtle, N-Triples),
- * but can also apply to other text or binary formats.
- *
- * Example:
- * name = "Turtle"
- * extensions = ["ttl"]
- * mimeTypes = ["text/turtle"]
+ * Represents a general file format, including its name, associated file
+ * extensions, and MIME types.
  */
 public class FileFormat {
 
@@ -25,9 +16,9 @@ public class FileFormat {
     /**
      * Constructs a new FileFormat instance.
      *
-     * @param name       The human-readable name of the format (e.g., "Turtle").
-     * @param extensions The list of file extensions (e.g., ["ttl"]).
-     * @param mimeTypes  The list of MIME types (e.g., ["text/turtle"]).
+     * @param name       The human-readable name of the format.
+     * @param extensions The list of file extensions.
+     * @param mimeTypes  The list of MIME types.
      * @throws NullPointerException if name, extensions or mimeTypes is null or
      *                              empty.
      */
@@ -47,7 +38,7 @@ public class FileFormat {
     /**
      * Returns the name of the format.
      *
-     * @return The format name (e.g., "Turtle").
+     * @return The format name.
      */
     public String getName() {
         return name;
@@ -56,7 +47,7 @@ public class FileFormat {
     /**
      * Returns the list of known file extensions.
      *
-     * @return A list of extensions (e.g., ["ttl"]).
+     * @return A list of extensions.
      */
     public List<String> getExtensions() {
         return extensions;
@@ -65,7 +56,7 @@ public class FileFormat {
     /**
      * Returns the list of associated MIME types.
      *
-     * @return A list of MIME types (e.g., ["text/turtle"]).
+     * @return A list of MIME types.
      */
     public List<String> getMimeTypes() {
         return mimeTypes;
