@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.impl.common.serialization.config;
 
 /**
  * Defines the policy for serializing literal datatypes.

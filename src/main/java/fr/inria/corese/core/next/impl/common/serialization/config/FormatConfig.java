@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.impl.common.serialization.config;
 
 import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
 

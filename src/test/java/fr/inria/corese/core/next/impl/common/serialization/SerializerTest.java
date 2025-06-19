@@ -7,6 +7,9 @@ import static org.mockito.Mockito.verify;
 
 import java.io.Writer;
 
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +17,6 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.MockitoAnnotations;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 class SerializerTest {
 
@@ -95,4 +96,29 @@ class SerializerTest {
         }
     }
 
+    @Test
+    @DisplayName("serialize should delegate to TurtleFormat for TURTLE format")
+    void serializeShouldDelegateToTurtleFormat() throws SerializationException {
+        try (MockedConstruction<TurtleFormat> mockedTurtleConstructor = mockConstruction(TurtleFormat.class)) {
+            serializer.serialize(mockWriter, RdfFormat.TURTLE);
+
+            assertEquals(1, mockedTurtleConstructor.constructed().size(), "TurtleFormat constructor should be called once");
+            TurtleFormat createdTurtleSerializer = mockedTurtleConstructor.constructed().get(0);
+
+            verify(createdTurtleSerializer).write(mockWriter);
+        }
+    }
+
+    @Test
+    @DisplayName("serialize should delegate to TriGFormat for TRIG format")
+    void serializeShouldDelegateToTriGFormat() throws SerializationException {
+        try (MockedConstruction<TriGFormat> mockedTriGConstructor = mockConstruction(TriGFormat.class)) {
+            serializer.serialize(mockWriter, RdfFormat.TRIG);
+
+            assertEquals(1, mockedTriGConstructor.constructed().size(), "TriGFormat constructor should be called once");
+            TriGFormat createdTriGSerializer = mockedTriGConstructor.constructed().get(0);
+
+            verify(createdTriGSerializer).write(mockWriter);
+        }
+    }
 }

@@ -40,7 +40,7 @@ public final class SerializationConstants {
     public static final String TAB = "\t";
     public static final String LINE_FEED = "\n";
     public static final String CARRIAGE_RETURN = "\r";
-    public static final String NEWLINE = LINE_FEED; // Unix-style newline for general use
+    public static final String NEWLINE = LINE_FEED;
 
     public static final String POINT = ".";
     public static final String SEMICOLON = ";";
@@ -73,5 +73,9 @@ public final class SerializationConstants {
     public static final String DEFAULT_LINE_ENDING = "\n"; // Unix-style
 
     public static final String EMPTY_STRING = "";
+
+    // TriG-specific
+    public static final String OPEN_BRACE = "{";
+    public static final String CLOSE_BRACE = "}";
 
 }

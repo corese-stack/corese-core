@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.FormatSerializer;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 import java.io.Writer;
