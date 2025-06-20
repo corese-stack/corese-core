@@ -12,7 +12,6 @@ plugins {
 
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
-    id("org.gradlex.extra-java-module-info") version "1.11"      // Module metadata for JARs without module info
     id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
     id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
     id("com.intershop.gradle.javacc") version "5.0.0"           // JavaCC plugin for parsing JavaCC files
@@ -139,21 +138,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.5.0")                               // Mockito core for mocking in tests
     testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")                      // Mockito integration with JUnit Jupiter
 }
-
-// Configure extra Java module information for dependencies without module-info
-extraJavaModuleInfo {
-    // If a library is missing module info, the build process will not fail.
-    failOnMissingModuleInfo.set(false)
-
-    // Map automatic module names for non-modular libraries.
-    automaticModule("fr.com.hp.hpl.jena.rdf.arp:arp", "arp")                           // Module for Jena RDF ARP
-    automaticModule("com.github.jsonld-java:jsonld-java", "jsonld.java")               // Module for JSON-LD Java
-    automaticModule("commons-lang:commons-lang", "commons.lang")                       // Module for Commons Lang
-    automaticModule("fr.inria.lille.shexjava:shexjava-core", "shexjava.core")          // Module for ShexJava core
-    automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model")                    // Module for RDF4J model
-
-}
-
 
 /////////////////////////
 // Publishing settings //
