@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-class NQuadsFormatTest {
+class NQuadsSerializerTest {
 
     private Model model;
     private FormatConfig config;
-    private NQuadsFormat nQuadsFormat;
+    private NQuadsSerializer nQuadsFormat;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -45,7 +44,7 @@ class NQuadsFormatTest {
     void setUp() {
         model = mock(Model.class);
         config = FormatConfig.nquadsConfig();
-        nQuadsFormat = new NQuadsFormat(model, config);
+        nQuadsFormat = new NQuadsSerializer(model, config);
 
         mockExPerson = createIRI("http://example.org/Person");
         mockExName = createIRI("http://example.org/name");
@@ -63,14 +62,14 @@ class NQuadsFormatTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        assertThrows(NullPointerException.class, () -> new NQuadsFormat(null), "Model cannot be null");
-        assertThrows(NullPointerException.class, () -> new NQuadsFormat(null, config), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new NQuadsSerializer(null), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new NQuadsSerializer(null, config), "Model cannot be null");
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null config")
     void constructorShouldThrowForNullConfig() {
-        assertThrows(NullPointerException.class, () -> new NQuadsFormat(model, null), "Configuration cannot be null");
+        assertThrows(NullPointerException.class, () -> new NQuadsSerializer(model, null), "Configuration cannot be null");
     }
 
     @Test
@@ -210,7 +209,7 @@ class NQuadsFormatTest {
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn,
-                null // Explicitly null context
+                null
         );
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
@@ -272,7 +271,7 @@ class NQuadsFormatTest {
 
         Writer writer = new StringWriter();
 
-        NQuadsFormat serializer = new NQuadsFormat(currentTestModel, FormatConfig.nquadsConfig());
+        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, FormatConfig.nquadsConfig());
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",

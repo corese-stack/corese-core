@@ -20,9 +20,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Serializes a {@link Model} to Turtle format with comprehensive syntax support.
+ * Serializes a {@link Model} to TriG format with comprehensive syntax support.
  * This class provides a method to write the declarations of a model to a {@link Writer}
- * in accordance with the Turtle specification, taking into account configuration options.
+ * in accordance with the TriG specification, taking into account configuration options.
  *
  * <p>This implementation handles:</p>
  * <ul>
@@ -36,16 +36,17 @@ import java.util.stream.Collectors;
  * <li>Serialization of RDF collections (lists) using the '()' syntax.</li>
  * <li>Detection and prevention of infinite loops during serialization of nested blank nodes and lists.</li>
  * <li>Sorting of subjects and predicates if configured.</li>
+ * <li><b>Serialization of named graphs using the `{}` syntax for TriG.</b></li>
  * </ul>
  * <p>Advanced features such as strict adherence to maximum line length
  * and generation of stable blank node identifiers are not fully implemented in this version.</p>
  */
-public class TurtleFormat implements FormatSerializer {
+public class TriGSerializer implements IRdfSerializer {
 
     /**
      * Logger for this class, used to log potential issues or information during serialization.
      */
-    private static final Logger logger = LoggerFactory.getLogger(TurtleFormat.class);
+    private static final Logger logger = LoggerFactory.getLogger(TriGSerializer.class);
 
     private final Model model;
     private final FormatConfig config;
@@ -57,26 +58,26 @@ public class TurtleFormat implements FormatSerializer {
     private final Set<Resource> currentlyWritingBlankNodes;
 
     /**
-     * Constructs a new {@code TurtleFormat} instance with the specified model and default configuration.
-     * The default configuration is returned by {@link FormatConfig#turtleConfig()}.
+     * Constructs a new {@code TriGSerializer} instance with the specified model and default configuration.
+     * The default configuration is returned by {@link FormatConfig#trigConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
-    public TurtleFormat(Model model) {
-        this(model, FormatConfig.turtleConfig());
+    public TriGSerializer(Model model) {
+        this(model, FormatConfig.trigConfig());
     }
 
     /**
-     * Constructs a new {@code TurtleFormat} instance with the specified model and custom configuration.
+     * Constructs a new {@code TriGSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link FormatConfig} to use for serialization. Must not be null.
+     * @param config the {@link ISerializationConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public TurtleFormat(Model model, FormatConfig config) {
+    public TriGSerializer(Model model, ISerializationConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
-        this.config = Objects.requireNonNull(config, "Configuration cannot be null");
+        this.config = (FormatConfig)  Objects.requireNonNull(config, "Configuration cannot be null");
         this.iriToPrefixMapping = new HashMap<>();
         this.prefixToIriMapping = new HashMap<>();
         this.consumedBlankNodes = new HashSet<>();
@@ -96,9 +97,9 @@ public class TurtleFormat implements FormatSerializer {
     }
 
     /**
-     * Writes the model to the given writer in Turtle format.
+     * Writes the model to the given writer in TriG format.
      *
-     * @param writer the {@link Writer} to which the Turtle output will be written.
+     * @param writer the {@link Writer} to which the TriG output will be written.
      * @throws SerializationException if an I/O error occurs during writing or if invalid data is encountered.
      */
     @Override
@@ -109,7 +110,9 @@ public class TurtleFormat implements FormatSerializer {
             Set<Resource> precomputedInlineBlankNodes = precomputeInlineBlankNodesAndLists();
             consumedBlankNodes.addAll(precomputedInlineBlankNodes);
 
-            if (config.useCompactTriples() && config.groupBySubject()) {
+            if (config.includeContext()) {
+                writeStatementsWithContext(writer);
+            } else if (config.useCompactTriples() && config.groupBySubject()) {
                 writeOptimizedStatements(writer);
             } else {
                 writeSimpleStatements(writer);
@@ -117,14 +120,14 @@ public class TurtleFormat implements FormatSerializer {
 
             writer.flush();
         } catch (IOException e) {
-            throw new SerializationException("Failed to write to stream for Turtle format", "Turtle", e);
+            throw new SerializationException("Failed to write to stream for TriG format", "TriG", e);
         } catch (IllegalArgumentException e) {
-            throw new SerializationException("Invalid data for Turtle format: " + e.getMessage(), "Turtle", e);
+            throw new SerializationException("Invalid data for TriG format: " + e.getMessage(), "TriG", e);
         }
     }
 
     /**
-     * Writes the Turtle document header, including base IRI declaration and prefixes.
+     * Writes the TriG document header, including base IRI declaration and prefixes.
      *
      * @param writer the {@link Writer} to which the header will be written.
      * @throws IOException if an I/O error occurs.
@@ -152,8 +155,10 @@ public class TurtleFormat implements FormatSerializer {
                 .flatMap(stmt -> Arrays.asList(
                         stmt.getSubject(),
                         stmt.getPredicate(),
-                        stmt.getObject()
+                        stmt.getObject(),
+                        stmt.getContext()
                 ).stream())
+                .filter(Objects::nonNull)
                 .filter(Value::isIRI)
                 .map(v -> getNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
@@ -196,6 +201,7 @@ public class TurtleFormat implements FormatSerializer {
     /**
      * Serializes the model's statements in a simple manner, one per line, without grouping.
      * Triples already "consumed" by inline serialization are ignored.
+     * This method is used when `includeContext` is false and `useCompactTriples` is false.
      *
      * @param writer the {@link Writer} to which the statements will be written.
      * @throws IOException if an I/O error occurs.
@@ -210,7 +216,9 @@ public class TurtleFormat implements FormatSerializer {
     }
 
     /**
-     * Writes a single {@link Statement} to the writer in Turtle format.
+     * Writes a single {@link Statement} to the writer in TriG format.
+     * If the statement has a context and `includeContext` is enabled, this method will be
+     * called within a named graph block, so it will only write the triple parts.
      *
      * @param writer the {@link Writer} to which the statement will be written.
      * @param stmt   the {@link Statement} to write.
@@ -231,13 +239,10 @@ public class TurtleFormat implements FormatSerializer {
         // Object
         writeValue(writer, stmt.getObject());
 
-        // Trailing dot
-        if (config.trailingDot()) {
-            writer.write(SerializationConstants.SPACE);
-            writer.write(SerializationConstants.POINT);
-        }
 
-        logContextWarning(stmt);
+        writer.write(SerializationConstants.SPACE);
+        writer.write(SerializationConstants.POINT);
+
     }
 
     /**
@@ -304,7 +309,7 @@ public class TurtleFormat implements FormatSerializer {
 
             currentlyWritingBlankNodes.remove(bNode);
         } else {
-            throw new IllegalArgumentException("Unsupported value type for Turtle serialization: " + value.getClass().getName());
+            throw new IllegalArgumentException("Unsupported value type for TriG serialization: " + value.getClass().getName());
         }
     }
 
@@ -327,12 +332,12 @@ public class TurtleFormat implements FormatSerializer {
         if (prefixed != null) {
             writer.write(prefixed);
         } else {
-            writer.write(String.format("<%s>", escapeTurtleIRI(iri.stringValue())));
+            writer.write(String.format("<%s>", escapeTriGIRI(iri.stringValue())));
         }
     }
 
     /**
-     * Writes a {@link Literal} to the writer in Turtle format.
+     * Writes a {@link Literal} to the writer in TriG format.
      * Applies escaping and datatype/language tag rules based on configuration.
      *
      * @param writer  the {@link Writer} to which the literal will be written.
@@ -345,7 +350,7 @@ public class TurtleFormat implements FormatSerializer {
         if (config.shouldUseTripleQuotes(value)) {
             writer.write(String.format("\"\"\"%s\"\"\"", escapeMultilineLiteral(value)));
         } else {
-            writer.write(String.format("\"%s\"", escapeTurtleLiteral(value)));
+            writer.write(String.format("\"%s\"", escapeTriGLiteral(value)));
         }
 
         literal.getLanguage().ifPresent(lang -> {
@@ -404,8 +409,8 @@ public class TurtleFormat implements FormatSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeInlineBlankNode(Writer writer, List<Statement> properties) throws IOException {
-        String currentIndent = config.prettyPrint() ? config.getIndent() : SerializationConstants.EMPTY_STRING;
-        String propIndent = config.prettyPrint() ? currentIndent + config.getIndent() : SerializationConstants.EMPTY_STRING;
+        String currentIndent = config.prettyPrint() ? config.getIndent() : "";
+        String propIndent = config.prettyPrint() ? currentIndent + config.getIndent() : "";
 
         writer.write(SerializationConstants.BLANK_NODE_START);
 
@@ -443,12 +448,12 @@ public class TurtleFormat implements FormatSerializer {
      * Serializes the model's statements by grouping triples by subject, then by predicate,
      * using compact syntax (semicolons and commas) if configured.
      * Triples already "consumed" by inline serialization are ignored.
+     * This method is used when `includeContext` is false and `useCompactTriples` is true.
      *
      * @param writer the {@link Writer} to which the optimized statements will be written.
      * @throws IOException if an I/O error occurs.
      */
     private void writeOptimizedStatements(Writer writer) throws IOException {
-        // Collect and group statements by subject
         Map<Resource, List<Statement>> bySubject = config.sortSubjects() ?
                 new TreeMap<>(Comparator.comparing(Resource::stringValue)) :
                 new LinkedHashMap<>();
@@ -459,12 +464,11 @@ public class TurtleFormat implements FormatSerializer {
                 .forEach(stmt -> bySubject.computeIfAbsent(stmt.getSubject(), k -> new ArrayList<>()).add(stmt));
 
         for (Map.Entry<Resource, List<Statement>> subjectEntry : bySubject.entrySet()) {
-            String indent = config.prettyPrint() ? config.getIndent() : SerializationConstants.EMPTY_STRING;
+            String indent = config.prettyPrint() ? config.getIndent() : "";
             writer.write(indent);
             writeValue(writer, subjectEntry.getKey());
             writer.write(SerializationConstants.SPACE);
 
-            // Group statements of the current subject by predicate
             Map<IRI, List<Statement>> byPredicate = config.sortPredicates() ?
                     new TreeMap<>(Comparator.comparing(IRI::stringValue)) :
                     new LinkedHashMap<>();
@@ -506,6 +510,101 @@ public class TurtleFormat implements FormatSerializer {
             writer.write(config.getLineEnding());
         }
     }
+
+    /**
+     * Serializes statements, grouping them by named graph context.
+     * Statements without a context are considered part of the default graph.
+     * This method is used when {@code includeContext} is true.
+     *
+     * @param writer the {@link Writer} to which the statements will be written.
+     * @throws IOException if an I/O error occurs.
+     */
+    private void writeStatementsWithContext(Writer writer) throws IOException {
+        Map<Resource, List<Statement>> byContext = new LinkedHashMap<>();
+        model.stream()
+                .filter(stmt -> !isConsumed(stmt.getSubject()))
+                .forEach(stmt -> byContext.computeIfAbsent(stmt.getContext(), k -> new ArrayList<>()).add(stmt));
+
+        for (Map.Entry<Resource, List<Statement>> contextEntry : byContext.entrySet()) {
+            Resource context = contextEntry.getKey();
+            List<Statement> statementsInContext = contextEntry.getValue();
+
+            String initialIndent = "";
+            String graphIndent = config.prettyPrint() ? config.getIndent() : "";
+
+            if (context != null) {
+                if (context.isIRI()) {
+                    writeIRI(writer, (IRI) context);
+                } else if (context.isBNode()) {
+                    writeValue(writer, context);
+                }
+                writer.write(SerializationConstants.SPACE);
+                writer.write(SerializationConstants.OPEN_BRACE);
+                writer.write(config.getLineEnding());
+                initialIndent = graphIndent;
+            }
+
+
+            Map<Resource, List<Statement>> bySubject = config.sortSubjects() ?
+                    new TreeMap<>(Comparator.comparing(Resource::stringValue)) :
+                    new LinkedHashMap<>();
+
+            statementsInContext.forEach(stmt -> bySubject.computeIfAbsent(stmt.getSubject(), k -> new ArrayList<>()).add(stmt));
+
+            for (Map.Entry<Resource, List<Statement>> subjectEntry : bySubject.entrySet()) {
+                writer.write(initialIndent);
+                writeValue(writer, subjectEntry.getKey());
+                writer.write(SerializationConstants.SPACE);
+
+                Map<IRI, List<Statement>> byPredicate = config.sortPredicates() ?
+                        new TreeMap<>(Comparator.comparing(IRI::stringValue)) :
+                        new LinkedHashMap<>();
+
+                subjectEntry.getValue().forEach(stmt -> byPredicate.computeIfAbsent(stmt.getPredicate(), k -> new ArrayList<>()).add(stmt));
+
+                boolean firstPredicate = true;
+                for (Map.Entry<IRI, List<Statement>> predicateEntry : byPredicate.entrySet()) {
+                    if (!firstPredicate) {
+                        writer.write(SerializationConstants.SEMICOLON);
+                        if (config.prettyPrint()) {
+                            writer.write(config.getLineEnding() + initialIndent + config.getIndent());
+                        } else {
+                            writer.write(SerializationConstants.SPACE);
+                        }
+                    }
+                    firstPredicate = false;
+
+                    writePredicate(writer, predicateEntry.getKey());
+                    writer.write(SerializationConstants.SPACE);
+
+                    boolean firstObject = true;
+                    for (Statement stmt : predicateEntry.getValue()) {
+                        if (!firstObject) {
+                            writer.write(SerializationConstants.COMMA);
+                            if (config.prettyPrint()) {
+                                writer.write(config.getLineEnding() + initialIndent + config.getIndent() + config.getIndent());
+                            } else {
+                                writer.write(SerializationConstants.SPACE);
+                            }
+                        }
+                        firstObject = false;
+                        writeValue(writer, stmt.getObject());
+                    }
+                }
+                writer.write(SerializationConstants.SPACE + SerializationConstants.POINT);
+                writer.write(config.getLineEnding());
+            }
+
+            if (context != null) {
+                writer.write(SerializationConstants.CLOSE_BRACE);
+                writer.write(SerializationConstants.SPACE);
+                writer.write(SerializationConstants.POINT);
+                writer.write(config.getLineEnding());
+            }
+            writer.write(config.getLineEnding());
+        }
+    }
+
 
     /**
      * Attempts to serialize an RDF list if the given blank node is its head.
@@ -558,7 +657,7 @@ public class TurtleFormat implements FormatSerializer {
             items.add(first.get());
 
             if (rest.get().stringValue().equals(SerializationConstants.RDF_NIL)) {
-                current = null; // End of the list
+                current = null;
             } else if (rest.get().isBNode()) {
                 current = (Resource) rest.get();
             } else {
@@ -608,7 +707,6 @@ public class TurtleFormat implements FormatSerializer {
         for (Statement stmt : model) {
             if (stmt.getSubject().isBNode()) {
                 Resource bNodeSubject = stmt.getSubject();
-
                 if (config.useCollections() && isRDFListHead(bNodeSubject)) {
                     Resource current = bNodeSubject;
                     Set<Resource> listNodes = new HashSet<>();
@@ -674,7 +772,6 @@ public class TurtleFormat implements FormatSerializer {
         return precomputed;
     }
 
-
     /**
      * Checks if a given blank node is the head of an RDF list.
      *
@@ -682,7 +779,6 @@ public class TurtleFormat implements FormatSerializer {
      * @return true if it's the head of an RDF list, false otherwise.
      */
     private boolean isRDFListHead(Resource bNode) {
-
         boolean hasFirstAndRest = model.stream()
                 .filter(stmt -> stmt.getSubject().equals(bNode))
                 .anyMatch(stmt -> stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST))
@@ -691,9 +787,6 @@ public class TurtleFormat implements FormatSerializer {
                         .filter(stmt -> stmt.getSubject().equals(bNode))
                         .anyMatch(stmt -> stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_REST));
 
-        if (!hasFirstAndRest) return false;
-
-        // Check if this blank node is the object of another rdf:rest triple
         boolean isObjectOfRest = model.stream()
                 .filter(stmt -> stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_REST))
                 .anyMatch(stmt -> stmt.getObject().equals(bNode));
@@ -712,24 +805,20 @@ public class TurtleFormat implements FormatSerializer {
      * @param prefix       The associated prefix.
      */
     private void addPrefixMapping(String namespaceURI, String prefix) {
-
         if (iriToPrefixMapping.containsKey(namespaceURI)) {
-            if (!iriToPrefixMapping.get(namespaceURI).equals(prefix) && logger.isWarnEnabled()) {
+            if (logger.isWarnEnabled() && !iriToPrefixMapping.get(namespaceURI).equals(prefix)) {
                 logger.warn("Namespace URI '{}' is already mapped to prefix '{}'. Cannot map to new prefix '{}'.",
                         namespaceURI, iriToPrefixMapping.get(namespaceURI), prefix);
-
             }
             return;
         }
 
-
         if (prefixToIriMapping.containsKey(prefix)) {
-            if (!prefixToIriMapping.get(prefix).equals(namespaceURI) && logger.isWarnEnabled()) {
+            if (logger.isWarnEnabled() && !prefixToIriMapping.get(prefix).equals(namespaceURI)) {
                 String originalNamespace = prefixToIriMapping.get(prefix);
                 logger.warn("Prefix '{}' is already mapped to namespace '{}'. Cannot map to new namespace '{}'. " +
                                 "A new unique prefix will be generated for '{}'.",
                         prefix, originalNamespace, namespaceURI, namespaceURI);
-
             }
             return;
         }
@@ -826,12 +915,13 @@ public class TurtleFormat implements FormatSerializer {
             }
         }
 
-        base = base.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        base = base.replaceAll("[^a-zA-Z0-9]", SerializationConstants.EMPTY_STRING).toLowerCase();
         if (base.isEmpty()) base = "p";
 
-        // Ensure uniqueness
+
         String candidate = base;
         int i = 0;
+
         while (prefixToIriMapping.containsKey(candidate) && !prefixToIriMapping.get(candidate).equals(namespace)) {
             candidate = base + (++i);
         }
@@ -842,14 +932,14 @@ public class TurtleFormat implements FormatSerializer {
     // --- Helpers for escaping and validation ---
 
     /**
-     * Escapes special characters in Turtle string literals.
+     * Escapes special characters in TriG string literals.
      * Handles backslashes, double quotes, and common control characters.
      * Unicode escape sequences are used for unprintable characters if `escapeUnicode` is true.
      *
      * @param value The string value of the literal to escape.
-     * @return The escaped string suitable for a Turtle literal.
+     * @return The escaped string suitable for a TriG literal.
      */
-    private String escapeTurtleLiteral(String value) {
+    private String escapeTriGLiteral(String value) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -899,10 +989,9 @@ public class TurtleFormat implements FormatSerializer {
      * Primarily used to escape occurrences of `"""` within the literal.
      *
      * @param value The string value of the literal to escape.
-     * @return The escaped string suitable for a multi-line Turtle literal.
+     * @return The escaped string suitable for a multi-line TriG literal.
      */
     private String escapeMultilineLiteral(String value) {
-
         return value.replace(SerializationConstants.QUOTE + SerializationConstants.QUOTE + SerializationConstants.QUOTE,
                 SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
                         SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
@@ -910,13 +999,13 @@ public class TurtleFormat implements FormatSerializer {
     }
 
     /**
-     * Escapes characters in an IRI string for Turtle output.
+     * Escapes characters in an IRI string for TriG output.
      * This method primarily focuses on control characters and problematic characters within angle brackets.
      *
      * @param iri The IRI to escape.
      * @return The escaped IRI.
      */
-    private String escapeTurtleIRI(String iri) {
+    private String escapeTriGIRI(String iri) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < iri.length(); i++) {
             char c = iri.charAt(i);
@@ -938,8 +1027,8 @@ public class TurtleFormat implements FormatSerializer {
      */
     private void validateValue(Value value) {
         if (value == null) {
-            logger.warn("Null value encountered where a non-null value was expected for Turtle serialization. This will lead to an IllegalArgumentException if strict mode is enabled.");
-            throw new IllegalArgumentException("Value cannot be null in Turtle format when strictMode is enabled.");
+            logger.warn("Null value encountered where a non-null value was expected for TriG serialization. This will lead to an IllegalArgumentException if strict mode is enabled.");
+            throw new IllegalArgumentException("Value cannot be null in TriG format when strictMode is enabled.");
         }
 
         if (config.isStrictMode() && value.isLiteral()) {
@@ -948,7 +1037,7 @@ public class TurtleFormat implements FormatSerializer {
     }
 
     /**
-     * Validates a {@link Literal} to ensure it conforms to RDF/Turtle rules.
+     * Validates a {@link Literal} to ensure it conforms to RDF/TriG rules.
      * Specifically checks for consistency between language tags and the rdf:langString datatype.
      * Called only if strictMode is enabled.
      *
@@ -973,8 +1062,8 @@ public class TurtleFormat implements FormatSerializer {
     }
 
     /**
-     * Validates an {@link IRI} to ensure it conforms to Turtle rules.
-     * Checks if the IRI string contains characters not allowed in unescaped Turtle
+     * Validates an {@link IRI} to ensure it conforms to TriG rules.
+     * Checks if the IRI string contains characters not allowed in unescaped TriG
      * form within angle brackets (e.g., control characters, space).
      * Called only if strictMode and validateURIs are enabled.
      *
@@ -988,20 +1077,9 @@ public class TurtleFormat implements FormatSerializer {
                 iriString.contains(SerializationConstants.QUOTE) ||
                 iriString.contains(SerializationConstants.LT) ||
                 iriString.contains(SerializationConstants.GT)) {
-            throw new IllegalArgumentException("IRI contains illegal characters (space, quotes, angle brackets) for unescaped Turtle form: " + iriString);
+            throw new IllegalArgumentException("IRI contains illegal characters (space, quotes, angle brackets) for unescaped TriG form: " + iriString);
         }
     }
 
-    /**
-     * Logs a warning if a context (named graph) is present in a statement,
-     * as the Turtle format does not support named graphs.
-     *
-     * @param stmt The statement to check.
-     */
-    private void logContextWarning(Statement stmt) {
-        if (stmt.getContext() != null && logger.isWarnEnabled()) {
-            logger.warn("Turtle format does not support named graphs. Context '{}' will be ignored for statement: {}",
-                    stmt.getContext().stringValue(), stmt);
-        }
-    }
+
 }

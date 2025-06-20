@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
- * Test class for {@link TriGFormat} using Mockito to verify serialization behavior
+ * Test class for {@link TurtleSerializerTest} using Mockito to verify serialization behavior
  * under various configurations and RDF graph structures.
  */
-class TriGFormatTest {
+class TurtleSerializerTest {
 
     /**
-     * Tests basic TriG serialization of a simple triple.
+     * Tests basic Turtle serialization of a simple triple.
      * Verifies that the subject, predicate, and object are correctly formatted
      * and that standard prefixes are declared and used.
      *
@@ -32,7 +32,7 @@ class TriGFormatTest {
      * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testBasicTriGSerialization() throws SerializationException, IOException {
+    void testBasicTurtleSerialization() throws SerializationException, IOException {
         // Given
         Model mockModel = mock(Model.class);
         Statement mockStatement = mock(Statement.class);
@@ -40,21 +40,21 @@ class TriGFormatTest {
         IRI mockPredicate = mock(IRI.class);
         Literal mockObject = mock(Literal.class);
 
-
+        // Configure mocks for the subject
         when(mockSubject.stringValue()).thenReturn("http://example.org/ns/person1");
         when(mockSubject.isIRI()).thenReturn(true);
         when(mockSubject.isResource()).thenReturn(true);
         when(mockSubject.isBNode()).thenReturn(false);
         when(mockSubject.isLiteral()).thenReturn(false);
 
-
+        // Configure mocks for the predicate
         when(mockPredicate.stringValue()).thenReturn("http://example.org/ns/hasName");
         when(mockPredicate.isIRI()).thenReturn(true);
         when(mockPredicate.isResource()).thenReturn(true);
         when(mockPredicate.isBNode()).thenReturn(false);
         when(mockPredicate.isLiteral()).thenReturn(false);
 
-
+        // Configure mocks for the object (literal)
         when(mockObject.stringValue()).thenReturn("John Doe");
         when(mockObject.isLiteral()).thenReturn(true);
         when(mockObject.isIRI()).thenReturn(false);
@@ -63,6 +63,7 @@ class TriGFormatTest {
         when(mockObject.getLanguage()).thenReturn(Optional.empty());
         when(mockObject.getDatatype()).thenReturn(null);
 
+        // Configure the statement
         when(mockStatement.getSubject()).thenReturn(mockSubject);
         when(mockStatement.getPredicate()).thenReturn(mockPredicate);
         when(mockStatement.getObject()).thenReturn(mockObject);
@@ -74,13 +75,12 @@ class TriGFormatTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, FormatConfig.turtleConfig());
 
-        TriGFormat trigFormat = new TriGFormat(mockModel, FormatConfig.trigConfig());
+        // When
+        turtleFormat.write(writer);
 
-
-        trigFormat.write(writer);
-
-
+        // Then
         verify(mockModel, times(2)).stream();
         verify(mockSubject, atLeastOnce()).stringValue();
         verify(mockSubject, atLeastOnce()).isIRI();
@@ -97,8 +97,7 @@ class TriGFormatTest {
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
-                ns:person1 ns:hasName "John Doe" .
-                
+                  ns:person1 ns:hasName "John Doe" .
                 """;
 
         String actual = writer.toString().replace("\r\n", "\n");
@@ -114,13 +113,14 @@ class TriGFormatTest {
      */
     @Test
     void testRdfTypeShortcut() throws SerializationException, IOException {
-
+        // Given
         Model mockModel = mock(Model.class);
         Statement mockStatement = mock(Statement.class);
         IRI mockSubject = mock(IRI.class);
         IRI mockPredicate = mock(IRI.class);
         IRI mockObject = mock(IRI.class);
 
+        // Configure mocks
         when(mockSubject.stringValue()).thenReturn("http://example.org/ns/person1");
         when(mockSubject.isIRI()).thenReturn(true);
         when(mockSubject.isResource()).thenReturn(true);
@@ -150,12 +150,12 @@ class TriGFormatTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TriGFormat trigFormat = new TriGFormat(mockModel);
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel);
 
+        // When
+        turtleFormat.write(writer);
 
-        trigFormat.write(writer);
-
-
+        // Then
         verify(mockModel, times(2)).stream();
 
         String expected = """ 
@@ -166,8 +166,7 @@ class TriGFormatTest {
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
-                ns:person1 a foaf:Person .
-                
+                  ns:person1 a foaf:Person .
                 """;
 
         String actual = writer.toString().replace("\r\n", "\n");
@@ -231,11 +230,11 @@ class TriGFormatTest {
         StringWriter writer = new StringWriter();
 
         // Explicitly create FormatConfig to ensure strictMode is false
-        Map<String, String> commonTriGPrefixes = new HashMap<>();
-        commonTriGPrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        commonTriGPrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        commonTriGPrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        commonTriGPrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
+        Map<String, String> commonTurtlePrefixes = new HashMap<>();
+        commonTurtlePrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        commonTurtlePrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        commonTurtlePrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
+        commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
 
         FormatConfig config = new FormatConfig.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
@@ -245,17 +244,17 @@ class TriGFormatTest {
                 .prettyPrint(true)
                 .indent("  ")
                 .lineEnding("\n")
-                .addCustomPrefixes(commonTriGPrefixes)
+                .addCustomPrefixes(commonTurtlePrefixes)
                 .autoDeclarePrefixes(true)
                 .trailingDot(true)
                 .strictMode(false)
                 .build();
-        TriGFormat trigFormat = new TriGFormat(mockModel, config);
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, config);
 
+        // When
+        turtleFormat.write(writer);
 
-        trigFormat.write(writer);
-
-
+        // Then
         verify(mockModel, times(2)).stream();
         String expected = """
                 @prefix 11: <http://purl.org/dc/elements/1.1/> .
@@ -328,25 +327,25 @@ class TriGFormatTest {
 
         StringWriter writer = new StringWriter();
 
-        Map<String, String> commonTrigPrefixes = new HashMap<>();
-        commonTrigPrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        commonTrigPrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        commonTrigPrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        commonTrigPrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
-        commonTrigPrefixes.put("dc", "http://purl.org/dc/elements/1.1/");
+        Map<String, String> commonTurtlePrefixes = new HashMap<>();
+        commonTurtlePrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        commonTurtlePrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        commonTurtlePrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
+        commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
+        commonTurtlePrefixes.put("dc", "http://purl.org/dc/elements/1.1/");
 
         FormatConfig config = new FormatConfig.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
-                .addCustomPrefixes(commonTrigPrefixes)
+                .addCustomPrefixes(commonTurtlePrefixes)
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TriGFormat triGFormat = new TriGFormat(mockModel, config);
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, config);
 
+        // When
+        turtleFormat.write(writer);
 
-        triGFormat.write(writer);
-
-
+        // Then
         verify(mockModel, times(2)).stream();
         String expected = """ 
                 @prefix data: <http://example.org/data/> .
@@ -362,6 +361,107 @@ class TriGFormatTest {
         assertEquals(expected, actual);
     }
 
+    /**
+     * Tests serialization of a blank node subject using the default anonymous style (`[]`).
+     * Verifies that the blank node is serialized inline with its properties.
+     *
+     * @throws SerializationException if a serialization error occurs.
+     * @throws IOException            if an I/O error occurs during writing.
+     */
+    @Test
+    void testBlankNodeSerialization() throws SerializationException, IOException {
+        Model mockModel = mock(Model.class);
+
+        Resource mockBNode = mock(Resource.class);
+        IRI mockBNodeProperty = mock(IRI.class);
+        Literal mockBNodeObject = mock(Literal.class);
+
+
+        IRI mockMainSubject = mock(IRI.class);
+        IRI mockMainPredicate = mock(IRI.class);
+        Statement mainStatement = mock(Statement.class);
+
+
+        Statement bNodePropertyStatement = mock(Statement.class);
+
+
+        when(mockBNode.stringValue()).thenReturn("b1");
+        when(mockBNode.isBNode()).thenReturn(true);
+        when(mockBNode.isResource()).thenReturn(true);
+        when(mockBNode.isIRI()).thenReturn(false);
+        when(mockBNode.isLiteral()).thenReturn(false);
+
+        when(mockBNodeProperty.stringValue()).thenReturn("http://example.org/ns/hasValue");
+        when(mockBNodeProperty.isIRI()).thenReturn(true);
+        when(mockBNodeProperty.isResource()).thenReturn(true);
+        when(mockBNodeProperty.isBNode()).thenReturn(false);
+        when(mockBNodeProperty.isLiteral()).thenReturn(false);
+
+        when(mockBNodeObject.stringValue()).thenReturn("Value of BNode");
+        when(mockBNodeObject.isLiteral()).thenReturn(true);
+        when(mockBNodeObject.isIRI()).thenReturn(false);
+        when(mockBNodeObject.isResource()).thenReturn(false);
+        when(mockBNodeObject.isBNode()).thenReturn(false);
+        when(mockBNodeObject.getLanguage()).thenReturn(Optional.empty());
+        when(mockBNodeObject.getDatatype()).thenReturn(null);
+
+
+        when(bNodePropertyStatement.getSubject()).thenReturn(mockBNode);
+        when(bNodePropertyStatement.getPredicate()).thenReturn(mockBNodeProperty);
+        when(bNodePropertyStatement.getObject()).thenReturn(mockBNodeObject);
+        when(bNodePropertyStatement.getContext()).thenReturn(null);
+
+
+        when(mockMainSubject.stringValue()).thenReturn("http://example.org/ns/mainSubject");
+        when(mockMainSubject.isIRI()).thenReturn(true);
+        when(mockMainSubject.isResource()).thenReturn(true);
+        when(mockMainSubject.isBNode()).thenReturn(false);
+        when(mockMainSubject.isLiteral()).thenReturn(false);
+
+        when(mockMainPredicate.stringValue()).thenReturn("http://example.org/ns/refersTo");
+        when(mockMainPredicate.isIRI()).thenReturn(true);
+        when(mockMainPredicate.isResource()).thenReturn(true);
+        when(mockMainPredicate.isBNode()).thenReturn(false);
+        when(mockMainPredicate.isLiteral()).thenReturn(false);
+
+        when(mainStatement.getSubject()).thenReturn(mockMainSubject);
+        when(mainStatement.getPredicate()).thenReturn(mockMainPredicate);
+        when(mainStatement.getObject()).thenReturn(mockBNode);
+        when(mainStatement.getContext()).thenReturn(null);
+
+
+        when(mockModel.iterator()).thenAnswer(invocation -> Arrays.asList(mainStatement, bNodePropertyStatement).iterator());
+        when(mockModel.stream())
+                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement))
+                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement))
+                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement))
+                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement))
+                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement));
+
+
+        StringWriter writer = new StringWriter();
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, FormatConfig.turtleConfig());
+
+        turtleFormat.write(writer);
+
+
+        verify(mockModel, times(5)).stream();
+
+        String expected = """
+                @prefix ns: <http://example.org/ns/> .
+                @prefix owl: <http://www.w3.org/2002/07/owl#> .
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+                
+                  ns:mainSubject ns:refersTo [
+                    ns:hasValue "Value of BNode"
+                  ] .
+                """;
+
+        String actual = writer.toString().replace("\r\n", "\n");
+        assertEquals(expected, actual);
+    }
 
     /**
      * Tests serialization with a base IRI defined.
@@ -413,22 +513,22 @@ class TriGFormatTest {
 
         StringWriter writer = new StringWriter();
 
-        Map<String, String> commonTrigPrefixes = new HashMap<>();
-        commonTrigPrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        commonTrigPrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        commonTrigPrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        commonTrigPrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
-        commonTrigPrefixes.put("base", "http://example.org/base/");
+        Map<String, String> commonTurtlePrefixes = new HashMap<>();
+        commonTurtlePrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+        commonTurtlePrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        commonTurtlePrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
+        commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
+        commonTurtlePrefixes.put("base", "http://example.org/base/");
 
         FormatConfig configWithBase = new FormatConfig.Builder()
                 .baseIRI("http://example.org/base/")
-                .addCustomPrefixes(commonTrigPrefixes)
+                .addCustomPrefixes(commonTurtlePrefixes)
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TriGFormat trigFormat = new TriGFormat(mockModel, configWithBase);
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, configWithBase);
 
-        trigFormat.write(writer);
+        turtleFormat.write(writer);
 
         verify(mockModel, times(2)).stream();
         String expected = """
@@ -463,10 +563,10 @@ class TriGFormatTest {
 
 
         StringWriter writer = new StringWriter();
-        TriGFormat triGFormat = new TriGFormat(emptyModel);
+        TurtleSerializer turtleFormat = new TurtleSerializer(emptyModel);
 
 
-        triGFormat.write(writer);
+        turtleFormat.write(writer);
 
 
         verify(emptyModel, times(2)).stream();
@@ -536,16 +636,16 @@ class TriGFormatTest {
 
         StringWriter writer = new StringWriter();
         FormatConfig strictConfig = new FormatConfig.Builder().strictMode(true).build();
-        TriGFormat triGFormat = new TriGFormat(mockModel, strictConfig);
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, strictConfig);
 
 
         SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            triGFormat.write(writer);
+            turtleFormat.write(writer);
         });
 
-        assertEquals("TriG", thrown.getFormatName());
+        assertEquals("Turtle", thrown.getFormatName());
 
-        assertEquals("Invalid data for TriG format: An rdf:langString literal must have a language tag. [Format: TriG]", thrown.getMessage());
+        assertEquals("Invalid data for Turtle format: An rdf:langString literal must have a language tag. [Format: Turtle]", thrown.getMessage());
     }
 
     /**
@@ -561,7 +661,7 @@ class TriGFormatTest {
         Statement mockStatement = mock(Statement.class);
         IRI mockSubject = mock(IRI.class);
         IRI mockPredicate = mock(IRI.class);
-        IRI mockObject = mock(IRI.class);
+        IRI mockObject = mock(IRI.class); // Invalid IRI
 
 
         when(mockSubject.stringValue()).thenReturn("http://example.org/s");
@@ -578,7 +678,7 @@ class TriGFormatTest {
         when(mockPredicate.isLiteral()).thenReturn(false);
 
 
-        when(mockObject.stringValue()).thenReturn("http://example.org/invalid iri");
+        when(mockObject.stringValue()).thenReturn("http://example.org/invalid iri"); // Contains a space
         when(mockObject.isIRI()).thenReturn(true);
         when(mockObject.isResource()).thenReturn(true);
         when(mockObject.isBNode()).thenReturn(false);
@@ -597,16 +697,16 @@ class TriGFormatTest {
 
         StringWriter writer = new StringWriter();
         FormatConfig strictConfig = new FormatConfig.Builder().strictMode(true).validateURIs(true).build();
-        TriGFormat triGFormat = new TriGFormat(mockModel, strictConfig);
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, strictConfig);
 
 
         SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            triGFormat.write(writer);
+            turtleFormat.write(writer);
         });
 
-        assertEquals("TriG", thrown.getFormatName());
+        assertEquals("Turtle", thrown.getFormatName());
 
-        assertEquals("Invalid data for TriG format: IRI contains illegal characters (space, quotes, angle brackets) for unescaped TriG form: http://example.org/invalid iri [Format: TriG]", thrown.getMessage());
+        assertEquals("Invalid data for Turtle format: IRI contains illegal characters (space, quotes, angle brackets) for unescaped Turtle form: http://example.org/invalid iri [Format: Turtle]", thrown.getMessage());
     }
 
     /**
@@ -625,13 +725,11 @@ class TriGFormatTest {
         IRI mockPredicate = mock(IRI.class);
         Literal mockObject = mock(Literal.class);
 
-
         when(mockSubject.stringValue()).thenReturn("http://example.org/book/1");
         when(mockSubject.isIRI()).thenReturn(true);
         when(mockSubject.isResource()).thenReturn(true);
         when(mockSubject.isBNode()).thenReturn(false);
         when(mockSubject.isLiteral()).thenReturn(false);
-
 
         when(mockPredicate.stringValue()).thenReturn("http://example.org/properties/description");
         when(mockPredicate.isIRI()).thenReturn(true);
@@ -646,8 +744,9 @@ class TriGFormatTest {
         when(mockObject.isResource()).thenReturn(false);
         when(mockObject.isBNode()).thenReturn(false);
         when(mockObject.getLanguage()).thenReturn(Optional.empty());
-        when(mockObject.getDatatype()).thenReturn(null);
+        when(mockObject.getDatatype()).thenReturn(null); // Assuming no specific datatype for simplicity
 
+        // Configure the statement
         when(mockStatement.getSubject()).thenReturn(mockSubject);
         when(mockStatement.getPredicate()).thenReturn(mockPredicate);
         when(mockStatement.getObject()).thenReturn(mockObject);
@@ -659,17 +758,18 @@ class TriGFormatTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
+        // Configure FormatConfig to enable multiline literals
         FormatConfig config = new FormatConfig.Builder()
                 .useMultilineLiterals(true)
                 .prettyPrint(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TriGFormat triGFormat = new TriGFormat(mockModel, config);
+        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, config);
 
+        // When
+        turtleFormat.write(writer);
 
-        triGFormat.write(writer);
-
-
+        // Then
         verify(mockModel, times(2)).stream();
         verify(mockSubject, atLeastOnce()).stringValue();
         verify(mockSubject, atLeastOnce()).isIRI();
@@ -678,107 +778,13 @@ class TriGFormatTest {
         verify(mockObject, atLeastOnce()).stringValue();
         verify(mockObject, atLeastOnce()).isLiteral();
 
+        // Corrected expected string
         String expected = """
                 @prefix book: <http://example.org/book/> .
                 @prefix properties: <http://example.org/properties/> .
                 
                   book:1 properties:description \"\"\"This is the first line.
                 This is the second line.\"\"\" .
-                """;
-
-        String actual = writer.toString().replace("\r\n", "\n");
-        assertEquals(expected, actual);
-    }
-
-    /**
-     * Tests basic TriG serialization with a named graph.
-     * Verifies that the graph name and graph block are correctly formatted.
-     *
-     * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
-     */
-    @Test
-    void testBasicTrigSerializationWithNamedGraph() throws SerializationException, IOException {
-        // Given
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        Literal mockObject = mock(Literal.class);
-        IRI mockContext = mock(IRI.class);
-
-
-        when(mockSubject.stringValue()).thenReturn("http://example.org/data/person1");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-
-        when(mockPredicate.stringValue()).thenReturn("http://example.org/data/name");
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
-
-        when(mockObject.stringValue()).thenReturn("Alice");
-        when(mockObject.isLiteral()).thenReturn(true);
-        when(mockObject.isIRI()).thenReturn(false);
-        when(mockObject.isResource()).thenReturn(false);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.getLanguage()).thenReturn(Optional.empty());
-        when(mockObject.getDatatype()).thenReturn(null);
-
-
-        when(mockContext.stringValue()).thenReturn("http://example.org/graph/g1");
-        when(mockContext.isIRI()).thenReturn(true);
-        when(mockContext.isResource()).thenReturn(true);
-        when(mockContext.isBNode()).thenReturn(false);
-        when(mockContext.isLiteral()).thenReturn(false);
-
-
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(mockContext);
-
-        when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
-        when(mockModel.stream())
-                .thenReturn(Stream.of(mockStatement))
-                .thenReturn(Stream.of(mockStatement))
-                .thenReturn(Stream.of(mockStatement));
-
-        StringWriter writer = new StringWriter();
-
-        TriGFormat trigFormat = new TriGFormat(mockModel, FormatConfig.trigConfig());
-
-
-        trigFormat.write(writer);
-
-
-        verify(mockModel, times(2)).stream();
-        verify(mockSubject, atLeastOnce()).stringValue();
-        verify(mockSubject, atLeastOnce()).isIRI();
-        verify(mockPredicate, atLeastOnce()).stringValue();
-        verify(mockPredicate, atLeastOnce()).isIRI();
-        verify(mockObject, atLeastOnce()).stringValue();
-        verify(mockObject, atLeastOnce()).isLiteral();
-        verify(mockContext, atLeastOnce()).stringValue();
-        verify(mockContext, atLeastOnce()).isIRI();
-
-        String expected = """
-                @prefix data: <http://example.org/data/> .
-                @prefix graph: <http://example.org/graph/> .
-                @prefix owl: <http://www.w3.org/2002/07/owl#> .
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-                
-                graph:g1 {
-                  data:person1 data:name "Alice" .
-                } .
-                
                 """;
 
         String actual = writer.toString().replace("\r\n", "\n");

@@ -18,11 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-class NTriplesFormatTest {
+class NTriplesSerializerTest {
 
     private Model model;
     private FormatConfig config;
-    private NTriplesFormat nTriplesFormat;
+    private NTriplesSerializer nTriplesFormat;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -39,7 +39,7 @@ class NTriplesFormatTest {
         model = mock(Model.class);
 
         config = FormatConfig.ntriplesConfig();
-        nTriplesFormat = new NTriplesFormat(model, config);
+        nTriplesFormat = new NTriplesSerializer(model, config);
 
 
         mockExPerson = createIRI("http://example.org/Person");
@@ -56,14 +56,14 @@ class NTriplesFormatTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(null), "Model cannot be null");
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(null, config), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new NTriplesSerializer(null), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new NTriplesSerializer(null, config), "Model cannot be null");
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null config")
     void constructorShouldThrowForNullConfig() {
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(model, null), "Configuration cannot be null");
+        assertThrows(NullPointerException.class, () -> new NTriplesSerializer(model, null), "Configuration cannot be null");
     }
 
     @Test
@@ -209,7 +209,7 @@ class NTriplesFormatTest {
                 .strictMode(true)  // Keep strict mode enabled to test validation
                 .build();
 
-        NTriplesFormat serializer = new NTriplesFormat(modelMock, testConfig);
+        NTriplesSerializer serializer = new NTriplesSerializer(modelMock, testConfig);
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);
@@ -235,7 +235,7 @@ class NTriplesFormatTest {
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        NTriplesFormat serializer = new NTriplesFormat(currentTestModel, FormatConfig.ntriplesConfig());
+        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, FormatConfig.ntriplesConfig());
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);

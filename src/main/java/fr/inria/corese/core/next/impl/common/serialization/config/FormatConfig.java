@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.impl.common.serialization.config;
 
+import fr.inria.corese.core.next.api.ISerializationConfig;
 import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
 
 import java.util.Collections;
@@ -16,7 +17,7 @@ import java.util.Objects;
  * Predefined configurations for common RDF formats are available via static methods
  * like {@link #ntriplesConfig()}, {@link #nquadsConfig()}, {@link #turtleConfig()}, etc.</p>
  */
-public class FormatConfig {
+public class FormatConfig implements ISerializationConfig {
 
     /**
      * Whether prefix declarations (e.g., `@prefix`, `PREFIX`) should be used for compact IRIs.
