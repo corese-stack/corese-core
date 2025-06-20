@@ -24,7 +24,7 @@ class NQuadsSerializerTest {
 
     private Model model;
     private FormatConfig config;
-    private NQuadsSerializer nQuadsFormat;
+    private NQuadsSerializer nQuadsSerializer;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -44,7 +44,7 @@ class NQuadsSerializerTest {
     void setUp() {
         model = mock(Model.class);
         config = FormatConfig.nquadsConfig();
-        nQuadsFormat = new NQuadsSerializer(model, config);
+        nQuadsSerializer = new NQuadsSerializer(model, config);
 
         mockExPerson = createIRI("http://example.org/Person");
         mockExName = createIRI("http://example.org/name");
@@ -83,7 +83,7 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
+        nQuadsSerializer.write(writer);
 
 
         String expected = String.format("<%s> <%s> \"%s\"",
@@ -105,7 +105,7 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
+        nQuadsSerializer.write(writer);
 
         String expected = String.format("_:%s <%s> _:%s",
                 mockBNode1.stringValue(),
@@ -128,7 +128,7 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
+        nQuadsSerializer.write(writer);
 
         String expected = String.format("_:%s <%s> <%s> _:%s",
                 mockBNode1.stringValue(),
@@ -151,9 +151,12 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer faultyWriter = mock(Writer.class);
-        doThrow(new IOException("Simulated IO error")).when(faultyWriter).write(anyString());
+        doThrow(new IOException("Simulated IO error during write")).when(faultyWriter).write(anyString());
+        doThrow(new IOException("Simulated IO error (char array)")).when(faultyWriter).write(any(char[].class), anyInt(), anyInt());
+        doThrow(new IOException("Simulated IO error (close)")).when(faultyWriter).close();
 
-        assertThrows(SerializationException.class, () -> nQuadsFormat.write(faultyWriter));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(faultyWriter));
+        assertEquals("N-Quads serialization failed [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
@@ -167,8 +170,8 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
-        assertEquals("Invalid data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: NQuads]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
+        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
@@ -182,8 +185,8 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
-        assertEquals("Invalid data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: NQuads]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
+        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
@@ -197,8 +200,8 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
-        assertEquals("Invalid data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: NQuads]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
+        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
@@ -214,7 +217,7 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
+        nQuadsSerializer.write(writer);
 
 
         String expected = String.format("<%s> <%s> \"%s\"",
@@ -248,7 +251,7 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
+        nQuadsSerializer.write(writer);
 
 
         String expectedEscapedLiteral = escapeNQuadsString(literalValue);
@@ -288,7 +291,7 @@ class NQuadsSerializerTest {
      * Creates a mocked Literal object.
      * Important: The `lexicalForm` is the *raw string value* of the literal,
      * without N-Quads specific quotes, lang tags, or datatype URIs.
-     * The `NQuadsFormat` class is responsible for adding those.
+     * The `nQuadsSerializer` class is responsible for adding those.
      *
      * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
      * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.
@@ -314,7 +317,7 @@ class NQuadsSerializerTest {
     /**
      * Escapes a string according to N-Quads literal escaping rules.
      * This helper is used in tests to construct the *expected* output strings.
-     * It mimics the behavior of NQuadsFormat's internal escapeLiteral method,
+     * It mimics the behavior of nQuadsSerializer's internal escapeLiteral method,
      * considering that `nquadsConfig().escapeUnicode()` is `true`.
      *
      * @param s The string to escape.

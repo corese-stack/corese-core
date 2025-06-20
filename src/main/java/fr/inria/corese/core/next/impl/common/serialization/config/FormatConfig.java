@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization.config;
 
 import fr.inria.corese.core.next.api.ISerializationConfig;
-import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 
 import java.util.Collections;
 import java.util.HashMap;

@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.Test;
 
@@ -75,10 +75,10 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, FormatConfig.turtleConfig());
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, FormatConfig.turtleConfig());
 
         // When
-        turtleFormat.write(writer);
+        turtleSerializer.write(writer);
 
         // Then
         verify(mockModel, times(2)).stream();
@@ -150,10 +150,10 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel);
 
         // When
-        turtleFormat.write(writer);
+        turtleSerializer.write(writer);
 
         // Then
         verify(mockModel, times(2)).stream();
@@ -249,10 +249,10 @@ class TurtleSerializerTest {
                 .trailingDot(true)
                 .strictMode(false)
                 .build();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, config);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
         // When
-        turtleFormat.write(writer);
+        turtleSerializer.write(writer);
 
         // Then
         verify(mockModel, times(2)).stream();
@@ -340,10 +340,10 @@ class TurtleSerializerTest {
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, config);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
         // When
-        turtleFormat.write(writer);
+        turtleSerializer.write(writer);
 
         // Then
         verify(mockModel, times(2)).stream();
@@ -440,9 +440,9 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, FormatConfig.turtleConfig());
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, FormatConfig.turtleConfig());
 
-        turtleFormat.write(writer);
+        turtleSerializer.write(writer);
 
 
         verify(mockModel, times(5)).stream();
@@ -526,9 +526,9 @@ class TurtleSerializerTest {
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, configWithBase);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, configWithBase);
 
-        turtleFormat.write(writer);
+        turtleSerializer.write(writer);
 
         verify(mockModel, times(2)).stream();
         String expected = """
@@ -563,10 +563,10 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleFormat = new TurtleSerializer(emptyModel);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(emptyModel);
 
 
-        turtleFormat.write(writer);
+        turtleSerializer.write(writer);
 
 
         verify(emptyModel, times(2)).stream();
@@ -636,11 +636,11 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
         FormatConfig strictConfig = new FormatConfig.Builder().strictMode(true).build();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, strictConfig);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
         SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            turtleFormat.write(writer);
+            turtleSerializer.write(writer);
         });
 
         assertEquals("Turtle", thrown.getFormatName());
@@ -697,11 +697,11 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
         FormatConfig strictConfig = new FormatConfig.Builder().strictMode(true).validateURIs(true).build();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, strictConfig);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
         SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            turtleFormat.write(writer);
+            turtleSerializer.write(writer);
         });
 
         assertEquals("Turtle", thrown.getFormatName());
@@ -764,10 +764,10 @@ class TurtleSerializerTest {
                 .prettyPrint(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TurtleSerializer turtleFormat = new TurtleSerializer(mockModel, config);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
         // When
-        turtleFormat.write(writer);
+        turtleSerializer.write(writer);
 
         // Then
         verify(mockModel, times(2)).stream();

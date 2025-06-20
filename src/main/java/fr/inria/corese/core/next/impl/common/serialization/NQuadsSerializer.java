@@ -4,15 +4,18 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 
 public class NQuadsSerializer implements IRdfSerializer {
 
@@ -44,7 +47,7 @@ public class NQuadsSerializer implements IRdfSerializer {
      */
     public NQuadsSerializer(Model model, ISerializationConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
-        this.config = (FormatConfig)  Objects.requireNonNull(config, "Configuration cannot be null");
+        this.config = (FormatConfig) Objects.requireNonNull(config, "Configuration cannot be null");
     }
 
     /**
@@ -56,16 +59,29 @@ public class NQuadsSerializer implements IRdfSerializer {
      */
     @Override
     public void write(Writer writer) throws SerializationException {
-        try {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+            Set<Resource> processedNodes = preprocessModel();
+
             for (Statement stmt : model) {
-                writeStatement(writer, stmt);
+                if (shouldProcess(stmt, processedNodes)) {
+                    writeStatement(bufferedWriter, stmt);
+                }
             }
-            writer.flush();
+
         } catch (IOException e) {
-            throw new SerializationException("Failed to write", "NQuads", e);
+            throw new SerializationException("N-Quads serialization failed", "N-Quads", e);
         } catch (IllegalArgumentException e) {
-            throw new SerializationException("Invalid data: " + e.getMessage(), "NQuads", e);
+            throw new SerializationException("Invalid N-Quads data: " + e.getMessage(), "N-Quads", e);
         }
+    }
+
+    private Set<Resource> preprocessModel() {
+        return Collections.emptySet();
+    }
+
+    private boolean shouldProcess(Statement stmt, Set<Resource> processedNodes) {
+
+        return !processedNodes.contains(stmt.getSubject());
     }
 
     /**

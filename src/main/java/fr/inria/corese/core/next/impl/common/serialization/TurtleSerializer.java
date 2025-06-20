@@ -6,11 +6,12 @@ import fr.inria.corese.core.next.impl.common.serialization.config.BlankNodeStyle
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
@@ -103,21 +104,20 @@ public class TurtleSerializer implements IRdfSerializer {
      */
     @Override
     public void write(Writer writer) throws SerializationException {
-        try {
-            writeHeader(writer);
+        try (Writer bufferedWriter = new BufferedWriter(writer)) {
+            writeHeader(bufferedWriter);
 
             Set<Resource> precomputedInlineBlankNodes = precomputeInlineBlankNodesAndLists();
             consumedBlankNodes.addAll(precomputedInlineBlankNodes);
 
             if (config.useCompactTriples() && config.groupBySubject()) {
-                writeOptimizedStatements(writer);
+                writeOptimizedStatements(bufferedWriter);
             } else {
-                writeSimpleStatements(writer);
+                writeSimpleStatements(bufferedWriter);
             }
 
-            writer.flush();
         } catch (IOException e) {
-            throw new SerializationException("Failed to write to stream for Turtle format", "Turtle", e);
+            throw new SerializationException("Failed to write Turtle output", "Turtle", e);
         } catch (IllegalArgumentException e) {
             throw new SerializationException("Invalid data for Turtle format: " + e.getMessage(), "Turtle", e);
         }

@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.common.util;
+package fr.inria.corese.core.next.impl.common.serialization.util;
 
 /**
  * Provides common constants used throughout the RDF serialization process.

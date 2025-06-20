@@ -22,7 +22,7 @@ class NTriplesSerializerTest {
 
     private Model model;
     private FormatConfig config;
-    private NTriplesSerializer nTriplesFormat;
+    private NTriplesSerializer nTriplesSerializer;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -39,7 +39,7 @@ class NTriplesSerializerTest {
         model = mock(Model.class);
 
         config = FormatConfig.ntriplesConfig();
-        nTriplesFormat = new NTriplesSerializer(model, config);
+        nTriplesSerializer = new NTriplesSerializer(model, config);
 
 
         mockExPerson = createIRI("http://example.org/Person");
@@ -77,7 +77,7 @@ class NTriplesSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nTriplesFormat.write(writer);
+        nTriplesSerializer.write(writer);
 
 
         String expected = String.format("<%s> <%s> \"%s\"",
@@ -101,7 +101,7 @@ class NTriplesSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nTriplesFormat.write(writer);
+        nTriplesSerializer.write(writer);
 
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
@@ -122,7 +122,7 @@ class NTriplesSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nTriplesFormat.write(writer);
+        nTriplesSerializer.write(writer);
 
         String expected = String.format("_:%s <%s> _:%s",
                 mockBNode1.stringValue(),
@@ -144,10 +144,15 @@ class NTriplesSerializerTest {
 
         Writer faultyWriter = mock(Writer.class);
 
-        doThrow(new IOException("Simulated IO error")).when(faultyWriter).write(anyString());
+        doThrow(new IOException("Simulated IO error during write")).when(faultyWriter).write(anyString());
+        doThrow(new IOException("Simulated IO error (char array)")).when(faultyWriter).write(any(char[].class), anyInt(), anyInt());
+        doThrow(new IOException("Simulated IO error (close)")).when(faultyWriter).close();
 
-        assertThrows(SerializationException.class, () -> nTriplesFormat.write(faultyWriter));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(faultyWriter));
+
+        assertEquals("NTriples serialization failed [Format: NTriples]", thrown.getMessage());
     }
+
 
     @Test
     @DisplayName("Write should throw SerializationException on null subject value from Statement in strict mode")
@@ -159,9 +164,9 @@ class NTriplesSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
 
-        assertEquals("Invalid data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
+        assertEquals("Invalid NTriples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
     }
 
     @Test
@@ -174,8 +179,8 @@ class NTriplesSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
-        assertEquals("Invalid data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
+        assertEquals("Invalid NTriples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
     }
 
     @Test
@@ -188,8 +193,8 @@ class NTriplesSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
-        assertEquals("Invalid data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
+        assertEquals("Invalid NTriples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
     }
 
 
@@ -253,7 +258,7 @@ class NTriplesSerializerTest {
     /**
      * Escapes a string according to N-Triples literal escaping rules.
      * This helper is used in tests to construct the *expected* output strings.
-     * It mimics the behavior of NTriplesFormat's internal escapeLiteral method,
+     * It mimics the behavior of nTriplesSerializer's internal escapeLiteral method,
      * specifically when `escapeUnicode` is true (as per ntriplesConfig() default).
      *
      * @param s The string to escape.
@@ -321,7 +326,7 @@ class NTriplesSerializerTest {
      * Creates a mocked Literal object.
      * Important: The `lexicalForm` is the *raw string value* of the literal,
      * without N-Triples specific quotes, lang tags, or datatype URIs.
-     * The `NTriplesFormat` class is responsible for adding those.
+     * The `nTriplesSerializer` class is responsible for adding those.
      *
      * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
      * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.

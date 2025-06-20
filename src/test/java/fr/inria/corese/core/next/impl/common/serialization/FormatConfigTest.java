@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.impl.common.serialization.config.BlankNodeStyle
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.Test;
 
@@ -75,10 +75,10 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TriGSerializer trigFormat = new TriGSerializer(mockModel, FormatConfig.trigConfig());
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel, FormatConfig.trigConfig());
 
 
-        trigFormat.write(writer);
+        triGSerializer.write(writer);
 
 
         verify(mockModel, times(2)).stream();
@@ -150,10 +150,10 @@ class TriGSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TriGSerializer trigFormat = new TriGSerializer(mockModel);
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel);
 
 
-        trigFormat.write(writer);
+        triGSerializer.write(writer);
 
 
         verify(mockModel, times(2)).stream();
@@ -250,10 +250,10 @@ class TriGSerializerTest {
                 .trailingDot(true)
                 .strictMode(false)
                 .build();
-        TriGSerializer trigFormat = new TriGSerializer(mockModel, config);
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel, config);
 
 
-        trigFormat.write(writer);
+        triGSerializer.write(writer);
 
 
         verify(mockModel, times(2)).stream();
@@ -341,10 +341,10 @@ class TriGSerializerTest {
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TriGSerializer triGFormat = new TriGSerializer(mockModel, config);
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel, config);
 
 
-        triGFormat.write(writer);
+        triGSerializer.write(writer);
 
 
         verify(mockModel, times(2)).stream();
@@ -426,9 +426,9 @@ class TriGSerializerTest {
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TriGSerializer trigFormat = new TriGSerializer(mockModel, configWithBase);
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel, configWithBase);
 
-        trigFormat.write(writer);
+        triGSerializer.write(writer);
 
         verify(mockModel, times(2)).stream();
         String expected = """
@@ -463,10 +463,10 @@ class TriGSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TriGSerializer triGFormat = new TriGSerializer(emptyModel);
+        TriGSerializer triGSerializer = new TriGSerializer(emptyModel);
 
 
-        triGFormat.write(writer);
+        triGSerializer.write(writer);
 
 
         verify(emptyModel, times(2)).stream();
@@ -536,11 +536,11 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
         FormatConfig strictConfig = new FormatConfig.Builder().strictMode(true).build();
-        TriGSerializer triGFormat = new TriGSerializer(mockModel, strictConfig);
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel, strictConfig);
 
 
         SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            triGFormat.write(writer);
+            triGSerializer.write(writer);
         });
 
         assertEquals("TriG", thrown.getFormatName());
@@ -597,11 +597,11 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
         FormatConfig strictConfig = new FormatConfig.Builder().strictMode(true).validateURIs(true).build();
-        TriGSerializer triGFormat = new TriGSerializer(mockModel, strictConfig);
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel, strictConfig);
 
 
         SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            triGFormat.write(writer);
+            triGSerializer.write(writer);
         });
 
         assertEquals("TriG", thrown.getFormatName());
@@ -664,10 +664,10 @@ class TriGSerializerTest {
                 .prettyPrint(true)
                 .autoDeclarePrefixes(true)
                 .build();
-        TriGSerializer triGFormat = new TriGSerializer(mockModel, config);
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel, config);
 
 
-        triGFormat.write(writer);
+        triGSerializer.write(writer);
 
 
         verify(mockModel, times(2)).stream();
@@ -751,10 +751,10 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TriGSerializer trigFormat = new TriGSerializer(mockModel, FormatConfig.trigConfig());
+        TriGSerializer triGSerializer = new TriGSerializer(mockModel, FormatConfig.trigConfig());
 
 
-        trigFormat.write(writer);
+        triGSerializer.write(writer);
 
 
         verify(mockModel, times(2)).stream();
