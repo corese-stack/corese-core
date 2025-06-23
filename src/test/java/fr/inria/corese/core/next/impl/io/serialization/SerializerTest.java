@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.impl.io.serialization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,6 +7,11 @@ import static org.mockito.Mockito.verify;
 
 import java.io.Writer;
 
+import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.impl.io.serialization.FormatConfig;
+import fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat;
+import fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat;
+import fr.inria.corese.core.next.impl.io.serialization.Serializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +24,7 @@ import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 class SerializerTest {
 
-    private Serializer serializer;
+    private fr.inria.corese.core.next.impl.io.serialization.Serializer serializer;
 
     @Mock
     private Model mockModel;
@@ -31,7 +36,7 @@ class SerializerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        serializer = new Serializer(mockModel, mockConfig);
+        serializer = new fr.inria.corese.core.next.impl.io.serialization.Serializer(mockModel, mockConfig);
     }
 
     // --- Constructor tests ---
@@ -39,8 +44,8 @@ class SerializerTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        assertThrows(NullPointerException.class, () -> new Serializer(null), "Model cannot be null");
-        assertThrows(NullPointerException.class, () -> new Serializer(null, mockConfig), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.Serializer(null), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.Serializer(null, mockConfig), "Model cannot be null");
     }
 
     @Test
@@ -54,7 +59,7 @@ class SerializerTest {
     @Test
     @DisplayName("serialize should throw NullPointerException for null writer")
     void serializeShouldThrowForNullWriter() {
-        assertThrows(NullPointerException.class, () -> serializer.serialize(null, RdfFormat.NTRIPLES),
+        assertThrows(NullPointerException.class, () -> serializer.serialize(null, fr.inria.corese.core.next.api.base.io.RdfFormat.NTRIPLES),
                 "Writer cannot be null");
     }
 
@@ -70,8 +75,8 @@ class SerializerTest {
     @Test
     @DisplayName("serialize should delegate to NTriplesFormat for NTRIPLES format")
     void serializeShouldDelegateToNTriplesFormat() throws SerializationException {
-        try (MockedConstruction<NTriplesFormat> mockedNtConstructor = mockConstruction(NTriplesFormat.class)) {
-            serializer.serialize(mockWriter, RdfFormat.NTRIPLES);
+        try (MockedConstruction<fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat> mockedNtConstructor = mockConstruction(fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat.class)) {
+            serializer.serialize(mockWriter, fr.inria.corese.core.next.api.base.io.RdfFormat.NTRIPLES);
 
             assertEquals(1, mockedNtConstructor.constructed().size(),
                     "NTriplesFormat constructor should be called once");
@@ -85,7 +90,7 @@ class SerializerTest {
     @Test
     @DisplayName("serialize should delegate to NQuadsFormat for NQUADS format")
     void serializeShouldDelegateToNQuadsFormat() throws SerializationException {
-        try (MockedConstruction<NQuadsFormat> mockedNqConstructor = mockConstruction(NQuadsFormat.class)) {
+        try (MockedConstruction<fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat> mockedNqConstructor = mockConstruction(fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat.class)) {
             serializer.serialize(mockWriter, RdfFormat.NQUADS);
 
             assertEquals(1, mockedNqConstructor.constructed().size(), "NQuadsFormat constructor should be called once");

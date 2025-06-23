@@ -1,27 +1,19 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.api.base.io;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link FileFormat}.
+ * Unit tests for {@link fr.inria.corese.core.next.api.base.io.FileFormat}.
  *
  * <p>
  * Coverage :
@@ -64,7 +56,7 @@ class FileFormatTest {
             List<String> extensions,
             List<String> mimeTypes) {
 
-        FileFormat format = new FileFormat(name, extensions, mimeTypes);
+        fr.inria.corese.core.next.api.base.io.FileFormat format = new fr.inria.corese.core.next.api.base.io.FileFormat(name, extensions, mimeTypes);
 
         assertAll("All getters reflect constructor arguments",
                 () -> assertEquals(name, format.getName(), "name"),
@@ -88,31 +80,31 @@ class FileFormatTest {
         @Test
         void null_name_throws_NPE() {
             assertThrows(NullPointerException.class,
-                    () -> new FileFormat(null, EXT, MIME));
+                    () -> new fr.inria.corese.core.next.api.base.io.FileFormat(null, EXT, MIME));
         }
 
         @Test
         void null_extensions_throws_NPE() {
             assertThrows(NullPointerException.class,
-                    () -> new FileFormat("Turtle", null, MIME));
+                    () -> new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", null, MIME));
         }
 
         @Test
         void null_mimeTypes_throws_NPE() {
             assertThrows(NullPointerException.class,
-                    () -> new FileFormat("Turtle", EXT, null));
+                    () -> new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", EXT, null));
         }
 
         @Test
         void empty_extensions_throws_IAE() {
             assertThrows(IllegalArgumentException.class,
-                    () -> new FileFormat("Turtle", List.of(), MIME));
+                    () -> new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", List.of(), MIME));
         }
 
         @Test
         void empty_mimeTypes_throws_IAE() {
             assertThrows(IllegalArgumentException.class,
-                    () -> new FileFormat("Turtle", EXT, List.of()));
+                    () -> new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", EXT, List.of()));
         }
     }
 
@@ -126,7 +118,7 @@ class FileFormatTest {
         // Build mutable lists
         List<String> ext = new ArrayList<>(List.of("ttl"));
         List<String> mime = new ArrayList<>(List.of("text/turtle"));
-        FileFormat format = new FileFormat("Turtle", ext, mime);
+        fr.inria.corese.core.next.api.base.io.FileFormat format = new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", ext, mime);
 
         // Mutate originals AFTER construction
         ext.add("bad");
@@ -152,11 +144,11 @@ class FileFormatTest {
     @Nested
     class Equals_and_hashCode_contract {
 
-        private final FileFormat base = new FileFormat("Turtle", List.of("ttl"), List.of("text/turtle"));
+        private final fr.inria.corese.core.next.api.base.io.FileFormat base = new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", List.of("ttl"), List.of("text/turtle"));
 
         @Test
         void symmetry_and_case_insensitivity() {
-            FileFormat sameDifferentCase = new FileFormat("tUrTlE", List.of("ttl"), List.of("text/turtle"));
+            fr.inria.corese.core.next.api.base.io.FileFormat sameDifferentCase = new fr.inria.corese.core.next.api.base.io.FileFormat("tUrTlE", List.of("ttl"), List.of("text/turtle"));
 
             assertEquals(base, sameDifferentCase);
             assertEquals(sameDifferentCase, base);
@@ -165,9 +157,9 @@ class FileFormatTest {
 
         @Test
         void transitivity() {
-            FileFormat a = new FileFormat("Turtle", List.of("ttl"), List.of("text/turtle"));
-            FileFormat b = new FileFormat("TURTLE", List.of("ttl"), List.of("text/turtle"));
-            FileFormat c = new FileFormat("turtle", List.of("ttl"), List.of("text/turtle"));
+            fr.inria.corese.core.next.api.base.io.FileFormat a = new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", List.of("ttl"), List.of("text/turtle"));
+            fr.inria.corese.core.next.api.base.io.FileFormat b = new fr.inria.corese.core.next.api.base.io.FileFormat("TURTLE", List.of("ttl"), List.of("text/turtle"));
+            fr.inria.corese.core.next.api.base.io.FileFormat c = new fr.inria.corese.core.next.api.base.io.FileFormat("turtle", List.of("ttl"), List.of("text/turtle"));
 
             assertAll(
                     () -> assertEquals(a, b),
@@ -177,9 +169,9 @@ class FileFormatTest {
 
         @Test
         void inequality_when_any_field_differs() {
-            FileFormat diffName = new FileFormat("N-Triples", List.of("ttl"), List.of("text/turtle"));
-            FileFormat diffExt = new FileFormat("Turtle", List.of("nt"), List.of("text/turtle"));
-            FileFormat diffMime = new FileFormat("Turtle", List.of("ttl"), List.of("application/n-triples"));
+            fr.inria.corese.core.next.api.base.io.FileFormat diffName = new fr.inria.corese.core.next.api.base.io.FileFormat("N-Triples", List.of("ttl"), List.of("text/turtle"));
+            fr.inria.corese.core.next.api.base.io.FileFormat diffExt = new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", List.of("nt"), List.of("text/turtle"));
+            fr.inria.corese.core.next.api.base.io.FileFormat diffMime = new fr.inria.corese.core.next.api.base.io.FileFormat("Turtle", List.of("ttl"), List.of("application/n-triples"));
 
             assertAll(
                     () -> assertNotEquals(base, diffName),
@@ -197,7 +189,7 @@ class FileFormatTest {
      */
     @Test
     void toString_contains_all_relevant_information() {
-        FileFormat format = new FileFormat("Turtle", List.of("ttl"), List.of("text/turtle"));
+        fr.inria.corese.core.next.api.base.io.FileFormat format = new FileFormat("Turtle", List.of("ttl"), List.of("text/turtle"));
 
         String out = format.toString();
         assertTrue(

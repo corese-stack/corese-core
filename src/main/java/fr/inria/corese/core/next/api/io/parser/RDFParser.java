@@ -1,4 +1,6 @@
-package fr.inria.corese.core.next.api.parser;
+package fr.inria.corese.core.next.api.io.parser;
+
+import fr.inria.corese.core.next.api.base.io.RdfFormat;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -8,7 +10,7 @@ public interface RDFParser {
     /**
      * Gets the RDF format that this parser can parse.
      */
-    RDFFormat getRDFFormat();
+    RdfFormat getRDFFormat();
 
     /**
      * Parses RDF data from the specified InputStream or Reader and adds it to the model.

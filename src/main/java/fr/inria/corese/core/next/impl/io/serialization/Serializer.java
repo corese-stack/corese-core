@@ -1,7 +1,8 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.impl.io.serialization;
 
-import fr.inria.corese.core.next.api.FormatSerializer;
+import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.base.io.RdfFormat;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 import java.io.Writer;
@@ -22,27 +23,27 @@ public class Serializer {
     }
 
     /**
-     * Serializes the RDF model to the given writer in the specified {@link RdfFormat}.
+     * Serializes the RDF model to the given writer in the specified {@link fr.inria.corese.core.next.api.base.io.RdfFormat}.
      *
      * @param writer the Writer to write the serialized data to.
-     * @param format the {@link RdfFormat} describing the desired serialization format.
+     * @param format the {@link fr.inria.corese.core.next.api.base.io.RdfFormat} describing the desired serialization format.
      * @throws SerializationException if an error occurs during serialization or if the format is not currently supported by an implementation.
      */
-    public void serialize(Writer writer, RdfFormat format) throws SerializationException {
+    public void serialize(Writer writer, fr.inria.corese.core.next.api.base.io.RdfFormat format) throws SerializationException {
         Objects.requireNonNull(writer, "Writer cannot be null");
         Objects.requireNonNull(format, "RdfFormat cannot be null");
 
         FormatSerializer formatSerializer;
 
 
-        if (format.equals(RdfFormat.NTRIPLES)) {
+        if (format.equals(fr.inria.corese.core.next.api.base.io.RdfFormat.NTRIPLES)) {
             formatSerializer = new NTriplesFormat(model, config);
-        } else if (format.equals( RdfFormat.NQUADS)) {
+        } else if (format.equals( fr.inria.corese.core.next.api.base.io.RdfFormat.NQUADS)) {
             formatSerializer = new NQuadsFormat(model, config);
-        } else if (format.equals( RdfFormat.TURTLE)) {
+        } else if (format.equals( fr.inria.corese.core.next.api.base.io.RdfFormat.TURTLE)) {
 
             throw new UnsupportedOperationException("Serialization to " + format.getName() + " format is not yet implemented.");
-        } else if (format.equals( RdfFormat.JSONLD)) {
+        } else if (format.equals( fr.inria.corese.core.next.api.base.io.RdfFormat.JSONLD)) {
             throw new UnsupportedOperationException("Serialization to " + format.getName() + " format is not yet implemented.");
         } else if (format.equals( RdfFormat.RDFXML)) {
             throw new UnsupportedOperationException("Serialization to " + format.getName() + " format is not yet implemented.");

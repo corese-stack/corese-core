@@ -117,6 +117,9 @@ dependencies {
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parser (Semargl)
     implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // Semargl core RDF parser
     implementation("com.github.jsonld-java:jsonld-java:0.13.6")                        // Legacy JSON-LD processing
+    implementation("com.apicatalog:titanium-json-ld:1.6.0")
+    implementation("com.apicatalog:titanium-rdf-api:1.0.0")
+    implementation("jakarta.json:jakarta.json-api:2.1.3")
 
 
     // === HTTP and XML ===

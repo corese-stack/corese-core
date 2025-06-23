@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.api.base.io;
 
 import java.util.List;
 import java.util.Objects;

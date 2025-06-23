@@ -1,14 +1,16 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.impl.io.serialization;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -16,15 +18,11 @@ import java.io.Writer;
 import java.util.Iterator;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
 class NTriplesFormatTest {
 
     private Model model;
-    private FormatConfig config;
-    private NTriplesFormat nTriplesFormat;
+    private fr.inria.corese.core.next.impl.io.serialization.FormatConfig config;
+    private fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat nTriplesFormat;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -41,9 +39,9 @@ class NTriplesFormatTest {
 
     @BeforeEach
     void setUp() {
-        model = mock(Model.class);
-        config = new FormatConfig.Builder().build();
-        nTriplesFormat = new NTriplesFormat(model, config);
+        model = Mockito.mock(Model.class);
+        config = new fr.inria.corese.core.next.impl.io.serialization.FormatConfig.Builder().build();
+        nTriplesFormat = new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(model, config);
 
 
         mockExPerson = createIRI("http://example.org/Person");
@@ -63,14 +61,14 @@ class NTriplesFormatTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(null), "Model cannot be null");
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(null, config), "Model cannot be null");
+        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(null), "Model cannot be null");
+        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(null, config), "Model cannot be null");
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null config")
     void constructorShouldThrowForNullConfig() {
-        assertThrows(NullPointerException.class, () -> new NTriplesFormat(model, null), "Configuration cannot be null");
+        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(model, null), "Configuration cannot be null");
     }
 
     @Test
@@ -81,7 +79,7 @@ class NTriplesFormatTest {
                 mockExName,
                 mockLiteralJohn
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         nTriplesFormat.write(writer);
@@ -92,7 +90,7 @@ class NTriplesFormatTest {
                 mockExName.stringValue(),
                 escapeNTriplesString(lexJohn)) + " .\n";
 
-        assertEquals(expected, writer.toString());
+        Assertions.assertEquals(expected, writer.toString());
     }
 
     @Test
@@ -105,7 +103,7 @@ class NTriplesFormatTest {
                 mockLiteralJohn,
                 mockContext
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         nTriplesFormat.write(writer);
@@ -115,7 +113,7 @@ class NTriplesFormatTest {
                 mockExName.stringValue(),
                 escapeNTriplesString(lexJohn)) + " .\n";
 
-        assertEquals(expected, writer.toString());
+        Assertions.assertEquals(expected, writer.toString());
     }
 
     @Test
@@ -126,7 +124,7 @@ class NTriplesFormatTest {
                 mockExKnows,
                 mockBNode2
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         nTriplesFormat.write(writer);
@@ -136,21 +134,21 @@ class NTriplesFormatTest {
                 mockExKnows.stringValue(),
                 mockBNode2.stringValue()) + " .\n";
 
-        assertEquals(expected, writer.toString());
+        Assertions.assertEquals(expected, writer.toString());
     }
 
     @Test
     @DisplayName("Write should handle blank nodes with custom prefix")
     void writeShouldHandleBlankNodesWithCustomPrefix() throws SerializationException {
-        FormatConfig customConfig = new FormatConfig.Builder().blankNodePrefix("genid-").build();
-        NTriplesFormat customSerializer = new NTriplesFormat(model, customConfig);
+        fr.inria.corese.core.next.impl.io.serialization.FormatConfig customConfig = new FormatConfig.Builder().blankNodePrefix("genid-").build();
+        fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat customSerializer = new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(model, customConfig);
 
         Statement stmt = createStatement(
                 mockBNode1,
                 mockExKnows,
                 mockBNode2
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         customSerializer.write(writer);
@@ -160,7 +158,7 @@ class NTriplesFormatTest {
                 mockExKnows.stringValue(),
                 mockBNode2.stringValue()) + " .\n";
 
-        assertEquals(expected, writer.toString());
+        Assertions.assertEquals(expected, writer.toString());
     }
 
     @Test
@@ -171,52 +169,52 @@ class NTriplesFormatTest {
                 mockExName,
                 mockLiteralJohn
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        Writer faultyWriter = mock(Writer.class);
+        Writer faultyWriter = Mockito.mock(Writer.class);
 
-        doThrow(new IOException("Simulated IO error")).when(faultyWriter).write(anyString());
+        Mockito.doThrow(new IOException("Simulated IO error")).when(faultyWriter).write(ArgumentMatchers.anyString());
 
-        assertThrows(SerializationException.class, () -> nTriplesFormat.write(faultyWriter));
+        Assertions.assertThrows(SerializationException.class, () -> nTriplesFormat.write(faultyWriter));
     }
 
     @Test
     @DisplayName("Write should throw SerializationException on null subject value from Statement")
     void writeShouldThrowOnNullSubjectValue() {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(null);
-        when(stmt.getPredicate()).thenReturn(mockExName);
-        when(stmt.getObject()).thenReturn(mockLiteralJohn);
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Statement stmt = Mockito.mock(Statement.class);
+        Mockito.when(stmt.getSubject()).thenReturn(null);
+        Mockito.when(stmt.getPredicate()).thenReturn(mockExName);
+        Mockito.when(stmt.getObject()).thenReturn(mockLiteralJohn);
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
+        Assertions.assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
     }
 
     @Test
     @DisplayName("Write should throw SerializationException on null predicate value from Statement")
     void writeShouldThrowOnNullPredicateValue() {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(mockExPerson);
-        when(stmt.getPredicate()).thenReturn(null);
-        when(stmt.getObject()).thenReturn(mockLiteralJohn);
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Statement stmt = Mockito.mock(Statement.class);
+        Mockito.when(stmt.getSubject()).thenReturn(mockExPerson);
+        Mockito.when(stmt.getPredicate()).thenReturn(null);
+        Mockito.when(stmt.getObject()).thenReturn(mockLiteralJohn);
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
+        Assertions.assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
     }
 
     @Test
     @DisplayName("Write should throw SerializationException on null object value from Statement")
     void writeShouldThrowOnNullObjectValue() {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(mockExPerson);
-        when(stmt.getPredicate()).thenReturn(mockExName);
-        when(stmt.getObject()).thenReturn(null);
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Statement stmt = Mockito.mock(Statement.class);
+        Mockito.when(stmt.getSubject()).thenReturn(mockExPerson);
+        Mockito.when(stmt.getPredicate()).thenReturn(mockExName);
+        Mockito.when(stmt.getObject()).thenReturn(null);
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
+        Assertions.assertThrows(SerializationException.class, () -> nTriplesFormat.write(writer));
     }
 
     @ParameterizedTest
@@ -239,7 +237,7 @@ class NTriplesFormatTest {
                 mockExName,
                 literalMock
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
         nTriplesFormat.write(writer);
@@ -250,7 +248,7 @@ class NTriplesFormatTest {
                 mockExName.stringValue(),
                 expectedEscapedLiteral) + " .\n";
 
-        assertEquals(expectedOutput, writer.toString());
+        Assertions.assertEquals(expectedOutput, writer.toString());
     }
 
     @Test
@@ -267,7 +265,7 @@ class NTriplesFormatTest {
                 mockExPerson,
                 createIRI("http://example.org/ctx")
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt1, stmt2));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt1, stmt2));
 
         StringWriter writer = new StringWriter();
         nTriplesFormat.write(writer);
@@ -281,7 +279,7 @@ class NTriplesFormatTest {
                         mockExKnows.stringValue(),
                         mockExPerson.stringValue()) + " .\n";
 
-        assertEquals(expectedOutput, writer.toString());
+        Assertions.assertEquals(expectedOutput, writer.toString());
     }
 
     @Test
@@ -289,11 +287,11 @@ class NTriplesFormatTest {
     void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
         Statement stmt = createStatement(mockExPerson, createIRI("http://example.org/greeting"), mockLiteralHelloEn);
 
-        Model currentTestModel = mock(Model.class);
-        when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Model currentTestModel = Mockito.mock(Model.class);
+        Mockito.when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer writer = new StringWriter();
-        NTriplesFormat serializer = new NTriplesFormat(currentTestModel);
+        fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat serializer = new NTriplesFormat(currentTestModel);
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
@@ -302,7 +300,7 @@ class NTriplesFormatTest {
                 escapeNTriplesString(hello),
                 mockLiteralHelloEn.getLanguage().get()) + " .\n";
 
-        assertEquals(expectedOutput, writer.toString());
+        Assertions.assertEquals(expectedOutput, writer.toString());
     }
 
 
@@ -384,19 +382,19 @@ class NTriplesFormatTest {
      * @return A mocked Literal instance.
      */
     private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
-        Literal literal = mock(Literal.class);
-        when(literal.isLiteral()).thenReturn(true);
-        when(literal.isResource()).thenReturn(false);
-        when(literal.stringValue()).thenReturn(lexicalForm);
+        Literal literal = Mockito.mock(Literal.class);
+        Mockito.when(literal.isLiteral()).thenReturn(true);
+        Mockito.when(literal.isResource()).thenReturn(false);
+        Mockito.when(literal.stringValue()).thenReturn(lexicalForm);
 
         if (langTag != null && !langTag.isEmpty()) {
-            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
+            Mockito.when(literal.getLanguage()).thenReturn(Optional.of(langTag));
 
 
-            when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
+            Mockito.when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
         } else {
-            when(literal.getLanguage()).thenReturn(Optional.empty());
-            when(literal.getDatatype()).thenReturn(dataTypeIRI);
+            Mockito.when(literal.getLanguage()).thenReturn(Optional.empty());
+            Mockito.when(literal.getDatatype()).thenReturn(dataTypeIRI);
         }
         return literal;
     }
@@ -406,29 +404,29 @@ class NTriplesFormatTest {
     }
 
     private Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(subject);
-        when(stmt.getPredicate()).thenReturn(predicate);
-        when(stmt.getObject()).thenReturn(object);
-        when(stmt.getContext()).thenReturn(context);
+        Statement stmt = Mockito.mock(Statement.class);
+        Mockito.when(stmt.getSubject()).thenReturn(subject);
+        Mockito.when(stmt.getPredicate()).thenReturn(predicate);
+        Mockito.when(stmt.getObject()).thenReturn(object);
+        Mockito.when(stmt.getContext()).thenReturn(context);
         return stmt;
     }
 
     private Resource createBlankNode(String id) {
-        Resource blankNode = mock(Resource.class);
-        when(blankNode.isResource()).thenReturn(true);
-        when(blankNode.isBNode()).thenReturn(true);
-        when(blankNode.isIRI()).thenReturn(false);
-        when(blankNode.stringValue()).thenReturn(id);
+        Resource blankNode = Mockito.mock(Resource.class);
+        Mockito.when(blankNode.isResource()).thenReturn(true);
+        Mockito.when(blankNode.isBNode()).thenReturn(true);
+        Mockito.when(blankNode.isIRI()).thenReturn(false);
+        Mockito.when(blankNode.stringValue()).thenReturn(id);
         return blankNode;
     }
 
     private IRI createIRI(String uri) {
-        IRI iri = mock(IRI.class);
-        when(iri.isResource()).thenReturn(true);
-        when(iri.isIRI()).thenReturn(true);
-        when(iri.isBNode()).thenReturn(false);
-        when(iri.stringValue()).thenReturn(uri);
+        IRI iri = Mockito.mock(IRI.class);
+        Mockito.when(iri.isResource()).thenReturn(true);
+        Mockito.when(iri.isIRI()).thenReturn(true);
+        Mockito.when(iri.isBNode()).thenReturn(false);
+        Mockito.when(iri.stringValue()).thenReturn(uri);
         return iri;
     }
 }

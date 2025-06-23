@@ -1,8 +1,9 @@
-package fr.inria.corese.core.next.api;
+package fr.inria.corese.core.next.api.io.serialization;
+
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 import java.io.Writer;
-
-import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 public interface FormatSerializer {
 

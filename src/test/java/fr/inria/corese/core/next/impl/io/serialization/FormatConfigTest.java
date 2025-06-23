@@ -1,11 +1,9 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.impl.io.serialization;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FormatConfigTest {
 
@@ -13,7 +11,7 @@ class FormatConfigTest {
     @DisplayName("Builder should create FormatConfig with default blank node prefix")
     void builderShouldCreateWithDefaultBlankNodePrefix() {
          
-        FormatConfig config = new FormatConfig.Builder().build();
+        fr.inria.corese.core.next.impl.io.serialization.FormatConfig config = new fr.inria.corese.core.next.impl.io.serialization.FormatConfig.Builder().build();
 
          
         assertNotNull(config, "FormatConfig should not be null");
@@ -26,7 +24,7 @@ class FormatConfigTest {
         String customPrefix = "genid-";
 
          
-        FormatConfig config = new FormatConfig.Builder()
+        fr.inria.corese.core.next.impl.io.serialization.FormatConfig config = new fr.inria.corese.core.next.impl.io.serialization.FormatConfig.Builder()
                 .blankNodePrefix(customPrefix)
                 .build();
 
@@ -39,7 +37,7 @@ class FormatConfigTest {
     @DisplayName("blankNodePrefix method in Builder should throw NullPointerException for null prefix")
     void blankNodePrefixShouldThrowForNull() {
 
-        FormatConfig.Builder builder = new FormatConfig.Builder();
+        fr.inria.corese.core.next.impl.io.serialization.FormatConfig.Builder builder = new fr.inria.corese.core.next.impl.io.serialization.FormatConfig.Builder();
 
 
         assertThrows(NullPointerException.class, () -> builder.blankNodePrefix(null),
@@ -50,7 +48,7 @@ class FormatConfigTest {
     @DisplayName("FormatConfig constructor should be private and only accessible via builder")
     void constructorIsPrivateAndAccessibleViaBuilder() {
 
-        FormatConfig config = new FormatConfig.Builder().build();
+        fr.inria.corese.core.next.impl.io.serialization.FormatConfig config = new FormatConfig.Builder().build();
         assertNotNull(config);
     }
 }
