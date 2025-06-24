@@ -77,4 +77,23 @@ public final class SerializationConstants {
     public static final String OPEN_BRACE = "{";
     public static final String CLOSE_BRACE = "}";
 
+    // XML-specific constants
+    public static final String XML_DECLARATION_START = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+    public static final String RDF_ROOT_START = "<rdf:RDF";
+    public static final String RDF_ROOT_END = "</rdf:RDF>";
+    public static final String RDF_DESCRIPTION_START = "<rdf:Description";
+    public static final String RDF_DESCRIPTION_END = "</rdf:Description>";
+    public static final String RDF_ABOUT_ATTRIBUTE = "rdf:about";
+    public static final String RDF_NODEID_ATTRIBUTE = "rdf:nodeID";
+    public static final String RDF_RESOURCE_ATTRIBUTE = "rdf:resource";
+    public static final String RDF_DATATYPE_ATTRIBUTE = "rdf:datatype";
+    public static final String XMLNS_PREFIX = "xmlns:";
+    public static final String XML_LANG_ATTRIBUTE = "xml:lang";
+
+    public static final String AMP_ENTITY = "&amp;";
+    public static final String LT_ENTITY = "&lt;";
+    public static final String GT_ENTITY = "&gt;";
+    public static final String QUOT_ENTITY = "&quot;";
+    public static final String APOS_ENTITY = "&apos;";
+
 }

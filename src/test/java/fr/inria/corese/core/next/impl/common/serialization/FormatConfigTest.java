@@ -8,6 +8,8 @@ import fr.inria.corese.core.next.impl.common.serialization.util.SerializationCon
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class FormatConfigTest {
@@ -68,6 +70,42 @@ class FormatConfigTest {
         assertEquals(SerializationConstants.DEFAULT_LINE_ENDING, config.getLineEnding());
         assertTrue(config.getCustomPrefixes().isEmpty());
     }
+
+    @Test
+    @DisplayName("rdfXmlConfig() devrait retourner la configuration par défaut correcte pour RDF/XML")
+    void rdfXmlConfigReturnsCorrectConfig() {
+        FormatConfig config = FormatConfig.rdfXmlConfig();
+
+        assertTrue(config.usePrefixes());
+        assertTrue(config.autoDeclarePrefixes());
+        assertEquals(PrefixOrderingEnum.ALPHABETICAL, config.getPrefixOrdering());
+        assertFalse(config.useCompactTriples());
+        assertFalse(config.useRdfTypeShortcut());
+        assertFalse(config.useCollections());
+        assertEquals(BlankNodeStyleEnum.NAMED, config.getBlankNodeStyle());
+        assertTrue(config.prettyPrint());
+        assertEquals(SerializationConstants.DEFAULT_INDENTATION, config.getIndent());
+        assertEquals(0, config.getMaxLineLength());
+        assertFalse(config.groupBySubject());
+        assertFalse(config.sortSubjects());
+        assertFalse(config.sortPredicates());
+        assertEquals(LiteralDatatypePolicyEnum.ALWAYS_TYPED, config.getLiteralDatatypePolicy());
+        assertFalse(config.escapeUnicode());
+        assertFalse(config.trailingDot());
+        assertNull(config.getBaseIRI());
+        assertTrue(config.stableBlankNodeIds());
+        assertFalse(config.includeContext());
+        assertEquals(SerializationConstants.DEFAULT_LINE_ENDING, config.getLineEnding());
+
+
+        Map<String, String> customPrefixes = config.getCustomPrefixes();
+        assertFalse(customPrefixes.isEmpty());
+        assertEquals(SerializationConstants.RDF_NS, customPrefixes.get("rdf"));
+        assertEquals(SerializationConstants.RDFS_NS, customPrefixes.get("rdfs"));
+        assertEquals(SerializationConstants.XSD_NS, customPrefixes.get("xsd"));
+        assertEquals(SerializationConstants.OWL_NS, customPrefixes.get("owl"));
+    }
+
 
 
     @Test

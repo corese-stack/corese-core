@@ -537,9 +537,42 @@ public class FormatConfig implements ISerializationConfig {
                 .build();
     }
 
+    /**
+     * Returns a default configuration suitable for RDF/XML serialization.
+     * RDF/XML is an XML-based syntax for RDF graphs.
+     *
+     * @return A {@code FormatConfig} instance for RDF/XML.
+     */
+    public static FormatConfig rdfXmlConfig() {
+        Map<String, String> commonRdfXmlPrefixes = new HashMap<>();
+        commonRdfXmlPrefixes.put("rdf", SerializationConstants.RDF_NS);
+        commonRdfXmlPrefixes.put("rdfs", SerializationConstants.RDFS_NS);
+        commonRdfXmlPrefixes.put("xsd", SerializationConstants.XSD_NS);
+        commonRdfXmlPrefixes.put("owl", SerializationConstants.OWL_NS);
+
+        return new Builder().usePrefixes(true)
+                .autoDeclarePrefixes(true)
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL).addCustomPrefixes(commonRdfXmlPrefixes).useCompactTriples(false)
+                .useRdfTypeShortcut(false)
+                .useCollections(false)
+                .blankNodeStyle(BlankNodeStyleEnum.NAMED)
+                .prettyPrint(true)
+                .indent(SerializationConstants.DEFAULT_INDENTATION).maxLineLength(0)
+                .groupBySubject(false)
+                .sortSubjects(false)
+                .sortPredicates(false)
+                .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
+                .escapeUnicode(false)
+                .trailingDot(false)
+                .baseIRI(null)
+                .stableBlankNodeIds(true)
+                .strictMode(true).validateURIs(true).useMultilineLiterals(true)
+                .includeContext(false)
+                .lineEnding(SerializationConstants.DEFAULT_LINE_ENDING).build();
+    }
+
     public boolean shouldUseTripleQuotes(String literalValue) {
-        return useMultilineLiterals &&
-                (literalValue.contains(SerializationConstants.LINE_FEED) || literalValue.contains(SerializationConstants.CARRIAGE_RETURN));
+        return useMultilineLiterals && (literalValue.contains(SerializationConstants.LINE_FEED) || literalValue.contains(SerializationConstants.CARRIAGE_RETURN));
     }
 
     public boolean shouldOptimizeOutput() {

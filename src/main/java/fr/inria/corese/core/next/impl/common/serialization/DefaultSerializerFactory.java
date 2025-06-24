@@ -27,12 +27,14 @@ public class DefaultSerializerFactory implements ISerializerFactory {
      * with constructors for all known {@link RdfFormat} implementations.
      */
     public DefaultSerializerFactory() {
-        Map<RdfFormat, BiFunction<Model, ISerializationConfig, IRdfSerializer>> tempRegistry = new HashMap<>(); // Changed to IFormatConfig
+        Map<RdfFormat, BiFunction<Model, ISerializationConfig, IRdfSerializer>> tempRegistry = new HashMap<>();
         // Cast the lambda to BiFunction<Model, IFormatConfig, IRdfSerializer>
         tempRegistry.put(RdfFormat.TURTLE, (model, config) -> new TurtleSerializer(model, (FormatConfig) config));
         tempRegistry.put(RdfFormat.NTRIPLES, (model, config) -> new NTriplesSerializer(model, (FormatConfig) config));
         tempRegistry.put(RdfFormat.NQUADS, (model, config) -> new NQuadsSerializer(model, (FormatConfig) config));
         tempRegistry.put(RdfFormat.TRIG, (model, config) -> new TriGSerializer(model, (FormatConfig) config));
+        tempRegistry.put(RdfFormat.RDFXML, (model, config) -> new XmlSerializer(model, (FormatConfig) config));
+
         this.registry = Collections.unmodifiableMap(tempRegistry);
     }
 
@@ -41,7 +43,7 @@ public class DefaultSerializerFactory implements ISerializerFactory {
      *
      * @param format the {@link RdfFormat} for which to create the serializer. Must not be null.
      * @param model the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link ISerializationConfig} to apply during serialization. Must not be null. // Changed to IFormatConfig
+     * @param config the {@link ISerializationConfig} to apply during serialization. Must not be null.
      * @return a new instance of {@link IRdfSerializer} configured for the specified format.
      * @throws NullPointerException if any of the arguments (format, model, config) are null.
      * @throws IllegalArgumentException if the provided format is not supported by this factory.
