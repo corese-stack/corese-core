@@ -8,10 +8,8 @@ import static org.mockito.Mockito.verify;
 import java.io.Writer;
 
 import fr.inria.corese.core.next.api.base.io.RdfFormat;
-import fr.inria.corese.core.next.impl.io.serialization.FormatConfig;
-import fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat;
-import fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat;
-import fr.inria.corese.core.next.impl.io.serialization.Serializer;
+import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,7 +73,7 @@ class SerializerTest {
     @Test
     @DisplayName("serialize should delegate to NTriplesFormat for NTRIPLES format")
     void serializeShouldDelegateToNTriplesFormat() throws SerializationException {
-        try (MockedConstruction<fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat> mockedNtConstructor = mockConstruction(fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat.class)) {
+        try (MockedConstruction<fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat> mockedNtConstructor = mockConstruction(fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat.class)) {
             serializer.serialize(mockWriter, fr.inria.corese.core.next.api.base.io.RdfFormat.NTRIPLES);
 
             assertEquals(1, mockedNtConstructor.constructed().size(),
@@ -90,7 +88,7 @@ class SerializerTest {
     @Test
     @DisplayName("serialize should delegate to NQuadsFormat for NQUADS format")
     void serializeShouldDelegateToNQuadsFormat() throws SerializationException {
-        try (MockedConstruction<fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat> mockedNqConstructor = mockConstruction(fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat.class)) {
+        try (MockedConstruction<NQuadsFormat> mockedNqConstructor = mockConstruction(NQuadsFormat.class)) {
             serializer.serialize(mockWriter, RdfFormat.NQUADS);
 
             assertEquals(1, mockedNqConstructor.constructed().size(), "NQuadsFormat constructor should be called once");

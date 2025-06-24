@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.io.serialization;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ class NQuadsFormatTest {
 
     private Model model;
     private fr.inria.corese.core.next.impl.io.serialization.FormatConfig config;
-    private fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat nQuadsFormat;
+    private fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat nQuadsFormat;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -45,7 +46,7 @@ class NQuadsFormatTest {
     void setUp() {
         model = mock(Model.class);
         config = new fr.inria.corese.core.next.impl.io.serialization.FormatConfig.Builder().build();
-        nQuadsFormat = new fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat(model, config);
+        nQuadsFormat = new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(model, config);
 
         mockExPerson = createIRI("http://example.org/Person");
         mockExName = createIRI("http://example.org/name");
@@ -64,14 +65,14 @@ class NQuadsFormatTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat(null), "Model cannot be null");
-        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat(null, config), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(null), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(null, config), "Model cannot be null");
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null config")
     void constructorShouldThrowForNullConfig() {
-        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat(model, null), "Configuration cannot be null");
+        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(model, null), "Configuration cannot be null");
     }
 
     @Test
@@ -169,7 +170,7 @@ class NQuadsFormatTest {
     @DisplayName("Write should handle blank nodes with custom prefix")
     void writeShouldHandleBlankNodesWithCustomPrefix() throws SerializationException {
         fr.inria.corese.core.next.impl.io.serialization.FormatConfig customConfig = new FormatConfig.Builder().blankNodePrefix("genid-").build();
-        fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat customSerializer = new fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat(model, customConfig);
+        fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat customSerializer = new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(model, customConfig);
 
         Statement stmt = createStatement(
                 mockBNode1,
@@ -318,7 +319,7 @@ class NQuadsFormatTest {
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer writer = new StringWriter();
-        fr.inria.corese.core.next.impl.io.serialization.NQuadsFormat serializer = new NQuadsFormat(currentTestModel);
+        fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat serializer = new NQuadsFormat(currentTestModel);
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",

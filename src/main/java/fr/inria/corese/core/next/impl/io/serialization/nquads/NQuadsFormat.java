@@ -1,9 +1,10 @@
-package fr.inria.corese.core.next.impl.io.serialization;
+package fr.inria.corese.core.next.impl.io.serialization.nquads;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
 import fr.inria.corese.core.next.impl.common.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.serialization.FormatConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,47 +14,47 @@ import java.io.Writer;
 import java.util.Objects;
 
 /**
- * Serializes a Corese {@link Model} into N-Triples format.
- * This class provides a method to write the statements of a model to a given {@link Writer}
- * according to the N-Triples specification.
+ * Serializes a Corese {@link Model} into N-Quads format.
+ * This class provides a method to write the statements (quads) of a model to a given {@link Writer}
+ * according to the N-Quads specification, including support for named graphs (contexts).
  */
-public class NTriplesFormat implements FormatSerializer {
+public class NQuadsFormat implements FormatSerializer {
 
     /**
      * Logger for this class, used for logging potential issues or information during serialization.
      */
-    private static final Logger logger = LoggerFactory.getLogger(NTriplesFormat.class);
+    private static final Logger logger = LoggerFactory.getLogger(NQuadsFormat.class);
 
     private final Model model;
     private final FormatConfig config;
 
     /**
-     * Constructs a new {@code NTriplesFormat} instance with the specified model and default configuration.
+     * Constructs a new {@code NQuadsFormat} instance with the specified model and default configuration.
      *
      * @param model the {@link Model} to be serialized. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
-    public NTriplesFormat(Model model) {
+    public NQuadsFormat(Model model) {
         this(model, new FormatConfig.Builder().build());
     }
 
     /**
-     * Constructs a new {@code NTriplesFormat} instance with the specified model and custom configuration.
+     * Constructs a new {@code NQuadsFormat} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
      * @param config the {@link FormatConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NTriplesFormat(Model model, FormatConfig config) {
+    public NQuadsFormat(Model model, FormatConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
     }
 
     /**
-     * Writes the model to the given writer in N-Triples format.
-     * Each statement in the model is written on a new line, terminated by a dot and a newline character.
+     * Writes the model to the given writer in N-Quads format.
+     * Each statement (quad) in the model is written on a new line, terminated by a dot and a newline character.
      *
-     * @param writer the {@link Writer} to which the N-Triples output will be written.
+     * @param writer the {@link Writer} to which the N-Quads output will be written.
      * @throws SerializationException if an I/O error occurs during writing or if invalid data is encountered.
      */
     @Override
@@ -64,16 +65,16 @@ public class NTriplesFormat implements FormatSerializer {
             }
             writer.flush();
         } catch (IOException e) {
-            throw new SerializationException("Failed to write", "NTriples", e);
+            throw new SerializationException("Failed to write", "NQuads", e);
         } catch (IllegalArgumentException e) {
-            throw new SerializationException("Invalid data: " + e.getMessage(), "NTriples", e);
+            throw new SerializationException("Invalid data: " + e.getMessage(), "NQuads", e);
         }
     }
 
     /**
-     * Writes a single {@link Statement} to the writer in N-Triples format.
-     * The statement is written as "$subject $predicate $object ."
-     * N-Triples does not support contexts (named graphs). If a context is present, it's ignored and a warning is logged.
+     * Writes a single {@link Statement} (quad) to the writer in N-Quads format.
+     * The statement is written as "$subject $predicate $object $context ." if a context is present,
+     * or "$subject $predicate $object ." if no context is present (default graph).
      *
      * @param writer the {@link Writer} to which the statement will be written.
      * @param stmt   the {@link Statement} to write.
@@ -87,10 +88,9 @@ public class NTriplesFormat implements FormatSerializer {
         writeValue(writer, stmt.getObject());
 
         Resource context = stmt.getContext();
-        if (context != null && logger.isWarnEnabled()) {
-            logger.warn("N-Triples format does not support named graphs. Context '{}' will be ignored for statement: {}",
-                    context.stringValue(), stmt);
-
+        if (context != null) {
+            writer.write(SerializationConstants.SPACE);
+            writeValue(writer, context);
         }
 
         writer.write(SerializationConstants.SPACE_POINT);
@@ -116,15 +116,15 @@ public class NTriplesFormat implements FormatSerializer {
             } else if (value.isBNode()) {
                 writeBlankNode(writer, (Resource) value);
             } else {
-                throw new IllegalArgumentException("Unsupported resource type for N-Triples serialization: " + value.getClass().getName());
+                throw new IllegalArgumentException("Unsupported resource type for N-Quads serialization: " + value.getClass().getName());
             }
         } else {
-            throw new IllegalArgumentException("Unsupported value type for N-Triples serialization: " + value.getClass().getName());
+            throw new IllegalArgumentException("Unsupported value type for N-Quads serialization: " + value.getClass().getName());
         }
     }
 
     /**
-     * Writes a {@link Literal} to the writer in N-Triples format.
+     * Writes a {@link Literal} to the writer in N-Quads format.
      * Handles plain literals, language-tagged literals, and typed literals.
      *
      * @param writer  the {@link Writer} to which the literal will be written.
@@ -136,12 +136,12 @@ public class NTriplesFormat implements FormatSerializer {
         writer.write(escapeLiteral(literal.stringValue()));
         writer.write(SerializationConstants.QUOTE);
 
+        // Gestion du langage
         literal.getLanguage().ifPresent(lang -> {
             try {
                 writer.write(SerializationConstants.AT_SIGN + lang);
             } catch (IOException e) {
-
-                throw new UncheckedIOException("Error writing language tag to stream", e);
+                throw new UncheckedIOException("Error writing language tag", e);
             }
         });
 
@@ -156,7 +156,7 @@ public class NTriplesFormat implements FormatSerializer {
 
     /**
      * Writes an {@link IRI} to the writer.
-     * The IRI's string representation must be enclosed in angle brackets for N-Triples.
+     * The IRI's string representation must be enclosed in angle brackets for N-Quads.
      *
      * @param writer the {@link Writer} to which the IRI will be written.
      * @param iri    the {@link IRI} to write.
@@ -184,7 +184,7 @@ public class NTriplesFormat implements FormatSerializer {
     /**
      * Validates and potentially escapes an IRI string.
      * Throws an {@link IllegalArgumentException} if the IRI contains characters
-     * that are not allowed in N-Triples unescaped form (like spaces, quotes, angle brackets).
+     * that are not allowed in N-Quads unescaped form (like spaces, quotes, angle brackets).
      *
      * @param iri The string value of the IRI to validate and escape.
      * @return The validated and potentially escaped IRI string.
@@ -192,19 +192,20 @@ public class NTriplesFormat implements FormatSerializer {
      */
     private String escapeIRI(String iri) {
 
-        if (iri.contains(SerializationConstants.SPACE) || iri.contains(SerializationConstants.QUOTE) || iri.contains(SerializationConstants.LT) || iri.contains(SerializationConstants.GT)) {
-            throw new IllegalArgumentException("Invalid IRI: contains illegal characters for N-Triples unescaped form: " + iri);
+        if (iri.contains(SerializationConstants.SPACE) || iri.contains(SerializationConstants.QUOTE) ||
+                iri.contains(SerializationConstants.LT) || iri.contains(SerializationConstants.GT)) {
+            throw new IllegalArgumentException("Invalid IRI: contains illegal characters for N-Quads unescaped form: " + iri);
         }
         return iri;
     }
 
     /**
-     * Escape special characters in N-Triples string literals.
+     * Escape special characters in N-Quads string literals.
      * Handles backslash, double quote, and common control characters.
      * Unicode escape sequences are used for unprintable characters.
      *
      * @param value The string value of the literal to escape.
-     * @return The escaped string suitable for N-Triples literal.
+     * @return The escaped string suitable for N-Quads literal.
      */
     private String escapeLiteral(String value) {
         StringBuilder sb = new StringBuilder();
@@ -220,10 +221,10 @@ public class NTriplesFormat implements FormatSerializer {
                 case '\t':
                     sb.append(SerializationConstants.BACK_SLASH).append('t');
                     break;
-                case '\b': // backspace
+                case '\b':
                     sb.append(SerializationConstants.BACK_SLASH).append('b');
                     break;
-                case '\f': // form feed
+                case '\f':
                     sb.append(SerializationConstants.BACK_SLASH).append('f');
                     break;
                 case '"':
@@ -244,15 +245,15 @@ public class NTriplesFormat implements FormatSerializer {
     }
 
     /**
-     * Validates RDF values before serialization to ensure they conform to N-Triples rules.
+     * Validates RDF values before serialization to ensure they conform to N-Quads rules.
      *
      * @param value The {@link Value} to validate.
      * @throws IllegalArgumentException if the value is null or invalid.
      */
     private void validateValue(Value value) {
         if (value == null) {
-            logger.warn("Encountered a null value where a non-null value was expected for N-Triples serialization.");
-            throw new IllegalArgumentException("Value cannot be null in N-Triples format");
+            logger.warn("Encountered a null value where a non-null value was expected for N-Quads serialization.");
+            throw new IllegalArgumentException("Value cannot be null in N-Quads format");
         }
 
         if (value.isLiteral()) {
@@ -260,11 +261,10 @@ public class NTriplesFormat implements FormatSerializer {
         } else if (value.isIRI()) {
             validateIRI((IRI) value);
         }
-
     }
 
     /**
-     * Validates a {@link Literal} to ensure it conforms to RDF/N-Triples rules.
+     * Validates a {@link Literal} to ensure it conforms to RDF/N-Quads rules.
      * Specifically checks for consistency between language tags and the rdf:langString datatype.
      *
      * @param literal The {@link Literal} to validate.
@@ -291,8 +291,8 @@ public class NTriplesFormat implements FormatSerializer {
     }
 
     /**
-     * Validates an {@link IRI} to ensure it conforms to N-Triples rules.
-     * Checks if the IRI string contains characters that are not allowed in N-Triples
+     * Validates an {@link IRI} to ensure it conforms to N-Quads rules.
+     * Checks if the IRI string contains characters that are not allowed in N-Quads
      * unescaped form, such as spaces.
      *
      * @param iri The {@link IRI} to validate.
@@ -300,7 +300,7 @@ public class NTriplesFormat implements FormatSerializer {
      */
     private void validateIRI(IRI iri) {
         if (iri.stringValue().contains(SerializationConstants.SPACE)) {
-            throw new IllegalArgumentException("IRI contains spaces, which is not allowed in N-Triples unescaped form: " + iri.stringValue());
+            throw new IllegalArgumentException("IRI contains spaces, which is not allowed in N-Quads unescaped form: " + iri.stringValue());
         }
     }
 }

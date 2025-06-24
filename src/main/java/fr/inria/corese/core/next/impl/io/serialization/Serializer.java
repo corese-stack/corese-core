@@ -4,6 +4,8 @@ import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RdfFormat;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat;
 
 import java.io.Writer;
 import java.util.Objects;

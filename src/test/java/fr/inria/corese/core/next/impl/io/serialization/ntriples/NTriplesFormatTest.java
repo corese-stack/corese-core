@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.io.serialization;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +23,7 @@ class NTriplesFormatTest {
 
     private Model model;
     private fr.inria.corese.core.next.impl.io.serialization.FormatConfig config;
-    private fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat nTriplesFormat;
+    private fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat nTriplesFormat;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -41,7 +42,7 @@ class NTriplesFormatTest {
     void setUp() {
         model = Mockito.mock(Model.class);
         config = new fr.inria.corese.core.next.impl.io.serialization.FormatConfig.Builder().build();
-        nTriplesFormat = new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(model, config);
+        nTriplesFormat = new fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat(model, config);
 
 
         mockExPerson = createIRI("http://example.org/Person");
@@ -61,14 +62,14 @@ class NTriplesFormatTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(null), "Model cannot be null");
-        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(null, config), "Model cannot be null");
+        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat(null), "Model cannot be null");
+        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat(null, config), "Model cannot be null");
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null config")
     void constructorShouldThrowForNullConfig() {
-        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(model, null), "Configuration cannot be null");
+        Assertions.assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat(model, null), "Configuration cannot be null");
     }
 
     @Test
@@ -141,7 +142,7 @@ class NTriplesFormatTest {
     @DisplayName("Write should handle blank nodes with custom prefix")
     void writeShouldHandleBlankNodesWithCustomPrefix() throws SerializationException {
         fr.inria.corese.core.next.impl.io.serialization.FormatConfig customConfig = new FormatConfig.Builder().blankNodePrefix("genid-").build();
-        fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat customSerializer = new fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat(model, customConfig);
+        fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat customSerializer = new fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat(model, customConfig);
 
         Statement stmt = createStatement(
                 mockBNode1,
@@ -291,7 +292,7 @@ class NTriplesFormatTest {
         Mockito.when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer writer = new StringWriter();
-        fr.inria.corese.core.next.impl.io.serialization.NTriplesFormat serializer = new NTriplesFormat(currentTestModel);
+        fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat serializer = new NTriplesFormat(currentTestModel);
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",

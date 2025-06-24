@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.api.base.io.parser;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
+import fr.inria.corese.core.next.api.io.IOConfig;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 
@@ -12,6 +13,16 @@ public abstract class AbstractParser implements RDFParser {
 
     private final Model model;
     private final ValueFactory valueFactory;
+    private IOConfig config;
+
+    public IOConfig getConfig() {
+        return config;
+    }
+
+    @Override
+    public void setConfig(IOConfig config) {
+        this.config = config;
+    }
 
     protected AbstractParser(Model model, ValueFactory factory) {
             this.model = model;

@@ -9,6 +9,7 @@ import com.apicatalog.rdf.api.RdfQuadConsumer;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractParser;
 import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.io.IOConfig;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 
 import java.io.InputStream;
@@ -22,6 +23,13 @@ public class JSONLDParser extends AbstractParser {
 
     public JSONLDParser(Model model, ValueFactory factory) {
         super(model, factory);
+    }
+
+    public JSONLDParser(Model model, ValueFactory factory, IOConfig config) {
+        super(model, factory);
+        if(config instanceof JSONLDParserConfig) {
+            setConfig(config);
+        }
     }
 
     @Override

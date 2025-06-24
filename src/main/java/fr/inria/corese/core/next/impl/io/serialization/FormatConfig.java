@@ -1,12 +1,15 @@
 package fr.inria.corese.core.next.impl.io.serialization;
 
+import fr.inria.corese.core.next.api.io.IOConfig;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat;
+
 import java.util.Objects;
 
 /**
  * Configuration options for the {@link NTriplesFormat} serializer.
  * Use {@link FormatConfig # Builder} to create instances.
  */
-public class FormatConfig {
+public class FormatConfig implements IOConfig {
 
     private final String blankNodePrefix;
 
