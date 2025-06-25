@@ -15,6 +15,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.7"
     id("org.sonarqube") version "6.1.0.5360"                    // SonarQube integration
     id("com.intershop.gradle.javacc") version "5.0.1"           // JavaCC plugin for parsing JavaCC files
+    id("antlr")                                                 // Antlr plugin for generating parsers from grammar files
 }
 
 // SonarQube configuration
@@ -69,11 +70,11 @@ object Meta {
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
     const val githubRepo = "corese-stack/corese-core"
-  
+
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-  
+
     // Sonatype OSSRH publishing settings
     const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -113,6 +114,10 @@ dependencies {
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:0.7.2")            // RDFa parser (Semargl)
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
 
+    // === Antlr dependencies ===
+    antlr("org.antlr:antlr4:4.13.2")                                                   // Antlr for parsing (ANTLR 4)
+    implementation("org.antlr:antlr4-runtime:4.13.2")                                  // Antlr runtime for parsing
+
     // === HTTP and XML ===
     implementation("org.glassfish.jersey.core:jersey-client:3.1.10")                   // HTTP client (Jersey)
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")                    // Dependency injection for Jersey
@@ -143,7 +148,7 @@ publishing {
             // Configure the publication to include JAR, sources, and Javadoc
             from(components["java"])
 
-            // Configures version mapping to control how dependency versions are resolved 
+            // Configures version mapping to control how dependency versions are resolved
             // for different usage contexts (API and runtime).
             versionMapping {
                 // Defines version mapping for Java API usage.
@@ -270,7 +275,7 @@ tasks.withType<Javadoc> {
 tasks {
     shadowJar {
         this.archiveClassifier = "jar-with-dependencies"
-            }
+    }
 }
 
 // Configure Javadoc tasks to disable doclint warnings.
@@ -320,4 +325,38 @@ tasks.withType<PublishToMavenLocal>().configureEach {
 // This guarantees that artifacts are signed before they are published to Maven repositories.
 tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
+}
+
+// === Antlr generated sources configuration ===
+
+// Path where Antlr will generate sources
+val generatedSourcesPath = "src/main/generated"
+
+// Add the generated sources directory to the main source set
+sourceSets["main"].java.srcDir(file(generatedSourcesPath))
+
+// Configure the Antlr task to generate parser code with specific arguments
+tasks.named<AntlrTask>("generateGrammarSource") {
+    arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.impl.parser.antlr"))
+    outputDirectory = file("$buildDir/generated-src/antlr/main")
+    outputs.dirs(outputDirectory)
+}
+
+// Ensure Java compilation depends on Antlr code generation
+tasks.named("compileJava") {
+    dependsOn("generateGrammarSource" /*, "copyAntlrGenerated" */)
+}
+
+// Ensure sources JAR includes generated sources and depends on Antlr code generation
+tasks.named<Jar>("sourcesJar") {
+    dependsOn("generateGrammarSource" /*, "copyAntlrGenerated" */)
+    from(generatedSourcesPath)
+    includeEmptyDirs = false
+}
+
+// Clean up generated sources on clean
+tasks.clean {
+    doLast {
+        file(generatedSourcesPath).deleteRecursively()
+    }
 }
