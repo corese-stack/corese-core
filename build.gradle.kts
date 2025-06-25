@@ -16,6 +16,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
     id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
     id("com.intershop.gradle.javacc") version "5.0.0"           // JavaCC plugin for parsing JavaCC files
+    id("antlr")
 }
 
 // SonarQube configuration
@@ -69,11 +70,11 @@ object Meta {
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
     const val githubRepo = "corese-stack/corese-core"
-  
+
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-  
+
     // Sonatype OSSRH publishing settings
     const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -104,9 +105,15 @@ repositories {
 dependencies {
     val jersey_version = "3.0.4"
     val semargl_version = "0.7.1"
+    val antlr_version = "4.13.2"
 
     // === Public API (Corese-Core users must see these classes) ===
     api("org.slf4j:slf4j-api:2.0.9")                                                   // Exposed: Logging API
+
+    // === Antlr
+
+    antlr("org.antlr:antlr4:$antlr_version")
+    //antlr("org.antlr:antlr4-runtime:$antlr_version")
 
     // === Internal implementations ===
     implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // Exposed: RDF/XML parser
@@ -122,7 +129,8 @@ dependencies {
     implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // RDF core parser
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // Internal JSON-LD parser
     implementation("com.typesafe:config:1.4.3")                                        // Typesafe config
-
+    implementation("org.antlr:antlr4:$antlr_version")                                  // Antlr for grammar creation
+    implementation("org.antlr:antlr4-runtime:$antlr_version")
     // === For tests ===
     testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit 5 BOM for dependency management
     testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit 5 for unit testing
@@ -133,6 +141,7 @@ dependencies {
 
     // === For viewing logs during development (DO NOT include in production) ===
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging
+
 }
 
 // Configure extra Java module information for dependencies without module-info
@@ -161,7 +170,7 @@ publishing {
             // Configure the publication to include JAR, sources, and Javadoc
             from(components["java"])
 
-            // Configures version mapping to control how dependency versions are resolved 
+            // Configures version mapping to control how dependency versions are resolved
             // for different usage contexts (API and runtime).
             versionMapping {
                 // Defines version mapping for Java API usage.
@@ -288,7 +297,7 @@ tasks.withType<Javadoc> {
 tasks {
     shadowJar {
         this.archiveClassifier = "jar-with-dependencies"
-            }
+    }
 }
 
 // Configure Javadoc tasks to disable doclint warnings.
@@ -334,4 +343,43 @@ tasks.withType<PublishToMavenLocal>().configureEach {
 // This guarantees that artifacts are signed before they are published to Maven repositories.
 tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
+}
+
+
+
+val generatedSourcesPath = "src/main/generated"
+sourceSets["main"].java.srcDir(file(generatedSourcesPath))
+
+tasks.named<AntlrTask>("generateGrammarSource") {
+    arguments.addAll(listOf("-visitor", "-long-messages","-package", "fr.inria.corese.core.next.impl.parser.antlr"))
+    outputDirectory = file("$buildDir/generated-src/antlr/main")
+    outputs.dirs(outputDirectory)
+}
+
+/*
+val copyAntlrGenerated = tasks.register<Copy>("copyAntlrGenerated") {
+    dependsOn("generateGrammarSource")
+    from("$buildDir/generated-src/antlr/main")
+    into("$generatedSourcesPath/antlr/parser")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    outputs.dir("$generatedSourcesPath/antlr/parser")
+}
+ */
+
+
+tasks.named("compileJava") {
+    dependsOn("generateGrammarSource" /*, "copyAntlrGenerated" */)
+}
+
+tasks.named<Jar>("sourcesJar") {
+    dependsOn("generateGrammarSource"/*, "copyAntlrGenerated" */)
+    from(generatedSourcesPath)
+    includeEmptyDirs = false
+}
+
+
+tasks.clean {
+    doLast {
+        file(generatedSourcesPath).deleteRecursively()
+    }
 }

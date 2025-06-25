@@ -13,6 +13,6 @@ public class TurtleParserFactory implements RDFParserFactory {
         if (!format.equals(RDFFormats.TURTLE)) {
             throw new IllegalArgumentException("Unsupported format : " + format);
         }
-        return new TurtleParser(model);
+        return new ANTLRTurtleParser(model);
     }
 }
