@@ -100,7 +100,7 @@ public class FormatConfig implements ISerializationConfig {
      */
     private final LiteralDatatypePolicyEnum literalDatatypePolicy;
     /**
-     * Whether non-ASCII characters should be escaped using Unicode escape sequences (e.g., `\u00E9`).
+     * Whether non-ASCII characters should be escaped using Unicode escape sequences (e.g., `\ u00E9`).
      * This ensures compatibility with systems that might not handle UTF-8 correctly, but makes output less human-readable.
      */
     private final boolean escapeUnicode; // XXXX for non-ASCII

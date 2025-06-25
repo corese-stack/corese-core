@@ -73,6 +73,18 @@ class DefaultSerializerFactoryTest {
         }
     }
 
+    @Test
+    @DisplayName("createSerializer should return XmlSerializer for RDFXML format")
+    void createSerializer_shouldReturnXmlSerializer_forRdfXmlFormat() {
+        try (MockedConstruction<XmlSerializer> mockedConstruction = mockConstruction(XmlSerializer.class)) {
+            IRdfSerializer serializer = factory.createSerializer(RdfFormat.RDFXML, mockModel, mockConfig);
+
+            assertNotNull(serializer);
+            assertTrue(serializer instanceof XmlSerializer);
+            assertEquals(1, mockedConstruction.constructed().size(), "XmlSerializer constructor should be called once");
+        }
+    }
+
 
     @Test
     @DisplayName("createSerializer should throw NullPointerException for null format")
