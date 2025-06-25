@@ -1,0 +1,33 @@
+package fr.inria.corese.core.next.impl.io.serialization.jsonld;
+
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.io.IOConfig;
+
+/**
+ * Placeholder class while waiting for the general serializer factory to be implemented
+ */
+public class JSONLDSerializerFactory {
+
+    public JSONLDSerializerFactory() {
+    }
+
+    public JSONLDSerializer createSerializer(RdfFormat format, Model model) {
+        return createSerializer(format, model, null);
+    }
+
+    public JSONLDSerializer createSerializer(RdfFormat format, Model model, IOConfig config) {
+        if(format == RdfFormat.JSONLD) {
+            if(config == null) {
+                return new JSONLDSerializer(model);
+            } else if(config instanceof JSONLDSerializerConfig) {
+                return new JSONLDSerializer(model, (JSONLDSerializerConfig) config);
+            }  else {
+                throw new IllegalArgumentException("Unsupported config for JSONLD serialization: " + config);
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported format: " + format);
+        }
+
+    }
+}
