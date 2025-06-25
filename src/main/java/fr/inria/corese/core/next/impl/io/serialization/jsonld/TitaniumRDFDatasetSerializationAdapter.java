@@ -18,6 +18,9 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
 
+/**
+ * Adapter class from Model to RdfDataset for usage in the JSON-LD serialization process using the titanium library.
+ */
 public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     private static final Logger logger = LoggerFactory.getLogger(TitaniumRDFDatasetSerializationAdapter.class);
@@ -29,7 +32,17 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     @Override
     public RdfGraph getDefaultGraph() {
-        return null;
+        return new RdfGraph() {
+            @Override
+            public boolean contains(RdfTriple triple) {
+                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()));
+            }
+
+            @Override
+            public List<RdfTriple> toList() {
+                return model.stream().map(TitaniumRDFDatasetSerializationAdapter.this::toRdfTriple).toList();
+            }
+        };
     }
 
     @Override
@@ -58,7 +71,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         return Optional.of(new RdfGraph() {
             @Override
             public boolean contains(RdfTriple triple) {
-                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()));
+                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()), toResource(graphName));
             }
 
             @Override
@@ -82,6 +95,25 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
                 return Optional.of(toRdfResource(statement.getContext()));
             }
 
+            @Override
+            public RdfResource getSubject() {
+                return toRdfResource(statement.getSubject());
+            }
+
+            @Override
+            public RdfResource getPredicate() {
+                return toRdfResource(statement.getPredicate());
+            }
+
+            @Override
+            public RdfValue getObject() {
+                return toRdfValue(statement.getObject());
+            }
+        };
+    }
+
+    private RdfTriple toRdfTriple(Statement statement) {
+        return new RdfTriple() {
             @Override
             public RdfResource getSubject() {
                 return toRdfResource(statement.getSubject());

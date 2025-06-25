@@ -12,8 +12,8 @@ public class JSONLDSerializerFactory {
     public JSONLDSerializerFactory() {
     }
 
-    public JSONLDSerializer createSerializer(RdfFormat format, Model model) {
-        return createSerializer(format, model, null);
+    public JSONLDSerializer createSerializer(Model model) {
+        return createSerializer(RdfFormat.JSONLD, model, null);
     }
 
     public JSONLDSerializer createSerializer(RdfFormat format, Model model, IOConfig config) {
