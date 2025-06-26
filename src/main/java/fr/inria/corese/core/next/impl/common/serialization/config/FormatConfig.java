@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Configuration for RDF serialization formats (Turtle, TriG, N-Triples, N-Quads).
+ * Configuration for RDF serialization formats (Turtle, TriG, N-Triples, N-Quads, XML).
  * This class provides a comprehensive set of options to control the output
  * syntax, pretty-printing, and technical aspects of RDF serialization.
  *
@@ -201,7 +201,7 @@ public class FormatConfig implements ISerializationConfig {
         private boolean usePrefixes = true;
         private boolean autoDeclarePrefixes = true;
         private PrefixOrderingEnum prefixOrdering = PrefixOrderingEnum.ALPHABETICAL;
-        private Map<String, String> customPrefixes = new HashMap<>();
+        private final Map<String, String> customPrefixes = new HashMap<>();
 
         private boolean useCompactTriples = true;
         private boolean useRdfTypeShortcut = true;

@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.exception;
 
 /**
  * Exception levée lors d'échecs de sérialisation/désérialisation RDF.
- * Peut contenir des détails spécifiques au format (NTriples, JSON-LD, etc.).
+ * Peut contenir des détails spécifiques au format (NTriples, JSON-LD, XML , etc.).
  */
 public class SerializationException extends Exception {
     private final String formatName;
