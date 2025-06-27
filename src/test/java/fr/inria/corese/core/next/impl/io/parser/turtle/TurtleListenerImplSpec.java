@@ -1,8 +1,10 @@
-package fr.inria.corese.core.next.impl.parser.turtle;
+package fr.inria.corese.core.next.impl.io.parser.turtle;
 
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -14,10 +16,12 @@ import org.junit.jupiter.api.Test;
 
 import java.io.StringReader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TurtleListenerImplSpec {
     private Model parseAndPrintModel(String turtleData) throws Exception {
+        ValueFactory factory = new CoreseAdaptedValueFactory();
+
         CharStream input = CharStreams.fromReader(new StringReader(turtleData));
         TurtleLexer lexer = new TurtleLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -26,15 +30,18 @@ public class TurtleListenerImplSpec {
         ParseTree tree = parser.turtleDoc();
 
         Model model = new CoreseModel();
-        TurtleListenerImpl listener = new TurtleListenerImpl(model, null);
+        TurtleListenerImpl listener = new TurtleListenerImpl(model, null, factory);
         walker.walk((ParseTreeListener) listener, tree);
 
 
+        /*
         model.forEach(stmt -> {
             System.out.println(stmt.getSubject().stringValue() + " " +
                     stmt.getPredicate().stringValue() + " " +
                     stmt.getObject().stringValue());
         });
+
+         */
 
 
         return model;
@@ -94,6 +101,30 @@ public class TurtleListenerImplSpec {
 
         Model model = parseAndPrintModel(turtleData);
         assertEquals(model.size(), 2);
+        assertEquals(model.getNamespaces().size(), 2);
+    }
+
+    @Test
+    public void testTypedIntegerLiteral() throws Exception {
+        String turtleData =
+                "@prefix : <http://example.org/> .\n" +
+                        "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
+                        ":John :age \"42\"^^xsd:integer .";
+
+        Model model = parseAndPrintModel(turtleData);
+        model.objects().forEach(obj -> {
+            assertTrue(obj.isLiteral(), "Expected object to be a literal");
+            // test if we can parse the literal to int. Should be ok
+            try {
+                int value = Integer.parseInt(obj.stringValue());
+                System.out.println("Parsed integer: " + value);
+            } catch (NumberFormatException e) {
+                fail("Literal is not a valid integer: " + obj.stringValue());
+            }
+        });
+
+
+        assertEquals(model.size(), 1);
         assertEquals(model.getNamespaces().size(), 2);
     }
 }

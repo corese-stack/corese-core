@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.parser.turtle;
+package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
@@ -21,14 +21,15 @@ public class TurtleListenerImpl extends TurtleBaseListener {
     private final Model model;
     private String baseURI;
     private final Map<String, String> prefixMap = new HashMap<>();
-    private final ValueFactory factory = new CoreseAdaptedValueFactory();
+    private final ValueFactory factory;
 
     private Resource currentSubject;
     private IRI currentPredicate;
 
-    public TurtleListenerImpl(Model model, String baseURI) {
+    public TurtleListenerImpl(Model model, String baseURI, ValueFactory factory) {
         this.model = model;
         this.baseURI = baseURI != null ? baseURI : "";
+        this.factory = factory;
     }
 
     public void exitPrefixID(TurtleParser.PrefixIDContext ctx) {
@@ -47,7 +48,7 @@ public class TurtleListenerImpl extends TurtleBaseListener {
         baseURI = iri.substring(1, iri.length() - 1);
     }
 
-     public void enterTriples(TurtleParser.TriplesContext ctx) {
+    public void enterTriples(TurtleParser.TriplesContext ctx) {
         currentSubject = extractSubject(ctx.subject());
      }
 
@@ -59,16 +60,6 @@ public class TurtleListenerImpl extends TurtleBaseListener {
         Value object = extractObject(ctx);
         model.add(currentSubject, currentPredicate, object);
     }
-
-
-    @Override public void enterEveryRule(ParserRuleContext ctx) {}
-
-    @Override public void exitEveryRule(ParserRuleContext ctx) { }
-
-    @Override public void visitTerminal(TerminalNode node) { }
-
-    @Override public void visitErrorNode(ErrorNode node) { }
-
 
     private String resolveIRI(String raw) {
         if (raw.startsWith("<") && raw.endsWith(">")) {
@@ -146,10 +137,10 @@ public class TurtleListenerImpl extends TurtleBaseListener {
 
     private Value extractObject(TurtleParser.Object_Context ctx) {
         if (ctx.iri() != null) {
-            return new CoreseIRI(resolveIRI(ctx.iri().getText()));
+            return factory.createIRI(resolveIRI(ctx.iri().getText()));
         }
         if (ctx.BlankNode() != null) {
-            return new CoreseBNode(ctx.BlankNode().getText());
+            return factory.createBNode(ctx.BlankNode().getText());
         }
         if (ctx.literal() != null) {
             return extractLiteral(ctx.literal());
