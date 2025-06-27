@@ -303,12 +303,204 @@ class XmlSerializerTest {
         assertTrue(actual.contains(desc2));
     }
 
-    
+    @Test
+    @DisplayName("Should sort subjects alphabetically")
+    void shouldSortSubjectsAlphabetically() throws SerializationException {
+        Statement stmt1 = createMockStatement("http://ex.org/B", "http://ex.org/p", "http://ex.org/o");
+        Statement stmt2 = createMockStatement("http://ex.org/A", "http://ex.org/p", "http://ex.org/o");
+
+        when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
+        when(mockConfig.sortSubjects()).thenReturn(true);
+
+        Map<String, String> customPrefixes = new HashMap<>();
+        customPrefixes.put("http://ex.org/", "ex");
+        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
+        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+
+        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        serializer.write(writer);
+
+        String expected = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:ex="http://ex.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                  <rdf:Description rdf:about="http://ex.org/A">
+                    <ex:p rdf:resource="http://ex.org/o"/>
+                  </rdf:Description>
+                  <rdf:Description rdf:about="http://ex.org/B">
+                    <ex:p rdf:resource="http://ex.org/o"/>
+                  </rdf:Description>
+                </rdf:RDF>
+                """;
+
+        assertEquals(expected, writer.toString());
+    }
 
 
+    @Test
+    @DisplayName("Should escape XML attribute values")
+    void shouldEscapeXmlAttributeValues() throws SerializationException {
+        Statement stmt = createMockStatement("http://example.org/sub&ject<", "http://example.org/pred", "http://example.org/obj\"ect'");
+
+        when(mockModel.stream()).thenReturn(Stream.of(stmt));
+        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+
+        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        serializer.write(writer);
+
+        String expected = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                  <rdf:Description rdf:about="http://example.org/sub&amp;ject&lt;">
+                    <exampleorg:pred rdf:resource="http://example.org/obj&quot;ect&apos;"/>
+                  </rdf:Description>
+                </rdf:RDF>
+                """;
+
+        assertEquals(expected, writer.toString());
+    }
+
+    @Test
+    @DisplayName("Should escape XML content values")
+    void shouldEscapeXmlContentValues() throws SerializationException {
+        Statement stmt = createMockLiteralStatement("http://example.org/item", "http://example.org/prop", "Value with <tags> & entities", null,
+                null
+        );
+
+        when(mockModel.stream()).thenReturn(Stream.of(stmt));
+        when(mockConfig.getLiteralDatatypePolicy()).thenReturn(LiteralDatatypePolicyEnum.ALWAYS_TYPED);
+
+        Map<String, String> customPrefixes = new HashMap<>();
+        customPrefixes.put("http://example.org/", "ex");
+        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
+        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
 
 
+        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        serializer.write(writer);
 
+        String expected = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:ex="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                  <rdf:Description rdf:about="http://example.org/item">
+                    <ex:prop>Value with &lt;tags&gt; &amp; entities</ex:prop>
+                  </rdf:Description>
+                </rdf:RDF>
+                """;
+
+        assertEquals(expected, writer.toString());
+    }
+
+
+    @Test
+    @DisplayName("Should not auto-declare prefixes if disabled in configuration")
+    void shouldNotAutoDeclarePrefixesIfDisabled() throws SerializationException {
+        Statement stmt = createMockStatement("http://example.org/subject", "http://xmlns.com/foaf/0.1/name", "http://example.org/object");
+
+        when(mockModel.stream()).thenReturn(Stream.of(stmt));
+        when(mockConfig.autoDeclarePrefixes()).thenReturn(false);
+        when(mockConfig.usePrefixes()).thenReturn(true);
+
+        when(mockConfig.getCustomPrefixes()).thenReturn(new HashMap<>());
+        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+
+        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        serializer.write(writer);
+
+        String expected = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                  <rdf:Description rdf:about="http://example.org/subject">
+                    <http://xmlns.com/foaf/0.1/name rdf:resource="http://example.org/object"/>
+                  </rdf:Description>
+                </rdf:RDF>
+                """;
+
+        assertEquals(expected, writer.toString());
+        verify(mockConfig, times(1)).autoDeclarePrefixes();
+    }
+
+    @Test
+    @DisplayName("Should not use prefixes if disabled in configuration")
+    void shouldNotUsePrefixesIfDisabled() throws SerializationException {
+        Statement stmt = createMockStatement("http://example.org/subject", "http://xmlns.com/foaf/0.1/name", "http://example.org/object");
+
+        when(mockModel.stream()).thenReturn(Stream.of(stmt));
+        when(mockConfig.usePrefixes()).thenReturn(false);
+        when(mockConfig.autoDeclarePrefixes()).thenReturn(true);
+
+        Map<String, String> customPrefixes = new HashMap<>();
+        customPrefixes.put("http://xmlns.com/foaf/0.1/", "foaf");
+        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
+        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+
+        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        serializer.write(writer);
+
+        String expected = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                  <rdf:Description rdf:about="http://example.org/subject">
+                    <http://xmlns.com/foaf/0.1/name rdf:resource="http://example.org/object"/>
+                  </rdf:Description>
+                </rdf:RDF>
+                """;
+
+        assertEquals(expected, writer.toString());
+        verify(mockConfig, times(2)).usePrefixes();
+    }
+
+
+    @Test
+    @DisplayName("Should not generate stable blank node IDs and sort subjects alphabetically")
+    void shouldNotGenerateStableBlankNodeIds() throws SerializationException {
+        Statement stmt1 = createMockBlankNodeSubjectStatement("bnode-abc", "http://example.org/p", "http://example.org/o");
+        Statement stmt2 = createMockBlankNodeObjectStatement("http://example.org/s", "http://example.org/p", "bnode-xyz");
+
+        when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
+        when(mockConfig.stableBlankNodeIds()).thenReturn(false);
+        when(mockConfig.sortSubjects()).thenReturn(true);
+
+        Map<String, String> customPrefixes = new HashMap<>();
+        customPrefixes.put("http://example.org/", "ex");
+        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
+        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+
+        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        serializer.write(writer);
+
+
+        String expected = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:ex="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                  <rdf:Description rdf:nodeID="bnode-abc">
+                    <ex:p rdf:resource="http://example.org/o"/>
+                  </rdf:Description>
+                  <rdf:Description rdf:about="http://example.org/s">
+                    <ex:p rdf:nodeID="bnode-xyz"/>
+                  </rdf:Description>
+                </rdf:RDF>
+                """;
+
+        assertEquals(expected, writer.toString());
+    }
+
+    @Test
+    @DisplayName("Should handle an empty model")
+    void shouldHandleEmptyModel() throws SerializationException {
+        when(mockModel.stream()).thenReturn(Stream.empty());
+        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+
+        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        serializer.write(writer);
+
+        String expected = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                </rdf:RDF>
+                """;
+
+        assertEquals(expected, writer.toString());
+    }
 
 
     /**
