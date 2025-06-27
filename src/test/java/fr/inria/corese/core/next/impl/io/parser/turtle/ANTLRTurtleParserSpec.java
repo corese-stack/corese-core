@@ -1,7 +1,9 @@
-package fr.inria.corese.core.next.impl.parser.turtle;
+package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.parser.RDFParser;
+import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ANTLRTurtleParserSpec {
     private Model parseFromString(String turtleData, String baseURI) throws Exception {
         Model model = new CoreseModel();
-        RDFParser parser = new ANTLRTurtleParser(model);
+        ValueFactory factory = new CoreseAdaptedValueFactory();
+        RDFParser parser = new ANTLRTurtleParser(model, factory);
         parser.parse(new StringReader(turtleData), baseURI);
         return model;
     }
