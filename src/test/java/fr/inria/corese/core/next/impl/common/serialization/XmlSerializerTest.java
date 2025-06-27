@@ -249,6 +249,7 @@ class XmlSerializerTest {
         customPrefixes.put("http://ex.com/", "excom");
         when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
         when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        when(mockConfig.sortSubjects()).thenReturn(false);
 
         XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
         serializer.write(writer);

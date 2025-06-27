@@ -1,5 +1,11 @@
 package fr.inria.corese.core.next.impl.common.serialization.util;
 
+import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
+
+
 /**
  * Provides common constants used throughout the RDF serialization process.
  * This includes URIs for common RDF, RDFS, XSD, and OWL vocabularies,
@@ -13,15 +19,18 @@ public final class SerializationConstants {
     }
 
     // --- Standard RDF/RDFS/XSD/OWL URIs ---
-    public static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-    public static final String RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#";
-    public static final String XSD_NS = "http://www.w3.org/2001/XMLSchema#";
-    public static final String OWL_NS = "http://www.w3.org/2002/07/owl#";
+    public static final String RDF_NS = RDF.HTML.getNamespace();
+    public static final String RDF_TYPE = RDF.type.getIRI().stringValue();
+    public static final String RDF_FIRST = RDF.first.getIRI().stringValue();
+    public static final String RDF_REST = RDF.rest.getIRI().stringValue();
+    public static final String RDF_NIL = RDF.nil.getIRI().stringValue();
 
-    public static final String RDF_TYPE = RDF_NS + "type";
-    public static final String RDF_FIRST = RDF_NS + "first";
-    public static final String RDF_REST = RDF_NS + "rest";
-    public static final String RDF_NIL = RDF_NS + "nil";
+
+    public static final String RDFS_NS = RDFS.Resource.getNamespace();
+
+    public static final String XSD_NS = XSD.xsdString.getNamespace();
+
+    public static final String OWL_NS = OWL.NS;
 
     public static final String XSD_STRING = XSD_NS + "string";
     public static final String XSD_INTEGER = XSD_NS + "integer";
