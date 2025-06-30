@@ -4,6 +4,10 @@
 
 ### Changed
 
+- Removed ShEx implementation.
+- Removed LUBM benchmark.
+- Removed Java Platform Module System (JPMS) support.
+- Cleaned up unused resource files.
 - Updated and corrected documentation:
   - Fixed typos in the Getting Started guide.
   - Add imports to the Getting Started guide.
