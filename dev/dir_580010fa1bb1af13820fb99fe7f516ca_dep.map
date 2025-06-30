@@ -1,27 +1,26 @@
 <map id="/builds/actions&#45;runners/_work/corese&#45;core/corese&#45;core/src/main/java/fr/inria/corese/core" name="/builds/actions&#45;runners/_work/corese&#45;core/corese&#45;core/src/main/java/fr/inria/corese/core">
-<area shape="rect" id="node2" href="dir_ed3a8d765d03e190c72f1554112a3026.html" title="api" alt="" coords="2039,63,2081,88"/>
-<area shape="rect" id="node3" href="dir_51b0d295b061aa8a06ef1acc99325416.html" title="approximate" alt="" coords="1909,63,2014,88"/>
-<area shape="rect" id="node4" href="dir_fe6f263798320a8728f3415ba0e0df71.html" title="compiler" alt="" coords="1806,63,1885,88"/>
-<area shape="rect" id="node5" href="dir_db69fb962197cf573cb7200127c4b61c.html" title="edge" alt="" coords="1727,63,1782,88"/>
-<area shape="rect" id="node6" href="dir_13e4843eda2947941053fea97c120cee.html" title="elasticsearch" alt="" coords="1595,63,1703,88"/>
-<area shape="rect" id="node7" href="dir_2284d1e9909781c7040dc408dcba93a5.html" title="extension" alt="" coords="1485,63,1571,88"/>
-<area shape="rect" id="node8" href="dir_82a67b069fcd6da45856192f6afcc5f4.html" title="index" alt="" coords="1401,63,1460,88"/>
-<area shape="rect" id="node9" href="dir_c33e7cd9985aab53c2a4510f4337043e.html" title="kgram" alt="" coords="1313,63,1377,88"/>
-<area shape="rect" id="node10" href="dir_6f20a538c0b392218dc2890e89d789b4.html" title="load" alt="" coords="1239,63,1289,88"/>
-<area shape="rect" id="node11" href="dir_9dbc1065f4a99bbaac23c1930679f319.html" title="logic" alt="" coords="1161,63,1215,88"/>
-<area shape="rect" id="node12" href="dir_4066a39af85a2a6bc2412c4bf2e35234.html" title="print" alt="" coords="1085,63,1137,88"/>
-<area shape="rect" id="node13" href="dir_a9008d6a493af9911e99e91578b7922f.html" title="producer" alt="" coords="982,63,1061,88"/>
-<area shape="rect" id="node14" href="dir_97eedbc44cc1e9667adca745700f657f.html" title="query" alt="" coords="899,63,957,88"/>
-<area shape="rect" id="node15" href="dir_0cc0c5bcc60c0fcbd3b28b5084df24a9.html" title="rule" alt="" coords="827,63,874,88"/>
-<area shape="rect" id="node16" href="dir_a116fbd7fd2ba992864d224f0a1e322f.html" title="shacl" alt="" coords="747,63,803,88"/>
-<area shape="rect" id="node17" href="dir_62fcf4b87d457f1412628bc377e52cf7.html" title="shex" alt="" coords="669,63,723,88"/>
-<area shape="rect" id="node18" href="dir_351873b21afd6a446419583d9041f03c.html" title="sparql" alt="" coords="582,63,645,88"/>
-<area shape="rect" id="node19" href="dir_b7ac15707ba8fc4b2770492b7f22ec87.html" title="stats" alt="" coords="503,63,558,88"/>
-<area shape="rect" id="node20" href="dir_212bc3d58bb6d0a2911615b8431d20e6.html" title="storage" alt="" coords="409,63,479,88"/>
-<area shape="rect" id="node21" href="dir_f8d6c89212c3505293c0e54b846dd05e.html" title="transform" alt="" coords="298,63,385,88"/>
-<area shape="rect" id="node22" href="dir_ad6ce6852cf1d523997caec9905b945f.html" title="util" alt="" coords="231,63,273,88"/>
-<area shape="rect" id="node23" href="dir_d670fb481888f2509cb13ea5c33aebbb.html" title="visitor" alt="" coords="143,63,206,88"/>
-<area shape="rect" id="node24" href="dir_f42e3973b3892a6db35b9bdc040b1a42.html" title="workflow" alt="" coords="38,63,119,88"/>
-<area shape="rect" id="clust2" href="dir_580010fa1bb1af13820fb99fe7f516ca.html" alt="" coords="27,52,2167,99"/>
-<area shape="rect" id="clust1" href="dir_3b696c57ce1299b3c0ab83f174f81921.html" title="corese" alt="" coords="16,16,2177,109"/>
+<area shape="rect" id="node2" href="dir_ed3a8d765d03e190c72f1554112a3026.html" title="api" alt="" coords="1961,63,2004,88"/>
+<area shape="rect" id="node3" href="dir_51b0d295b061aa8a06ef1acc99325416.html" title="approximate" alt="" coords="1831,63,1937,88"/>
+<area shape="rect" id="node4" href="dir_fe6f263798320a8728f3415ba0e0df71.html" title="compiler" alt="" coords="1729,63,1807,88"/>
+<area shape="rect" id="node5" href="dir_db69fb962197cf573cb7200127c4b61c.html" title="edge" alt="" coords="1650,63,1705,88"/>
+<area shape="rect" id="node6" href="dir_13e4843eda2947941053fea97c120cee.html" title="elasticsearch" alt="" coords="1518,63,1626,88"/>
+<area shape="rect" id="node7" href="dir_2284d1e9909781c7040dc408dcba93a5.html" title="extension" alt="" coords="1407,63,1494,88"/>
+<area shape="rect" id="node8" href="dir_82a67b069fcd6da45856192f6afcc5f4.html" title="index" alt="" coords="1324,63,1383,88"/>
+<area shape="rect" id="node9" href="dir_c33e7cd9985aab53c2a4510f4337043e.html" title="kgram" alt="" coords="1236,63,1300,88"/>
+<area shape="rect" id="node10" href="dir_6f20a538c0b392218dc2890e89d789b4.html" title="load" alt="" coords="1161,63,1212,88"/>
+<area shape="rect" id="node11" href="dir_9dbc1065f4a99bbaac23c1930679f319.html" title="logic" alt="" coords="1084,63,1137,88"/>
+<area shape="rect" id="node12" href="dir_4066a39af85a2a6bc2412c4bf2e35234.html" title="print" alt="" coords="1007,63,1059,88"/>
+<area shape="rect" id="node13" href="dir_a9008d6a493af9911e99e91578b7922f.html" title="producer" alt="" coords="905,63,983,88"/>
+<area shape="rect" id="node14" href="dir_97eedbc44cc1e9667adca745700f657f.html" title="query" alt="" coords="821,63,880,88"/>
+<area shape="rect" id="node15" href="dir_0cc0c5bcc60c0fcbd3b28b5084df24a9.html" title="rule" alt="" coords="750,63,797,88"/>
+<area shape="rect" id="node16" href="dir_a116fbd7fd2ba992864d224f0a1e322f.html" title="shacl" alt="" coords="669,63,725,88"/>
+<area shape="rect" id="node17" href="dir_351873b21afd6a446419583d9041f03c.html" title="sparql" alt="" coords="582,63,645,88"/>
+<area shape="rect" id="node18" href="dir_b7ac15707ba8fc4b2770492b7f22ec87.html" title="stats" alt="" coords="503,63,558,88"/>
+<area shape="rect" id="node19" href="dir_212bc3d58bb6d0a2911615b8431d20e6.html" title="storage" alt="" coords="409,63,479,88"/>
+<area shape="rect" id="node20" href="dir_f8d6c89212c3505293c0e54b846dd05e.html" title="transform" alt="" coords="298,63,385,88"/>
+<area shape="rect" id="node21" href="dir_ad6ce6852cf1d523997caec9905b945f.html" title="util" alt="" coords="231,63,273,88"/>
+<area shape="rect" id="node22" href="dir_d670fb481888f2509cb13ea5c33aebbb.html" title="visitor" alt="" coords="143,63,206,88"/>
+<area shape="rect" id="node23" href="dir_f42e3973b3892a6db35b9bdc040b1a42.html" title="workflow" alt="" coords="38,63,119,88"/>
+<area shape="rect" id="clust2" href="dir_580010fa1bb1af13820fb99fe7f516ca.html" alt="" coords="27,52,2089,99"/>
+<area shape="rect" id="clust1" href="dir_3b696c57ce1299b3c0ab83f174f81921.html" title="corese" alt="" coords="16,16,2100,109"/>
 </map>

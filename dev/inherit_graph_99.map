@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1ExpPattern.html" title=" " alt="" coords="5,5,97,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,140,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1visitor_1_1ExpressionVisitorVariable.html" title="Visit filter/select/bind expressions function, let, map: declare arguments as local variables,..." alt="" coords="188,5,376,31"/>
+<area shape="poly" id="edge338_Node000000_Node000001" title=" " alt="" coords="154,15,188,15,188,21,154,21"/>
 </map>

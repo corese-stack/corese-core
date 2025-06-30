@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1fs_1_1FileHandler.html" title="Handler for manipulating disk file, channel, buffer, etc." alt="" coords="5,5,101,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,73,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1extension_1_1ListSort.html" title=" " alt="" coords="121,5,192,31"/>
+<area shape="poly" id="edge344_Node000000_Node000001" title=" " alt="" coords="87,15,121,15,121,21,87,21"/>
 </map>

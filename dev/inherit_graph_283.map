@@ -1,5 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,121,31"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1eval_1_1QuerySolver.html" title="Evaluator of SPARQL query by KGRAM Ready to use Package with KGRAM and SPARQL Parser &amp; Transformer." alt="" coords="169,5,272,31"/>
-<area shape="poly" id="edge461_Node000000_Node000001" title=" " alt="" coords="135,15,169,15,169,21,135,21"/>
+<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1SPARQLResultParser.html" title=" " alt="" coords="5,5,159,31"/>
 </map>

@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1cst_1_1Keyword.html" title=" " alt="" coords="5,5,84,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,100,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTPrinter.html" title=" " alt="" coords="148,5,239,31"/>
+<area shape="poly" id="edge396_Node000000_Node000001" title=" " alt="" coords="114,15,148,15,148,21,114,21"/>
 </map>

@@ -11,9 +11,9 @@
 <!-- Node0 -->
 <g id="Node000000" class="node">
 <title>Node0</title>
-<g id="a_Node000000"><a xlink:href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Regex.html" target="_top" xlink:title="Interface of Property Path Regex.">
+<g id="a_Node000000"><a xlink:href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Result.html" target="_top" xlink:title="Interface to KGRAM elementary result (a mapping)">
 <polygon fill="white" stroke="#666666" points="47,-19 0,-19 0,0 47,0 47,-19"/>
-<text text-anchor="middle" x="23.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">Regex</text>
+<text text-anchor="middle" x="23.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">Result</text>
 </a>
 </g>
 </g>

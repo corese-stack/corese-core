@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1DatatypeValue.html" title="Olivier Corby &#45; Wimmics, Inria, I3S, 2015." alt="" coords="5,5,124,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,31,127,56"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1result_1_1XMLResult_1_1MyHandler.html" title="SAX Handler." alt="" coords="175,5,341,31"/>
+<area shape="poly" id="edge323_Node000000_Node000001" title=" " alt="" coords="140,31,174,26,175,32,141,36"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1XMLResult_1_1MyHandler.html" title="SAX Handler." alt="" coords="175,55,341,80"/>
+<area shape="poly" id="edge324_Node000000_Node000002" title=" " alt="" coords="141,50,175,54,174,60,140,55"/>
 </map>

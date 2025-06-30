@@ -1,11 +1,15 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1EventListener.html" title="Event Listener to trace KGRAM execution." alt="" coords="5,5,116,31"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1EvalListener.html" title="Event Listener to trace KGRAM execution." alt="" coords="164,5,267,31"/>
-<area shape="poly" id="edge331_Node000000_Node000001" title=" " alt="" coords="129,15,164,15,164,21,129,21"/>
-<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1StatListener.html" title="Event Listener to trace KGRAM execution with statistics." alt="" coords="315,5,415,31"/>
-<area shape="poly" id="edge332_Node000001_Node000002" title=" " alt="" coords="280,15,314,15,314,21,280,21"/>
-<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1User.html" title="Model user interaction with debugger." alt="" coords="35,55,87,80"/>
-<area shape="poly" id="edge333_Node000003_Node000001" title=" " alt="" coords="99,52,174,28,175,33,101,58"/>
-<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1event_1_1UserImpl.html" title="Model user interaction with debugger." alt="" coords="175,55,256,80"/>
-<area shape="poly" id="edge334_Node000003_Node000004" title=" " alt="" coords="101,65,174,65,174,70,101,70"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,80,92,105"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1SparqlException.html" title=" " alt="" coords="142,5,269,31"/>
+<area shape="poly" id="edge332_Node000000_Node000001" title=" " alt="" coords="81,71,139,40,166,28,168,33,141,44,83,75"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1LoadException.html" title=" " alt="" coords="147,55,264,80"/>
+<area shape="poly" id="edge333_Node000000_Node000002" title=" " alt="" coords="105,81,146,74,147,79,106,86"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1CoreseException.html" title=" " alt="" coords="140,104,271,129"/>
+<area shape="poly" id="edge334_Node000000_Node000003" title=" " alt="" coords="106,99,140,104,139,109,105,104"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1ParseException.html" title="This exception is thrown when parse errors are encountered." alt="" coords="145,153,266,179"/>
+<area shape="poly" id="edge336_Node000000_Node000005" title=" " alt="" coords="85,110,141,138,171,151,169,156,139,143,83,114"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1CoreseDatatypeException.html" title=" " alt="" coords="319,104,509,129"/>
+<area shape="poly" id="edge335_Node000003_Node000004" title=" " alt="" coords="284,114,318,114,318,119,284,119"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1JavaccParseException.html" title=" " alt="" coords="333,153,495,179"/>
+<area shape="poly" id="edge337_Node000005_Node000006" title=" " alt="" coords="280,163,333,163,333,169,280,169"/>
 </map>
