@@ -9,18 +9,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.logic.OWL;
-import fr.inria.corese.core.logic.RDF;
-import fr.inria.corese.core.logic.RDFS;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.logic.OWL;
+import fr.inria.corese.core.logic.RDF;
+import fr.inria.corese.core.logic.RDFS;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
@@ -395,7 +395,7 @@ public class RDFFormat {
     }
 
     String toXML(String str) {
-        return StringEscapeUtils.escapeXml(str);
+        return StringEscapeUtils.escapeXml11(str);
     }
 
     IDatatype getValue(Node node) {

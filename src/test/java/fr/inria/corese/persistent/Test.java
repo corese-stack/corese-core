@@ -1,14 +1,16 @@
 package fr.inria.corese.persistent;
 
-import fr.inria.corese.core.sparql.storage.api.IStorage;
-import fr.inria.corese.core.sparql.storage.fs.StringManager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import org.apache.commons.lang.RandomStringUtils;
+
+import org.apache.commons.lang3.RandomStringUtils;
+
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.storage.fs.StringManager;
 
 /**
  * Test.java
@@ -39,7 +41,7 @@ public class Test {
         int c = 0;
         r[c++] = this.min;
         r[c++] = this.max;
-        //Constants.MAX_LIT_LEN = min;
+        // Constants.MAX_LIT_LEN = min;
 
         double[] writeNIO = this.writeNIO(num, true);
         r[c++] = writeNIO[0];
@@ -66,7 +68,7 @@ public class Test {
     }
 
     private long generate(Map<Integer, String> literalStrings, int count) {
-        //Generate ramdom strings
+        // Generate ramdom strings
         Random r = new Random();
         int c = count;
         long length = 0;
@@ -83,7 +85,7 @@ public class Test {
 
         return length / count;
     }
-        
+
     public double[] writeNIO(int nRecords, boolean generated) {
         // === 1 generate strings ===
         Map<Integer, String> literalsTmp = new HashMap<Integer, String>();
@@ -97,14 +99,14 @@ public class Test {
         for (Map.Entry<Integer, String> entrySet : literalsTmp.entrySet()) {
             Integer key = entrySet.getKey();
             String value = entrySet.getValue();
-            //if (manager.check(value)) {
-                manager.write(key, value);
-                counter++;
-            //}
+            // if (manager.check(value)) {
+            manager.write(key, value);
+            counter++;
+            // }
         }
         long time = System.currentTimeMillis() - start;
 
-        return new double[]{(double) avg, time * 1.0 / 1000, time * 1.0 / counter};
+        return new double[] { (double) avg, time * 1.0 / 1000, time * 1.0 / counter };
     }
 
     private long generate(Map<Integer, String> literalStrings, String[] strings) {
@@ -129,7 +131,7 @@ public class Test {
         // Writes the content to the file
 
         for (Map.Entry<Integer, String> entrySet : literalsAll.entrySet()) {
-            //Integer key = entrySet.getKey();
+            // Integer key = entrySet.getKey();
             String value = entrySet.getValue();
             if (manager.check(value)) {
                 writer.write(value);
@@ -140,7 +142,7 @@ public class Test {
         writer.close();
         long time = System.currentTimeMillis() - start;
 
-        return new double[]{time * 1.0 / 1000, time * 1.0 / counter};
+        return new double[] { time * 1.0 / 1000, time * 1.0 / counter };
     }
 
     public double[] read(boolean random, int nRecords, boolean check) {
@@ -156,10 +158,10 @@ public class Test {
             Integer[] keys = literalsAll.keySet().toArray(new Integer[size]);
             while (counter > 0) {
                 int key = keys[r.nextInt(size)];
-                //if(literalsRead.containsKey(ind)){
+                // if(literalsRead.containsKey(ind)){
                 literalsRead.put(key, manager.read(key));
                 counter--;
-                //}
+                // }
             }
         } else {
             for (Map.Entry<Integer, String> entrySet : literalsAll.entrySet()) {
@@ -170,7 +172,7 @@ public class Test {
 
         long time = System.currentTimeMillis() - start;
         if (check) {
-            //check if read correctly
+            // check if read correctly
             for (Map.Entry<Integer, String> entrySet : literalsRead.entrySet()) {
                 Integer key = entrySet.getKey();
 
@@ -180,11 +182,11 @@ public class Test {
 
             }
         }
-        return new double[]{time * 1.0 / 1000, time * 1.0 / literalsRead.size()};
+        return new double[] { time * 1.0 / 1000, time * 1.0 / literalsRead.size() };
     }
 
     public void delete(int nRecords) {
-        //generate randomly the literals to delete
+        // generate randomly the literals to delete
         int size = literalsAll.size();
         Random r = new Random();
         int counter = nRecords;
@@ -192,7 +194,7 @@ public class Test {
         Integer[] ids = literalsAll.keySet().toArray(new Integer[literalsAll.size()]);
         while (counter-- > 0) {
             int id = ids[r.nextInt(size)];
-            if (literalsAll.containsKey(id)) {//maybe has been deleted
+            if (literalsAll.containsKey(id)) {// maybe has been deleted
                 manager.delete(id);
                 literalsAll.remove(id);
                 nDeleted++;
