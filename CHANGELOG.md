@@ -5,6 +5,7 @@
 ### Changed
 
 - Removed ShEx implementation.
+- Removed LUBM benchmark.
 - Updated and corrected documentation:
   - Fixed typos in the Getting Started guide.
   - Add imports to the Getting Started guide.
