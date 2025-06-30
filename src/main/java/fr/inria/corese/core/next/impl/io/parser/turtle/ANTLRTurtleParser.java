@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.parser.RDFParser;
+import fr.inria.corese.core.next.api.base.io.parser.AbstractParser;
+import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.base.parser.RDFFormat;
-import fr.inria.corese.core.next.api.base.parser.RDFFormats;
+import fr.inria.corese.core.next.api.base.io.RdfFormat;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
 
@@ -20,19 +20,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-public class ANTLRTurtleParser implements RDFParser {
+public class ANTLRTurtleParser extends AbstractParser {
 
-    private final Model model;
-    private final RDFFormat format = RDFFormats.TURTLE;
-    private final ValueFactory factory;
+    private final RdfFormat format = RdfFormat.TURTLE;
 
     public ANTLRTurtleParser(Model model, ValueFactory factory) {
-        this.model = model;
-        this.factory = factory;
+        super(model, factory);
     }
 
     @Override
-    public RDFFormat getRDFFormat() {
+    public RdfFormat getRDFFormat() {
         return format;
     }
 
@@ -66,7 +63,7 @@ public class ANTLRTurtleParser implements RDFParser {
             TurtleParser parser = new TurtleParser(tokens);
             ParseTreeWalker walker = new ParseTreeWalker();
             ParseTree tree = parser.turtleDoc();
-            TurtleListenerImpl listener = new TurtleListenerImpl(model, baseURI, factory);
+            TurtleListenerImpl listener = new TurtleListenerImpl(this.getModel(), baseURI, this.getValueFactory());
 
             walker.walk((ParseTreeListener) listener, tree);
 

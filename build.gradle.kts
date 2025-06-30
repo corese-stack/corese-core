@@ -118,6 +118,11 @@ dependencies {
     antlr("org.antlr:antlr4:$antlr_version")
     //antlr("org.antlr:antlr4-runtime:$antlr_version")
 
+    // === JSONLD
+    implementation("com.apicatalog:titanium-json-ld:1.6.0")
+    implementation("com.apicatalog:titanium-rdf-api:1.0.0")
+    implementation("jakarta.json:jakarta.json-api:2.1.3")
+
     // === Internal implementations ===
     implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // Exposed: RDF/XML parser
     implementation("org.apache.commons:commons-text:1.10.0")                           // Used internally (text manipulation)
@@ -148,7 +153,7 @@ dependencies {
     // === For viewing logs during development (DO NOT include in production) ===
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging
 
-}
+
 
     // === Test dependencies ===
     testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit BOM for consistent test versions
