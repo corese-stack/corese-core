@@ -15,6 +15,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
     id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
     id("com.intershop.gradle.javacc") version "5.0.0"           // JavaCC plugin for parsing JavaCC files
+    id("antlr")
 }
 
 // SonarQube configuration
@@ -69,11 +70,11 @@ object Meta {
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
     const val githubRepo = "corese-stack/corese-core"
-  
+
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-  
+
     // Sonatype OSSRH publishing settings
     const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -105,22 +106,38 @@ repositories {
 dependencies {
     val jersey_version = "3.1.3"
     val semargl_version = "0.7.1"
+    val antlr_version = "4.13.2"
 
     // === Logging ===
     api("org.slf4j:slf4j-api:2.0.9")                                                   // Logging API only (SLF4J)
     implementation("org.apache.logging.log4j:log4j-core:2.20.0")                       // Log4j2 core for internal logging
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0")                   // SLF4J binding for Log4j2 (runtime)
 
-    // === Core dependencies ===
-    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
-    implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                        // ShEx validation engine
-    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parser (Semargl)
-    implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // Semargl core RDF parser
-    implementation("com.github.jsonld-java:jsonld-java:0.13.6")                        // Legacy JSON-LD processing
-    implementation("com.apicatalog:titanium-json-ld:1.6.0")
-    implementation("com.apicatalog:titanium-rdf-api:1.0.0")
-    implementation("jakarta.json:jakarta.json-api:2.1.3")
+    // === Antlr
 
+    antlr("org.antlr:antlr4:$antlr_version")
+    //antlr("org.antlr:antlr4-runtime:$antlr_version")
+
+    // === Internal implementations ===
+    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // Exposed: RDF/XML parser
+    implementation("org.apache.commons:commons-text:1.10.0")                           // Used internally (text manipulation)
+    implementation("commons-lang:commons-lang:2.4")                                    // Used internally (basic utilities)
+    implementation("org.json:json:20240303")                                           // Used internally (JSON)
+    implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                        // Used internally (ShEx validation)
+    implementation("org.glassfish.jersey.core:jersey-client:$jersey_version")          // Internal HTTP client
+    implementation("org.glassfish.jersey.inject:jersey-hk2:$jersey_version")           // Internal Jersey injection
+    implementation("com.sun.activation:jakarta.activation:2.0.1")                      // Internal MIME handling
+    implementation("javax.xml.bind:jaxb-api:2.3.1")                                    // Internal XML binding
+    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parsing
+    implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // RDF core parser
+    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // Internal JSON-LD parser
+    implementation("com.typesafe:config:1.4.3")                                        // Typesafe config
+    implementation("org.antlr:antlr4:$antlr_version")                                  // Antlr for grammar creation
+    implementation("org.antlr:antlr4-runtime:$antlr_version")
+    // === For tests ===
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit 5 BOM for dependency management
+    testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit 5 for unit testing
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")               // JUnit 5 runtime for launching tests
 
     // === HTTP and XML ===
     implementation("org.glassfish.jersey.core:jersey-client:$jersey_version")          // HTTP client (Jersey)
@@ -128,11 +145,10 @@ dependencies {
     implementation("com.sun.activation:jakarta.activation:2.0.1")                      // MIME type handling (Jakarta Activation)
     implementation("javax.xml.bind:jaxb-api:2.3.1")                                    // XML binding (JAXB)
 
-    // === Utilities ===
-    implementation("org.apache.commons:commons-text:1.10.0")                           // Text manipulation utilities (Commons Text)
-    implementation("commons-lang:commons-lang:2.4")                                    // General utilities (Commons Lang)
-    implementation("org.json:json:20240303")                                           // JSON processing
-    implementation("com.typesafe:config:1.4.3")                                        // Configuration library (Typesafe Config)
+    // === For viewing logs during development (DO NOT include in production) ===
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging
+
+}
 
     // === Test dependencies ===
     testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit BOM for consistent test versions
@@ -154,7 +170,7 @@ publishing {
             // Configure the publication to include JAR, sources, and Javadoc
             from(components["java"])
 
-            // Configures version mapping to control how dependency versions are resolved 
+            // Configures version mapping to control how dependency versions are resolved
             // for different usage contexts (API and runtime).
             versionMapping {
                 // Defines version mapping for Java API usage.
@@ -281,7 +297,7 @@ tasks.withType<Javadoc> {
 tasks {
     shadowJar {
         this.archiveClassifier = "jar-with-dependencies"
-            }
+    }
 }
 
 // Configure Javadoc tasks to disable doclint warnings.
@@ -331,4 +347,43 @@ tasks.withType<PublishToMavenLocal>().configureEach {
 // This guarantees that artifacts are signed before they are published to Maven repositories.
 tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
+}
+
+
+
+val generatedSourcesPath = "src/main/generated"
+sourceSets["main"].java.srcDir(file(generatedSourcesPath))
+
+tasks.named<AntlrTask>("generateGrammarSource") {
+    arguments.addAll(listOf("-visitor", "-long-messages","-package", "fr.inria.corese.core.next.impl.parser.antlr"))
+    outputDirectory = file("$buildDir/generated-src/antlr/main")
+    outputs.dirs(outputDirectory)
+}
+
+/*
+val copyAntlrGenerated = tasks.register<Copy>("copyAntlrGenerated") {
+    dependsOn("generateGrammarSource")
+    from("$buildDir/generated-src/antlr/main")
+    into("$generatedSourcesPath/antlr/parser")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    outputs.dir("$generatedSourcesPath/antlr/parser")
+}
+ */
+
+
+tasks.named("compileJava") {
+    dependsOn("generateGrammarSource" /*, "copyAntlrGenerated" */)
+}
+
+tasks.named<Jar>("sourcesJar") {
+    dependsOn("generateGrammarSource"/*, "copyAntlrGenerated" */)
+    from(generatedSourcesPath)
+    includeEmptyDirs = false
+}
+
+
+tasks.clean {
+    doLast {
+        file(generatedSourcesPath).deleteRecursively()
+    }
 }
