@@ -95,15 +95,19 @@ public class JSONLDParser extends AbstractParser {
 
                             // Graph
                             Resource graphResource = null;
-                            if (RdfQuadConsumer.isBlank(graph)) {
-                                graphResource = getValueFactory().createBNode(graph);
-                            } else if(! graph.equals(JSONLD_JAVA_DEFAULT_GRAPH)) {
-                                graphResource = getValueFactory().createIRI(graph);
+                            if(graph != null) {
+                                if (RdfQuadConsumer.isBlank(graph)) {
+                                    graphResource = getValueFactory().createBNode(graph);
+                                } else if (!graph.equals(JSONLD_JAVA_DEFAULT_GRAPH)) {
+                                    graphResource = getValueFactory().createIRI(graph);
+                                }
                             }
 
                             if(graphResource == null) {
+                                logger.debug("Adding triple: {} {} {}", subjResource.stringValue(), predicateIRI.stringValue(), objValue.stringValue());
                                 getModel().add(subjResource, predicateIRI, objValue);
                             } else {
+                                logger.debug("Adding quad: {} {} {} {}", subjResource.stringValue(), predicateIRI.stringValue(), objValue.stringValue(), graphResource.stringValue());
                                 getModel().add(subjResource, predicateIRI, objValue, graphResource);
                             }
 

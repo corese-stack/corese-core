@@ -122,6 +122,7 @@ dependencies {
     implementation("com.apicatalog:titanium-json-ld:1.6.0")
     implementation("com.apicatalog:titanium-rdf-api:1.0.0")
     implementation("jakarta.json:jakarta.json-api:2.1.3")
+    implementation("org.eclipse.parsson:parsson:1.1.7")
 
     // === Internal implementations ===
     implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // Exposed: RDF/XML parser

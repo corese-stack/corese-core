@@ -1,9 +1,6 @@
 package fr.inria.corese.core.next.impl.io.parser.jsonld;
 
-import fr.inria.corese.core.next.api.BNode;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.RdfFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
@@ -12,6 +9,7 @@ import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.Reader;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,10 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JSONLDParserTest {
 
     private final ParserFactory factory = new ParserFactory();
+    private final ValueFactory valueFactory = new CoreseAdaptedValueFactory();
 
     @Test
     void testGetRDFFormat() {
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, new CoreseModel(), new CoreseAdaptedValueFactory());
+        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, new CoreseModel(), valueFactory);
         assertEquals(RdfFormat.JSONLD, parser.getRDFFormat());
     }
 
@@ -48,17 +47,17 @@ public class JSONLDParserTest {
                   ]
                 }
                 """;
-        CoreseModel model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, new CoreseAdaptedValueFactory());
+        Model model = new CoreseModel();
+        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
         parser.parse(new ByteArrayInputStream(sampleJsonLD.getBytes()));
 
         assertEquals(3, model.size());
-        IRI subject = new CoreseAdaptedValueFactory().createIRI("http://me.markus-lanthaler.com/");
-        IRI namePredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/name");
-        IRI knowsPredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/knows");
-        Literal nameMarkusObject = new CoreseAdaptedValueFactory().createLiteral("Markus Lanthaler");
-        Literal nameDaveObject = new CoreseAdaptedValueFactory().createLiteral("Dave Longley");
-        Statement daveNameStatement = new CoreseAdaptedValueFactory().createStatement(subject, namePredicate, nameMarkusObject);
+        IRI subject = valueFactory.createIRI("http://me.markus-lanthaler.com/");
+        IRI namePredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/name");
+        IRI knowsPredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/knows");
+        Literal nameMarkusObject = valueFactory.createLiteral("Markus Lanthaler");
+        Literal nameDaveObject = valueFactory.createLiteral("Dave Longley");
+        Statement daveNameStatement = valueFactory.createStatement(subject, namePredicate, nameMarkusObject);
 
         assertTrue(model.contains(daveNameStatement));
         assertTrue(model.contains(subject, knowsPredicate, null));
@@ -86,17 +85,17 @@ public class JSONLDParserTest {
                   ]
                 }
                 """;
-        CoreseModel model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, new CoreseAdaptedValueFactory());
+        Model model = new CoreseModel();
+        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
         parser.parse(new ByteArrayInputStream(sampleJsonLD.getBytes()), "http://me.markus-lanthaler.com/");
 
         assertEquals(3, model.size());
-        IRI subject = new CoreseAdaptedValueFactory().createIRI("http://me.markus-lanthaler.com/");
-        IRI namePredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/name");
-        IRI knowsPredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/knows");
-        Literal nameMarkusObject = new CoreseAdaptedValueFactory().createLiteral("Markus Lanthaler");
-        Literal nameDaveObject = new CoreseAdaptedValueFactory().createLiteral("Dave Longley");
-        Statement daveNameStatement = new CoreseAdaptedValueFactory().createStatement(subject, namePredicate, nameMarkusObject);
+        IRI subject = valueFactory.createIRI("http://me.markus-lanthaler.com/");
+        IRI namePredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/name");
+        IRI knowsPredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/knows");
+        Literal nameMarkusObject = valueFactory.createLiteral("Markus Lanthaler");
+        Literal nameDaveObject = valueFactory.createLiteral("Dave Longley");
+        Statement daveNameStatement = valueFactory.createStatement(subject, namePredicate, nameMarkusObject);
 
         assertTrue(model.contains(daveNameStatement));
         assertTrue(model.contains(subject, knowsPredicate, null));
@@ -124,17 +123,17 @@ public class JSONLDParserTest {
                   ]
                 }
                 """;
-        CoreseModel model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, new CoreseAdaptedValueFactory());
+        Model model = new CoreseModel();
+        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD));
 
         assertEquals(3, model.size());
-        IRI subject = new CoreseAdaptedValueFactory().createIRI("http://me.markus-lanthaler.com/");
-        IRI namePredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/name");
-        IRI knowsPredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/knows");
-        Literal nameMarkusObject = new CoreseAdaptedValueFactory().createLiteral("Markus Lanthaler");
-        Literal nameDaveObject = new CoreseAdaptedValueFactory().createLiteral("Dave Longley");
-        Statement daveNameStatement = new CoreseAdaptedValueFactory().createStatement(subject, namePredicate, nameMarkusObject);
+        IRI subject = valueFactory.createIRI("http://me.markus-lanthaler.com/");
+        IRI namePredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/name");
+        IRI knowsPredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/knows");
+        Literal nameMarkusObject = valueFactory.createLiteral("Markus Lanthaler");
+        Literal nameDaveObject = valueFactory.createLiteral("Dave Longley");
+        Statement daveNameStatement = valueFactory.createStatement(subject, namePredicate, nameMarkusObject);
 
         assertTrue(model.contains(daveNameStatement));
         assertTrue(model.contains(subject, knowsPredicate, null));
@@ -162,17 +161,17 @@ public class JSONLDParserTest {
                   ]
                 }
                 """;
-        CoreseModel model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, new CoreseAdaptedValueFactory());
+        Model model = new CoreseModel();
+        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD), "http://me.markus-lanthaler.com/");
 
         assertEquals(3, model.size());
-        IRI subject = new CoreseAdaptedValueFactory().createIRI("http://me.markus-lanthaler.com/");
-        IRI namePredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/name");
-        IRI knowsPredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/knows");
-        Literal nameMarkusObject = new CoreseAdaptedValueFactory().createLiteral("Markus Lanthaler");
-        Literal nameDaveObject = new CoreseAdaptedValueFactory().createLiteral("Dave Longley");
-        Statement daveNameStatement = new CoreseAdaptedValueFactory().createStatement(subject, namePredicate, nameMarkusObject);
+        IRI subject = valueFactory.createIRI("http://me.markus-lanthaler.com/");
+        IRI namePredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/name");
+        IRI knowsPredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/knows");
+        Literal nameMarkusObject = valueFactory.createLiteral("Markus Lanthaler");
+        Literal nameDaveObject = valueFactory.createLiteral("Dave Longley");
+        Statement daveNameStatement = valueFactory.createStatement(subject, namePredicate, nameMarkusObject);
 
         assertTrue(model.contains(daveNameStatement));
         assertTrue(model.contains(subject, knowsPredicate, null));
@@ -205,14 +204,15 @@ public class JSONLDParserTest {
                         }
                 
                 """;
-        CoreseModel model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, new CoreseAdaptedValueFactory());
-        parser.parse(new StringReader(sampleJsonLD));
+        Model model = new CoreseModel();
+        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
+        Reader reader = new StringReader(sampleJsonLD);
+        parser.parse(reader);
 
         assertEquals(2, model.size());
-        BNode b0 = new CoreseAdaptedValueFactory().createBNode("b0");
-        BNode b1 = new CoreseAdaptedValueFactory().createBNode("b1");
-        IRI knowsPredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/knows");
+        BNode b0 = valueFactory.createBNode("b0");
+        BNode b1 = valueFactory.createBNode("b1");
+        IRI knowsPredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/knows");
         assertTrue(model.contains(b0, knowsPredicate, b1));
         assertTrue(model.contains(b1, knowsPredicate, b0));
     }
@@ -251,25 +251,29 @@ public class JSONLDParserTest {
                 }
                 """;
 
-        CoreseModel model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, new CoreseAdaptedValueFactory());
+        Model model = new CoreseModel();
+        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD));
 
         assertEquals(7, model.size());
-        IRI graphIRI = new CoreseAdaptedValueFactory().createIRI("http://example.org/foaf-graph");
-        IRI generatedAt = new CoreseAdaptedValueFactory().createIRI("http://www.w3.org/ns/prov#generatedAtTime");
-        IRI datetimeDatatype = new CoreseAdaptedValueFactory().createIRI("http://www.w3.org/2001/XMLSchema#dateTime");
-        Literal generatedAtValue = new CoreseAdaptedValueFactory().createLiteral("2012-04-09T00:00:00", datetimeDatatype) ;
-        IRI manuIRI = new CoreseAdaptedValueFactory().createIRI("http://manu.sporny.org/about#manu");
-        Literal manuName = new CoreseAdaptedValueFactory().createLiteral("Manu Sporny");
-        IRI greggIRI = new CoreseAdaptedValueFactory().createIRI("https://greggkellogg.net/foaf#me");
-        Literal greggName = new CoreseAdaptedValueFactory().createLiteral("Gregg Kellogg");
-        IRI typeIRI = new CoreseAdaptedValueFactory().createIRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-        IRI knowsPredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/knows");
-        IRI personType = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/Person");
-        IRI namePredicate = new CoreseAdaptedValueFactory().createIRI("http://xmlns.com/foaf/0.1/name");
+        Resource graphIRI = valueFactory.createIRI("http://example.org/foaf-graph");
+        IRI generatedAt = valueFactory.createIRI("http://www.w3.org/ns/prov#generatedAtTime");
+        IRI datetimeDatatype = valueFactory.createIRI("http://www.w3.org/2001/XMLSchema#dateTime");
+        Literal generatedAtValue = valueFactory.createLiteral("2012-04-09T00:00:00", datetimeDatatype) ;
+        IRI manuIRI = valueFactory.createIRI("http://manu.sporny.org/about#manu");
+        Literal manuName = valueFactory.createLiteral("Manu Sporny");
+        IRI greggIRI = valueFactory.createIRI("https://greggkellogg.net/foaf#me");
+        Literal greggName = valueFactory.createLiteral("Gregg Kellogg");
+        IRI typeIRI = valueFactory.createIRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+        IRI knowsPredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/knows");
+        IRI personType = valueFactory.createIRI("http://xmlns.com/foaf/0.1/Person");
+        IRI namePredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/name");
 
+        Statement stat1 = valueFactory.createStatement(graphIRI, generatedAt, generatedAtValue);
+        Statement stat2 = valueFactory.createStatement(manuIRI, typeIRI, personType, graphIRI);
 
+        //<http://example.org/foaf-graph> prov:generatedAtTime "2012-04-09T00:00:00"^^xsd:dateTime .
+        assertTrue(model.contains(stat1));
         //<http://example.org/foaf-graph> {
         //  <http://manu.sporny.org/about#manu> a foaf:Person;
         assertTrue(model.contains(manuIRI, typeIRI, personType, graphIRI));
@@ -285,7 +289,5 @@ public class JSONLDParserTest {
         //     foaf:knows <http://manu.sporny.org/about#manu> .
         assertTrue(model.contains(greggIRI, knowsPredicate, manuIRI, graphIRI));
         //}
-        //<http://example.org/foaf-graph> prov:generatedAtTime "2012-04-09T00:00:00"^^xsd:dateTime .
-        assertTrue(model.contains(graphIRI, generatedAt, generatedAtValue));
     }
 }
