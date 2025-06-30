@@ -9,8 +9,7 @@ plugins {
     
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
-    id("org.gradlex.extra-java-module-info") version "1.9"      // Module metadata for JARs without module info
-    id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
+    id("com.gradleup.shadow") version "8.3.7"                   // Bundles dependencies into a single JAR
 }
 
 /////////////////////////
@@ -59,46 +58,29 @@ repositories {
 
 // Define dependencies
 dependencies {
-    val jersey_version = "3.0.4"
-    val semargl_version = "0.7.1"
+    // === Logging ===
+    api("org.slf4j:slf4j-api:2.0.17")                                                  // Logging API only (SLF4J)
+    runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.0")                          // Log4j2 core for internal logging
+    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
 
-    // === Public API (Corese-Core users must see these classes) ===
-    api("org.slf4j:slf4j-api:2.0.9")                          // Exposed: Logging API
+    // === Core dependencies ===
+    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
+    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:0.7.2")            // RDFa parser (Semargl)
+    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
 
-    // === Internal implementations ===
-    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")               // Exposed: RDF/XML parser
-    implementation("org.apache.commons:commons-text:1.10.0")  // Used internally (text manipulation)
-    implementation("commons-lang:commons-lang:2.4")           // Used internally (basic utilities)
-    implementation("org.json:json:20240303")                  // Used internally (JSON)
-    implementation("fr.inria.lille.shexjava:shexjava-core:1.0") // Used internally (ShEx validation)
-    implementation("org.glassfish.jersey.core:jersey-client:$jersey_version") // Internal HTTP client
-    implementation("org.glassfish.jersey.inject:jersey-hk2:$jersey_version")  // Internal Jersey injection
-    implementation("com.sun.activation:jakarta.activation:2.0.1")             // Internal MIME handling
-    implementation("javax.xml.bind:jaxb-api:2.3.1")                            // Internal XML binding
-    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parsing
-    implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // RDF core parser
-    implementation("com.github.jsonld-java:jsonld-java:0.13.4") // Internal JSON-LD parser
+    // === HTTP and XML ===
+    implementation("org.glassfish.jersey.core:jersey-client:3.1.10")                   // HTTP client (Jersey)
+    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")                    // Dependency injection for Jersey
+    implementation("com.sun.activation:jakarta.activation:2.0.1")                      // MIME type handling (Jakarta Activation)
 
-    // === For tests ===
-    testImplementation("junit:junit:4.13.2")                  // Unit testing framework
+    // === Utilities ===
+    implementation("org.apache.commons:commons-text:1.13.1")                           // Text manipulation utilities (Commons Text)
+    implementation("org.json:json:20250517")                                           // JSON processing
+    implementation("com.typesafe:config:1.4.3")                                        // Configuration library (Typesafe Config)
 
-    // === For viewing logs during development (DO NOT include in production) ===
-    runtimeOnly("org.slf4j:slf4j-simple:2.0.9")
+    // === Test dependencies ===
+    testImplementation("junit:junit:4.13.2")                                           // Unit testing framework
 }
-
-// Configure extra Java module information for dependencies without module-info
-extraJavaModuleInfo {
-    // If a library is missing module info, the build process will not fail.
-    failOnMissingModuleInfo.set(false)
-
-    // Map automatic module names for non-modular libraries.
-    automaticModule("fr.com.hp.hpl.jena.rdf.arp:arp", "arp") // Module for Jena RDF ARP
-    automaticModule("com.github.jsonld-java:jsonld-java", "jsonld.java") // Module for JSON-LD Java
-    automaticModule("commons-lang:commons-lang", "commons.lang") // Module for Commons Lang
-    automaticModule("fr.inria.lille.shexjava:shexjava-core", "shexjava.core")
-    automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model")
-}
-
 
 /////////////////////////
 // Publishing settings //
