@@ -150,7 +150,7 @@ class NTriplesSerializerTest {
 
         SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(faultyWriter));
 
-        assertEquals("NTriples serialization failed [Format: NTriples]", thrown.getMessage());
+        assertEquals("N-Triples serialization failed [Format: N-Triples]", thrown.getMessage());
     }
 
 
@@ -166,7 +166,7 @@ class NTriplesSerializerTest {
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
 
-        assertEquals("Invalid NTriples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
+        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
     @Test
@@ -180,7 +180,7 @@ class NTriplesSerializerTest {
 
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
-        assertEquals("Invalid NTriples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
+        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
     @Test
@@ -194,7 +194,7 @@ class NTriplesSerializerTest {
 
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
-        assertEquals("Invalid NTriples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: NTriples]", thrown.getMessage());
+        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
 
