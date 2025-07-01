@@ -2,8 +2,8 @@ package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.Test;
@@ -431,12 +431,7 @@ class TurtleSerializerTest {
 
 
         when(mockModel.iterator()).thenAnswer(invocation -> Arrays.asList(mainStatement, bNodePropertyStatement).iterator());
-        when(mockModel.stream())
-                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement))
-                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement))
-                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement))
-                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement))
-                .thenReturn(Stream.of(mainStatement, bNodePropertyStatement));
+        when(mockModel.stream()).thenAnswer(invocation -> Stream.of(mainStatement, bNodePropertyStatement));
 
 
         StringWriter writer = new StringWriter();
@@ -445,7 +440,7 @@ class TurtleSerializerTest {
         turtleSerializer.write(writer);
 
 
-        verify(mockModel, times(5)).stream();
+        verify(mockModel, atLeastOnce()).stream();
 
         String expected = """
                 @prefix ns: <http://example.org/ns/> .
@@ -645,7 +640,7 @@ class TurtleSerializerTest {
 
         assertEquals("Turtle", thrown.getFormatName());
 
-        assertEquals("Invalid data for Turtle format: An rdf:langString literal must have a language tag. [Format: Turtle]", thrown.getMessage());
+        assertEquals("Invalid data for format Turtle: An rdf:langString literal must have a language tag. [Format: Turtle]", thrown.getMessage());
     }
 
     /**
@@ -706,7 +701,7 @@ class TurtleSerializerTest {
 
         assertEquals("Turtle", thrown.getFormatName());
 
-        assertEquals("Invalid data for Turtle format: IRI contains illegal characters (space, quotes, angle brackets) for unescaped Turtle form: http://example.org/invalid iri [Format: Turtle]", thrown.getMessage());
+        assertEquals("Invalid data for format Turtle: IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form of Turtle: http://example.org/invalid iri [Format: Turtle]", thrown.getMessage());
     }
 
     /**

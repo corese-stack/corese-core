@@ -545,7 +545,7 @@ class TriGSerializerTest {
 
         assertEquals("TriG", thrown.getFormatName());
 
-        assertEquals("Invalid data for TriG format: An rdf:langString literal must have a language tag. [Format: TriG]", thrown.getMessage());
+        assertEquals("Invalid data for format TriG: An rdf:langString literal must have a language tag. [Format: TriG]", thrown.getMessage());
     }
 
     /**
@@ -606,7 +606,7 @@ class TriGSerializerTest {
 
         assertEquals("TriG", thrown.getFormatName());
 
-        assertEquals("Invalid data for TriG format: IRI contains illegal characters (space, quotes, angle brackets) for unescaped TriG form: http://example.org/invalid iri [Format: TriG]", thrown.getMessage());
+        assertEquals("Invalid data for format TriG: IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form of TriG: http://example.org/invalid iri [Format: TriG]", thrown.getMessage());
     }
 
     /**
