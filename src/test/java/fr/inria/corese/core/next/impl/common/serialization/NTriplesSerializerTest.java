@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 class NTriplesSerializerTest {
 
     private Model model;
-    private FormatConfig config;
+    private SerializerConfig config;
     private NTriplesSerializer nTriplesSerializer;
 
     private Resource mockExPerson;
@@ -38,7 +38,7 @@ class NTriplesSerializerTest {
     void setUp() {
         model = mock(Model.class);
 
-        config = FormatConfig.ntriplesConfig();
+        config = SerializerConfig.ntriplesConfig();
         nTriplesSerializer = new NTriplesSerializer(model, config);
 
 
@@ -210,7 +210,7 @@ class NTriplesSerializerTest {
         Model modelMock = mock(Model.class);
         when(modelMock.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        FormatConfig testConfig = new FormatConfig.Builder()
+        SerializerConfig testConfig = new SerializerConfig.Builder()
                 .strictMode(true)  // Keep strict mode enabled to test validation
                 .build();
 
@@ -240,7 +240,7 @@ class NTriplesSerializerTest {
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, FormatConfig.ntriplesConfig());
+        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, SerializerConfig.ntriplesConfig());
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);

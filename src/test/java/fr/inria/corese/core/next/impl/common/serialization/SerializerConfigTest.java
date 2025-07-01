@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.impl.common.serialization.config.BlankNodeStyleEnum;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
@@ -12,11 +12,11 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FormatConfigTest {
+class SerializerConfigTest {
     @Test
     @DisplayName("ntriplesConfig() should return correct default config for N-Triples")
     void ntriplesConfigReturnsCorrectConfig() {
-        FormatConfig config = FormatConfig.ntriplesConfig();
+        SerializerConfig config = SerializerConfig.ntriplesConfig();
 
         assertFalse(config.usePrefixes());
         assertFalse(config.autoDeclarePrefixes());
@@ -45,7 +45,7 @@ class FormatConfigTest {
     @Test
     @DisplayName("nquadsConfig() should return correct default config for N-Quads")
     void nquadsConfigReturnsCorrectConfig() {
-        FormatConfig config = FormatConfig.nquadsConfig();
+        SerializerConfig config = SerializerConfig.nquadsConfig();
 
         assertFalse(config.usePrefixes());
         assertFalse(config.autoDeclarePrefixes());
@@ -74,7 +74,7 @@ class FormatConfigTest {
     @Test
     @DisplayName("rdfXmlConfig() devrait retourner la configuration par défaut correcte pour RDF/XML")
     void rdfXmlConfigReturnsCorrectConfig() {
-        FormatConfig config = FormatConfig.rdfXmlConfig();
+        SerializerConfig config = SerializerConfig.rdfXmlConfig();
 
         assertTrue(config.usePrefixes());
         assertTrue(config.autoDeclarePrefixes());
@@ -109,17 +109,17 @@ class FormatConfigTest {
 
 
     @Test
-    @DisplayName("FormatConfig constructor should be private and only accessible via builder")
+    @DisplayName("SerializerConfig constructor should be private and only accessible via builder")
     void constructorIsPrivateAndAccessibleViaBuilder() {
 
-        FormatConfig config = new FormatConfig.Builder().build();
+        SerializerConfig config = new SerializerConfig.Builder().build();
         assertNotNull(config);
     }
 
     @Test
     @DisplayName("blankNodeStyle method in Builder should throw NullPointerException for null style")
     void blankNodeStyleShouldThrowForNull() {
-        FormatConfig.Builder builder = new FormatConfig.Builder();
+        SerializerConfig.Builder builder = new SerializerConfig.Builder();
         assertThrows(NullPointerException.class, () -> builder.blankNodeStyle(null),
                 "Setting a null blankNodeStyle should throw NullPointerException");
     }
@@ -127,7 +127,7 @@ class FormatConfigTest {
     @Test
     @DisplayName("indent method in Builder should throw NullPointerException for null indent")
     void indentShouldThrowForNull() {
-        FormatConfig.Builder builder = new FormatConfig.Builder();
+        SerializerConfig.Builder builder = new SerializerConfig.Builder();
         assertThrows(NullPointerException.class, () -> builder.indent(null),
                 "Setting a null indent should throw NullPointerException");
     }
@@ -135,7 +135,7 @@ class FormatConfigTest {
     @Test
     @DisplayName("lineEnding method in Builder should throw NullPointerException for null lineEnding")
     void lineEndingShouldThrowForNull() {
-        FormatConfig.Builder builder = new FormatConfig.Builder();
+        SerializerConfig.Builder builder = new SerializerConfig.Builder();
         assertThrows(NullPointerException.class, () -> builder.lineEnding(null),
                 "Setting a null lineEnding should throw NullPointerException");
     }
@@ -143,17 +143,17 @@ class FormatConfigTest {
     @Test
     @DisplayName("prefixOrdering method in Builder should throw NullPointerException for null prefixOrdering")
     void prefixOrderingShouldThrowForNull() {
-        FormatConfig.Builder builder = new FormatConfig.Builder();
+        SerializerConfig.Builder builder = new SerializerConfig.Builder();
         assertThrows(NullPointerException.class, () -> builder.prefixOrdering(null),
                 "Setting a null prefixOrdering should throw NullPointerException");
     }
 
     @Test
-    @DisplayName("Builder should create FormatConfig with all default values")
+    @DisplayName("Builder should create SerializerConfig with all default values")
     void builderShouldCreateWithAllDefaults() {
-        FormatConfig config = new FormatConfig.Builder().build();
+        SerializerConfig config = new SerializerConfig.Builder().build();
 
-        assertNotNull(config, "FormatConfig should not be null");
+        assertNotNull(config, "SerializerConfig should not be null");
 
         // --- Syntax Sugar Defaults ---
         assertTrue(config.usePrefixes(), "Default usePrefixes should be true");

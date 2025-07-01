@@ -4,7 +4,17 @@ import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 import java.io.Writer;
 
-public interface IRdfSerializer {
+/**
+ * Factory interface for creating {@link RdfSerializer} instances.
+ * This interface defines a contract for classes that are responsible
+ * for providing appropriate RDF serializers based on the desired
+ * {@link fr.inria.corese.core.next.impl.common.serialization.RdfFormat}, a {@link Model} to be serialized, and
+ * {@link SerializationConfig}.
+ * Implementations of this factory can manage the instantiation
+ * and configuration of various RDF serializers, promoting
+ * loose coupling and extensibility in the serialization process.
+ */
+public interface RdfSerializer {
 
     /**
      * A serializer that converts a {@link Model} instance

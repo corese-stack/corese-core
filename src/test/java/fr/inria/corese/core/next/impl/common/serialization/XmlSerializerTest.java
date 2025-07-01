@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
@@ -30,7 +30,7 @@ class XmlSerializerTest {
     @Mock
     private Model mockModel;
     @Mock
-    private FormatConfig mockConfig;
+    private SerializerConfig mockConfig;
     @Mock
     private Resource mockResource;
     @Mock

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.impl.common.serialization.config;
 
-import fr.inria.corese.core.next.api.ISerializationConfig;
+import fr.inria.corese.core.next.api.SerializationConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 
 import java.util.Collections;
@@ -13,11 +13,11 @@ import java.util.Objects;
  * This class provides a comprehensive set of options to control the output
  * syntax, pretty-printing, and technical aspects of RDF serialization.
  *
- * <p>Use the {@link Builder} class to create instances of {@code FormatConfig}.
+ * <p>Use the {@link Builder} class to create instances of {@code SerializerConfig}.
  * Predefined configurations for common RDF formats are available via static methods
  * like {@link #ntriplesConfig()}, {@link #nquadsConfig()}, {@link #turtleConfig()}, etc.</p>
  */
-public class FormatConfig implements ISerializationConfig {
+public class SerializerConfig implements SerializationConfig {
 
     /**
      * Whether prefix declarations (e.g., `@prefix`, `PREFIX`) should be used for compact IRIs.
@@ -150,7 +150,7 @@ public class FormatConfig implements ISerializationConfig {
      *
      * @param builder The builder instance.
      */
-    private FormatConfig(Builder builder) {
+    private SerializerConfig(Builder builder) {
 
         this.usePrefixes = builder.usePrefixes;
         this.autoDeclarePrefixes = builder.autoDeclarePrefixes;
@@ -193,8 +193,8 @@ public class FormatConfig implements ISerializationConfig {
     // --- Builder Class ---
 
     /**
-     * Builder class for {@link FormatConfig}.
-     * Provides a fluent API for constructing FormatConfig instances with default values.
+     * Builder class for {@link SerializerConfig}.
+     * Provides a fluent API for constructing SerializerConfig instances with default values.
      */
     public static class Builder {
         // Syntax Sugar Defaults
@@ -377,13 +377,13 @@ public class FormatConfig implements ISerializationConfig {
         }
 
         /**
-         * Builds and returns a new {@link FormatConfig} instance with the current builder settings.
+         * Builds and returns a new {@link SerializerConfig} instance with the current builder settings.
          *
-         * @return A new {@code FormatConfig} instance.
+         * @return A new {@code SerializerConfig} instance.
          * @throws NullPointerException if any required field has not been set (should not happen with default values).
          */
-        public FormatConfig build() {
-            return new FormatConfig(this);
+        public SerializerConfig build() {
+            return new SerializerConfig(this);
         }
     }
 
@@ -393,9 +393,9 @@ public class FormatConfig implements ISerializationConfig {
      * Returns a default configuration suitable for N-Triples serialization.
      * N-Triples is a simple, line-oriented format without prefixes, contexts, or complex syntax sugar.
      *
-     * @return A {@code FormatConfig} instance for N-Triples.
+     * @return A {@code SerializerConfig} instance for N-Triples.
      */
-    public static FormatConfig ntriplesConfig() {
+    public static SerializerConfig ntriplesConfig() {
         return new Builder()
                 .usePrefixes(false) // N-Triples doesn't use prefixes
                 .autoDeclarePrefixes(false)
@@ -426,9 +426,9 @@ public class FormatConfig implements ISerializationConfig {
      * Returns a default configuration suitable for N-Quads serialization.
      * N-Quads extends N-Triples with named graphs.
      *
-     * @return A {@code FormatConfig} instance for N-Quads.
+     * @return A {@code SerializerConfig} instance for N-Quads.
      */
-    public static FormatConfig nquadsConfig() {
+    public static SerializerConfig nquadsConfig() {
         return new Builder()
                 .usePrefixes(false) // N-Quads doesn't use prefixes
                 .autoDeclarePrefixes(false)
@@ -459,9 +459,9 @@ public class FormatConfig implements ISerializationConfig {
      * Returns a default configuration suitable for Turtle serialization.
      * Turtle is a concise, human-readable format with extensive syntax sugar and pretty-printing.
      *
-     * @return A {@code FormatConfig} instance for Turtle.
+     * @return A {@code SerializerConfig} instance for Turtle.
      */
-    public static FormatConfig turtleConfig() {
+    public static SerializerConfig turtleConfig() {
         Map<String, String> commonTurtlePrefixes = new HashMap<>();
         commonTurtlePrefixes.put("rdf", SerializationConstants.RDF_NS);
         commonTurtlePrefixes.put("rdfs", SerializationConstants.RDFS_NS);
@@ -500,9 +500,9 @@ public class FormatConfig implements ISerializationConfig {
      * Returns a default configuration suitable for TriG serialization.
      * TriG extends Turtle with named graphs, supporting all Turtle features plus context inclusion.
      *
-     * @return A {@code FormatConfig} instance for TriG.
+     * @return A {@code SerializerConfig} instance for TriG.
      */
-    public static FormatConfig trigConfig() {
+    public static SerializerConfig trigConfig() {
         Map<String, String> commonTriGPrefixes = new HashMap<>();
         commonTriGPrefixes.put("rdf", SerializationConstants.RDF_NS);
         commonTriGPrefixes.put("rdfs", SerializationConstants.RDFS_NS);
@@ -541,9 +541,9 @@ public class FormatConfig implements ISerializationConfig {
      * Returns a default configuration suitable for RDF/XML serialization.
      * RDF/XML is an XML-based syntax for RDF graphs.
      *
-     * @return A {@code FormatConfig} instance for RDF/XML.
+     * @return A {@code SerializerConfig} instance for RDF/XML.
      */
-    public static FormatConfig rdfXmlConfig() {
+    public static SerializerConfig rdfXmlConfig() {
         Map<String, String> commonRdfXmlPrefixes = new HashMap<>();
         commonRdfXmlPrefixes.put("rdf", SerializationConstants.RDF_NS);
         commonRdfXmlPrefixes.put("rdfs", SerializationConstants.RDFS_NS);

@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.serialization.base.AbstractLineBasedSerializer;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,24 +24,24 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
 
     /**
      * Constructs a new {@code NQuadsSerializer} instance with the specified model and default N-Quads configuration.
-     * The default configuration is obtained from {@link FormatConfig#nquadsConfig()}.
+     * The default configuration is obtained from {@link SerializerConfig#nquadsConfig()}.
      *
      * @param model the {@link Model} to be serialized. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public NQuadsSerializer(Model model) {
-        this(model, FormatConfig.nquadsConfig());
+        this(model, SerializerConfig.nquadsConfig());
     }
 
     /**
      * Constructs a new {@code NQuadsSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link ISerializationConfig} to use for serialization. Must not be null.
+     * @param config the {@link SerializationConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NQuadsSerializer(Model model, ISerializationConfig config) {
-        super(model, (FormatConfig) config);
+    public NQuadsSerializer(Model model, SerializationConfig config) {
+        super(model, (SerializerConfig) config);
     }
 
     /**

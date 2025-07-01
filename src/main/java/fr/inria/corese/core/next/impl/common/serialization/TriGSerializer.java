@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.impl.common.serialization;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.BlankNodeStyleEnum;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * <p>Advanced features such as strict adherence to maximum line length
  * and generation of stable blank node identifiers are not fully implemented in this version.</p>
  */
-public class TriGSerializer implements IRdfSerializer {
+public class TriGSerializer implements RdfSerializer {
 
     /**
      * Logger for this class, used to log potential issues or information during serialization.
@@ -50,7 +50,7 @@ public class TriGSerializer implements IRdfSerializer {
     private static final Logger logger = LoggerFactory.getLogger(TriGSerializer.class);
 
     private final Model model;
-    private final FormatConfig config;
+    private final SerializerConfig config;
     private final Map<String, String> iriToPrefixMapping;
     private final Map<String, String> prefixToIriMapping;
     // Set to track blank nodes already serialized inline or as part of a list
@@ -60,25 +60,25 @@ public class TriGSerializer implements IRdfSerializer {
 
     /**
      * Constructs a new {@code TriGSerializer} instance with the specified model and default configuration.
-     * The default configuration is returned by {@link FormatConfig#trigConfig()}.
+     * The default configuration is returned by {@link SerializerConfig#trigConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public TriGSerializer(Model model) {
-        this(model, FormatConfig.trigConfig());
+        this(model, SerializerConfig.trigConfig());
     }
 
     /**
      * Constructs a new {@code TriGSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link ISerializationConfig} to use for serialization. Must not be null.
+     * @param config the {@link SerializationConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public TriGSerializer(Model model, ISerializationConfig config) {
+    public TriGSerializer(Model model, SerializationConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
-        this.config = (FormatConfig)  Objects.requireNonNull(config, "Configuration cannot be null");
+        this.config = (SerializerConfig)  Objects.requireNonNull(config, "Configuration cannot be null");
         this.iriToPrefixMapping = new HashMap<>();
         this.prefixToIriMapping = new HashMap<>();
         this.consumedBlankNodes = new HashSet<>();

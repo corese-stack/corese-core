@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
@@ -32,12 +32,12 @@ import java.util.stream.Collectors;
  * <p>Advanced features such as handling XML schemata, specific RDF/XML graph structures (e.g., rdf:Bag, rdf:Seq, rdf:Alt),
  * and full blank node syntax optimization are simplified in this version.</p>
  */
-public class XmlSerializer implements IRdfSerializer {
+public class XmlSerializer implements RdfSerializer {
 
     private static final Logger logger = LoggerFactory.getLogger(XmlSerializer.class);
 
     private final Model model;
-    private final FormatConfig config;
+    private final SerializerConfig config;
     private final Map<String, String> iriToPrefixMapping;
     private final Map<String, String> prefixToIriMapping;
     private final Map<Resource, String> blankNodeIds;
@@ -46,25 +46,25 @@ public class XmlSerializer implements IRdfSerializer {
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and default configuration.
-     * The default configuration is returned by {@link FormatConfig#rdfXmlConfig()}.
+     * The default configuration is returned by {@link SerializerConfig#rdfXmlConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public XmlSerializer(Model model) {
-        this(model, FormatConfig.rdfXmlConfig());
+        this(model, SerializerConfig.rdfXmlConfig());
     }
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link ISerializationConfig} to use for serialization. Must not be null.
+     * @param config the {@link SerializationConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public XmlSerializer(Model model, ISerializationConfig config) {
+    public XmlSerializer(Model model, SerializationConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
-        this.config = (FormatConfig) Objects.requireNonNull(config, "Configuration cannot be null");
+        this.config = (SerializerConfig) Objects.requireNonNull(config, "Configuration cannot be null");
         this.iriToPrefixMapping = new HashMap<>();
         this.prefixToIriMapping = new HashMap<>();
         this.blankNodeIds = new HashMap<>();
@@ -73,7 +73,7 @@ public class XmlSerializer implements IRdfSerializer {
 
     /**
      * Initializes prefix mappings by adding custom prefixes from the configuration.
-     * The custom prefixes map in FormatConfig is expected to be {namespaceURI: prefix}.
+     * The custom prefixes map in SerializerConfig is expected to be {namespaceURI: prefix}.
      */
     private void initializePrefixes() {
         if (config.usePrefixes()) {

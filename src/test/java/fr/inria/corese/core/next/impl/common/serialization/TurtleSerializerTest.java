@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
@@ -75,7 +75,7 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, FormatConfig.turtleConfig());
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, SerializerConfig.turtleConfig());
 
         // When
         turtleSerializer.write(writer);
@@ -229,14 +229,14 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        // Explicitly create FormatConfig to ensure strictMode is false
+        // Explicitly create SerializerConfig to ensure strictMode is false
         Map<String, String> commonTurtlePrefixes = new HashMap<>();
         commonTurtlePrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         commonTurtlePrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
         commonTurtlePrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
         commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
 
-        FormatConfig config = new FormatConfig.Builder()
+        SerializerConfig config = new SerializerConfig.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .useRdfTypeShortcut(true)
                 .useCollections(true)
@@ -334,7 +334,7 @@ class TurtleSerializerTest {
         commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
         commonTurtlePrefixes.put("dc", "http://purl.org/dc/elements/1.1/");
 
-        FormatConfig config = new FormatConfig.Builder()
+        SerializerConfig config = new SerializerConfig.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .addCustomPrefixes(commonTurtlePrefixes)
                 .usePrefixes(true)
@@ -440,7 +440,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, FormatConfig.turtleConfig());
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, SerializerConfig.turtleConfig());
 
         turtleSerializer.write(writer);
 
@@ -520,7 +520,7 @@ class TurtleSerializerTest {
         commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
         commonTurtlePrefixes.put("base", "http://example.org/base/");
 
-        FormatConfig configWithBase = new FormatConfig.Builder()
+        SerializerConfig configWithBase = new SerializerConfig.Builder()
                 .baseIRI("http://example.org/base/")
                 .addCustomPrefixes(commonTurtlePrefixes)
                 .usePrefixes(true)
@@ -635,7 +635,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        FormatConfig strictConfig = new FormatConfig.Builder().strictMode(true).build();
+        SerializerConfig strictConfig = new SerializerConfig.Builder().strictMode(true).build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
@@ -696,7 +696,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        FormatConfig strictConfig = new FormatConfig.Builder().strictMode(true).validateURIs(true).build();
+        SerializerConfig strictConfig = new SerializerConfig.Builder().strictMode(true).validateURIs(true).build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
@@ -758,8 +758,8 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        // Configure FormatConfig to enable multiline literals
-        FormatConfig config = new FormatConfig.Builder()
+        // Configure SerializerConfig to enable multiline literals
+        SerializerConfig config = new SerializerConfig.Builder()
                 .useMultilineLiterals(true)
                 .prettyPrint(true)
                 .autoDeclarePrefixes(true)

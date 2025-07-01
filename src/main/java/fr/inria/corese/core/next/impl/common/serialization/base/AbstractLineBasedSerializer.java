@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.common.serialization.base;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
@@ -22,7 +22,7 @@ import java.util.Set;
  * Contains all the common logic for writing statements line by line.
  * Subclasses only need to implement how to handle the context part.
  */
-public abstract class AbstractLineBasedSerializer implements IRdfSerializer {
+public abstract class AbstractLineBasedSerializer implements RdfSerializer {
 
     /**
      * Logger for this class, used for logging potential issues or information during serialization.
@@ -30,16 +30,16 @@ public abstract class AbstractLineBasedSerializer implements IRdfSerializer {
     private static final Logger logger = LoggerFactory.getLogger(AbstractLineBasedSerializer.class);
 
     protected final Model model;
-    protected final FormatConfig config;
+    protected final SerializerConfig config;
 
     /**
      * Constructs a new line-based serializer.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link FormatConfig} to use for serialization. Must not be null.
+     * @param config the {@link SerializerConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or config is null.
      */
-    protected AbstractLineBasedSerializer(Model model, FormatConfig config) {
+    protected AbstractLineBasedSerializer(Model model, SerializerConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
     }

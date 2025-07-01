@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.config.FormatConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class NQuadsSerializerTest {
 
     private Model model;
-    private FormatConfig config;
+    private SerializerConfig config;
     private NQuadsSerializer nQuadsSerializer;
 
     private Resource mockExPerson;
@@ -43,7 +43,7 @@ class NQuadsSerializerTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-        config = FormatConfig.nquadsConfig();
+        config = SerializerConfig.nquadsConfig();
         nQuadsSerializer = new NQuadsSerializer(model, config);
 
         mockExPerson = createIRI("http://example.org/Person");
@@ -274,7 +274,7 @@ class NQuadsSerializerTest {
 
         Writer writer = new StringWriter();
 
-        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, FormatConfig.nquadsConfig());
+        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, SerializerConfig.nquadsConfig());
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
