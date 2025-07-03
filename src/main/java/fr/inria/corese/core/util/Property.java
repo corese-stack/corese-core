@@ -228,7 +228,6 @@ public class Property {
     }
 
     static void basicSet(Value value, boolean b) {
-        logger.debug("{} = {}", value, b);
         getSingleton().getBooleanProperty().put(value, b);
 
         switch (value) {
@@ -430,7 +429,6 @@ public class Property {
     }
 
     static void basicSet(Value value, String... str) {
-        logger.debug("{} = {}", value, str);
         switch (value) {
             case FEDERATE_BLACKLIST:
                 getSingleton().blacklist(str);
@@ -442,7 +440,6 @@ public class Property {
     }
 
     static void basicSet(Value value, String str) {
-        logger.debug("{} = {}", value, str);
         getSingleton().getStringProperty().put(value, str);
         switch (value) {
 
@@ -549,7 +546,6 @@ public class Property {
     }
 
     static void basicSet(Value value, int n) {
-        logger.debug("{} = {}", value, n);
         getSingleton().getIntegerProperty().put(value, n);
 
         switch (value) {
@@ -687,10 +683,8 @@ public class Property {
                 String importPath = expand(name);
 
                 if (getImports().containsKey(importPath)) {
-                    logger.info("Skip import: " + importPath);
                 } else {
                     getImports().put(importPath, importPath);
-                    logger.info("Import: " + importPath);
                     try (FileReader importReader = new FileReader(importPath)) {
                         getProperties().load(importReader);
                     }
@@ -712,7 +706,7 @@ public class Property {
             try {
                 define(name, value);
             } catch (Exception e) {
-                logger.info("Incorrect Property: " + name + " " + value);
+                logger.error("Incorrect Property: " + name + " " + value);
             }
         }
     }
@@ -774,7 +768,6 @@ public class Property {
         for (String str : list.split(SEP)) {
             alist.add(NSManager.nsm().toNamespace(str));
         }
-        logger.info("Split: " + alist);
         FederateVisitor.DEFAULT_SPLIT = alist;
     }
 
@@ -804,11 +797,6 @@ public class Property {
     private void defineVariableMap() {
         for (Pair pair : getValueListBasic(Value.VARIABLE)) {
             String variable = varName(pair.getKey());
-
-            if (getVariableMap().containsKey(variable)) {
-                logger.info("Overload variable: " + variable);
-            }
-            logger.info(String.format("variable: %s=%s", variable, expand(pair.getValue())));
 
             getVariableMap().put(variable, expand(pair.getValue()));
         }
@@ -848,7 +836,6 @@ public class Property {
     }
 
     void defineFederation(String path) {
-        logger.info("federation: " + path);
         QueryProcess exec = QueryProcess.create(Graph.create());
         try {
             Graph g = exec.defineFederation(path);
@@ -861,7 +848,7 @@ public class Property {
         QueryProcess exec = QueryProcess.create();
         for (String name : str.split(SEP)) {
             try {
-                exec.imports(str);
+                exec.imports(name);
             } catch (EngineException ex) {
                 logger.error(ex.toString());
             }
@@ -923,7 +910,6 @@ public class Property {
         for (String name : path.split(SEP)) {
             try {
                 String file = expand(name);
-                logger.info("Load: " + file);
                 ld.parse(file.strip());
             } catch (LoadException ex) {
                 logger.error(ex.toString());
@@ -939,7 +925,6 @@ public class Property {
         for (Pair pair : getValueListBasic(Value.LDSCRIPT_VARIABLE)) {
             String variable = pair.getKey().strip();
             String val = pair.getValue().strip();
-            logger.info(String.format("ldscript variable: %s=%s", variable, val));
             IDatatype dt = DatatypeMap.newValue(val);
             Binding.setStaticVariable(variable, dt);
         }

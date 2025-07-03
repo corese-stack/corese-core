@@ -7,6 +7,8 @@ import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.Reader;
@@ -17,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JSONLDParserTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(JSONLDParserTest.class);
     private final ParserFactory factory = new ParserFactory();
     private final ValueFactory valueFactory = new CoreseAdaptedValueFactory();
 
@@ -226,8 +229,12 @@ public class JSONLDParserTest {
                     "generatedAt": {
                       "@id": "http://www.w3.org/ns/prov#generatedAtTime"
                     },
-                    "Person": "http://xmlns.com/foaf/0.1/Person",
-                    "name": "http://xmlns.com/foaf/0.1/name",
+                    "Person": {
+                      "@id": "http://xmlns.com/foaf/0.1/Person"
+                    },
+                    "name": {
+                      "@id": "http://xmlns.com/foaf/0.1/name"
+                    },
                     "knows": {"@id": "http://xmlns.com/foaf/0.1/knows", "@type": "@id"}
                   },
                   "@id": "http://example.org/foaf-graph",
@@ -269,25 +276,19 @@ public class JSONLDParserTest {
         IRI personType = valueFactory.createIRI("http://xmlns.com/foaf/0.1/Person");
         IRI namePredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/name");
 
-        Statement stat1 = valueFactory.createStatement(graphIRI, generatedAt, generatedAtValue);
-        Statement stat2 = valueFactory.createStatement(manuIRI, typeIRI, personType, graphIRI);
-
-        //<http://example.org/foaf-graph> prov:generatedAtTime "2012-04-09T00:00:00"^^xsd:dateTime .
-        assertTrue(model.contains(stat1));
-        //<http://example.org/foaf-graph> {
-        //  <http://manu.sporny.org/about#manu> a foaf:Person;
-        assertTrue(model.contains(manuIRI, typeIRI, personType, graphIRI));
-        //     foaf:name "Manu Sporny";
-        assertTrue(model.contains(manuIRI, namePredicate, manuName, graphIRI));
-        //     foaf:knows <https://greggkellogg.net/foaf#me> .
+        //<http://manu.sporny.org/about#manu> <http://xmlns.com/foaf/0.1/knows> <https://greggkellogg.net/foaf#me> <http://example.org/foaf-graph> .
         assertTrue(model.contains(manuIRI, knowsPredicate, greggIRI, graphIRI));
-        //
-        //  <https://greggkellogg.net/foaf#me> a foaf:Person;
-        assertTrue(model.contains(greggIRI, typeIRI, personType, graphIRI));
-        //     foaf:name "Gregg Kellogg";
+        //<https://greggkellogg.net/foaf#me> <http://xmlns.com/foaf/0.1/name> "Gregg Kellogg" <http://example.org/foaf-graph> .
         assertTrue(model.contains(greggIRI, namePredicate, greggName, graphIRI));
-        //     foaf:knows <http://manu.sporny.org/about#manu> .
+        //<https://greggkellogg.net/foaf#me> <http://xmlns.com/foaf/0.1/knows> <http://manu.sporny.org/about#manu> <http://example.org/foaf-graph> .
         assertTrue(model.contains(greggIRI, knowsPredicate, manuIRI, graphIRI));
-        //}
+        //<http://manu.sporny.org/about#manu> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> <http://example.org/foaf-graph> .
+        assertTrue(model.contains(manuIRI, typeIRI, personType, graphIRI));
+        //<http://example.org/foaf-graph> <http://www.w3.org/ns/prov#generatedAtTime> "2012-04-09T00:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+        assertTrue(model.contains(graphIRI, generatedAt, generatedAtValue));
+        //<http://manu.sporny.org/about#manu> <http://xmlns.com/foaf/0.1/name> "Manu Sporny" <http://example.org/foaf-graph> .
+        assertTrue(model.contains(manuIRI, namePredicate, manuName, graphIRI));
+        //<https://greggkellogg.net/foaf#me> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> <http://example.org/foaf-graph> .
+        assertTrue(model.contains(greggIRI, typeIRI, personType, graphIRI));
     }
 }

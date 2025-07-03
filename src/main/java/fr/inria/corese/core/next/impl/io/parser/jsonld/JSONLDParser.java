@@ -10,6 +10,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractParser;
 import fr.inria.corese.core.next.api.base.io.RdfFormat;
 import fr.inria.corese.core.next.api.io.IOConfig;
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 
 import java.io.InputStream;
@@ -74,12 +75,11 @@ public class JSONLDParser extends AbstractParser {
 
                             // Object
                             Value objValue = null;
-                            if (RdfQuadConsumer.isValidObject(object, datatype, language)) {
                                 // Object is a BN
                                 if (RdfQuadConsumer.isBlank(object)) {
                                     objValue = getValueFactory().createBNode(object);
                                     // Object is a Literal
-                                } else if (RdfQuadConsumer.isLiteral(object, datatype, language)) {
+                                } else if (RdfQuadConsumer.isLiteral(datatype, language, direction)) {
                                     if (RdfQuadConsumer.isLangString(datatype, language, direction)) {
                                         objValue = getValueFactory().createLiteral(object, language);
                                     } else if( datatype != null ){
@@ -88,9 +88,10 @@ public class JSONLDParser extends AbstractParser {
                                         objValue = getValueFactory().createLiteral(object);
                                     }
                                     // Object is a IRI
-                                } else {
+                                } else if(IRIUtils.isStandardIRI(object)) {
                                     objValue = getValueFactory().createIRI(object);
-                                }
+                                } else {
+                                throw new RdfConsumerException("Invalid object: " + object);
                             }
 
                             // Graph
@@ -98,18 +99,20 @@ public class JSONLDParser extends AbstractParser {
                             if(graph != null) {
                                 if (RdfQuadConsumer.isBlank(graph)) {
                                     graphResource = getValueFactory().createBNode(graph);
-                                } else if (!graph.equals(JSONLD_JAVA_DEFAULT_GRAPH)) {
+                                } else if (!graph.equals(JSONLD_JAVA_DEFAULT_GRAPH) && IRIUtils.isStandardIRI(graph)) {
                                     graphResource = getValueFactory().createIRI(graph);
+                                } else {
+                                    throw new ParsingErrorException("Invalid graph: " + graph);
                                 }
                             }
 
+                            Statement statement = null;
                             if(graphResource == null) {
-                                logger.debug("Adding triple: {} {} {}", subjResource.stringValue(), predicateIRI.stringValue(), objValue.stringValue());
-                                getModel().add(subjResource, predicateIRI, objValue);
+                                statement = getValueFactory().createStatement(subjResource, predicateIRI, objValue);
                             } else {
-                                logger.debug("Adding quad: {} {} {} {}", subjResource.stringValue(), predicateIRI.stringValue(), objValue.stringValue(), graphResource.stringValue());
-                                getModel().add(subjResource, predicateIRI, objValue, graphResource);
+                                statement = getValueFactory().createStatement(subjResource, predicateIRI, objValue, graphResource);
                             }
+                            getModel().add(statement);
 
                             return this;
                         }
