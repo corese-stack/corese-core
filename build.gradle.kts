@@ -64,7 +64,7 @@ dependencies {
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
 
     // === Core dependencies ===
-    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
+    api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:0.7.2")            // RDFa parser (Semargl)
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
 
