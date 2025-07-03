@@ -27,7 +27,7 @@ Add this dependency to your `pom.xml` file:
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-core</artifactId>
-    <version>4.6.3</version>
+    <version>4.6.4-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ Add this dependency to your `pom.xml` file:
 Include the following in your `build.gradle` file:
 
 ``` gradle
-implementation 'fr.inria.corese:corese-core:4.6.3'
+implementation 'fr.inria.corese:corese-core:4.6.4-SNAPSHOT'
 ```
 
 **JAR:**
