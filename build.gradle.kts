@@ -12,10 +12,10 @@ plugins {
 
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
-    id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
-    id("org.sonarqube") version "6.0.1.5171"                    // SonarQube integration
-    id("com.intershop.gradle.javacc") version "5.0.0"           // JavaCC plugin for parsing JavaCC files
-    id("antlr")
+    id("com.gradleup.shadow") version "8.3.7"
+    id("org.sonarqube") version "6.1.0.5360"                    // SonarQube integration
+    id("com.intershop.gradle.javacc") version "5.0.1"           // JavaCC plugin for parsing JavaCC files
+    id("antlr")                                                 // Antlr plugin for generating parsers from grammar files
 }
 
 // SonarQube configuration
@@ -65,7 +65,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-core"
-    const val version = "4.6.3"
+    const val version = "4.6.4"
 
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
@@ -88,9 +88,9 @@ object Meta {
 java {
     withJavadocJar()                             // Include Javadoc JAR in publications
     withSourcesJar()                             // Include sources JAR in publications
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(21))
+  }
 }
 
 /////////////////////////
@@ -104,64 +104,45 @@ repositories {
 }
 
 dependencies {
-    val jersey_version = "3.1.3"
-    val semargl_version = "0.7.1"
-    val antlr_version = "4.13.2"
-
     // === Logging ===
-    api("org.slf4j:slf4j-api:2.0.9")                                                   // Logging API only (SLF4J)
-    implementation("org.apache.logging.log4j:log4j-core:2.20.0")                       // Log4j2 core for internal logging
-    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0")                   // SLF4J binding for Log4j2 (runtime)
+    api("org.slf4j:slf4j-api:2.0.17")                                                  // Logging API only (SLF4J)
+    runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.0")                          // Log4j2 core for internal logging
+    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
 
-    // === Antlr
+    // === Core dependencies ===
+    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
+    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:0.7.2")            // RDFa parser (Semargl)
+    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
 
-    antlr("org.antlr:antlr4:$antlr_version")
-    //antlr("org.antlr:antlr4-runtime:$antlr_version")
+    // === Antlr dependencies ===
+    antlr("org.antlr:antlr4:4.13.2")                                                   // Antlr for parsing (ANTLR 4)
+    implementation("org.antlr:antlr4-runtime:4.13.2")                                  // Antlr runtime for parsing
+
 
     // === JSONLD
     implementation("com.apicatalog:titanium-json-ld:1.6.0")
     implementation("com.apicatalog:titanium-rdf-api:1.0.0")
-    implementation("jakarta.json:jakarta.json-api:2.1.3")
     implementation("org.eclipse.parsson:parsson:1.1.7")
-
-    // === Internal implementations ===
-    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // Exposed: RDF/XML parser
-    implementation("org.apache.commons:commons-text:1.10.0")                           // Used internally (text manipulation)
-    implementation("commons-lang:commons-lang:2.4")                                    // Used internally (basic utilities)
-    implementation("org.json:json:20240303")                                           // Used internally (JSON)
-    implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                        // Used internally (ShEx validation)
-    implementation("org.glassfish.jersey.core:jersey-client:$jersey_version")          // Internal HTTP client
-    implementation("org.glassfish.jersey.inject:jersey-hk2:$jersey_version")           // Internal Jersey injection
-    implementation("com.sun.activation:jakarta.activation:2.0.1")                      // Internal MIME handling
-    implementation("javax.xml.bind:jaxb-api:2.3.1")                                    // Internal XML binding
-    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:$semargl_version") // RDFa parsing
-    implementation("fr.inria.corese.org.semarglproject:semargl-core:$semargl_version") // RDF core parser
-    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // Internal JSON-LD parser
-    implementation("com.typesafe:config:1.4.3")                                        // Typesafe config
-    implementation("org.antlr:antlr4:$antlr_version")                                  // Antlr for grammar creation
-    implementation("org.antlr:antlr4-runtime:$antlr_version")
-    // === For tests ===
-    testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit 5 BOM for dependency management
-    testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit 5 for unit testing
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")               // JUnit 5 runtime for launching tests
+    implementation("jakarta.json:jakarta.json-api:2.1.3")
 
     // === HTTP and XML ===
-    implementation("org.glassfish.jersey.core:jersey-client:$jersey_version")          // HTTP client (Jersey)
-    implementation("org.glassfish.jersey.inject:jersey-hk2:$jersey_version")           // Dependency injection for Jersey
+    implementation("org.glassfish.jersey.core:jersey-client:3.1.10")                   // HTTP client (Jersey)
+    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")                    // Dependency injection for Jersey
     implementation("com.sun.activation:jakarta.activation:2.0.1")                      // MIME type handling (Jakarta Activation)
-    implementation("javax.xml.bind:jaxb-api:2.3.1")                                    // XML binding (JAXB)
 
-    // === For viewing logs during development (DO NOT include in production) ===
-    runtimeOnly("org.slf4j:slf4j-simple:2.0.9")                                        // Simple SLF4J implementation for logging
+    // === Utilities ===
+    implementation("org.apache.commons:commons-text:1.13.1")                           // Text manipulation utilities (Commons Text)
+    implementation("org.json:json:20250517")                                           // JSON processing
+    implementation("com.typesafe:config:1.4.3")                                        // Configuration library (Typesafe Config)
 
 
 
     // === Test dependencies ===
-    testImplementation(platform("org.junit:junit-bom:5.12.2"))                         // JUnit BOM for consistent test versions
-    testImplementation("org.junit.jupiter:junit-jupiter")                              // JUnit Jupiter API and engine
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")               // JUnit platform launcher (runtime)
-    testImplementation("org.mockito:mockito-core:5.5.0")                               // Mockito core for mocking in tests
-    testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")                      // Mockito integration with JUnit Jupiter
+    testImplementation(platform("org.junit:junit-bom:5.13.2"))                         // JUnit BOM for consistent test versions
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.2")                       // JUnit Jupiter API and engine
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.2")               // JUnit platform launcher (runtime)
+    testImplementation("org.mockito:mockito-core:5.18.0")                              // Mockito core for mocking in tests
+    testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")                     // Mockito integration with JUnit Jupiter
 }
 
 /////////////////////////
@@ -355,39 +336,34 @@ tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
 }
 
+// === Antlr generated sources configuration ===
 
-
+// Path where Antlr will generate sources
 val generatedSourcesPath = "src/main/generated"
+
+// Add the generated sources directory to the main source set
 sourceSets["main"].java.srcDir(file(generatedSourcesPath))
 
+// Configure the Antlr task to generate parser code with specific arguments
 tasks.named<AntlrTask>("generateGrammarSource") {
-    arguments.addAll(listOf("-visitor", "-long-messages","-package", "fr.inria.corese.core.next.impl.parser.antlr"))
+    arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.impl.parser.antlr"))
     outputDirectory = file("$buildDir/generated-src/antlr/main")
     outputs.dirs(outputDirectory)
 }
 
-/*
-val copyAntlrGenerated = tasks.register<Copy>("copyAntlrGenerated") {
-    dependsOn("generateGrammarSource")
-    from("$buildDir/generated-src/antlr/main")
-    into("$generatedSourcesPath/antlr/parser")
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    outputs.dir("$generatedSourcesPath/antlr/parser")
-}
- */
-
-
+// Ensure Java compilation depends on Antlr code generation
 tasks.named("compileJava") {
     dependsOn("generateGrammarSource" /*, "copyAntlrGenerated" */)
 }
 
+// Ensure sources JAR includes generated sources and depends on Antlr code generation
 tasks.named<Jar>("sourcesJar") {
-    dependsOn("generateGrammarSource"/*, "copyAntlrGenerated" */)
+    dependsOn("generateGrammarSource" /*, "copyAntlrGenerated" */)
     from(generatedSourcesPath)
     includeEmptyDirs = false
 }
 
-
+// Clean up generated sources on clean
 tasks.clean {
     doLast {
         file(generatedSourcesPath).deleteRecursively()
