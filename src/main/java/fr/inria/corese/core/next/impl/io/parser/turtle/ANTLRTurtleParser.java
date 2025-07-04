@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.parser.RDFParser;
+import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.base.parser.RDFFormat;
-import fr.inria.corese.core.next.api.base.parser.RDFFormats;
+import fr.inria.corese.core.next.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
 
@@ -20,20 +20,31 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-public class ANTLRTurtleParser implements RDFParser {
-
-    private final Model model;
-    private final RDFFormat format = RDFFormats.TURTLE;
-    private final ValueFactory factory;
+public class ANTLRTurtleParser extends AbstractRDFParser {
 
     public ANTLRTurtleParser(Model model, ValueFactory factory) {
-        this.model = model;
-        this.factory = factory;
+        super(model, factory);
     }
 
     @Override
-    public RDFFormat getRDFFormat() {
-        return format;
+    public RdfFormat getRDFFormat() {
+        return RdfFormat.TURTLE;
+    }
+
+    /**
+     * @param config we are not using any config in this parser implementation
+     */
+    @Override
+    public void setConfig(RDFParserOptions config) {
+        // nothing to do
+    }
+
+    /**
+     * @return null, we are not using any config in this parser implementation
+     */
+    @Override
+    public RDFParserOptions getConfig() {
+        return null;
     }
 
     @Override
@@ -66,7 +77,7 @@ public class ANTLRTurtleParser implements RDFParser {
             TurtleParser parser = new TurtleParser(tokens);
             ParseTreeWalker walker = new ParseTreeWalker();
             ParseTree tree = parser.turtleDoc();
-            TurtleListenerImpl listener = new TurtleListenerImpl(model, baseURI, factory);
+            TurtleListenerImpl listener = new TurtleListenerImpl(getModel(), baseURI, getValueFactory());
 
             walker.walk((ParseTreeListener) listener, tree);
 

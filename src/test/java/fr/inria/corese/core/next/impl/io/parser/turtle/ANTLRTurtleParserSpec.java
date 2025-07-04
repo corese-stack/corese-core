@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.parser.RDFParser;
+import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;

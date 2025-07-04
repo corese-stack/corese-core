@@ -5,6 +5,7 @@ import com.apicatalog.jsonld.serialization.RdfToJsonld;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.TitaniumJSONLDProcessorOptions;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -16,15 +17,15 @@ import java.util.Objects;
 public class JSONLDSerializer implements FormatSerializer {
 
     private Model model;
-    private JSONLDSerializerConfig config;
+    private TitaniumJSONLDProcessorOptions config;
 
-    public JSONLDSerializer(Model model, JSONLDSerializerConfig config) {
+    public JSONLDSerializer(Model model, TitaniumJSONLDProcessorOptions config) {
         this.model = Objects.requireNonNull(model);
         this.config = Objects.requireNonNull(config);
     }
 
     public JSONLDSerializer(Model model) {
-        this(model, new JSONLDSerializerConfig());
+        this(model, new TitaniumJSONLDProcessorOptions.Builder().build());
     }
 
     @Override
@@ -33,9 +34,9 @@ public class JSONLDSerializer implements FormatSerializer {
         try {
             RdfToJsonld builder = RdfToJsonld.with(adapter)
                 .ordered(this.config.isOrdered())
-                .processingMode(this.config.getVersion())
-                .useNativeTypes(this.config.usesNativeTypes())
-                .useRdfType(this.config.usesRdfType());
+                .processingMode(this.config.getProcessingMode())
+                .useNativeTypes(this.config.isUseNativeTypes())
+                .useRdfType(this.config.isUseRdfType());
             jakarta.json.JsonArray jsonArray = builder.build();
             writer.write(jsonArray.toString());
         } catch (JsonLdError | IOException e) {

@@ -1,4 +1,4 @@
 package fr.inria.corese.core.next.api.io;
 
-public interface IOConfig {
+public interface IOOptions {
 }

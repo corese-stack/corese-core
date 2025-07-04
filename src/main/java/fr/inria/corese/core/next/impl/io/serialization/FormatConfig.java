@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization;
 
-import fr.inria.corese.core.next.api.io.IOConfig;
+import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
+import fr.inria.corese.core.next.api.io.serialization.BlankNodePrefixOptions;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesFormat;
 
 import java.util.Objects;
@@ -9,7 +10,7 @@ import java.util.Objects;
  * Configuration options for the {@link NTriplesFormat} serializer.
  * Use {@link FormatConfig # Builder} to create instances.
  */
-public class FormatConfig implements IOConfig {
+public class FormatConfig extends AbstractIOOptions implements BlankNodePrefixOptions {
 
     private final String blankNodePrefix;
 
@@ -29,6 +30,7 @@ public class FormatConfig implements IOConfig {
      *
      * @return The blank node prefix.
      */
+    @Override
     public String getBlankNodePrefix() {
         return blankNodePrefix;
     }
@@ -36,7 +38,7 @@ public class FormatConfig implements IOConfig {
     /**
      * Builder class for {@link FormatConfig}.
      */
-    public static class Builder {
+    public static class Builder extends AbstractIOOptions.Builder<FormatConfig> {
 
         private String blankNodePrefix = "_:";
 
@@ -45,7 +47,7 @@ public class FormatConfig implements IOConfig {
          * Initializes fields with default values.
          */
         public Builder() {
-
+           super();
         }
 
         /**
