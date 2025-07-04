@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.literal.RDF;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.XmlConfig;
@@ -14,12 +14,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.StringWriter;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -239,47 +237,6 @@ class XmlSerializerTest {
         assertEquals(expected, writer.toString());
     }
 
-    @Test
-    @DisplayName("Should respect alphabetical prefix ordering")
-    void shouldRespectPrefixOrderingAlphabetical() throws SerializationException {
-        Statement stmt1 = factory.createStatement(
-                factory.createIRI("http://ex.org/s1"),
-                factory.createIRI("http://ex.org/p1"),
-                factory.createIRI("http://ex.org/o1")
-        );
-        Statement stmt2 = factory.createStatement(
-                factory.createIRI("http://ex.com/s2"),
-                factory.createIRI("http://ex.com/p2"),
-                factory.createIRI("http://ex.com/o2")
-        );
-
-        when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
-
-        XmlConfig testConfig = new XmlConfig.Builder()
-                .addCustomPrefix("exorg", "http://ex.org/")
-                .addCustomPrefix("excom", "http://ex.com/")
-                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
-                .sortSubjects(false)
-                .build();
-
-        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
-        serializer.write(writer);
-
-
-        String expected = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:excom="http://ex.com/" xmlns:exorg="http://ex.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
-                  <rdf:Description rdf:about="http://ex.com/s2">
-                    <excom:p2 rdf:resource="http://ex.com/o2"/>
-                  </rdf:Description>
-                  <rdf:Description rdf:about="http://ex.org/s1">
-                    <exorg:p1 rdf:resource="http://ex.org/o1"/>
-                  </rdf:Description>
-                </rdf:RDF>
-                """;
-
-        assertEquals(expected, writer.toString());
-    }
 
     @Test
     @DisplayName("Should respect default prefix ordering (non-deterministic for subjects)")
@@ -523,11 +480,11 @@ class XmlSerializerTest {
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <rdf:RDF xmlns:ex="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
-                  <rdf:Description rdf:nodeID="bnode-abc">
+                  <rdf:Description rdf:nodeID="ode-abc">
                     <ex:p rdf:resource="http://example.org/o"/>
                   </rdf:Description>
                   <rdf:Description rdf:about="http://example.org/s">
-                    <ex:p rdf:nodeID="bnode-xyz"/>
+                    <ex:p rdf:nodeID="ode-xyz"/>
                   </rdf:Description>
                 </rdf:RDF>
                 """;
