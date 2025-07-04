@@ -1,8 +1,11 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.serialization.base.AbstractGraphSerializer;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.TriGConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 
 import java.io.IOException;
@@ -35,24 +38,26 @@ public class TriGSerializer extends AbstractGraphSerializer {
 
     /**
      * Constructs a new {@code TriGSerializer} instance with the specified model and default configuration.
-     * The default configuration is returned by {@link SerializerConfig#trigConfig()}.
+     * The default configuration is returned by {@link TriGConfig#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public TriGSerializer(Model model) {
-        this(model, SerializerConfig.trigConfig());
+        this(model, TriGConfig.defaultConfig());
     }
 
     /**
      * Constructs a new {@code TriGSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link SerializationConfig} to use for serialization. Must not be null.
+     * @param config the {@link TriGConfig} to use for serialization. Must not be null.
+     *               This config object should be an instance of {@code TriGConfig} or a subclass thereof.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public TriGSerializer(Model model, SerializationConfig config) {
+    public TriGSerializer(Model model, TriGConfig config) {
         super(model, config);
+        Objects.requireNonNull(config, "TriGConfig cannot be null");
     }
 
     /**
@@ -66,6 +71,21 @@ public class TriGSerializer extends AbstractGraphSerializer {
     }
 
     /**
+     * Helper method to safely cast the generic config to TriGConfig.
+     * This should be called before accessing any methods specific to TriGConfig.
+     *
+     * @return The config cast to TriGConfig.
+     * @throws IllegalStateException if the config is not an instance of TriGConfig.
+     */
+    private TriGConfig getTriGConfig() {
+        if (!(config instanceof TriGConfig)) {
+            throw new IllegalStateException("Current serializer configuration is not an instance of TriGConfig. " +
+                    "TriGSerializer requires a TriGConfig instance.");
+        }
+        return (TriGConfig) config;
+    }
+
+    /**
      * Implements the main statement writing logic for the TriG format.
      * Handles the serialization of named graphs.
      *
@@ -74,9 +94,11 @@ public class TriGSerializer extends AbstractGraphSerializer {
      */
     @Override
     protected void doWriteStatements(Writer writer) throws IOException {
-        if (config.includeContext()) {
+        TriGConfig trigConfig = getTriGConfig();
+
+        if (trigConfig.includeContext()) {
             writeStatementsWithContext(writer);
-        } else if (config.useCompactTriples() && config.groupBySubject()) {
+        } else if (trigConfig.useCompactTriples() && trigConfig.groupBySubject()) {
             writeOptimizedStatements(writer);
         } else {
             writeSimpleStatements(writer);
@@ -92,6 +114,8 @@ public class TriGSerializer extends AbstractGraphSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeStatementsWithContext(Writer writer) throws IOException {
+        TriGConfig trigConfig = getTriGConfig();
+
         Map<Resource, List<Statement>> byContext = new LinkedHashMap<>();
         model.stream()
                 .filter(stmt -> !isConsumed(stmt.getSubject()))
@@ -102,7 +126,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
             List<Statement> statementsInContext = contextEntry.getValue();
 
             String initialIndent = "";
-            String graphIndent = config.prettyPrint() ? config.getIndent() : "";
+            String graphIndent = trigConfig.prettyPrint() ? trigConfig.getIndent() : "";
 
             if (context != null) {
                 if (context.isIRI()) {
@@ -112,11 +136,11 @@ public class TriGSerializer extends AbstractGraphSerializer {
                 }
                 writer.write(SerializationConstants.SPACE);
                 writer.write(SerializationConstants.OPEN_BRACE);
-                writer.write(config.getLineEnding());
+                writer.write(trigConfig.getLineEnding());
                 initialIndent = graphIndent;
             }
 
-            Map<Resource, List<Statement>> bySubject = config.sortSubjects() ?
+            Map<Resource, List<Statement>> bySubject = trigConfig.sortSubjects() ?
                     new TreeMap<>(Comparator.comparing(Resource::stringValue)) :
                     new LinkedHashMap<>();
 
@@ -127,7 +151,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
                 writeValue(writer, subjectEntry.getKey());
                 writer.write(SerializationConstants.SPACE);
 
-                Map<IRI, List<Statement>> byPredicate = config.sortPredicates() ?
+                Map<IRI, List<Statement>> byPredicate = trigConfig.sortPredicates() ?
                         new TreeMap<>(Comparator.comparing(IRI::stringValue)) :
                         new LinkedHashMap<>();
 
@@ -137,8 +161,8 @@ public class TriGSerializer extends AbstractGraphSerializer {
                 for (Map.Entry<IRI, List<Statement>> predicateEntry : byPredicate.entrySet()) {
                     if (!firstPredicate) {
                         writer.write(SerializationConstants.SEMICOLON);
-                        if (config.prettyPrint()) {
-                            writer.write(config.getLineEnding() + initialIndent + config.getIndent());
+                        if (trigConfig.prettyPrint()) {
+                            writer.write(trigConfig.getLineEnding() + initialIndent + trigConfig.getIndent());
                         } else {
                             writer.write(SerializationConstants.SPACE);
                         }
@@ -152,8 +176,8 @@ public class TriGSerializer extends AbstractGraphSerializer {
                     for (Statement stmt : predicateEntry.getValue()) {
                         if (!firstObject) {
                             writer.write(SerializationConstants.COMMA);
-                            if (config.prettyPrint()) {
-                                writer.write(config.getLineEnding() + initialIndent + config.getIndent() + config.getIndent());
+                            if (trigConfig.prettyPrint()) {
+                                writer.write(trigConfig.getLineEnding() + initialIndent + trigConfig.getIndent() + trigConfig.getIndent());
                             } else {
                                 writer.write(SerializationConstants.SPACE);
                             }
@@ -163,16 +187,16 @@ public class TriGSerializer extends AbstractGraphSerializer {
                     }
                 }
                 writer.write(SerializationConstants.SPACE + SerializationConstants.POINT);
-                writer.write(config.getLineEnding());
+                writer.write(trigConfig.getLineEnding());
             }
 
             if (context != null) {
                 writer.write(SerializationConstants.CLOSE_BRACE);
                 writer.write(SerializationConstants.SPACE);
                 writer.write(SerializationConstants.POINT);
-                writer.write(config.getLineEnding());
+                writer.write(trigConfig.getLineEnding());
             }
-            writer.write(config.getLineEnding());
+            writer.write(trigConfig.getLineEnding());
         }
     }
 

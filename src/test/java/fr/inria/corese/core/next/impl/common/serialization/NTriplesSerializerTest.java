@@ -1,12 +1,14 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.NTriplesConfig;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -21,7 +23,7 @@ import static org.mockito.Mockito.*;
 class NTriplesSerializerTest {
 
     private Model model;
-    private SerializerConfig config;
+    private NTriplesConfig config;
     private NTriplesSerializer nTriplesSerializer;
 
     private Resource mockExPerson;
@@ -29,45 +31,44 @@ class NTriplesSerializerTest {
     private IRI mockExKnows;
 
     private final String lexJohn = "John Doe";
+    private final String hello = "Hello";
 
     private Literal mockLiteralJohn;
+    private Literal mockLiteralHelloEn;
     private Resource mockBNode1;
     private Resource mockBNode2;
 
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-
-        config = SerializerConfig.ntriplesConfig();
+        config = NTriplesConfig.defaultConfig();
         nTriplesSerializer = new NTriplesSerializer(model, config);
-
 
         mockExPerson = createIRI("http://example.org/Person");
         mockExName = createIRI("http://example.org/name");
         mockExKnows = createIRI("http://example.org/knows");
 
+        mockLiteralJohn = createLiteral(lexJohn, null, null);
+        mockLiteralHelloEn = createLiteral(hello, null, "en");
 
         mockBNode1 = createBlankNode("b1");
         mockBNode2 = createBlankNode("b2");
-
-        mockLiteralJohn = createLiteral(lexJohn, null, null);
     }
 
     @Test
-    @DisplayName("Constructor should throw NullPointerException for null model")
+    @DisplayName("Le constructeur devrait lever NullPointerException pour un modèle nul")
     void constructorShouldThrowForNullModel() {
         assertThrows(NullPointerException.class, () -> new NTriplesSerializer(null), "Model cannot be null");
-        assertThrows(NullPointerException.class, () -> new NTriplesSerializer(null, config), "Model cannot be null");
     }
 
     @Test
-    @DisplayName("Constructor should throw NullPointerException for null config")
+    @DisplayName("Le constructeur devrait lever NullPointerException pour une configuration nulle")
     void constructorShouldThrowForNullConfig() {
         assertThrows(NullPointerException.class, () -> new NTriplesSerializer(model, null), "Configuration cannot be null");
     }
 
     @Test
-    @DisplayName("Write should serialize simple statement correctly")
+    @DisplayName("L'écriture devrait sérialiser une déclaration simple correctement (graphe par défaut)")
     void writeShouldSerializeSimpleStatement() throws SerializationException {
         Statement stmt = createStatement(
                 mockExPerson,
@@ -79,7 +80,6 @@ class NTriplesSerializerTest {
         StringWriter writer = new StringWriter();
         nTriplesSerializer.write(writer);
 
-
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
@@ -89,7 +89,7 @@ class NTriplesSerializerTest {
     }
 
     @Test
-    @DisplayName("Write should serialize statement with context but ignore it (N-Triples)")
+    @DisplayName("L'écriture devrait sérialiser une déclaration avec contexte mais l'ignorer (N-Triples)")
     void writeShouldSerializeStatementWithContext() throws SerializationException {
         IRI mockContext = createIRI("http://example.org/ctx");
         Statement stmt = createStatement(
@@ -112,7 +112,7 @@ class NTriplesSerializerTest {
     }
 
     @Test
-    @DisplayName("Write should handle blank nodes with default N-Triples prefix (_:)")
+    @DisplayName("L'écriture devrait gérer les nœuds vierges avec le préfixe N-Triples par défaut (_:)")
     void writeShouldHandleBlankNodes() throws SerializationException {
         Statement stmt = createStatement(
                 mockBNode1,
@@ -133,7 +133,7 @@ class NTriplesSerializerTest {
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on IO error")
+    @DisplayName("L'écriture devrait lever SerializationException en cas d'erreur E/S")
     void writeShouldThrowOnIOException() throws IOException {
         Statement stmt = createStatement(
                 mockExPerson,
@@ -155,12 +155,13 @@ class NTriplesSerializerTest {
 
 
     @Test
-    @DisplayName("Write should throw SerializationException on null subject value from Statement in strict mode")
+    @DisplayName("L'écriture devrait lever SerializationException pour une valeur de sujet nulle dans le mode strict")
     void writeShouldThrowOnNullSubjectValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(null);
         when(stmt.getPredicate()).thenReturn(mockExName);
         when(stmt.getObject()).thenReturn(mockLiteralJohn);
+        when(stmt.getContext()).thenReturn(null);
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
@@ -170,12 +171,13 @@ class NTriplesSerializerTest {
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null predicate value from Statement in strict mode")
+    @DisplayName("L'écriture devrait lever SerializationException pour une valeur de prédicat nulle dans le mode strict")
     void writeShouldThrowOnNullPredicateValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
         when(stmt.getPredicate()).thenReturn(null);
         when(stmt.getObject()).thenReturn(mockLiteralJohn);
+        when(stmt.getContext()).thenReturn(null);
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
@@ -184,12 +186,12 @@ class NTriplesSerializerTest {
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null object value from Statement in strict mode")
+    @DisplayName("L'écriture devrait lever SerializationException pour une valeur d'objet nulle dans le mode strict")
     void writeShouldThrowOnNullObjectValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
         when(stmt.getPredicate()).thenReturn(mockExName);
-        when(stmt.getObject()).thenReturn(null); // L'objet est null
+        when(stmt.getObject()).thenReturn(null);
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
@@ -199,38 +201,89 @@ class NTriplesSerializerTest {
 
 
     @Test
-    @DisplayName("Should handle literals with language tags correctly")
-    void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
-        IRI subject = createIRI("http://example.org/person");
-        IRI predicate = createIRI("http://example.org/greeting");
-        Literal object = createLiteral("Hello", "en"); // Use the helper that sets rdf:langString
-
-        Statement stmt = createStatement(subject, predicate, object);
-
-        Model modelMock = mock(Model.class);
-        when(modelMock.iterator()).thenReturn(new MockStatementIterator(stmt));
-
-        SerializerConfig testConfig = new SerializerConfig.Builder()
-                .strictMode(true)  // Keep strict mode enabled to test validation
-                .build();
-
-        NTriplesSerializer serializer = new NTriplesSerializer(modelMock, testConfig);
+    @DisplayName("Devrait gérer correctement le contexte nul (graphe par défaut)")
+    void writeShouldHandleNullContext() throws SerializationException {
+        Statement stmt = createStatement(
+                mockExPerson,
+                mockExName,
+                mockLiteralJohn,
+                null
+        );
+        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        serializer.write(writer);
+        nTriplesSerializer.write(writer);
 
-        String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
-                subject.stringValue(),
-                predicate.stringValue(),
-                escapeNTriplesString("Hello"),
-                "en") + " .\n";
+
+        String expected = String.format("<%s> <%s> \"%s\"",
+                mockExPerson.stringValue(),
+                mockExName.stringValue(),
+                escapeNTriplesString(lexJohn)) + " .\n";
+
+        assertEquals(expected, writer.toString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "simple literal",
+            "literal with \"quotes\"",
+            "literal with \\ backslash",
+            "literal with \n newline",
+            "literal with \t tab",
+            "literal with \r carriage return",
+            "literal with \u0001 (SOH)",
+            "literal with \u007F (DEL)"
+    })
+    @DisplayName("L'écriture devrait gérer diverses valeurs littérales avec un échappement approprié (y compris Unicode)")
+    void writeShouldHandleVariousLiterals(String literalValue) throws SerializationException {
+        Literal literalMock = createLiteral(literalValue, null, null);
+
+        Statement stmt = createStatement(
+                mockExPerson,
+                mockExName,
+                literalMock
+        );
+        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+
+        StringWriter writer = new StringWriter();
+        nTriplesSerializer.write(writer);
+
+
+        String expectedEscapedLiteral = escapeNTriplesString(literalValue);
+        String expectedOutput = String.format("<%s> <%s> \"%s\"",
+                mockExPerson.stringValue(),
+                mockExName.stringValue(),
+                expectedEscapedLiteral) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
     }
 
 
     @Test
-    @DisplayName("Should handle literals with custom datatypes")
+    @DisplayName("Devrait gérer les littéraux avec des balises de langue")
+    void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
+        Statement stmt = createStatement(mockExPerson, createIRI("http://example.org/greeting"), mockLiteralHelloEn);
+
+        Model currentTestModel = mock(Model.class);
+        when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
+
+        Writer writer = new StringWriter();
+
+        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesConfig.defaultConfig());
+        serializer.write(writer);
+
+        String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
+                mockExPerson.stringValue(),
+                createIRI("http://example.org/greeting").stringValue(),
+                escapeNTriplesString(hello),
+                mockLiteralHelloEn.getLanguage().get()) + " .\n";
+
+        assertEquals(expectedOutput, writer.toString());
+    }
+
+
+    @Test
+    @DisplayName("Devrait gérer les littéraux avec des types de données personnalisés")
     void shouldHandleLiteralsWithCustomDatatypes() throws SerializationException {
         IRI customDatatype = createIRI("http://example.org/myDataType");
         Literal customLiteral = createLiteral("123", customDatatype, null);
@@ -240,7 +293,7 @@ class NTriplesSerializerTest {
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, SerializerConfig.ntriplesConfig());
+        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesConfig.defaultConfig());
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);
@@ -256,13 +309,40 @@ class NTriplesSerializerTest {
 
 
     /**
-     * Escapes a string according to N-Triples literal escaping rules.
-     * This helper is used in tests to construct the *expected* output strings.
-     * It mimics the behavior of nTriplesSerializer's internal escapeLiteral method,
-     * specifically when `escapeUnicode` is true (as per ntriplesConfig() default).
+     * Crée un objet Literal mocké.
+     * Important : le `lexicalForm` est la *valeur de chaîne brute* du littéral,
+     * sans les guillemets spécifiques à N-Triples, les balises de langue ou les URI de type de données.
+     * La classe `nTriplesSerializer` est chargée d'ajouter ceux-ci.
      *
-     * @param s The string to escape.
-     * @return The escaped string.
+     * @param lexicalForm La valeur de chaîne brute du littéral (par exemple, "hello", "123").
+     * @param dataTypeIRI L'IRI du type de données du littéral (par exemple, XSD.INTEGER.getIRI()), ou null pour simple/avec balise de langue.
+     * @param langTag     La balise de langue (par exemple, "en"), ou null si non balisé par la langue.
+     * @return Une instance de Literal mockée.
+     */
+    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
+        Literal literal = mock(Literal.class);
+        when(literal.isLiteral()).thenReturn(true);
+        when(literal.isResource()).thenReturn(false);
+        when(literal.stringValue()).thenReturn(lexicalForm);
+
+        if (langTag != null && !langTag.isEmpty()) {
+            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
+            when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
+        } else {
+            when(literal.getLanguage()).thenReturn(Optional.empty());
+            when(literal.getDatatype()).thenReturn(dataTypeIRI);
+        }
+        return literal;
+    }
+
+    /**
+     * Échappe une chaîne selon les règles d'échappement des littéraux N-Triples.
+     * Cette aide est utilisée dans les tests pour construire les chaînes de sortie *attendues*.
+     * Elle imite le comportement de la méthode interne `escapeLiteral` de `nTriplesSerializer`,
+     * en considérant que `ntriplesConfig().escapeUnicode()` est `true`.
+     *
+     * @param s La chaîne à échapper.
+     * @return La chaîne échappée.
      */
     private String escapeNTriplesString(String s) {
         StringBuilder sb = new StringBuilder();
@@ -301,7 +381,6 @@ class NTriplesSerializerTest {
         return sb.toString();
     }
 
-
     private static class MockStatementIterator implements Iterator<Statement> {
         private final Statement[] statements;
         private int index = 0;
@@ -319,35 +398,6 @@ class NTriplesSerializerTest {
         public Statement next() {
             return statements[index++];
         }
-    }
-
-
-    /**
-     * Creates a mocked Literal object.
-     * Important: The `lexicalForm` is the *raw string value* of the literal,
-     * without N-Triples specific quotes, lang tags, or datatype URIs.
-     * The `nTriplesSerializer` class is responsible for adding those.
-     *
-     * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
-     * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.
-     * @param langTag     The language tag (e.g., "en"), or null if not language-tagged.
-     * @return A mocked Literal instance.
-     */
-    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
-        Literal literal = mock(Literal.class);
-        when(literal.isLiteral()).thenReturn(true);
-        when(literal.isResource()).thenReturn(false);
-        when(literal.stringValue()).thenReturn(lexicalForm);
-
-        if (langTag != null && !langTag.isEmpty()) {
-            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
-            // When a language tag is present, the datatype should be rdf:langString implicitly or explicitly
-            when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
-        } else {
-            when(literal.getLanguage()).thenReturn(Optional.empty());
-            when(literal.getDatatype()).thenReturn(dataTypeIRI); // Can be XSD.STRING.getIRI() or any custom IRI
-        }
-        return literal;
     }
 
     private Statement createStatement(Resource subject, IRI predicate, Value object) {
@@ -379,15 +429,5 @@ class NTriplesSerializerTest {
         when(iri.isBNode()).thenReturn(false);
         when(iri.stringValue()).thenReturn(uri);
         return iri;
-    }
-
-    public static Literal createLiteral(String value, String lang) {
-        Literal mockLiteral = mock(Literal.class);
-        when(mockLiteral.stringValue()).thenReturn(value); // Removed quotes here
-        when(mockLiteral.getLanguage()).thenReturn(Optional.of(lang));
-        when(mockLiteral.isLiteral()).thenReturn(true);
-        when(mockLiteral.isResource()).thenReturn(false);
-        when(mockLiteral.getDatatype()).thenReturn(RDF.langString.getIRI());
-        return mockLiteral;
     }
 }

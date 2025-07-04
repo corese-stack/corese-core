@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
+import fr.inria.corese.core.next.impl.common.serialization.config.XmlConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class XmlSerializer implements RdfSerializer {
     private static final Logger logger = LoggerFactory.getLogger(XmlSerializer.class);
 
     private final Model model;
-    private final SerializerConfig config;
+    private final XmlConfig config;
     private final Map<String, String> iriToPrefixMapping;
     private final Map<String, String> prefixToIriMapping;
     private final Map<Resource, String> blankNodeIds;
@@ -46,25 +46,25 @@ public class XmlSerializer implements RdfSerializer {
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and default configuration.
-     * The default configuration is returned by {@link SerializerConfig#rdfXmlConfig()}.
+     * The default configuration is obtained from {@link XmlConfig#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public XmlSerializer(Model model) {
-        this(model, SerializerConfig.rdfXmlConfig());
+        this(model, XmlConfig.defaultConfig());
     }
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link SerializationConfig} to use for serialization. Must not be null.
+     * @param config the {@link XmlConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public XmlSerializer(Model model, SerializationConfig config) {
+    public XmlSerializer(Model model, XmlConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
-        this.config = (SerializerConfig) Objects.requireNonNull(config, "Configuration cannot be null");
+        this.config = Objects.requireNonNull(config, "Configuration cannot be null");
         this.iriToPrefixMapping = new HashMap<>();
         this.prefixToIriMapping = new HashMap<>();
         this.blankNodeIds = new HashMap<>();
@@ -73,12 +73,12 @@ public class XmlSerializer implements RdfSerializer {
 
     /**
      * Initializes prefix mappings by adding custom prefixes from the configuration.
-     * The custom prefixes map in SerializerConfig is expected to be {namespaceURI: prefix}.
+     * The custom prefixes map in XmlConfig is expected to be {prefix: namespaceURI}.
      */
     private void initializePrefixes() {
         if (config.usePrefixes()) {
             for (Map.Entry<String, String> entry : config.getCustomPrefixes().entrySet()) {
-                addPrefixMapping(entry.getKey(), entry.getValue());
+                addPrefixMapping(entry.getValue(), entry.getKey());
             }
         }
     }
@@ -376,7 +376,13 @@ public class XmlSerializer implements RdfSerializer {
                 writer.write(">");
             }
 
-            writer.write(escapeXmlContent(literal.stringValue()));
+            if (config.useMultilineLiterals() && (literal.stringValue().contains(SerializationConstants.LINE_FEED) || literal.stringValue().contains(SerializationConstants.CARRIAGE_RETURN))) {
+
+                writer.write(escapeXmlContent(literal.stringValue()));
+            } else {
+                writer.write(escapeXmlContent(literal.stringValue()));
+            }
+
             writer.write(String.format("</%s>", elementName));
             writer.write(config.getLineEnding());
         } else {

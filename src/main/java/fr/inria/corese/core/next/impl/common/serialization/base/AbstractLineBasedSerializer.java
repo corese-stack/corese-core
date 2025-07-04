@@ -2,7 +2,8 @@ package fr.inria.corese.core.next.impl.common.serialization.base;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
+// Changed import from SerializerConfig to AbstractSerializerConfig
+import fr.inria.corese.core.next.impl.common.serialization.config.AbstractSerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
@@ -30,16 +31,16 @@ public abstract class AbstractLineBasedSerializer implements RdfSerializer {
     private static final Logger logger = LoggerFactory.getLogger(AbstractLineBasedSerializer.class);
 
     protected final Model model;
-    protected final SerializerConfig config;
+    protected final AbstractSerializerConfig config;
 
     /**
      * Constructs a new line-based serializer.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link SerializerConfig} to use for serialization. Must not be null.
+     * @param config the {@link AbstractSerializerConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or config is null.
      */
-    protected AbstractLineBasedSerializer(Model model, SerializerConfig config) {
+    protected AbstractLineBasedSerializer(Model model, AbstractSerializerConfig config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
     }
@@ -335,7 +336,7 @@ public abstract class AbstractLineBasedSerializer implements RdfSerializer {
      *
      * @param literal The {@link Literal} to validate.
      * @throws IllegalArgumentException if the literal is invalid (e.g., language tag with wrong datatype,
-     *                                  or rdf:langString literal missing a language tag).
+     * or rdf:langString literal missing a language tag).
      */
     protected void validateLiteral(Literal literal) {
         IRI datatype = literal.getDatatype();

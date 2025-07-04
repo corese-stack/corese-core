@@ -2,13 +2,15 @@ package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.serialization.base.AbstractGraphSerializer;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.TurtleConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.AbstractTFamilyConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
 
 /**
  * Serializes a {@link Model} to Turtle format with comprehensive syntax support.
@@ -37,24 +39,25 @@ public class TurtleSerializer extends AbstractGraphSerializer {
 
     /**
      * Constructs a new {@code TurtleSerializer} instance with the specified model and default configuration.
-     * The default configuration is returned by {@link SerializerConfig#turtleConfig()}.
+     * The default configuration is returned by {@link TurtleConfig#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public TurtleSerializer(Model model) {
-        this(model, SerializerConfig.turtleConfig());
+        this(model, TurtleConfig.defaultConfig());
     }
 
     /**
      * Constructs a new {@code TurtleSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link SerializationConfig} to use for serialization. Must not be null.
+     * @param config the {@link TurtleConfig} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public TurtleSerializer(Model model, SerializationConfig config) {
+    public TurtleSerializer(Model model, TurtleConfig config) {
         super(model, config);
+        Objects.requireNonNull(config, "TurtleConfig cannot be null");
     }
 
     /**
@@ -77,7 +80,9 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      */
     @Override
     protected void doWriteStatements(Writer writer) throws IOException {
-        if (config.useCompactTriples() && config.groupBySubject()) {
+        AbstractTFamilyConfig tFamilyConfig = (AbstractTFamilyConfig) config;
+
+        if (tFamilyConfig.useCompactTriples() && tFamilyConfig.groupBySubject()) {
             writeOptimizedStatements(writer);
         } else {
             writeSimpleStatements(writer);

@@ -1,14 +1,17 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.serialization.base.AbstractLineBasedSerializer;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.NQuadsConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
 
 /**
  * Serializes a Corese {@link Model} into N-Quads format.
@@ -24,24 +27,26 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
 
     /**
      * Constructs a new {@code NQuadsSerializer} instance with the specified model and default N-Quads configuration.
-     * The default configuration is obtained from {@link SerializerConfig#nquadsConfig()}.
+     * The default configuration is obtained from {@link NQuadsConfig#defaultConfig()}.
      *
      * @param model the {@link Model} to be serialized. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public NQuadsSerializer(Model model) {
-        this(model, SerializerConfig.nquadsConfig());
+        this(model, NQuadsConfig.defaultConfig());
     }
 
     /**
      * Constructs a new {@code NQuadsSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link SerializationConfig} to use for serialization. Must not be null.
+     * @param config the {@link NQuadsConfig} to use for serialization. Must not be null.
+     *               This config object should be an instance of {@code NQuadsConfig} or a subclass thereof.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NQuadsSerializer(Model model, SerializationConfig config) {
-        super(model, (SerializerConfig) config);
+    public NQuadsSerializer(Model model, NQuadsConfig config) {
+        super(model, config);
+        Objects.requireNonNull(config, "NQuadsConfig cannot be null");
     }
 
     /**

@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
+import fr.inria.corese.core.next.impl.common.serialization.config.XmlConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,14 +13,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the XmlSerializer class.
@@ -29,8 +28,7 @@ class XmlSerializerTest {
 
     @Mock
     private Model mockModel;
-    @Mock
-    private SerializerConfig mockConfig;
+    XmlConfig mockConfig;
     @Mock
     private Resource mockResource;
     @Mock
@@ -47,17 +45,8 @@ class XmlSerializerTest {
         MockitoAnnotations.openMocks(this);
         writer = new StringWriter();
 
+        mockConfig = XmlConfig.defaultConfig();
 
-        when(mockConfig.getIndent()).thenReturn("  ");
-        when(mockConfig.getLineEnding()).thenReturn("\n");
-        when(mockConfig.usePrefixes()).thenReturn(true);
-        when(mockConfig.autoDeclarePrefixes()).thenReturn(true);
-        when(mockConfig.getCustomPrefixes()).thenReturn(new HashMap<>());
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.CUSTOM);
-        when(mockConfig.sortSubjects()).thenReturn(false);
-        when(mockConfig.sortPredicates()).thenReturn(false);
-        when(mockConfig.getLiteralDatatypePolicy()).thenReturn(LiteralDatatypePolicyEnum.MINIMAL);
-        when(mockConfig.stableBlankNodeIds()).thenReturn(true);
     }
 
 
@@ -68,21 +57,21 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .autoDeclarePrefixes(true)
+                .usePrefixes(true)
+                .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        Map<String, String> customPrefixes = new HashMap<>();
 
-        customPrefixes.put("http://xmlns.com/foaf/0.1/", "foaf");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
-
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/subject">
                     <foaf:name rdf:resource="http://example.org/object"/>
                   </rdf:Description>
@@ -99,20 +88,18 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://xmlns.com/foaf/0.1/", "foaf");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .stableBlankNodeIds(true)
+                .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-
-        when(mockConfig.stableBlankNodeIds()).thenReturn(true);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
-
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:nodeID="b0">
                     <foaf:name rdf:resource="http://example.org/Alice"/>
                   </rdf:Description>
@@ -130,20 +117,19 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://purl.org/dc/elements/1.1/", "dc");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .stableBlankNodeIds(true)
+                .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        when(mockConfig.stableBlankNodeIds()).thenReturn(true);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
-
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:exampleorg="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/book">
                     <dc:creator rdf:nodeID="b0"/>
                   </rdf:Description>
@@ -160,19 +146,19 @@ class XmlSerializerTest {
                 null);
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
-        when(mockConfig.getLiteralDatatypePolicy()).thenReturn(LiteralDatatypePolicyEnum.MINIMAL);
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://xmlns.com/foaf/0.1/", "foaf");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
+                .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/person">
                     <foaf:name>John Doe</foaf:name>
                   </rdf:Description>
@@ -187,20 +173,20 @@ class XmlSerializerTest {
         Statement stmt = createMockLiteralStatement("http://example.org/data", "http://example.org/vocabulary/value", "123", SerializationConstants.XSD_INTEGER, null);
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
-        when(mockConfig.getLiteralDatatypePolicy()).thenReturn(LiteralDatatypePolicyEnum.MINIMAL);
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://example.org/vocabulary/", "ex");
-        customPrefixes.put("http://www.w3.org/2001/XMLSchema#", "xsd");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
+                .addCustomPrefix("ex", "http://example.org/vocabulary/")
+                .addCustomPrefix("xsd", "http://www.w3.org/2001/XMLSchema#")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://example.org/vocabulary/" xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:ex="http://example.org/vocabulary/" xmlns:exampleorg="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/data">
                     <ex:value rdf:datatype="xsd:integer">123</ex:value>
                   </rdf:Description>
@@ -216,17 +202,17 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://purl.org/dc/elements/1.1/", "dc");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:exampleorg="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/book">
                     <dc:title xml:lang="en">The Book</dc:title>
                   </rdf:Description>
@@ -244,20 +230,20 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://ex.org/", "exorg");
-        customPrefixes.put("http://ex.com/", "excom");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
-        when(mockConfig.sortSubjects()).thenReturn(false);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .addCustomPrefix("exorg", "http://ex.org/")
+                .addCustomPrefix("excom", "http://ex.com/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .sortSubjects(false)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:excom="http://ex.com/" xmlns:exorg="http://ex.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:excom="http://ex.com/" xmlns:exorg="http://ex.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://ex.com/s2">
                     <excom:p2 rdf:resource="http://ex.com/o2"/>
                   </rdf:Description>
@@ -278,14 +264,14 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://ex.org/", "exorg");
-        customPrefixes.put("http://ex.com/", "excom");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.USAGE_ORDER);
-        when(mockConfig.sortSubjects()).thenReturn(false);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .addCustomPrefix("exorg", "http://ex.org/")
+                .addCustomPrefix("excom", "http://ex.com/")
+                .prefixOrdering(PrefixOrderingEnum.USAGE_ORDER)
+                .sortSubjects(false)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String actual = writer.toString();
@@ -311,19 +297,19 @@ class XmlSerializerTest {
         Statement stmt2 = createMockStatement("http://ex.org/A", "http://ex.org/p", "http://ex.org/o");
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
-        when(mockConfig.sortSubjects()).thenReturn(true);
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://ex.org/", "ex");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .sortSubjects(true)
+                .addCustomPrefix("ex", "http://ex.org/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://ex.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:ex="http://ex.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://ex.org/A">
                     <ex:p rdf:resource="http://ex.org/o"/>
                   </rdf:Description>
@@ -343,14 +329,17 @@ class XmlSerializerTest {
         Statement stmt = createMockStatement("http://example.org/sub&ject<", "http://example.org/pred", "http://example.org/obj\"ect'");
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
+
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/sub&amp;ject&lt;">
                     <exampleorg:pred rdf:resource="http://example.org/obj&quot;ect&apos;"/>
                   </rdf:Description>
@@ -368,20 +357,20 @@ class XmlSerializerTest {
         );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
-        when(mockConfig.getLiteralDatatypePolicy()).thenReturn(LiteralDatatypePolicyEnum.ALWAYS_TYPED);
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://example.org/", "ex");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
+                .addCustomPrefix("ex", "http://example.org/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:ex="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/item">
                     <ex:prop>Value with &lt;tags&gt; &amp; entities</ex:prop>
                   </rdf:Description>
@@ -398,18 +387,19 @@ class XmlSerializerTest {
         Statement stmt = createMockStatement("http://example.org/subject", "http://xmlns.com/foaf/0.1/name", "http://example.org/object");
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
-        when(mockConfig.autoDeclarePrefixes()).thenReturn(false);
-        when(mockConfig.usePrefixes()).thenReturn(true);
 
-        when(mockConfig.getCustomPrefixes()).thenReturn(new HashMap<>());
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .autoDeclarePrefixes(false)
+                .usePrefixes(true)
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/subject">
                     <http://xmlns.com/foaf/0.1/name rdf:resource="http://example.org/object"/>
                   </rdf:Description>
@@ -417,7 +407,6 @@ class XmlSerializerTest {
                 """;
 
         assertEquals(expected, writer.toString());
-        verify(mockConfig, times(1)).autoDeclarePrefixes();
     }
 
     @Test
@@ -426,15 +415,14 @@ class XmlSerializerTest {
         Statement stmt = createMockStatement("http://example.org/subject", "http://xmlns.com/foaf/0.1/name", "http://example.org/object");
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
-        when(mockConfig.usePrefixes()).thenReturn(false);
-        when(mockConfig.autoDeclarePrefixes()).thenReturn(true);
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://xmlns.com/foaf/0.1/", "foaf");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .usePrefixes(false)
+                .autoDeclarePrefixes(true)
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -447,7 +435,6 @@ class XmlSerializerTest {
                 """;
 
         assertEquals(expected, writer.toString());
-        verify(mockConfig, times(2)).usePrefixes();
     }
 
 
@@ -458,21 +445,21 @@ class XmlSerializerTest {
         Statement stmt2 = createMockBlankNodeObjectStatement("http://example.org/s", "http://example.org/p", "bnode-xyz");
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
-        when(mockConfig.stableBlankNodeIds()).thenReturn(false);
-        when(mockConfig.sortSubjects()).thenReturn(true);
 
-        Map<String, String> customPrefixes = new HashMap<>();
-        customPrefixes.put("http://example.org/", "ex");
-        when(mockConfig.getCustomPrefixes()).thenReturn(customPrefixes);
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .stableBlankNodeIds(false)
+                .sortSubjects(true)
+                .addCustomPrefix("ex", "http://example.org/")
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:ex="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:nodeID="bnode-abc">
                     <ex:p rdf:resource="http://example.org/o"/>
                   </rdf:Description>
@@ -489,14 +476,17 @@ class XmlSerializerTest {
     @DisplayName("Should handle an empty model")
     void shouldHandleEmptyModel() throws SerializationException {
         when(mockModel.stream()).thenReturn(Stream.empty());
-        when(mockConfig.getPrefixOrdering()).thenReturn(PrefixOrderingEnum.ALPHABETICAL);
 
-        XmlSerializer serializer = new XmlSerializer(mockModel, mockConfig);
+        XmlConfig testConfig = new XmlConfig.Builder()
+                .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
+                .build();
+
+        XmlSerializer serializer = new XmlSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                 </rdf:RDF>
                 """;
 

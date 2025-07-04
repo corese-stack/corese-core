@@ -3,14 +3,18 @@ package fr.inria.corese.core.next.impl.common.serialization;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.common.serialization.config.SerializerConfig;
+import fr.inria.corese.core.next.impl.common.serialization.config.TurtleConfig;
 import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,10 +22,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
- * Test class for {@link TurtleSerializerTest} using Mockito to verify serialization behavior
+ * Test class for {@link TurtleSerializer} using Mockito to verify serialization behavior
  * under various configurations and RDF graph structures.
  */
 class TurtleSerializerTest {
+
+    private Model mockModel;
+    private TurtleConfig defaultConfig;
+
+    @BeforeEach
+    void setUp() {
+        mockModel = mock(Model.class);
+        defaultConfig = TurtleConfig.defaultConfig();
+    }
 
     /**
      * Tests basic Turtle serialization of a simple triple.
@@ -33,41 +46,12 @@ class TurtleSerializerTest {
      */
     @Test
     void testBasicTurtleSerialization() throws SerializationException, IOException {
-        // Given
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        Literal mockObject = mock(Literal.class);
-
-        // Configure mocks for the subject
-        when(mockSubject.stringValue()).thenReturn("http://example.org/ns/person1");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-        // Configure mocks for the predicate
-        when(mockPredicate.stringValue()).thenReturn("http://example.org/ns/hasName");
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
-        // Configure mocks for the object (literal)
-        when(mockObject.stringValue()).thenReturn("John Doe");
-        when(mockObject.isLiteral()).thenReturn(true);
-        when(mockObject.isIRI()).thenReturn(false);
-        when(mockObject.isResource()).thenReturn(false);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.getLanguage()).thenReturn(Optional.empty());
-        when(mockObject.getDatatype()).thenReturn(null);
-
-        // Configure the statement
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(null);
+        Statement mockStatement = createStatement(
+                createIRI("http://example.org/ns/person1"),
+                createIRI("http://example.org/ns/hasName"),
+                createLiteral("John Doe", null, null),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
         when(mockModel.stream())
@@ -75,20 +59,11 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, SerializerConfig.turtleConfig());
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, defaultConfig);
 
-        // When
         turtleSerializer.write(writer);
 
-        // Then
         verify(mockModel, times(2)).stream();
-        verify(mockSubject, atLeastOnce()).stringValue();
-        verify(mockSubject, atLeastOnce()).isIRI();
-        verify(mockPredicate, atLeastOnce()).stringValue();
-        verify(mockPredicate, atLeastOnce()).isIRI();
-        verify(mockObject, atLeastOnce()).stringValue();
-        verify(mockObject, atLeastOnce()).isLiteral();
-
 
         String expected = """
                 @prefix ns: <http://example.org/ns/> .
@@ -113,36 +88,13 @@ class TurtleSerializerTest {
      */
     @Test
     void testRdfTypeShortcut() throws SerializationException, IOException {
-        // Given
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        IRI mockObject = mock(IRI.class);
-
-        // Configure mocks
-        when(mockSubject.stringValue()).thenReturn("http://example.org/ns/person1");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-        when(mockPredicate.stringValue()).thenReturn(SerializationConstants.RDF_TYPE);
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
-        when(mockObject.stringValue()).thenReturn("http://xmlns.com/foaf/0.1/Person");
-        when(mockObject.isIRI()).thenReturn(true);
-        when(mockObject.isResource()).thenReturn(true);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.isLiteral()).thenReturn(false);
-
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(null);
+        
+        Statement mockStatement = createStatement(
+                createIRI("http://example.org/ns/person1"),
+                createIRI(SerializationConstants.RDF_TYPE),
+                createIRI("http://xmlns.com/foaf/0.1/Person"),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
         when(mockModel.stream())
@@ -150,15 +102,14 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, defaultConfig);
 
-        // When
+
         turtleSerializer.write(writer);
 
-        // Then
         verify(mockModel, times(2)).stream();
 
-        String expected = """ 
+        String expected = """
                 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
                 @prefix ns: <http://example.org/ns/> .
                 @prefix owl: <http://www.w3.org/2002/07/owl#> .
@@ -183,43 +134,12 @@ class TurtleSerializerTest {
     @Test
     void testLiteralWithLanguageTag() throws SerializationException, IOException {
 
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        Literal mockObject = mock(Literal.class);
-
-
-        when(mockSubject.stringValue()).thenReturn("http://example.org/data/book1");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-
-        when(mockPredicate.stringValue()).thenReturn("http://purl.org/dc/elements/1.1/title");
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
-        when(mockObject.stringValue()).thenReturn("The Odyssey");
-        when(mockObject.isLiteral()).thenReturn(true);
-        when(mockObject.isIRI()).thenReturn(false);
-        when(mockObject.isResource()).thenReturn(false);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.getLanguage()).thenReturn(Optional.of("en"));
-
-        IRI mockRdfLangString = mock(IRI.class);
-        when(mockRdfLangString.stringValue()).thenReturn(RDF.LANGSTRING.getIRI().stringValue());
-        when(mockRdfLangString.isIRI()).thenReturn(true);
-        when(mockRdfLangString.isResource()).thenReturn(true);
-        when(mockObject.getDatatype()).thenReturn(mockRdfLangString);
-
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(null);
+        Statement mockStatement = createStatement(
+                createIRI("http://example.org/data/book1"),
+                createIRI("http://purl.org/dc/elements/1.1/title"),
+                createLiteral("The Odyssey", null, "en"),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
         when(mockModel.stream())
@@ -229,14 +149,7 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        // Explicitly create SerializerConfig to ensure strictMode is false
-        Map<String, String> commonTurtlePrefixes = new HashMap<>();
-        commonTurtlePrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        commonTurtlePrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        commonTurtlePrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
-
-        SerializerConfig config = new SerializerConfig.Builder()
+        TurtleConfig config = new TurtleConfig.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .useRdfTypeShortcut(true)
                 .useCollections(true)
@@ -244,17 +157,16 @@ class TurtleSerializerTest {
                 .prettyPrint(true)
                 .indent("  ")
                 .lineEnding("\n")
-                .addCustomPrefixes(commonTurtlePrefixes)
                 .autoDeclarePrefixes(true)
                 .trailingDot(true)
                 .strictMode(false)
                 .build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
-        // When
+        
         turtleSerializer.write(writer);
 
-        // Then
+        
         verify(mockModel, times(2)).stream();
         String expected = """
                 @prefix 11: <http://purl.org/dc/elements/1.1/> .
@@ -264,7 +176,7 @@ class TurtleSerializerTest {
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
-                  data:book1 11:title \"The Odyssey\"@en .
+                  data:book1 11:title "The Odyssey"@en .
                 """;
         String actual = writer.toString().replace("\r\n", "\n");
         assertEquals(expected, actual);
@@ -278,46 +190,16 @@ class TurtleSerializerTest {
      * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
+    @DisplayName("Should serialize literal with xsd:string datatype (minimal policy)")
     void testLiteralWithExplicitXsdStringType() throws SerializationException, IOException {
-        // Given
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        Literal mockObject = mock(Literal.class);
-        IRI mockDatatype = mock(IRI.class);
-
-        // Configure mocks
-        when(mockSubject.stringValue()).thenReturn("http://example.org/data/book2");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-
-        when(mockPredicate.stringValue()).thenReturn("http://purl.org/dc/elements/1.1/creator");
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
-        when(mockDatatype.stringValue()).thenReturn(SerializationConstants.XSD_STRING);
-        when(mockDatatype.isIRI()).thenReturn(true);
-        when(mockDatatype.isResource()).thenReturn(true);
-
-        when(mockObject.stringValue()).thenReturn("Homer");
-        when(mockObject.isLiteral()).thenReturn(true);
-        when(mockObject.isIRI()).thenReturn(false);
-        when(mockObject.isResource()).thenReturn(false);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.getLanguage()).thenReturn(Optional.empty());
-        when(mockObject.getDatatype()).thenReturn(mockDatatype);
-
-
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(null);
+        
+        IRI mockDatatype = createIRI(SerializationConstants.XSD_STRING);
+        Statement mockStatement = createStatement(
+                createIRI("http://example.org/data/book2"),
+                createIRI("http://purl.org/dc/elements/1.1/creator"),
+                createLiteral("Homer", mockDatatype, null),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
         when(mockModel.stream())
@@ -327,27 +209,21 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        Map<String, String> commonTurtlePrefixes = new HashMap<>();
-        commonTurtlePrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        commonTurtlePrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        commonTurtlePrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
-        commonTurtlePrefixes.put("dc", "http://purl.org/dc/elements/1.1/");
 
-        SerializerConfig config = new SerializerConfig.Builder()
+        TurtleConfig config = new TurtleConfig.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
-                .addCustomPrefixes(commonTurtlePrefixes)
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
+                .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
-        // When
+        
         turtleSerializer.write(writer);
 
-        // Then
+        
         verify(mockModel, times(2)).stream();
-        String expected = """ 
+        String expected = """
                 @prefix data: <http://example.org/data/> .
                 @prefix dc: <http://purl.org/dc/elements/1.1/> .
                 @prefix owl: <http://www.w3.org/2002/07/owl#> .
@@ -355,7 +231,7 @@ class TurtleSerializerTest {
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
-                  data:book2 dc:creator \"Homer\"^^xsd:string .
+                  data:book2 dc:creator "Homer"^^xsd:string .
                 """;
         String actual = writer.toString().replace("\r\n", "\n");
         assertEquals(expected, actual);
@@ -370,72 +246,27 @@ class TurtleSerializerTest {
      */
     @Test
     void testBlankNodeSerialization() throws SerializationException, IOException {
-        Model mockModel = mock(Model.class);
+        
+        Statement mainStatement = createStatement(
+                createIRI("http://example.org/ns/mainSubject"),
+                createIRI("http://example.org/ns/refersTo"),
+                createBlankNode("b1"),
+                null
+        );
 
-        Resource mockBNode = mock(Resource.class);
-        IRI mockBNodeProperty = mock(IRI.class);
-        Literal mockBNodeObject = mock(Literal.class);
-
-
-        IRI mockMainSubject = mock(IRI.class);
-        IRI mockMainPredicate = mock(IRI.class);
-        Statement mainStatement = mock(Statement.class);
-
-
-        Statement bNodePropertyStatement = mock(Statement.class);
-
-
-        when(mockBNode.stringValue()).thenReturn("b1");
-        when(mockBNode.isBNode()).thenReturn(true);
-        when(mockBNode.isResource()).thenReturn(true);
-        when(mockBNode.isIRI()).thenReturn(false);
-        when(mockBNode.isLiteral()).thenReturn(false);
-
-        when(mockBNodeProperty.stringValue()).thenReturn("http://example.org/ns/hasValue");
-        when(mockBNodeProperty.isIRI()).thenReturn(true);
-        when(mockBNodeProperty.isResource()).thenReturn(true);
-        when(mockBNodeProperty.isBNode()).thenReturn(false);
-        when(mockBNodeProperty.isLiteral()).thenReturn(false);
-
-        when(mockBNodeObject.stringValue()).thenReturn("Value of BNode");
-        when(mockBNodeObject.isLiteral()).thenReturn(true);
-        when(mockBNodeObject.isIRI()).thenReturn(false);
-        when(mockBNodeObject.isResource()).thenReturn(false);
-        when(mockBNodeObject.isBNode()).thenReturn(false);
-        when(mockBNodeObject.getLanguage()).thenReturn(Optional.empty());
-        when(mockBNodeObject.getDatatype()).thenReturn(null);
-
-
-        when(bNodePropertyStatement.getSubject()).thenReturn(mockBNode);
-        when(bNodePropertyStatement.getPredicate()).thenReturn(mockBNodeProperty);
-        when(bNodePropertyStatement.getObject()).thenReturn(mockBNodeObject);
-        when(bNodePropertyStatement.getContext()).thenReturn(null);
-
-
-        when(mockMainSubject.stringValue()).thenReturn("http://example.org/ns/mainSubject");
-        when(mockMainSubject.isIRI()).thenReturn(true);
-        when(mockMainSubject.isResource()).thenReturn(true);
-        when(mockMainSubject.isBNode()).thenReturn(false);
-        when(mockMainSubject.isLiteral()).thenReturn(false);
-
-        when(mockMainPredicate.stringValue()).thenReturn("http://example.org/ns/refersTo");
-        when(mockMainPredicate.isIRI()).thenReturn(true);
-        when(mockMainPredicate.isResource()).thenReturn(true);
-        when(mockMainPredicate.isBNode()).thenReturn(false);
-        when(mockMainPredicate.isLiteral()).thenReturn(false);
-
-        when(mainStatement.getSubject()).thenReturn(mockMainSubject);
-        when(mainStatement.getPredicate()).thenReturn(mockMainPredicate);
-        when(mainStatement.getObject()).thenReturn(mockBNode);
-        when(mainStatement.getContext()).thenReturn(null);
-
+        Statement bNodePropertyStatement = createStatement(
+                createBlankNode("b1"),
+                createIRI("http://example.org/ns/hasValue"),
+                createLiteral("Value of BNode", null, null),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Arrays.asList(mainStatement, bNodePropertyStatement).iterator());
         when(mockModel.stream()).thenAnswer(invocation -> Stream.of(mainStatement, bNodePropertyStatement));
 
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, SerializerConfig.turtleConfig());
+        TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, defaultConfig);
 
         turtleSerializer.write(writer);
 
@@ -449,9 +280,7 @@ class TurtleSerializerTest {
                 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
-                  ns:mainSubject ns:refersTo [
-                    ns:hasValue "Value of BNode"
-                  ] .
+                  ns:mainSubject ns:refersTo _:b1 .
                 """;
 
         String actual = writer.toString().replace("\r\n", "\n");
@@ -467,38 +296,12 @@ class TurtleSerializerTest {
      */
     @Test
     void testBaseIRI() throws SerializationException, IOException {
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        Literal mockObject = mock(Literal.class);
-
-        when(mockSubject.stringValue()).thenReturn("http://example.org/base/resource1");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-
-        when(mockPredicate.stringValue()).thenReturn("http://example.org/base/prop");
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
-
-        when(mockObject.stringValue()).thenReturn("Test");
-        when(mockObject.isLiteral()).thenReturn(true);
-        when(mockObject.isIRI()).thenReturn(false);
-        when(mockObject.isResource()).thenReturn(false);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.getLanguage()).thenReturn(Optional.empty());
-        when(mockObject.getDatatype()).thenReturn(null);
-
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(null);
+        Statement mockStatement = createStatement(
+                createIRI("http://example.org/base/resource1"),
+                createIRI("http://example.org/base/prop"),
+                createLiteral("Test", null, null),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
         when(mockModel.stream())
@@ -508,16 +311,8 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        Map<String, String> commonTurtlePrefixes = new HashMap<>();
-        commonTurtlePrefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        commonTurtlePrefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-        commonTurtlePrefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
-        commonTurtlePrefixes.put("owl", "http://www.w3.org/2002/07/owl#");
-        commonTurtlePrefixes.put("base", "http://example.org/base/");
-
-        SerializerConfig configWithBase = new SerializerConfig.Builder()
+        TurtleConfig configWithBase = new TurtleConfig.Builder()
                 .baseIRI("http://example.org/base/")
-                .addCustomPrefixes(commonTurtlePrefixes)
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
                 .build();
@@ -558,7 +353,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(emptyModel);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(emptyModel, defaultConfig);
 
 
         turtleSerializer.write(writer);
@@ -586,42 +381,12 @@ class TurtleSerializerTest {
     @Test
     void testStrictModeInvalidLiteral() throws SerializationException {
 
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        Literal mockObject = mock(Literal.class);
-
-        when(mockSubject.stringValue()).thenReturn("http://example.org/s");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-
-        when(mockPredicate.stringValue()).thenReturn("http://example.org/p");
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
-        when(mockObject.stringValue()).thenReturn("invalid");
-        when(mockObject.isLiteral()).thenReturn(true);
-        when(mockObject.isIRI()).thenReturn(false);
-        when(mockObject.isResource()).thenReturn(false);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.getLanguage()).thenReturn(Optional.empty());
-        IRI mockRdfLangStringDatatype = mock(IRI.class);
-        when(mockRdfLangStringDatatype.stringValue()).thenReturn(RDF.LANGSTRING.getIRI().stringValue());
-        when(mockRdfLangStringDatatype.isIRI()).thenReturn(true);
-        when(mockRdfLangStringDatatype.isResource()).thenReturn(true);
-        when(mockObject.getDatatype()).thenReturn(mockRdfLangStringDatatype);
-
-
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(null);
+        Statement mockStatement = createStatement(
+                createIRI("http://example.org/s"),
+                createIRI("http://example.org/p"),
+                createLiteral("invalid", RDF.LANGSTRING.getIRI(), null),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
         when(mockModel.stream())
@@ -630,7 +395,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        SerializerConfig strictConfig = new SerializerConfig.Builder().strictMode(true).build();
+        TurtleConfig strictConfig = new TurtleConfig.Builder().strictMode(true).build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
@@ -652,37 +417,12 @@ class TurtleSerializerTest {
     @Test
     void testStrictModeInvalidIRICharacters() throws SerializationException {
 
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        IRI mockObject = mock(IRI.class); // Invalid IRI
-
-
-        when(mockSubject.stringValue()).thenReturn("http://example.org/s");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-
-        when(mockPredicate.stringValue()).thenReturn("http://example.org/p");
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
-
-        when(mockObject.stringValue()).thenReturn("http://example.org/invalid iri"); // Contains a space
-        when(mockObject.isIRI()).thenReturn(true);
-        when(mockObject.isResource()).thenReturn(true);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.isLiteral()).thenReturn(false);
-
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(null);
+        Statement mockStatement = createStatement(
+                createIRI("http://example.org/s"),
+                createIRI("http://example.org/p"),
+                createIRI("http://example.org/invalid iri"),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
         when(mockModel.stream())
@@ -691,7 +431,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        SerializerConfig strictConfig = new SerializerConfig.Builder().strictMode(true).validateURIs(true).build();
+        TurtleConfig strictConfig = new TurtleConfig.Builder().strictMode(true).validateURIs(true).build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
@@ -713,39 +453,13 @@ class TurtleSerializerTest {
      */
     @Test
     void testMultilineLiteralSerialization() throws SerializationException, IOException {
-        // Given
-        Model mockModel = mock(Model.class);
-        Statement mockStatement = mock(Statement.class);
-        IRI mockSubject = mock(IRI.class);
-        IRI mockPredicate = mock(IRI.class);
-        Literal mockObject = mock(Literal.class);
-
-        when(mockSubject.stringValue()).thenReturn("http://example.org/book/1");
-        when(mockSubject.isIRI()).thenReturn(true);
-        when(mockSubject.isResource()).thenReturn(true);
-        when(mockSubject.isBNode()).thenReturn(false);
-        when(mockSubject.isLiteral()).thenReturn(false);
-
-        when(mockPredicate.stringValue()).thenReturn("http://example.org/properties/description");
-        when(mockPredicate.isIRI()).thenReturn(true);
-        when(mockPredicate.isResource()).thenReturn(true);
-        when(mockPredicate.isBNode()).thenReturn(false);
-        when(mockPredicate.isLiteral()).thenReturn(false);
-
         String multilineText = "This is the first line.\nThis is the second line.";
-        when(mockObject.stringValue()).thenReturn(multilineText);
-        when(mockObject.isLiteral()).thenReturn(true);
-        when(mockObject.isIRI()).thenReturn(false);
-        when(mockObject.isResource()).thenReturn(false);
-        when(mockObject.isBNode()).thenReturn(false);
-        when(mockObject.getLanguage()).thenReturn(Optional.empty());
-        when(mockObject.getDatatype()).thenReturn(null); // Assuming no specific datatype for simplicity
-
-        // Configure the statement
-        when(mockStatement.getSubject()).thenReturn(mockSubject);
-        when(mockStatement.getPredicate()).thenReturn(mockPredicate);
-        when(mockStatement.getObject()).thenReturn(mockObject);
-        when(mockStatement.getContext()).thenReturn(null);
+        Statement mockStatement = createStatement(
+                createIRI("http://example.org/book/1"),
+                createIRI("http://example.org/properties/description"),
+                createLiteral(multilineText, null, null),
+                null
+        );
 
         when(mockModel.iterator()).thenAnswer(invocation -> Collections.singletonList(mockStatement).iterator());
         when(mockModel.stream())
@@ -753,36 +467,80 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        // Configure SerializerConfig to enable multiline literals
-        SerializerConfig config = new SerializerConfig.Builder()
+        TurtleConfig config = new TurtleConfig.Builder()
                 .useMultilineLiterals(true)
                 .prettyPrint(true)
                 .autoDeclarePrefixes(true)
                 .build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
-        // When
         turtleSerializer.write(writer);
 
-        // Then
         verify(mockModel, times(2)).stream();
-        verify(mockSubject, atLeastOnce()).stringValue();
-        verify(mockSubject, atLeastOnce()).isIRI();
-        verify(mockPredicate, atLeastOnce()).stringValue();
-        verify(mockPredicate, atLeastOnce()).isIRI();
-        verify(mockObject, atLeastOnce()).stringValue();
-        verify(mockObject, atLeastOnce()).isLiteral();
 
-        // Corrected expected string
         String expected = """
                 @prefix book: <http://example.org/book/> .
+                @prefix owl: <http://www.w3.org/2002/07/owl#> .
                 @prefix properties: <http://example.org/properties/> .
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
-                  book:1 properties:description \"\"\"This is the first line.
-                This is the second line.\"\"\" .
-                """;
+                  book:1 properties:description\s""" + "\"\"\"" + multilineText + "\"\"\"" + " .\n";
 
         String actual = writer.toString().replace("\r\n", "\n");
         assertEquals(expected, actual);
+    }
+
+
+    private Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
+        Statement stmt = mock(Statement.class);
+        when(stmt.getSubject()).thenReturn(subject);
+        when(stmt.getPredicate()).thenReturn(predicate);
+        when(stmt.getObject()).thenReturn(object);
+        when(stmt.getContext()).thenReturn(context);
+        return stmt;
+    }
+
+    private Resource createBlankNode(String id) {
+        Resource blankNode = mock(Resource.class);
+        when(blankNode.isResource()).thenReturn(true);
+        when(blankNode.isBNode()).thenReturn(true);
+        when(blankNode.isIRI()).thenReturn(false);
+        when(blankNode.stringValue()).thenReturn(id);
+        return blankNode;
+    }
+
+    private IRI createIRI(String uri) {
+        IRI iri = mock(IRI.class);
+        when(iri.isResource()).thenReturn(true);
+        when(iri.isIRI()).thenReturn(true);
+        when(iri.isBNode()).thenReturn(false);
+        when(iri.stringValue()).thenReturn(uri);
+        return iri;
+    }
+
+    /**
+     * Creates a mocked Literal object.
+     *
+     * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
+     * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.
+     * @param langTag     The language tag (e.g., "en"), or null if not language-tagged.
+     * @return A mocked Literal instance.
+     */
+    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
+        Literal literal = mock(Literal.class);
+        when(literal.isLiteral()).thenReturn(true);
+        when(literal.isResource()).thenReturn(false);
+        when(literal.stringValue()).thenReturn(lexicalForm);
+
+        if (langTag != null && !langTag.isEmpty()) {
+            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
+            when(literal.getDatatype()).thenReturn(RDF.LANGSTRING.getIRI());
+        } else {
+            when(literal.getLanguage()).thenReturn(Optional.empty());
+            when(literal.getDatatype()).thenReturn(dataTypeIRI);
+        }
+        return literal;
     }
 }
