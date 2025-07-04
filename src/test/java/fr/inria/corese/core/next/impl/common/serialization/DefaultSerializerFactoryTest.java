@@ -12,11 +12,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 
+/**
+ * Unit tests for the {@link DefaultSerializerFactory} class.
+ * This class verifies that the factory correctly creates instances of
+ * various {@link RdfSerializer} implementations based on the provided
+ * {@link RdfFormat} and handles null inputs gracefully.
+ */
 class DefaultSerializerFactoryTest {
 
     private DefaultSerializerFactory factory;
     private Model mockModel;
     private SerializationConfig mockConfig;
+
 
     @BeforeEach
     void setUp() {
@@ -26,86 +33,86 @@ class DefaultSerializerFactoryTest {
     }
 
     @Test
-    @DisplayName("createSerializer devrait retourner TurtleSerializer pour le format TURTLE")
+    @DisplayName("createSerializer should return TurtleSerializer for TURTLE format")
     void createSerializer_shouldReturnTurtleSerializer_forTurtleFormat() {
         try (MockedConstruction<TurtleSerializer> mockedConstruction = mockConstruction(TurtleSerializer.class)) {
             RdfSerializer serializer = factory.createSerializer(RdfFormat.TURTLE, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof TurtleSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "Le constructeur de TurtleSerializer devrait être appelé une fois");
+            assertEquals(1, mockedConstruction.constructed().size(), "TurtleSerializer constructor should be called once");
         }
     }
 
     @Test
-    @DisplayName("createSerializer devrait retourner NTriplesSerializer pour le format NTRIPLES")
+    @DisplayName("createSerializer should return NTriplesSerializer for NTRIPLES format")
     void createSerializer_shouldReturnNTriplesSerializer_forNTriplesFormat() {
         try (MockedConstruction<NTriplesSerializer> mockedConstruction = mockConstruction(NTriplesSerializer.class)) {
             RdfSerializer serializer = factory.createSerializer(RdfFormat.NTRIPLES, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof NTriplesSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "Le constructeur de NTriplesSerializer devrait être appelé une fois");
+            assertEquals(1, mockedConstruction.constructed().size(), "NTriplesSerializer constructor should be called once");
         }
     }
 
     @Test
-    @DisplayName("createSerializer devrait retourner NQuadsSerializer pour le format NQUADS")
+    @DisplayName("createSerializer should return NQuadsSerializer for NQUADS format")
     void createSerializer_shouldReturnNQuadsSerializer_forNQuadsFormat() {
         try (MockedConstruction<NQuadsSerializer> mockedConstruction = mockConstruction(NQuadsSerializer.class)) {
             RdfSerializer serializer = factory.createSerializer(RdfFormat.NQUADS, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof NQuadsSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "Le constructeur de NQuadsSerializer devrait être appelé une fois");
+            assertEquals(1, mockedConstruction.constructed().size(), "NQuadsSerializer constructor should be called once");
         }
     }
 
     @Test
-    @DisplayName("createSerializer devrait retourner TriGSerializer pour le format TRIG")
+    @DisplayName("createSerializer should return TriGSerializer for TRIG format")
     void createSerializer_shouldReturnTriGSerializer_forTriGFormat() {
         try (MockedConstruction<TriGSerializer> mockedConstruction = mockConstruction(TriGSerializer.class)) {
             RdfSerializer serializer = factory.createSerializer(RdfFormat.TRIG, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof TriGSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "Le constructeur de TriGSerializer devrait être appelé une fois");
+            assertEquals(1, mockedConstruction.constructed().size(), "TriGSerializer constructor should be called once");
         }
     }
 
     @Test
-    @DisplayName("createSerializer devrait retourner XmlSerializer pour le format RDFXML")
+    @DisplayName("createSerializer should return XmlSerializer for RDFXML format")
     void createSerializer_shouldReturnXmlSerializer_forRdfXmlFormat() {
         try (MockedConstruction<XmlSerializer> mockedConstruction = mockConstruction(XmlSerializer.class)) {
             RdfSerializer serializer = factory.createSerializer(RdfFormat.RDFXML, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof XmlSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "Le constructeur de XmlSerializer devrait être appelé une fois");
+            assertEquals(1, mockedConstruction.constructed().size(), "XmlSerializer constructor should be called once");
         }
     }
 
     @Test
-    @DisplayName("createSerializer devrait lever NullPointerException pour un format nul")
+    @DisplayName("createSerializer should throw NullPointerException for a null format")
     void createSerializer_shouldThrowNPE_forNullFormat() {
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(null, mockModel, mockConfig),
-                "Devrait lever NullPointerException pour RdfFormat nul");
+                "Should throw NullPointerException for null RdfFormat");
     }
 
     @Test
-    @DisplayName("createSerializer devrait lever NullPointerException pour un modèle nul")
+    @DisplayName("createSerializer should throw NullPointerException for a null model")
     void createSerializer_shouldThrowNPE_forNullModel() {
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(RdfFormat.TURTLE, null, mockConfig),
-                "Devrait lever NullPointerException pour Model nul");
+                "Should throw NullPointerException for null Model");
     }
 
     @Test
-    @DisplayName("createSerializer devrait lever NullPointerException pour une configuration nulle")
+    @DisplayName("createSerializer should throw NullPointerException for a null config")
     void createSerializer_shouldThrowNPE_forNullConfig() {
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(RdfFormat.TURTLE, mockModel, null),
-                "Devrait lever NullPointerException pour SerializationConfig nulle");
+                "Should throw NullPointerException for null SerializationConfig");
     }
 }

@@ -56,19 +56,19 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("Le constructeur devrait lever NullPointerException pour un modèle nul")
+    @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
         assertThrows(NullPointerException.class, () -> new NQuadsSerializer(null), "Model cannot be null");
     }
 
     @Test
-    @DisplayName("Le constructeur devrait lever NullPointerException pour une configuration nulle")
+    @DisplayName("Constructor should throw NullPointerException for null configuration")
     void constructorShouldThrowForNullConfig() {
         assertThrows(NullPointerException.class, () -> new NQuadsSerializer(model, null), "Configuration cannot be null");
     }
 
     @Test
-    @DisplayName("L'écriture devrait sérialiser une déclaration simple correctement (graphe par défaut)")
+    @DisplayName("Write should serialize a simple statement correctly (default graph)")
     void writeShouldSerializeSimpleStatement() throws SerializationException {
         Statement stmt = createStatement(
                 mockExPerson,
@@ -89,7 +89,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("L'écriture devrait gérer les nœuds vierges avec le préfixe par défaut")
+    @DisplayName("Write should handle blank nodes with default prefix")
     void writeShouldHandleBlankNodes() throws SerializationException {
         Statement stmt = createStatement(
                 mockBNode1,
@@ -110,7 +110,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("L'écriture devrait gérer les nœuds vierges dans le contexte avec le préfixe par défaut")
+    @DisplayName("Write should handle blank nodes in context with default prefix")
     void writeShouldHandleBlankNodesInContext() throws SerializationException {
         Resource blankNodeContext = createBlankNode("b3");
         Statement stmt = createStatement(
@@ -134,7 +134,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("L'écriture devrait lever SerializationException en cas d'erreur E/S")
+    @DisplayName("Write should throw SerializationException on IO error")
     void writeShouldThrowOnIOException() throws IOException {
         Statement stmt = createStatement(
                 mockExPerson,
@@ -153,7 +153,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("L'écriture devrait lever SerializationException pour une valeur de sujet nulle dans le mode strict")
+    @DisplayName("Write should throw SerializationException for null subject value in strict mode")
     void writeShouldThrowOnNullSubjectValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(null);
@@ -168,7 +168,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("L'écriture devrait lever SerializationException pour une valeur de prédicat nulle dans le mode strict")
+    @DisplayName("Write should throw SerializationException for null predicate value in strict mode")
     void writeShouldThrowOnNullPredicateValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
@@ -183,7 +183,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("L'écriture devrait lever SerializationException pour une valeur d'objet nulle dans le mode strict")
+    @DisplayName("Write should throw SerializationException for null object value in strict mode")
     void writeShouldThrowOnNullObjectValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
@@ -198,7 +198,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("L'écriture devrait gérer correctement le contexte nul (graphe par défaut)")
+    @DisplayName("Write should handle null context correctly (default graph)")
     void writeShouldHandleNullContext() throws SerializationException {
         Statement stmt = createStatement(
                 mockExPerson,
@@ -230,7 +230,7 @@ class NQuadsSerializerTest {
             "literal with \u0001 (SOH)",
             "literal with \u007F (DEL)"
     })
-    @DisplayName("L'écriture devrait gérer diverses valeurs littérales avec un échappement approprié (y compris Unicode)")
+    @DisplayName("Write should handle various literal values with appropriate escaping (including Unicode)")
     void writeShouldHandleVariousLiterals(String literalValue) throws SerializationException {
         Literal literalMock = createLiteral(literalValue, null, null);
 
@@ -254,7 +254,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("Devrait gérer les littéraux avec des balises de langue")
+    @DisplayName("Should handle literals with language tags")
     void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
         Statement stmt = createStatement(mockExPerson, createIRI("http://example.org/greeting"), mockLiteralHelloEn);
 
@@ -276,7 +276,7 @@ class NQuadsSerializerTest {
     }
 
     @Test
-    @DisplayName("Devrait gérer les littéraux avec des types de données personnalisés")
+    @DisplayName("Should handle literals with custom datatypes")
     void shouldHandleLiteralsWithCustomDatatypes() throws SerializationException {
         IRI customDatatype = createIRI("http://example.org/myDataType");
         Literal customLiteral = createLiteral("123", customDatatype, null);
@@ -300,17 +300,7 @@ class NQuadsSerializerTest {
         assertEquals(expectedOutput, writer.toString());
     }
 
-    /**
-     * Crée un objet Literal mocké.
-     * Important : le `lexicalForm` est la *valeur de chaîne brute* du littéral,
-     * sans les guillemets spécifiques à N-Quads, les balises de langue ou les URI de type de données.
-     * La classe `nQuadsSerializer` est chargée d'ajouter ceux-ci.
-     *
-     * @param lexicalForm La valeur de chaîne brute du littéral (par exemple, "hello", "123").
-     * @param dataTypeIRI L'IRI du type de données du littéral (par exemple, XSD.INTEGER.getIRI()), ou null pour simple/avec balise de langue.
-     * @param langTag     La balise de langue (par exemple, "en"), ou null si non balisé par la langue.
-     * @return Une instance de Literal mockée.
-     */
+
     private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
         Literal literal = mock(Literal.class);
         when(literal.isLiteral()).thenReturn(true);
@@ -327,15 +317,7 @@ class NQuadsSerializerTest {
         return literal;
     }
 
-    /**
-     * Échappe une chaîne selon les règles d'échappement des littéraux N-Quads.
-     * Cette aide est utilisée dans les tests pour construire les chaînes de sortie *attendues*.
-     * Elle imite le comportement de la méthode interne `escapeLiteral` de `nQuadsSerializer`,
-     * en considérant que `nquadsConfig().escapeUnicode()` est `true`.
-     *
-     * @param s La chaîne à échapper.
-     * @return La chaîne échappée.
-     */
+
     private String escapeNQuadsString(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
