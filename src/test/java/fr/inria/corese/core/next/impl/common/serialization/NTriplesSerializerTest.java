@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.serialization.config.NTriplesConfig;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Iterator;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,6 +23,7 @@ class NTriplesSerializerTest {
     private Model model;
     private NTriplesConfig config;
     private NTriplesSerializer nTriplesSerializer;
+    private TestStatementFactory factory;
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -43,16 +42,17 @@ class NTriplesSerializerTest {
         model = mock(Model.class);
         config = NTriplesConfig.defaultConfig();
         nTriplesSerializer = new NTriplesSerializer(model, config);
+        factory = new TestStatementFactory();
 
-        mockExPerson = createIRI("http://example.org/Person");
-        mockExName = createIRI("http://example.org/name");
-        mockExKnows = createIRI("http://example.org/knows");
+        mockExPerson = factory.createIRI("http://example.org/Person");
+        mockExName = factory.createIRI("http://example.org/name");
+        mockExKnows = factory.createIRI("http://example.org/knows");
 
-        mockLiteralJohn = createLiteral(lexJohn, null, null);
-        mockLiteralHelloEn = createLiteral(hello, null, "en");
+        mockLiteralJohn = factory.createLiteral(lexJohn, null, null);
+        mockLiteralHelloEn = factory.createLiteral(hello, null, "en");
 
-        mockBNode1 = createBlankNode("b1");
-        mockBNode2 = createBlankNode("b2");
+        mockBNode1 = factory.createBlankNode("b1");
+        mockBNode2 = factory.createBlankNode("b2");
     }
 
     @Test
@@ -70,7 +70,7 @@ class NTriplesSerializerTest {
     @Test
     @DisplayName("Write should serialize a simple statement correctly (default graph)")
     void writeShouldSerializeSimpleStatement() throws SerializationException {
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn
@@ -91,8 +91,8 @@ class NTriplesSerializerTest {
     @Test
     @DisplayName("Write should serialize a statement with context but ignore it (N-Triples)")
     void writeShouldSerializeStatementWithContext() throws SerializationException {
-        IRI mockContext = createIRI("http://example.org/ctx");
-        Statement stmt = createStatement(
+        IRI mockContext = factory.createIRI("http://example.org/ctx");
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn,
@@ -114,7 +114,7 @@ class NTriplesSerializerTest {
     @Test
     @DisplayName("Write should handle blank nodes with default N-Triples prefix (_:)")
     void writeShouldHandleBlankNodes() throws SerializationException {
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockBNode1,
                 mockExKnows,
                 mockBNode2
@@ -135,7 +135,7 @@ class NTriplesSerializerTest {
     @Test
     @DisplayName("Write should throw SerializationException on IO error")
     void writeShouldThrowOnIOException() throws IOException {
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn
@@ -203,7 +203,7 @@ class NTriplesSerializerTest {
     @Test
     @DisplayName("Should handle null context correctly (default graph)")
     void writeShouldHandleNullContext() throws SerializationException {
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn,
@@ -236,9 +236,9 @@ class NTriplesSerializerTest {
     })
     @DisplayName("Write should handle various literal values with appropriate escaping (including Unicode)")
     void writeShouldHandleVariousLiterals(String literalValue) throws SerializationException {
-        Literal literalMock = createLiteral(literalValue, null, null);
+        Literal literalMock = factory.createLiteral(literalValue, null, null);
 
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 literalMock
@@ -262,7 +262,7 @@ class NTriplesSerializerTest {
     @Test
     @DisplayName("Should handle literals with language tags")
     void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
-        Statement stmt = createStatement(mockExPerson, createIRI("http://example.org/greeting"), mockLiteralHelloEn);
+        Statement stmt = factory.createStatement(mockExPerson, factory.createIRI("http://example.org/greeting"), mockLiteralHelloEn);
 
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
@@ -274,7 +274,7 @@ class NTriplesSerializerTest {
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
                 mockExPerson.stringValue(),
-                createIRI("http://example.org/greeting").stringValue(),
+                factory.createIRI("http://example.org/greeting").stringValue(),
                 escapeNTriplesString(hello),
                 mockLiteralHelloEn.getLanguage().get()) + " .\n";
 
@@ -285,10 +285,10 @@ class NTriplesSerializerTest {
     @Test
     @DisplayName("Should handle literals with custom datatypes")
     void shouldHandleLiteralsWithCustomDatatypes() throws SerializationException {
-        IRI customDatatype = createIRI("http://example.org/myDataType");
-        Literal customLiteral = createLiteral("123", customDatatype, null);
+        IRI customDatatype = factory.createIRI("http://example.org/myDataType");
+        Literal customLiteral = factory.createLiteral("123", customDatatype, null);
 
-        Statement stmt = createStatement(mockExPerson, createIRI("http://example.org/value"), customLiteral);
+        Statement stmt = factory.createStatement(mockExPerson, factory.createIRI("http://example.org/value"), customLiteral);
 
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
@@ -300,28 +300,11 @@ class NTriplesSerializerTest {
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"^^<%s>",
                 mockExPerson.stringValue(),
-                createIRI("http://example.org/value").stringValue(),
+                factory.createIRI("http://example.org/value").stringValue(),
                 escapeNTriplesString("123"),
                 customDatatype.stringValue()) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
-    }
-
-
-    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
-        Literal literal = mock(Literal.class);
-        when(literal.isLiteral()).thenReturn(true);
-        when(literal.isResource()).thenReturn(false);
-        when(literal.stringValue()).thenReturn(lexicalForm);
-
-        if (langTag != null && !langTag.isEmpty()) {
-            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
-            when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
-        } else {
-            when(literal.getLanguage()).thenReturn(Optional.empty());
-            when(literal.getDatatype()).thenReturn(dataTypeIRI);
-        }
-        return literal;
     }
 
 
@@ -379,36 +362,5 @@ class NTriplesSerializerTest {
         public Statement next() {
             return statements[index++];
         }
-    }
-
-    private Statement createStatement(Resource subject, IRI predicate, Value object) {
-        return createStatement(subject, predicate, object, null);
-    }
-
-    private Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(subject);
-        when(stmt.getPredicate()).thenReturn(predicate);
-        when(stmt.getObject()).thenReturn(object);
-        when(stmt.getContext()).thenReturn(context);
-        return stmt;
-    }
-
-    private Resource createBlankNode(String id) {
-        Resource blankNode = mock(Resource.class);
-        when(blankNode.isResource()).thenReturn(true);
-        when(blankNode.isBNode()).thenReturn(true);
-        when(blankNode.isIRI()).thenReturn(false);
-        when(blankNode.stringValue()).thenReturn(id);
-        return blankNode;
-    }
-
-    private IRI createIRI(String uri) {
-        IRI iri = mock(IRI.class);
-        when(iri.isResource()).thenReturn(true);
-        when(iri.isIRI()).thenReturn(true);
-        when(iri.isBNode()).thenReturn(false);
-        when(iri.stringValue()).thenReturn(uri);
-        return iri;
     }
 }

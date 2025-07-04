@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.TurtleConfig;
@@ -14,7 +16,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,11 +30,13 @@ class TurtleSerializerTest {
 
     private Model mockModel;
     private TurtleConfig defaultConfig;
+    private TestStatementFactory factory;
 
     @BeforeEach
     void setUp() {
         mockModel = mock(Model.class);
         defaultConfig = TurtleConfig.defaultConfig();
+        factory = new TestStatementFactory();
     }
 
     /**
@@ -46,10 +49,10 @@ class TurtleSerializerTest {
      */
     @Test
     void testBasicTurtleSerialization() throws SerializationException, IOException {
-        Statement mockStatement = createStatement(
-                createIRI("http://example.org/ns/person1"),
-                createIRI("http://example.org/ns/hasName"),
-                createLiteral("John Doe", null, null),
+        Statement mockStatement = factory.createStatement(
+                factory.createIRI("http://example.org/ns/person1"),
+                factory.createIRI("http://example.org/ns/hasName"),
+                factory.createLiteral("John Doe", null, null),
                 null
         );
 
@@ -88,11 +91,11 @@ class TurtleSerializerTest {
      */
     @Test
     void testRdfTypeShortcut() throws SerializationException, IOException {
-        
-        Statement mockStatement = createStatement(
-                createIRI("http://example.org/ns/person1"),
-                createIRI(SerializationConstants.RDF_TYPE),
-                createIRI("http://xmlns.com/foaf/0.1/Person"),
+
+        Statement mockStatement = factory.createStatement(
+                factory.createIRI("http://example.org/ns/person1"),
+                factory.createIRI(SerializationConstants.RDF_TYPE),
+                factory.createIRI("http://xmlns.com/foaf/0.1/Person"),
                 null
         );
 
@@ -134,10 +137,10 @@ class TurtleSerializerTest {
     @Test
     void testLiteralWithLanguageTag() throws SerializationException, IOException {
 
-        Statement mockStatement = createStatement(
-                createIRI("http://example.org/data/book1"),
-                createIRI("http://purl.org/dc/elements/1.1/title"),
-                createLiteral("The Odyssey", null, "en"),
+        Statement mockStatement = factory.createStatement(
+                factory.createIRI("http://example.org/data/book1"),
+                factory.createIRI("http://purl.org/dc/elements/1.1/title"),
+                factory.createLiteral("The Odyssey", null, "en"),
                 null
         );
 
@@ -163,10 +166,10 @@ class TurtleSerializerTest {
                 .build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
-        
+
         turtleSerializer.write(writer);
 
-        
+
         verify(mockModel, times(2)).stream();
         String expected = """
                 @prefix 11: <http://purl.org/dc/elements/1.1/> .
@@ -192,12 +195,12 @@ class TurtleSerializerTest {
     @Test
     @DisplayName("Should serialize literal with xsd:string datatype (minimal policy)")
     void testLiteralWithExplicitXsdStringType() throws SerializationException, IOException {
-        
-        IRI mockDatatype = createIRI(SerializationConstants.XSD_STRING);
-        Statement mockStatement = createStatement(
-                createIRI("http://example.org/data/book2"),
-                createIRI("http://purl.org/dc/elements/1.1/creator"),
-                createLiteral("Homer", mockDatatype, null),
+
+        IRI mockDatatype = factory.createIRI(SerializationConstants.XSD_STRING);
+        Statement mockStatement = factory.createStatement(
+                factory.createIRI("http://example.org/data/book2"),
+                factory.createIRI("http://purl.org/dc/elements/1.1/creator"),
+                factory.createLiteral("Homer", mockDatatype, null),
                 null
         );
 
@@ -218,10 +221,10 @@ class TurtleSerializerTest {
                 .build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
-        
+
         turtleSerializer.write(writer);
 
-        
+
         verify(mockModel, times(2)).stream();
         String expected = """
                 @prefix data: <http://example.org/data/> .
@@ -246,18 +249,18 @@ class TurtleSerializerTest {
      */
     @Test
     void testBlankNodeSerialization() throws SerializationException, IOException {
-        
-        Statement mainStatement = createStatement(
-                createIRI("http://example.org/ns/mainSubject"),
-                createIRI("http://example.org/ns/refersTo"),
-                createBlankNode("b1"),
+
+        Statement mainStatement = factory.createStatement(
+                factory.createIRI("http://example.org/ns/mainSubject"),
+                factory.createIRI("http://example.org/ns/refersTo"),
+                factory.createBlankNode("b1"),
                 null
         );
 
-        Statement bNodePropertyStatement = createStatement(
-                createBlankNode("b1"),
-                createIRI("http://example.org/ns/hasValue"),
-                createLiteral("Value of BNode", null, null),
+        Statement bNodePropertyStatement = factory.createStatement(
+                factory.createBlankNode("b1"),
+                factory.createIRI("http://example.org/ns/hasValue"),
+                factory.createLiteral("Value of BNode", null, null),
                 null
         );
 
@@ -296,10 +299,10 @@ class TurtleSerializerTest {
      */
     @Test
     void testBaseIRI() throws SerializationException, IOException {
-        Statement mockStatement = createStatement(
-                createIRI("http://example.org/base/resource1"),
-                createIRI("http://example.org/base/prop"),
-                createLiteral("Test", null, null),
+        Statement mockStatement = factory.createStatement(
+                factory.createIRI("http://example.org/base/resource1"),
+                factory.createIRI("http://example.org/base/prop"),
+                factory.createLiteral("Test", null, null),
                 null
         );
 
@@ -381,10 +384,10 @@ class TurtleSerializerTest {
     @Test
     void testStrictModeInvalidLiteral() throws SerializationException {
 
-        Statement mockStatement = createStatement(
-                createIRI("http://example.org/s"),
-                createIRI("http://example.org/p"),
-                createLiteral("invalid", RDF.LANGSTRING.getIRI(), null),
+        Statement mockStatement = factory.createStatement(
+                factory.createIRI("http://example.org/s"),
+                factory.createIRI("http://example.org/p"),
+                factory.createLiteral("invalid", RDF.LANGSTRING.getIRI(), null),
                 null
         );
 
@@ -417,10 +420,10 @@ class TurtleSerializerTest {
     @Test
     void testStrictModeInvalidIRICharacters() throws SerializationException {
 
-        Statement mockStatement = createStatement(
-                createIRI("http://example.org/s"),
-                createIRI("http://example.org/p"),
-                createIRI("http://example.org/invalid iri"),
+        Statement mockStatement = factory.createStatement(
+                factory.createIRI("http://example.org/s"),
+                factory.createIRI("http://example.org/p"),
+                factory.createIRI("http://example.org/invalid iri"),
                 null
         );
 
@@ -454,10 +457,10 @@ class TurtleSerializerTest {
     @Test
     void testMultilineLiteralSerialization() throws SerializationException, IOException {
         String multilineText = "This is the first line.\nThis is the second line.";
-        Statement mockStatement = createStatement(
-                createIRI("http://example.org/book/1"),
-                createIRI("http://example.org/properties/description"),
-                createLiteral(multilineText, null, null),
+        Statement mockStatement = factory.createStatement(
+                factory.createIRI("http://example.org/book/1"),
+                factory.createIRI("http://example.org/properties/description"),
+                factory.createLiteral(multilineText, null, null),
                 null
         );
 
@@ -492,55 +495,4 @@ class TurtleSerializerTest {
         assertEquals(expected, actual);
     }
 
-
-    private Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(subject);
-        when(stmt.getPredicate()).thenReturn(predicate);
-        when(stmt.getObject()).thenReturn(object);
-        when(stmt.getContext()).thenReturn(context);
-        return stmt;
-    }
-
-    private Resource createBlankNode(String id) {
-        Resource blankNode = mock(Resource.class);
-        when(blankNode.isResource()).thenReturn(true);
-        when(blankNode.isBNode()).thenReturn(true);
-        when(blankNode.isIRI()).thenReturn(false);
-        when(blankNode.stringValue()).thenReturn(id);
-        return blankNode;
-    }
-
-    private IRI createIRI(String uri) {
-        IRI iri = mock(IRI.class);
-        when(iri.isResource()).thenReturn(true);
-        when(iri.isIRI()).thenReturn(true);
-        when(iri.isBNode()).thenReturn(false);
-        when(iri.stringValue()).thenReturn(uri);
-        return iri;
-    }
-
-    /**
-     * Creates a mocked Literal object.
-     *
-     * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
-     * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.
-     * @param langTag     The language tag (e.g., "en"), or null if not language-tagged.
-     * @return A mocked Literal instance.
-     */
-    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
-        Literal literal = mock(Literal.class);
-        when(literal.isLiteral()).thenReturn(true);
-        when(literal.isResource()).thenReturn(false);
-        when(literal.stringValue()).thenReturn(lexicalForm);
-
-        if (langTag != null && !langTag.isEmpty()) {
-            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
-            when(literal.getDatatype()).thenReturn(RDF.LANGSTRING.getIRI());
-        } else {
-            when(literal.getLanguage()).thenReturn(Optional.empty());
-            when(literal.getDatatype()).thenReturn(dataTypeIRI);
-        }
-        return literal;
-    }
 }

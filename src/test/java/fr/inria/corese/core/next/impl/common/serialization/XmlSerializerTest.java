@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
 import fr.inria.corese.core.next.impl.common.serialization.config.XmlConfig;
@@ -29,14 +30,7 @@ class XmlSerializerTest {
     @Mock
     private Model mockModel;
     XmlConfig mockConfig;
-    @Mock
-    private Resource mockResource;
-    @Mock
-    private IRI mockIRI;
-    @Mock
-    private Literal mockLiteral;
-    @Mock
-    private Statement mockStatement;
+    private TestStatementFactory factory;
 
     private StringWriter writer;
 
@@ -44,16 +38,20 @@ class XmlSerializerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         writer = new StringWriter();
+        factory = new TestStatementFactory();
 
         mockConfig = XmlConfig.defaultConfig();
-
     }
 
 
     @Test
     @DisplayName("Should serialize a simple IRI triple with auto-declared namespaces")
     void shouldSerializeSimpleIriTriple() throws SerializationException {
-        Statement stmt = createMockStatement("http://example.org/subject", "http://xmlns.com/foaf/0.1/name", "http://example.org/object");
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/subject"),
+                factory.createIRI("http://xmlns.com/foaf/0.1/name"),
+                factory.createIRI("http://example.org/object")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -84,7 +82,11 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should handle blank node subject")
     void shouldHandleBlankNodeSubject() throws SerializationException {
-        Statement stmt = createMockBlankNodeSubjectStatement("b1", "http://xmlns.com/foaf/0.1/name", "http://example.org/Alice");
+        Statement stmt = factory.createStatement(
+                factory.createBlankNode("b1"),
+                factory.createIRI("http://xmlns.com/foaf/0.1/name"),
+                factory.createIRI("http://example.org/Alice")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -113,7 +115,11 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should handle blank node object with correct namespace ordering")
     void shouldHandleBlankNodeObject() throws SerializationException {
-        Statement stmt = createMockBlankNodeObjectStatement("http://example.org/book", "http://purl.org/dc/elements/1.1/creator", "b2");
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/book"),
+                factory.createIRI("http://purl.org/dc/elements/1.1/creator"),
+                factory.createBlankNode("b2")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -142,8 +148,11 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should serialize literal with xsd:string datatype (minimal policy)")
     void shouldSerializeLiteralWithStringDatatypeMinimalPolicy() throws SerializationException {
-        Statement stmt = createMockLiteralStatement("http://example.org/person", "http://xmlns.com/foaf/0.1/name", "John Doe", SerializationConstants.XSD_STRING,
-                null);
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/person"),
+                factory.createIRI("http://xmlns.com/foaf/0.1/name"),
+                factory.createLiteral("John Doe", factory.createIRI(SerializationConstants.XSD_STRING), null)
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -170,7 +179,11 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should serialize literal with custom datatype using minimal policy")
     void shouldSerializeLiteralWithCustomDatatypeMinimalPolicy() throws SerializationException {
-        Statement stmt = createMockLiteralStatement("http://example.org/data", "http://example.org/vocabulary/value", "123", SerializationConstants.XSD_INTEGER, null);
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/data"),
+                factory.createIRI("http://example.org/vocabulary/value"),
+                factory.createLiteral("123", factory.createIRI(SerializationConstants.XSD_INTEGER), null)
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -198,7 +211,11 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should serialize literal with language tag")
     void shouldSerializeLiteralWithLanguage() throws SerializationException {
-        Statement stmt = createMockLiteralStatement("http://example.org/book", "http://purl.org/dc/elements/1.1/title", "The Book", null, "en");
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/book"),
+                factory.createIRI("http://purl.org/dc/elements/1.1/title"),
+                factory.createLiteral("The Book", null, "en")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -225,8 +242,16 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should respect alphabetical prefix ordering")
     void shouldRespectPrefixOrderingAlphabetical() throws SerializationException {
-        Statement stmt1 = createMockStatement("http://ex.org/s1", "http://ex.org/p1", "http://ex.org/o1");
-        Statement stmt2 = createMockStatement("http://ex.com/s2", "http://ex.com/p2", "http://ex.com/o2");
+        Statement stmt1 = factory.createStatement(
+                factory.createIRI("http://ex.org/s1"),
+                factory.createIRI("http://ex.org/p1"),
+                factory.createIRI("http://ex.org/o1")
+        );
+        Statement stmt2 = factory.createStatement(
+                factory.createIRI("http://ex.com/s2"),
+                factory.createIRI("http://ex.com/p2"),
+                factory.createIRI("http://ex.com/o2")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
@@ -259,8 +284,16 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should respect default prefix ordering (non-deterministic for subjects)")
     void shouldRespectPrefixOrderingDefault() throws SerializationException {
-        Statement stmt1 = createMockStatement("http://ex.org/s1", "http://ex.org/p1", "http://ex.org/o1");
-        Statement stmt2 = createMockStatement("http://ex.com/s2", "http://ex.com/p2", "http://ex.com/o2");
+        Statement stmt1 = factory.createStatement(
+                factory.createIRI("http://ex.org/s1"),
+                factory.createIRI("http://ex.org/p1"),
+                factory.createIRI("http://ex.org/o1")
+        );
+        Statement stmt2 = factory.createStatement(
+                factory.createIRI("http://ex.com/s2"),
+                factory.createIRI("http://ex.com/p2"),
+                factory.createIRI("http://ex.com/o2")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
@@ -293,8 +326,16 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should sort subjects alphabetically")
     void shouldSortSubjectsAlphabetically() throws SerializationException {
-        Statement stmt1 = createMockStatement("http://ex.org/B", "http://ex.org/p", "http://ex.org/o");
-        Statement stmt2 = createMockStatement("http://ex.org/A", "http://ex.org/p", "http://ex.org/o");
+        Statement stmt1 = factory.createStatement(
+                factory.createIRI("http://ex.org/B"),
+                factory.createIRI("http://ex.org/p"),
+                factory.createIRI("http://ex.org/o")
+        );
+        Statement stmt2 = factory.createStatement(
+                factory.createIRI("http://ex.org/A"),
+                factory.createIRI("http://ex.org/p"),
+                factory.createIRI("http://ex.org/o")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
@@ -326,7 +367,11 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should escape XML attribute values")
     void shouldEscapeXmlAttributeValues() throws SerializationException {
-        Statement stmt = createMockStatement("http://example.org/sub&ject<", "http://example.org/pred", "http://example.org/obj\"ect'");
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/sub&ject<"),
+                factory.createIRI("http://example.org/pred"),
+                factory.createIRI("http://example.org/obj\"ect'")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -352,8 +397,10 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should escape XML content values")
     void shouldEscapeXmlContentValues() throws SerializationException {
-        Statement stmt = createMockLiteralStatement("http://example.org/item", "http://example.org/prop", "Value with <tags> & entities", null,
-                null
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/item"),
+                factory.createIRI("http://example.org/prop"),
+                factory.createLiteral("Value with <tags> & entities", null, null)
         );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
@@ -384,7 +431,11 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should not auto-declare prefixes if disabled in configuration")
     void shouldNotAutoDeclarePrefixesIfDisabled() throws SerializationException {
-        Statement stmt = createMockStatement("http://example.org/subject", "http://xmlns.com/foaf/0.1/name", "http://example.org/object");
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/subject"),
+                factory.createIRI("http://xmlns.com/foaf/0.1/name"),
+                factory.createIRI("http://example.org/object")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -412,7 +463,11 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should not use prefixes if disabled in configuration")
     void shouldNotUsePrefixesIfDisabled() throws SerializationException {
-        Statement stmt = createMockStatement("http://example.org/subject", "http://xmlns.com/foaf/0.1/name", "http://example.org/object");
+        Statement stmt = factory.createStatement(
+                factory.createIRI("http://example.org/subject"),
+                factory.createIRI("http://xmlns.com/foaf/0.1/name"),
+                factory.createIRI("http://example.org/object")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
@@ -441,8 +496,16 @@ class XmlSerializerTest {
     @Test
     @DisplayName("Should not generate stable blank node IDs and sort subjects alphabetically")
     void shouldNotGenerateStableBlankNodeIds() throws SerializationException {
-        Statement stmt1 = createMockBlankNodeSubjectStatement("bnode-abc", "http://example.org/p", "http://example.org/o");
-        Statement stmt2 = createMockBlankNodeObjectStatement("http://example.org/s", "http://example.org/p", "bnode-xyz");
+        Statement stmt1 = factory.createStatement(
+                factory.createBlankNode("bnode-abc"),
+                factory.createIRI("http://example.org/p"),
+                factory.createIRI("http://example.org/o")
+        );
+        Statement stmt2 = factory.createStatement(
+                factory.createIRI("http://example.org/s"),
+                factory.createIRI("http://example.org/p"),
+                factory.createBlankNode("bnode-xyz")
+        );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
@@ -492,118 +555,4 @@ class XmlSerializerTest {
 
         assertEquals(expected, writer.toString());
     }
-
-
-    /**
-     * Helper method to create a mock Statement with IRI subject, predicate, and object.
-     * Completes all necessary stubbing for these mocks.
-     */
-    private Statement createMockStatement(String subjectUri, String predicateUri, String objectUri) {
-        Resource subject = mock(Resource.class);
-        when(subject.isIRI()).thenReturn(true);
-        when(subject.isBNode()).thenReturn(false);
-        when(subject.stringValue()).thenReturn(subjectUri);
-
-        IRI predicate = mock(IRI.class);
-        when(predicate.isIRI()).thenReturn(true);
-        when(predicate.isBNode()).thenReturn(false);
-        when(predicate.stringValue()).thenReturn(predicateUri);
-
-        IRI object = mock(IRI.class);
-        when(object.isIRI()).thenReturn(true);
-        when(object.isBNode()).thenReturn(false);
-        when(object.stringValue()).thenReturn(objectUri);
-
-        Statement statement = mock(Statement.class);
-        when(statement.getSubject()).thenReturn(subject);
-        when(statement.getPredicate()).thenReturn(predicate);
-        when(statement.getObject()).thenReturn(object);
-
-        return statement;
-    }
-
-    /**
-     * Helper method to create a mock Statement with a blank node subject.
-     */
-    private Statement createMockBlankNodeSubjectStatement(String blankNodeId, String predicateUri, String objectUri) {
-        Resource subject = mock(Resource.class);
-        when(subject.isIRI()).thenReturn(false);
-        when(subject.isBNode()).thenReturn(true);
-        when(subject.stringValue()).thenReturn("_:" + blankNodeId);
-
-        IRI predicate = mock(IRI.class);
-        when(predicate.isIRI()).thenReturn(true);
-        when(predicate.stringValue()).thenReturn(predicateUri);
-
-        IRI object = mock(IRI.class);
-        when(object.isIRI()).thenReturn(true);
-        when(object.stringValue()).thenReturn(objectUri);
-
-        Statement statement = mock(Statement.class);
-        when(statement.getSubject()).thenReturn(subject);
-        when(statement.getPredicate()).thenReturn(predicate);
-        when(statement.getObject()).thenReturn(object);
-
-        return statement;
-    }
-
-    /**
-     * Helper method to create a mock Statement with a blank node object.
-     */
-    private Statement createMockBlankNodeObjectStatement(String subjectUri, String predicateUri, String blankNodeId) {
-        Resource subject = mock(Resource.class);
-        when(subject.isIRI()).thenReturn(true);
-        when(subject.stringValue()).thenReturn(subjectUri);
-
-        IRI predicate = mock(IRI.class);
-        when(predicate.isIRI()).thenReturn(true);
-        when(predicate.stringValue()).thenReturn(predicateUri);
-
-        Resource object = mock(Resource.class);
-        when(object.isIRI()).thenReturn(false);
-        when(object.isBNode()).thenReturn(true);
-        when(object.stringValue()).thenReturn("_:" + blankNodeId);
-
-        Statement statement = mock(Statement.class);
-        when(statement.getSubject()).thenReturn(subject);
-        when(statement.getPredicate()).thenReturn(predicate);
-        when(statement.getObject()).thenReturn(object);
-
-        return statement;
-    }
-
-    /**
-     * Helper method to create a mock Statement with a literal object.
-     */
-    private Statement createMockLiteralStatement(String subjectUri, String predicateUri, String literalValue, String datatypeUri, String langTag) {
-        Resource subject = mock(Resource.class);
-        when(subject.isIRI()).thenReturn(true);
-        when(subject.stringValue()).thenReturn(subjectUri);
-
-        IRI predicate = mock(IRI.class);
-        when(predicate.isIRI()).thenReturn(true);
-        when(predicate.stringValue()).thenReturn(predicateUri);
-
-        Literal literal = mock(Literal.class);
-        when(literal.isIRI()).thenReturn(false);
-        when(literal.isBNode()).thenReturn(false);
-        when(literal.isLiteral()).thenReturn(true);
-        when(literal.stringValue()).thenReturn(literalValue);
-        when(literal.getLanguage()).thenReturn(Optional.ofNullable(langTag));
-        if (datatypeUri != null) {
-            IRI datatype = mock(IRI.class);
-            when(datatype.stringValue()).thenReturn(datatypeUri);
-            when(literal.getDatatype()).thenReturn(datatype);
-        } else {
-            when(literal.getDatatype()).thenReturn(null);
-        }
-
-        Statement statement = mock(Statement.class);
-        when(statement.getSubject()).thenReturn(subject);
-        when(statement.getPredicate()).thenReturn(predicate);
-        when(statement.getObject()).thenReturn(literal);
-
-        return statement;
-    }
-
 }
