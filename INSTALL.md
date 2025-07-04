@@ -41,7 +41,7 @@ If you're only interested in building without tests:
 ./gradlew assemble
 ```
 
-## 🧪 Run Tests
+## Run Tests
 
 ```bash
 ./gradlew test
@@ -53,7 +53,7 @@ You can view the test reports in:
 corese-core/build/reports/tests/test/index.html
 ```
 
-## 📦 Publish to Local Maven (optional)
+## Publish to Local Maven (optional)
 
 To publish Corese-Core locally for use in other modules (like `corese-gui`, `corese-server`, etc.):
 
@@ -67,7 +67,7 @@ The artifact will be installed under:
 ~/.m2/repository/fr/inria/corese/corese-core/
 ```
 
-## 🧼 Clean Build
+## Clean Build
 
 ```bash
 ./gradlew clean
@@ -75,8 +75,8 @@ The artifact will be installed under:
 
 ---
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
-- ❌ *Gradle not found?* → Use `./gradlew` instead of `gradle`
-- ❌ *Java version too low?* → Corese requires Java 21+. You can install it via SDKMAN, Homebrew, or your package manager.
-- ❌ *Tests failing due to RDF line endings or hashes?* → Make sure to normalize line endings (`\n`) and verify data hashes if you're running tests on Windows.
+- *Gradle not found?* → Use `./gradlew` instead of `gradle`
+- *Java version too low?* → Corese requires Java 21+. You can install it via SDKMAN, Homebrew, or your package manager.
+- *Tests failing due to RDF line endings or hashes?* → Make sure to normalize line endings (`\n`) and verify data hashes if you're running tests on Windows.
