@@ -65,7 +65,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-core"
-    const val version = "4.6.4"
+    const val version = "4.6.4-SNAPSHOT"
 
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
@@ -110,7 +110,7 @@ dependencies {
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
 
     // === Core dependencies ===
-    implementation("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
+    api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:0.7.2")            // RDFa parser (Semargl)
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
 
