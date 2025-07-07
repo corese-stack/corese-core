@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.impl.common.serialization.config;
 /**
  * Configuration for N-Quads serialization format.
  * This class extends {@link AbstractNFamilyConfig} and provides specific defaults
- * and options tailored for N-Quads, which extends N-Triples with named graphs.
+ * and options tailored for N-Quads, which extends N-Quads with named graphs.
  *
  * <p>Use the {@link Builder} class to create instances of {@code NQuadsConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
