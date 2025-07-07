@@ -13,8 +13,8 @@ public interface RDFParser {
      */
     RdfFormat getRDFFormat();
 
-    public void setConfig(RDFParserOptions config);
-    public RDFParserOptions getConfig();
+    void setConfig(IOOptions config);
+    IOOptions getConfig();
 
     /**
      * Parses RDF data from the specified InputStream or Reader and adds it to the model.

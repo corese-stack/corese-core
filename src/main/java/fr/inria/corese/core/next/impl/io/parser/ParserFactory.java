@@ -20,8 +20,19 @@ public class ParserFactory extends AbstractRDFParserFactory {
         if(format == RdfFormat.JSONLD) {
             return new JSONLDParser(model, factory, config);
         } else if(format == RdfFormat.TURTLE) {
+            return new ANTLRTurtleParser(model, factory, config);
+        }
+        throw new IllegalArgumentException("Unsupported format: " + format);
+    }
+
+    @Override
+    public RDFParser createRDFParser(RdfFormat format, Model model, ValueFactory factory) {
+        if(format == RdfFormat.JSONLD) {
+            return new JSONLDParser(model, factory);
+        } else if(format == RdfFormat.TURTLE) {
             return new ANTLRTurtleParser(model, factory);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
     }
+
 }

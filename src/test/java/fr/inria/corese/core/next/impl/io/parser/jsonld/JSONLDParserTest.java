@@ -14,8 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JSONLDParserTest {
 
@@ -24,7 +23,27 @@ public class JSONLDParserTest {
     private final ValueFactory valueFactory = new CoreseAdaptedValueFactory();
 
     @Test
-    void testGetRDFFormat() {
+    void constructorNullModelThrowsTest() {
+        assertThrows(NullPointerException.class, () -> new JSONLDParser(null, valueFactory));
+    }
+
+    @Test
+    void constructorNullValueFactoryThrowsTest() {
+        assertThrows(NullPointerException.class, () -> new JSONLDParser(new CoreseModel(), null));
+    }
+
+    @Test
+    void constructorNullModelAndValueFactoryThrowsTest() {
+        assertThrows(NullPointerException.class, () -> new JSONLDParser(null, null));
+    }
+
+    @Test
+    void constructorConfigNoThrowsTest() {
+        assertDoesNotThrow(() -> new JSONLDParser(new CoreseModel(), valueFactory, null));
+    }
+
+    @Test
+    void getRDFFormatTest() {
         RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, new CoreseModel(), valueFactory);
         assertEquals(RdfFormat.JSONLD, parser.getRDFFormat());
     }

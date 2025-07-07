@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RdfFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
@@ -26,6 +27,10 @@ public class ANTLRTurtleParser extends AbstractRDFParser {
         super(model, factory);
     }
 
+    public ANTLRTurtleParser(Model model, ValueFactory factory, IOOptions config) {
+        super(model, factory, config);
+    }
+
     @Override
     public RdfFormat getRDFFormat() {
         return RdfFormat.TURTLE;
@@ -35,7 +40,7 @@ public class ANTLRTurtleParser extends AbstractRDFParser {
      * @param config we are not using any config in this parser implementation
      */
     @Override
-    public void setConfig(RDFParserOptions config) {
+    public void setConfig(IOOptions config) {
         // nothing to do
     }
 
@@ -43,7 +48,7 @@ public class ANTLRTurtleParser extends AbstractRDFParser {
      * @return null, we are not using any config in this parser implementation
      */
     @Override
-    public RDFParserOptions getConfig() {
+    public IOOptions getConfig() {
         return null;
     }
 
@@ -77,7 +82,7 @@ public class ANTLRTurtleParser extends AbstractRDFParser {
             TurtleParser parser = new TurtleParser(tokens);
             ParseTreeWalker walker = new ParseTreeWalker();
             ParseTree tree = parser.turtleDoc();
-            TurtleListenerImpl listener = new TurtleListenerImpl(getModel(), baseURI, getValueFactory());
+            TurtleListenerImpl listener = new TurtleListenerImpl(getModel(), getValueFactory(), this.getConfig());
 
             walker.walk((ParseTreeListener) listener, tree);
 

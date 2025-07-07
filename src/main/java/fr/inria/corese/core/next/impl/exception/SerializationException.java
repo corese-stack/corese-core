@@ -4,10 +4,14 @@ package fr.inria.corese.core.next.impl.exception;
  * Exception levée lors d'échecs de sérialisation/désérialisation RDF.
  * Peut contenir des détails spécifiques au format (NTriples, JSON-LD, etc.).
  */
-public class SerializationException extends Exception {
+public class SerializationException extends RuntimeException {
     private final String formatName;
     private final int lineNumber;
     private final int columnNumber;
+
+    public SerializationException(String message, String formatName) {
+        this(message, formatName, -1, -1, null);
+    }
 
     public SerializationException(String message, String formatName, Throwable cause) {
         this(message, formatName, -1, -1, cause);

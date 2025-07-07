@@ -30,19 +30,8 @@ public class TurtleListenerImplSpec {
         ParseTree tree = parser.turtleDoc();
 
         Model model = new CoreseModel();
-        TurtleListenerImpl listener = new TurtleListenerImpl(model, null, factory);
+        TurtleListenerImpl listener = new TurtleListenerImpl(model, factory, null);
         walker.walk((ParseTreeListener) listener, tree);
-
-
-        /*
-        model.forEach(stmt -> {
-            System.out.println(stmt.getSubject().stringValue() + " " +
-                    stmt.getPredicate().stringValue() + " " +
-                    stmt.getObject().stringValue());
-        });
-
-         */
-
 
         return model;
     }

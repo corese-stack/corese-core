@@ -8,14 +8,15 @@ import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests to check that values are properly set
+ */
 class TitaniumJSONLDProcessorOptionsTest {
 
     private TitaniumJSONLDProcessorOptions optionAllTrue = new TitaniumJSONLDProcessorOptions(new TitaniumJSONLDProcessorOptions.Builder().base("http://example.org/AllTrue")
             .extractAllScripts(true)
             .compactToRelative(true)
             .compactArrays(true)
-            .omitDefault(true)
-            .omitGraph(true)
             .ordered(true)
             .useRdfType(true)
             .useNativeTypes(true)
@@ -25,8 +26,6 @@ class TitaniumJSONLDProcessorOptionsTest {
             .extractAllScripts(false)
             .compactArrays(false)
             .compactToRelative(false)
-            .omitDefault(false)
-            .omitGraph(false)
             .ordered(false)
             .useRdfType(false)
             .useNativeTypes(false)
@@ -48,18 +47,6 @@ class TitaniumJSONLDProcessorOptionsTest {
     void isExtractAllScripts() {
         assertTrue(optionAllTrue.isExtractAllScripts());
         assertFalse(optionAllFalse.isExtractAllScripts());
-    }
-
-    @Test
-    void isOmitDefault() {
-        assertTrue(optionAllTrue.isOmitDefault());
-        assertFalse(optionAllFalse.isOmitDefault());
-    }
-
-    @Test
-    void isOmitGraph() {
-        assertTrue(optionAllTrue.isOmitGraph());
-        assertFalse(optionAllFalse.isOmitGraph());
     }
 
     @Test
