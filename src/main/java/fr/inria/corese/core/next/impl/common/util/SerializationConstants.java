@@ -73,6 +73,7 @@ public class SerializationConstants {
     // Nouvelle constante pour le séparateur de datatype
     public static final String DATATYPE_SEPARATOR = "^^";
 
+    public static final String DEFAULT_GRAPH_IRI = "http://ns.inria.fr/corese/default-graph";
 
     /**
      * Private constructor to prevent instantiation of this utility class.

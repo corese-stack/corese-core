@@ -4,6 +4,8 @@ import com.apicatalog.rdf.*;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
+
+import static fr.inria.corese.core.next.impl.common.util.SerializationConstants.DEFAULT_GRAPH_IRI;
 
 /**
  * Adapter class from Model to RdfDataset for usage in the JSON-LD serialization process using the titanium library.
@@ -63,7 +67,27 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     @Override
     public Set<RdfResource> getGraphNames() {
-        return new HashSet<>(this.model.contexts().stream().map(this::toRdfResource).toList());
+        return new HashSet<>(this.model.contexts().stream().map( context -> {
+              if (context == null) {
+                  return new RdfResource() {
+                      @Override
+                      public boolean isIRI() {
+                          return true;
+                      }
+
+                      @Override
+                      public boolean isBlankNode() {
+                          return false;
+                      }
+
+                      @Override
+                      public String getValue() {
+                          return DEFAULT_GRAPH_IRI;
+                      }
+                  };
+              }
+               return toRdfResource(context);
+        }).toList());
     }
 
     @Override
@@ -71,13 +95,21 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         return Optional.of(new RdfGraph() {
             @Override
             public boolean contains(RdfTriple triple) {
-                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()), toResource(graphName));
+                Resource graphResource = null;
+                if (graphName != null && !graphName.getValue().equals(DEFAULT_GRAPH_IRI)) {
+                    graphResource = toResource(graphName);
+                }
+                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()), graphResource);
             }
 
             @Override
             public List<RdfTriple> toList() {
                 List<RdfTriple> result = new ArrayList<>();
-                model.getStatements(null, null, null, toResource(graphName)).forEach(statement -> result.add(toRdfNQuad(statement)));
+                Resource graphResource = null;
+                if (graphName != null && !graphName.getValue().equals(DEFAULT_GRAPH_IRI)) {
+                    graphResource = toResource(graphName);
+                }
+                model.getStatements(null, null, null, graphResource).forEach(statement -> result.add(toRdfNQuad(statement)));
                 return result;
             }
         });
@@ -116,42 +148,99 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         return new RdfTriple() {
             @Override
             public RdfResource getSubject() {
+                logger.debug("getSubject: {}", statement.getSubject().stringValue());
                 return toRdfResource(statement.getSubject());
             }
 
             @Override
             public RdfResource getPredicate() {
+                logger.debug("getPredicate: {}", statement.getPredicate().stringValue());
                 return toRdfResource(statement.getPredicate());
             }
 
             @Override
             public RdfValue getObject() {
+                logger.debug("getObject: {}", statement.getObject().stringValue());
                 return toRdfValue(statement.getObject());
             }
         };
     }
 
     private RdfResource toRdfResource(Resource resource) {
-        return () -> {
-            if (resource != null) {
+        if (resource != null && (! (resource.isBNode() || resource.isIRI()))) {
+            throw new SerializationException("Unknown resource type " + resource, "JSON-LD");
+        } else if (resource == null) {
+            return null;
+        }
+        return new RdfResource() {
+            @Override
+            public boolean isIRI() {
+                return resource.isIRI();
+            }
+
+            @Override
+            public boolean isBlankNode() {
+                return resource.isBNode();
+            }
+
+            @Override
+            public String getValue() {
                 return resource.stringValue();
-            } else {
-                return null;
             }
         };
     }
 
     private RdfValue toRdfValue(Value value) {
-        if (value.isResource()) {
-            return toRdfResource((Resource) value);
+        if (value.isIRI()) {
+            logger.debug("toRdfValue: {} -> IRI", value.stringValue());
+            return toRdfIRI((IRI) value);
+        } else if (value.isBNode()) {
+            logger.debug("toRdfValue: {} -> BNode", value.stringValue());
+            return toRdfBlankNode((BNode) value);
         } else if (value.isLiteral()) {
+            logger.debug("toRdfValue: {} -> Literal", value.stringValue());
             return toRdfLiteral((Literal) value);
         } else {
-            throw new IllegalArgumentException("Unknown value type");
+            throw new SerializationException("Unknown value type " + value.stringValue(), "JSON-LD");
         }
     }
 
+    private RdfResource toRdfIRI(IRI iri) {
+        return new RdfResource() {
+            @Override
+            public boolean isIRI() {
+                return true;
+            }
+            @Override
+            public boolean isBlankNode() {
+                return false;
+            }
+            @Override
+            public String getValue() {
+                return iri.stringValue();
+            }
+        };
+    }
+
+    private RdfResource toRdfBlankNode(BNode bnode) {
+        return new RdfResource() {
+            @Override
+            public boolean isIRI() {
+                return false;
+            }
+            @Override
+            public boolean isBlankNode() {
+                return true;
+            }
+            @Override
+            public String getValue() {
+                return bnode.stringValue();
+            }
+        };
+    }
+
     private RdfLiteral toRdfLiteral(Literal literal) {
+        logger.debug("toRdfLiteral: {} {} {}", literal.stringValue(), literal.getDatatype().stringValue(), literal.getLanguage());
         return new RdfLiteral() {
             @Override
             public String getValue() {
@@ -160,7 +249,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
             @Override
             public String getDatatype() {
-                if (literal.getDatatype() != null) {
+                if (literal.getDatatype() != null && !literal.getDatatype().equals(XSD.xsdString.getIRI())) {
                     return literal.getDatatype().stringValue();
                 } else {
                     return "";
@@ -182,7 +271,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         } else if (value.isBlankNode()) {
             return toBNode((RdfResource) value);
         } else {
-            throw new IllegalArgumentException("Unknown value type");
+            throw new SerializationException("Unknown value type " + value.getValue(), "JSON-LD");
         }
     }
 
@@ -192,7 +281,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         } else if (resource.isBlankNode()) {
             return toBNode(resource);
         } else {
-            throw new IllegalArgumentException("Unknown resource type");
+            throw new SerializationException("Unknown resource type " + resource.getValue(), "JSON-LD");
         }
     }
 
@@ -221,6 +310,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
     }
 
     private Literal toLiteral(RdfLiteral literal) {
+        logger.debug("Converting literal: {}", literal);
         return new Literal() {
             @Override
             public String stringValue() {
@@ -302,9 +392,8 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
                 try {
                     return DatatypeFactory.newInstance().newXMLGregorianCalendar(literal.getValue());
                 } catch (DatatypeConfigurationException e) {
-                    logger.error("Literal couldn't be converted to XMLGregorianCalendar", e);
+                    throw new SerializationException("Literal couldn't be converted to XMLGregorianCalendar", "JSON-LD", e);
                 }
-                return null;
             }
 
             @Override
@@ -316,7 +405,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     private IRI stringToIRI(String iri) {
         if (iri == null || !IRIUtils.isStandardIRI(iri)) {
-            return null;
+            throw new SerializationException("Invalid IRI: " + iri, "JSON-LD");
         }
         return new IRI() {
             @Override

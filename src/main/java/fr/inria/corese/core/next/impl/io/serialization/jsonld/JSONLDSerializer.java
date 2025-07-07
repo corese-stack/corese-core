@@ -1,8 +1,12 @@
 package fr.inria.corese.core.next.impl.io.serialization.jsonld;
 
+import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
+import com.apicatalog.jsonld.api.FromRdfApi;
+import com.apicatalog.jsonld.document.RdfDocument;
 import com.apicatalog.jsonld.serialization.RdfToJsonld;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.TitaniumJSONLDProcessorOptions;
@@ -17,9 +21,14 @@ import java.util.Objects;
 public class JSONLDSerializer implements FormatSerializer {
 
     private Model model;
-    private TitaniumJSONLDProcessorOptions config;
+    private IOOptions config;
 
-    public JSONLDSerializer(Model model, TitaniumJSONLDProcessorOptions config) {
+    /**
+     * Constructor.
+     * @param model
+     * @param config
+     */
+    public JSONLDSerializer(Model model, IOOptions config) {
         this.model = Objects.requireNonNull(model);
         this.config = Objects.requireNonNull(config);
     }
@@ -32,12 +41,12 @@ public class JSONLDSerializer implements FormatSerializer {
     public void write(Writer writer) throws SerializationException {
         TitaniumRDFDatasetSerializationAdapter adapter = new TitaniumRDFDatasetSerializationAdapter(model);
         try {
-            RdfToJsonld builder = RdfToJsonld.with(adapter)
-                .ordered(this.config.isOrdered())
-                .processingMode(this.config.getProcessingMode())
-                .useNativeTypes(this.config.isUseNativeTypes())
-                .useRdfType(this.config.isUseRdfType());
-            jakarta.json.JsonArray jsonArray = builder.build();
+            FromRdfApi fromRdfApi = JsonLd.fromRdf(RdfDocument.of(adapter));
+            if(this.config instanceof TitaniumJSONLDProcessorOptions options) {
+                fromRdfApi.options(options.getJsonLdOptions());
+            }
+
+            jakarta.json.JsonArray jsonArray = fromRdfApi.get();
             writer.write(jsonArray.toString());
         } catch (JsonLdError | IOException e) {
             throw new SerializationException("Error during serialization", "JSONLD", e);
