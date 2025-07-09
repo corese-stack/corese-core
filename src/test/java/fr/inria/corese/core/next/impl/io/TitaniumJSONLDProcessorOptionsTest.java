@@ -33,14 +33,14 @@ class TitaniumJSONLDProcessorOptionsTest {
 
     @Test
     void isCompactArrays() {
-        assertTrue(optionAllTrue.isCompactArrays());
-        assertFalse(optionAllFalse.isCompactArrays());
+        assertTrue(optionAllTrue.compactsArrays());
+        assertFalse(optionAllFalse.compactsArrays());
     }
 
     @Test
     void isCompactToRelative() {
-        assertTrue(optionAllTrue.isCompactToRelative());
-        assertFalse(optionAllFalse.isCompactToRelative());
+        assertTrue(optionAllTrue.compactsToRelative());
+        assertFalse(optionAllFalse.compactsToRelative());
     }
 
     @Test
@@ -72,14 +72,14 @@ class TitaniumJSONLDProcessorOptionsTest {
 
     @Test
     void isUseNativeTypes() {
-        assertTrue(optionAllTrue.isUseNativeTypes());
-        assertFalse(optionAllFalse.isUseNativeTypes());
+        assertTrue(optionAllTrue.usesNativeTypes());
+        assertFalse(optionAllFalse.usesNativeTypes());
     }
 
     @Test
     void isUseRdfType() {
-        assertTrue(optionAllTrue.isUseRdfType());
-        assertFalse(optionAllFalse.isUseRdfType());
+        assertTrue(optionAllTrue.usesRdfType());
+        assertFalse(optionAllFalse.usesRdfType());
     }
 
     @Test

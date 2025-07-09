@@ -25,14 +25,14 @@ public class TitaniumJSONLDProcessorOptions extends AbstractIOOptions implements
     /**
      * @return it true, the serializer will compact arrays of length 1 with a single object item will be compacted to use only that object instead. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-compactarrays">See standard.</a>
      */
-    public boolean isCompactArrays() {
+    public boolean compactsArrays() {
         return this.builder.options.isCompactArrays();
     }
 
     /**
      * @return if true, the serializer will compact IRIs to be relative to document base. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-compacttorelative">See standard.</a>
      */
-    public boolean isCompactToRelative() {
+    public boolean compactsToRelative() {
         return this.builder.options.isCompactToRelative();
     }
 
@@ -41,6 +41,14 @@ public class TitaniumJSONLDProcessorOptions extends AbstractIOOptions implements
      */
     public boolean isExtractAllScripts() {
         return this.builder.options.isExtractAllScripts();
+    }
+
+    public boolean omitsDefault() {
+        return this.builder.options.isOmitDefault();
+    }
+
+    public boolean omitGraphs() {
+        return this.builder.options.isOmitGraph();
     }
 
     /**
@@ -69,14 +77,14 @@ public class TitaniumJSONLDProcessorOptions extends AbstractIOOptions implements
     /**
      * @return If true, the serializer will produce JSON-LD using native types. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-usenativetypes">See standard.</a>
      */
-    public boolean isUseNativeTypes() {
+    public boolean usesNativeTypes() {
         return this.builder.options.isUseNativeTypes();
     }
 
     /**
      * @return If true, the serializer will produce JSON-LD using RDF type. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-userdftype">See standard.</a>
      */
-    public boolean isUseRdfType() {
+    public boolean usesRdfType() {
         return this.builder.options.isUseRdfType();
     }
 
@@ -132,7 +140,7 @@ public class TitaniumJSONLDProcessorOptions extends AbstractIOOptions implements
 
         /**
          * @param compactToRelative if true, compact IRIs to be relative to document base.
-         * @return
+         * @return this builder
          */
         public Builder compactToRelative(boolean compactToRelative) {
             this.options.setCompactToRelative(compactToRelative);
@@ -145,6 +153,16 @@ public class TitaniumJSONLDProcessorOptions extends AbstractIOOptions implements
          */
         public Builder extractAllScripts(boolean extractAllScripts) {
             this.options.setExtractAllScripts(extractAllScripts);
+            return this;
+        }
+
+        public Builder omitGraph(boolean omitGraph) {
+            this.options.setOmitGraph(omitGraph);
+            return this;
+        }
+
+        public Builder omitDefault(boolean omitDefault) {
+            this.options.setOmitDefault(omitDefault);
             return this;
         }
 

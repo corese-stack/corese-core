@@ -4,6 +4,7 @@ import com.apicatalog.rdf.*;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.slf4j.Logger;
@@ -67,27 +68,13 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     @Override
     public Set<RdfResource> getGraphNames() {
-        return new HashSet<>(this.model.contexts().stream().map( context -> {
-              if (context == null) {
-                  return new RdfResource() {
-                      @Override
-                      public boolean isIRI() {
-                          return true;
-                      }
-
-                      @Override
-                      public boolean isBlankNode() {
-                          return false;
-                      }
-
-                      @Override
-                      public String getValue() {
-                          return DEFAULT_GRAPH_IRI;
-                      }
-                  };
-              }
-               return toRdfResource(context);
-        }).toList());
+        HashSet<RdfResource> result = new HashSet<>();
+        this.model.contexts().forEach(context -> {
+            if(context != null) {
+                result.add(toRdfResource(context));
+            }
+        });
+        return result;
     }
 
     @Override
@@ -212,10 +199,6 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
                 return true;
             }
             @Override
-            public boolean isBlankNode() {
-                return false;
-            }
-            @Override
             public String getValue() {
                 return iri.stringValue();
             }
@@ -224,10 +207,6 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     private RdfResource toRdfBlankNode(BNode bnode) {
         return new RdfResource() {
-            @Override
-            public boolean isIRI() {
-                return false;
-            }
             @Override
             public boolean isBlankNode() {
                 return true;
@@ -243,16 +222,28 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         logger.debug("toRdfLiteral: {} {} {}", literal.stringValue(), literal.getDatatype().stringValue(), literal.getLanguage());
         return new RdfLiteral() {
             @Override
+            public boolean isLiteral() {
+                return true;
+            }
+
+            @Override
             public String getValue() {
                 return literal.getLabel();
             }
 
             @Override
             public String getDatatype() {
-                if (literal.getDatatype() != null && !literal.getDatatype().equals(XSD.xsdString.getIRI())) {
+                if (literal.getDatatype() != null
+                        && ! (literal.getDatatype().equals(XSD.xsdString.getIRI())
+                            || (literal.getDatatype().equals(RDF.langString.getIRI())
+                                && literal.getLanguage().isPresent())
+                        )
+                    ) {
                     return literal.getDatatype().stringValue();
+                } else if (literal.getLanguage().isPresent()) {
+                    return RDF.langString.getIRI().stringValue();
                 } else {
-                    return "";
+                    return XSD.xsdString.getIRI().stringValue();
                 }
             }
 
