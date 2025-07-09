@@ -209,7 +209,7 @@ publishing {
                         id.set("pierremaillot")
                         name.set("Pierre Maillot")
                         email.set("pierre.maillot@inria.fr")
-                        url.set("https://maillpierre.github.io/personal-page/")
+                        url.set("https://w3id.org/people/pierremaillot")
                         organization.set("Inria")
                         organizationUrl.set("http://www.inria.fr/")
                     }
