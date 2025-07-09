@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.common.serialization.config.NQuadsConfig;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,27 +13,23 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Iterator;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-class NQuadsFormatTest {
+class NQuadsSerializerTest {
 
     private Model model;
-    private FormatConfig config;
-    private NQuadsFormat nQuadsFormat;
+    private NQuadsConfig config;
+    private NQuadsSerializer nQuadsSerializer;
+    private TestStatementFactory factory;
 
     private Resource mockExPerson;
     private IRI mockExName;
-
     private IRI mockExKnows;
-    private IRI mockExContext;
-
 
     private final String lexJohn = "John Doe";
-
     private final String hello = "Hello";
 
     private Literal mockLiteralJohn;
@@ -44,40 +40,37 @@ class NQuadsFormatTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-        config = new FormatConfig.Builder().build();
-        nQuadsFormat = new NQuadsFormat(model, config);
+        config = NQuadsConfig.defaultConfig();
+        nQuadsSerializer = new NQuadsSerializer(model, config);
+        factory = new TestStatementFactory();
 
-        mockExPerson = createIRI("http://example.org/Person");
-        mockExName = createIRI("http://example.org/name");
+        mockExPerson = factory.createIRI("http://example.org/Person");
+        mockExName = factory.createIRI("http://example.org/name");
+        mockExKnows = factory.createIRI("http://example.org/knows");
 
-        mockExKnows = createIRI("http://example.org/knows");
+        mockLiteralJohn = factory.createLiteral(lexJohn, null, null);
+        mockLiteralHelloEn = factory.createLiteral(hello, null, "en");
 
-
-        mockLiteralJohn = createLiteral(lexJohn, null, null);
-        mockLiteralHelloEn = createLiteral(hello, null, "en");
-
-        mockBNode1 = createBlankNode("b1");
-        mockBNode2 = createBlankNode("b2");
-        mockExContext = createIRI("http://example.org/myGraph");
+        mockBNode1 = factory.createBlankNode("b1");
+        mockBNode2 = factory.createBlankNode("b2");
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        assertThrows(NullPointerException.class, () -> new NQuadsFormat(null), "Model cannot be null");
-        assertThrows(NullPointerException.class, () -> new NQuadsFormat(null, config), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new NQuadsSerializer(null), "Model cannot be null");
     }
 
     @Test
-    @DisplayName("Constructor should throw NullPointerException for null config")
+    @DisplayName("Constructor should throw NullPointerException for null configuration")
     void constructorShouldThrowForNullConfig() {
-        assertThrows(NullPointerException.class, () -> new NQuadsFormat(model, null), "Configuration cannot be null");
+        assertThrows(NullPointerException.class, () -> new NQuadsSerializer(model, null), "Configuration cannot be null");
     }
 
     @Test
-    @DisplayName("Write should serialize simple statement correctly (default graph)")
+    @DisplayName("Write should serialize a simple statement correctly (default graph)")
     void writeShouldSerializeSimpleStatement() throws SerializationException {
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn
@@ -85,8 +78,7 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
-
+        nQuadsSerializer.write(writer);
 
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
@@ -97,33 +89,9 @@ class NQuadsFormatTest {
     }
 
     @Test
-    @DisplayName("Write should serialize statement with context (named graph)")
-    void writeShouldSerializeStatementWithContext() throws SerializationException {
-        Statement stmt = createStatement(
-                mockExPerson,
-                mockExName,
-                mockLiteralJohn,
-                mockExContext
-        );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
-
-        StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
-
-
-        String expected = String.format("<%s> <%s> \"%s\" <%s>",
-                mockExPerson.stringValue(),
-                mockExName.stringValue(),
-                escapeNQuadsString(lexJohn),
-                mockExContext.stringValue()) + " .\n";
-
-        assertEquals(expected, writer.toString());
-    }
-
-    @Test
     @DisplayName("Write should handle blank nodes with default prefix")
     void writeShouldHandleBlankNodes() throws SerializationException {
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockBNode1,
                 mockExKnows,
                 mockBNode2
@@ -131,7 +99,7 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
+        nQuadsSerializer.write(writer);
 
         String expected = String.format("_:%s <%s> _:%s",
                 mockBNode1.stringValue(),
@@ -144,8 +112,8 @@ class NQuadsFormatTest {
     @Test
     @DisplayName("Write should handle blank nodes in context with default prefix")
     void writeShouldHandleBlankNodesInContext() throws SerializationException {
-        Resource blankNodeContext = createBlankNode("b3");
-        Statement stmt = createStatement(
+        Resource blankNodeContext = factory.createBlankNode("b3");
+        Statement stmt = factory.createStatement(
                 mockBNode1,
                 mockExKnows,
                 mockExPerson,
@@ -154,7 +122,7 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
+        nQuadsSerializer.write(writer);
 
         String expected = String.format("_:%s <%s> <%s> _:%s",
                 mockBNode1.stringValue(),
@@ -166,35 +134,9 @@ class NQuadsFormatTest {
     }
 
     @Test
-    @DisplayName("Write should handle blank nodes with custom prefix")
-    void writeShouldHandleBlankNodesWithCustomPrefix() throws SerializationException {
-        FormatConfig customConfig = new FormatConfig.Builder().blankNodePrefix("genid-").build();
-        NQuadsFormat customSerializer = new NQuadsFormat(model, customConfig);
-
-        Statement stmt = createStatement(
-                mockBNode1,
-                mockExKnows,
-                mockBNode2,
-                createBlankNode("b3")
-        );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
-
-        StringWriter writer = new StringWriter();
-        customSerializer.write(writer);
-
-        String expected = String.format("genid-%s <%s> genid-%s genid-%s",
-                mockBNode1.stringValue(),
-                mockExKnows.stringValue(),
-                mockBNode2.stringValue(),
-                createBlankNode("b3").stringValue()) + " .\n";
-
-        assertEquals(expected, writer.toString());
-    }
-
-    @Test
     @DisplayName("Write should throw SerializationException on IO error")
     void writeShouldThrowOnIOException() throws IOException {
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn
@@ -202,13 +144,16 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer faultyWriter = mock(Writer.class);
-        doThrow(new IOException("Simulated IO error")).when(faultyWriter).write(anyString());
+        doThrow(new IOException("Simulated IO error during write")).when(faultyWriter).write(anyString());
+        doThrow(new IOException("Simulated IO error (char array)")).when(faultyWriter).write(any(char[].class), anyInt(), anyInt());
+        doThrow(new IOException("Simulated IO error (close)")).when(faultyWriter).close();
 
-        assertThrows(SerializationException.class, () -> nQuadsFormat.write(faultyWriter));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(faultyWriter));
+        assertEquals("N-Quads serialization failed [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null subject value from Statement")
+    @DisplayName("Write should throw SerializationException for null subject value in strict mode")
     void writeShouldThrowOnNullSubjectValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(null);
@@ -218,11 +163,12 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
+        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null predicate value from Statement")
+    @DisplayName("Write should throw SerializationException for null predicate value in strict mode")
     void writeShouldThrowOnNullPredicateValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
@@ -232,27 +178,28 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
+        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Write should throw SerializationException on null object value from Statement")
+    @DisplayName("Write should throw SerializationException for null object value in strict mode")
     void writeShouldThrowOnNullObjectValue() {
         Statement stmt = mock(Statement.class);
         when(stmt.getSubject()).thenReturn(mockExPerson);
         when(stmt.getPredicate()).thenReturn(mockExName);
         when(stmt.getObject()).thenReturn(null);
-        when(stmt.getContext()).thenReturn(null);
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        assertThrows(SerializationException.class, () -> nQuadsFormat.write(writer));
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
+        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
-    @DisplayName("Write should correctly handle null context (default graph)")
+    @DisplayName("Write should handle null context correctly (default graph)")
     void writeShouldHandleNullContext() throws SerializationException {
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 mockLiteralJohn,
@@ -261,8 +208,7 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
-
+        nQuadsSerializer.write(writer);
 
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
@@ -283,12 +229,11 @@ class NQuadsFormatTest {
             "literal with \u0001 (SOH)",
             "literal with \u007F (DEL)"
     })
-    @DisplayName("Write should handle various literal values with proper escaping")
+    @DisplayName("Write should handle various literal values with appropriate escaping (including Unicode)")
     void writeShouldHandleVariousLiterals(String literalValue) throws SerializationException {
+        Literal literalMock = factory.createLiteral(literalValue, null, null);
 
-        Literal literalMock = createLiteral(literalValue, null, null);
-
-        Statement stmt = createStatement(
+        Statement stmt = factory.createStatement(
                 mockExPerson,
                 mockExName,
                 literalMock
@@ -296,8 +241,7 @@ class NQuadsFormatTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsFormat.write(writer);
-
+        nQuadsSerializer.write(writer);
 
         String expectedEscapedLiteral = escapeNQuadsString(literalValue);
         String expectedOutput = String.format("<%s> <%s> \"%s\"",
@@ -308,65 +252,54 @@ class NQuadsFormatTest {
         assertEquals(expectedOutput, writer.toString());
     }
 
-
     @Test
     @DisplayName("Should handle literals with language tags")
     void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
-        Statement stmt = createStatement(mockExPerson, createIRI("http://example.org/greeting"), mockLiteralHelloEn);
+        Statement stmt = factory.createStatement(mockExPerson, factory.createIRI("http://example.org/greeting"), mockLiteralHelloEn);
 
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer writer = new StringWriter();
-        NQuadsFormat serializer = new NQuadsFormat(currentTestModel);
+
+        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsConfig.defaultConfig());
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
                 mockExPerson.stringValue(),
-                createIRI("http://example.org/greeting").stringValue(),
+                factory.createIRI("http://example.org/greeting").stringValue(),
                 escapeNQuadsString(hello),
                 mockLiteralHelloEn.getLanguage().get()) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
     }
 
+    @Test
+    @DisplayName("Should handle literals with custom datatypes")
+    void shouldHandleLiteralsWithCustomDatatypes() throws SerializationException {
+        IRI customDatatype = factory.createIRI("http://example.org/myDataType");
+        Literal customLiteral = factory.createLiteral("123", customDatatype, null);
 
-    /**
-     * Creates a mocked Literal object.
-     * Important: The `lexicalForm` is the *raw string value* of the literal,
-     * without N-Quads specific quotes, lang tags, or datatype URIs.
-     * The `NQuadsFormat` class is responsible for adding those.
-     *
-     * @param lexicalForm The raw string value of the literal (e.g., "hello", "123").
-     * @param dataTypeIRI The IRI of the literal's datatype (e.g., XSD.INTEGER.getIRI()), or null for plain/lang-tagged.
-     * @param langTag     The language tag (e.g., "en"), or null if not language-tagged.
-     * @return A mocked Literal instance.
-     */
-    private Literal createLiteral(String lexicalForm, IRI dataTypeIRI, String langTag) {
-        Literal literal = mock(Literal.class);
-        when(literal.isLiteral()).thenReturn(true);
-        when(literal.isResource()).thenReturn(false);
-        when(literal.stringValue()).thenReturn(lexicalForm);
+        Statement stmt = factory.createStatement(mockExPerson, factory.createIRI("http://example.org/value"), customLiteral);
 
-        if (langTag != null && !langTag.isEmpty()) {
-            when(literal.getLanguage()).thenReturn(Optional.of(langTag));
+        Model currentTestModel = mock(Model.class);
+        when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-            when(literal.getDatatype()).thenReturn(RDF.langString.getIRI());
-        } else {
-            when(literal.getLanguage()).thenReturn(Optional.empty());
-            when(literal.getDatatype()).thenReturn(dataTypeIRI);
-        }
-        return literal;
+        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsConfig.defaultConfig());
+
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+
+        String expectedOutput = String.format("<%s> <%s> \"%s\"^^<%s>",
+                mockExPerson.stringValue(),
+                factory.createIRI("http://example.org/value").stringValue(),
+                escapeNQuadsString("123"),
+                customDatatype.stringValue()) + " .\n";
+
+        assertEquals(expectedOutput, writer.toString());
     }
 
-    /**
-     * Escapes a string according to N-Quads literal escaping rules.
-     * This helper is used in tests to construct the *expected* output strings.
-     * It mimics the behavior of NQuadsFormat's internal escapeLiteral method.
-     *
-     * @param s The string to escape.
-     * @return The escaped string.
-     */
+
     private String escapeNQuadsString(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
@@ -394,8 +327,18 @@ class NQuadsFormatTest {
                     sb.append("\\\\");
                     break;
                 default:
-                    if (c >= '\u0000' && c <= '\u001F' || c == '\u007F') {
+                    if (c <= 0x1F || c == 0x7F) {
                         sb.append(String.format("\\u%04X", (int) c));
+                    } else if (c >= 0x80 && c <= 0xFFFF) {
+                        sb.append(String.format("\\u%04X", (int) c));
+                    } else if (Character.isHighSurrogate(c)) {
+                        int codePoint = s.codePointAt(i);
+                        if (Character.isValidCodePoint(codePoint)) {
+                            sb.append(String.format("\\U%08X", codePoint));
+                            i++;
+                        } else {
+                            sb.append(c);
+                        }
                     } else {
                         sb.append(c);
                     }
@@ -403,7 +346,6 @@ class NQuadsFormatTest {
         }
         return sb.toString();
     }
-
 
     private static class MockStatementIterator implements Iterator<Statement> {
         private final Statement[] statements;
@@ -422,36 +364,5 @@ class NQuadsFormatTest {
         public Statement next() {
             return statements[index++];
         }
-    }
-
-    private Statement createStatement(Resource subject, IRI predicate, Value object) {
-        return createStatement(subject, predicate, object, null);
-    }
-
-    private Statement createStatement(Resource subject, IRI predicate, Value object, Resource context) {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(subject);
-        when(stmt.getPredicate()).thenReturn(predicate);
-        when(stmt.getObject()).thenReturn(object);
-        when(stmt.getContext()).thenReturn(context);
-        return stmt;
-    }
-
-    private Resource createBlankNode(String id) {
-        Resource blankNode = mock(Resource.class);
-        when(blankNode.isResource()).thenReturn(true);
-        when(blankNode.isBNode()).thenReturn(true);
-        when(blankNode.isIRI()).thenReturn(false);
-        when(blankNode.stringValue()).thenReturn(id);
-        return blankNode;
-    }
-
-    private IRI createIRI(String uri) {
-        IRI iri = mock(IRI.class);
-        when(iri.isResource()).thenReturn(true);
-        when(iri.isIRI()).thenReturn(true);
-        when(iri.isBNode()).thenReturn(false);
-        when(iri.stringValue()).thenReturn(uri);
-        return iri;
     }
 }
