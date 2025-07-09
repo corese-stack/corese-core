@@ -11,6 +11,10 @@ import fr.inria.corese.core.next.impl.common.util.literal.CoreDatatypeHelper;
 import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.impl.temp.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseGeneric;
+import fr.inria.corese.core.sparql.datatype.CoreseString;
+
+import static fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdString;
 
 /**
  * An implementation of the {@code xsd:string} datatype used by Corese.
@@ -25,37 +29,29 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
     /**
      * The Corese object representing the string literal in the old API.
      */
-    private final fr.inria.corese.core.sparql.datatype.CoreseString coreseObject;
+    private final CoreseString coreseObject;
 
     /**
      * The core datatype of this literal.
      */
     private CoreDatatype coreDatatype;
-    /**
-     * The value of the string literal.
-     */
-    private String value;
-    /**
-     * The datatype IRI of the literal.
-     */
-    private IRI dataype;
 
     /**
      * Constructs a {@link CoreseTyped} instance from an {@link IDatatype} Corese
      * object.
      * The Corese object should be an instance of
-     * {@link fr.inria.corese.core.sparql.datatype.CoreseString}.
+     * {@link CoreseString}.
      * 
      * @param coreseObject The {@link IDatatype} Corese object representing the
      *                     string literal.
      * @throws IncorrectOperationException If the provided {@link IDatatype} is not
      *                                     a
-     *                                     {@link fr.inria.corese.core.sparql.datatype.CoreseString}.
+     *                                     {@link CoreseString}.
      */
     public CoreseTyped(IDatatype coreseObject) {
-        super(new CoreseIRI(coreseObject.getDatatypeURI()));
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseString) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseString) coreseObject;
+        super(coreseObject.getDatatypeURI() != null && ! coreseObject.getDatatypeURI().isEmpty() ? new CoreseIRI(coreseObject.getDatatypeURI()) : new CoreseIRI(xsdString.getIRI()));
+        if (coreseObject instanceof CoreseString) {
+            this.coreseObject = (CoreseString) coreseObject;
         } else {
             throw new IncorrectOperationException("Cannot create CoreseString from a non-string Corese object");
         }
@@ -68,10 +64,9 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
      * @param value The string value for the literal.
      */
     public CoreseTyped(String value) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseString(value));
+        this(new CoreseString(value));
         this.coreDatatype = XSD.STRING;
         this.datatype = XSD.STRING.getIRI();
-        this.value = value;
     }
 
     /**
@@ -85,8 +80,7 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
      * @param datatype The datatype IRI for the literal.
      */
     public CoreseTyped(String value, IRI datatype) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseString(value));
-        this.value = value;
+        this(new CoreseGeneric(value, datatype == null ? xsdString.getIRI().stringValue() : datatype.stringValue()));
         if (datatype == null) {
             this.datatype = XSD.STRING.getIRI();
             this.coreDatatype = XSD.STRING;
@@ -105,9 +99,8 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
      * @param coreDatatype The core datatype for the literal.
      */
     public CoreseTyped(String value, CoreDatatype coreDatatype) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseString(value));
+        this(new CoreseString(value));
         this.datatype = coreDatatype.getIRI();
-        this.value = value;
         this.coreDatatype = Objects.requireNonNull(coreDatatype);
         this.datatype = coreDatatype.getIRI();
     }
@@ -128,7 +121,7 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
      *                                     {@code null}.
      */
     public CoreseTyped(String value, IRI datatype, CoreDatatype coreDatatype) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseString(value));
+        this(new CoreseString(value));
 
         if (datatype == null || coreDatatype == null) {
             throw new IncorrectOperationException("Datatype and CoreDatatype cannot be null");
@@ -138,7 +131,6 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
             throw new IncorrectOperationException("Datatype IRI does not match CoreDatatype's IRI");
         }
 
-        this.value = value;
         this.datatype = datatype;
         this.coreDatatype = coreDatatype;
     }

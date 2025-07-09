@@ -4,7 +4,6 @@ import com.apicatalog.jsonld.JsonLd;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.api.FromRdfApi;
 import com.apicatalog.jsonld.document.RdfDocument;
-import com.apicatalog.jsonld.serialization.RdfToJsonld;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
@@ -40,6 +39,7 @@ public class JSONLDSerializer implements FormatSerializer {
     @Override
     public void write(Writer writer) throws SerializationException {
         TitaniumRDFDatasetSerializationAdapter adapter = new TitaniumRDFDatasetSerializationAdapter(model);
+
         try {
             FromRdfApi fromRdfApi = JsonLd.fromRdf(RdfDocument.of(adapter));
             if(this.config instanceof TitaniumJSONLDProcessorOptions options) {

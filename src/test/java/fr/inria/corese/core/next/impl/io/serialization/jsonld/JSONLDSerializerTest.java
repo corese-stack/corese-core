@@ -1,12 +1,19 @@
 package fr.inria.corese.core.next.impl.io.serialization.jsonld;
 
+import com.apicatalog.jsonld.json.JsonLdComparison;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
+import fr.inria.corese.core.next.impl.io.TitaniumJSONLDProcessorOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import jakarta.json.Json;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonReaderFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,34 +47,44 @@ class JSONLDSerializerTest {
         // IRI IRI LangLiteral
         this.model.add(iriNode, iriPred, langLiteral);
 
-        FormatSerializer serializer = new JSONLDSerializer(this.model);
+        FormatSerializer serializer = new JSONLDSerializer(this.model, (new TitaniumJSONLDProcessorOptions.Builder()).ordered(true).build());
 
         StringWriter writer = new StringWriter();
+
         serializer.write(writer);
         String result = writer.toString();
 
-        String expectedResult= "[\n" +
-                "  {\n" +
-                "    \"@id\": \"http://example.org/iri1\",\n" +
-                "    \"http://example.org/pred1\": [\n" +
-                "      {\n" +
-                "        \"@id\": \"http://example.org/iri1\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"@type\": \"http://example.org/datatype1\",\n" +
-                "        \"@value\": \"literal2\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"@value\": \"literal1\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"@language\": \"en\",\n" +
-                "        \"@value\": \"literal3\"\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }\n" +
-                "]";
-        assertEquals(expectedResult.replace('\n', ' ').replaceAll("\\s+", ""), result, "The result should be a JSON object");
+        String expectedResult = """
+            [
+                {
+                    "@id": "http://example.org/iri1",
+                    "http://example.org/pred1": [
+                        {
+                            "@id": "http://example.org/iri1"
+                        },
+                        {
+                            "@value": "literal1"
+                        },
+                        {
+                            "@value": "literal2",
+                            "@type": "http://example.org/datatype1"
+                        },
+                        {
+                            "@language": "en",
+                            "@value": "literal3"
+                        }
+                    ]
+                }
+            ]
+            """.replace('\n', ' ').replaceAll("\\s+", "");
+
+        Reader resultReader = new StringReader(result);
+        Reader expectedResultReader = new StringReader(expectedResult);
+
+        JsonReaderFactory factory = Json.createReaderFactory(null);
+        JsonReader resultJsonReader = factory.createReader(resultReader);
+        JsonReader expectedResultJsonReader = factory.createReader(expectedResultReader);
+        assertTrue(JsonLdComparison.equals(resultJsonReader.readValue(), expectedResultJsonReader.readValue()), "The result should be the expected JSON object");
     }
 
     @Test
@@ -86,7 +103,39 @@ class JSONLDSerializerTest {
         StringWriter writer = new StringWriter();
         serializer.write(writer);
         String result = writer.toString();
-        assertEquals("{}", result, "The result should be an empty JSON object");
+
+        String expectedResult = """
+[
+    {
+        "@id":"http://example.org/iri1",
+        "http://example.org/pred1":[
+            {"@id":"blank1"}
+        ]
+    },
+    {
+        "@id":"blank1",
+        "http://example.org/pred1":[
+            {
+                "@id":"http://example.org/iri1"
+            },
+            {
+                "@id":"blank1"
+            },
+            {
+                "@value":"literal1"
+            }
+        ]
+    }
+]
+            """.replace('\n', ' ').replaceAll("\\s+", "");
+
+        Reader resultReader = new StringReader(result);
+        Reader expectedResultReader = new StringReader(expectedResult);
+
+        JsonReaderFactory factory = Json.createReaderFactory(null);
+        JsonReader resultJsonReader = factory.createReader(resultReader);
+        JsonReader expectedResultJsonReader = factory.createReader(expectedResultReader);
+        assertTrue(JsonLdComparison.equals(resultJsonReader.readValue(), expectedResultJsonReader.readValue()), "The result should be " + expectedResult);
     }
 
     @Test
@@ -105,6 +154,71 @@ class JSONLDSerializerTest {
         StringWriter writer = new StringWriter();
         serializer.write(writer);
         String result = writer.toString();
-        assertEquals("{}", result, "The result should be an empty JSON object");
+
+        String expectedResult = """
+[
+    {
+        "@id":"http://example.org/iri1",
+        "http://example.org/pred1":[
+            {
+                "@id":"http://example.org/iri1"
+            },
+            {
+                "@value":"literal1"
+            },
+            {
+                "@value":"literal2",
+                "@type":"http://example.org/datatype1"
+            },
+            {
+               "@language":"en",
+               "@value":"literal3"
+            }
+        ]
+    },
+    {
+        "@id":"http://example.org/graph1",
+        "@graph":[
+            {
+                "@id":"http://example.org/iri1",
+                "http://example.org/pred1":[
+                    {
+                        "@value":"literal1"
+                    },
+                    {
+                        "@language":"en",
+                        "@value":"literal3"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@id":"http://example.org/graph2",
+        "@graph":[
+            {
+                "@id":"http://example.org/iri1",
+                "http://example.org/pred1":[
+                    {
+                        "@value":"literal2",
+                        "@type":"http://example.org/datatype1"
+                    },
+                    {
+                        "@language":"en",
+                        "@value":"literal3"
+                    }
+                ]
+            }
+        ]
+    }
+]
+        """.replace('\n', ' ').replaceAll("\\s+", "");
+        Reader resultReader = new StringReader(result);
+        Reader expectedResultReader = new StringReader(expectedResult);
+
+        JsonReaderFactory jsonReaderFactory = Json.createReaderFactory(null);
+        JsonReader resultJsonReader = jsonReaderFactory.createReader(resultReader);
+        JsonReader expectedResultJsonReader = jsonReaderFactory.createReader(expectedResultReader);
+        assertTrue(JsonLdComparison.equals(resultJsonReader.readValue(), expectedResultJsonReader.readValue()), "The result should be the " + expectedResult);
     }
 }

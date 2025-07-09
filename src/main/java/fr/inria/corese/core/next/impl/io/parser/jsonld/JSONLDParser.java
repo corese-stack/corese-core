@@ -11,6 +11,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.base.io.RdfFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.TitaniumJSONLDProcessorOptions;
@@ -109,7 +110,7 @@ public class JSONLDParser extends AbstractRDFParser {
                 } else if (RdfQuadConsumer.isLiteral(datatype, language, direction)) {
                     if (RdfQuadConsumer.isLangString(datatype, language, direction)) {
                         objValue = getValueFactory().createLiteral(object, language);
-                    } else if( datatype != null ){
+                    } else if( ! datatype.equals(XSD.STRING.toString()) ){
                         objValue = getValueFactory().createLiteral(object, getValueFactory().createIRI(datatype));
                     } else {
                         objValue = getValueFactory().createLiteral(object);

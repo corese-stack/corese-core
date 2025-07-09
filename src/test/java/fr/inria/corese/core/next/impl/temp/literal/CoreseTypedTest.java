@@ -7,14 +7,13 @@ import fr.inria.corese.core.next.api.Literal;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.temp.CoreseIRI;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.CoreseLiteral;
 import fr.inria.corese.core.sparql.datatype.CoreseString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CoreseTypeTest {
+public class CoreseTypedTest {
     private String testValue;
     private IRI testDatatypeIRI;
     private CoreDatatype testCoreDatatype;
