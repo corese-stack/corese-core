@@ -349,9 +349,8 @@ tasks.withType<PublishToMavenRepository>().configureEach {
 // Configure the Antlr task to generate parser code with specific arguments
 tasks.named<AntlrTask>("generateGrammarSource") {
     arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.impl.parser.antlr"))
-    outputDirectory = antlrPackageDir
-    inputs.files(fileTree("src/main/antlr"))
-    outputs.dir(antlrPackageDir)
+    outputDirectory = layout.buildDirectory.dir("generated-src/antlr/main/fr/inria/corese/core/next/impl/parser/antlr").get().asFile
+    outputs.dirs(outputDirectory)
 }
 
 // Ensure Java compilation depends on both JavaCC and Antlr code generation
