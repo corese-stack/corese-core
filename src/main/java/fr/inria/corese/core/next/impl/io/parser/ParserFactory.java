@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParserFactory;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.impl.io.parser.jsonld.JSONLDParser;
+import fr.inria.corese.core.next.impl.io.parser.ntriples.ANTLRNTriplesParser;
 import fr.inria.corese.core.next.impl.io.parser.turtle.ANTLRTurtleParser;
 
 /**
@@ -34,10 +35,12 @@ public class ParserFactory extends AbstractRDFParserFactory {
      */
     @Override
     public RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory, RDFParserOptions config) {
-        if(format == RDFFormat.JSONLD) {
+        if (format == RDFFormat.JSONLD) {
             return new JSONLDParser(model, factory, config);
-        } else if(format == RDFFormat.TURTLE) {
+        } else if (format == RDFFormat.TURTLE) {
             return new ANTLRTurtleParser(model, factory, config);
+        } else if (format == RdfFormat.NTRIPLES) {
+            return new ANTLRNTriplesParser(model, factory, config);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
     }
@@ -51,10 +54,12 @@ public class ParserFactory extends AbstractRDFParserFactory {
      */
     @Override
     public RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory) {
-        if(format == RDFFormat.JSONLD) {
+        if (format == RDFFormat.JSONLD) {
             return new JSONLDParser(model, factory);
-        } else if(format == RDFFormat.TURTLE) {
+        } else if (format == RDFFormat.TURTLE) {
             return new ANTLRTurtleParser(model, factory);
+        } else if (format == RdfFormat.NTRIPLES) {
+            return new ANTLRNTriplesParser(model, factory);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
     }
