@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.parser.RDFFormat;
 import fr.inria.corese.core.next.api.base.parser.RDFFormats;
 import fr.inria.corese.core.next.api.base.parser.RDFParser;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.xml.sax.*;
@@ -14,6 +15,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
+
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 
 public class RdfXmlParser extends DefaultHandler implements RDFParser {
@@ -25,13 +28,13 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
     private StringBuilder characters = new StringBuilder();
 
     private String baseURI;
-    private Resource currentSubject;
+
     private Statement statement;
 
-    private final Deque<Statement> statementStack = new ArrayDeque<>();
     private final Deque<Resource> subjectStack = new ArrayDeque<>();
     private final Deque<IRI> predicateStack = new ArrayDeque<>();
     private final Deque<String> langStack = new ArrayDeque<>();
+    private final Deque<String> datatypeStack = new ArrayDeque<>();
 
     private boolean inContainer = false;
     private int liIndex = 1;
@@ -91,6 +94,9 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attrs) {
         characters.setLength(0);
+
+        String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
+        datatypeStack.push(datatype);
 
         // Ignore rdf:RDF
         if (isRdfRDF(uri, localName)) return;
@@ -179,42 +185,56 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
         String text = characters.toString().trim();
         characters.setLength(0);
 
-        // Handle language cleanup
-        if (!langStack.isEmpty()) {
-            langStack.pop();
+        if (!langStack.isEmpty()) langStack.pop();
+        if (!datatypeStack.isEmpty()) {
+            String datatypeUri = datatypeStack.pop();
+
+            if (!predicateStack.isEmpty() && !text.isEmpty()) {
+                IRI predicate = predicateStack.pop();
+                Resource subject = subjectStack.peek();
+
+                Value literal;
+
+                if (datatypeUri != null) {
+                    Optional<XSD> known = fromURI(datatypeUri);
+
+                    if (known.isPresent()) {
+                        // normalized
+                        IRI normalizedDatatype = known.get().getIRI();
+                        literal = factory.createLiteral(text, normalizedDatatype);
+                    } else {
+                        // unknown datatype – fallback or warning
+                        System.err.printf("[Warning] Unknown datatype: %s%n", datatypeUri);
+                        IRI fallbackDatatype = factory.createIRI(datatypeUri);
+                        literal = factory.createLiteral(text, fallbackDatatype);
+                    }
+                } else {
+                    // no datatype – use xml:lang if set
+                    String lang = langStack.peek();
+                    literal = (lang != null)
+                            ? factory.createLiteral(text, lang)
+                            : factory.createLiteral(text);
+                }
+
+                model.add(factory.createStatement(subject, predicate, literal));
+            } else if (!predicateStack.isEmpty()) {
+                predicateStack.pop(); // cleanup
+            }
+
+            return;
         }
 
-        // End of a container (rdf:Seq, rdf:Bag, rdf:Alt)
+        // other cases (containers, descriptions, etc.)
         if (isContainer(localName, uri)) {
-            if (!subjectStack.isEmpty()) {
-                subjectStack.pop();
-            }
+            if (!subjectStack.isEmpty()) subjectStack.pop();
             inContainer = false;
             liIndex = 1;
             return;
         }
 
-        // End of rdf:Description
         if (isDescription(localName, uri)) {
-            if (!subjectStack.isEmpty()) {
-                subjectStack.pop();
-            }
+            if (!subjectStack.isEmpty()) subjectStack.pop();
             return;
-        }
-
-        // Closing a property element with text content
-        if (!predicateStack.isEmpty()) {
-            IRI predicate = predicateStack.pop();
-            Resource subject = subjectStack.peek();
-
-            if (!text.isEmpty()) {
-                String lang = langStack.peek();
-                Value literal = (lang != null)
-                        ? factory.createLiteral(text, lang)
-                        : factory.createLiteral(text);
-
-                model.add(factory.createStatement(subject, predicate, literal));
-            }
         }
     }
 
@@ -270,5 +290,14 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
 
     private void emitTriple(Resource subj, IRI pred, Value obj,  Resource context) {
         this.statement = factory.createStatement(subj, pred, obj, context);
+    }
+
+    public Optional<XSD> fromURI(String uri) {
+        for (XSD xsd : XSD.values()) {
+            if (xsd.getIRI().stringValue().equals(uri)) {
+                return Optional.of(xsd);
+            }
+        }
+        return Optional.empty();
     }
 }
