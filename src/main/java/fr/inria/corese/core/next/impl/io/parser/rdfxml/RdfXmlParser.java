@@ -31,7 +31,7 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
     private final Deque<Statement> statementStack = new ArrayDeque<>();
     private final Deque<Resource> subjectStack = new ArrayDeque<>();
     private final Deque<IRI> predicateStack = new ArrayDeque<>();
-
+    private final Deque<String> langStack = new ArrayDeque<>();
 
     private boolean inContainer = false;
     private int liIndex = 1;
@@ -94,6 +94,16 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
 
         // Ignore rdf:RDF
         if (isRdfRDF(uri, localName)) return;
+
+        // Handle xml:lang
+        String xmlLang = attrs.getValue("xml:lang");
+        if (xmlLang != null) {
+            // "" means no language
+            langStack.push(xmlLang.isEmpty() ? null : xmlLang);
+        } else {
+            // Inherit from parent
+            langStack.push(langStack.peek());
+        }
 
         // Handle container elements: rdf:Seq, rdf:Bag, rdf:Alt
         if (isContainer(localName, uri)) {
@@ -169,28 +179,45 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
         String text = characters.toString().trim();
         characters.setLength(0);
 
+        // Handle language cleanup
+        if (!langStack.isEmpty()) {
+            langStack.pop();
+        }
+
+        // End of a container (rdf:Seq, rdf:Bag, rdf:Alt)
         if (isContainer(localName, uri)) {
-            subjectStack.pop();
+            if (!subjectStack.isEmpty()) {
+                subjectStack.pop();
+            }
             inContainer = false;
             liIndex = 1;
             return;
         }
 
+        // End of rdf:Description
         if (isDescription(localName, uri)) {
-            subjectStack.pop();
+            if (!subjectStack.isEmpty()) {
+                subjectStack.pop();
+            }
             return;
         }
 
-        // Closing a property element with literal content
-        if (!predicateStack.isEmpty() && !text.isEmpty()) {
+        // Closing a property element with text content
+        if (!predicateStack.isEmpty()) {
             IRI predicate = predicateStack.pop();
             Resource subject = subjectStack.peek();
-            model.add(factory.createStatement(subject, predicate, factory.createLiteral(text)));
 
-        } else if (!predicateStack.isEmpty()) {
-            predicateStack.pop(); // still clean up
+            if (!text.isEmpty()) {
+                String lang = langStack.peek();
+                Value literal = (lang != null)
+                        ? factory.createLiteral(text, lang)
+                        : factory.createLiteral(text);
+
+                model.add(factory.createStatement(subject, predicate, literal));
+            }
         }
     }
+
 
     @Override
     public void characters(char[] ch, int start, int length) {
