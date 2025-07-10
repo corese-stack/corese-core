@@ -1,11 +1,13 @@
 package fr.inria.corese.core.next.impl.exception;
 
+import fr.inria.corese.core.next.api.base.exception.CoreseException;
+
 /**
  * Exception thrown during RDF serialization or deserialization failures.
  * This exception can carry format-specific details (e.g., NTriples, JSON-LD, XML, etc.),
  * as well as information about the location of the error within the data stream.
  */
-public class SerializationException extends RuntimeException {
+public class SerializationException extends CoreseException {
     private final String formatName;
     private final int lineNumber;
     private final int columnNumber;

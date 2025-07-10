@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.impl.exception;
 
-public class ParsingErrorException extends RuntimeException {
+import fr.inria.corese.core.sparql.exceptions.CoreseException;
+
+public class ParsingErrorException extends CoreseException {
 
     private static final long serialVersionUID = -2053549958572141648L;
 
