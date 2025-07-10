@@ -21,7 +21,7 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
 
-import static fr.inria.corese.core.next.impl.common.util.SerializationConstants.DEFAULT_GRAPH_IRI;
+import static fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants.DEFAULT_GRAPH_IRI;
 
 /**
  * Adapter class from Model to RdfDataset for usage in the JSON-LD serialization process using the titanium library.

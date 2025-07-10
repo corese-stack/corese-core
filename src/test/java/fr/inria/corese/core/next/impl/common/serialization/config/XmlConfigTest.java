@@ -1,6 +1,9 @@
 package fr.inria.corese.core.next.impl.common.serialization.config;
 
-import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlOption;
+import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +13,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link XmlConfig} class.
+ * Unit tests for the {@link XmlOption} class.
  * These tests verify the default configuration settings and the functionality
  * of the builder pattern for customizing RDF/XML serialization options.
  */
@@ -19,7 +22,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("defaultConfig() should return a config with expected RDF/XML defaults")
     void defaultConfig_shouldReturnExpectedDefaults() {
-        XmlConfig config = XmlConfig.defaultConfig();
+        XmlOption config = XmlOption.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
 
@@ -42,7 +45,7 @@ class XmlConfigTest {
         assertFalse(config.sortPredicates(), "Default sortPredicates should be false for XML");
         assertTrue(config.useMultilineLiterals(), "Default useMultilineLiterals should be true for XML");
 
-        assertTrue(config.strictMode, "Default strictMode should be true");
+        assertTrue(config.isStrictMode(), "Default strictMode should be true");
         assertFalse(config.escapeUnicode(), "Default escapeUnicode should be false for XML");
         assertEquals(LiteralDatatypePolicyEnum.ALWAYS_TYPED, config.getLiteralDatatypePolicy(), "Default literalDatatypePolicy should be ALWAYS_TYPED for XML");
         assertNull(config.getBaseIRI(), "Default baseIRI should be null");
@@ -52,7 +55,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding usePrefixes")
     void builder_shouldAllowOverridingUsePrefixes() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .usePrefixes(false)
                 .build();
         assertFalse(config.usePrefixes(), "usePrefixes should be overridden to false");
@@ -61,7 +64,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding autoDeclarePrefixes")
     void builder_shouldAllowOverridingAutoDeclarePrefixes() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .autoDeclarePrefixes(false)
                 .build();
         assertFalse(config.autoDeclarePrefixes(), "autoDeclarePrefixes should be overridden to false");
@@ -70,7 +73,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding prefixOrdering")
     void builder_shouldAllowOverridingPrefixOrdering() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .prefixOrdering(PrefixOrderingEnum.USAGE_ORDER)
                 .build();
         assertEquals(PrefixOrderingEnum.USAGE_ORDER, config.getPrefixOrdering(), "prefixOrdering should be overridden to USAGE_ORDER");
@@ -81,7 +84,7 @@ class XmlConfigTest {
     void builder_shouldAllowAddingCustomPrefixes() {
         String customPrefix = "my";
         String customNamespace = "http://my.example.org/";
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .addCustomPrefix(customPrefix, customNamespace)
                 .build();
 
@@ -94,7 +97,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding prettyPrint")
     void builder_shouldAllowOverridingPrettyPrint() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .prettyPrint(false)
                 .build();
         assertFalse(config.prettyPrint(), "prettyPrint should be overridden to false");
@@ -104,7 +107,7 @@ class XmlConfigTest {
     @DisplayName("Builder should allow overriding indent")
     void builder_shouldAllowOverridingIndent() {
         String customIndent = "\t";
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .indent(customIndent)
                 .build();
         assertEquals(customIndent, config.getIndent(), "indent should be overridden to custom value");
@@ -114,7 +117,7 @@ class XmlConfigTest {
     @DisplayName("Builder should allow overriding maxLineLength")
     void builder_shouldAllowOverridingMaxLineLength() {
         int customLength = 120;
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .maxLineLength(customLength)
                 .build();
         assertEquals(customLength, config.getMaxLineLength(), "maxLineLength should be overridden to custom value");
@@ -123,7 +126,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding sortSubjects")
     void builder_shouldAllowOverridingSortSubjects() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .sortSubjects(true)
                 .build();
         assertTrue(config.sortSubjects(), "sortSubjects should be overridden to true");
@@ -132,7 +135,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding sortPredicates")
     void builder_shouldAllowOverridingSortPredicates() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .sortPredicates(true)
                 .build();
         assertTrue(config.sortPredicates(), "sortPredicates should be overridden to true");
@@ -141,7 +144,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding useMultilineLiterals")
     void builder_shouldAllowOverridingUseMultilineLiterals() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .useMultilineLiterals(false)
                 .build();
         assertFalse(config.useMultilineLiterals(), "useMultilineLiterals should be overridden to false");
@@ -150,16 +153,16 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding strictMode")
     void builder_shouldAllowOverridingStrictMode() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .strictMode(false)
                 .build();
-        assertFalse(config.strictMode, "strictMode should be overridden to false");
+        assertFalse(config.isStrictMode(), "strictMode should be overridden to false");
     }
 
     @Test
     @DisplayName("Builder should allow overriding escapeUnicode")
     void builder_shouldAllowOverridingEscapeUnicode() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .escapeUnicode(true)
                 .build();
         assertTrue(config.escapeUnicode(), "escapeUnicode should be overridden to true");
@@ -168,7 +171,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
     void builder_shouldAllowOverridingLiteralDatatypePolicy() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .build();
         assertEquals(LiteralDatatypePolicyEnum.MINIMAL, config.getLiteralDatatypePolicy(), "literalDatatypePolicy should be overridden to MINIMAL");
@@ -178,7 +181,7 @@ class XmlConfigTest {
     @DisplayName("Builder should allow setting baseIRI")
     void builder_shouldAllowSettingBaseIRI() {
         String testBaseIRI = "http://example.org/base/";
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .baseIRI(testBaseIRI)
                 .build();
         assertEquals(testBaseIRI, config.getBaseIRI(), "baseIRI should be set correctly");
@@ -188,7 +191,7 @@ class XmlConfigTest {
     @DisplayName("Builder should allow overriding lineEnding")
     void builder_shouldAllowOverridingLineEnding() {
         String customLineEnding = "\r\n";
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .lineEnding(customLineEnding)
                 .build();
         assertEquals(customLineEnding, config.getLineEnding(), "lineEnding should be overridden to custom value");
@@ -197,7 +200,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
     void builder_shouldAllowOverridingValidateURIs() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .validateURIs(true)
                 .build();
         assertTrue(config.validateURIs(), "validateURIs should be overridden to true");
@@ -206,7 +209,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
     void builder_shouldAllowOverridingStableBlankNodeIds() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .stableBlankNodeIds(false)
                 .build();
         assertFalse(config.stableBlankNodeIds(), "stableBlankNodeIds should be overridden to false");
@@ -215,7 +218,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding includeContext")
     void builder_shouldAllowOverridingIncludeContext() {
-        XmlConfig config = new XmlConfig.Builder()
+        XmlOption config = new XmlOption.Builder()
                 .includeContext(true)
                 .build();
         assertTrue(config.includeContext(), "includeContext should be overridden to true");

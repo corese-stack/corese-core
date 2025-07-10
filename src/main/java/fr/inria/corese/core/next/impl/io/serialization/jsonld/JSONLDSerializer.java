@@ -5,10 +5,10 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.api.FromRdfApi;
 import com.apicatalog.jsonld.document.RdfDocument;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.TitaniumJSONLDProcessorOptions;
+import fr.inria.corese.core.next.impl.io.serialization.option.TitaniumJSONLDProcessorOption;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * Serializer for JSON-LD format.
  */
-public class JSONLDSerializer implements FormatSerializer {
+public class JSONLDSerializer implements RDFSerializer {
 
     private Model model;
     private IOOptions config;
@@ -33,7 +33,7 @@ public class JSONLDSerializer implements FormatSerializer {
     }
 
     public JSONLDSerializer(Model model) {
-        this(model, new TitaniumJSONLDProcessorOptions.Builder().build());
+        this(model, new TitaniumJSONLDProcessorOption.Builder().build());
     }
 
     @Override
@@ -42,7 +42,7 @@ public class JSONLDSerializer implements FormatSerializer {
 
         try {
             FromRdfApi fromRdfApi = JsonLd.fromRdf(RdfDocument.of(adapter));
-            if(this.config instanceof TitaniumJSONLDProcessorOptions options) {
+            if(this.config instanceof TitaniumJSONLDProcessorOption options) {
                 fromRdfApi.options(options.getJsonLdOptions());
             }
 

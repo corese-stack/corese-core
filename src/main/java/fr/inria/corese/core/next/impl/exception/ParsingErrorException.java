@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.exception;
 
-import fr.inria.corese.core.sparql.exceptions.CoreseException;
+
+import fr.inria.corese.core.next.api.base.exception.CoreseException;
 
 public class ParsingErrorException extends CoreseException {
 

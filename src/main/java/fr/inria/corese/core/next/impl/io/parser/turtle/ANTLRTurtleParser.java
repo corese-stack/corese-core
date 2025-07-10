@@ -1,11 +1,10 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
 
@@ -32,8 +31,8 @@ public class ANTLRTurtleParser extends AbstractRDFParser {
     }
 
     @Override
-    public RdfFormat getRDFFormat() {
-        return RdfFormat.TURTLE;
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.TURTLE;
     }
 
     /**

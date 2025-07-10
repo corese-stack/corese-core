@@ -1,12 +1,14 @@
 package fr.inria.corese.core.next.impl.common.serialization.config;
 
+import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesOption;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link NTriplesConfig} class.
+ * Unit tests for the {@link NTriplesOption} class.
  * These tests verify the default configuration settings and the functionality
  * of the builder pattern for customizing N-Triples serialization options.
  */
@@ -15,11 +17,11 @@ class NTriplesConfigTest {
     @Test
     @DisplayName("defaultConfig() should return a config with expected N-Triples defaults")
     void defaultConfig_shouldReturnExpectedDefaults() {
-        NTriplesConfig config = NTriplesConfig.defaultConfig();
+        NTriplesOption config = NTriplesOption.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
 
-        assertTrue(config.strictMode, "Default strictMode should be true for N-Triples");
+        assertTrue(config.isStrictMode(), "Default strictMode should be true for N-Triples");
         assertTrue(config.escapeUnicode(), "Default escapeUnicode should be true for N-Triples");
         assertEquals(LiteralDatatypePolicyEnum.ALWAYS_TYPED, config.getLiteralDatatypePolicy(), "Default literalDatatypePolicy should be ALWAYS_TYPED");
         assertNull(config.getBaseIRI(), "Default baseIRI should be null");
@@ -31,7 +33,7 @@ class NTriplesConfigTest {
     @Test
     @DisplayName("Builder should allow overriding includeContext")
     void builder_shouldAllowOverridingIncludeContext() {
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .includeContext(true)
                 .build();
 
@@ -41,7 +43,7 @@ class NTriplesConfigTest {
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
     void builder_shouldAllowOverridingLiteralDatatypePolicy() {
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .build();
 
@@ -51,7 +53,7 @@ class NTriplesConfigTest {
     @Test
     @DisplayName("Builder should allow overriding escapeUnicode")
     void builder_shouldAllowOverridingEscapeUnicode() {
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .escapeUnicode(false)
                 .build();
 
@@ -61,18 +63,18 @@ class NTriplesConfigTest {
     @Test
     @DisplayName("Builder should allow overriding strictMode")
     void builder_shouldAllowOverridingStrictMode() {
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .strictMode(false)
                 .build();
 
-        assertFalse(config.strictMode, "strictMode should be overridden to false");
+        assertFalse(config.isStrictMode(), "strictMode should be overridden to false");
     }
 
     @Test
     @DisplayName("Builder should allow setting baseIRI")
     void builder_shouldAllowSettingBaseIRI() {
         String testBaseIRI = "http://example.org/base/";
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .baseIRI(testBaseIRI)
                 .build();
 
@@ -83,7 +85,7 @@ class NTriplesConfigTest {
     @DisplayName("Builder should allow setting lineEnding")
     void builder_shouldAllowSettingLineEnding() {
         String customLineEnding = "\r\n";
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .lineEnding(customLineEnding)
                 .build();
 
@@ -93,7 +95,7 @@ class NTriplesConfigTest {
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
     void builder_shouldAllowOverridingValidateURIs() {
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .validateURIs(true)
                 .build();
 
@@ -103,7 +105,7 @@ class NTriplesConfigTest {
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
     void builder_shouldAllowOverridingStableBlankNodeIds() {
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .stableBlankNodeIds(true)
                 .build();
 
@@ -113,7 +115,7 @@ class NTriplesConfigTest {
     @Test
     @DisplayName("Builder should handle null values for optional fields gracefully (e.g., baseIRI)")
     void builder_shouldHandleNullForOptionalFields() {
-        NTriplesConfig config = NTriplesConfig.builder()
+        NTriplesOption config = NTriplesOption.builder()
                 .baseIRI(null)
                 .build();
 

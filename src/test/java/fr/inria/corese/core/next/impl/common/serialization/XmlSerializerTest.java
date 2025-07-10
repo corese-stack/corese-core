@@ -2,10 +2,11 @@ package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.common.serialization.config.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.common.serialization.config.XmlConfig;
-import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlOption;
+import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +28,7 @@ class XmlSerializerTest {
 
     @Mock
     private Model mockModel;
-    XmlConfig mockConfig;
+    XmlOption mockConfig;
     private TestStatementFactory factory;
 
     private StringWriter writer;
@@ -38,7 +39,7 @@ class XmlSerializerTest {
         writer = new StringWriter();
         factory = new TestStatementFactory();
 
-        mockConfig = XmlConfig.defaultConfig();
+        mockConfig = XmlOption.defaultConfig();
     }
 
 
@@ -53,7 +54,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .autoDeclarePrefixes(true)
                 .usePrefixes(true)
                 .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
@@ -88,7 +89,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .stableBlankNodeIds(true)
                 .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -121,7 +122,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .stableBlankNodeIds(true)
                 .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -154,7 +155,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -185,7 +186,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .addCustomPrefix("ex", "http://example.org/vocabulary/")
                 .addCustomPrefix("xsd", "http://www.w3.org/2001/XMLSchema#")
@@ -217,7 +218,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
@@ -254,7 +255,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .addCustomPrefix("exorg", "http://ex.org/")
                 .addCustomPrefix("excom", "http://ex.com/")
                 .prefixOrdering(PrefixOrderingEnum.USAGE_ORDER)
@@ -296,7 +297,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .sortSubjects(true)
                 .addCustomPrefix("ex", "http://ex.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -332,7 +333,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -362,7 +363,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .addCustomPrefix("ex", "http://example.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -396,7 +397,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .autoDeclarePrefixes(false)
                 .usePrefixes(true)
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -428,7 +429,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .usePrefixes(false)
                 .autoDeclarePrefixes(true)
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -466,7 +467,7 @@ class XmlSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .stableBlankNodeIds(false)
                 .sortSubjects(true)
                 .addCustomPrefix("ex", "http://example.org/")
@@ -497,7 +498,7 @@ class XmlSerializerTest {
     void shouldHandleEmptyModel() throws SerializationException {
         when(mockModel.stream()).thenReturn(Stream.empty());
 
-        XmlConfig testConfig = new XmlConfig.Builder()
+        XmlOption testConfig = new XmlOption.Builder()
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 

@@ -38,12 +38,12 @@ public abstract class AbstractRDFParser implements RDFParser {
     }
 
     @Override
-    public void parse(InputStream in) throws ParsingErrorException {
+    public void parse(InputStream in) {
         parse(in, null);
     }
 
     @Override
-    public void parse(Reader reader) throws ParsingErrorException {
+    public void parse(Reader reader) {
         parse(reader, null);
     }
 

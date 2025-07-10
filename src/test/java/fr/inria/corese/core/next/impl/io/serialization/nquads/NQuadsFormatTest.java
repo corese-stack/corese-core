@@ -1,9 +1,10 @@
-package fr.inria.corese.core.next.impl.io.serialization;
+package fr.inria.corese.core.next.impl.io.serialization.nquads;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.config.NQuadsConfig;
+import fr.inria.corese.core.next.impl.common.serialization.TestStatementFactory;
+import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsOption;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,14 +23,9 @@ import static org.mockito.Mockito.*;
 class NQuadsSerializerTest {
 
     private Model model;
-<<<<<<<< HEAD:src/test/java/fr/inria/corese/core/next/impl/io/serialization/nquads/NQuadsFormatTest.java
-    private fr.inria.corese.core.next.impl.io.serialization.FormatConfig config;
-    private fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat nQuadsFormat;
-========
-    private NQuadsConfig config;
+    private NQuadsOption config;
     private NQuadsSerializer nQuadsSerializer;
     private TestStatementFactory factory;
->>>>>>>> feature/corese-next:src/test/java/fr/inria/corese/core/next/impl/common/serialization/NQuadsSerializerTest.java
 
     private Resource mockExPerson;
     private IRI mockExName;
@@ -46,14 +42,9 @@ class NQuadsSerializerTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-<<<<<<<< HEAD:src/test/java/fr/inria/corese/core/next/impl/io/serialization/nquads/NQuadsFormatTest.java
-        config = new fr.inria.corese.core.next.impl.io.serialization.FormatConfig.Builder().build();
-        nQuadsFormat = new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(model, config);
-========
-        config = NQuadsConfig.defaultConfig();
+        config = NQuadsOption.defaultConfig();
         nQuadsSerializer = new NQuadsSerializer(model, config);
         factory = new TestStatementFactory();
->>>>>>>> feature/corese-next:src/test/java/fr/inria/corese/core/next/impl/common/serialization/NQuadsSerializerTest.java
 
         mockExPerson = factory.createIRI("http://example.org/Person");
         mockExName = factory.createIRI("http://example.org/name");
@@ -69,22 +60,13 @@ class NQuadsSerializerTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-<<<<<<<< HEAD:src/test/java/fr/inria/corese/core/next/impl/io/serialization/nquads/NQuadsFormatTest.java
-        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(null), "Model cannot be null");
-        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(null, config), "Model cannot be null");
-========
         assertThrows(NullPointerException.class, () -> new NQuadsSerializer(null), "Model cannot be null");
->>>>>>>> feature/corese-next:src/test/java/fr/inria/corese/core/next/impl/common/serialization/NQuadsSerializerTest.java
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null configuration")
     void constructorShouldThrowForNullConfig() {
-<<<<<<<< HEAD:src/test/java/fr/inria/corese/core/next/impl/io/serialization/nquads/NQuadsFormatTest.java
-        assertThrows(NullPointerException.class, () -> new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(model, null), "Configuration cannot be null");
-========
         assertThrows(NullPointerException.class, () -> new NQuadsSerializer(model, null), "Configuration cannot be null");
->>>>>>>> feature/corese-next:src/test/java/fr/inria/corese/core/next/impl/common/serialization/NQuadsSerializerTest.java
     }
 
     @Test
@@ -154,35 +136,6 @@ class NQuadsSerializerTest {
     }
 
     @Test
-<<<<<<<< HEAD:src/test/java/fr/inria/corese/core/next/impl/io/serialization/nquads/NQuadsFormatTest.java
-    @DisplayName("Write should handle blank nodes with custom prefix")
-    void writeShouldHandleBlankNodesWithCustomPrefix() throws SerializationException {
-        fr.inria.corese.core.next.impl.io.serialization.FormatConfig customConfig = new FormatConfig.Builder().blankNodePrefix("genid-").build();
-        fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat customSerializer = new fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat(model, customConfig);
-
-        Statement stmt = createStatement(
-                mockBNode1,
-                mockExKnows,
-                mockBNode2,
-                createBlankNode("b3")
-        );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
-
-        StringWriter writer = new StringWriter();
-        customSerializer.write(writer);
-
-        String expected = String.format("genid-%s <%s> genid-%s genid-%s",
-                mockBNode1.stringValue(),
-                mockExKnows.stringValue(),
-                mockBNode2.stringValue(),
-                createBlankNode("b3").stringValue()) + " .\n";
-
-        assertEquals(expected, writer.toString());
-    }
-
-    @Test
-========
->>>>>>>> feature/corese-next:src/test/java/fr/inria/corese/core/next/impl/common/serialization/NQuadsSerializerTest.java
     @DisplayName("Write should throw SerializationException on IO error")
     void writeShouldThrowOnIOException() throws IOException {
         Statement stmt = factory.createStatement(
@@ -310,12 +263,8 @@ class NQuadsSerializerTest {
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer writer = new StringWriter();
-<<<<<<<< HEAD:src/test/java/fr/inria/corese/core/next/impl/io/serialization/nquads/NQuadsFormatTest.java
-        fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsFormat serializer = new NQuadsFormat(currentTestModel);
-========
 
-        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsConfig.defaultConfig());
->>>>>>>> feature/corese-next:src/test/java/fr/inria/corese/core/next/impl/common/serialization/NQuadsSerializerTest.java
+        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsOption.defaultConfig());
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
@@ -338,7 +287,7 @@ class NQuadsSerializerTest {
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsConfig.defaultConfig());
+        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsOption.defaultConfig());
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);

@@ -1,8 +1,15 @@
 package fr.inria.corese.core.next.impl.common.serialization;
 
 import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.RdfSerializer;
-import fr.inria.corese.core.next.api.SerializationConfig;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.serialization.SerializationConfig;
+import fr.inria.corese.core.next.impl.io.serialization.*;
+import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +22,8 @@ import static org.mockito.Mockito.mockConstruction;
 /**
  * Unit tests for the {@link DefaultSerializerFactory} class.
  * This class verifies that the factory correctly creates instances of
- * various {@link RdfSerializer} implementations based on the provided
- * {@link RdfFormat} and handles null inputs gracefully.
+ * various {@link RDFSerializer} implementations based on the provided
+ * {@link RDFFormat} and handles null inputs gracefully.
  */
 class DefaultSerializerFactoryTest {
 
@@ -36,7 +43,7 @@ class DefaultSerializerFactoryTest {
     @DisplayName("createSerializer should return TurtleSerializer for TURTLE format")
     void createSerializer_shouldReturnTurtleSerializer_forTurtleFormat() {
         try (MockedConstruction<TurtleSerializer> mockedConstruction = mockConstruction(TurtleSerializer.class)) {
-            RdfSerializer serializer = factory.createSerializer(RdfFormat.TURTLE, mockModel, mockConfig);
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.TURTLE, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof TurtleSerializer);
@@ -48,7 +55,7 @@ class DefaultSerializerFactoryTest {
     @DisplayName("createSerializer should return NTriplesSerializer for NTRIPLES format")
     void createSerializer_shouldReturnNTriplesSerializer_forNTriplesFormat() {
         try (MockedConstruction<NTriplesSerializer> mockedConstruction = mockConstruction(NTriplesSerializer.class)) {
-            RdfSerializer serializer = factory.createSerializer(RdfFormat.NTRIPLES, mockModel, mockConfig);
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.NTRIPLES, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof NTriplesSerializer);
@@ -60,7 +67,7 @@ class DefaultSerializerFactoryTest {
     @DisplayName("createSerializer should return NQuadsSerializer for NQUADS format")
     void createSerializer_shouldReturnNQuadsSerializer_forNQuadsFormat() {
         try (MockedConstruction<NQuadsSerializer> mockedConstruction = mockConstruction(NQuadsSerializer.class)) {
-            RdfSerializer serializer = factory.createSerializer(RdfFormat.NQUADS, mockModel, mockConfig);
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.NQUADS, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof NQuadsSerializer);
@@ -72,7 +79,7 @@ class DefaultSerializerFactoryTest {
     @DisplayName("createSerializer should return TriGSerializer for TRIG format")
     void createSerializer_shouldReturnTriGSerializer_forTriGFormat() {
         try (MockedConstruction<TriGSerializer> mockedConstruction = mockConstruction(TriGSerializer.class)) {
-            RdfSerializer serializer = factory.createSerializer(RdfFormat.TRIG, mockModel, mockConfig);
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.TRIG, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof TriGSerializer);
@@ -84,7 +91,7 @@ class DefaultSerializerFactoryTest {
     @DisplayName("createSerializer should return XmlSerializer for RDFXML format")
     void createSerializer_shouldReturnXmlSerializer_forRdfXmlFormat() {
         try (MockedConstruction<XmlSerializer> mockedConstruction = mockConstruction(XmlSerializer.class)) {
-            RdfSerializer serializer = factory.createSerializer(RdfFormat.RDFXML, mockModel, mockConfig);
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFXML, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof XmlSerializer);
@@ -97,14 +104,14 @@ class DefaultSerializerFactoryTest {
     void createSerializer_shouldThrowNPE_forNullFormat() {
         assertThrows(NullPointerException.class,
                 () -> factory.createSerializer(null, mockModel, mockConfig),
-                "Should throw NullPointerException for null RdfFormat");
+                "Should throw NullPointerException for null RDFFormat");
     }
 
     @Test
     @DisplayName("createSerializer should throw NullPointerException for a null model")
     void createSerializer_shouldThrowNPE_forNullModel() {
         assertThrows(NullPointerException.class,
-                () -> factory.createSerializer(RdfFormat.TURTLE, null, mockConfig),
+                () -> factory.createSerializer(RDFFormat.TURTLE, null, mockConfig),
                 "Should throw NullPointerException for null Model");
     }
 
@@ -112,7 +119,7 @@ class DefaultSerializerFactoryTest {
     @DisplayName("createSerializer should throw NullPointerException for a null config")
     void createSerializer_shouldThrowNPE_forNullConfig() {
         assertThrows(NullPointerException.class,
-                () -> factory.createSerializer(RdfFormat.TURTLE, mockModel, null),
+                () -> factory.createSerializer(RDFFormat.TURTLE, mockModel, null),
                 "Should throw NullPointerException for null SerializationConfig");
     }
 }

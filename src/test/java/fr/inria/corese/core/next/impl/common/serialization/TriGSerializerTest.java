@@ -4,9 +4,10 @@ import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.common.serialization.config.TriGConfig;
-import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.io.serialization.trig.TriGOption;
+import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,13 +28,13 @@ import static org.mockito.Mockito.*;
 class TriGSerializerTest {
 
     private Model mockModel;
-    private TriGConfig defaultConfig;
+    private TriGOption defaultConfig;
     private TestStatementFactory factory;
 
     @BeforeEach
     void setUp() {
         mockModel = mock(Model.class);
-        defaultConfig = TriGConfig.defaultConfig();
+        defaultConfig = TriGOption.defaultConfig();
         factory = new TestStatementFactory();
     }
 
@@ -155,7 +156,7 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TriGConfig customConfig = new TriGConfig.Builder()
+        TriGOption customConfig = new TriGOption.Builder()
                 .strictMode(false)
                 .build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, customConfig);
@@ -205,7 +206,7 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TriGConfig customConfig = new TriGConfig.Builder()
+        TriGOption customConfig = new TriGOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, customConfig);
@@ -255,7 +256,7 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TriGConfig configWithBase = new TriGConfig.Builder()
+        TriGOption configWithBase = new TriGOption.Builder()
                 .baseIRI("http://example.org/base/")
                 .build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, configWithBase);
@@ -338,7 +339,7 @@ class TriGSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TriGConfig strictConfig = new TriGConfig.Builder().strictMode(true).build();
+        TriGOption strictConfig = new TriGOption.Builder().strictMode(true).build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, strictConfig);
 
 
@@ -374,7 +375,7 @@ class TriGSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TriGConfig strictConfig = new TriGConfig.Builder().strictMode(true).validateURIs(true).build();
+        TriGOption strictConfig = new TriGOption.Builder().strictMode(true).validateURIs(true).build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, strictConfig);
 
 
@@ -411,7 +412,7 @@ class TriGSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TriGConfig customConfig = new TriGConfig.Builder()
+        TriGOption customConfig = new TriGOption.Builder()
                 .useMultilineLiterals(true)
                 .prettyPrint(true)
                 .build();

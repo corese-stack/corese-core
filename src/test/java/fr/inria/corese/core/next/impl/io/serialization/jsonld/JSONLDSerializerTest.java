@@ -2,8 +2,8 @@ package fr.inria.corese.core.next.impl.io.serialization.jsonld;
 
 import com.apicatalog.jsonld.json.JsonLdComparison;
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.io.serialization.FormatSerializer;
-import fr.inria.corese.core.next.impl.io.TitaniumJSONLDProcessorOptions;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.option.TitaniumJSONLDProcessorOption;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import jakarta.json.Json;
@@ -47,7 +47,7 @@ class JSONLDSerializerTest {
         // IRI IRI LangLiteral
         this.model.add(iriNode, iriPred, langLiteral);
 
-        FormatSerializer serializer = new JSONLDSerializer(this.model, (new TitaniumJSONLDProcessorOptions.Builder()).ordered(true).build());
+        RDFSerializer serializer = new JSONLDSerializer(this.model, (new TitaniumJSONLDProcessorOption.Builder()).ordered(true).build());
 
         StringWriter writer = new StringWriter();
 
@@ -98,7 +98,7 @@ class JSONLDSerializerTest {
         // BlankNode IRI BlankNode
         this.model.add(blankNode, iriPred, blankNode);
 
-        FormatSerializer serializer = new JSONLDSerializer(this.model);
+        RDFSerializer serializer = new JSONLDSerializer(this.model);
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);
@@ -149,7 +149,7 @@ class JSONLDSerializerTest {
         // IRI IRI LangLiteral
         this.model.add(iriNode, iriPred, langLiteral, graph1, graph2);
 
-        FormatSerializer serializer = new JSONLDSerializer(this.model);
+        RDFSerializer serializer = new JSONLDSerializer(this.model);
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);

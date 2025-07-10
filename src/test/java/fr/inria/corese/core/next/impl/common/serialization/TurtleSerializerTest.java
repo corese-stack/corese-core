@@ -4,9 +4,10 @@ import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.serialization.config.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.common.serialization.config.TurtleConfig;
-import fr.inria.corese.core.next.impl.common.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleOption;
+import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,13 +30,13 @@ import static org.mockito.Mockito.*;
 class TurtleSerializerTest {
 
     private Model mockModel;
-    private TurtleConfig defaultConfig;
+    private TurtleOption defaultConfig;
     private TestStatementFactory factory;
 
     @BeforeEach
     void setUp() {
         mockModel = mock(Model.class);
-        defaultConfig = TurtleConfig.defaultConfig();
+        defaultConfig = TurtleOption.defaultConfig();
         factory = new TestStatementFactory();
     }
 
@@ -152,7 +153,7 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TurtleConfig config = new TurtleConfig.Builder()
+        TurtleOption config = new TurtleOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .useRdfTypeShortcut(true)
                 .useCollections(true)
@@ -213,7 +214,7 @@ class TurtleSerializerTest {
         StringWriter writer = new StringWriter();
 
 
-        TurtleConfig config = new TurtleConfig.Builder()
+        TurtleOption config = new TurtleOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
@@ -314,7 +315,7 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TurtleConfig configWithBase = new TurtleConfig.Builder()
+        TurtleOption configWithBase = new TurtleOption.Builder()
                 .baseIRI("http://example.org/base/")
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
@@ -398,7 +399,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TurtleConfig strictConfig = new TurtleConfig.Builder().strictMode(true).build();
+        TurtleOption strictConfig = new TurtleOption.Builder().strictMode(true).build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
@@ -434,7 +435,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TurtleConfig strictConfig = new TurtleConfig.Builder().strictMode(true).validateURIs(true).build();
+        TurtleOption strictConfig = new TurtleOption.Builder().strictMode(true).validateURIs(true).build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
@@ -470,7 +471,7 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleConfig config = new TurtleConfig.Builder()
+        TurtleOption config = new TurtleOption.Builder()
                 .useMultilineLiterals(true)
                 .prettyPrint(true)
                 .autoDeclarePrefixes(true)

@@ -9,12 +9,12 @@ import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.io.TitaniumJSONLDProcessorOptions;
+import fr.inria.corese.core.next.impl.io.serialization.option.TitaniumJSONLDProcessorOption;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -27,7 +27,7 @@ public class JSONLDParser extends AbstractRDFParser {
     private static final String JSONLD_JAVA_DEFAULT_GRAPH = "@default";
 
     public JSONLDParser(Model model, ValueFactory factory) {
-        super(model, factory, new TitaniumJSONLDProcessorOptions.Builder().build());
+        super(model, factory, new TitaniumJSONLDProcessorOption.Builder().build());
     }
 
     public JSONLDParser(Model model, ValueFactory factory, IOOptions config) {
@@ -35,8 +35,8 @@ public class JSONLDParser extends AbstractRDFParser {
     }
 
     @Override
-    public RdfFormat getRDFFormat() {
-        return RdfFormat.JSONLD;
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.JSONLD;
     }
 
     /**
@@ -47,7 +47,7 @@ public class JSONLDParser extends AbstractRDFParser {
      * @throws ParsingErrorException
      */
     @Override
-    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
+    public void parse(InputStream in, String baseURI) {
             try {
                 parseJSONLDDocument(JsonDocument.of(in), baseURI);
             } catch (JsonLdError e) {
@@ -73,8 +73,8 @@ public class JSONLDParser extends AbstractRDFParser {
     private void parseJSONLDDocument(Document document, String baseURI) {
         try {
             JsonLdOptions options = new JsonLdOptions();
-            if(this.getConfig() instanceof TitaniumJSONLDProcessorOptions) {
-                options = ((TitaniumJSONLDProcessorOptions) this.getConfig()).getJsonLdOptions();
+            if(this.getConfig() instanceof TitaniumJSONLDProcessorOption) {
+                options = ((TitaniumJSONLDProcessorOption) this.getConfig()).getJsonLdOptions();
             }
             if(baseURI != null && !baseURI.isEmpty()) {
                 options.setBase(URI.create(baseURI));

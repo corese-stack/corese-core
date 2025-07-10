@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.io.parser.jsonld;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
@@ -44,8 +44,8 @@ public class JSONLDParserTest {
 
     @Test
     void getRDFFormatTest() {
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, new CoreseModel(), valueFactory);
-        assertEquals(RdfFormat.JSONLD, parser.getRDFFormat());
+        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, new CoreseModel(), valueFactory);
+        assertEquals(RDFFormat.JSONLD, parser.getRDFFormat());
     }
 
     /**
@@ -70,7 +70,7 @@ public class JSONLDParserTest {
                 }
                 """;
         Model model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
+        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new ByteArrayInputStream(sampleJsonLD.getBytes()));
 
         assertEquals(3, model.size());
@@ -108,7 +108,7 @@ public class JSONLDParserTest {
                 }
                 """;
         Model model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
+        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new ByteArrayInputStream(sampleJsonLD.getBytes()), "http://me.markus-lanthaler.com/");
 
         assertEquals(3, model.size());
@@ -146,7 +146,7 @@ public class JSONLDParserTest {
                 }
                 """;
         Model model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
+        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD));
 
         assertEquals(3, model.size());
@@ -184,7 +184,7 @@ public class JSONLDParserTest {
                 }
                 """;
         Model model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
+        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD), "http://me.markus-lanthaler.com/");
 
         assertEquals(3, model.size());
@@ -227,7 +227,7 @@ public class JSONLDParserTest {
                 
                 """;
         Model model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
+        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         Reader reader = new StringReader(sampleJsonLD);
         parser.parse(reader);
 
@@ -278,7 +278,7 @@ public class JSONLDParserTest {
                 """;
 
         Model model = new CoreseModel();
-        RDFParser parser = factory.createRDFParser(RdfFormat.JSONLD, model, valueFactory);
+        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD));
 
         assertEquals(7, model.size());
