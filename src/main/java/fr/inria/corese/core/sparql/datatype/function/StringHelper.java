@@ -358,7 +358,7 @@ public class StringHelper {
      * qualifier, scientific notation and numbers marked with a type
      * qualifier (e.g. 123L).
      *
-     * @see org.apache.commons.lang.math.NumberUtils
+     * @see org.apache.commons.lang3.math.NumberUtils
      * @param str the string to check
      * @return true if the string denotes a correctly formatted number, false otherwise.
      */

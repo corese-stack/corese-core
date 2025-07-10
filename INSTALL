@@ -1,4 +1,0 @@
-To build the project: `./gradlew clean build shadowJar` where:
-- `clean` removes the '.\build' repository;
-- `build` produces the .jar library without dependencies;
-- `shadowJar` products the jar-with-dependencies (aka uber-jar or flat-jar) for corese-core.

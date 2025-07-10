@@ -219,6 +219,18 @@ class RdfFormatTest {
         assertFalse(rdfxml.supportsNamedGraphs());
     }
 
+    @Test
+    @DisplayName("TRIG constant should be correctly defined")
+    void trigConstant() {
+        RdfFormat trig = RdfFormat.TRIG;
+
+        assertNotNull(trig, "TRIG constant should not be null");
+        assertEquals("TriG", trig.getName());
+        assertTrue(trig.getExtensions().contains("trig"));
+        assertTrue(trig.getMimeTypes().contains("application/trig"));
+        assertTrue(trig.supportsNamespaces());
+        assertTrue(trig.supportsNamedGraphs());
+    }
 
     @Test
     @DisplayName("byName() should find existing format by name (case-insensitive)")
@@ -286,13 +298,14 @@ class RdfFormatTest {
         List<fr.inria.corese.core.next.api.base.io.RdfFormat> allFormats = fr.inria.corese.core.next.api.base.io.RdfFormat.all();
 
         assertNotNull(allFormats, "List of all formats should not be null");
-        assertEquals(5, allFormats.size(), "List should contain 5 predefined formats"); // TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML
+        assertEquals(6, allFormats.size(), "List should contain 5 predefined formats"); // TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML, TRIG
 
-        assertTrue(allFormats.contains(fr.inria.corese.core.next.api.base.io.RdfFormat.TURTLE));
-        assertTrue(allFormats.contains(fr.inria.corese.core.next.api.base.io.RdfFormat.NTRIPLES));
-        assertTrue(allFormats.contains(fr.inria.corese.core.next.api.base.io.RdfFormat.NQUADS));
-        assertTrue(allFormats.contains(fr.inria.corese.core.next.api.base.io.RdfFormat.JSONLD));
-        assertTrue(allFormats.contains(fr.inria.corese.core.next.api.base.io.RdfFormat.RDFXML));
+        assertTrue(allFormats.contains(RdfFormat.TURTLE));
+        assertTrue(allFormats.contains(RdfFormat.NTRIPLES));
+        assertTrue(allFormats.contains(RdfFormat.NQUADS));
+        assertTrue(allFormats.contains(RdfFormat.JSONLD));
+        assertTrue(allFormats.contains(RdfFormat.RDFXML));
+        assertTrue(allFormats.contains(RdfFormat.TRIG));
 
         assertThrows(UnsupportedOperationException.class, () -> allFormats.add(RdfFormat.TURTLE),
                 "The list returned by all() should be unmodifiable");

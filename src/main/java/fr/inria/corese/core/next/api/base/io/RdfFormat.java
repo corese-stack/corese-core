@@ -52,6 +52,13 @@ public class RdfFormat extends FileFormat {
             true,
             false);
 
+    public static final RdfFormat TRIG = new RdfFormat(
+            "TriG",
+            List.of("trig"),
+            List.of("application/trig"),
+            true,
+            true);
+
     /**
      * Constructs a new RDF format.
      *
@@ -138,7 +145,7 @@ public class RdfFormat extends FileFormat {
      * @return An unmodifiable List of all RdfFormat constants.
      */
     public static List<RdfFormat> all() {
-        return List.of(TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML);
+        return List.of(TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML, TRIG);
     }
 
     @Override
