@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.impl.io.serialization.jsonld;
 import com.apicatalog.jsonld.json.JsonLdComparison;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.option.TitaniumJSONLDProcessorOption;
+import fr.inria.corese.core.next.impl.io.option.TitaniumJSONLDProcessorOption;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import jakarta.json.Json;

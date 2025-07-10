@@ -1,7 +1,6 @@
-package fr.inria.corese.core.next.impl.io;
+package fr.inria.corese.core.next.impl.io.option;
 
 import com.apicatalog.jsonld.JsonLdVersion;
-import fr.inria.corese.core.next.impl.io.serialization.option.TitaniumJSONLDProcessorOption;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;

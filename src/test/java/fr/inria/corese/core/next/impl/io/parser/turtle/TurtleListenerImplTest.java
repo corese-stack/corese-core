@@ -18,7 +18,7 @@ import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TurtleListenerImplSpec {
+public class TurtleListenerImplTest {
     private Model parseAndPrintModel(String turtleData) throws Exception {
         ValueFactory factory = new CoreseAdaptedValueFactory();
 

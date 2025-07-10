@@ -11,7 +11,7 @@ import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ANTLRTurtleParserSpec {
+public class ANTLRTurtleParserTest {
     private Model parseFromString(String turtleData, String baseURI) throws Exception {
         Model model = new CoreseModel();
         ValueFactory factory = new CoreseAdaptedValueFactory();

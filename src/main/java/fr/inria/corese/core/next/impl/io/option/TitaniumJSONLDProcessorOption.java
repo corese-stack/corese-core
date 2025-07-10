@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.io.serialization.option;
+package fr.inria.corese.core.next.impl.io.option;
 
 import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.JsonLdVersion;

@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.serialization.option.TitaniumJSONLDProcessorOption;
+import fr.inria.corese.core.next.impl.io.option.TitaniumJSONLDProcessorOption;
 
 import java.io.IOException;
 import java.io.Writer;

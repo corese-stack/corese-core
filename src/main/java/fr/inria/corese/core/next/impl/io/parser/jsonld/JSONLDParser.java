@@ -14,7 +14,7 @@ import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.io.serialization.option.TitaniumJSONLDProcessorOption;
+import fr.inria.corese.core.next.impl.io.option.TitaniumJSONLDProcessorOption;
 
 import java.io.InputStream;
 import java.io.Reader;

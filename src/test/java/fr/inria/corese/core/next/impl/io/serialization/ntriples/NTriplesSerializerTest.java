@@ -1,15 +1,15 @@
-package fr.inria.corese.core.next.impl.common.serialization;
+package fr.inria.corese.core.next.impl.io.serialization.ntriples;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.serialization.TestStatementFactory;
-import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsOption;
-import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -20,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-class NQuadsSerializerTest {
+class NTriplesSerializerTest {
 
     private Model model;
-    private NQuadsOption config;
-    private NQuadsSerializer nQuadsSerializer;
+    private NTriplesOption config;
+    private NTriplesSerializer nTriplesSerializer;
     private TestStatementFactory factory;
 
     private Resource mockExPerson;
@@ -42,8 +42,8 @@ class NQuadsSerializerTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-        config = NQuadsOption.defaultConfig();
-        nQuadsSerializer = new NQuadsSerializer(model, config);
+        config = NTriplesOption.defaultConfig();
+        nTriplesSerializer = new NTriplesSerializer(model, config);
         factory = new TestStatementFactory();
 
         mockExPerson = factory.createIRI("http://example.org/Person");
@@ -60,13 +60,13 @@ class NQuadsSerializerTest {
     @Test
     @DisplayName("Constructor should throw NullPointerException for null model")
     void constructorShouldThrowForNullModel() {
-        assertThrows(NullPointerException.class, () -> new NQuadsSerializer(null), "Model cannot be null");
+        assertThrows(NullPointerException.class, () -> new NTriplesSerializer(null), "Model cannot be null");
     }
 
     @Test
     @DisplayName("Constructor should throw NullPointerException for null configuration")
     void constructorShouldThrowForNullConfig() {
-        assertThrows(NullPointerException.class, () -> new NQuadsSerializer(model, null), "Configuration cannot be null");
+        assertThrows(NullPointerException.class, () -> new NTriplesSerializer(model, null), "Configuration cannot be null");
     }
 
     @Test
@@ -77,62 +77,61 @@ class NQuadsSerializerTest {
                 mockExName,
                 mockLiteralJohn
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsSerializer.write(writer);
+        nTriplesSerializer.write(writer);
 
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
-                escapeNQuadsString(lexJohn)) + " .\n";
+                escapeNTriplesString(lexJohn)) + " .\n";
 
-        assertEquals(expected, writer.toString());
+        Assertions.assertEquals(expected, writer.toString());
     }
 
     @Test
-    @DisplayName("Write should handle blank nodes with default prefix")
+    @DisplayName("Write should serialize a statement with context but ignore it (N-Triples)")
+    void writeShouldSerializeStatementWithContext() throws SerializationException {
+        IRI mockContext = factory.createIRI("http://example.org/ctx");
+        Statement stmt = factory.createStatement(
+                mockExPerson,
+                mockExName,
+                mockLiteralJohn,
+                mockContext
+        );
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+
+        StringWriter writer = new StringWriter();
+        nTriplesSerializer.write(writer);
+
+        String expected = String.format("<%s> <%s> \"%s\"",
+                mockExPerson.stringValue(),
+                mockExName.stringValue(),
+                escapeNTriplesString(lexJohn)) + " .\n";
+
+        Assertions.assertEquals(expected, writer.toString());
+    }
+
+    @Test
+    @DisplayName("Write should handle blank nodes with default N-Triples prefix (_:)")
     void writeShouldHandleBlankNodes() throws SerializationException {
         Statement stmt = factory.createStatement(
                 mockBNode1,
                 mockExKnows,
                 mockBNode2
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsSerializer.write(writer);
+        nTriplesSerializer.write(writer);
 
         String expected = String.format("_:%s <%s> _:%s",
                 mockBNode1.stringValue(),
                 mockExKnows.stringValue(),
                 mockBNode2.stringValue()) + " .\n";
 
-        assertEquals(expected, writer.toString());
-    }
-
-    @Test
-    @DisplayName("Write should handle blank nodes in context with default prefix")
-    void writeShouldHandleBlankNodesInContext() throws SerializationException {
-        Resource blankNodeContext = factory.createBlankNode("b3");
-        Statement stmt = factory.createStatement(
-                mockBNode1,
-                mockExKnows,
-                mockExPerson,
-                blankNodeContext
-        );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
-
-        StringWriter writer = new StringWriter();
-        nQuadsSerializer.write(writer);
-
-        String expected = String.format("_:%s <%s> <%s> _:%s",
-                mockBNode1.stringValue(),
-                mockExKnows.stringValue(),
-                mockExPerson.stringValue(),
-                blankNodeContext.stringValue()) + " .\n";
-
-        assertEquals(expected, writer.toString());
+        Assertions.assertEquals(expected, writer.toString());
     }
 
     @Test
@@ -143,16 +142,19 @@ class NQuadsSerializerTest {
                 mockExName,
                 mockLiteralJohn
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        Writer faultyWriter = mock(Writer.class);
+        Writer faultyWriter = Mockito.mock(Writer.class);
+
         doThrow(new IOException("Simulated IO error during write")).when(faultyWriter).write(anyString());
         doThrow(new IOException("Simulated IO error (char array)")).when(faultyWriter).write(any(char[].class), anyInt(), anyInt());
         doThrow(new IOException("Simulated IO error (close)")).when(faultyWriter).close();
 
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(faultyWriter));
-        assertEquals("N-Quads serialization failed [Format: N-Quads]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(faultyWriter));
+
+        assertEquals("N-Triples serialization failed [Format: N-Triples]", thrown.getMessage());
     }
+
 
     @Test
     @DisplayName("Write should throw SerializationException for null subject value in strict mode")
@@ -165,8 +167,9 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
-        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
+
+        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
     @Test
@@ -180,26 +183,27 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
-        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
+        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
     @Test
     @DisplayName("Write should throw SerializationException for null object value in strict mode")
     void writeShouldThrowOnNullObjectValue() {
-        Statement stmt = mock(Statement.class);
-        when(stmt.getSubject()).thenReturn(mockExPerson);
-        when(stmt.getPredicate()).thenReturn(mockExName);
-        when(stmt.getObject()).thenReturn(null);
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Statement stmt = Mockito.mock(Statement.class);
+        Mockito.when(stmt.getSubject()).thenReturn(mockExPerson);
+        Mockito.when(stmt.getPredicate()).thenReturn(mockExName);
+        Mockito.when(stmt.getObject()).thenReturn(null);
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
-        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
+        SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
+        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
+
     @Test
-    @DisplayName("Write should handle null context correctly (default graph)")
+    @DisplayName("Should handle null context correctly (default graph)")
     void writeShouldHandleNullContext() throws SerializationException {
         Statement stmt = factory.createStatement(
                 mockExPerson,
@@ -210,12 +214,13 @@ class NQuadsSerializerTest {
         when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsSerializer.write(writer);
+        nTriplesSerializer.write(writer);
+
 
         String expected = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
-                escapeNQuadsString(lexJohn)) + " .\n";
+                escapeNTriplesString(lexJohn)) + " .\n";
 
         assertEquals(expected, writer.toString());
     }
@@ -240,18 +245,19 @@ class NQuadsSerializerTest {
                 mockExName,
                 literalMock
         );
-        when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Mockito.when(model.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         StringWriter writer = new StringWriter();
-        nQuadsSerializer.write(writer);
+        nTriplesSerializer.write(writer);
 
-        String expectedEscapedLiteral = escapeNQuadsString(literalValue);
+
+        String expectedEscapedLiteral = escapeNTriplesString(literalValue);
         String expectedOutput = String.format("<%s> <%s> \"%s\"",
                 mockExPerson.stringValue(),
                 mockExName.stringValue(),
                 expectedEscapedLiteral) + " .\n";
 
-        assertEquals(expectedOutput, writer.toString());
+        Assertions.assertEquals(expectedOutput, writer.toString());
     }
 
     @Test
@@ -259,22 +265,23 @@ class NQuadsSerializerTest {
     void shouldHandleLiteralsWithLanguageTags() throws SerializationException {
         Statement stmt = factory.createStatement(mockExPerson, factory.createIRI("http://example.org/greeting"), mockLiteralHelloEn);
 
-        Model currentTestModel = mock(Model.class);
-        when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
+        Model currentTestModel = Mockito.mock(Model.class);
+        Mockito.when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
         Writer writer = new StringWriter();
 
-        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsOption.defaultConfig());
+        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesOption.defaultConfig());
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
                 mockExPerson.stringValue(),
                 factory.createIRI("http://example.org/greeting").stringValue(),
-                escapeNQuadsString(hello),
+                escapeNTriplesString(hello),
                 mockLiteralHelloEn.getLanguage().get()) + " .\n";
 
-        assertEquals(expectedOutput, writer.toString());
+        Assertions.assertEquals(expectedOutput, writer.toString());
     }
+
 
     @Test
     @DisplayName("Should handle literals with custom datatypes")
@@ -287,7 +294,7 @@ class NQuadsSerializerTest {
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsOption.defaultConfig());
+        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesOption.defaultConfig());
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);
@@ -295,14 +302,14 @@ class NQuadsSerializerTest {
         String expectedOutput = String.format("<%s> <%s> \"%s\"^^<%s>",
                 mockExPerson.stringValue(),
                 factory.createIRI("http://example.org/value").stringValue(),
-                escapeNQuadsString("123"),
+                escapeNTriplesString("123"),
                 customDatatype.stringValue()) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
     }
 
 
-    private String escapeNQuadsString(String s) {
+    private String escapeNTriplesString(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
@@ -316,10 +323,10 @@ class NQuadsSerializerTest {
                 case '\t':
                     sb.append("\\t");
                     break;
-                case '\b': // backspace
+                case '\b':
                     sb.append("\\b");
                     break;
-                case '\f': // form feed
+                case '\f':
                     sb.append("\\f");
                     break;
                 case '"':
@@ -331,16 +338,6 @@ class NQuadsSerializerTest {
                 default:
                     if (c <= 0x1F || c == 0x7F) {
                         sb.append(String.format("\\u%04X", (int) c));
-                    } else if (c >= 0x80 && c <= 0xFFFF) {
-                        sb.append(String.format("\\u%04X", (int) c));
-                    } else if (Character.isHighSurrogate(c)) {
-                        int codePoint = s.codePointAt(i);
-                        if (Character.isValidCodePoint(codePoint)) {
-                            sb.append(String.format("\\U%08X", codePoint));
-                            i++;
-                        } else {
-                            sb.append(c);
-                        }
                     } else {
                         sb.append(c);
                     }

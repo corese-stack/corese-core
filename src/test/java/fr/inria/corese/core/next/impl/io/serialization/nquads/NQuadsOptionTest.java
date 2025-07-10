@@ -1,7 +1,6 @@
-package fr.inria.corese.core.next.impl.common.serialization.config;
+package fr.inria.corese.core.next.impl.io.serialization.nquads;
 
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsOption;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * These tests verify the default configuration settings and the functionality
  * of the builder pattern for customizing N-Quads serialization options.
  */
-class NQuadsConfigTest {
+class NQuadsOptionTest {
 
     @Test
     @DisplayName("defaultConfig() should return a config with expected N-Quads defaults")

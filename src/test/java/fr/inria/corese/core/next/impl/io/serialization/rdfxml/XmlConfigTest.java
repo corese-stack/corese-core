@@ -1,8 +1,7 @@
-package fr.inria.corese.core.next.impl.common.serialization.config;
+package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlOption;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
