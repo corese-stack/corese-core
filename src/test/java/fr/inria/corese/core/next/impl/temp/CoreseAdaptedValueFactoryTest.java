@@ -125,4 +125,11 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         assertEquals(literal, statement.getObject());
         assertEquals(context, statement.getContext());
     }
+
+    @Test
+    public void testCreateFOAFURI() {
+        IRI foaf = valueFactory.createIRI("http://xmlns.com/foaf/0.1/");
+        assertNotNull(foaf);
+        assertEquals("http://xmlns.com/foaf/0.1/", foaf.stringValue());
+    }
 }
