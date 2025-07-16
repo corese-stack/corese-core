@@ -93,25 +93,30 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attrs) {
+        // Ignore rdf:RDF root element
+        if (isRdfRDF(uri, localName)) return;
         characters.setLength(0);
 
+        // Handle datatype
         String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
-        datatypeStack.push(datatype);
+        if (datatype != null) {
+            datatypeStack.push(datatype);
+        }
 
-        // Ignore rdf:RDF
-        if (isRdfRDF(uri, localName)) return;
 
         // Handle xml:lang
         String xmlLang = attrs.getValue("xml:lang");
         if (xmlLang != null) {
-            // "" means no language
-            langStack.push(xmlLang.isEmpty() ? null : xmlLang);
-        } else {
-            // Inherit from parent
-            langStack.push(langStack.peek());
+            langStack.push(xmlLang);
         }
 
-        // Handle container elements: rdf:Seq, rdf:Bag, rdf:Alt
+        // Handle xml:base
+        String xmlBase = attrs.getValue("xml:base");
+        if (xmlBase != null) {
+            baseURI = xmlBase;
+        }
+
+        // Handle RDF containers
         if (isContainer(localName, uri)) {
             Resource subject = extractSubject(attrs);
             subjectStack.push(subject);
@@ -120,7 +125,7 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
             return;
         }
 
-        // Handle container children: rdf:li → rdf:_n
+        // Handle container items: rdf:li → rdf:_n
         if (inContainer && RDF.type.getNamespace().equals(uri)) {
             String pred = null;
             if ("li".equals(localName)) {
@@ -133,50 +138,66 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
                 IRI predicate = factory.createIRI(pred);
                 String resource = attrs.getValue("rdf:resource");
                 if (resource != null) {
-                    model.add(factory.createStatement(subjectStack.peek(), predicate, factory.createIRI(resource)));
+                    model.add(factory.createStatement(
+                            subjectStack.peek(),
+                            predicate,
+                            factory.createIRI(resolveAgainstBase(resource))
+                    ));
                 }
                 return;
             }
         }
 
-        // Handle <rdf:Description>
-        if (isDescription(localName, uri)) {
-            Resource subject = extractSubject(attrs);
-
+        // Handle <rdf:Description> (typed or untyped)
+        if (isDescription(localName, uri) || isNodeElement(attrs)) {
+            Resource newSubject = extractSubject(attrs);
+            // If this <rdf:Description> or typed element is the object of a property
             if (!predicateStack.isEmpty() && !subjectStack.isEmpty()) {
                 Resource parent = subjectStack.peek();
-                IRI predicate = predicateStack.peek();
-                model.add(factory.createStatement(parent, predicate, subject));
+                IRI predicate = predicateStack.pop(); // consume the predicate
+                model.add(factory.createStatement(parent, predicate, newSubject));
             }
 
-            subjectStack.push(subject);
+            subjectStack.push(newSubject);
 
+            // If it's a typed node (e.g., <ex:Document>), add rdf:type triple
+            if (!isDescription(localName, uri)) {
+                IRI typeIRI = factory.createIRI(expandQName(uri, localName, qName));
+                model.add(factory.createStatement(
+                        newSubject,
+                        factory.createIRI(RDF.type.getIRI().stringValue()),
+                        typeIRI
+                ));
+            }
+
+            // Handle property attributes
             for (int i = 0; i < attrs.getLength(); i++) {
                 String attrURI = attrs.getURI(i);
                 String attrLocal = attrs.getLocalName(i);
                 String attrQName = attrs.getQName(i);
                 String value = attrs.getValue(i);
 
-                if (isSyntaxAttribute(attrURI, attrLocal, attrQName)) {
-                    continue; // skip core syntax attributes
-                }
+                if (isSyntaxAttribute(attrURI, attrLocal, attrQName)) continue;
 
                 IRI pred = factory.createIRI(expandQName(attrURI, attrLocal, attrQName));
-                model.add(factory.createStatement(subject, pred, factory.createLiteral(value)));
+                model.add(factory.createStatement(newSubject, pred, factory.createLiteral(value)));
             }
 
             return;
         }
 
-
-        // Handle regular property elements
+        // Handle regular property elements (e.g., <ex:editor>)
         IRI predicate = factory.createIRI(expandQName(uri, localName, qName));
         predicateStack.push(predicate);
 
-        // Check for rdf:resource
+        // Handle rdf:resource object (IRI)
         String resource = attrs.getValue("rdf:resource");
         if (resource != null) {
-            model.add(factory.createStatement(subjectStack.peek(), predicate, factory.createIRI(resource)));
+            model.add(factory.createStatement(
+                    subjectStack.peek(),
+                    predicate,
+                    factory.createIRI(resolveAgainstBase(resource))
+            ));
         }
     }
 
@@ -185,46 +206,48 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
         String text = characters.toString().trim();
         characters.setLength(0);
 
+        // Always pop lang/datatype if pushed
         if (!langStack.isEmpty()) langStack.pop();
-        if (!datatypeStack.isEmpty()) {
-            String datatypeUri = datatypeStack.pop();
+        String datatypeUri = !datatypeStack.isEmpty() ? datatypeStack.pop() : null;
 
-            if (!predicateStack.isEmpty() && !text.isEmpty()) {
-                IRI predicate = predicateStack.pop();
-                Resource subject = subjectStack.peek();
+        // Property literal
+        if (!predicateStack.isEmpty() && !text.isEmpty()) {
+            IRI predicate = predicateStack.pop();
+            Resource subject = subjectStack.peek();
 
-                Value literal;
+            Value literal;
 
-                if (datatypeUri != null) {
-                    Optional<XSD> known = fromURI(datatypeUri);
+            if (datatypeUri != null && !datatypeUri.isBlank()) {
+                Optional<XSD> known = fromURI(datatypeUri);
 
-                    if (known.isPresent()) {
-                        // normalized
-                        IRI normalizedDatatype = known.get().getIRI();
-                        literal = factory.createLiteral(text, normalizedDatatype);
-                    } else {
-                        // unknown datatype – fallback or warning
-                        System.err.printf("[Warning] Unknown datatype: %s%n", datatypeUri);
-                        IRI fallbackDatatype = factory.createIRI(datatypeUri);
-                        literal = factory.createLiteral(text, fallbackDatatype);
-                    }
+                if (known.isPresent()) {
+                    // normalized datatype
+                    IRI normalizedDatatype = known.get().getIRI();
+                    literal = factory.createLiteral(text, normalizedDatatype);
                 } else {
-                    // no datatype – use xml:lang if set
-                    String lang = langStack.peek();
-                    literal = (lang != null)
-                            ? factory.createLiteral(text, lang)
-                            : factory.createLiteral(text);
+                    // fallback datatype
+                    System.err.printf("[Warning] Unknown datatype: %s%n", datatypeUri);
+                    IRI fallbackDatatype = factory.createIRI(datatypeUri);
+                    literal = factory.createLiteral(text, fallbackDatatype);
                 }
-
-                model.add(factory.createStatement(subject, predicate, literal));
-            } else if (!predicateStack.isEmpty()) {
-                predicateStack.pop(); // cleanup
+            } else {
+                // no datatype – use language tag if any
+                String lang = langStack.isEmpty() ? null : langStack.peek();
+                literal = (lang != null && !lang.equals("__NO_LANG__"))
+                        ? factory.createLiteral(text, lang)
+                        : factory.createLiteral(text);
             }
 
+            model.add(factory.createStatement(subject, predicate, literal));
             return;
         }
 
-        // other cases (containers, descriptions, etc.)
+        // Clean up stray predicates
+        if (!predicateStack.isEmpty()) {
+            predicateStack.pop();
+        }
+
+        // Handle containers
         if (isContainer(localName, uri)) {
             if (!subjectStack.isEmpty()) subjectStack.pop();
             inContainer = false;
@@ -232,9 +255,9 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
             return;
         }
 
+        // Handle end of rdf:Description
         if (isDescription(localName, uri)) {
             if (!subjectStack.isEmpty()) subjectStack.pop();
-            return;
         }
     }
 
@@ -245,16 +268,31 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
     }
 
     private Resource extractSubject(Attributes attrs) {
-        String about = attrs.getValue("rdf:about");
-        if (about != null) return factory.createIRI(about);
+        String about = attrs.getValue(RDF.type.getNamespace(), "about");
+        if (about != null) return factory.createIRI(resolveAgainstBase(about));
 
-        String nodeID = attrs.getValue("rdf:nodeID");
+        String nodeID = attrs.getValue(RDF.type.getNamespace(), "nodeID");
         if (nodeID != null) return factory.createBNode("_:" + nodeID);
 
-        String id = attrs.getValue("rdf:ID");
-        if (id != null) return factory.createIRI("#" + id);
+        String id = attrs.getValue(RDF.type.getNamespace(), "ID");
+        if (id != null) return factory.createIRI(resolveAgainstBase("#" + id));
 
+        // Default to blank node
         return factory.createBNode();
+    }
+
+    private String resolveAgainstBase(String iri) {
+        if (iri == null) return null;
+        if (baseURI == null || iri.matches("^[a-zA-Z][a-zA-Z0-9+.-]*:.*")) {
+            // Absolute IRI or no base, return as-is
+            return iri;
+        }
+
+        try {
+            return new java.net.URI(baseURI).resolve(iri).toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to resolve IRI: " + iri + " against base: " + baseURI, e);
+        }
     }
 
     private boolean isRdfRDF(String uri, String localName) {
@@ -290,6 +328,12 @@ public class RdfXmlParser extends DefaultHandler implements RDFParser {
 
     private void emitTriple(Resource subj, IRI pred, Value obj,  Resource context) {
         this.statement = factory.createStatement(subj, pred, obj, context);
+    }
+
+    private boolean isNodeElement(Attributes attrs) {
+        return attrs.getValue(RDF.type.getNamespace(), "about") != null ||
+                attrs.getValue(RDF.type.getNamespace(), "nodeID") != null ||
+                attrs.getValue(RDF.type.getNamespace(), "ID") != null;
     }
 
     public Optional<XSD> fromURI(String uri) {
