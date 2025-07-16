@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.io.parser.ntriples;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -86,7 +86,7 @@ class ANTLRNTriplesParserTest {
     @Test
     @DisplayName("Test get RDF format returns NTRIPLES")
     void testGetRDFFormat() {
-        assertEquals(RdfFormat.NTRIPLES, parser.getRDFFormat());
+        assertEquals(RDFFormat.NTRIPLES, parser.getRDFFormat());
     }
 
     @Test

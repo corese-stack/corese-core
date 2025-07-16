@@ -40,9 +40,9 @@ public class ParserFactory extends AbstractRDFParserFactory {
             return new JSONLDParser(model, factory, config);
         } else if (format == RDFFormat.TURTLE) {
             return new ANTLRTurtleParser(model, factory, config);
-        } else if (format == RdfFormat.NTRIPLES) {
+        } else if (format == RDFFormat.NTRIPLES) {
             return new ANTLRNTriplesParser(model, factory, config);
-        } else if (format == RdfFormat.NQUADS) {
+        } else if (format == RDFFormat.NQUADS) {
             return new ANTLRNQuadsParser(model, factory, config);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
@@ -61,9 +61,9 @@ public class ParserFactory extends AbstractRDFParserFactory {
             return new JSONLDParser(model, factory);
         } else if (format == RDFFormat.TURTLE) {
             return new ANTLRTurtleParser(model, factory);
-        } else if (format == RdfFormat.NTRIPLES) {
+        } else if (format == RDFFormat.NTRIPLES) {
             return new ANTLRNTriplesParser(model, factory);
-        } else if (format == RdfFormat.NQUADS) {
+        } else if (format == RDFFormat.NQUADS) {
             return new ANTLRNQuadsParser(model, factory);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);

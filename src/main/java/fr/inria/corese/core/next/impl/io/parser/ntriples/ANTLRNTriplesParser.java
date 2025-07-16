@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.ntriples;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
@@ -37,8 +37,8 @@ public class ANTLRNTriplesParser extends AbstractRDFParser {
     }
 
     @Override
-    public RdfFormat getRDFFormat() {
-        return RdfFormat.NTRIPLES;
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.NTRIPLES;
     }
 
 

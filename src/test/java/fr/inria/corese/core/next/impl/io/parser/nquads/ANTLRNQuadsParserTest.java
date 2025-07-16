@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.io.parser.nquads;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.io.RdfFormat;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -96,7 +96,7 @@ class ANTLRNQuadsParserTest {
     @Test
     @DisplayName("Test get RDF format returns NQUADS")
     void testGetRDFFormat() {
-        assertEquals(RdfFormat.NQUADS, parser.getRDFFormat());
+        assertEquals(RDFFormat.NQUADS, parser.getRDFFormat());
     }
 
     @Test
