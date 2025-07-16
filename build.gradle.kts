@@ -78,11 +78,11 @@ object Meta {
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
     const val githubRepo = "corese-stack/corese-core"
-  
+
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-  
+
     // Sonatype OSSRH publishing settings
     const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -142,7 +142,6 @@ dependencies {
     implementation("com.typesafe.akka:akka-stream_2.13:2.6.20")                        // Akka Streams for reactive streams processing
     implementation("com.lightbend.akka:akka-stream-alpakka-xml_2.13:3.0.4")            // Alpakka XML for XML processing with Akka Streams
 
-
     // === Utilities ===
     implementation("org.apache.commons:commons-text:1.13.1")                           // Text manipulation utilities (Commons Text)
     implementation("org.json:json:20250517")                                           // JSON processing
@@ -168,7 +167,7 @@ publishing {
             // Configure the publication to include JAR, sources, and Javadoc
             from(components["java"])
 
-            // Configures version mapping to control how dependency versions are resolved 
+            // Configures version mapping to control how dependency versions are resolved
             // for different usage contexts (API and runtime).
             versionMapping {
                 // Defines version mapping for Java API usage.
@@ -295,7 +294,7 @@ tasks.withType<Javadoc> {
 tasks {
     shadowJar {
         this.archiveClassifier = "jar-with-dependencies"
-            }
+    }
 }
 
 // Configure Javadoc tasks to disable doclint warnings.
