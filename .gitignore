@@ -88,3 +88,4 @@ gradle/gradle-daemon-jvm.properties
 # Fichiers de logs
 logs/
 *.log
+.sonarlint/
