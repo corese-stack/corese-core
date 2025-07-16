@@ -15,7 +15,7 @@ public class IRIUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(IRIUtils.class);
 
-    private static final Pattern IRI_PATTERN = Pattern.compile("^(([\\w\\-]+:\\/\\/([\\w\\-_:]+\\.)*[\\w\\-_:]*)(\\/([\\w\\-\\._\\:]+\\/)*))([\\w\\-\\._\\:]+)(\\?[\\w\\-_\\:\\?\\=]+)?((\\#)?([\\w\\-_]+))?$");
+    private static final Pattern IRI_PATTERN = Pattern.compile("^(([\\w\\-]+:\\/\\/([\\w\\-_:]+\\.)*[\\w\\-_:]*)(\\/([\\w\\-\\._\\:]+\\/)*))([\\w\\-\\._\\:]+)?(\\?[\\w\\-_\\:\\?\\=]+)?((\\#)?([\\w\\-_]+))?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
 
     /**
@@ -34,9 +34,11 @@ public class IRIUtils {
             Matcher matcher = IRI_PATTERN.matcher(iri);
 
             if(matcher.matches()) {
-                if(matcher.group(8) == null ) { // If the IRI has no fragment)
+                if((matcher.group(8) == null) || (matcher.group(6) == null && matcher.group(9) == null) ) { // If the IRI has no fragment or ends with a slash
+
                     return matcher.group(1);
                 } else {
+                    // 1: Domain and path ending with a slash, 6: final path element without slash, 9: final # if there is a fragment
                     return matcher.group(1) + matcher.group(6) + matcher.group(9);
                 }
             } else {
@@ -57,10 +59,12 @@ public class IRIUtils {
             Matcher matcher = IRI_PATTERN.matcher(iri);
 
             if(matcher.matches()) {
-                if(matcher.group(8) == null ) { // If the IRI has no fragment)
-                    return matcher.group(6);
-                } else {
+                if(matcher.group(10) != null){ // If the IRI has a fragment
                     return matcher.group(10);
+                } else if(matcher.group(6) != null ) { // If the IRI has no fragment but do not ends with a slash
+                    return matcher.group(6);
+                } else { // If the URI ends with a slash
+                    return "";
                 }
             } else {
                 return "";
