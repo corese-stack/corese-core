@@ -4,6 +4,9 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 
+/**
+ * A factory for creating RDF parsers.
+ */
 public interface RDFParserFactory {
 
 

@@ -9,12 +9,23 @@ import fr.inria.corese.core.next.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.impl.io.parser.jsonld.JSONLDParser;
 import fr.inria.corese.core.next.impl.io.parser.turtle.ANTLRTurtleParser;
 
+/**
+ * Factory class for creating RDF parsers. Generates according to the RDFFormat provided.
+ */
 public class ParserFactory extends AbstractRDFParserFactory {
 
     public ParserFactory() {
         super();
     }
 
+    /**
+     * Creates an RDF parser for the given format, model, value factory, and configuration.
+     * @param format The RDF format to use for parsing.
+     * @param model The model to which the parsed data will be added.
+     * @param factory The value factory to use for creating RDF values.
+     * @param config The configuration to use for parsing.
+     * @return An RDF parser for the given format, model, value factory, and configuration.
+     */
     @Override
     public RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory, RDFParserOptions config) {
         if(format == RDFFormat.JSONLD) {
@@ -25,6 +36,13 @@ public class ParserFactory extends AbstractRDFParserFactory {
         throw new IllegalArgumentException("Unsupported format: " + format);
     }
 
+    /**
+     * Creates an RDF parser for the given format, model, and value factory.
+     * @param format The {@link RDFFormat} to use for parsing.
+     * @param model  The {@link Model} to which the parsed data will be added.
+     * @param factory The {@link ValueFactory} factory to use for creating RDF values.
+     * @return An RDF parser for the given format, model, and value factory.
+     */
     @Override
     public RDFParser createRDFParser(RDFFormat format, Model model, ValueFactory factory) {
         if(format == RDFFormat.JSONLD) {

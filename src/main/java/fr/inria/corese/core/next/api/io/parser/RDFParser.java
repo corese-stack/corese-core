@@ -6,6 +6,12 @@ import fr.inria.corese.core.next.api.io.IOOptions;
 import java.io.InputStream;
 import java.io.Reader;
 
+/**
+ * An interface for parsing RDF data from an InputStream or Reader and adding statements to a model.
+ *
+ * @see RDFParserFactory
+ * @see RDFFormat
+ */
 public interface RDFParser {
 
     /**

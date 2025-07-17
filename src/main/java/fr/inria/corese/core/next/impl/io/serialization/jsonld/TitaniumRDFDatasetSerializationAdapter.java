@@ -25,6 +25,7 @@ import static fr.inria.corese.core.next.impl.io.serialization.util.Serialization
 
 /**
  * Adapter class from Model to RdfDataset for usage in the JSON-LD serialization process using the titanium library.
+ * @see <a href="https://github.com/filip26/titanium-rdf-api">Titanium RDF API</a>
  */
 public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
@@ -107,6 +108,11 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         return this.model.size();
     }
 
+    /**
+     * Converts a Corese statement to a titanium RDF NQuad
+     * @param statement the statement to convert
+     * @return the converted statement
+     */
     private RdfNQuad toRdfNQuad(Statement statement) {
         return new RdfNQuad() {
             @Override
@@ -131,28 +137,35 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         };
     }
 
+    /**
+     * Converts a Corese statement to a titanium RDF triple
+     * @param statement the statement to convert
+     * @return the converted statement
+     */
     private RdfTriple toRdfTriple(Statement statement) {
         return new RdfTriple() {
             @Override
             public RdfResource getSubject() {
-                logger.debug("getSubject: {}", statement.getSubject().stringValue());
                 return toRdfResource(statement.getSubject());
             }
 
             @Override
             public RdfResource getPredicate() {
-                logger.debug("getPredicate: {}", statement.getPredicate().stringValue());
                 return toRdfResource(statement.getPredicate());
             }
 
             @Override
             public RdfValue getObject() {
-                logger.debug("getObject: {}", statement.getObject().stringValue());
                 return toRdfValue(statement.getObject());
             }
         };
     }
 
+    /**
+     * Converts a Corese resource to a titanium RDF resource
+     * @param resource the resource to convert
+     * @return the converted resource
+     */
     private RdfResource toRdfResource(Resource resource) {
         if (resource != null && (! (resource.isBNode() || resource.isIRI()))) {
             throw new SerializationException("Unknown resource type " + resource, "JSON-LD");
@@ -177,21 +190,28 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         };
     }
 
+    /**
+     * Converts a Corese value to a titanium RDF value
+     * @param value the value to convert
+     * @return the converted value
+     */
     private RdfValue toRdfValue(Value value) {
         if (value.isIRI()) {
-            logger.debug("toRdfValue: {} -> IRI", value.stringValue());
             return toRdfIRI((IRI) value);
         } else if (value.isBNode()) {
-            logger.debug("toRdfValue: {} -> BNode", value.stringValue());
             return toRdfBlankNode((BNode) value);
         } else if (value.isLiteral()) {
-            logger.debug("toRdfValue: {} -> Literal", value.stringValue());
             return toRdfLiteral((Literal) value);
         } else {
             throw new SerializationException("Unknown value type " + value.stringValue(), "JSON-LD");
         }
     }
 
+    /**
+     * Converts a Corese IRI to a titanium RDF Resource
+     * @param iri the IRI to convert
+     * @return the converted IRI
+     */
     private RdfResource toRdfIRI(IRI iri) {
         return new RdfResource() {
             @Override
@@ -205,6 +225,11 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         };
     }
 
+    /**
+     * Converts a Corese BNode to a titanium RDF Resource
+     * @param bnode the BNode to convert
+     * @return the converted BNode
+     */
     private RdfResource toRdfBlankNode(BNode bnode) {
         return new RdfResource() {
             @Override
@@ -218,8 +243,12 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         };
     }
 
+    /**
+     * Converts a Corese Literal to a titanium RDF Literal
+     * @param literal the Literal to convert
+     * @return the converted Literal
+     */
     private RdfLiteral toRdfLiteral(Literal literal) {
-        logger.debug("toRdfLiteral: {} {} {}", literal.stringValue(), literal.getDatatype().stringValue(), literal.getLanguage());
         return new RdfLiteral() {
             @Override
             public boolean isLiteral() {
@@ -254,6 +283,11 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         };
     }
 
+    /**
+     * Convert a Titanium RdfValue to a Corese Value
+     * @param value the Titanium RdfValue
+     * @return the Corese Value
+     */
     private Value toValue(RdfValue value) {
         if (value.isIRI()) {
             return toIRI((RdfResource) value);
@@ -266,6 +300,11 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         }
     }
 
+    /**
+     * Convert a Titanium RdfResource to a Corese Resource
+     * @param resource the Titanium RdfResource
+     * @return the Corese Resource
+     */
     private Resource toResource(RdfResource resource) {
         if (resource.isIRI()) {
             return toIRI(resource);
@@ -276,6 +315,11 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         }
     }
 
+    /**
+     * Convert a Titanium RdfResource to a Corese IRI
+     * @param resource the Titanium RdfResource
+     * @return the Corese IRI
+     */
     private IRI toIRI(RdfResource resource) {
         if(resource.isIRI()) {
             return stringToIRI(resource.getValue());
@@ -283,6 +327,11 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         return null;
     }
 
+    /**
+     * Convert a Titanium RdfResource to a Corese BNode
+     * @param resource the Titanium RdfResource
+     * @return the Corese BNode
+     */
     private BNode toBNode(RdfResource resource) {
         if(resource.isBlankNode()) {
             return new BNode() {
@@ -300,8 +349,12 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         return null;
     }
 
+    /**
+     * Convert a Titanium RdfLiteral to a Corese Literal
+     * @param literal the Titanium RdfLiteral
+     * @return the Corese Literal
+     */
     private Literal toLiteral(RdfLiteral literal) {
-        logger.debug("Converting literal: {}", literal);
         return new Literal() {
             @Override
             public String stringValue() {
@@ -394,6 +447,12 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
         };
     }
 
+    /**
+     * Converts a string to an IRI.
+     *
+     * @param iri the string to convert
+     * @return the IRI
+     */
     private IRI stringToIRI(String iri) {
         if (iri == null || !IRIUtils.isStandardIRI(iri)) {
             throw new SerializationException("Invalid IRI: " + iri, "JSON-LD");

@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.api.io.serialization;
 
+/**
+ * Options for RDF parsers that support adding a prefix to blank nodes ids.
+ */
 public interface RDFSerializerBNPrefixOptions {
 
     /**

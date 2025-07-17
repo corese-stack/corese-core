@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Objects;
 
+/**
+ * Abstract class for RDFParser that set up the inner Model and ValueFactory
+ */
 public abstract class AbstractRDFParser implements RDFParser {
 
     private final Model model;

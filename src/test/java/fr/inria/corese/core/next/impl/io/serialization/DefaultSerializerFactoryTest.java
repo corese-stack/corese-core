@@ -3,8 +3,7 @@ package fr.inria.corese.core.next.impl.io.serialization;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.api.io.serialization.SerializationConfig;
-import fr.inria.corese.core.next.impl.io.serialization.*;
+import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlSerializer;
@@ -29,14 +28,14 @@ class DefaultSerializerFactoryTest {
 
     private DefaultSerializerFactory factory;
     private Model mockModel;
-    private SerializationConfig mockConfig;
+    private SerializationOption mockConfig;
 
 
     @BeforeEach
     void setUp() {
         factory = new DefaultSerializerFactory();
         mockModel = mock(Model.class);
-        mockConfig = mock(SerializationConfig.class);
+        mockConfig = mock(SerializationOption.class);
     }
 
     @Test

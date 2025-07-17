@@ -36,6 +36,9 @@ class JSONLDSerializerTest {
         model = new CoreseModel();
     }
 
+    /**
+     * Check that the serializer can handle a small model with all types of literals
+     */
     @Test
     public void smallModelTest() {
         // IRI IRI IRI
@@ -87,6 +90,9 @@ class JSONLDSerializerTest {
         assertTrue(JsonLdComparison.equals(resultJsonReader.readValue(), expectedResultJsonReader.readValue()), "The result should be the expected JSON object");
     }
 
+    /**
+     * Test the serialization of a model with blank nodes.
+     */
     @Test
     public void modelWithBlankNodesTest() {
         // IRI IRI BlankNode
@@ -138,6 +144,9 @@ class JSONLDSerializerTest {
         assertTrue(JsonLdComparison.equals(resultJsonReader.readValue(), expectedResultJsonReader.readValue()), "The result should be " + expectedResult);
     }
 
+    /**
+     * Test the serialization of a model with named graphs.
+     */
     @Test
     public void modelWithNamedGraphsTest() {
         // IRI IRI IRI

@@ -20,6 +20,12 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
 
+/**
+ * Parser for JSON-LD RDF files. This parser is based on the Titanium JSON-LD library.
+ *
+ * @see fr.inria.corese.core.next.impl.io.parser.ParserFactory
+ * @see <a href="https://github.com/filip26/titanium-json-ld">Titanium JSON-LD</a>
+ */
 public class JSONLDParser extends AbstractRDFParser {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(JSONLDParser.class);

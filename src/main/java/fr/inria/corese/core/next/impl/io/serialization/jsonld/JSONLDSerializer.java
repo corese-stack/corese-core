@@ -15,7 +15,8 @@ import java.io.Writer;
 import java.util.Objects;
 
 /**
- * Serializer for JSON-LD format.
+ * Serializer for JSON-LD format. This serializer uses the <a href="https://github.com/filip26/titanium">Titanium</a> library.
+ * @see <a href="https://github.com/filip26/titanium">Titanium JSON-LD</a>
  */
 public class JSONLDSerializer implements RDFSerializer {
 
@@ -24,14 +25,18 @@ public class JSONLDSerializer implements RDFSerializer {
 
     /**
      * Constructor.
-     * @param model
-     * @param config
+     * @param model the model to serialize
+     * @param config the options for the serialization
      */
     public JSONLDSerializer(Model model, IOOptions config) {
         this.model = Objects.requireNonNull(model);
         this.config = Objects.requireNonNull(config);
     }
 
+    /**
+     * Constructor for a JSON-LD with default options.
+     * @param model
+     */
     public JSONLDSerializer(Model model) {
         this(model, new TitaniumJSONLDProcessorOption.Builder().build());
     }

@@ -3,6 +3,9 @@ package fr.inria.corese.core.next.impl.exception;
 
 import fr.inria.corese.core.next.api.base.exception.CoreseException;
 
+/**
+ * Exception thrown when an error occurs during parsing
+ */
 public class ParsingErrorException extends CoreseException {
 
     private static final long serialVersionUID = -2053549958572141648L;
