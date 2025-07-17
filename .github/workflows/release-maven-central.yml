@@ -7,8 +7,8 @@ on:
       - "v*.*.*"
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  release-maven-central:
+    runs-on: [self-hosted, corese-stack-ubuntu-24]
 
     steps:
       - name: Checkout code
