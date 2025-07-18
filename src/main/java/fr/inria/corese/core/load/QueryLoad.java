@@ -103,7 +103,7 @@ public class QueryLoad extends Load {
         try {
             query = readWE(name);
         } catch (LoadException ex) {
-            LoggerFactory.getLogger(QueryLoad.class.getName()).error( "", ex);
+            logger.error("Error loading query '{}'", name, ex);
         }
         if (query == "") {
             return null;
@@ -228,30 +228,53 @@ public class QueryLoad extends Load {
         }
         return null;
     }
-    
+
+    /**
+     * Writes content from an IDatatype to a temporary file.
+     * If the IDatatype is a list, each element is written on a new line.
+     * Ensures that the BufferedWriter and FileWriter are closed automatically using try-with-resources.
+     * Refactored to reduce nesting of control flow statements.
+     *
+     * @param name The base name for the temporary file.
+     * @param dt The IDatatype containing the content to write (can be a single value or a list).
+     * @return The absolute path of the created temporary file, or null if an error occurs.
+     */
     public String writeTemp(String name, IDatatype dt) {
         try {
-            File file = File.createTempFile(getName(name), getSuffix(name));
+             File file = File.createTempFile(getName(name), getSuffix(name));
+
             try (FileWriter fr = new FileWriter(file);
                  BufferedWriter fq = new BufferedWriter(fr)) {
 
-                if (dt.isList()) {
-                    for (IDatatype elem : dt) {
-                        fq.write(elem.stringValue());
-                        fq.write(NL);
-                    }
-                } else {
-                    fq.write(dt.stringValue());
-                }
+                writeContentToBuffer(fq, dt);
+
                 fq.flush();
             }
             return file.toString();
-        } catch (FileNotFoundException e) {
-            logger.error(e.getMessage());
+
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Error writing to temporary file '{}': {}", name, e.getMessage(), e);
         }
         return null;
+    }
+
+    /**
+     * Helper method to write the content of an IDatatype to a BufferedWriter.
+     * This method encapsulates the conditional writing logic to reduce nesting in the caller.
+     *
+     * @param fq The BufferedWriter to write to.
+     * @param dt The IDatatype containing the content.
+     * @throws IOException If an I/O error occurs during writing.
+     */
+    private void writeContentToBuffer(BufferedWriter fq, IDatatype dt) throws IOException {
+        if (dt.isList()) {
+            for (IDatatype elem : dt) {
+                fq.write(elem.stringValue());
+                fq.write(NL);
+            }
+        } else {
+            fq.write(dt.stringValue());
+        }
     }
      
     String getName(String name) {
