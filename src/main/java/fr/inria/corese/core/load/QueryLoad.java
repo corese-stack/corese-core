@@ -210,22 +210,51 @@ public class QueryLoad extends Load {
         }
         return sb.toString();
     }
-    
+    /**
+     * Creates a temporary file with the given name pattern and writes the string content to it.
+     *
+     * @param name The base name pattern for the temporary file
+     * @param str The string content to write to the file
+     * @return The absolute path of the created file, or null if an error occurs
+     */
     public String writeTemp(String name, String str) {
+        File file = createTemp(name);
+        return write(file, str) ? file.toString() : null;
+    }
+
+    /**
+     * Creates a temporary file with the specified name pattern.
+     *
+     * @param name The base name pattern for the temporary file
+     * @return The created File object
+     * @throws RuntimeException if file creation fails
+     */
+    private File createTemp(String name) {
         try {
-            File file = File.createTempFile(getName(name), getSuffix(name));
-            try (FileWriter fr = new FileWriter(file);
-                 BufferedWriter fq = new BufferedWriter(fr)) {
-                fq.write(str);
-                fq.flush();
-            }
-            return file.toString();
-        } catch (FileNotFoundException e) {
-            logger.error(e.getMessage());
+            return File.createTempFile(getName(name), getSuffix(name));
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed to create temp file: {}", e.getMessage());
+            throw new RuntimeException("Failed to create temp file", e);
         }
-        return null;
+    }
+
+    /**
+     * Writes content to the specified file.
+     *
+     * @param file The file to write to
+     * @param content The content to write
+     * @return true if write was successful, false otherwise
+     */
+    private boolean write(File file, String content) {
+        try (FileWriter fr = new FileWriter(file);
+             BufferedWriter writer = new BufferedWriter(fr)) {
+            writer.write(content);
+            writer.flush();
+            return true;
+        } catch (IOException e) {
+            logger.error("Failed to write to file {}: {}", file, e.getMessage());
+            return false;
+        }
     }
 
     /**
