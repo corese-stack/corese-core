@@ -1,24 +1,79 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 
+import fr.inria.corese.core.next.api.Literal;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Value;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
-import org.apache.jena.base.Sys;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RdfxmlParserTest {
-    @Test
-    public void testNodeElementsWithIRIs() throws Exception {
+    /**
+     * Helper method to parse the RDF/XML String
+     * @param rdfXml
+     * @return model
+     * @throws Exception
+     */
+    private Model parseRdfXml(String rdfXml) throws Exception {
         Model model = new CoreseModel();
         ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+
+        try (InputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8))) {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            SAXParser saxParser = factory.newSAXParser();
+            RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
+            saxParser.parse(inputStream, handler);
+        }
+
+        return model;
+    }
+
+    /**
+     * Helper method to print the model.
+     * @param model
+     */
+    private void printModel(Model model) {
+        model.stream().forEach(stmt -> {
+            Value obj = stmt.getObject();
+            if (obj instanceof Literal literal) {
+                if (literal.getLanguage().isPresent()) {
+                    System.out.printf("(%s, %s, \"%s\"@%s)%n",
+                            stmt.getSubject().stringValue(),
+                            stmt.getPredicate().stringValue(),
+                            literal.getLabel(),
+                            literal.getLanguage().get());
+                } else {
+                    System.out.printf("(%s, %s, \"%s\")%n",
+                            stmt.getSubject().stringValue(),
+                            stmt.getPredicate().stringValue(),
+                            literal.getLabel());
+                }
+            } else {
+                System.out.printf("(%s, %s, %s)%n",
+                        stmt.getSubject().stringValue(),
+                        stmt.getPredicate().stringValue(),
+                        obj.stringValue());
+            }
+        });
+    }
+
+
+    /**
+     * Test node elements with IRIs
+     * @throws Exception
+     */
+    @Test
+    public void testNodeElementsWithIRIs() throws Exception {
         String rdfXml = """
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -27,7 +82,7 @@ public class RdfxmlParserTest {
                   <ex:editor>
                     <rdf:Description>
                       <ex:homePage>
-                        <rdf:Description rdf:about="http://purl.org/net/dajobe">
+                        <rdf:Description rdf:about="http://purl.org/net/dajobe/">
                         </rdf:Description>
                       </ex:homePage>
                     </rdf:Description>
@@ -36,34 +91,18 @@ public class RdfxmlParserTest {
                 </rdf:RDF>
                 """;
 
-
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
         assertEquals(2, model.size(), "Expected two RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
 
     }
 
+    /**
+     * Test a basic RDF/XML file
+     * @throws Exception
+     */
     @Test
     public void testBasicRdfParsing() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -74,33 +113,17 @@ public class RdfxmlParserTest {
                   </rdf:Description>
                 </rdf:RDF>
                 """;
-
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
         assertEquals(2, model.size(), "Expected two RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 
+    /**
+     * Test a RDF/XML file with Complete description of all graph paths
+     * @throws Exception
+     */
     @Test
     public void testExample3CompleteDescriptionOfAllGraphPaths() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
                 <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -129,47 +152,19 @@ public class RdfxmlParserTest {
                     </rdf:Description>
                 </rdf:RDF>
                 """.trim();
-
-        String inTriG = """
-                @prefix dcterms: <http://purl.org/dc/terms/> .
-                
-                {
-                	<http://www.w3.org/TR/rdf-syntax-grammar> <http://example.org/stuff/1.0/editor> _:b15, _:b16 ;
-                		dcterms:title "RDF 1.2 XML Syntax" .
-                
-                	_:b15 <http://example.org/stuff/1.0/homePage> <http://purl.org/net/dajobe/> .
-                
-                	_:b16 <http://example.org/stuff/1.0/fullName> "Dave Beckett" .
-                }
-                """;
-
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
         assertEquals(5, model.size(), "Expected five RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 
+    /**
+     * Test RDF/XML File Using multiple property elements on a node element
+     * @throws Exception
+     */
     @Test
     public void testExample4UsingMultiplePropertyElements() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
+                <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                          xmlns:ex="http://example.org/stuff/1.0/"
                          xmlns:dc="http://purl.org/dc/terms/">
@@ -188,33 +183,19 @@ public class RdfxmlParserTest {
                 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(5, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(4, model.size(), "Expected four RDF statements");
     }
 
+    /**
+     * Test RDF/XML with Empty property elements
+     * @throws Exception
+     */
     @Test
     public void testExample5EmptyPropertyElements() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
+                <?xml version="1.0"?>
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                          xmlns:ex="http://example.org/stuff/1.0/"
                          xmlns:dc="http://purl.org/dc/terms/">
@@ -230,32 +211,19 @@ public class RdfxmlParserTest {
                 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
 
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(4, model.size(), "Expected four RDF statements");
 
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(5, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 
+    /**
+     * Test a RDF/XML file with Replacing property elements with string literal content into property attributes
+     * @throws Exception
+     */
     @Test
     public void testExample6ReplacingPropertyElementsWithStringLiteral() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
                 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                          xmlns:ex="http://example.org/stuff/1.0/"
@@ -271,32 +239,18 @@ public class RdfxmlParserTest {
                 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(4, model.size(), "Expected four RDF statements");
 
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(5, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 
+    /**
+     * Test a Complete RDF/XML
+     * @throws Exception
+     */
     @Test
     public void testExample7CompleteRDFXML() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -311,36 +265,19 @@ public class RdfxmlParserTest {
       </rdf:Description>
     </ex:editor>
   </rdf:Description>
-
 </rdf:RDF>
                 """.trim();
-
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(5, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(4, model.size(), "Expected four RDF statements");
     }
 
+    /**
+     * Test a Complete example of xml:lang
+     * @throws Exception
+     */
     @Test
     public void testExample8CompleteExampleXmlLang() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
                 <?xml version="1.0" encoding="utf-8"?>
                           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -361,32 +298,13 @@ public class RdfxmlParserTest {
                           </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(8, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(6, model.size(), "Expected six RDF statements");
     }
 
     @Test
     public void testExample11CompleteExamplerdfDatatype() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
                 <?xml version="1.0"?>
                                     <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -398,33 +316,18 @@ public class RdfxmlParserTest {
                 
                                     </rdf:RDF>
                 """.trim();
-
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(2, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(1, model.size(), "Expected four RDF statements");
     }
 
+    /**
+     * Test a Complete RDF/XML file with a description of graph using rdf:nodeID
+     * @throws Exception
+     */
     @Test
     public void testExample12CompleteRDFXMLUsingRdfNodeID() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -443,32 +346,19 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
 
         // Assert or inspect the result
-        assertEquals(6, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        assertEquals(4, model.size(), "Expected five RDF statements");
     }
 
+    /**
+     * Test a RDF/XML file with a Complete example using rdf:parseType=Resource
+     * @throws Exception
+     */
     @Test
     public void testExample13CompleteExampleUsingRdfparseTypeResource() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -484,32 +374,19 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
         assertEquals(4, model.size(), "Expected four RDF statements");
 
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 
+    /**
+     * Test a RDF/XML file with a Complete example of property attributes on an empty property element
+     * @throws Exception
+     */
     @Test
     public void testExample14CompleteExampleOfPorpertyAttributesOnAnEmptyPropertyElement() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -525,32 +402,17 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(2, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(3, model.size(), "Expected three RDF statements");
     }
 
+    /**
+     * Test a RDF/XML file with a Complete example with rdf:type
+     * @throws Exception
+     */
     @Test
     public void testExample15CompleteExampleWithRdfType() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -564,32 +426,17 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(3, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(2, model.size(), "Expected four RDF statements");
     }
 
+    /**
+     * Test a RDF/XML file with a Complete example using a typed node element to replace an rdf:type
+     * @throws Exception
+     */
     @Test
     public void testExample16CompleteExampleUsingATypedNodeElementToReplaceAnRdfType() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -603,32 +450,17 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(2, model.size(), "Expected two RDF statements");
 
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(2, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 
     @Test
+    /**
+     * Test a XML/RDF File using rdf:ID and xml:base
+     */
     public void testExample17CompleteExampleUsingRdfIDAndXmlbase() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -642,32 +474,19 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(1, model.size(), "Expected one RDF statement");
 
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(2, model.size(), "Expected four RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 
+    /**
+     * Test a Complex example using RDF list properties
+     * @throws Exception
+     */
     @Test
     public void testExample18ComplexExampleUsingRdfListProperties() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -681,32 +500,18 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(3, model.size(), "Expected three RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(4, model.size(), "Expected three RDF statements");
     }
 
+    /**
+     * Test a Complete example using rdf:li
+     * @throws Exception
+     */
     @Test
-    public void testExample19ComplexExampleUsingRdfliProperties() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+    public void testExample19CompleteExampleUsingRdfliProperties() throws Exception {
+
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -720,32 +525,18 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(4, model.size(), "Expected three RDF statements");
 
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(3, model.size(), "Expected three RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 
+    /**
+     * Test a Complete example of a RDF collection
+     * @throws Exception
+     */
     @Test
     public void testExample20CompleteExampleOfARdfCollectionOfNodes() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -762,32 +553,17 @@ public class RdfxmlParserTest {
 </rdf:RDF>
                 """.trim();
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(4, model.size(), "Expected three RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(7, model.size(), "Expected three RDF statements");
     }
 
+    /**
+     * Test a Complete example of rdf:ID reifying a property element
+     * @throws Exception
+     */
     @Test
     public void testExample21CompleteExampleOfRdfID() throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         String rdfXml = """
 <?xml version="1.0"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -799,26 +575,9 @@ public class RdfxmlParserTest {
 
 </rdf:RDF>
                 """.trim();
+        Model model = parseRdfXml(rdfXml);
+        printModel(model);
+        assertEquals(1, model.size(), "Expected one RDF statement");
 
-        // Prepare input stream
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8));
-
-        // Set up the parser
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        SAXParser saxParser = factory.newSAXParser();
-
-        // Provide an explicit model
-        RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-
-        // Parse the input
-        saxParser.parse(inputStream, handler);
-
-        // Assert or inspect the result
-        assertEquals(3, model.size(), "Expected three RDF statements");
-
-        model.stream().forEach(stmt -> {
-            System.out.println(stmt.toString());
-        });
     }
 }
