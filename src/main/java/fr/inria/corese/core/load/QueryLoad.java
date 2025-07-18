@@ -212,7 +212,6 @@ public class QueryLoad extends Load {
     }
     
     public String writeTemp(String name, String str) {
-        String query = "";
         try {
             File file = File.createTempFile(getName(name), getSuffix(name));
             try (FileWriter fr = new FileWriter(file);
@@ -230,32 +229,58 @@ public class QueryLoad extends Load {
     }
 
     /**
-     * Writes content from an IDatatype to a temporary file.
-     * If the IDatatype is a list, each element is written on a new line.
-     * Ensures that the BufferedWriter and FileWriter are closed automatically using try-with-resources.
-     * Refactored to reduce nesting of control flow statements.
+     * Writes content to a temporary file and returns the file path.
+     * <p>
+     * Creates a temporary file with the specified name pattern, writes the given data to it,
+     * and returns the absolute path of the created file. If an error occurs during file operations,
+     * logs the error and returns null.
      *
-     * @param name The base name for the temporary file.
-     * @param dt The IDatatype containing the content to write (can be a single value or a list).
-     * @return The absolute path of the created temporary file, or null if an error occurs.
+     * @param name The base name pattern for the temporary file (used to generate the filename)
+     * @param dt The data content to be written to the file
+     * @return The absolute path of the created temporary file, or null if an error occurs
+     * @see java.io.File#createTempFile(String, String)
+     * @see java.io.BufferedWriter
      */
     public String writeTemp(String name, IDatatype dt) {
         try {
-             File file = File.createTempFile(getName(name), getSuffix(name));
-
-            try (FileWriter fr = new FileWriter(file);
-                 BufferedWriter fq = new BufferedWriter(fr)) {
-
-                writeContentToBuffer(fq, dt);
-
-                fq.flush();
-            }
+            File file = createTempFile(name);
+            writeToFile(file, dt);
             return file.toString();
-
         } catch (IOException e) {
             logger.error("Error writing to temporary file '{}': {}", name, e.getMessage(), e);
+            return null;
         }
-        return null;
+    }
+
+    /**
+     * Creates a temporary file using the specified name pattern.
+     *
+     * @param name The base name pattern for the temporary file
+     * @return The created temporary File object
+     * @throws IOException If the file could not be created
+     * @see #getName(String)
+     * @see #getSuffix(String)
+     */
+    private File createTempFile(String name) throws IOException {
+        return File.createTempFile(getName(name), getSuffix(name));
+    }
+
+    /**
+     * Writes content to the specified file using a buffered writer.
+     * Uses try-with-resources to ensure proper resource cleanup. The content
+     * is written through the {@link #writeContentToBuffer(BufferedWriter, IDatatype)} method.
+     *
+     * @param file The file to write to
+     * @param dt   The data content to be written
+     * @throws IOException If an I/O error occurs during writing
+     * @see java.io.BufferedWriter
+     */
+    private void writeToFile(File file, IDatatype dt) throws IOException {
+        try (FileWriter fr = new FileWriter(file);
+             BufferedWriter fq = new BufferedWriter(fr)) {
+            writeContentToBuffer(fq, dt);
+            fq.flush();
+        }
     }
 
     /**
@@ -298,7 +323,6 @@ public class QueryLoad extends Load {
     }
 
     public void write(String name, String str) {
-        String query = "";
         try {
             try (FileWriter fr = new FileWriter(name);
                  BufferedWriter fq = new BufferedWriter(fr)) {
