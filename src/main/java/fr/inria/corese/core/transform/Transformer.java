@@ -1,35 +1,19 @@
 package fr.inria.corese.core.transform;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.inria.corese.core.compiler.eval.Interpreter;
-import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.query.QueryEngine;
-import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
+import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.ExprType;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Memory;
+import fr.inria.corese.core.kgram.core.*;
 import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.kgram.core.SparqlException;
 import fr.inria.corese.core.kgram.filter.Extension;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.query.QueryEngine;
+import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.api.TransformProcessor;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
@@ -38,14 +22,20 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.script.Funcall;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.sparql.triple.parser.Context;
-import fr.inria.corese.core.sparql.triple.parser.Dataset;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.sparql.triple.parser.Processor;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * SPARQL Template Transformation Engine
