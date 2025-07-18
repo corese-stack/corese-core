@@ -5953,7 +5953,7 @@ public class TestQuery1 {
             // logger.debug(map.toString());
             assertTrue(1 <= map.size(), () -> "Result " + map.size());
         } catch (EngineException e) {
-            assertEquals(true, e, "Result");
+            assertNotNull(e, "Expected an exception but none was thrown");
         }
 
     }
@@ -6343,7 +6343,8 @@ public class TestQuery1 {
             assertEquals(1, map.size());
 
         } catch (EngineException ex) {
-            assertEquals(ex, true);
+            fail("Unexpected exception: " + ex.getMessage());
+
         }
 
     }
@@ -6636,7 +6637,7 @@ public class TestQuery1 {
             assertEquals(3, map.size(), "Result");
         } catch (EngineException e) {
 
-            assertEquals(2, e, "Result");
+            fail("Unexpected exception: " + e.getMessage());
 
         }
 
