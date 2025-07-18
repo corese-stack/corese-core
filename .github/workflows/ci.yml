@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   Continuous-Integration-Actions:
-    runs-on: self-hosted
+    runs-on: [self-hosted, corese-stack-ubuntu-24]
 
     env:
       PACKAGE_TOKEN: ${{ secrets.JLS_TOKEN }}

@@ -12,9 +12,9 @@ on:
       - develop
 
 jobs:
-  prerelease:
+  prerelease-github:
     name: Build and Publish Pre-release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, corese-stack-ubuntu-24]
     permissions:
       contents: write
 
