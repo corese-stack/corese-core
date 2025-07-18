@@ -1,29 +1,19 @@
 package fr.inria.corese.core.load;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.Writer;
-import java.net.URL;
-
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.TermEval;
 import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import java.io.File;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class QueryLoad extends Load {
 
@@ -225,11 +215,11 @@ public class QueryLoad extends Load {
         String query = "";
         try {
             File file = File.createTempFile(getName(name), getSuffix(name));
-            Writer fr = new FileWriter(file);
-            BufferedWriter fq = new BufferedWriter(fr);
-            fq.write(str);
-            fq.flush();
-            fr.close();
+            try (FileWriter fr = new FileWriter(file);
+                 BufferedWriter fq = new BufferedWriter(fr)) {
+                fq.write(str);
+                fq.flush();
+            }
             return file.toString();
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage());
@@ -240,22 +230,21 @@ public class QueryLoad extends Load {
     }
     
     public String writeTemp(String name, IDatatype dt) {
-        String query = "";
         try {
             File file = File.createTempFile(getName(name), getSuffix(name));
-            Writer fr = new FileWriter(file);
-            BufferedWriter fq = new BufferedWriter(fr);
-            if (dt.isList()) {
-                for (IDatatype elem : dt) {
-                    fq.write(elem.stringValue());
-                    fq.write(NL);
+            try (FileWriter fr = new FileWriter(file);
+                 BufferedWriter fq = new BufferedWriter(fr)) {
+
+                if (dt.isList()) {
+                    for (IDatatype elem : dt) {
+                        fq.write(elem.stringValue());
+                        fq.write(NL);
+                    }
+                } else {
+                    fq.write(dt.stringValue());
                 }
+                fq.flush();
             }
-            else {
-                fq.write(dt.stringValue());
-            }
-            fq.flush();
-            fr.close();
             return file.toString();
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage());
@@ -288,16 +277,14 @@ public class QueryLoad extends Load {
     public void write(String name, String str) {
         String query = "";
         try {
-            Writer fr = new FileWriter(name);
-            BufferedWriter fq = new BufferedWriter(fr);
-            fq.write(str);
-            fq.flush();
-            fr.close();
-        } catch (FileNotFoundException e) {
-            logger.error("An error has occurred", e);
+            try (FileWriter fr = new FileWriter(name);
+                 BufferedWriter fq = new BufferedWriter(fr)) {
+                fq.write(str);
+                fq.flush();
+            }
         } catch (IOException e) {
+            logger.error("Error writing to file '{}': {}", name, e.getMessage(), e);
         }
-        
     }
 
 }

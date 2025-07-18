@@ -1,9 +1,6 @@
 package fr.inria.corese.core.transform;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -403,11 +400,12 @@ public class Transformer implements TransformProcessor {
     }
 
     public void write(String name) throws IOException {
-        FileWriter fw = new FileWriter(name);
-        String str = toString();
-        fw.write(str);
-        fw.flush();
-        fw.close();
+        try (FileWriter fw = new FileWriter(name);
+             BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
+            String str = toString();
+            bufferedWriter.write(str);
+            bufferedWriter.flush();
+        }
     }
 
     public void write(OutputStream out) throws IOException {

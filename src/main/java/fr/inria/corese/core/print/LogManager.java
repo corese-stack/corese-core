@@ -13,6 +13,8 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.cst.LogKey;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import fr.inria.corese.core.sparql.triple.parser.URLServer;
+
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,10 +59,13 @@ public class LogManager implements LogKey {
     }
     
     public void toFile(String fileName) throws IOException {
-        FileWriter file = new FileWriter(fileName);
-        file.write(toString());
-        file.flush();
-        file.close();
+
+        try (FileWriter fileWriter = new FileWriter(fileName);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+
+            bufferedWriter.write(toString());
+            bufferedWriter.flush();
+        }
     }
 
     /**

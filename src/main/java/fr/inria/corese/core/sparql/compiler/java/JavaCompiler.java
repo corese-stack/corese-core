@@ -12,6 +12,7 @@ import fr.inria.corese.core.sparql.triple.parser.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -33,7 +34,6 @@ public class JavaCompiler {
     static final String SPACE = " ";
     static final int STEP = 2;
     static final String IDATATYPE = "IDatatype";
-    private static final Logger logger = LoggerFactory.getLogger(JavaCompiler.class);
     int margin = 0;
     int count = 0;
     int level = 0;
@@ -123,14 +123,18 @@ public class JavaCompiler {
     }
 
     public void write(String path) throws IOException {
-        FileWriter fw = new FileWriter(String.format("%s%s.java", path, name));
-        fw.write(head.getStringBuilder().toString());
-        fw.write(dtc.getStringBuilder().toString());
-        fw.write(dtc.getStringBuilderVar().toString());
-        fw.write(NL);
-        fw.write(sb.toString());
-        fw.flush();
-        fw.close();
+        String fullFileName = String.format("%s%s.java", path, name);
+
+        try (FileWriter fw = new FileWriter(fullFileName);
+             BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
+            bufferedWriter.write(head.getStringBuilder().toString());
+            bufferedWriter.write(dtc.getStringBuilder().toString());
+            bufferedWriter.write(dtc.getStringBuilderVar().toString());
+            bufferedWriter.write(NL);
+            bufferedWriter.write(sb.toString());
+
+            bufferedWriter.flush();
+        }
     }
 
     /**
