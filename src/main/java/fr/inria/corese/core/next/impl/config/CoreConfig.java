@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.config;
 
-import com.typesafe.config.*;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
  * Configuration class for Corese Core

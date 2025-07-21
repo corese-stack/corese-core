@@ -120,7 +120,7 @@ public class CoreseValueConverter {
                 return factory.createLiteral(dt.getLabel(), dt.getLang());
             }
             if (dt.getDatatypeURI() != null) {
-                return factory.createLiteral(dt.getLabel(), dt.getDatatypeURI());
+                return factory.createLiteral(dt.getLabel(), factory.createIRI(dt.getDatatypeURI()));
             }
             return factory.createLiteral(dt.getLabel());
         }

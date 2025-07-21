@@ -1,21 +1,20 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleBaseListener;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseIRI;
 import fr.inria.corese.core.next.impl.temp.ModelNamespace;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseBNode;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Listener for the ANTLR4 generated parser for Turtle.
+ */
 public class TurtleListenerImpl extends TurtleBaseListener {
 
     private final Model model;
@@ -26,9 +25,12 @@ public class TurtleListenerImpl extends TurtleBaseListener {
     private Resource currentSubject;
     private IRI currentPredicate;
 
-    public TurtleListenerImpl(Model model, String baseURI, ValueFactory factory) {
+    public TurtleListenerImpl(Model model, ValueFactory factory, IOOptions options) {
         this.model = model;
-        this.baseURI = baseURI != null ? baseURI : "";
+        this.baseURI =  "";
+        if(options != null && options instanceof RDFParserBaseIRIOptions) {
+            this.baseURI = ((RDFParserBaseIRIOptions) options).getBase();
+        }
         this.factory = factory;
     }
 

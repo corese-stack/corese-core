@@ -66,6 +66,7 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
+.continue/
 
 # Logs and coverage reports
 *.log
@@ -82,7 +83,9 @@ gradle/gradle-daemon-jvm.properties
 
 # Other build directories and generated files
 /bin/
+/out/
 
 # Fichiers de logs
 logs/
 *.log
+.sonarlint/
