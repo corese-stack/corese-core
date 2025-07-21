@@ -31,11 +31,15 @@ public class Display extends TermEval {
         for (IDatatype dt : param) {
             IDatatype res = dt.display();
             switch (oper()) {
-                case ExprType.XT_PRETTY: return res;
+                case ExprType.XT_PRETTY: return res; 
+                case ExprType.XT_PRINT: System.out.print(res.stringValue()); 
+                break;
                 case ExprType.XT_DISPLAY:    
-                default:
+                default:                System.out.print(res);              
             }
-        }
+            System.out.print(" ");
+        }       
+        System.out.println();
         return TRUE;
     }
 

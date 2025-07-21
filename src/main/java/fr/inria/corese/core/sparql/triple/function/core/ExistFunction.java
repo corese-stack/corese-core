@@ -2,6 +2,10 @@ package fr.inria.corese.core.sparql.triple.function.core;
 
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.function.term.TermEval;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Eval;
@@ -12,14 +16,9 @@ import fr.inria.corese.core.kgram.core.Memory;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.core.SparqlException;
 import fr.inria.corese.core.kgram.core.Stack;
-import fr.inria.corese.core.sparql.api.Computer;
-import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import fr.inria.corese.core.sparql.triple.api.Walker;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.function.term.TermEval;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
@@ -29,50 +28,35 @@ import fr.inria.corese.core.sparql.triple.parser.Expression;
  * @author Olivier Corby, Wimmics INRIA I3S, 2017
  *
  */
-public class ExistFunction extends TermEval {
-
-    public ExistFunction() {
-    }
-
-    public ExistFunction(String name) {
+public class ExistFunction extends TermEval {  
+    
+    public ExistFunction() {}
+    
+    public ExistFunction(String name){
         super(name);
     }
-
+    
     @Override
     public IDatatype eval(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
-        check(this, b, env);
+        if (isSystem()) {
+            // LDScript subquery
+            check(Feature.LDSCRIPT_SPARQL, b, SPARQL_MESS);
+        }
         try {
-            // return eval.exist(this, env, p);
-            return exist(this, eval, b, env, p);
+            //return eval.exist(this, env, p);
+            return exist(this, eval, env, p);
         } catch (EngineException ex) {
             log(ex.getMessage());
             return null;
         }
     }
-
-    void check(Expr exp, Binding bind, Environment env) throws SafetyException {
-        if (exp.isSystem()) {
-            // system generated for LDScript nested query
-            // e.g. for (?m in select where) {}
-            // is compiled with internal system exists
-            // for (?m in exists {select where}){}
-            Query q = env.getQuery();
-            Exp pat = q.getPattern(exp);
-            Exp sub = pat.get(0).get(0);
-
-            if (sub.isQuery() && sub.getQuery().isUpdate()) {
-                // protect sparql update in ldscript function
-                check(Feature.LDSCRIPT_SPARQL, bind, SPARQL_MESS);
-            }
-        }
-    }
-
+    
     @Override
     public boolean isTermExist() {
         return true;
     }
-
-    @Override
+    
+     @Override
     public Expression prepare(ASTQuery ast) throws EngineException {
         if (isSystem()) {
             ast.setLDScript(true);
@@ -80,14 +64,16 @@ public class ExistFunction extends TermEval {
         }
         return super.prepare(ast);
     }
-
+    
     @Override
     public void walk(Walker walker) {
         walker.enter(this);
         getExist().walk(walker);
         walker.leave(this);
     }
-
+    
+    
+    
     Eval createEval(Eval currentEval, Expr exp, Environment env, Producer p) {
         Exp pat = env.getQuery().getPattern(exp);
         Memory memory = currentEval.createMemory(env, pat);
@@ -104,22 +90,21 @@ public class ExistFunction extends TermEval {
      * filter exists { } exists statement is also used to embed LDScript nested
      * query in this case it is tagged as system
      */
-    public IDatatype exist(Expr exp, Computer evaluator, Binding biding, Environment env, Producer p)
-            throws EngineException {
+    public IDatatype exist(Expr exp, Computer evaluator, Environment env, Producer p) throws EngineException {
         try {
             Eval currentEval = env.getEval();
-            if (currentEval.getListener() != null) {
+            if (currentEval.getListener()!=null) {
                 currentEval.getListener().listen(exp);
             }
             if (exp.arity() == 1) {
                 // argument return a graph on which we evaluate the exists
-                // IDatatype res = eval(exp.getExp(0), env, p);
-                IDatatype res = exp.getExp(0).evalWE(evaluator, biding, env, p);
+                //IDatatype res = eval(exp.getExp(0), env, p);
+                IDatatype res = exp.getExp(0).evalWE(evaluator, env.getBind(), env, p);
                 if (res == null) {
                     return null;
                 }
-                if (p.isProducer(res)) {
-                    p = p.getProducer(res, env);
+                if (p.isProducer((Node) res)) {
+                    p = p.getProducer((Node) res, env);
                 }
             }
             Query q = env.getQuery();
@@ -130,9 +115,9 @@ public class ExistFunction extends TermEval {
             // in case of // evaluation of a pattern
             synchronized (exp) {
                 if (exp.isSystem()) {
-                    // system generated for LDScript nested query
+                    // system generated for LDScript nested query 
                     // e.g. for (?m in select where) {}
-                    // is compiled with internal system exists
+                    // is compiled with internal system exists 
                     // for (?m in exists {select where}){}
                     Exp sub = pat.get(0).get(0);
 
@@ -160,7 +145,7 @@ public class ExistFunction extends TermEval {
                         return null;
                     }
                 } else {
-                    // SPARQL exists {}
+                    // SPARQL exists {}               
                     Eval eval = createEval(currentEval, exp, env, p);
                     if (eval == null) {
                         return null;
@@ -175,7 +160,7 @@ public class ExistFunction extends TermEval {
             if (exp.isSystem()) {
                 return DatatypeMap.createObject(map);
             } else {
-                // report(q, env, map);
+                //report(q, env, map);
                 return DatatypeMap.newInstance(b);
             }
         } catch (SparqlException e) {
@@ -198,5 +183,5 @@ public class ExistFunction extends TermEval {
             return Mapping.create(env.getBind());
         }
     }
-
+   
 }

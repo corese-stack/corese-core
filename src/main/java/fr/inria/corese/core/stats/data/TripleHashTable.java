@@ -8,7 +8,6 @@ import static fr.inria.corese.core.stats.IStats.SUBJECT;
 import fr.inria.corese.core.stats.Options;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * TripleHashTable.java
@@ -18,13 +17,12 @@ import java.util.Objects;
  */
 public class TripleHashTable {
 
-    private final static int SUB = 0;
-    private final static int OBJ = 1;
+    private final static int SUB = 0, OBJ = 1;
 
     private double[] options = Options.DEF_PARA_HTT;
 
     //Size of table = Max * size of predicates * Max (500)
-    private final Map<Triple, Integer> table = new HashMap<>();
+    private final Map<Triple, Integer> table = new HashMap<Triple, Integer>();
 
     public TripleHashTable(double[] options) {
         if (options != null) {
@@ -75,6 +73,7 @@ public class TripleHashTable {
             }
         }
         return count;
+        //return table.containsKey(t) ? table.get(t) : 0;
     }
 
     class Triple {
@@ -108,9 +107,13 @@ public class TripleHashTable {
 
             final Triple other = (Triple) obj;
             boolean es = this.s == other.s;
-            boolean ep = Objects.equals(this.p, other.p);
+            boolean ep = (this.p == null) ? (other.p == null) : this.p.equals(other.p);
             boolean eo = this.o == other.o;
 
+            //(s ? o) | (? p o) | (s p ?)
+//            if ((es && eo) || (ep && eo) || (es && ep)) {
+//                return true;
+//            }
             //(s p o)
             return es && ep && eo;
         }
@@ -126,7 +129,7 @@ public class TripleHashTable {
 
         public boolean match(Triple other, int type) {
             boolean es = this.s == other.s;
-            boolean ep = Objects.equals(this.p, other.p);
+            boolean ep = (this.p == null) ? (other.p == null) : this.p.equals(other.p);
             boolean eo = this.o == other.o;
 
             switch (type) {

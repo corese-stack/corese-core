@@ -18,6 +18,8 @@ public class QuerySolverVisitorUser extends QuerySolverVisitor {
     
     @Override
     public IDatatype init(Query q) {
+        System.out.println("User defined init:");
+        System.out.println(q.getAST());
         return DatatypeMap.TRUE;
     }
 

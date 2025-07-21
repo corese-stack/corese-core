@@ -1,21 +1,22 @@
 package fr.inria.corese.core.edge.binary;
 
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.edge.EdgeBinary;
-import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Graph Edge for the defaultGraph
- *
+ * 
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
+ *
  */
 public class EdgeBinaryLabel extends EdgeBinary {
 
     EdgeBinaryLabel(Node subject, Node object) {
         super(subject, object);
     }
-
-    public static EdgeBinaryLabel create(Node source, Node subject, Node predicate, Node object) {
+    
+    public static EdgeBinaryLabel create(Node source, Node subject, Node predicate, Node object){
         return new EdgeBinaryLabel(subject, object);
     }
 

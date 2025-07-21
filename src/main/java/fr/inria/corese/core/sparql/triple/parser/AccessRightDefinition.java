@@ -29,9 +29,9 @@ public class AccessRightDefinition {
         setSingleton(new AccessRightDefinition());
     }
     
-    public class AccessMap extends HashMap<String, AccessRight.AccessRights> {
+    public class AccessMap extends HashMap<String, Byte> {
 
-        public AccessMap define(String uri, AccessRight.AccessRights b) {
+        public AccessMap define(String uri, Byte b) {
             put(uri, b);
             return this;
         }
@@ -40,13 +40,12 @@ public class AccessRightDefinition {
          * return URI access right if any
          * otherwise return namespace(URI) access right if any
          * otherwise return null
-         * @return
          */
-        AccessRight.AccessRights getAccess(Node node) {
+        Byte getAccess(Node node) {
             if (isEmpty()) {
                 return null;
             }
-            AccessRight.AccessRights b = get(node.getLabel());
+            Byte b = get(node.getLabel());
             if (b != null) {
                 return b;
             }
@@ -115,25 +114,24 @@ public class AccessRightDefinition {
     
     /**
      * def is the default access right granted
-     * res is the URI|namespace access right granted for edge
-     * @return
+     * res is the URI|namespace access right granted for edge 
      */
-    AccessRight.AccessRights getAccess(Edge edge, AccessRight.AccessRights def) {
-        AccessRight.AccessRights res = getAccess(edge);
+    Byte getAccess(Edge edge, byte def) {
+        Byte res = getAccess(edge);
         if (res == null) {
             return def;
         }
         return res;
     }
     
-    AccessRight.AccessRights getAccess(Edge edge) {
+    Byte getAccess(Edge edge) {
        return getAccessDirect(edge);
     }
     
     /**
      * URI of default may overload namespace of current (if current has no URI)
      */
-    AccessRight.AccessRights getAccessDirect(Edge edge) {
+    Byte getAccessDirect(Edge edge) {  
         if (size() == 0) {
             return null;
         }
@@ -143,39 +141,40 @@ public class AccessRightDefinition {
     /**
      * Namespace of current overload URI of default
      */
-    AccessRight.AccessRights getAccessWithDefault(Edge edge) {
-        AccessRight.AccessRights subject = get(getSubject(edge), getSingleton().getSubject(edge));
-        AccessRight.AccessRights object = get(getObject(edge), getSingleton().getObject(edge));
-        AccessRight.AccessRights pred = get(getPredicate(edge), getSingleton().getPredicate(edge));
-        AccessRight.AccessRights graph = get(getGraph(edge), getSingleton().getGraph(edge));
+    Byte getAccessWithDefault(Edge edge) {
+        Byte subject = get(getSubject(edge), getSingleton().getSubject(edge));
+        Byte object = get(getObject(edge), getSingleton().getObject(edge));
+        Byte pred = get(getPredicate(edge), getSingleton().getPredicate(edge));
+        Byte graph = get(getGraph(edge), getSingleton().getGraph(edge));
         return combine(subject, combine(object, combine(pred, graph)));
-    }
-
-    AccessRight.AccessRights get(AccessRight.AccessRights current, AccessRight.AccessRights defaut) {
+    }  
+         
+    Byte get(Byte current, Byte defaut) {
         return (current == null) ? defaut : current;
     }
-
-    AccessRight.AccessRights getAccess2(Edge edge, AccessRight.AccessRights def) {
-        AccessRight.AccessRights res = getAccessOrDefault(edge);
+    
+    Byte getAccess2(Edge edge, byte def) {
+        Byte res = getAccessOrDefault(edge);
         if (res == null) {
             return def;
         }
         return res;
     }
-
-    AccessRight.AccessRights getAccessOrDefault(Edge edge) {
-        AccessRight.AccessRights res = getAccessBasic(edge);
+    
+    Byte getAccessOrDefault(Edge edge) {
+        Byte res = getAccessBasic(edge);
         if (res == null) {
             return getSingleton().getAccessBasic(edge);
         }
         return res;
     }
-
-    AccessRight.AccessRights getAccessBasic(Edge edge) {
+    
+    Byte getAccessBasic(Edge edge) {
         if (size() > 0) {
-            AccessRight.AccessRights node   = combine(getSubject(edge),   getObject(edge));
-            AccessRight.AccessRights access = combine(getPredicate(edge), getGraph(edge));
-            return combine(node, access);
+            Byte node   = combine(getSubject(edge),   getObject(edge));
+            Byte access = combine(getPredicate(edge), getGraph(edge));
+            Byte res    = combine(node, access);           
+            return res;
         }
         return null;
     }
@@ -185,62 +184,62 @@ public class AccessRightDefinition {
     }
 
     
-    AccessRight.AccessRights combine(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
+    Byte combine(Byte b1, Byte b2) {
         if (getMode() == AccessRight.BI_MODE) {
             return combineBinary(b1, b2);
         }
         return moreRestricted(b1, b2);
     }
-
-    AccessRight.AccessRights combineBinary(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
+    
+    Byte combineBinary(Byte b1, Byte b2) {
         if (b1 == null) {
             return b2;
         }
         if (b2 == null) {
             return b1;
         }
-        return AccessRight.getLevel((byte) (b1.getByteValue() | b2.getByteValue())) ;
+        return (byte)(b1 | b2) ;
     }
+    
 
-
-    AccessRight.AccessRights moreRestricted(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
+    Byte moreRestricted(Byte b1, Byte b2) {
         if (b1 == null) {
             return b2;
         }
         if (b2 == null) {
             return b1;
         }
-        return (b1.getByteValue() > b2.getByteValue()) ? b1 : b2;
+        return b1 > b2 ? b1 : b2;
     }
-
-    AccessRight.AccessRights lessRestricted(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
+    
+    Byte lessRestricted(Byte b1, Byte b2) {
         if (b1 == null) {
             return b2;
         }
         if (b2 == null) {
             return b1;
         }
-        return b1.getByteValue() < b2.getByteValue() ? b1 : b2;
+        return b1 < b2 ? b1 : b2;
     }
 
   
     // return null when there is no uri access right
-    AccessRight.AccessRights getPredicate(Edge edge) {
+    Byte getPredicate(Edge edge) {
         return getPredicate().getAccess(edge.getProperty());
     }
-
-    AccessRight.AccessRights getGraph(Edge edge) {
+    
+    Byte getGraph(Edge edge) {
          if (edge.getGraph() == null) {
             return null;
         }
         return getGraph().getAccess(edge.getGraph());
     }
-
-    AccessRight.AccessRights getSubject(Edge edge) {
+    
+    Byte getSubject(Edge edge) {
         return getNode().getAccess(edge.getNode(0));
     }
-
-    AccessRight.AccessRights getObject(Edge edge) {
+       
+    Byte getObject(Edge edge) {
         return getNode().getAccess(edge.getNode(1));
     }
     

@@ -1,14 +1,23 @@
 package fr.inria.corese.core.print;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.text.StringEscapeUtils;
 
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
+import java.util.ArrayList;
+
+
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
@@ -39,7 +48,7 @@ public class XMLFormat extends AbstractNestedResultFormat {
     private static final String CRESULT = "</result>";
     private static final String OBOOLEAN = "<boolean>";
     private static final String CBOOLEAN = "</boolean>";
-    private static final String[] XML = { "&", "<" };
+    private static final String[] XML = {"&", "<"};
     private static final String ODATA = "<![CDATA[";
     private static final String CDATA = "]]>";
     private static final String OCOM = "<!--";
@@ -53,7 +62,7 @@ public class XMLFormat extends AbstractNestedResultFormat {
 
     public static XMLFormat create(Mappings lm) {
         Query q = lm.getQuery();
-        return XMLFormat.create(q, q.getAST(), lm);
+        return XMLFormat.create(q,  q.getAST(), lm);
     }
 
     public static XMLFormat create(Query q, ASTQuery ast, Mappings lm) {
@@ -67,13 +76,14 @@ public class XMLFormat extends AbstractNestedResultFormat {
         ast = q;
     }
 
+
     void setWriter(PrintWriter p) {
         pw = p;
     }
 
     enum XMLTitle implements Title {
         XMLDEC, OCOM, CCOM
-    }
+    };
 
     public <T extends AbstractNestedResultFormat.Title> String getTitle(T t) {
         if (XMLTitle.XMLDEC.equals(t)) {
@@ -98,9 +108,9 @@ public class XMLFormat extends AbstractNestedResultFormat {
             return ORESULTS;
         } else if (AbstractTitle.CRESULTS.equals(t)) {
             return CRESULTS;
-        } else if (XMLTitle.OCOM.equals(t)) {
+        } else if(XMLTitle.OCOM.equals(t)) {
             return OCOM;
-        } else if (XMLTitle.CCOM.equals(t)) {
+        } else if(XMLTitle.CCOM.equals(t)) {
             return CCOM;
         }
         return "";
@@ -158,35 +168,38 @@ public class XMLFormat extends AbstractNestedResultFormat {
         display(dt);
         println("</binding>");
     }
-
+    
     void display(IDatatype dt) {
         String str = dt.getLabel();
         if (dt.isList()) {
             printList(dt);
-        } else if (dt.isLiteral()) {
+        }
+        else if (dt.isLiteral()) {
             str = toXML(str);
 
             if (dt.hasLang()) {
                 printf("<literal xml:lang='%s'>%s</literal>", dt.getLang(), str);
-            } else if (dt.getDatatype() != null && dt.getCode() != IDatatype.Datatype.LITERAL) {
+            } else if (dt.getDatatype() != null && dt.getCode() != IDatatype.LITERAL) {
                 if (dt.isExtension()) {
                     str = toXML(dt.getContent());
                 }
                 printf("<literal datatype='%s'>%s</literal>",
-                        dt.getDatatype().getLabel(), str);
+                        dt.getDatatype().getLabel() ,str);
             } else {
-                printf("<literal>%s</literal>", str);
+                printf("<literal>%s</literal>" ,str );
             }
         } else if (dt.isTripleWithEdge()) {
             // rdf star triple
-            print(dt.getEdge());
-        } else if (dt.isBlank()) {
+            print(dt.getEdge());            
+        }          
+        else if (dt.isBlank()) {
             printf("<bnode>%s</bnode>", str);
-        } else if (dt.isURI()) {
+        } 
+        else if (dt.isURI()) {
             printf("<uri>%s</uri>", StringEscapeUtils.escapeXml11(str));
         }
     }
-
+    
     void printList(IDatatype list) {
         println("<list>");
         for (IDatatype dt : list) {
@@ -195,7 +208,7 @@ public class XMLFormat extends AbstractNestedResultFormat {
         }
         println("</list>");
     }
-
+    
     void print(Edge e) {
         println("<triple>");
         print("<subject>");

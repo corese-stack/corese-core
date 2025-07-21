@@ -19,9 +19,6 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.producer.DataProducer;
 import fr.inria.corese.core.query.PluginTransform;
 import fr.inria.corese.core.query.QueryProcess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -35,7 +32,6 @@ import java.util.ArrayList;
  *
  */
 public class Core implements FunctionEvaluator {
-    private static final Logger logger = LoggerFactory.getLogger(Core.class);
 
     private static final String QM = "?";
 
@@ -75,9 +71,18 @@ public class Core implements FunctionEvaluator {
             Method m = this.getClass().getMethod(name, aclasses);
             return (IDatatype) m.invoke(this, ldt);
         } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-            logger.error("", e);
+            trace(e, "funcall", name, ldt);
         }
         return null;
+    }
+
+    void trace(Exception e, String title, String name, IDatatype[] ldt) {
+        String str = "";
+        for (IDatatype dt : ldt) {
+            str += dt + " ";
+        }
+//        logger.warn(e);
+//        logger.warn(title + " "+ name + " " + str);  
     }
 
     /**
@@ -96,8 +101,16 @@ public class Core implements FunctionEvaluator {
                 ldt[0] = dt;
                 m.invoke(this, ldt);
             }
-        } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-            logger.error("", e);
+        } catch (SecurityException e) {
+            trace(e, "map", name, ldt);
+        } catch (NoSuchMethodException e) {
+            trace(e, "map", name, ldt);
+        } catch (IllegalArgumentException e) {
+            trace(e, "map", name, ldt);
+        } catch (IllegalAccessException e) {
+            trace(e, "map", name, ldt);
+        } catch (InvocationTargetException e) {
+            trace(e, "map", name, ldt);
         }
         return null;
     }
@@ -120,15 +133,23 @@ public class Core implements FunctionEvaluator {
                 }
             }
             return DatatypeMap.newInstance(res);
-        } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-            logger.error("", e);
+        } catch (SecurityException e) {
+            trace(e, "maplist", name, ldt);
+        } catch (NoSuchMethodException e) {
+            trace(e, "maplist", name, ldt);
+        } catch (IllegalArgumentException e) {
+            trace(e, "maplist", name, ldt);
+        } catch (IllegalAccessException e) {
+            trace(e, "maplist", name, ldt);
+        } catch (InvocationTargetException e) {
+            trace(e, "maplist", name, ldt);
         }
         return null;
     }
 
     /**
      * This PluginImpl was created for executing a Method such as java:report()
-     * where java: = &lt;function:// ...>
+     * where java: = <function:// ...>
      * This PluginImpl contains Environment and Producer use case: JavaCompiler
      * external function
      */
@@ -157,13 +178,13 @@ public class Core implements FunctionEvaluator {
      * First param is query other param are variable bindings (variable, value)
      */
     Mapping createMapping(Producer p, IDatatype[] param, int start) {
-        ArrayList<Node> variables = new ArrayList<>();
-        ArrayList<Node> val = new ArrayList<>();
+        ArrayList<Node> var = new ArrayList<Node>();
+        ArrayList<Node> val = new ArrayList<Node>();
         for (int i = start; i < param.length; i += 2) {
-            variables.add(NodeImpl.createVariable(clean(param[i].getLabel())));
+            var.add(NodeImpl.createVariable(clean(param[i].getLabel())));
             val.add(p.getNode(param[i + 1]));
         }
-        return Mapping.create(variables, val);
+        return Mapping.create(var, val);
     }
 
     String clean(String name) {
@@ -204,7 +225,13 @@ public class Core implements FunctionEvaluator {
     }
 
     Loopable getLoop(final Producer p, final IDatatype subj, final IDatatype pred, final IDatatype obj) {
-        return () -> new DataProducer(getGraph(p)).iterate(subj, pred, obj);
+        Loopable loop = new Loopable() {
+            @Override
+            public Iterable getLoop() {
+                return new DataProducer(getGraph(p)).iterate(subj, pred, obj);
+            }
+        };
+        return loop;
     }
 
     public IDatatype and(IDatatype... ldt) {
@@ -265,7 +292,6 @@ public class Core implements FunctionEvaluator {
     /**
      * @param environment the environment to set
      */
-    @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
     }
@@ -273,7 +299,6 @@ public class Core implements FunctionEvaluator {
     /**
      * @param producer the producer to set
      */
-    @Override
     public void setProducer(Producer producer) {
         this.producer = producer;
     }

@@ -6,6 +6,7 @@ import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Context;
@@ -25,7 +26,7 @@ import org.json.JSONObject;
 public class ResultMessage {
     
     private JSONObject system;
-    private static ResultMessage singleton = null;
+    private static ResultMessage singleton;
 
     private Context context;
     private ContextLog log;
@@ -33,12 +34,29 @@ public class ResultMessage {
     private Graph graph;
     private ASTQuery ast;
     
-    ResultMessage () {
-        setSystem(new JSONObject());
-        getSystem().put("system", getSingleton().system("uname -a"));
-        getSystem().put("java", getSingleton().system("java --version"));
-        getSystem().put("platform", "Corese 4.2.3");
-        getSystem().put("date", new Date());
+    static {
+        init();
+    }
+    
+    ResultMessage () {}
+
+    public ResultMessage(Graph g, Context ct, ContextLog log) {
+        if (ct == null) {
+            ct = new Context();
+            ct.set(URLParam.DATE, DatatypeMap.newDate());
+        }
+        setContext(ct);
+        setLog(log);
+        setGraph(g);
+    }
+    
+    static void init() {
+        setSingleton(new ResultMessage());
+        getSingleton().setSystem(new JSONObject());
+        getSingleton().getSystem().put("system", getSingleton().system("uname -a"));
+        getSingleton().getSystem().put("java", getSingleton().system("java --version"));
+        getSingleton().getSystem().put("platform", "Corese 4.2.3");
+        getSingleton().getSystem().put("date", new Date());
     }
 
     /**
@@ -46,7 +64,7 @@ public class ResultMessage {
      * "message" return context as json object
      */
     public JSONObject process(Mappings map) {
-        setAst(map.getAST());
+        setAst((ASTQuery) map.getAST());
         setJson(getContext().json());
         // select data from ContextLog
         if (getLog() != null) {
@@ -82,10 +100,11 @@ public class ResultMessage {
         if (getContext().hasValue(URLParam.DISTANCE)) {
             // URL parameter sv:distance=n
             IDatatype dt = getContext().getFirst(URLParam.DISTANCE);
-            distance = Integer.parseInt(dt.getLabel());
+            distance = Integer.valueOf(dt.getLabel());
         }
-
-        return getGraph().match(getAst(), distance);
+        
+        JSONObject obj = getGraph().match(getAst(), distance);                        
+        return obj;
     }
 
     void messageException(ContextLog log) {
@@ -102,26 +121,27 @@ public class ResultMessage {
     }
 
     JSONObject message(EngineException e) {
-        JSONObject messageJson = new JSONObject();
+        JSONObject json = new JSONObject();
 
         if (e.getURL() != null) {
-            messageJson.put(URLParam.URL, e.getURL().getServer());
+            json.put(URLParam.URL, e.getURL().getServer());
         }
 
         if (e.getCause() instanceof ResponseProcessingException) {
             Response resp = (Response) e.getObject();
             if (resp != null) {
-                messageJson.put("statusInfo", resp.getStatusInfo().toString());
-                messageJson.put("status", resp.getStatus());
+                json.put("statusInfo", resp.getStatusInfo().toString());
+                json.put("status", resp.getStatus());
                 String server = getServer(resp);
                 if (server != null) {
-                    messageJson.put("server", server);
+                    json.put("server", server);
                 }
             }
         }
 
-        messageJson.put(URLParam.MES, e.getMessage());
-        return messageJson;
+        json.put(URLParam.MES, e.getMessage());
+        //e.getAST().toString();
+        return json;
     }
 
     String getServer(Response resp) {
@@ -140,8 +160,9 @@ public class ResultMessage {
             Process p = Runtime.getRuntime().exec(cmd);
             p.waitFor();
             QueryLoad ql =  QueryLoad.create();
-            return ql.readWE(p.getInputStream());
-        } catch (IOException | InterruptedException | LoadException ignored) {
+            String line = ql.readWE(p.getInputStream());            
+            return line;
+        } catch (IOException | InterruptedException | LoadException e1) {
         }
         return null;
     }
@@ -187,10 +208,11 @@ public class ResultMessage {
     }
 
     public static ResultMessage getSingleton() {
-        if(singleton == null) {
-            singleton = new ResultMessage();
-        }
         return singleton;
+    }
+
+    public static void setSingleton(ResultMessage aSingleton) {
+        singleton = aSingleton;
     }
 
     public JSONObject getSystem() {

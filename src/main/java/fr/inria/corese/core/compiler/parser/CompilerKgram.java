@@ -1,10 +1,20 @@
 package fr.inria.corese.core.compiler.parser;
 
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.api.core.Filter;
-import fr.inria.corese.core.kgram.api.core.*;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Regex;
 import fr.inria.corese.core.kgram.tool.Message;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Processor;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,10 +28,12 @@ import java.util.List;
  * @author corby
  */
 public class CompilerKgram implements ExpType, Compiler {
+    static int count = 0;
     static final String EQUAL = "=";
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CompilerKgram.class);
+
     ASTQuery ast;
     EdgeImpl edge;
+    Node node;
 
     HashMap<String, Node> varTable;
     HashMap<String, Node> resTable;
@@ -36,12 +48,12 @@ public class CompilerKgram implements ExpType, Compiler {
     public static CompilerKgram create() {
         return new CompilerKgram();
     }
-
+    
     @Override
     public HashMap<String, Node> getVarTable() {
         return varTable;
     }
-
+    
     @Override
     public void share(Compiler cp) {
         varTable = cp.getVarTable();
@@ -81,7 +93,8 @@ public class CompilerKgram implements ExpType, Compiler {
         Expression ee = process(exp);
         Expression cpl = ee.process(ast);
         if (cpl == null) {
-            logger.warn(Message.Prefix.REWRITE.getString(), exp, ast);
+            Message.log(Message.REWRITE, exp);
+            Message.log(ast);
             cpl = exp;
         }
         cpl.compile(ast);
@@ -100,7 +113,8 @@ public class CompilerKgram implements ExpType, Compiler {
                 exp.getArg(0).getName().equals(Processor.XPATH)) {
             Term list = Term.list();
             list.add(exp.getArg(0));
-            return Term.create(Processor.IN, exp.getArg(1), list);
+            Term t = Term.create(Processor.IN, exp.getArg(1), list);
+            return t;
         }
         return exp;
     }
@@ -108,11 +122,11 @@ public class CompilerKgram implements ExpType, Compiler {
     Node getNode(Atom at) {
         return getNode(at, false);
     }
-
+    
     NodeImpl getNodeImpl(Atom at) {
         return (NodeImpl) getNode(at, false);
     }
-
+    
     @Override
     public Node createNode(Atom at, boolean isReuse) {
         return getNode(at, isReuse);
@@ -125,8 +139,8 @@ public class CompilerKgram implements ExpType, Compiler {
      * For resources it is to enable to approximate match a query Class with
      * different target classes
      */
-    Node getNode(Atom at, boolean isReuse) {
-
+  Node getNode(Atom at, boolean isReuse) {
+        
         if (at.isVariable()) {
             Node node = varTable.get(at.getName());
             if (node == null) {
@@ -141,7 +155,8 @@ public class CompilerKgram implements ExpType, Compiler {
                 resTable.put(at.getName(), node);
             }
             return node;
-        } else if (at.isBlank()) {
+        }
+        else if (at.isBlank()) {
             Node node = bnodeTable.get(at.getName());
             if (node == null) {
                 node = new NodeImpl(at);
@@ -161,33 +176,33 @@ public class CompilerKgram implements ExpType, Compiler {
     public Edge compile(Triple tt, boolean reuse) {
         return compile(tt, reuse, false);
     }
-
+    
     /**
-     * when rec = true:
+     * when rec = true: 
      * when triple(t p o) where t is triple reference of triple(a q b t) ->
      * recursively compile triple(a q b t)
      * use case: values ?t {<<<<a q b>> p o>>}
      */
-
+    
     Node getNodeRec(Atom at, boolean reuse, boolean rec) {
         Node node = getNode(at, reuse);
-        if (rec && at.isTriple() && at.getTriple() != null &&
-                node.getEdge() == null) {
-            Edge complileddge = compile(at.getTriple(), reuse, rec);
-            complileddge.setCreated(true);
-            node.setEdge(complileddge);
+        if (rec && at.isTriple() && at.getTriple()!=null && 
+                node.getEdge()==null) {
+            Edge edge = compile(at.getTriple(), reuse, rec);
+            edge.setCreated(true);
+            node.setEdge(edge);
         }
         return node;
     }
-
+    
     @Override
     public Edge compile(Triple triple, boolean reuse, boolean rec) {
-        EdgeImpl compiledEdge = new EdgeImpl(triple);
-        compiledEdge.setCreated(rec);
+        EdgeImpl edge = new EdgeImpl(triple);
+        edge.setCreated(rec);
         Node subject = getNodeRec(triple.getSubject(), reuse, rec);
         if (triple.getVariable() != null) {
             Node variable = getNode(triple.getVariable());
-            compiledEdge.setEdgeVariable(variable);
+            edge.setEdgeVariable(variable);
         }
         Node predicate = getNode(triple.getProperty(), reuse);
         // PRAGMA:
@@ -197,15 +212,15 @@ public class CompilerKgram implements ExpType, Compiler {
         // if it would be same Node, it would need to be bound to same value
         // TODO: fix it for relax
         Node object = getNodeRec(triple.getObject(), reuse, rec);
-        compiledEdge.add(subject);
-        compiledEdge.add(object);
-        compiledEdge.setEdgeNode(predicate);
+        edge.add(subject);
+        edge.add(object);
+        edge.setEdgeNode(predicate);
 
         if (triple.getArgs() != null) {
             // tuple(s p o arg1 .. argn)
             for (Atom arg : triple.getArgs()) {
-                NodeImpl sup = getNodeImpl(arg);
-
+                NodeImpl sup =  getNodeImpl(arg);
+                
                 if (arg.isVariable()) {
                     sup.setMatchNodeList(arg.getVariable().isMatchNodeList());
                     sup.setMatchCardinality(arg.getVariable().isMatchCardinality());
@@ -213,13 +228,13 @@ public class CompilerKgram implements ExpType, Compiler {
                 if (sup.isTriple()) {
                     // triple(s p o t) where t is triple reference
                     // t points to target edge
-                    sup.setEdge(compiledEdge);
+                    sup.setEdge(edge);
                 }
-                compiledEdge.add(sup);
+                edge.add(sup);                
             }
         }
 
-        return compiledEdge;
+        return edge;
 
     }
 

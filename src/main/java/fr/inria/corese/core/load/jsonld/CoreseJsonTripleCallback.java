@@ -24,7 +24,7 @@ public class CoreseJsonTripleCallback implements JsonLdTripleCallback {
 
     private AddTripleHelper helper;
     String source;
-    private final Graph graph;
+    private Graph graph;
     private DataManager dataManager;
     private Node graphSource, defaultGraphSource;
     private final static String JSONLD_DEFAULT_GRAPH = "@default";

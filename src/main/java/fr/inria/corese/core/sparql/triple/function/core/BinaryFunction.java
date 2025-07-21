@@ -105,7 +105,7 @@ public class BinaryFunction extends TermEval {
         }
         if (l2.indexOf("-") != -1) {
             // en-us need exact match
-            return value(l1.equalsIgnoreCase(l2));
+            return value(l1.toLowerCase().equals(l2.toLowerCase()));
         }
         return value(l1.regionMatches(true, 0, l2, 0, 2));
     }

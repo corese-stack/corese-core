@@ -13,7 +13,7 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.script.Funcall;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import java.util.List;
-
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class ListSort extends Funcall {
-    private static final Logger logger = LoggerFactory.getLogger(ListSort.class);
+    private static Logger logger = LoggerFactory.getLogger(ListSort.class);
 
     public ListSort(){}
     

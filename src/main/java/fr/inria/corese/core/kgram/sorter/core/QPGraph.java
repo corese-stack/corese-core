@@ -1,6 +1,6 @@
 package fr.inria.corese.core.kgram.sorter.core;
 
-import fr.inria.corese.core.kgram.api.core.ExpType;
+import static fr.inria.corese.core.kgram.api.core.ExpType.EMPTY;
 import fr.inria.corese.core.kgram.core.Exp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,7 +179,7 @@ public class QPGraph {
      * @return
      */
     public List<QPGNode> getAllNodes() {
-        return this.getAllNodes(ExpType.Type.EMPTY);
+        return this.getAllNodes(EMPTY);
     }
 
     /**
@@ -188,7 +188,7 @@ public class QPGraph {
      * @param type EDGE, VALUES, FILTER, GRAPH, otherwise return all
      * @return
      */
-    public List<QPGNode> getAllNodes(ExpType.Type type) {
+    public List<QPGNode> getAllNodes(int type) {
         if (Const.plannable(type)) {
             List<QPGNode> list = new ArrayList<>();
             for (QPGNode node : this.nodes) {

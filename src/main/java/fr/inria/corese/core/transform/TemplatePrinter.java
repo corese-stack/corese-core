@@ -58,7 +58,7 @@ public class TemplatePrinter {
                     header();
 
                     for (Query q : qe.getNamedTemplates()){
-                            process(q.getAST());
+                            process((ASTQuery) q.getAST());
                     }
                     for (Query q : qe.getQueries()){
                             process( q.getAST());

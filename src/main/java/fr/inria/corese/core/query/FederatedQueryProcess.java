@@ -6,7 +6,6 @@ import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
-
 import java.util.Arrays;
 
 /**
@@ -14,27 +13,27 @@ import java.util.Arrays;
  * Define a federation
  * Execute query on federation
  */
-public class FederatedQueryProcess {
-
-    private QueryProcess queryProcess;
+public class FederatedQueryProcess  {
+    
+    private QueryProcess queryProcess; 
     private Metadata metadata;
-
-
+    
+    
     public FederatedQueryProcess() {
         setQueryProcess(QueryProcess.create());
         setMetadata(new Metadata());
     }
-
+    
     public FederatedQueryProcess(Graph g) {
         setQueryProcess(QueryProcess.create(g));
     }
-
+    
     public FederatedQueryProcess defineFederation(String name, String... url) {
         getQueryProcess().defineFederation(name, Arrays.asList(url));
-        getMetadata().add(Metadata.Type.FEDERATION, name);
+        getMetadata().add(Metadata.FEDERATION, name);
         return this;
     }
-
+    
     public Mappings query(String query) throws EngineException {
         getQueryProcess().setMetadata(getMetadata());
         return getQueryProcess().query(query);
@@ -44,27 +43,32 @@ public class FederatedQueryProcess {
         getQueryProcess().setMetadata(getMetadata());
         return getQueryProcess().compile(query);
     }
-
-
+    
+    
+    
+    
+    
+    
     public FederatedQueryProcess setLimit(int n) {
-        getMetadata().add(Metadata.Type.LIMIT, DatatypeMap.newInstance(n));
+        getMetadata().add(Metadata.LIMIT, DatatypeMap.newInstance(n));
         return this;
     }
-
+    
     public FederatedQueryProcess setTimeout(int n) {
-        getMetadata().add(Metadata.Type.TIMEOUT, DatatypeMap.newInstance(n));
+        getMetadata().add(Metadata.TIMEOUT, DatatypeMap.newInstance(n));
         return this;
-    }
-
+    }    
+    
     public FederatedQueryProcess setTrace(boolean b) {
         if (b) {
-            getMetadata().add(Metadata.Type.TRACE);
-        } else {
-            getMetadata().remove(Metadata.Type.TRACE);
+            getMetadata().add(Metadata.TRACE);
+        }
+        else {
+            getMetadata().remove(Metadata.TRACE);
         }
         return this;
-    }
-
+    } 
+    
     public QueryProcess getQueryProcess() {
         return queryProcess;
     }

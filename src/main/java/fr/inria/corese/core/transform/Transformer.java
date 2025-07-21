@@ -4,7 +4,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,7 +64,7 @@ import fr.inria.corese.core.sparql.triple.parser.Processor;
  */
 public class Transformer implements TransformProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(Transformer.class);
+    private static Logger logger = LoggerFactory.getLogger(Transformer.class);
 
     private static final String NULL = "";
     private static final String STL = NSManager.STL;
@@ -125,9 +124,10 @@ public class Transformer implements TransformProcessor {
     private static final String OUT = ASTQuery.OUT;
     public static final String IN = ASTQuery.IN;
     public static final String IN2 = ASTQuery.IN2;
-    private static final String NL = "\n";
+    private static String NL = "\n";
     private static boolean isOptimizeDefault = false;
     private static boolean isExplainDefault = false;
+    public static boolean DEFAULT_DEBUG = false;
     public static int count = 0;
     static HashMap<String, Boolean> dmap;
     // private TemplateVisitor visitor;
@@ -147,6 +147,8 @@ public class Transformer implements TransformProcessor {
     String sepTemplate = NL;
     // separator of several results of one template
     String sepResult = " ";
+    boolean isDebug = DEFAULT_DEBUG;
+    private boolean isTrace = false;
     private boolean isDetail = false;
     private IDatatype EMPTY;
     boolean isTurtle = false;
@@ -174,7 +176,7 @@ public class Transformer implements TransformProcessor {
     // st:process() of template variable, may be overloaded
     private int process = ExprType.TURTLE;
     // default template aggregate:
-    private final int aggregate = ExprType.STL_GROUPCONCAT;
+    private int aggregate = ExprType.STL_GROUPCONCAT;
     // actual template aggregate (function st:aggregate (){} in profile):
     private int defAggregate = ExprType.STL_GROUPCONCAT;
     // st:default() process of template variable, may be overloaded
@@ -213,6 +215,7 @@ public class Transformer implements TransformProcessor {
         loaded = new HashMap<>();
         imported = new HashMap<>();
         tmap = new TransformerMapping(qp.getGraph());
+        setDebug(p);
         try {
             setEventVisitor(QuerySolverVisitorTransformer.create(this, qp.getCreateEval()));
         } catch (EngineException ex) {
@@ -398,7 +401,7 @@ public class Transformer implements TransformProcessor {
         set(g);
         String str = transform();
         if (str != null) {
-            out.write(str.getBytes(StandardCharsets.UTF_8));
+            out.write(str.getBytes("UTF-8"));
         }
     }
 
@@ -412,7 +415,7 @@ public class Transformer implements TransformProcessor {
 
     public void write(OutputStream out) throws IOException {
         String str = toString();
-        out.write(str.getBytes(StandardCharsets.UTF_8));
+        out.write(str.getBytes("UTF-8"));
     }
 
     public void definePrefix(String p, String ns) {
@@ -561,6 +564,34 @@ public class Transformer implements TransformProcessor {
         table.setOptimize(ns, isOptimize);
     }
 
+    public void setDebug(boolean b) {
+        isDebug = b;
+    }
+
+    public static void setDefaultDebug(boolean b) {
+        DEFAULT_DEBUG = b;
+    }
+
+    void setDebug(String name) {
+        for (String key : dmap.keySet()) {
+            if (name.startsWith(key)) {
+                Boolean b = dmap.get(key);
+                if (b != null) {
+                    setDebug(b);
+                }
+                return;
+            }
+        }
+    }
+
+    public static void debug(String name, boolean b) {
+        if (b) {
+            dmap.put(name, b);
+        } else {
+            dmap.remove(name);
+        }
+    }
+
     void setLevelMax(int n) {
         levelMax = n;
     }
@@ -623,7 +654,7 @@ public class Transformer implements TransformProcessor {
         try {
             qe.defQuery(t);
         } catch (EngineException e) {
-            logger.error("Operation failure", e);
+            e.printStackTrace();
         }
     }
 
@@ -695,6 +726,10 @@ public class Transformer implements TransformProcessor {
                     // import prefix from st:start template
                     getNSM().complete(nsm(qq));
                 }
+
+                if (isDebug) {
+                    // qq.setDebug(true);
+                }
                 // remember start with qq for function pprint below
                 query = qq;
                 if (query.getName() != null) {
@@ -703,10 +738,21 @@ public class Transformer implements TransformProcessor {
                     context.set(STL_START, (String) null);
                 }
 
+                if (isDebug) { // (getTransformation().contains("turtlehtml")) {
+                    System.out.println("transformer start: " + getTransformation());
+                    System.out.println(qq.getAST());
+                    System.out.println("graph size: " + getGraph().size());
+                }
+
                 Mappings map = exec.query(qq, m);
                 save(map);
                 query = null;
                 IDatatype res = getResult(map);
+
+                if (isDebug) {
+                    System.out.println("transformer result: \n" + map.toString(true));
+                    System.out.println(res);
+                }
 
                 if (res != null) {
                     if (all) {
@@ -819,7 +865,7 @@ public class Transformer implements TransformProcessor {
     }
 
     public IDatatype process(String temp, IDatatype... ldt) throws EngineException {
-        return process(temp, false, null, null, null, ldt[0], (ldt.length == 1) ? null : ldt);
+        return process(temp, false, null, null, (Environment) null, ldt[0], (ldt.length == 1) ? null : ldt);
     }
 
     public IDatatype process(String temp, Binding b, IDatatype... ldt) throws EngineException {
@@ -885,6 +931,10 @@ public class Transformer implements TransformProcessor {
                 stack.push(dt, args, query);
             }
 
+            if (isDebug || isTrace) {
+                trace(temp, dt, args, exp);
+            }
+
             QueryProcess exec = this.exec;
 
             int count = 0, n = 0;
@@ -909,6 +959,19 @@ public class Transformer implements TransformProcessor {
 
                 Mapping bm = m;
 
+                if (isDetail) {
+                    qq.setDebug(true);
+                }
+
+                if (isDebug) {
+                    if (qq.isFail()) {
+                        System.out.println("template fail: " + dt + "\n" + qq.getAST());
+                    }
+                    if (stack.contains(dt, args, qq)) {
+                        System.out.println("stack contains: " + dt + "\n" + qq.getAST());
+                    }
+                }
+
                 if (!qq.isFail() && !stack.contains(dt, args, qq)) {
 
                     nbt++;
@@ -932,13 +995,25 @@ public class Transformer implements TransformProcessor {
                         share(bm, env);
                     }
 
+                    if (isDebug) {
+                        System.out.println("try:\n" + qq.getAST());
+                    }
+
                     Mappings map = exec.query(qq, bm);
                     save(map);
                     stack.visit(dt);
                     stack.pop();
                     IDatatype res = getResult(map);
 
+                    if (isDebug) {
+                        System.out.println("map:\n" + map);
+                        System.out.println("res:\n" + res);
+                    }
+
                     if (res != null) {
+                        if (isTrace) {
+                            System.out.println(qq.getAST());
+                        }
 
                         if (allTemplates) {
                             nodes.add(map.getTemplateResult());
@@ -1011,6 +1086,35 @@ public class Transformer implements TransformProcessor {
 
     IDatatype result(IDatatype dt1, IDatatype dt2) {
         return dt2;
+    }
+
+    void trace(String name, IDatatype dt1, IDatatype[] args, Expr exp) {
+        if (dt1 != null && (args == null || args.length == 0)) {
+            args = new IDatatype[1];
+            args[0] = dt1;
+        }
+        String trans = nsm.toPrefix(getTransformation());
+        name = name == null ? "" : nsm.toPrefix(name);
+        System.out.println(level() + " " + trans + " " + name + " " + exp);
+
+        for (IDatatype dt : args) {
+            System.out.print(dt + " ");
+            if (dt.isBlank()) {
+                Transformer t = Transformer.create(graph, TURTLE);
+                t.setDebug(false);
+                String str;
+                try {
+                    str = t.process(dt).getLabel();
+                } catch (EngineException ex) {
+                    str = "";
+                }
+                if (!dt.getLabel().equals(str)) {
+                    System.out.print("= " + str + " ");
+                }
+            }
+        }
+        System.out.println();
+        System.out.println("------");
     }
 
     public IDatatype getResult(Mappings map) {
@@ -1215,7 +1319,7 @@ public class Transformer implements TransformProcessor {
                 if (function != null) {
                     IDatatype dt1 = null;
                     try {
-                        dt1 = new Funcall(name).callWE(exec.getEvaluator(),
+                        dt1 = new Funcall(name).callWE((Interpreter) exec.getEvaluator(),
                                 env.getBind(), env, exec.getProducer(), (Function) function, param(dt));
                     } catch (EngineException ex) {
                         logger.error(ex.getMessage() + " in " + name);
@@ -1251,7 +1355,7 @@ public class Transformer implements TransformProcessor {
     }
 
     /**
-     * if prefix exists, return qname, else return URI as is (without &lt;>)
+     * if prefix exists, return qname, else return URI as is (without <>)
      */
     public IDatatype qnameURI(IDatatype dt) {
         String uri = nsm.toPrefix(dt.getLabel(), true);
@@ -1346,6 +1450,20 @@ public class Transformer implements TransformProcessor {
             }
         }
         qe.clean();
+        if (stat) {
+            trace();
+        }
+    }
+
+    public void trace() {
+        System.out.println("PP nb templates: " + qe.getQueries().size());
+        for (Query q : qe.getQueries()) {
+            if (q.hasPragma(Pragma.FILE)) {
+                System.out.println(name(q));
+            }
+            ASTQuery ast = q.getAST();
+            System.out.println(ast);
+        }
     }
 
     String name(Query qq) {
@@ -1357,6 +1475,18 @@ public class Transformer implements TransformProcessor {
             }
         }
         return f;
+    }
+
+    void trace(Query qq, Node res) {
+        System.out.println();
+        System.out.println("query:  " + name(qq));
+        System.out.println("result: " + res);
+    }
+
+    public void nbcall() {
+        for (Query q : qe.getQueries()) {
+            System.out.println(q.getNumber() + " " + name(q) + " " + tcount.get(q));
+        }
     }
 
     private void succ(Query q) {
@@ -1382,6 +1512,14 @@ public class Transformer implements TransformProcessor {
 
     public Graph getGraph() {
         return graph;
+    }
+
+    public boolean isTrace() {
+        return isTrace;
+    }
+
+    public void setTrace(boolean isTrace) {
+        this.isTrace = isTrace;
     }
 
     public boolean isHasDefault() {
@@ -1488,7 +1626,18 @@ public class Transformer implements TransformProcessor {
     }
 
     void init(Context c) {
+        if (c.get(Context.STL_DEBUG) != null && c.get(Context.STL_DEBUG).booleanValue()) {
+            isDebug = true;
+        }
     }
+
+    // TemplateVisitor getVisitor(Query q, Transformer ct) {
+    // if (ct == null) {
+    // return (TemplateVisitor) q.getTemplateVisitor();
+    // } else {
+    // return ct.getVisitor();
+    // }
+    // }
 
     Context getContext(Query q, Transformer ct) {
         if (ct == null) {
@@ -1518,6 +1667,31 @@ public class Transformer implements TransformProcessor {
         }
         return null;
     }
+
+    // public void setVisitor(TemplateVisitor visitor) {
+    // this.visitor = visitor;
+    // if (visitor != null) {
+    // visitor.setGraph(getGraph());
+    // }
+    // }
+    //
+    // public TemplateVisitor defVisitor() {
+    // if (getVisitor() == null) {
+    // setVisitor(new DefaultVisitor());
+    // }
+    // return getVisitor();
+    // }
+
+    // public IDatatype visitedGraph() {
+    // if (getVisitor() == null) {
+    // return null;
+    // }
+    // return getVisitor().visitedGraphNode();
+    // }
+
+    // void initVisit() {
+    // setVisitor(new DefaultVisitor());
+    // }
 
     public HashMap<String, Transformer> getTransformerMap() {
         return transformerMap;

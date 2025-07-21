@@ -13,6 +13,6 @@ public interface TemplateVisitor extends TransformVisitor {
            
     void setGraph(Graph g);
              
-    Graph visitedGraph();
+    public Graph visitedGraph();
         
 }

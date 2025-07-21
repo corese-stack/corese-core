@@ -202,6 +202,7 @@ public class AddTripleHelper implements ILoadSerialization {
     /**
      * Get the default graph source according to the status of graph and source
      *
+     * @param graph  Graph that will be filled in
      * @param source The particular name to add nodes to
      *
      * @return

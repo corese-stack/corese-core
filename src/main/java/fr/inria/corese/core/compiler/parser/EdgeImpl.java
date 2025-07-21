@@ -1,5 +1,8 @@
 package fr.inria.corese.core.compiler.parser;
 
+import java.util.ArrayList;
+import java.util.Objects;
+
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.core.PointerType;
@@ -12,16 +15,11 @@ import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.Triple;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
 
-import java.util.ArrayList;
-import java.util.Objects;
-
 public class EdgeImpl extends PointerObject implements Edge {
 
     public static String TOP = RDFS.RootPropertyURI;
     ArrayList<Node> nodes;
-    Node edgeNode;
-    Node edgeVariable;
-    Node mySelf;
+    Node edgeNode, edgeVariable, mySelf;
     String label;
     Triple triple;
     int index = -1;
@@ -63,6 +61,7 @@ public class EdgeImpl extends PointerObject implements Edge {
         edge.add(sub);
         edge.add(obj);
         if (prop.isVariable()) {
+            // edge.setEdgeNode(prop);
             edge.setEdgeVariable(prop);
         } else {
             edge.setEdgeNode(prop);
@@ -78,39 +77,50 @@ public class EdgeImpl extends PointerObject implements Edge {
         return basicTriple();
     }
 
-    String basicTriple() {
+    String basicTriple() {    
         String str = "";
         String name = label;
-
-        if (getTriple() != null && getTriple().getRegex() != null) {
+        
+        if (getTriple()!=null && getTriple().getRegex()!=null) {
             name = getTriple().getRegex().toString();
-        } else if (getEdgeVariable() != null) {
+        }
+        else if (getEdgeVariable() != null) {
             name = getEdgeVariable().toString();
         } else if (getTriple() != null) {
             name = getTriple().getProperty().getName();
         }
-
-        str += getNode(0);
+        
+        str += getNode(0);        
         str += " " + name;
         for (int i = 1; i < nodes.size(); i++) {
-            str += " " + getNode(i);
+            str += " " + getNode(i);           
         }
         return str;
     }
-
+    
     String nestedTriple() {
         return nestedTripleBasic();
     }
-
+    
+    String nestedTripleDebug() {
+        String str = String.format("<<%s[%s] %s %s[%s]>> [%s]", 
+                getNode(0), getNode(0).isVariable()?getNode(0).getLabel():"",
+                getPredicateNode(), 
+                getNode(1), getNode(1).isVariable()?getNode(1).getLabel():"",
+                getNode(Edge.REF_INDEX).getLabel());        
+        return str;
+    }
+    
     String nestedTripleBasic() {
-        return String.format("<<%s %s %s>> [%s]",
-                getNode(0), getPredicateNode(), getNode(1),
-                getNode(Edge.REF_INDEX).getLabel());
+        String str = String.format("<<%s %s %s>> [%s]", 
+                getNode(0), getPredicateNode(), getNode(1), 
+                getNode(Edge.REF_INDEX).getLabel());        
+        return str;
     }
 
     @Override
     public Iterable<IDatatype> getLoop() {
-        ArrayList<IDatatype> list = new ArrayList<>();
+        ArrayList<IDatatype> list = new ArrayList();
         for (int i = 0; i <= nodes.size(); i++) {
             list.add(getValue(null, i));
         }
@@ -147,8 +157,8 @@ public class EdgeImpl extends PointerObject implements Edge {
     }
 
     public Node getPredicateNode() {
-        Node varNode = getEdgeVariable();
-        return (varNode == null) ? getEdgeNode() : varNode;
+        Node var = getEdgeVariable();
+        return (var == null) ? getEdgeNode() : var;
     }
 
     public Triple getTriple() {
@@ -163,7 +173,8 @@ public class EdgeImpl extends PointerObject implements Edge {
         Atom object = ((NodeImpl) nodes.get(1)).getAtom();
         Constant property = getName();
         Variable variable = getVariable();
-        return Triple.create(subject, property, variable, object);
+        Triple triple = Triple.create(subject, property, variable, object);
+        return triple;
     }
 
     Constant getName() {
@@ -186,6 +197,15 @@ public class EdgeImpl extends PointerObject implements Edge {
         nodes.add(node);
     }
 
+    /**
+     *
+     * Query edge node is stored only if it is a variable otherwise it is useless
+     * and may lead to a pb when match subproperty
+     */
+    public void setEdgeNode(Node n) {
+        edgeNode = n;
+    }
+
     @Override
     public boolean contains(Node n) {
         return nodes.contains(n);
@@ -196,21 +216,9 @@ public class EdgeImpl extends PointerObject implements Edge {
         return edgeNode;
     }
 
-    /**
-     * Query edge node is stored only if it is a variable otherwise it is useless
-     * and may lead to a pb when match subproperty
-     */
-    public void setEdgeNode(Node n) {
-        edgeNode = n;
-    }
-
     @Override
     public Node getEdgeVariable() {
         return edgeVariable;
-    }
-
-    public void setEdgeVariable(Node n) {
-        edgeVariable = n;
     }
 
     @Override
@@ -221,14 +229,13 @@ public class EdgeImpl extends PointerObject implements Edge {
         return edgeVariable;
     }
 
-    @Override
-    public int getEdgeIndex() {
-        return index;
+    public void setEdgeVariable(Node n) {
+        edgeVariable = n;
     }
 
     @Override
-    public void setEdgeIndex(int n) {
-        index = n;
+    public int getEdgeIndex() {
+        return index;
     }
 
     @Override
@@ -249,6 +256,11 @@ public class EdgeImpl extends PointerObject implements Edge {
     @Override
     public int nbGraphNode() {
         return nodes.size();
+    }
+
+    @Override
+    public void setEdgeIndex(int n) {
+        index = n;
     }
 
     @Override

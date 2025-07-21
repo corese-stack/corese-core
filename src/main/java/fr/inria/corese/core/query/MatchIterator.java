@@ -1,19 +1,20 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.core.Graph;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Matcher;
-
-import java.util.HashMap;
-import java.util.Iterator;
+import fr.inria.corese.core.Graph;
 
 /**
  * Iterator of Entity that perform match.match() It checks subsumption in the
  * Producer Return one occurrence of each resource for ?x rdf:type aClass
  *
  * @author Olivier Corby, Wimmics INRIA 2012
+ *
  */
 public class MatchIterator implements Iterable<Edge>, Iterator<Edge> {
 
@@ -97,7 +98,8 @@ public class MatchIterator implements Iterable<Edge>, Iterator<Edge> {
     /**
      * ?x rdf:type ex:Person Keep one occurrence of each value of ?x graph ?g {
      * ?x rdf:type ex:Person } Keep one occurrence of each value of ?x for each
-     * graph
+     * graph 
+	 *
      */
     boolean isFirst(Edge ent) {
         Table t = getTable(ent);
@@ -109,11 +111,11 @@ public class MatchIterator implements Iterable<Edge>, Iterator<Edge> {
         return true;
     }
 
-    static class Table extends HashMap<Node, Node> {
+    class Table extends HashMap<Node, Node> {
     }
 
     // gNode -> Table
-    static class GTable extends HashMap<Node, Table> {
+    class GTable extends HashMap<Node, Table> {
     }
 
 }

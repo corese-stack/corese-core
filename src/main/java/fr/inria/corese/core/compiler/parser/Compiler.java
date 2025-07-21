@@ -23,43 +23,42 @@ import java.util.List;
 
 public interface Compiler {
 
-    void setAST(ASTQuery ast);
+  void setAST(ASTQuery ast);
 
-    boolean isFail();
+  boolean isFail();
 
-    Node createNode(String name);
+  Node createNode(String name);
 
-    Node createNode(Atom at);
+  Node createNode(Atom at);
+  
+  Node createNode(Atom at, boolean reuse);
 
-    Node createNode(Atom at, boolean reuse);
+  Node getNode();
 
-    Node getNode();
+  Edge getEdge();
 
-    Edge getEdge();
+  List<Filter> getFilters();
 
-    List<Filter> getFilters();
+  Collection<Node> getVariables();
 
-    Collection<Node> getVariables();
+  Filter compile(Expression exp) throws EngineException;
 
-    Filter compile(Expression exp) throws EngineException;
+  Edge compile(Triple t, boolean insertData);
+  // rec==true when compile nested triple in values clause
+  Edge compile(Triple t, boolean insertData, boolean rec);
 
-    Edge compile(Triple t, boolean insertData);
+  List<Filter> compileFilter(Expression exp) throws EngineException;
 
-    // rec==true when compile nested triple in values clause
-    Edge compile(Triple t, boolean insertData, boolean rec);
+  Regex getRegex(Filter f) throws EngineException ;
 
-    List<Filter> compileFilter(Expression exp) throws EngineException;
+  String getMode(Filter f);
 
-    Regex getRegex(Filter f) throws EngineException;
+  int getMin(Filter f);
 
-    String getMode(Filter f);
+  int getMax(Filter f);
 
-    int getMin(Filter f);
-
-    int getMax(Filter f);
-
-    HashMap<String, Node> getVarTable();
-
-    void share(Compiler cp);
+  HashMap<String, Node> getVarTable();
+  
+  void share (Compiler cp);
 
 }

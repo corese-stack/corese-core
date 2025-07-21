@@ -1,71 +1,123 @@
 package fr.inria.corese.core.compiler.eval;
 
-import fr.inria.corese.core.kgram.api.core.Expr;
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.api.query.Environment;
-import fr.inria.corese.core.kgram.api.query.Evaluator;
-import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.sparql.api.ComputerProxy;
-import fr.inria.corese.core.sparql.api.GraphProcessor;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.function.script.Function;
-import fr.inria.corese.core.sparql.triple.parser.Context;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.event.EvalListener;
+import fr.inria.corese.core.sparql.api.GraphProcessor;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.script.Function;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+
 /**
- * Evaluator of operators &amp; functions of filter language
+ * Evaluator of operators & functions of filter language 
  * implemented by fr.inria.corese.core.query.PluginImpl
- *
+ * 
  * @author Olivier Corby, Edelweiss, INRIA 2010
+ * 
  */
 public abstract class ProxyInterpreter implements ExprType {
 
-    public static final String RDFNS = NSManager.RDF;
-    private static final Logger logger = LoggerFactory.getLogger(ProxyInterpreter.class);
+    private static final String URN_UUID = "urn:uuid:";
+    private static Logger logger = LoggerFactory.getLogger(ProxyInterpreter.class);
+    public static final IDatatype TRUE = DatatypeMap.TRUE;
+    public static final IDatatype FALSE = DatatypeMap.FALSE;
+    public static final IDatatype UNDEF = DatatypeMap.UNBOUND;
+
+    static final String UTF8 = "UTF-8";
+    public static final String RDFNS = NSManager.RDF; //"http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    public static final String RDFTYPE = RDFNS + "type";
+    private static final String USER_DISPLAY = NSManager.USER + "display";
     public static int count = 0;
-    protected IDatatype EMPTY = DatatypeMap.newStringBuilder("");
+    //ProxyInterpreter plugin;
+    Custom custom;
+    SQLFun sql;
     Interpreter eval;
-    int number = 0;
     private Producer producer;
+    EvalListener el;
     // for LDScript java compiling only
     private Environment environment;
+    int number = 0;
+    // KGRAM is relax wrt to string vs literal vs uri input arg of functions
+    // eg regex() concat() strdt()
+    // setMode(SPARQL_MODE) 
+    boolean SPARQLCompliant = false;
+    protected IDatatype EMPTY = DatatypeMap.newStringBuilder("");
 
-    protected ProxyInterpreter() {
+    public ProxyInterpreter() {
+//        sql = new SQLFun();
+//        custom = new Custom();
+        //setPlugin(this);
+    }
+
+    public void setEvaluator(Interpreter ev) {
+        eval =  ev;
+//        if (plugin != null) {
+//            plugin.setEvaluator(ev);
+//        }
     }
 
     public Interpreter getEvaluator() {
         return eval;
     }
 
-    public void setEvaluator(Interpreter ev) {
-        eval = ev;
-    }
+//    public void setPlugin(ProxyInterpreter p) {
+//        plugin = p;
+//        //plugin.setEvaluator(eval);
+//    }
+
+//    public ProxyInterpreter getPlugin() {
+//        return plugin;
+//    }
+//
+//    public ProxyInterpreter getComputerPlugin() {
+//        return plugin;
+//    }
 
     public GraphProcessor getGraphProcessor() {
+        //return plugin.getGraphProcessor();
         return null;
     }
 
     public ComputerProxy getComputerTransform() {
+        //return plugin.getComputerTransform();
         return null;
     }
 
-    public abstract void setMode(Evaluator.Mode mode);
+    public void setMode(int mode) {
+//        switch (mode) {
+//
+//            case Evaluator.SPARQL_MODE:
+//                SPARQLCompliant = true;
+//                break;
+//
+//            case Evaluator.KGRAM_MODE:
+//                SPARQLCompliant = false;
+//                break;
+//        }
+//        plugin.setMode(mode);
+    }
 
     public void start() {
         number = 0;
     }
 
-
+    
     public Producer getProducer() {
         return producer;
     }
 
-
+    
     // for Core & Extension
     public void setProducer(Producer producer) {
         this.producer = producer;
@@ -73,9 +125,9 @@ public abstract class ProxyInterpreter implements ExprType {
 
     public IDatatype getValue(boolean b) {
         if (b) {
-            return DatatypeMap.TRUE;
+            return TRUE;
         } else {
-            return DatatypeMap.FALSE;
+            return FALSE;
         }
     }
 
@@ -105,28 +157,38 @@ public abstract class ProxyInterpreter implements ExprType {
     }
 
     public Function getDefine(Expr exp, Environment env, String name, int n) throws EngineException {
+        //return plugin.getDefine(exp, env, name, n);
         return null;
     }
 
-    public abstract void start(Producer p, Environment env);
+    public void start(Producer p, Environment env) {
+        //plugin.start(p, env);
+    }
 
-    public abstract void finish(Producer p, Environment env);
+    public void finish(Producer p, Environment env) {
+        //plugin.finish(p, env);
+    }
 
+//    public IDatatype getBufferedValue(StringBuilder sb, Environment env) {
+//        //return plugin.getBufferedValue(sb, env);
+//        return null;
+//    }
+   
     public Environment getEnvironment() {
         return environment;
     }
 
-    // for Core & Extension
-    public void setEnvironment(Environment environment) {
-        this.environment = environment;
-    }
-
     public Context getContext() {
-        return getEval().getEvaluator().getContext(getEnvironment().getBind(), getEnvironment(), getProducer());
+        return ((Interpreter) getEval().getEvaluator()).getContext(getEnvironment().getBind(), getEnvironment(), getProducer());
     }
 
     public Eval getEval() {
         return getEnvironment().getEval();
+    }
+    
+    // for Core & Extension
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
 }

@@ -37,6 +37,7 @@ import java.util.List;
 public class DatatypeHierarchy implements Hierarchy {
     
     HashMap<String, List<String>> hierarchy;
+    private boolean debug = false;
     
     public DatatypeHierarchy() {
         hierarchy = new HashMap<String, List<String>>();
@@ -69,6 +70,12 @@ public class DatatypeHierarchy implements Hierarchy {
     public List<String> superTypes(String name) {
         return hierarchy.get(name);
     }
+
+//    public List<String> getSuperTypes(IDatatype value, IDatatype type) {
+//        List<String> list = getSuperTypes( value,  type);
+//        if (isDebug()) System.out.println("DH: " + value + " " + list);
+//        return list;
+//    }
       
     @Override
     public List<String> getSuperTypes(IDatatype dt, IDatatype type) {
@@ -91,11 +98,13 @@ public class DatatypeHierarchy implements Hierarchy {
     }
     
     void defResource(String name){
+        //defSuperType(name, name);
         defSuperType(name, IDatatype.RESOURCE_DATATYPE);
         defSuperType(name, IDatatype.ENTITY_DATATYPE);
     }
     
     void defLiteral(String name, String type) {
+        //defSuperType(name, name);
         defSuperType(name, type);
         defSuperType(name, IDatatype.LITERAL_DATATYPE);
         defSuperType(name, IDatatype.ENTITY_DATATYPE);
@@ -103,6 +112,20 @@ public class DatatypeHierarchy implements Hierarchy {
    
     IDatatype xt_kind(IDatatype dt) {
        return DatatypeMap.kind(dt);
+    }
+    
+     /**
+     * @return the debug
+     */
+    public boolean isDebug() {
+        return debug;
+    }
+
+    /**
+     * @param debug the debug to set
+     */
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 
 }

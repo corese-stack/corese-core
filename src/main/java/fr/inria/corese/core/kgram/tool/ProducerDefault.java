@@ -149,6 +149,8 @@ public class ProducerDefault implements Producer {
     public void close() {
     }
 
+    ;
+
     @Override
     public void start(Query q) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

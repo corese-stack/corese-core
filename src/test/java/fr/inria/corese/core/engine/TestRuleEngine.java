@@ -1,15 +1,16 @@
 package fr.inria.corese.core.engine;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.Date;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import fr.inria.corese.core.compiler.eval.QuerySolver;
+import fr.inria.corese.core.EdgeFactory;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphStore;
 import fr.inria.corese.core.api.Engine;
@@ -23,8 +24,6 @@ import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.storage.api.Parameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Test rule engines and pipeline
@@ -32,14 +31,12 @@ import org.slf4j.LoggerFactory;
  */
 public class TestRuleEngine {
 
-    private static final Logger logger = LoggerFactory.getLogger(TestRuleEngine.class);
-
     static String data = TestRuleEngine.class.getResource("/data-test/").getPath();
     static Graph graph;
     static Engine rengine;
     static RuleEngine fengine;
 
-    @BeforeAll
+    @BeforeClass
     public static void init() throws EngineException {
         QuerySolver.definePrefix("c", "http://www.inria.fr/acacia/comma#");
 
@@ -47,13 +44,17 @@ public class TestRuleEngine {
         Load load = Load.create(graph);
         QueryProcess.setPlanDefault(Query.QP_HEURISTICS_BASED);
         try {
+            System.out.println(data + "engine/ontology/test.rdfs");
+            System.out.println(data + "engine/data/test.rdf");
+            System.out.println(data + "engine/rule/test2.brul");
+            System.out.println(data + "engine/rule/meta.rul");
 
             load.parse(data + "engine/ontology/test.rdfs");
             load.parse(data + "engine/data/test.rdf");
             load.parse(data + "engine/rule/test2.brul");
             load.parse(data + "engine/rule/meta.rul", "meta.rul");
         } catch (LoadException e) {
-            logger.error("An error has occurred", e);
+            e.printStackTrace();
         }
 
         fengine = load.getRuleEngine();
@@ -62,8 +63,9 @@ public class TestRuleEngine {
         QueryProcess.create(graph);
     }
 
-    @AfterAll
+    @AfterClass
     static public void finish() {
+        EdgeFactory.trace();
     }
 
     static GraphStore createGraph() {
@@ -84,7 +86,7 @@ public class TestRuleEngine {
                 + "}";
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(q);
-        IDatatype dt = map.getValue("?g");
+        IDatatype dt = (IDatatype) map.getValue("?g");
         Graph gg = (Graph) dt.getPointerObject();
         assertEquals(7, gg.size());
     }
@@ -109,7 +111,7 @@ public class TestRuleEngine {
             re.defRule(rule);
             re.defRule(rule2);
         } catch (EngineException e1) {
-            logger.error("An error has occurred", e1);
+            e1.printStackTrace();
         }
 
         String init = "prefix e: <htp://example.org/>" + "insert data {"
@@ -123,13 +125,14 @@ public class TestRuleEngine {
 
         try {
             exec.query(init);
-
+            // re.setDebug(true);
             re.process();
             Mappings map = exec.query(query);
+            //// System.out.println(map);
+            assertEquals("Result", 1, map.size());
 
-            assertEquals(1, map.size(), "Result");
         } catch (EngineException e) {
-            logger.error("An error has occurred", e);
+            e.printStackTrace();
         }
 
     }
@@ -144,11 +147,12 @@ public class TestRuleEngine {
             ld.parse(data + "template/owl/data/primer.owl");
             ld.parse(data + "owlrule/owlrllite.rul");
         } catch (LoadException ex) {
-            logger.error("An error has occurred", ex);
-
+            System.out.println(ex);
+            throw ex;
         }
         RuleEngine re = ld.getRuleEngine();
-        re.setProfile(RuleEngine.ProfileType.OWL_RL_FULL);
+        // Date d1 = new Date();
+        re.setProfile(RuleEngine.OWL_RL_FULL);
         re.process();
 
         String q = "prefix f: <http://example.com/owl/families/>"
@@ -176,9 +180,11 @@ public class TestRuleEngine {
             ld.parse(data + "template/owl/data/primer.owl");
             ld.parse(data + "owlrule/owlrllite.rul");
         } catch (LoadException ex) {
-            logger.error("An error has occurred", ex);
+            System.out.println(ex);
         }
         RuleEngine re = ld.getRuleEngine();
+        // Date d1 = new Date();
+        // re.setProfile(re.OWL_RL);
         re.process();
 
         String q = "prefix f: <http://example.com/owl/families/>"
@@ -206,10 +212,10 @@ public class TestRuleEngine {
         try {
             ld.parse(data + "template/owl/data/primer.owl");
         } catch (LoadException ex) {
-            logger.error("An error has occurred", ex);
+            System.out.println(ex);
         }
         RuleEngine re = RuleEngine.create(gs);
-        re.setProfile(RuleEngine.ProfileType.OWL_RL);
+        re.setProfile(RuleEngine.OWL_RL);
         // Date d1 = new Date();
         re.process();
 
@@ -236,7 +242,7 @@ public class TestRuleEngine {
         Load ld = Load.create(g);
         ld.parse(data + "template/owl/data/primer.owl");
         RuleEngine re = RuleEngine.create(g);
-        re.setProfile(RuleEngine.ProfileType.OWL_RL_LITE);
+        re.setProfile(RuleEngine.OWL_RL_LITE);
         re.process();
 
         String q = "select * "
@@ -308,7 +314,7 @@ public class TestRuleEngine {
         Load ld = Load.create(g);
         ld.parse(data + "template/owl/data/primer.owl");
         RuleEngine re = RuleEngine.create(g);
-        re.setProfile(RuleEngine.ProfileType.OWL_RL_LITE);
+        re.setProfile(RuleEngine.OWL_RL_LITE);
         // re.process();
         g.addEngine(re);
         String q = "select * "
@@ -346,12 +352,11 @@ public class TestRuleEngine {
         Graph g = re.getRDFGraph();
 
         re.setSpeedUp(true);
-        logger.info("Graph: {}" , g.size());
+        System.out.println("Graph: " + g.size());
         Date d1 = new Date();
         re.process();
         Date d2 = new Date();
-        logger.info("** Time opt: {} ", (d2.getTime() - d1.getTime()) / (1000.0));
-
+        System.out.println("** Time opt: " + (d2.getTime() - d1.getTime()) / (1000.0));
         validate(g, 37735);
 
         assertEquals(54028, g.size());
@@ -362,11 +367,11 @@ public class TestRuleEngine {
         RuleEngine re = testRules();
         Graph g = re.getRDFGraph();
 
-        logger.info("Graph: {}" , g.size());
+        System.out.println("Graph: " + g.size());
         Date d1 = new Date();
         re.process();
         Date d2 = new Date();
-        logger.info("** Time opt: {} ", (d2.getTime() - d1.getTime()) / (1000.0));
+        System.out.println("** Time std: " + (d2.getTime() - d1.getTime()) / (1000.0));
 
         validate(g, 41109);
         assertEquals(57402, g.size());
@@ -383,7 +388,7 @@ public class TestRuleEngine {
         try {
             ld.parse(data + "owlrule/owlrllite-junit.rul");
         } catch (LoadException e) {
-            logger.error("An error has occurred", e);
+            e.printStackTrace();
         }
         RuleEngine re = ld.getRuleEngine();
         return re;
@@ -400,6 +405,48 @@ public class TestRuleEngine {
         assertEquals(n, map.size());
     }
 
+    // //@Test
+    // public void test1(){
+    //
+    // String query =
+    // "prefix c: <http://www.inria.fr/acacia/comma#>" +
+    // "select ?x ?y where { " +
+    // "?y c:hasSister ?z" +
+    // "?x c:hasBrother ?y " +
+    // "}";
+    //
+    // LBind bind = rengine.SPARQLProve(query);
+    // assertEquals("Result", 13, bind.size());
+    // }
+    //
+    //
+    // //@Test
+    // public void test2(){
+    //
+    // String query =
+    // "prefix c: <http://www.inria.fr/acacia/comma#>" +
+    // "select * where {" +
+    // "?x c:hasGrandParent c:Pierre " +
+    // "}";
+    //
+    // LBind bind = rengine.SPARQLProve(query);
+    // assertEquals("Result", 4, bind.size());
+    // }
+    //
+    //
+    // //@Test
+    // public void test3(){
+    //
+    // String query =
+    // "prefix c: <http://www.inria.fr/acacia/comma#>" +
+    // "select * where {" +
+    // "?x c:hasGrandParent c:Pierre ?x c:hasID ?id " +
+    // "}";
+    //
+    // LBind bind = rengine.SPARQLProve(query);
+    // assertEquals("Result", 0, bind.size());
+    // }
+
     @Test
     public void test4() throws EngineException {
 
@@ -413,9 +460,9 @@ public class TestRuleEngine {
         Mappings map;
         try {
             map = exec.query(query);
-            assertEquals(4, map.size(), "Result");
+            assertEquals("Result", 4, map.size());
         } catch (EngineException e) {
-            assertEquals("Result", e.getMessage());
+            assertEquals("Result", 4, e);
         }
     }
 
@@ -434,11 +481,13 @@ public class TestRuleEngine {
         Mappings map;
         try {
             map = exec.query(query);
-            assertEquals(4, map.size(), "Result");
+            assertEquals("Result", 4, map.size());
+
             map = exec.query(ent);
+            // System.out.println(map);
 
         } catch (EngineException e) {
-            assertEquals("Result", e.getMessage());
+            assertEquals("Result", 4, e);
         }
     }
 
@@ -453,8 +502,7 @@ public class TestRuleEngine {
 
         qe.process();
 
-        assertEquals(1, g.size(), "Result");
-
+        assertEquals("Result", 1, g.size());
     }
 
     @Test
@@ -473,11 +521,13 @@ public class TestRuleEngine {
         Mappings map;
         try {
             map = exec.query(query);
-            assertEquals(4, map.size(), "Result");
+            assertEquals("Result", 4, map.size());
+
             map = exec.query(ent);
+            // System.out.println(map);
 
         } catch (EngineException e) {
-            assertEquals("Result", e.getMessage());
+            assertEquals("Result", 4, e);
         }
     }
 

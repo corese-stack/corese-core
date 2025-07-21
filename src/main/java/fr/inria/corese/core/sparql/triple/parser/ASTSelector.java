@@ -142,7 +142,8 @@ public class ASTSelector {
                     if (join(exp.getTriple(), t, uri)) {
                         suc = true;
                     } else {
-                         return false;
+                        //System.out.println("sel skip: " + t + " " + exp.getTriple());
+                        return false;
                     }
                 }
             }

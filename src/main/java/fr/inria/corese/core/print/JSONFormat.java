@@ -206,7 +206,7 @@ public class JSONFormat extends AbstractNestedResultFormat {
         if (dt.isLiteral()) {
             if (dt.hasLang()) {
                 printf("\"literal\", \"xml:lang\": \"%s\"", dt.getLang());
-            } else if (dt.getCode() == IDatatype.Datatype.LITERAL) {
+            } else if (dt.getCode() == IDatatype.LITERAL) {
                 print("\"literal\"");
             } else {
                 if (DatatypeMap.isDouble(dt)) {

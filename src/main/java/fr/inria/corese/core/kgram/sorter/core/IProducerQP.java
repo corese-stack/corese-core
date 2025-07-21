@@ -17,7 +17,7 @@ public interface IProducerQP {
      *              SUBJECT( PREDICATE| OBJECT): return the number of disinct SUBJECT( PREDICATE| OBJECT)
      * @return 
      */
-    int getSize(int type);
+    public int getSize(int type);
 
     /**
      * Return the count of triples according the given type
@@ -25,5 +25,5 @@ public interface IProducerQP {
      * @param type
      * @return 
      */
-    int getCount(QPGNode n, int type);
+    public int getCount(QPGNode n, int type);
 }

@@ -1,43 +1,65 @@
 package fr.inria.corese.core.compiler.eval;
 
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.compiler.api.QueryVisitor;
 import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.compiler.parser.Transformer;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.query.*;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.Provider;
+import fr.inria.corese.core.kgram.api.query.SPARQLEngine;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.kgram.core.*;
+import fr.inria.corese.core.kgram.core.Sorter;
+import fr.inria.corese.core.kgram.core.SparqlException;
 import fr.inria.corese.core.kgram.event.EventListener;
 import fr.inria.corese.core.kgram.event.EventManager;
 import fr.inria.corese.core.kgram.event.ResultListener;
 import fr.inria.corese.core.kgram.tool.MetaProducer;
-import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.AccessRight;
+import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Evaluator of SPARQL query by KGRAM Ready to use Package with KGRAM and SPARQL
- * Parser &amp; Transformer
+ * Parser & Transformer
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
+ *
  */
 public class QuerySolver implements SPARQLEngine {
 
+    private static Logger logger = LoggerFactory.getLogger(QuerySolver.class);
     public static final String MAIN_FUN = NSManager.EXT + "main";
+
     public static final int STD_ENTAILMENT = 0;
     public static final int RDF_ENTAILMENT = 1;
     public static final int RDFS_ENTAILMENT = 2;
-    private static final Logger logger = LoggerFactory.getLogger(QuerySolver.class);
     public static int QUERY_PLAN = Query.QP_DEFAULT;
     public static boolean BGP_DEFAULT = false;
     public static boolean ALGEBRA_DEFAULT = false;
@@ -45,8 +67,11 @@ public class QuerySolver implements SPARQLEngine {
     // true: do not join 1 and 1.0 
     // true: from named without from is sparql compliant
     public static boolean SPARQL_COMPLIANT_DEFAULT = false;
-    static String NAMESPACES;
     private static boolean visitorable = false;
+
+    static String NAMESPACES;
+    private static Metadata defaultMetadata;
+
     protected EventManager manager;
     protected ResultListener listener;
     protected Producer producer;
@@ -55,22 +80,17 @@ public class QuerySolver implements SPARQLEngine {
     protected Matcher matcher;
     protected Sorter sort;
     protected List<QueryVisitor> visit;
+    private List<Atom> serviceList;
+    // use case: reuse federated visitor source selection
+    private Mappings mappings;
+
     boolean isListGroup = false,
             isListPath = true,
             isCountPath = false,
             isCheckLoop = false,
             isDebug = false,
-            isOptimize = false,
+            isOptimize = false,            
             isSPARQLCompliant = SPARQL_COMPLIANT_DEFAULT;
-    boolean isSequence = false;
-    int slice = Query.DEFAULT_SLICE;
-    // set default base for SPARQL Query
-    // it is overloaded if query has a base (cf prefix/base)
-    // use case: expand from <data.ttl> in manifest.ttl
-    String defaultBase;
-    Eval current;
-    // use case: reuse federated visitor source selection
-    private Mappings mappings;
     private boolean isGenerateMain = true;
     private boolean isSynchronized = false;
     private boolean isPathType = false;
@@ -85,12 +105,31 @@ public class QuerySolver implements SPARQLEngine {
     private boolean isMatchBlank = false;
     // skolemize construct/describe result graphs (and only them)
     private boolean isSkolem = false;
+
     private boolean isDetail = false;
+
+    boolean isSequence = false;
+
+    int slice = Query.DEFAULT_SLICE;
+    //private int mode = INIT_SERVER_MODE;
+
+    // set default base for SPARQL Query
+    // it is overloaded if query has a base (cf prefix/base)
+    // use case: expand from <data.ttl> in manifest.ttl
+    String defaultBase;
+
     private BasicGraphPattern pragma;
     private Metadata metadata;
     private Binding binding;
+
+    static int count = 0;
+
+    private AccessRight accessRight;
+
+    static boolean test = true;
     private int planner = QUERY_PLAN;
     private boolean isUseBind = false;
+    Eval current;
 
     public QuerySolver() {
     }
@@ -110,33 +149,6 @@ public class QuerySolver implements SPARQLEngine {
         QUERY_PLAN = n;
     }
 
-    public static void defaultNamespaces(String ns) {
-        NAMESPACES = ns;
-    }
-
-    public static void definePrefix(String pref, String ns) {
-        if (NAMESPACES == null) {
-            NAMESPACES = "";
-        }
-        NAMESPACES += pref + " " + ns + " ";
-    }
-
-    public static void testAlgebra(boolean b) {
-        BGP_DEFAULT = b;
-        ALGEBRA_DEFAULT = b;
-    }
-
-    public static boolean isVisitorable() {
-        return visitorable;
-    }
-
-    /**
-     * @param aVisitorable the visitorable to set
-     */
-    public static void setVisitorable(boolean aVisitorable) {
-        visitorable = aVisitorable;
-    }
-
     public void add(Producer prod) {
         MetaProducer meta;
         if (producer instanceof MetaProducer) {
@@ -153,15 +165,15 @@ public class QuerySolver implements SPARQLEngine {
     public void set(Sorter s) {
         sort = s;
     }
-
+    
     public ContextLog getLog(Mappings map) {
         return getLog();
     }
-
+    
     public ContextLog getLog() {
         return getCreateBinding().getCreateLog();
     }
-
+    
     public ContextLog getCreateLog() {
         return getCreateBinding().getCreateLog();
     }
@@ -193,19 +205,25 @@ public class QuerySolver implements SPARQLEngine {
         return provider;
     }
 
-    public void setDefaultBase(String str) {
-        setBase(str);
+    public void setSPARQL1(boolean b) {
     }
 
-    public String getBase() {
-        return defaultBase;
+    public static void defaultSPARQL1(boolean b) {
+    }
+
+    public void setDefaultBase(String str) {
+        setBase(str);
     }
 
     public void setBase(String str) {
         defaultBase = str;
     }
 
-    public Transformer transformer() {
+    public String getBase() {
+        return defaultBase;
+    }
+
+   public Transformer transformer() {
         Transformer transformer = Transformer.create();
         transformer.setSPARQLEngine(this);
         if (sort != null) {
@@ -223,29 +241,32 @@ public class QuerySolver implements SPARQLEngine {
     public Mappings basicQuery(ASTQuery ast) throws EngineException {
         return basicQuery(ast, null, null);
     }
-
+    
     public Mappings basicQuery(ASTQuery ast, Context ct) throws EngineException {
         return basicQuery(ast, null, Dataset.create(ct));
     }
-
-    /**
-     * Dataset may contain Binding and/or Context
+    
+     /**
+     * Dataset may contain Binding and/or Context 
      * Prepare Mapping with Binding/Context for Eval query processing
      * Binding records Context if any
      * Note that st:get/st:set consider Context in Query (cf PluginTransform getContext())
-     * ProviderService consider Context in Binding
-     * Hence we have  Context both in Query and in Binding
+     * ProviderService consider Context in Binding 
+     * Hence we have  Context both in Query and in Binding 
+     * 
      */
     public Mapping completeMappings(Query q, Mapping m, Dataset ds) {
-        if (q.getContext() != null && ds == null) {
+        if (q.getContext()!=null && ds==null) {
             // use case: federate visitor create context
             ds = Dataset.create(q.getContext());
         }
-        if (ds != null && (ds.getBinding() != null || ds.getContext() != null)) {
-            if (m == null) {
-                m = new Mapping();
+        if (ds != null) {           
+            if (ds.getBinding() != null || ds.getContext() != null) {
+                if (m == null) {
+                    m = new Mapping();
+                }
+                return ds.call(m);
             }
-            return ds.call(m);
         }
         return m;
     }
@@ -255,7 +276,7 @@ public class QuerySolver implements SPARQLEngine {
         m = completeMappings(query, m, ds);
         return query(query, m);
     }
-
+  
     public Mappings query(String squery) throws EngineException {
         return query(squery, null, null);
     }
@@ -268,14 +289,14 @@ public class QuerySolver implements SPARQLEngine {
         Query query = compile(squery, ds);
         return query(query, map);
     }
-
+    
     public Mappings query(Query query) throws EngineException {
         return query(query, null);
     }
 
     @Override
     public Mappings eval(Query query, Mapping m, Producer p) throws SparqlException {
-        return query(null, query, m);
+        return query((Node) null, query, m);
     }
 
     @Override
@@ -287,7 +308,7 @@ public class QuerySolver implements SPARQLEngine {
      * Core QueryExec processor
      */
     public Mappings query(Query query, Mapping m) throws EngineException {
-        return query(null, query, m);
+        return query((Node) null, query, m);
     }
 
     /**
@@ -295,6 +316,7 @@ public class QuerySolver implements SPARQLEngine {
      */
     public Mappings query(Node gNode, Query query, Mapping m) throws EngineException {
         init(query);
+        debug(query);
 
         if (getProducer() instanceof MetaProducer) {
             query.setDistribute(true);
@@ -322,14 +344,14 @@ public class QuerySolver implements SPARQLEngine {
     }
 
     void before(Query q) {
-        ASTQuery ast = q.getAST();
+        ASTQuery ast =  q.getAST();
         for (fr.inria.corese.core.sparql.api.QueryVisitor vis : ast.getVisitorList()) {
             vis.before(q);
         }
     }
 
     void after(Mappings map) {
-        ASTQuery ast = map.getQuery().getAST();
+        ASTQuery ast =  map.getQuery().getAST();
         for (fr.inria.corese.core.sparql.api.QueryVisitor vis : ast.getVisitorList()) {
             vis.after(map);
         }
@@ -349,7 +371,7 @@ public class QuerySolver implements SPARQLEngine {
      * If a query has been executed, return Environment Binding
      * otherwise, create a temporary local Binding
      * Use case:  @federate need a Binding
-     * PRAGMA:
+     * PRAGMA: 
      * if a query is executed later, the two Binding will differ
      */
     public Binding getCreateBinding() {
@@ -362,29 +384,29 @@ public class QuerySolver implements SPARQLEngine {
         }
         return bind;
     }
-
-    public Binding getCreateBinding(Mapping m) {
+    
+    public Binding getCreateBinding (Mapping m) {
         Binding b = getBinding(m);
         if (b != null) {
             return b;
         }
         return getCreateBinding();
     }
-
+    
     public Binding getBinding(Mapping m) {
         if (m == null) {
             return null;
         }
         return m.getBind();
     }
-
+    
     public Environment getEnvironment() {
         if (getCurrentEval() == null) {
             return null;
         }
         return getCurrentEval().getEnvironment();
     }
-
+    
     public Context getContext() {
         return getCreateBinding().getCreateContext();
     }
@@ -394,21 +416,22 @@ public class QuerySolver implements SPARQLEngine {
             current.finish();
         }
     }
-
+        
     public Mappings modifier(Query q, Mappings map) throws SparqlException {
         if (getCurrentEval() == null) {
             logger.info("Undefined Eval");
             return getCreateEval().modifier(q, map);
-        } else {
+        }
+        else {
             return getCurrentEval().modifier(q, map);
         }
     }
-
+    
     // defined in QueryProcess
-    public Eval getCreateEval() throws EngineException {
+    public Eval getCreateEval() throws EngineException{
         return null;
     }
-
+    
     public Eval getCurrentEval() {
         return current;
     }
@@ -417,8 +440,13 @@ public class QuerySolver implements SPARQLEngine {
         current = e;
     }
 
+//    public void setEval(Eval e) {
+//        setCurrentEval(e);
+//    }
+
     void tune(Eval kgram, Query q, Mapping m) {
-        ASTQuery ast = q.getAST();
+        ASTQuery ast =  q.getAST();
+//        boolean event = ast.hasMetadata(Metadata.EVENT);
         boolean event = true;
         // Dataset ds parameter in QueryProcess is set as ast defaultDataset
         tune(kgram, ast.getDefaultDataset(), m, event);
@@ -434,16 +462,17 @@ public class QuerySolver implements SPARQLEngine {
 
     void tune(Eval kgram, Dataset ds, Mapping m, boolean isVisitor) {
         if ((isVisitor || isVisitorable()) && isEvent(m)) {
-            if (ds != null && ds.getVisitor() != null) {
+            if (ds != null && ds.getVisitor()!= null) {
                 ds.getVisitor().setProcessor(kgram);
                 kgram.setVisitor(ds.getVisitor());
-            } else {
+            }
+            else {
                 kgram.setVisitor(createProcessVisitor(kgram));
             }
         }
         kgram.getVisitor().setDefaultValue(DatatypeMap.TRUE);
     }
-
+    
     boolean isEvent(Mapping m) {
         return Access.accept(Feature.EVENT, Access.getLevel(m));
     }
@@ -461,6 +490,7 @@ public class QuerySolver implements SPARQLEngine {
     }
 
     /**
+     *
      * @return an Eval able to execute callback functions str contains function
      * definitions
      * @throws EngineException
@@ -484,9 +514,26 @@ public class QuerySolver implements SPARQLEngine {
     }
 
     @Deprecated
-    public IDatatype eval(String q) {
+    public IDatatype eval(String q) throws EngineException {
         return DatatypeMap.TRUE;
     }
+//
+//    public IDatatype eval(String q, Dataset ds) throws EngineException {
+//        return eval(q, MAIN_FUN, ds);
+//    }
+//
+//    IDatatype eval(String q, String name, Dataset ds) throws EngineException {
+//        setGenerateMain(false);
+//        Eval kgram = createEval(q, ds);
+//        setEval(kgram);
+//        IDatatype dt = funcall(name);
+//        return dt;
+//    }
+//    
+//    // overriden by QueryProcess
+//    public IDatatype funcall(String name, IDatatype... param) throws EngineException {
+//        return null;
+//    }
 
     void init(Query q) {
         // use case: OWL RL kg:sparql(query) in a rule
@@ -504,6 +551,9 @@ public class QuerySolver implements SPARQLEngine {
         q.setCheckLoop(isCheckLoop);
         q.setDetail(q.isDetail() || isDetail);
         q.setSlice(slice);
+        if (isDebug()) {
+            q.setDebug(isDebug());
+        }
         if (isOptimize) {
             q.setOptimize(isOptimize);
         }
@@ -530,7 +580,7 @@ public class QuerySolver implements SPARQLEngine {
     }
 
     public ASTQuery getAST(Query q) {
-        return q.getAST();
+        return  q.getAST();
     }
 
     public ASTQuery getAST(Mappings lm) {
@@ -549,11 +599,17 @@ public class QuerySolver implements SPARQLEngine {
         listener = el;
     }
 
+    public void removeResultListener(ResultListener el) {
+        if (listener == el) {
+            listener = null;
+        }
+    }
+
     public Query compile(String squery) throws EngineException {
         return compile(squery, null);
     }
 
-    // rule: construct where
+    // rule: construct where 
     public Query compileRule(String squery) throws EngineException {
         return compileRule(squery, null);
     }
@@ -572,19 +628,21 @@ public class QuerySolver implements SPARQLEngine {
 
     public Query compileRule(String squery, Dataset ds) throws EngineException {
         Transformer transformer = createTransformer(ds);
-        return transformer.transform(squery, true);
+        Query query = transformer.transform(squery, true);
+        return query;
     }
 
     public Query compile(String squery, Dataset ds) throws EngineException {
         Transformer transformer = createTransformer(ds);
         transformer.setSPARQLCompliant(isSPARQLCompliant);
-        return transformer.transform(squery);
+        Query query = transformer.transform(squery);
+        return query;
     }
-
+    
     public ASTQuery parse(String q) throws EngineException {
         return parse(q, (Dataset) null);
     }
-
+    
     public ASTQuery parse(String q, Dataset ds) throws EngineException {
         Transformer transformer = createTransformer(ds);
         return transformer.parse(q);
@@ -597,7 +655,7 @@ public class QuerySolver implements SPARQLEngine {
         transformer.set(ds);
         return transformer;
     }
-
+    
     public Query compile(ASTQuery ast, Dataset ds) throws EngineException {
         if (ds != null) {
             ast.setDefaultDataset(ds);
@@ -616,12 +674,29 @@ public class QuerySolver implements SPARQLEngine {
         completeCompile(query);
         return query;
     }
-
+    
     // FederateVisitor set data in ast Log
     // share it in solver log
     void completeCompile(Query query) {
         if (query.isFederate()) {
             getLog().share(query.getAST().getLog());
+        }
+    }
+
+//    Query compileFilter(String filter) throws EngineException {
+//        String str = "select * where {} having(" + filter + ")";
+//        Query q = compile(str);
+//        return q;
+//    }
+
+
+    void debug(Query query) {
+        if (query.isDebug()) {
+            logger.debug(query.getBody().toString());
+            logger.debug("limit " + query.getLimit());
+            if (query.isFail()) {
+                logger.debug("Fail at compile time");
+            }
         }
     }
 
@@ -635,7 +710,7 @@ public class QuerySolver implements SPARQLEngine {
     }
 
     void pragma(Eval kgram, Query query) {
-        ASTQuery ast = query.getAST();
+        ASTQuery ast =  query.getAST();
         Pragma pg = new Pragma(kgram, query, ast);
         if (getPragma() != null) {
             pg.parse(getPragma());
@@ -667,6 +742,17 @@ public class QuerySolver implements SPARQLEngine {
         getPragma().add(Triple.create(subject, property, value));
     }
 
+    public static void defaultNamespaces(String ns) {
+        NAMESPACES = ns;
+    }
+
+    public static void definePrefix(String pref, String ns) {
+        if (NAMESPACES == null) {
+            NAMESPACES = "";
+        }
+        NAMESPACES += pref + " " + ns + " ";
+    }
+
     public void setListGroup(boolean b) {
         isListGroup = b;
     }
@@ -683,20 +769,20 @@ public class QuerySolver implements SPARQLEngine {
         isCheckLoop = !b;
     }
 
-    boolean isSPARQLCompliant() {
-        return isSPARQLCompliant;
-    }
-
     public void setSPARQLCompliant(boolean isSPARQLCompliant) {
         this.isSPARQLCompliant = isSPARQLCompliant;
     }
 
-    public boolean isDebug() {
-        return isDebug;
+    boolean isSPARQLCompliant() {
+        return isSPARQLCompliant;
     }
 
     public void setDebug(boolean b) {
         isDebug = b;
+    }
+
+    public boolean isDebug() {
+        return isDebug;
     }
 
     public void setOptimize(boolean b) {
@@ -807,30 +893,56 @@ public class QuerySolver implements SPARQLEngine {
         this.isCachePath = isCachePath;
     }
 
+//    /**
+//     * @return the mode
+//     */
+//    public int getMode() {
+//        return mode;
+//    }
+//
+//    /**
+//     * @param mode the mode to set
+//     */
+//    public void setMode(int mode) {
+//        this.mode = mode;
+//        //initMode();
+//    }
+//
+//    static public void setModeDefault(int mode) {
+//        INIT_SERVER_MODE = mode;
+//    }
+
+//    public void initMode() {
+//    }
+    
     // true = skip Lock ;  false = with Lock
     @Override
     public boolean isSynchronized() {
         return isSynchronized;
     }
-
+   
     // true = skip Lock ;  false = with Lock
     @Override
     public void setSynchronized(boolean isSynchronized) {
         this.isSynchronized = isSynchronized;
     }
 
+    
     public boolean isUseBind() {
         return isUseBind;
     }
 
+    
     public void setUseBind(boolean isUseBind) {
         this.isUseBind = isUseBind;
     }
 
+    
     public boolean isGenerateMain() {
         return isGenerateMain;
     }
 
+    
     public void setGenerateMain(boolean isGenerateMain) {
         this.isGenerateMain = isGenerateMain;
     }
@@ -838,11 +950,10 @@ public class QuerySolver implements SPARQLEngine {
     public Query parseQuery(String path) throws EngineException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     public Query parseQuery(String path, Level level) throws EngineException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
     public ASTQuery parse(String path, Level level) throws EngineException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -851,10 +962,12 @@ public class QuerySolver implements SPARQLEngine {
         return getMetadata();
     }
 
+    
     public Metadata getMetadata() {
         return metadata;
     }
 
+    
     public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
     }
@@ -863,14 +976,34 @@ public class QuerySolver implements SPARQLEngine {
         this.metadata = metadata;
     }
 
+    
     public boolean isRule() {
         return isRule;
     }
 
+   
     public void setRule(boolean rule) {
         this.isRule = rule;
     }
 
+    
+//    public List<Atom> getServiceList() {
+//        return serviceList;
+//    }
+//
+//    
+//    public void setServiceList(List<Atom> serviceList) {
+//        this.serviceList = serviceList;
+//    }
+
+//    public void service(String uri) {
+//        if (getServiceList() == null) {
+//            setServiceList(new ArrayList<Atom>());
+//        }
+//        getServiceList().add(Constant.createResource(uri));
+//    }
+
+   
     public boolean isAlgebra() {
         return algebra;
     }
@@ -884,10 +1017,17 @@ public class QuerySolver implements SPARQLEngine {
         this.algebra = algebra;
     }
 
+    public static void testAlgebra(boolean b) {
+        BGP_DEFAULT = b;
+        ALGEBRA_DEFAULT = b;
+    }
+
+    
     public boolean isBGP() {
         return isBGP;
     }
 
+   
     public void setBGP(boolean BGP) {
         this.isBGP = BGP;
     }
@@ -896,12 +1036,24 @@ public class QuerySolver implements SPARQLEngine {
     public void getLinkedFunction(String uri) throws EngineException {
     }
 
-    public Binding getBinding() {
-        return binding;
+   
+    public static boolean isVisitorable() {
+        return visitorable;
+    }
+
+    /**
+     * @param aVisitorable the visitorable to set
+     */
+    public static void setVisitorable(boolean aVisitorable) {
+        visitorable = aVisitorable;
     }
 
     public void setBinding(Binding binding) {
         this.binding = binding;
+    }
+
+    public Binding getBinding() {
+        return binding;
     }
 
     public Mappings getMappings() {

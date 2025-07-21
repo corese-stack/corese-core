@@ -20,6 +20,8 @@ public class QuerySolverVisitorTransformerUser extends QuerySolverVisitorTransfo
     
     @Override
     public IDatatype afterTransformer(String uri, String res) {
+        System.out.println("User defined transformer: " + uri);
+        System.out.println(res);
         return DatatypeMap.TRUE;
     }
 

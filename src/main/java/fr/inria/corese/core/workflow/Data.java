@@ -1,31 +1,30 @@
 package fr.inria.corese.core.workflow;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import fr.inria.corese.core.EventManager;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.transform.TemplateVisitor;
+import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.Dataset;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.transform.TemplateVisitor;
-import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
+ *
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
+ *
  */
 public class Data {
-
-    private static final Logger logger = LoggerFactory.getLogger(Data.class);
 
     private Dataset dataset;
     private WorkflowProcess process;
@@ -80,6 +79,7 @@ public class Data {
         Data data = new Data(process, map, graph);
         data.setDatatypeValue(datatype);
         data.setDataList(dataList);
+        // data.setVisitor(visitor);
         data.setDataset(dataset);
         data.setContext(context);
         data.setTemplateResult(templateResult);
@@ -100,7 +100,7 @@ public class Data {
             return QuerySolverVisitorTransformer
                     .create(QueryProcess.create(getGraph(), getDataManager()).getCreateEval());
         } catch (EngineException ex) {
-            logger.error("An unexpected error has occurred", ex);
+            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
@@ -162,6 +162,15 @@ public class Data {
         this.context = context;
     }
 
+    // public TemplateVisitor getVisitor() {
+    // return visitor;
+    // }
+    //
+    //
+    // public void setVisitor(TemplateVisitor visitor) {
+    // this.visitor = visitor;
+    // }
+
     public Graph getVisitedGraph() {
         TemplateVisitor vis = getTransformerVisitor();
         if (vis == null) {
@@ -176,6 +185,13 @@ public class Data {
         }
         return (TemplateVisitor) getBinding().getTransformerVisitor();
     }
+
+    // public Graph getVisitedGraph(){
+    // if (getVisitor() == null){
+    // return null;
+    // }
+    // return getVisitor().visitedGraph();
+    // }
 
     public String getTemplateResult() {
         return templateResult;
@@ -205,13 +221,9 @@ public class Data {
         return dataList;
     }
 
-    public void setDataList(List<Data> dataList) {
-        this.dataList = dataList;
-    }
-
     public List<Data> getResultList() {
         if (dataList == null) {
-            return new ArrayList<>();
+            return new ArrayList<Data>();
         }
         return dataList;
     }
@@ -250,7 +262,7 @@ public class Data {
     }
 
     IDatatype getTransformationList() {
-        ArrayList<IDatatype> list = new ArrayList<>();
+        ArrayList<IDatatype> list = new ArrayList<IDatatype>();
         for (Data d : getDataList()) {
             if (d.getTemplateResult() != null) {
                 list.add(d.getDatatypeValue());
@@ -275,16 +287,22 @@ public class Data {
         if (c != null) {
             ds.setContext(c);
         }
-
+        // if (getVisitor()!= null) {
+        // ds.setTemplateVisitor(getVisitor());
+        // }
         if (getBinding() != null) {
             ds.setBinding(getBinding());
         }
         return ds;
     }
 
+    public void setDataList(List<Data> dataList) {
+        this.dataList = dataList;
+    }
+
     void addData(Data d) {
         if (dataList == null) {
-            dataList = new ArrayList<>();
+            dataList = new ArrayList<Data>();
         }
         dataList.add(d);
     }

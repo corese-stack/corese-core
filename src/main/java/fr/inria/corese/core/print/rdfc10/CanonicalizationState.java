@@ -71,6 +71,7 @@ public class CanonicalizationState {
      * Retrieves blanks nodes associated with a specific hash value.
      * 
      * @param hash The hash value.
+     * @return A list of blank nodes associated with the hash value.
      */
     public void removeHash(String hash) {
         this.hashToBlankNode.remove(hash);

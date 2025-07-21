@@ -6,8 +6,6 @@ import java.io.InputStreamReader;
 import java.util.Hashtable;
 
 import javax.swing.JOptionPane;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -17,9 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class UserImpl implements User {
-
-	private static final Logger logger = LoggerFactory.getLogger(UserImpl.class);
-
+	
 	BufferedReader read;
 	Hashtable<String, Integer> table;
 	Hashtable<String, String> tableButton;
@@ -75,7 +71,7 @@ public class UserImpl implements User {
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.error("Operation failure", e);
+			e.printStackTrace();
 		}
 		return Event.STEP;
 

@@ -33,7 +33,7 @@ import org.w3c.dom.Attr;
  */
 public class RuleLoad {
 
-    private static final Logger logger = LoggerFactory.getLogger(Load.class);
+    private static Logger logger = LoggerFactory.getLogger(Load.class);
     static final String NS  = NSManager.RULE;
     static final String NS2 = "http://ns.inria.fr/edelweiss/2011/rule#";
     static final String NS1 = "http://ns.inria.fr/corese/2008/rule#";
@@ -255,7 +255,7 @@ public class RuleLoad {
             try {
                 engine.defRule(rule);
             } catch (EngineException e) {
-                logger.error("An error has occurred", e);
+                e.printStackTrace();
             }
         }
     }

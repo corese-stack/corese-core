@@ -1,7 +1,11 @@
 package fr.inria.corese.core.compiler.federate;
 
-import fr.inria.corese.core.sparql.triple.parser.*;
-
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Union;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +36,7 @@ import java.util.List;
 public class RewriteBGPList {
     public static boolean BGP_LIST = true;
     public static boolean TRACE_BGP_LIST = false;
-    private static final boolean MERGE_EVEN_IF_NOT_CONNECTED = true;
+    private static boolean MERGE_EVEN_IF_NOT_CONNECTED = true;
     
     private FederateVisitor visitor;
     // connected bgp of triple with one uri (deprecated)
@@ -65,6 +69,7 @@ public class RewriteBGPList {
             // partition means cover body with partition of triple
             // complete each partition with missing triple from body
             List<List<BasicGraphPattern>> partitionList = partition(sortedList);
+            trace(sortedList, partitionList);
             
             for (List<BasicGraphPattern> bgpList : partitionList) {
                 // rewrite each partition of bgp as service {bgp} 
@@ -105,8 +110,9 @@ public class RewriteBGPList {
         for (Exp exp : filterList) {
             body.getBody().remove(exp);
         }
-
-        return union(list, 0);
+        
+        Exp union = union(list, 0);               
+        return union;
     }
     
     // rewrite one bgpList partition of connected bgp as list of service {bgp}
@@ -135,6 +141,7 @@ public class RewriteBGPList {
             if (! contains(bgpList, triple)) {
                 Service service = getVisitor().getRewriteTriple()
                  .rewriteTripleWithSeveralURI(namedGraph, triple, body, filterList);
+               // getVisitor().filter(body, service.getBodyExp());
                 exp.add(service);
             }
         }
@@ -154,8 +161,10 @@ public class RewriteBGPList {
         // @hint: 
         // merge(true)  merge all bgp
         // merge(false) merge connected bgp only
+        ctrace("before simplify: %s", exp);
         getVisitor().getSimplify().merge(exp, isMergeEvenIfNotConnected());
         // @todo: filter
+        ctrace("after simplify: %s", exp);
         return exp;
     }
         
@@ -191,10 +200,14 @@ public class RewriteBGPList {
         
         // natural partition with |bgp|>1 and |uri|=1, if any
         List<BasicGraphPattern> partition = bgp2uri.partition();
+        ctrace("natural partition:\n%s", partition);
         // remove natural partition from candidate bgpList, if any
-        List<BasicGraphPattern> subList = substract(bgpList, partition);
+        List<BasicGraphPattern> subList = substract(bgpList, partition); 
+        ctrace("start bgpList:\n%s", subList);
         // start rec computing with natural partition, if any
-        rec(subList, partition, res, 0);
+        rec(subList, partition, res, 0); 
+        ctrace("list: %s", uriList2bgp.getTripleList());
+        ctrace("map: %s", bgp2uri);
         return res;
     }
     
@@ -235,6 +248,29 @@ public class RewriteBGPList {
             // no more recursive call, there is a solution: record it
             resList.add(List.copyOf(res));
         }
+    }   
+    
+    void ctrace(String mes, Object... obj) {
+        if (TRACE_BGP_LIST) {
+            trace(mes, obj);
+        }
+    }
+    
+    void trace(String mes, Object... obj) {
+        System.out.println(String.format(mes, obj));
+    }
+        
+    void trace(List<BasicGraphPattern> sortedList, List<List<BasicGraphPattern>> alist) {
+        if (TRACE_BGP_LIST) {
+            for (BasicGraphPattern bgp : sortedList) {
+                trace("bgp: %s", bgp);
+                trace("");
+            }
+            for (List<BasicGraphPattern> ll : alist) {
+                trace("partition: %s",ll);
+                trace("");
+            }
+        }
     }
     
     Exp union(List<Exp> list, int n) {
@@ -271,7 +307,12 @@ public class RewriteBGPList {
                 if (uriList.size()>nbUri) {
                     nbUri = uriList.size();
                 }
+                trace("%s\n%s", uriList, bgp);
             }
+            if (count==size && nbUri==1) {
+                trace("complete");
+            }
+            trace("__");
         }
     }
 

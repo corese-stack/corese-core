@@ -7,7 +7,7 @@ import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 public class NodeImpl extends fr.inria.corese.core.kgram.tool.NodeImpl {
 
-
+   
     public NodeImpl(Atom at) {
         super(at);
     }

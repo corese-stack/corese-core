@@ -23,24 +23,26 @@ public class Options {
 
     //*** hash triple table ***
     private static final double HTT_MAX_SIZE = 1000;
+    //private static final double HTT_PRE = 10;
+    //private static final double HTT_OBJ = 100;
 
     //*** default parameters for each algorithm ***
-    public static final double[] DEF_PARA_CUTOFF = new double[]{RES_LIMIT_TOP, TRI_LIMIT_TOP, RES_LIMIT_BOTTOM, TRI_LIMIT_BOTTOM};
-    public static final double[] DEF_PARA_HASH = new double[]{BUCKET_SIZE_MIN, BUCKET_NUMBER_MAX};
-    public static final double[] DEF_PARA_HTT = new double[]{HTT_MAX_SIZE, HTT_MAX_SIZE};
+    public final static double[] DEF_PARA_CUTOFF = new double[]{RES_LIMIT_TOP, TRI_LIMIT_TOP, RES_LIMIT_BOTTOM, TRI_LIMIT_BOTTOM};
+    public final static double[] DEF_PARA_HASH = new double[]{BUCKET_SIZE_MIN, BUCKET_NUMBER_MAX};
+    public final static double[] DEF_PARA_HTT = new double[]{HTT_MAX_SIZE, HTT_MAX_SIZE};
 
     //For class Options
-    public static final int HT_HASH = 10;
-    public static final int HT_FULL = 20;
-    public static final int HT_CUTOFF = 30;
-    public static final int HT_AVERAGE = 40;
-    public static final int HT_TRIPLE_HASH = 50;
+    public final static int HT_HASH = 10;
+    public final static int HT_FULL = 20;
+    public final static int HT_CUTOFF = 30;
+    public final static int HT_AVERAGE = 40;
+    public final static int HT_TRIPLE_HASH = 50;
 
     //default options for triple (sub, pre, obj), etc..
-    public static final int DEF_OPT_SUB = 11;
-    public static final int DEF_OPT_PRE = 22;
-    public static final int DEF_OPT_OBJ = 33;
-    public static final int DEF_OPT_TRIPLE = 44;
+    public final static int DEF_OPT_SUB = 11;
+    public final static int DEF_OPT_PRE = 22;
+    public final static int DEF_OPT_OBJ = 33;
+    public final static int DEF_OPT_TRIPLE = 44;
 
     private final int heuristic;
     private final int nodeType;

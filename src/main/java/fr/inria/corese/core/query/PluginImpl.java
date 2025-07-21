@@ -1,23 +1,30 @@
 package fr.inria.corese.core.query;
 
+import static fr.inria.corese.core.kgram.api.core.PointerType.GRAPH;
+import static fr.inria.corese.core.kgram.api.core.PointerType.MAPPINGS;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
+import fr.inria.corese.core.util.GraphListen;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import fr.inria.corese.core.compiler.eval.ProxyInterpreter;
+import fr.inria.corese.core.compiler.eval.QuerySolver;
+import fr.inria.corese.core.compiler.eval.QuerySolverVisitorBasic;
+import fr.inria.corese.core.compiler.parser.NodeImpl;
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.EventManager;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.Graph.TreeNode;
 import fr.inria.corese.core.GraphStore;
-import fr.inria.corese.core.api.Loader;
-import fr.inria.corese.core.compiler.eval.ProxyInterpreter;
-import fr.inria.corese.core.compiler.eval.QuerySolver;
-import fr.inria.corese.core.compiler.eval.QuerySolverVisitorBasic;
-import fr.inria.corese.core.compiler.parser.NodeImpl;
-import fr.inria.corese.core.kgram.api.core.*;
-import fr.inria.corese.core.kgram.api.query.Environment;
-import fr.inria.corese.core.kgram.api.query.Evaluator;
-import fr.inria.corese.core.kgram.api.query.Matcher;
-import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Memory;
+import fr.inria.corese.core.approximate.ext.AppxSearchPlugin;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.LoadFormat;
@@ -30,9 +37,24 @@ import fr.inria.corese.core.print.ResultFormat;
 import fr.inria.corese.core.producer.MetadataManager;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.shacl.Shacl;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.transform.TemplateVisitor;
+import fr.inria.corese.core.transform.Transformer;
+import fr.inria.corese.core.util.MappingsGraph;
+import fr.inria.corese.core.util.SPINProcess;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Memory;
 import fr.inria.corese.core.sparql.api.GraphProcessor;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
@@ -40,25 +62,14 @@ import fr.inria.corese.core.sparql.storage.api.IStorage;
 import fr.inria.corese.core.sparql.storage.util.StorageFactory;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.transform.TemplateVisitor;
-import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.core.util.GraphListen;
-import fr.inria.corese.core.util.MappingsGraph;
-import fr.inria.corese.core.util.SPINProcess;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
 import jakarta.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import static fr.inria.corese.core.kgram.api.core.PointerType.GRAPH;
-import static fr.inria.corese.core.kgram.api.core.PointerType.MAPPINGS;
 
 /**
  * Plugin for filter evaluator
@@ -66,11 +77,17 @@ import static fr.inria.corese.core.kgram.api.core.PointerType.MAPPINGS;
  * solutions Implement graph specific function for LDScript
  *
  * @author Olivier Corby, Edelweiss, INRIA 2011
+ *
  */
 public class PluginImpl
         extends ProxyInterpreter
         implements GraphProcessor {
 
+    static public Logger logger = LoggerFactory.getLogger(PluginImpl.class);
+    static String DEF_PPRINTER = Transformer.PPRINTER;
+    private static final String NL = "\n";
+    private static final IDatatype SUB_CLASS_OF = DatatypeMap.newResource(RDFS.SUBCLASSOF);
+    static int nbBufferedValue = 0;
     static final String EXT = ExpType.EXT;
     public static final String METADATA = EXT + "metadata";
     public static final String VISITOR = EXT + "visitor";
@@ -93,19 +110,19 @@ public class PluginImpl
     public static final String TRANSFORMER = EXT + "transformer";
     public static final String BINDING = EXT + "binding";
     public static final String DYNAMIC_CAPTURE = EXT + "dynamic";
-    private static final String NL = System.getProperty("line.separator");
-    private static final IDatatype SUB_CLASS_OF = DatatypeMap.newResource(RDFS.SUBCLASSOF);
+
     private static final String QM = "?";
-    static public Logger logger = LoggerFactory.getLogger(PluginImpl.class);
-    static String DEF_PPRINTER = Transformer.PPRINTER;
-    static int nbBufferedValue = 0;
-    // draft storage for large literal values (not used)
-    private static IStorage storageMgr;
+
     String PPRINTER = DEF_PPRINTER;
     MatcherImpl match;
-    int index = 0;
     // Plugin for Transformer functions
     private PluginTransform pt;
+    // draft storage for large literal values (not used)
+    private static IStorage storageMgr;
+    // Plugin for approximate search
+    private AppxSearchPlugin approximateSearch;
+
+    int index = 0;
 
     public PluginImpl() {
         init();
@@ -118,15 +135,17 @@ public class PluginImpl
         }
     }
 
+    void init() {
+        pt = new PluginTransform(this);
+        setApproximateSearch(new AppxSearchPlugin(this));
+    }
+
     public static PluginImpl create(Matcher m) {
         return new PluginImpl(m);
     }
 
-    void init() {
-        pt = new PluginTransform(this);    }
-
     @Override
-    public void setMode(Evaluator.Mode mode) {
+    public void setMode(int mode) {
         // TODO document why this method is empty
     }
 
@@ -152,6 +171,9 @@ public class PluginImpl
         ASTQuery ast = env.getQuery().getAST();
         if (ext != null && ext.isMethod() && ast.hasMetadata(Metadata.METHOD)) {
             ClassHierarchy ch = new ClassHierarchy(getGraph(p));
+            if (env.getQuery().getGlobalQuery().isDebug()) {
+                ch.setDebug(true);
+            }
             ext.setHierarchy(ch);
             // WARNING: draft test below
             // store current graph in the Interpreter
@@ -193,15 +215,16 @@ public class PluginImpl
         }
         Graph g;
 
-        PointerType pointerType = dt.pointerType();
-        if (pointerType == MAPPINGS) {
-            g = graph(dt.getPointerObject().getMappings());
-            if (g == null) {
-                return null;
-            }
-            return DatatypeMap.createObject(g);
-        } else if (pointerType == GRAPH) {
-            return dt;
+        switch (dt.pointerType()) {
+            case MAPPINGS:
+                g = graph(dt.getPointerObject().getMappings());
+                if (g == null) {
+                    return null;
+                }
+                return DatatypeMap.createObject(g);
+
+            case GRAPH:
+                return dt;
         }
 
         return null;
@@ -238,6 +261,21 @@ public class PluginImpl
     @Override
     public IDatatype format(IDatatype[] ldt) {
         return getPluginTransform().format(ldt);
+    }
+
+    // function xt:approximate
+    // xt:approximate(var, val, algo, threshold)
+    // algo: jw --jaro winckler ng --ngram wn eq
+    @Override
+    public IDatatype approximate(Expr exp, Environment env, Producer p, IDatatype[] param) {
+        return getApproximateSearch().eval(exp, env, p, param);
+    }
+
+    // function xt:sim
+    // compute similarity of solution ?
+    @Override
+    public IDatatype approximate(Expr exp, Environment env, Producer p) {
+        return getApproximateSearch().eval(exp, env, p);
     }
 
     // function xt:depth
@@ -332,6 +370,7 @@ public class PluginImpl
      * Similarity of a query solution when @relax mode
      * Sum distance of approximate
      * types Divide by number of nodes and edge
+     *
      */
     @Override
     public IDatatype similarity(Environment env, Producer p) {
@@ -438,7 +477,7 @@ public class PluginImpl
     // @todo DataManager
     @Override
     public IDatatype load(Producer p, IDatatype dt, IDatatype graph, IDatatype expectedFormat, IDatatype requiredFormat,
-                          Level level) throws SafetyException {
+            Level level) throws SafetyException {
         Graph g;
         if (graph == null || graph.pointerType() != GRAPH) {
             g = Graph.create();
@@ -449,6 +488,13 @@ public class PluginImpl
         // not available yet because we are inside update
         // and startWriteTransaction is set by update
         // and function parse reset startWriteTransaction and raise an error
+        // if (graph == null && p!=null && p.hasDataManager()) {
+        // // when there is data manager:
+        // // use xt:load(uri, xt:graph()) to load in current graph
+        // // use xt:load(uri, xt:create(dt:graph()) to load in new graph
+        // // use xt:load(uri) to load in data manager
+        // ld.setDataManager(dataManager(p));
+        // }
         ld.setLevel(level);
 
         return load(ld, dt, g, expectedFormat, requiredFormat);
@@ -515,6 +561,16 @@ public class PluginImpl
         ResultFormat ft = ResultFormat.create(g, syntax.getLabel());
         String str = (node == null) ? ft.toString() : ft.toString(node);
         return DatatypeMap.newInstance(str);
+    }
+
+    private IDatatype even(Expr exp, IDatatype dt) {
+        boolean b = dt.intValue() % 2 == 0;
+        return getValue(b);
+    }
+
+    private IDatatype odd(Expr exp, IDatatype dt) {
+        boolean b = dt.intValue() % 2 != 0;
+        return getValue(b);
     }
 
     public PluginTransform getPluginTransform() {
@@ -590,11 +646,11 @@ public class PluginImpl
     @Override
     public IDatatype shape(Expr exp, Environment env, Producer p, IDatatype[] param) {
         try {
-            int oper = exp.oper();
-            if (oper == XT_SHAPE_GRAPH) {
-                return shapeGraph(p, param);
-            } else if (oper == XT_SHAPE_NODE) {
-                return shapeNode(p, param);
+            switch (exp.oper()) {
+                case XT_SHAPE_GRAPH:
+                    return shapeGraph(p, param);
+                case XT_SHAPE_NODE:
+                    return shapeNode(p, param);
             }
             return null;
         } catch (EngineException ex) {
@@ -681,7 +737,7 @@ public class PluginImpl
             Graph gg = (Graph) first.getPointerObject();
             e = gg.insert(param[1], param[2], param[3]);
         }
-        return (e == null) ? DatatypeMap.FALSE : DatatypeMap.TRUE;
+        return (e == null) ? FALSE : TRUE;
     }
 
     // function xt:delete
@@ -696,7 +752,7 @@ public class PluginImpl
             le = gg.delete(param[1], param[2], param[3]);
         }
 
-        return (le == null || !le.iterator().hasNext()) ? DatatypeMap.FALSE : DatatypeMap.TRUE;
+        return (le == null || !le.iterator().hasNext()) ? FALSE : TRUE;
     }
 
     public Graph getGraph() {
@@ -706,7 +762,7 @@ public class PluginImpl
     /**
      * rdf star
      * triple(s, p, o)
-     * filter bind &lt;&lt;s p o&gt;&gt;
+     * filter bind <<s p o>>
      */
     // @todo DataManager
     @Override
@@ -722,7 +778,7 @@ public class PluginImpl
     // index n: index of result node
     @Override
     public IDatatype value(Environment env, Producer prod, IDatatype graph, IDatatype node, IDatatype predicate,
-                           int n) {
+            int n) {
         if (graph == null) {
             return value(prod, node, predicate, null, n);
         } else if (graph.getPointerObject() instanceof Graph) {
@@ -841,6 +897,23 @@ public class PluginImpl
                     g.removeListener();
                 }
                 break;
+            case VERBOSE:
+                break;
+            case DEBUG:
+                switch (dt2.getLabel()) {
+                    case TRANSFORMER:
+                        // xt:tune(st:debug, st:transformer, st:ds)
+                        Transformer.debug(dt3.getLabel(), dt.length > 3 ? dt[3].booleanValue() : true);
+                        break;
+
+                    case BINDING:
+                        env.getBind().setDebug(dt3.booleanValue());
+                        break;
+
+                    default:
+                        getEvaluator().setDebug(dt2.booleanValue());
+                }
+                break;
 
             case EVENT_HIGH:
                 break;
@@ -890,7 +963,7 @@ public class PluginImpl
 
         }
 
-        return DatatypeMap.TRUE;
+        return TRUE;
     }
 
     EventManager getEventManager(Producer p) {
@@ -898,12 +971,13 @@ public class PluginImpl
     }
 
     Node node(Graph g, IDatatype dt) {
-        return g.getNode(dt, false, false);
+        Node n = g.getNode(dt, false, false);
+        return n;
     }
 
     IDatatype db(Environment env, Graph g) {
         ASTQuery ast = env.getQuery().getAST();
-        String name = ast.getMetadataValue(Metadata.Type.DB);
+        String name = ast.getMetadataValue(Metadata.DB);
         return db(name, g);
     }
 
@@ -927,13 +1001,13 @@ public class PluginImpl
      * First param is query other param are variable bindings (variable, value)
      */
     Mapping createMapping(Producer p, IDatatype[] param, int start) {
-        ArrayList<Node> nodeArrayList = new ArrayList<>();
+        ArrayList<Node> var = new ArrayList<>();
         ArrayList<Node> val = new ArrayList<>();
         for (int i = start; i < param.length; i += 2) {
-            nodeArrayList.add(NodeImpl.createVariable(clean(param[i].getLabel())));
+            var.add(NodeImpl.createVariable(clean(param[i].getLabel())));
             val.add(p.getNode(param[i + 1]));
         }
-        return Mapping.create(nodeArrayList, val);
+        return Mapping.create(var, val);
     }
 
     String clean(String name) {
@@ -1063,7 +1137,7 @@ public class PluginImpl
             logger.error(ex.getMessage());
         }
         if (str == null) {
-            return null;
+            return null; // str = "";
         }
         return DatatypeMap.newInstance(str);
     }
@@ -1125,6 +1199,7 @@ public class PluginImpl
      * its own StrManager Managed in the Context to be shared between
      * subtransformation (cf OWL2)
      */
+    // @Override
     public IDatatype getBufferedValue(StringBuilder sb, Environment env) {
         if (storageMgr == null) {
             createManager();
@@ -1146,6 +1221,14 @@ public class PluginImpl
     @Override
     public GraphProcessor getGraphProcessor() {
         return this;
+    }
+
+    public AppxSearchPlugin getApproximateSearch() {
+        return approximateSearch;
+    }
+
+    public void setApproximateSearch(AppxSearchPlugin approximateSearch) {
+        this.approximateSearch = approximateSearch;
     }
 
 }

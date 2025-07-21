@@ -1,21 +1,25 @@
 package fr.inria.corese.core.compiler.parser;
 
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
 import fr.inria.corese.core.kgram.api.core.Edge;
+import static fr.inria.corese.core.kgram.api.core.ExpType.BIND;
+import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
+import static fr.inria.corese.core.kgram.api.core.ExpType.FILTER;
+import static fr.inria.corese.core.kgram.api.core.ExpType.PATH;
+import static fr.inria.corese.core.kgram.api.core.ExpType.QUERY;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.ExprType;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.inria.corese.core.kgram.api.core.ExpType.*;
-
 /**
+ *
  * @author Olivier Corby, Wimmics INRIA I3S, 2014
+ *
  */
 public class VisitQuery {
 
@@ -32,13 +36,13 @@ public class VisitQuery {
     }
 
     List<Node> visit(Exp exp) {
-        ArrayList<Node> list = new ArrayList<>();
+        ArrayList<Node> list = new ArrayList<Node>();
         visit(exp, list);
         return list;
     }
-
+    
     void add(List<Node> list, Node p, Edge edge) {
-        if (!list.contains(p)) {
+        if (! list.contains(p)) {
             list.add(p);
         }
         query.recordPredicate(p, edge);
@@ -53,7 +57,7 @@ public class VisitQuery {
 
             case EDGE:
                 add(list, exp.getEdge().getEdgeNode(), exp.getEdge());
-                if (exp.isPath()) {
+                if (exp.isPath()){
                     visit(exp.getPath());
                 }
                 break;
@@ -82,6 +86,7 @@ public class VisitQuery {
                 if (q.getHaving() != null) {
                     visit(q.getHaving().getFilter().getExp(), list);
                 }
+            // continue
 
             default:
                 for (Exp ee : exp.getExpList()) {
@@ -105,6 +110,7 @@ public class VisitQuery {
         } else if (exp.isTerm() && exp.isNot()) {
             // ! p is a problem because we do not know the predicate nodes ...
             // let's return top level property, it subsumes all properties
+            //list.clear();
             Node node = compiler.createNode(ASTQuery.getRootPropertyURI());
             add(list, node, edge);
         } else {

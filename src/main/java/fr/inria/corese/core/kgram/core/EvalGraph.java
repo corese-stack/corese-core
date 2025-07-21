@@ -3,25 +3,25 @@ package fr.inria.corese.core.kgram.core;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.query.Matcher;
 import fr.inria.corese.core.kgram.api.query.Producer;
-
 import java.util.List;
 
 /**
+ *
  * @author corby
  */
 public class EvalGraph {
-
+    
     Eval eval;
     boolean stop = false;
-
+    
     EvalGraph(Eval e) {
         eval = e;
     }
-
+    
     void setStop(boolean b) {
         stop = b;
     }
-
+    
     /**
      * gNode is possible named graphURI stemming from evaluation context
      * It is not the named graph at stake here
@@ -31,7 +31,7 @@ public class EvalGraph {
         // current named graph URI/VAR
         Node graphNode = exp.getGraphName();
         // URI or value of VAR or null if unbound
-        Node graph = eval.getNode(p, graphNode);
+        Node graph     = eval.getNode(p, graphNode);
         Mappings res;
 
         if (graph == null) {
@@ -49,21 +49,21 @@ public class EvalGraph {
 
         for (Mapping m : res) {
             if (stop) {
-                return Eval.STOP;
-            }
-
+                return eval.STOP;
+            }            
+            
             Node namedGraph = null;
             if (graphNode.isVariable()) {
                 namedGraph = m.getNode(graphNode);
-                if (namedGraph != null && !namedGraph.equals(m.getNamedGraph())) {
+                if (namedGraph != null && ! namedGraph.equals(m.getNamedGraph())) {
                     // graph ?g { s p o optional { o q ?g }}
                     // variable ?g bound by exp not equal to named graph variable ?g
                     continue;
                 }
             }
-
+            
             if (env.push(m, n)) {
-                boolean pop = false;
+                boolean pop = false;                               
                 if (env.push(graphNode, m.getNamedGraph())) {
                     pop = true;
                 } else {
@@ -86,7 +86,7 @@ public class EvalGraph {
     }
 
     /**
-     * Iterate named graph pattern evaluation on named graph list
+     * Iterate named graph pattern evaluation on named graph list 
      * named graph list may come from Mappings map  from previous statement
      * OR from the "from named" clause OR from dataset named graph list
      */
@@ -98,7 +98,7 @@ public class EvalGraph {
         Node name = exp.getGraphName();
         Mappings res = null;
         Iterable<Node> graphNodes = null;
-
+        
         if (map != null && map.inScope(name)) {
             // named graph list may come from evaluation context
             List<Node> list = map.aggregate(name);
@@ -145,37 +145,39 @@ public class EvalGraph {
         Exp main = exp;
         Exp body = exp.rest();
         Mappings res;
-        Node varNode = null;
-        Node target = null;
-
+        Node var = null, target = null;
+        
         if (external) {
             if (graphNode.isVariable() && graph.getDatatypeValue().isExtension()) {
-                varNode = graphNode;
+                var    = graphNode;
                 target = graph;
             }
-        } else {
+        }
+        else {
             target = graph;
         }
-
+        
         if (eval.isFederate(exp)) {
-            res = eval.subEval(np, target, varNode, body, main, map, null, false, external);
-        } else {
+            res = eval.subEval(np, target, var, body, main, map, null, false, external);
+        } 
+        else {
             Exp ee = body;
-            Mappings data = null;
-
+            Mappings data = null; 
+            
             if (graph.getPath() == null) {
                 // not a path pointer
                 if (Eval.isParameterGraphMappings()) {
                     // eval graph body with parameter map
                     // pro: if body is optional, eval it with parameter map
                     data = map;
-                } else {
+                }
+                else {
                     // eval graph body with values(map)
                     ee = body.complete(map);
                 }
             }
-
-            res = eval.subEval(np, target, varNode, ee, main, data, null, false, external);
+            
+            res = eval.subEval(np, target, var, ee, main, data, null, false, external);
         }
         res.setNamedGraph(graph);
 
@@ -183,5 +185,5 @@ public class EvalGraph {
         return res;
     }
 
-
+    
 }

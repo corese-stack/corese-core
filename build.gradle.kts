@@ -1,6 +1,3 @@
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 plugins {
     // Core Gradle plugins
     `java-library`                                              // For creating reusable Java libraries
@@ -9,61 +6,11 @@ plugins {
     signing                                                     // Signs artifacts for Maven Central
     `maven-publish`                                             // Enables publishing to Maven repositories
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0" // Automates Nexus publishing
-
+    
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
-    id("com.gradleup.shadow") version "8.3.7"
-    id("org.sonarqube") version "6.1.0.5360"                    // SonarQube integration
-    id("com.intershop.gradle.javacc") version "5.0.1"           // JavaCC plugin for parsing JavaCC files
-    id("antlr")                                                 // Antlr plugin for generating parsers from grammar files
+    id("com.gradleup.shadow") version "8.3.7"                   // Bundles dependencies into a single JAR
 }
-
-// SonarQube configuration
-
-val currentDate: String = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-
-sonar {
-    properties {
-        property("sonar.projectKey", "crs-core-new")
-        property("sonar.host.url", "https://sonarqube.inria.fr/sonarqube")
-        property("sonar.login", System.getenv("SONAR_TOKEN"))
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
-        property("sonar.sourceEncoding", "UTF-8")
-        property("sonar.projectDate", currentDate)
-    }
-}
-
-// === Generated sources directories ===
-val javaccGeneratedDir = layout.buildDirectory.dir("generated-src/javacc").get().asFile
-val antlrGeneratedDir = layout.buildDirectory.dir("generated-src/antlr").get().asFile
-val antlrPackageDir = layout.buildDirectory.dir("generated-src/antlr/fr/inria/corese/core/next/impl/parser/antlr").get().asFile
-
-// JavaCC configuration
-javacc {
-    configs {
-        register("sparqlCorese") {
-            inputFile = file("src/main/java/fr/inria/corese/core/sparql/triple/javacc1/sparql_corese.jj")
-            packageName = "fr.inria.corese.core.sparql.triple.javacc1"
-            outputDir = javaccGeneratedDir
-        }
-    }
-}
-
-// Configure source sets to include generated sources
-sourceSets {
-    main {
-        java {
-            srcDir(javaccGeneratedDir)
-            srcDir(antlrGeneratedDir)
-        }
-    }
-}
-
-// Ensure JavaCC generation happens before compilation
-tasks.named("compileJava") {
-    dependsOn("javaccSparqlCorese")
-}
-
 
 /////////////////////////
 // Project metadata    //
@@ -78,11 +25,11 @@ object Meta {
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
     const val githubRepo = "corese-stack/corese-core"
-
+  
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-
+  
     // Sonatype OSSRH publishing settings
     const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -96,9 +43,7 @@ object Meta {
 java {
     withJavadocJar()                             // Include Javadoc JAR in publications
     withSourcesJar()                             // Include sources JAR in publications
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(21))
-  }
+    sourceCompatibility = JavaVersion.VERSION_11 // Configure minimum Java version
 }
 
 /////////////////////////
@@ -111,6 +56,7 @@ repositories {
     mavenCentral()  // Then, check Maven Central
 }
 
+// Define dependencies
 dependencies {
     // === Logging ===
     api("org.slf4j:slf4j-api:2.0.17")                                                  // Logging API only (SLF4J)
@@ -122,17 +68,6 @@ dependencies {
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:0.7.2")            // RDFa parser (Semargl)
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
 
-    // === Antlr dependencies ===
-    antlr("org.antlr:antlr4:4.13.2")                                                   // Antlr for parsing (ANTLR 4)
-    implementation("org.antlr:antlr4-runtime:4.13.2")                                  // Antlr runtime for parsing
-
-
-    // === JSONLD
-    implementation("com.apicatalog:titanium-json-ld:1.6.0")
-    implementation("com.apicatalog:titanium-rdf-api:1.0.0")
-    implementation("org.eclipse.parsson:parsson:1.1.7")
-    implementation("jakarta.json:jakarta.json-api:2.1.3")
-
     // === HTTP and XML ===
     implementation("org.glassfish.jersey.core:jersey-client:3.1.10")                   // HTTP client (Jersey)
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")                    // Dependency injection for Jersey
@@ -143,14 +78,8 @@ dependencies {
     implementation("org.json:json:20250517")                                           // JSON processing
     implementation("com.typesafe:config:1.4.3")                                        // Configuration library (Typesafe Config)
 
-
-
     // === Test dependencies ===
-    testImplementation(platform("org.junit:junit-bom:5.13.2"))                         // JUnit BOM for consistent test versions
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.2")                       // JUnit Jupiter API and engine
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.2")               // JUnit platform launcher (runtime)
-    testImplementation("org.mockito:mockito-core:5.18.0")                              // Mockito core for mocking in tests
-    testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")                     // Mockito integration with JUnit Jupiter
+    testImplementation("junit:junit:4.13.2")                                           // Unit testing framework
 }
 
 /////////////////////////
@@ -165,7 +94,7 @@ publishing {
             // Configure the publication to include JAR, sources, and Javadoc
             from(components["java"])
 
-            // Configures version mapping to control how dependency versions are resolved
+            // Configures version mapping to control how dependency versions are resolved 
             // for different usage contexts (API and runtime).
             versionMapping {
                 // Defines version mapping for Java API usage.
@@ -217,7 +146,7 @@ publishing {
                         id.set("pierremaillot")
                         name.set("Pierre Maillot")
                         email.set("pierre.maillot@inria.fr")
-                        url.set("https://w3id.org/people/pierremaillot")
+                        url.set("https://maillpierre.github.io/personal-page/")
                         organization.set("Inria")
                         organizationUrl.set("http://www.inria.fr/")
                     }
@@ -274,14 +203,14 @@ nexusPublishing {
 /////////////////////////
 
 // Set UTF-8 encoding for Java compilation tasks
-tasks.withType<JavaCompile> {
+tasks.withType<JavaCompile>() {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-Xlint:none")
 }
 
 // Configure Javadoc tasks with UTF-8 encoding and disable failure on error.
 // This ensures that Javadoc generation won't fail due to minor issues.
-tasks.withType<Javadoc> {
+tasks.withType<Javadoc>() {
     options.encoding = "UTF-8"
     isFailOnError = false
 }
@@ -292,7 +221,7 @@ tasks.withType<Javadoc> {
 tasks {
     shadowJar {
         this.archiveClassifier = "jar-with-dependencies"
-    }
+            }
 }
 
 // Configure Javadoc tasks to disable doclint warnings.
@@ -324,11 +253,10 @@ tasks.jacocoTestReport {
 // Set the test task to be followed by Jacoco report generation.
 // This ensures that test coverage reports are always generated after tests.
 tasks.test {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
-    systemProperty("java.util.logging.config.file", "src/test/resources/logging.properties")
+    // testLogging {
+    //     events("passed", "skipped", "failed") // Affiche les résultats des tests
+    //     showStandardStreams = true           // Affiche les sorties console des tests
+    // }
     finalizedBy(tasks.jacocoTestReport)
 }
 
@@ -342,54 +270,4 @@ tasks.withType<PublishToMavenLocal>().configureEach {
 // This guarantees that artifacts are signed before they are published to Maven repositories.
 tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
-}
-
-// === Antlr generated sources configuration ===
-
-// Configure the Antlr task to generate parser code with specific arguments
-tasks.named<AntlrTask>("generateGrammarSource") {
-    arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.impl.parser.antlr"))
-    outputDirectory = antlrPackageDir
-    inputs.files(fileTree("src/main/antlr"))
-    outputs.dir(antlrPackageDir)
-}
-
-// Ensure Java compilation depends on both JavaCC and Antlr code generation
-tasks.named("compileJava") {
-    dependsOn("generateGrammarSource", "javaccSparqlCorese")
-}
-
-// Ensure sources JAR includes generated sources and depends on code generation
-tasks.named<Jar>("sourcesJar") {
-    dependsOn("generateGrammarSource", "javaccSparqlCorese")
-    from(javaccGeneratedDir)
-    from(antlrGeneratedDir)
-    includeEmptyDirs = false
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-// Clean up generated sources on clean
-tasks.clean {
-    doLast {
-        delete(javaccGeneratedDir)
-        delete(antlrGeneratedDir)
-    }
-}
-
-// Ensure generated directories exist before generation
-tasks.register("createGeneratedDirs") {
-    doLast {
-        javaccGeneratedDir.mkdirs()
-        antlrGeneratedDir.mkdirs()
-        antlrPackageDir.mkdirs()
-    }
-}
-
-// Make generation tasks depend on directory creation
-tasks.named("generateGrammarSource") {
-    dependsOn("createGeneratedDirs")
-}
-
-tasks.named("javaccSparqlCorese") {
-    dependsOn("createGeneratedDirs")
 }

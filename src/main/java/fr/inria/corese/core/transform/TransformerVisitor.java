@@ -81,6 +81,18 @@ public class TransformerVisitor implements QueryVisitor {
             }
         }
     }
+           
+    
+    void process(ASTQuery ast) {
+        Exp body = ast.getBody();
+        if (body.size() > 0) {
+            Exp exp = body.get(0);
+            if (exp.isGraph()) {
+                System.out.println(exp);
+                System.out.println();
+            }
+        }
+    }
     
     
 

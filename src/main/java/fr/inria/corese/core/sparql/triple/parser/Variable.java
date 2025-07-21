@@ -40,7 +40,7 @@ public class Variable extends Atom {
     private boolean isVisited = false;
     private boolean dynamic = false;
     // rdf star triple reference variable
-    private final boolean triple = false;
+    private boolean triple = false;
     private int index = ExprType.UNBOUND;
     private int type = ExprType.GLOBAL;
 
@@ -80,15 +80,29 @@ public class Variable extends Atom {
         else if (isBlankNode()) {
             if (isBlankVariable(name)) {
                 // variable for blank node, replace ?_ by _:
-                sb.append(KeywordPP.BN + name.substring(2));
+                sb.append(KeywordPP.BN + name.substring(2, name.length()));
             } else {
                 // remove ?
-                sb.append(KeywordPP.BN + name.substring(1));
+                sb.append(KeywordPP.BN + name.substring(1, name.length()));
             }
         } else {
             sb.append(name);            
         }
+        if (display) {
+            completeDisplay();
+        }
         return sb;
+    }
+    
+    void completeDisplay() {
+        if (isTriple() && getTriple()!=null) {
+            Triple t = getTriple();
+            System.out.println(String.format("%s = triple(%s %s %s)", getLabel(), 
+                    t.getSubject().getDatatypeValue(), t.getPredicate().getDatatypeValue(), t.getObject().getDatatypeValue()));
+            if (t.getObject().isTriple()) {
+                t.getObject().getVariable().completeDisplay();
+            }
+        }
     }
 
     @Override

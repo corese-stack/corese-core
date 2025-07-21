@@ -10,25 +10,24 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  * implemented by fr.inria.corese.core.query.PluginTransform
- *
  * @author corby
  */
 public interface ComputerProxy {
-
-    TransformProcessor getTransformer(Binding b, Environment env, Producer p)
+        
+    TransformProcessor getTransformer(Binding b, Environment env, Producer p) 
+            throws EngineException ;
+    
+    TransformProcessor getTransformer(Binding b, Environment env, Producer p, Expr exp, IDatatype uri, IDatatype gname) 
             throws EngineException;
-
-    TransformProcessor getTransformer(Binding b, Environment env, Producer p, Expr exp, IDatatype uri, IDatatype gname)
-            throws EngineException;
-
+    
     // implemented by fr.inria.corese.core.query.PluginImpl
     // plugin of Interpreter
     GraphProcessor getGraphProcessor();
 
     TransformVisitor getVisitor(Binding b, Environment env, Producer p);
-
+    
     Context getContext(Binding b, Environment env, Producer p);
-
+    
     NSManager getNSM(Binding b, Environment env, Producer p);
 
 }

@@ -10,8 +10,8 @@ import fr.inria.corese.core.kgram.api.core.Node;
  */
 public interface ILoadSerialization {
 
-    int LITERAL = 10;
-    int NON_LITERAL = 20;
+    public static final int LITERAL = 10;
+    public static final int NON_LITERAL = 20;
 
     /**
      * Add triples from parser to corese graph
@@ -24,5 +24,5 @@ public interface ILoadSerialization {
      * @param literalType literal type (LITERAL | NON_LITERAL)
      * @param source
      */
-    void addTriple(String subj, String pred, String obj, String lang, String type, int literalType, Node source);
+    public void addTriple(String subj, String pred, String obj, String lang, String type, int literalType, Node source);
 }

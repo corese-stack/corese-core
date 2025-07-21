@@ -1,29 +1,29 @@
 package fr.inria.corese.core.edge;
 
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.logic.Entailment;
-import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-
-import java.util.ArrayList;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.logic.Entailment;
 import java.util.Arrays;
 import java.util.List;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import java.util.ArrayList;
 
 /**
  * Graph Edge with n nodes (not only triple)
  * RDF star triple with reference node t
- * g &lt;&lt;s p o t>>
+ * g <<s p o t>>
  *
  * @author Olivier Corby, Edelweiss INRIA 2010
+ *
  */
 public class EdgeImpl extends EdgeTop
         implements Edge {
 
     public static boolean displayGraph = true;
-    protected Node graph, predicate;
     int index = -1;
+    protected Node graph, predicate;
     Node[] nodes;
     private boolean metadata;
 
@@ -72,7 +72,8 @@ public class EdgeImpl extends EdgeTop
     public static EdgeImpl create(Node g, Node pred, List<Node> list) {
         Node[] nodes = new Node[list.size()];
         list.toArray(nodes);
-        return new EdgeImpl(g, pred, nodes);
+        EdgeImpl e = new EdgeImpl(g, pred, nodes);
+        return e;
     }
 
     public static EdgeImpl create(Node g, Node pred, Node[] nodes) {
@@ -91,12 +92,12 @@ public class EdgeImpl extends EdgeTop
         return ent;
     }
 
-    public Node[] getNodes() {
-        return nodes;
-    }
-
     public void setNodes(Node[] args) {
         nodes = args;
+    }
+
+    public Node[] getNodes() {
+        return nodes;
     }
 
     @Override
@@ -113,18 +114,19 @@ public class EdgeImpl extends EdgeTop
     public String toString() {
         if (isNested()) {
             return nestedTriple();
-        } else if (nbNode() > 2 && !DatatypeMap.DISPLAY_AS_TRIPLE) {
+        }
+        else if (nbNode() > 2 && ! DatatypeMap.DISPLAY_AS_TRIPLE) {
             return tuple();
         }
         return super.toString();
     }
-
+    
     public String nestedTriple() {
         String str = String.format("<<%s %s %s>>", getNode(0), getEdgeNode(), getNode(1));
         if (!DatatypeMap.DISPLAY_AS_TRIPLE && hasReferenceNode()) {
             str = String.format("%s [%s]", str, getReferenceNode());
         }
-        if (getGraphNode() != null && !getGraphNode().getLabel().equals(Entailment.DEFAULT)) {
+        if (getGraphNode()!=null && !getGraphNode().getLabel().equals(Entailment.DEFAULT)) {
             str = String.format("%s %s", getGraphNode(), str);
         }
         return str;
@@ -140,7 +142,7 @@ public class EdgeImpl extends EdgeTop
         return str;
     }
 
-    String toParse(StringBuilder sb) {
+    String toParse(StringBuilder sb) {        
         sb.append("tuple(");
         sb.append(getEdgeNode());
         int j = 0;
@@ -149,13 +151,14 @@ public class EdgeImpl extends EdgeTop
                 if (!DatatypeMap.DISPLAY_AS_TRIPLE) {
                     sb.append(" ").append(n);
                 }
-            } else {
+            }
+            else {
                 sb.append(" ").append(n);
             }
         }
         sb.append(")");
-
-        if (!DatatypeMap.DISPLAY_AS_TRIPLE) {
+              
+        if (! DatatypeMap.DISPLAY_AS_TRIPLE) {
             int i = 0;
             for (Node n : nodes) {
                 if (i++ < 2) {
@@ -166,7 +169,7 @@ public class EdgeImpl extends EdgeTop
                 }
             }
         }
-
+        
         return sb.toString();
     }
 
@@ -193,11 +196,6 @@ public class EdgeImpl extends EdgeTop
     @Override
     public int getEdgeIndex() {
         return index;
-    }
-
-    @Override
-    public void setEdgeIndex(int n) {
-        index = n;
     }
 
     @Override
@@ -229,6 +227,11 @@ public class EdgeImpl extends EdgeTop
     }
 
     @Override
+    public void setEdgeIndex(int n) {
+        index = n;
+    }
+
+    @Override
     public Edge getEdge() {
         return this;
     }
@@ -245,11 +248,13 @@ public class EdgeImpl extends EdgeTop
 
     @Override
     public Node getNode() {
+        // TODO Auto-generated method stub
         return DatatypeMap.createObject(this.toString(), this);
     }
 
     @Override
     public Node getEdgeVariable() {
+        // TODO Auto-generated method stub
         return null;
     }
 
@@ -305,7 +310,7 @@ public class EdgeImpl extends EdgeTop
 
     @Override
     ArrayList<IDatatype> getNodeList() {
-        ArrayList<IDatatype> list = new ArrayList<>();
+        ArrayList<IDatatype> list = new ArrayList();
         for (int i = 0; i <= nodes.length + 1; i++) {
             list.add(getValue(null, i));
         }
@@ -316,7 +321,7 @@ public class EdgeImpl extends EdgeTop
      * return s p o v1 .. vn g
      */
     @Override
-    public IDatatype getValue(String varString, int n) {
+    public IDatatype getValue(String var, int n) {
         switch (n) {
             case 0:
                 return nodeValue(getNode(0));

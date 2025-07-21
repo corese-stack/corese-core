@@ -5,17 +5,17 @@ import java.util.List;
 
 public interface Log {
 
-    void reset();
+	enum Operation {
+		LOAD, QUERY, UPDATE
+	}
+	
+	void reset();	
+	
+	void log(Log.Operation type, Object obj);
+	
+	void log(Log.Operation type, Object obj1, Object obj2);
 
-    void log(Log.Operation type, Object obj);
-
-    void log(Log.Operation type, Object obj1, Object obj2);
-
-    List<Object> get(Log.Operation type);
-
-    enum Operation {
-        LOAD, QUERY, UPDATE
-    }
-
-
+	List<Object> get(Log.Operation type);
+	
+	
 }

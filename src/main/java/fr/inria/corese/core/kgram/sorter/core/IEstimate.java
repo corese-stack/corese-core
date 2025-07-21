@@ -10,11 +10,11 @@ import fr.inria.corese.core.kgram.api.query.Producer;
  */
 public interface IEstimate {
 
-    double MAX_COST = 1.0;
-    double MIN_COST = 0.0;
+    public final static double MAX_COST = 1.0;
+    public final static double MIN_COST = 0.0;
     //approximate minimum value, but not equal to 0
-    double MIN_COST_0 = 1.0 / Double.MAX_VALUE;
-    double NA_COST = -1;
+    public final static double MIN_COST_0 = 1.0 / Double.MAX_VALUE;
+    public final static double NA_COST = -1;
 
     /**
      * Estimate and assign the selectvity (or other criteria) for each node in
@@ -24,6 +24,6 @@ public interface IEstimate {
      * @param producer producer
      * @param parameters parameters for different implementations
      */
-    void estimate(QPGraph plein, Producer producer, Object parameters);
+    public void estimate(QPGraph plein, Producer producer, Object parameters);
     
 }

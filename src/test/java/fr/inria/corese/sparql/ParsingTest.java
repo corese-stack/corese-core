@@ -8,37 +8,35 @@ import fr.inria.corese.core.sparql.exceptions.QueryLexicalException;
 import fr.inria.corese.core.sparql.exceptions.QuerySyntaxException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.ParserSparql1;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 /**
  *
  * @author gaignard
  */
 public class ParsingTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(ParsingTest.class);
-
     public ParsingTest() {
     }
 
-    @BeforeAll
+    @BeforeClass
     public static void setUpClass() throws Exception {
     }
 
-    @AfterAll
+    @AfterClass
     public static void tearDownClass() throws Exception {
     }
 
-    @BeforeEach
+    @Before
     public void setUp() {
     }
 
-    @AfterEach
+    @After
     public void tearDown() {
     }
     // TODO add test methods here.
@@ -58,6 +56,6 @@ public class ParsingTest {
         ASTQuery ast = ASTQuery.create(query);
        // ast.setKgram(true);
         ParserSparql1.create(ast).parse();
-        logger.info("hello1 {} ", ast);
+        System.out.println(ast);
     }
 }

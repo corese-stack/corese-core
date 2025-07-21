@@ -1,91 +1,135 @@
 package fr.inria.corese.core.compiler.federate;
 
-import fr.inria.corese.core.sparql.triple.parser.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.ASTSelector;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.Union;
+import fr.inria.corese.core.sparql.triple.parser.Query;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Source;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Merge several service with same URI into one service
- *
+ * 
  * @author Olivier Corby, Wimmics INRIA I3S, 2018
+ *
  */
 public class Simplify extends Util {
-    private static final boolean MERGE_EVEN_IF_NOT_CONNECTED = false;
     static Logger logger = LoggerFactory.getLogger(Simplify.class);
+    private static boolean MERGE_EVEN_IF_NOT_CONNECTED = false;
     // heuristics to simplify service s bgp1 optional service (S) bgp2 
     // when all triple of bgp2
     // join with connected triple of bgp1 in s
     // and s memberOf S
     // heuristics similar to federate bgp, heuristics cover both arg of optional
+    
     FederateVisitor visitor;
+    private boolean debug = false;
     private boolean mergeEvenIfNotConnected = MERGE_EVEN_IF_NOT_CONNECTED;
-
+    
     Simplify(FederateVisitor vis) {
         visitor = vis;
     }
-
+    
+    class ServiceList {
+        HashMap<String, List<Service>> map;
+        
+        ServiceList() {
+            map = new HashMap<>();
+        }
+        
+        void add(Service serv) {
+            List<Service> l = map.get(serv.getServiceName().getLabel());
+            if (l == null) {
+                l = new ArrayList<>();
+                map.put(serv.getServiceName().getLabel(), l);
+            }
+            l.add(serv);
+        }
+        
+        HashMap<String, List<Service>> getMap() {
+            return map;
+        }
+    }
+    
     // main function
     // exp is binary
     Exp simplify(Exp exp) {
-        return simplifyBinary(exp);
+        Exp res = simplifyBinary(exp);
+        return res;
     }
 
     // main function
     Exp process(Exp bgp) {
         bgp = merge(bgp);
-        if (visitor.isBounce()) {
+        if (visitor.isBounce()){
             // @deprecated
             bgp = bounce(bgp);
         }
         return bgp;
     }
+    
 
+
+        
     /**
-     * BGP { service URI {EXP1} service URI {EXP2} EXP3 } ::=
+     * BGP { service URI {EXP1} service URI {EXP2} EXP3 } ::= 
      * BGP { service URI {EXP1 EXP2} EXP3 }
-     * <p>
+     *
      * TODO: merge when there is only one URI ???
-     */
-    Exp merge(Exp bgp) {
+     */ 
+    Exp merge(Exp bgp) {  
         return merge(bgp, isMergeEvenIfNotConnected());
     }
 
-    Exp merge(Exp bgp, boolean mergeEvenIfNotConnected) {
+    Exp merge(Exp bgp, boolean mergeEvenIfNotConnected) {    
         ServiceList include = new ServiceList();
-        ServiceList exclude = new ServiceList();
+        ServiceList exclude = new ServiceList();        
         // create map: service URI -> list (Service)
         for (Exp exp : bgp) {
-            if (exp.isService()) {
+            if (exp.isService()){ 
                 if (exp.getService().isFederate()) {
                     // several URI: skip
-                } else if (mergeEvenIfNotConnected) {
+                } 
+                else if (mergeEvenIfNotConnected) {
                     include.add(exp.getService());
-                } else if (isTripleFilterOnly(exp.getBodyExp())) {
+                }
+                else if (isTripleFilterOnly(exp.getBodyExp())) {
                     // do not merge basic BGP with same service URI
-                    // because they are not connected
+                    // because they are not connected 
                     exclude.add(exp.getService());
-                } else {
+                }
+                else {
                     include.add(exp.getService());
                 }
             }
         }
-
+              
         // group several services with same URI into one service
         for (List<Service> list : include.getMap().values()) {
             Service first = list.get(0);
             int i = 0;
-
+            boolean mod = false;
+            
             for (Service s : list) {
                 if (i++ > 0) {
                     first.getBodyExp().include(s.getBodyExp());
                     bgp.getBody().remove(s);
+                    mod = true;
                 }
             }
-
+            
             List<Service> alist = exclude.getMap().get(first.getServiceName().getLabel());
             if (alist != null) {
                 for (Service s : alist) {
@@ -93,17 +137,20 @@ public class Simplify extends Util {
                     if (first.getBodyExp().isConnect(s.getBodyExp())) {
                         first.getBodyExp().include(s.getBodyExp());
                         bgp.getBody().remove(s);
+                        mod = true;
                     }
                 }
             }
 
-            simplifyGraph2(first.getBodyExp());
-            visitor.sort(first.getBodyExp());
-        }
-        bgp = move(bgp, exclude);
+            if (true) { //  if (mod) {
+                simplifyGraph2(first.getBodyExp());
+                visitor.sort(first.getBodyExp());
+            }
+        }        
+        bgp = move(bgp, exclude);       
         return bgp;
     }
-
+    
     /**
      * @move rdfs:label
      * if there is a service s1 with several uri with a triple annotated as
@@ -111,7 +158,7 @@ public class Simplify extends Util {
      * merged with s2
      */
     Exp move(Exp bgp, ServiceList serviceList) {
-        if (!visitor.getAST().hasMetadata(Metadata.Type.MOVE)) {
+        if (! visitor.getAST().hasMetadata(Metadata.MOVE)) {
             return bgp;
         }
         boolean go = true;
@@ -134,11 +181,11 @@ public class Simplify extends Util {
                 bgp.getBody().remove(s);
             }
         }
-
+        
         return bgp;
     }
-
-    Service getCandidate(Service serv, ServiceList map) {
+    
+     Service getCandidate(Service serv, ServiceList map) {
         for (Atom name : serv.getServiceList()) {
             List<Service> list = map.getMap().get(name.getLabel());
             if (list != null) {
@@ -150,15 +197,15 @@ public class Simplify extends Util {
         }
         return null;
     }
-
+     
     Service getCandidate2(Service serv, ServiceList map) {
-        Service res = null;
+        Service res = null;       
         for (Atom name : serv.getServiceList()) {
             List<Service> list = map.getMap().get(name.getLabel());
             if (list != null) {
                 if (res == null) {
                     res = list.get(0);
-                    if (!serv.getBodyExp().isConnect(res.getBodyExp())) {
+                    if (! serv.getBodyExp().isConnect(res.getBodyExp())) {
                         return null;
                     }
                 } else {
@@ -168,7 +215,7 @@ public class Simplify extends Util {
         }
         return res;
     }
-
+    
     boolean isMoveable(Service exp) {
         Exp body = exp.getBodyExp();
         if (!exp.isFederate()) {
@@ -181,55 +228,57 @@ public class Simplify extends Util {
         return t.getPredicate().isConstant()
                 && isMoveable(t.getPredicate().getConstant());
     }
-
-    // TODO: there could be a bind
+    
+    // TODO: there could be a bind  
     Triple getUniqueTriple(Exp body) {
         Triple t = null;
         for (Exp exp : body) {
-            if (exp.isFilter()) {
-            } else if (exp.isTriple()) {
+            if (exp.isFilter()) {}
+            else if (exp.isTriple()) {
                 if (t == null) {
                     t = exp.getTriple();
-                } else {
+                }
+                else {
                     return null;
                 }
-            } else {
+            }
+            else {
                 return null;
             }
         }
         return t;
     }
-
+    
     boolean isMoveable(Constant predicate) {
-        return visitor.getAST().hasMetadata(Metadata.Type.MOVE)
-                && (visitor.getAST().hasMetadataValue(Metadata.Type.MOVE, predicate.getLabel())
-                || visitor.getAST().getMetadata().getValues(Metadata.Type.MOVE) == null);
+        return visitor.getAST().hasMetadata(Metadata.MOVE)
+                && (visitor.getAST().hasMetadataValue(Metadata.MOVE, predicate.getLabel())
+                 || visitor.getAST().getMetadata().getValues(Metadata.MOVE) == null);
     }
-
+    
     /**
      * BGP { service URI1 { EXP1 } service URI2 { EXP2 } }
      * if URI1 accept bouncing and EXP1.isConnected(EXP2)
      * ->
      * BGP { service URI1 { EXP1 service URI2 { EXP2 } } }
      */
-
+    
     Exp bounce(Exp bgp) {
-        HashMap<Service, Boolean> done = new HashMap<>();
-        HashMap<Service, Boolean> remove = new HashMap<>();
-
+        HashMap<Service, Boolean> done   = new HashMap();
+        HashMap<Service, Boolean> remove = new HashMap();
+        
         for (int i = 0; i < bgp.size(); i++) {
             Exp e1 = bgp.get(i);
-            if (done.get(e1) == null && e1.isService() && !e1.getService().isFederate()) {
+            if (done.get(e1) == null && e1.isService() && ! e1.getService().isFederate()) {
                 Service s1 = e1.getService();
-
+                
                 for (int j = i + 1; j < bgp.size(); j++) {
                     Exp e2 = bgp.get(j);
-                    if (done.get(e2) == null && e2.isService() && !e2.getService().isFederate()) {
+                    if (done.get(e2) == null && e2.isService() && ! e2.getService().isFederate()) {
                         Service s2 = e2.getService();
-
-                        if (!s1.getServiceName().equals(s2.getServiceName())
-                                && s1.getBodyExp().isConnected(s2.getBodyExp())) {
-
+                        
+                        if (! s1.getServiceName().equals(s2.getServiceName())
+                           && s1.getBodyExp().isConnected(s2.getBodyExp())) {
+                            
                             if (bounce(s1)) {
                                 s1.getBodyExp().add(s2);
                                 done.put(s2, true);
@@ -246,19 +295,19 @@ public class Simplify extends Util {
                 }
             }
         }
-
+        
         for (Service exp : remove.keySet()) {
             bgp.getBody().remove(exp);
         }
-
+        
         return bgp;
     }
-
+    
     // @bounce <URI>
     boolean bounce(Service s) {
-        return visitor.getAST().hasMetadataValue(Metadata.Type.BOUNCE, s.getServiceName().getLabel());
+        return visitor.getAST().hasMetadataValue(Metadata.BOUNCE, s.getServiceName().getLabel());
     }
-
+      
     /**
      * exp contains only triple and filter
      * TODO: accept bind (exp as var)
@@ -267,27 +316,28 @@ public class Simplify extends Util {
         for (Exp ee : exp) {
             if (ee.isFilter() || ee.isTriple()) {
                 // ok
-            } else {
+            }
+            else {
                 return false;
             }
         }
         return true;
     }
-
+    
     boolean isUnionTripleOnly(Exp bgp) {
         if (bgp.size() == 1 && bgp.get(0).isUnion()) {
             Union union = bgp.get(0).getUnion();
-            return isTripleFilterOnly(union.get(0)) && isTripleFilterOnly(union.get(1));
+            return isTripleFilterOnly(union.get(0)) && isTripleFilterOnly(union.get(1)) ;
         }
         return false;
     }
-
+    
     boolean isUnionOrTripleOnly(Exp bgp) {
         return isUnionTripleOnly(bgp) || isTripleFilterOnly(bgp);
     }
-
+    
     // bgp = filter exists { bgp }
-    // in filter exists, merge services with same URI list
+    // in filter exists, merge services with same URI list 
     void simplifyFilterExist(Exp bgp) {
         ArrayList<Service> list = new ArrayList<>();
         for (int i = 0; i < bgp.size(); i++) {
@@ -311,11 +361,12 @@ public class Simplify extends Util {
             bgp.getBody().remove(s);
         }
     }
-
+    
+    
     // second main function
     Exp simplifyBinary(Exp exp) {
         Exp simple = basicSimplify(exp);
-
+        
         if (simple.isOptional() || simple.isMinus()) {
             Exp split = split(simple);
             if (visitor.isFederateUndefined()) {
@@ -327,20 +378,22 @@ public class Simplify extends Util {
         if (visitor.isFederateUndefined()) {
             return skipUndefined(simple);
         }
-
+        
         return simple;
     }
-
+    
     // skip undefined service for union/optional/minus
     Exp skipUndefined(Exp exp) {
         if (exp.isUnion()) {
             return unionUndefined(exp);
-        } else if (exp.isOptional() || exp.isMinus()) {
+        }
+        else if (exp.isOptional()||exp.isMinus()) {
             return binaryUndefined(exp);
         }
         return exp;
     }
-
+       
+    
     /**
      * service s {e1} optional { service s {e2}}
      * ->
@@ -353,28 +406,31 @@ public class Simplify extends Util {
             Exp e2 = exp.get(1).get(0);
             if (e1.isService() && e2.isService()) {
                 Service s1 = e1.getService();
-                Service s2 = e2.getService();
+                Service s2 = e2.getService();               
                 return simplifyService(exp, s1, s2);
             }
         }
         return exp;
     }
-
+    
     Exp simplifyService(Exp exp, Service s1, Service s2) {
         if (isSimplifyUnion(exp, s1, s2)) {
             return simplifyUnion(exp, s1, s2);
-        } else if (!s1.isFederate() && !s2.isFederate()
-                && s1.getServiceName().equals(s2.getServiceName())) {
-            // both service with same uri
+        }
+        else if (!s1.isFederate() && !s2.isFederate()
+          && s1.getServiceName().equals(s2.getServiceName())) {
+            // both service with same uri            
             return merge(exp, s1, s2, s1.getServiceList());
-        } else if (exp.isOptional() && visitor.isFederateOptional()) {
+        }
+        else if (exp.isOptional() && visitor.isFederateOptional()) {
             return binary(exp);
-        } else if (exp.isMinus() && visitor.isFederateMinus()) {
+        }
+        else if (exp.isMinus()&& visitor.isFederateMinus()) {
             return binary(exp);
         }
         return exp;
     }
-
+    
     // exp =  service S1 {bgp1} optional {service S2 {bgp2}}
     // return service S1 {bgp1 optional {bgp2}}
     Service merge(Exp exp, Service s1, Service s2, List<Atom> list) {
@@ -384,11 +440,11 @@ public class Simplify extends Util {
         Service s = Service.create(list, BasicGraphPattern.create(simple));
         return s;
     }
-
+    
     // service S1 {bgp1} optional {service S2 {bgp2}}
-    // heuristics to simplify optional when triples in bgp2
+    // heuristics to simplify optional when triples in bgp2 
     // are present in service S1 inter S2
-    // and for all t in bgp2, connected(t, bgp1)
+    // and for all t in bgp2, connected(t, bgp1) 
     // => join(t, bgp1, S1 inter S2) == true
     // -> service S1 {bgp1 optional {bgp2}}
     // @todo: generalize with several service in right exp
@@ -396,13 +452,13 @@ public class Simplify extends Util {
         if (exp.get(0).size() == 1 && exp.get(1).size() == 1) {
             Exp e1 = exp.get(0).get(0);
             Exp e2 = exp.get(1).get(0);
-
+            
             if (e1.isService() && e2.isService()) {
                 Service s1 = e1.getService();
                 Service s2 = e2.getService();
                 List<Atom> inter = intersection(s1, s2);
 
-                if (!inter.isEmpty()) {
+                if (! inter.isEmpty()) {
                     if (join(s1.bgp(), s2.bgp(), inter)) {
                         return merge(exp, s1, s2, s1.getServiceList());
                     }
@@ -411,7 +467,7 @@ public class Simplify extends Util {
         }
         return exp;
     }
-
+    
     boolean join(BasicGraphPattern bgp1, BasicGraphPattern bgp2, List<Atom> list) {
         for (Atom uri : list) {
             if (!join(bgp1, bgp2, uri.getLabel())) {
@@ -421,6 +477,7 @@ public class Simplify extends Util {
         return true;
     }
 
+    
     // for all t in bgp2, connected(t, bgp1) => join(t, bgp1) == true
     // and at least one such t
     boolean join(BasicGraphPattern bgp1, BasicGraphPattern bgp2, String uri) {
@@ -429,7 +486,7 @@ public class Simplify extends Util {
             if (e.isTriple()) {
                 Triple t = e.getTriple();
                 if (bgp1.isConnected(t)) {
-                    join = visitor.getAstSelector().join(bgp1, t, uri);
+                    join = visitor.getAstSelector().join(bgp1, t, uri); 
                     if (!join) {
                         return false;
                     }
@@ -438,7 +495,7 @@ public class Simplify extends Util {
         }
         return join;
     }
-
+    
     // case where there is undefined service in one branch
     Exp unionUndefined(Exp exp) {
         if (hasUndefinedService(exp.get(0))
@@ -452,25 +509,26 @@ public class Simplify extends Util {
         }
         return exp;
     }
-
+    
     // optional/minus
     Exp binaryUndefined(Exp exp) {
         if (hasUndefinedService(exp.get(1)) &&
-                !hasUndefinedService(exp.get(0))) {
-            logger.info("Skip minus|optional exp:\n" + exp.get(1));
+          ! hasUndefinedService(exp.get(0))) {
+            logger.info("Skip minus|optional exp:\n" + exp.get(1));            
             return exp.get(0);
         }
         return exp;
     }
-
+    
     boolean hasUndefinedService(Exp exp) {
         return exp.hasUndefinedService();
-    }
-
+    } 
+    
     ASTSelector getSelector() {
         return visitor.getAstSelector();
     }
-
+    
+    
     /**
      * {service S {t1}} union {service S {t2}}
      * ::=
@@ -478,43 +536,45 @@ public class Simplify extends Util {
      */
     Service simplifyUnion(Exp exp, Service s1, Service s2) {
         Union union = Union.create(s1.getBodyExp(), s2.getBodyExp());
-        return Service.create(s1.getServiceList(), BasicGraphPattern.create(union));
+        Service s = Service.create(s1.getServiceList(), BasicGraphPattern.create(union));
+        return s;
     }
-
+    
     boolean isSimplifyUnion(Exp exp, Service s1, Service s2) {
-        return exp.isUnion() && s1.isFederate() && s2.isFederate()
-                && sameURIList(s1, s2)
-                && isUnionOrTripleOnly(s1.getBodyExp()) && isUnionOrTripleOnly(s2.getBodyExp());
+        return exp.isUnion() && s1.isFederate() && s2.isFederate() 
+            && sameURIList(s1, s2)
+            && isUnionOrTripleOnly(s1.getBodyExp()) && isUnionOrTripleOnly(s2.getBodyExp());
     }
-
+    
     boolean sameURIList(Service s1, Service s2) {
         return same(s1.getServiceList(), s2.getServiceList());
     }
-
-    boolean same(List<Atom> l1, List<Atom> l2) {
-        if (l1.size() != l2.size()) {
-            return false;
-        }
-        for (Atom s : l1) {
-            if (!l2.contains(s)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    
+   boolean same(List<Atom> l1, List<Atom> l2) {
+       if (l1.size() != l2.size()) {
+           return false;
+       }
+       for (Atom s : l1) {
+           if (! l2.contains(s)) {
+               return false;
+           }
+       }
+       return true;
+   }
+    
     Exp simplifyService2(Exp exp, Service s1, Service s2) {
         if (!s1.isFederate() && isMoveable(s2)
                 && s2.getServiceList().contains(s1.getServiceName())) {
             exp.set(0, s1.getBodyExp());
             exp.set(1, s2.getBodyExp());
             Exp simple = simplifyGraph(exp);
-            return Service.create(s1.getServiceName(),
-                    BasicGraphPattern.create(simple));
+            Service s = Service.create(s1.getServiceName(),
+                            BasicGraphPattern.create(simple));
+            return s;
         }
         return exp;
     }
-
+    
     /**
      * select from  g { e1 } optional { select from  g { e2 } }
      * ->
@@ -524,12 +584,12 @@ public class Simplify extends Util {
         if (exp.get(0).size() == 1 && exp.get(1).size() == 1) {
             Exp e1 = exp.get(0).get(0);
             Exp e2 = exp.get(1).get(0);
-            if (e1.isQuery() && e2.isQuery()) {
+            if (e1.isQuery() && e2.isQuery()){
                 ASTQuery ast1 = e1.getAST();
-                ASTQuery ast2 = e2.getAST();
-                if (ast1.getFrom().size() == 1 &&
-                        ast2.getFrom().size() == 1 &&
-                        ast1.getFrom().get(0).equals(ast2.getFrom().get(0))
+                ASTQuery ast2 = e2.getAST();                
+               if (ast1.getFrom().size() == 1 && 
+                    ast2.getFrom().size() == 1 &&
+                    ast1.getFrom().get(0).equals(ast2.getFrom().get(0))
                         && ast1.isSelectAll() && ast2.isSelectAll()) {
                     exp.set(0, ast1.getBody());
                     exp.set(1, ast2.getBody());
@@ -539,10 +599,10 @@ public class Simplify extends Util {
                 }
             }
         }
-        return exp;
+        return exp;       
     }
 
-    /**
+     /**
      * graph g { e1 } optional { graph g { e2 } }
      * ->
      * graph g { e1 optional { e2 } }
@@ -551,20 +611,21 @@ public class Simplify extends Util {
         if (exp.get(0).size() == 1 && exp.get(1).size() == 1) {
             Exp e1 = exp.get(0).get(0);
             Exp e2 = exp.get(1).get(0);
-            if (e1.isGraph() && e2.isGraph()) {
+            if (e1.isGraph() && e2.isGraph()){
                 Source g1 = e1.getNamedGraph();
-                Source g2 = e2.getNamedGraph();
-                if (//g1.getSource().isConstant() &&
-                        g1.getSource().equals(g2.getSource())) {
+                Source g2 = e2.getNamedGraph();  
+               if (//g1.getSource().isConstant() && 
+                   g1.getSource().equals(g2.getSource())) {
                     exp.set(0, g1.getBodyExp());
                     exp.set(1, g2.getBodyExp());
-                    return Source.create(g1.getSource(), exp);
+                    Source g = Source.create(g1.getSource(), exp);
+                    return g;
                 }
             }
         }
-        return exp;
+        return exp;       
     }
-
+    
     Exp simplifyGraph2(Exp exp) {
         int i = 0;
         ArrayList<Source> list = new ArrayList<>();
@@ -576,7 +637,7 @@ public class Simplify extends Util {
                         Source g1 = ee1.getNamedGraph();
                         Source g2 = ee2.getNamedGraph();
                         if (//g1.getSource().isConstant() &&
-                                g1.getSource().equals(g2.getSource())) {
+                            g1.getSource().equals(g2.getSource())) {                            
                             Source g = g1.merge(g2);
                             exp.set(i, g);
                             list.add(g2);
@@ -593,16 +654,18 @@ public class Simplify extends Util {
         }
         return exp;
     }
-
+    
+    
     /**
+     * 
      * service s1 {A} service s2 {B} optional { service s2 {C} }
      * with condition: x in var(C) & x not in B => x not in A
      * ->
      * service s1 {A} service s2 {B optional {C}}
-     * <p>
+     * 
      * service s1 {A} service s2 {B} minus { service s2 {C} }
      * with condition: x in var(C) & x not in B => x not in A
-     * ->
+     * -> 
      * service s1 {A} service s2 {B minus {C}}
      */
     Exp split(Exp exp) {
@@ -613,42 +676,45 @@ public class Simplify extends Util {
             Service s1 = fst.get(0).getService();
             Service s2 = fst.get(1).getService();
             Service s3 = rst.get(0).getService();
-
+            
             if (splitable(s1, s2, s3)) {
                 return split(exp, s1, s2, s3);
-            } else if (splitable(s2, s1, s3)) {
+            }
+            else if (splitable(s2, s1, s3)) {
                 return split(exp, s2, s1, s3);
             }
         }
         return exp;
     }
-
+    
     boolean splitable(Service s1, Service s2, Service s3) {
         return !s2.isFederate() && !s3.isFederate()
                 && s2.getServiceName().equals(s3.getServiceName())
                 && gentle(s1, s2, s3);
     }
-
+    
     Exp split(Exp exp, Service s1, Service s2, Service s3) {
         ASTQuery a = visitor.getAST();
         Service s = a.service(s2.getServiceName(), copy(a, exp, s2.getBodyExp(), s3.getBodyExp()));
-        return a.bgp(s1, s);
+        BasicGraphPattern bgp = a.bgp(s1, s);
+        return bgp;
     }
-
+    
     // condition: x in var(C) & x not in B => x not in A
-    boolean gentle(Service s1, Service s2, Service s3) {
+    boolean gentle (Service s1, Service s2, Service s3) {
         return gentle(s1.getInscopeVariables(), s2.getInscopeVariables(), s3.getInscopeVariables());
     }
-
+    
+   
     boolean gentle(List<Variable> l1, List<Variable> l2, List<Variable> l3) {
         for (Variable var : l3) {
-            if (!l2.contains(var) && l1.contains(var)) {
+            if (! l2.contains(var) && l1.contains(var)) {
                 return false;
             }
         }
         return true;
     }
-
+    
     Exp copy(ASTQuery a, Exp exp, Exp e1, Exp e2) {
         if (exp.isMinus()) {
             return a.minus(e1, e2);
@@ -661,22 +727,21 @@ public class Simplify extends Util {
         return mergeEvenIfNotConnected;
     }
 
-    class ServiceList {
-        HashMap<String, List<Service>> map;
-
-        ServiceList() {
-            map = new HashMap<>();
-        }
-
-        void add(Service serv) {
-            List<Service> l = map.computeIfAbsent(serv.getServiceName().getLabel(), k -> new ArrayList<>());
-            l.add(serv);
-        }
-
-        HashMap<String, List<Service>> getMap() {
-            return map;
-        }
+    public void setMergeEvenIfNotConnected(boolean mergeEvenIfNotConnected) {
+        this.mergeEvenIfNotConnected = mergeEvenIfNotConnected;
     }
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

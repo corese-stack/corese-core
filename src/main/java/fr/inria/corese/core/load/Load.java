@@ -536,8 +536,10 @@ public class Load
                 contentType = srv.getFormat();
             }
             if (contentType != null) {
+                // logger.info("Content-type: " + contentType);
                 Loader.format myFormat = getTypeFormat(contentType, Loader.format.UNDEF_FORMAT);
             }
+            // System.out.println("load: " + contentType + " " + myFormat);
 
         } else {
             stream = new FileInputStream(path);

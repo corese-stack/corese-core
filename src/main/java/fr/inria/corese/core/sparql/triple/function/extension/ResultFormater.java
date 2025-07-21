@@ -16,16 +16,13 @@ import fr.inria.corese.core.sparql.datatype.function.XPathFun;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.function.term.TermEval;
 import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class ResultFormater extends TermEval {
-
-    private static final Logger logger = LoggerFactory.getLogger(ResultFormater.class);
 
     public ResultFormater() {
     }
@@ -60,7 +57,7 @@ public class ResultFormater extends TermEval {
 
         switch (oper()) {
             case XT_JSON:
-                if (dt.getCode() == IDatatype.Datatype.STRING || dt.getCode() == IDatatype.Datatype.LITERAL) {
+                if (dt.getCode() == IDatatype.STRING || dt.getCode() == IDatatype.LITERAL) {
                     return DatatypeMap.json(dt.stringValue());
                 }
                 else if (dt.isXML()) {
@@ -70,10 +67,10 @@ public class ResultFormater extends TermEval {
 
             case XT_XML: 
                 switch (dt.getCode()) {
-                    case STRING:
-                    case LITERAL:
-                    case XMLLITERAL:
-                    case URI:
+                    case IDatatype.STRING:
+                    case IDatatype.LITERAL:
+                    case IDatatype.XMLLITERAL:
+                    case IDatatype.URI:
                     return parseXML(dt);
                 }
                 break;
@@ -104,7 +101,7 @@ public class ResultFormater extends TermEval {
             IDatatype res = DatatypeMap.newXMLObject(dt.getLabel(), node); 
             return res;
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            logger.error("An unexpected error has occurred", ex);
+            Logger.getLogger(ResultFormater.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

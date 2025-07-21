@@ -1,39 +1,42 @@
 package fr.inria.corese.core.compiler.federate;
 
+import static fr.inria.corese.core.compiler.federate.util.RewriteErrorMessage.NO_SERVICE;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.api.FederateMerge;
-import fr.inria.corese.core.sparql.triple.parser.*;
-
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Union;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.inria.corese.core.compiler.federate.util.RewriteErrorMessage.NO_SERVICE;
-
 /**
- * Rewrite rdf list into one service bgp
+ * Rewrite rdf list into one service bgp 
  * Rewrite bgp with bnode into one service bgp: ?s :p [ :q ?v ]
- *
  * @focus "?var" -> merge triple with variable var in bgp with bnode and var
  * @focus "?s"
  * ?s p [q u] . ?s p v
  * -> add ?s p v in bgp because it share variable ?s
  */
 public class RewriteList implements FederateMerge {
-
-    IDatatype focus;
+      
     private FederateVisitor visitor;
-
-    RewriteList(FederateVisitor vis) {
+    IDatatype focus;
+    
+    RewriteList(FederateVisitor vis){
         visitor = vis;
     }
-
+    
     // group rdf list in specific service bgp
     // group connected triple with bnode variable in specific service bgp
     // modify body
     // return false when one bgp has no service
     // @focus "var" -> merge triple with variable var in the same way as bnode variable
     boolean process(Exp body) {
-        focus = visitor.getAST().getMetadataDatatypeValue(Metadata.Type.FOCUS);
+        focus = visitor.getAST().getMetadataDatatypeValue(Metadata.FOCUS);
         boolean suc = true;
         if (getVisitor().isProcessList()) {
             List<BasicGraphPattern> list = new ArrayList<>();
@@ -43,37 +46,38 @@ public class RewriteList implements FederateMerge {
         }
         return suc;
     }
-
+    
     @Override
     public boolean merge(Triple t) {
         return hasBlank(t) || submerge(t);
     }
-
+    
     boolean hasBlank(Triple t) {
         return t.getSubject().isBlankNode() ||
-                t.getObject().isBlankNode();
+               t.getObject().isBlankNode();
     }
-
-    boolean submerge(Triple t) {
+    
+    boolean submerge(Triple t) {       
         if (focus == null) {
-            return false;
+             return false;   
         }
         return hasVariable(t, focus.getLabel());
     }
-
+    
     boolean hasVariable(Triple t, String var) {
         return hasVariable(t.getSubject(), var) ||
-                hasVariable(t.getObject(), var);
+               hasVariable(t.getObject(), var);
     }
-
+    
     boolean hasVariable(Atom at, String var) {
         if (at.isVariable()) {
             return var.contains(at.getLabel());
         }
         return false;
     }
+    
 
-
+        
     boolean bgp2service(Exp body, List<BasicGraphPattern> list) {
         boolean suc = true;
         for (BasicGraphPattern exp : list) {
@@ -89,7 +93,7 @@ public class RewriteList implements FederateMerge {
         }
         return suc;
     }
-
+    
     void replace(Exp body, BasicGraphPattern bgp, Exp serviceExp) {
         for (Exp exp : bgp) {
             if (exp.isTriple()) {
@@ -98,7 +102,7 @@ public class RewriteList implements FederateMerge {
         }
         body.add(serviceExp);
     }
-
+    
 
     // rewrite rdf list as service (S) { bgp }
     // where all rdf list triple are in all s in S
@@ -112,19 +116,21 @@ public class RewriteList implements FederateMerge {
             }
             if (count++ == 0) {
                 uriList = list;
-            } else {
-                uriList = intersection(uriList, list);
+            }
+            else {
+                uriList = intersection(uriList, list);            
             }
         }
-
+        
         if (uriList.isEmpty()) {
             return null;
         }
-        return Service.create(uriList, bgp);
+        Service s = Service.create(uriList, bgp);
+        return s;
     }
-
+    
     ArrayList<Atom> intersection(List<Atom> l1, List<Atom> l2) {
-        ArrayList<Atom> uriList = new ArrayList<>();
+        ArrayList<Atom> uriList = new ArrayList<>(); 
         for (Atom uri : l1) {
             if (l2.contains(uri)) {
                 uriList.add(uri);
@@ -133,12 +139,13 @@ public class RewriteList implements FederateMerge {
         return uriList;
     }
 
-
+   
     Exp union(List<Service> list, int n) {
-        if (n == list.size() - 1) {
+        if (n == list.size()-1) {
             return list.get(n);
-        } else {
-            return Union.create(list.get(n), union(list, n + 1));
+        }
+        else {
+            return Union.create(list.get(n), union(list, n+1));
         }
     }
 
@@ -149,6 +156,6 @@ public class RewriteList implements FederateMerge {
     public void setVisitor(FederateVisitor visitor) {
         this.visitor = visitor;
     }
-
-
+    
+    
 }

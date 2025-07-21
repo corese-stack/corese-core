@@ -18,82 +18,84 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 public class Metadata extends ASTObject
         implements Iterable<String> {
     static final String NL = "\n";
+    static final int UNDEFINED = -1;
     static final String AT = "@";
+    public static final int TEST = 0;
+    public static final int DEBUG = 1;
+    public static final int TRACE = 2;
+    public static final int PUBLIC = 3;
+    public static final int IMPORT = 4;
+    public static final int NEW = 5;
 
     // Query
-    public enum Type {
-        UNDEFINED,
-        TEST,
-        DEBUG,
-        TRACE,
-        PUBLIC,
-        IMPORT,
-        NEW,
-        SPARQL,
-        RELAX,
-        MORE,
-        FEDERATE,
-        DISPLAY,
-        BIND,
-        TYPE,
-        COMPILE,
-        SKIP,
-        PATH,
-        ENCODING,
-        DB,
-        DB_FACTORY,
-        ALGEBRA,
-        BOUNCE,
-        SPARQL10,
-        TRAP,
-        FEDERATION,
-        COUNT,
-        PARALLEL,
-        SEQUENCE,
-        VARIABLE,
-        SERVER,
-        PROVENANCE,
-        DUPLICATE,
-        LDPATH,
-        ENDPOINT,
-        FILE,
-        DETAIL,
-        ACCEPT,
-        REJECT,
-        OPTION,
-        SPLIT,
-        LOCK,
-        UNLOCK,
-        LIMIT,
-        GRAPH,
-        FROM,
-        UPDATE,
-        BINDING,
-        INDEX,
-        LOG,
-        EXPLAIN,
-        WHY,
-        MESSAGE,
-        MERGE_SERVICE,
-        BROWSE,
-        EVENT,
-        FORMAT,
-        SELECT,
-        REPORT,
-        DISTINCT,
-        ENUM,
-        HEADER,
-        COOKIE,
-        TIMEOUT,
-        RDF_STAR_SELECT,
-        RDF_STAR_DELETE,
-        METADATA,
-        VISITOR,
-        MOVE,
-        PATH_TYPE,
-        SLICE,
-        FOCUS
-    }
+    public static final int SPARQL = 10; // federate sparql
+    public static final int RELAX = 11;
+    public static final int MORE = 12;
+    public static final int FEDERATE = 13;
+    public static final int DISPLAY = 14;
+    public static final int BIND = 15; // @event @bind
+    public static final int TYPE = 16;
+    public static final int COMPILE = 17;
+    public static final int SKIP = 18;
+    public static final int PATH = 19;
+    public static final int ENCODING = 20;
+    public static final int DB = 21;
+    public static final int DB_FACTORY = 22;
+    public static final int ALGEBRA = 23;
+    public static final int BOUNCE = 24;
+    public static final int SPARQL10 = 25;
+    public static final int TRAP = 26;
+    public static final int FEDERATION = 27;
+    public static final int COUNT = 28;
+    public static final int PARALLEL = 29;
+    public static final int SEQUENCE = 30;
+    public static final int VARIABLE = 31;
+    public static final int SERVER = 32;
+    public static final int PROVENANCE = 33;
+    public static final int DUPLICATE = 34;
+    public static final int LDPATH = 35;
+    public static final int ENDPOINT = 36;
+    public static final int FILE = 37;
+    public static final int DETAIL = 38;
+    public static final int ACCEPT = 39;
+    public static final int REJECT = 40;
+    public static final int OPTION = 41;
+    public static final int SPLIT = 42;
+    public static final int LOCK = 43;
+    public static final int UNLOCK = 44;
+    public static final int LIMIT = 45;
+    public static final int GRAPH = 46;
+    public static final int FROM = 47;
+    public static final int UPDATE = 48;
+    public static final int BINDING = 50; // service binding
+    public static final int INDEX = 51; // service binding
+    public static final int LOG = 52;
+    public static final int EXPLAIN = 53;
+    public static final int WHY = 54;
+    public static final int MESSAGE = 55;
+    public static final int MERGE_SERVICE = 56;
+    public static final int BROWSE = 57;
+    public static final int EVENT = 58;
+    public static final int FORMAT = 59;
+    public static final int SELECT = 60;
+    public static final int REPORT = 61;
+    public static final int DISTINCT = 62;
+    public static final int ENUM = 63;
+    public static final int HEADER = 64;
+    public static final int COOKIE = 65;
+    public static final int TIMEOUT = 66;
+    // data producer return asserted and nested edge for sparql query
+    public static final int RDF_STAR_SELECT = 67;
+    // delete update query remove (nested) edge
+    public static final int RDF_STAR_DELETE = 68;
+
+    // uncertainty triple metadata
+    public static final int METADATA = 70;
+    public static final int VISITOR = 71;
+    public static final int MOVE = 72;
+    public static final int PATH_TYPE = 73;
+    public static final int SLICE = 74;
+    public static final int FOCUS = 75;
 
     static final String PREF = NSManager.KGRAM;
     public static final String DISPLAY_RDF_XML = PREF + "rdfxml";
@@ -136,7 +138,7 @@ public class Metadata extends ASTObject
     public static final String DISCOVERY = "@discovery";
     public static final String LOOP = AT + URLParam.LOOP;
     public static final String START = AT + URLParam.START;
-    public static final String UNTIL = AT + URLParam.UNTIL;
+    public static final String UNTIL = AT + URLParam.UNTIL;;
     public static final String HIDE = "@hide";
     public static final String LIMIT_STR = "@limit";
 
@@ -156,8 +158,8 @@ public class Metadata extends ASTObject
     public static final String FED_CLASS = "@federateClass";
     public static final String SAVE = "@save";
 
-    private static HashMap<String, Type> annotation;
-    private static HashMap<Type, String> back;
+    private static HashMap<String, Integer> annotation;
+    private static HashMap<Integer, String> back;
 
     HashMap<String, String> map;
     HashMap<String, List<String>> value;
@@ -172,82 +174,87 @@ public class Metadata extends ASTObject
     static void initAnnotate() {
         annotation = new HashMap();
         back = new HashMap();
-        define("@debug", Type.DEBUG);
-        define("@trace", Type.TRACE);
-        define("@test", Type.TEST);
-        define("@new", Type.NEW);
-        define("@parallel", Type.PARALLEL);
-        define("@sequence", Type.SEQUENCE);
-        define("@variable", Type.VARIABLE);
-        define("@provenance", Type.PROVENANCE);
-        define("@log", Type.LOG);
-        define("@duplicate", Type.DUPLICATE);
-        define("@distinct", Type.DISTINCT);
-        define("@count", Type.COUNT);
-        define("@server", Type.SERVER);
-        define("@export", Type.PUBLIC);
-        define("@public", Type.PUBLIC);
-        define("@more", Type.MORE);
-        define("@relax", Type.RELAX);
-        define("@federate", Type.FEDERATE);
-        define("@federation", Type.FEDERATION);
-        define("@sparql", Type.SPARQL);
-        define("@index", Type.INDEX);
-        define(LIMIT_STR, Type.LIMIT);
-        define("@slice", Type.SLICE);
-        define("@move", Type.MOVE);
-        define("@bounce", Type.BOUNCE);
-        define("@sparqlzero", Type.SPARQL10);
-        define("@encoding", Type.ENCODING);
-        define("@bind", Type.BIND); // @event @bind
-        define("@binding", Type.BINDING); // service bind: to differ from @event @bind
-        define("@import", Type.IMPORT);
-        define("@display", Type.DISPLAY);
-        define("@type", Type.TYPE);
-        define("@compile", Type.COMPILE);
-        define("@path", Type.PATH);
-        define("@pathtype", Type.PATH_TYPE);
-        define("@skip", Type.SKIP);
-        define("@db", Type.DB);
-        define("@dbfactory", Type.DB_FACTORY);
-        define("@algebra", Type.ALGEBRA);
-        define("@metadata", Type.METADATA);
-        define("@visitor", Type.VISITOR);
-        define("@trap", Type.TRAP);
-        define("@ldpath", Type.LDPATH);
-        define("@endpoint", Type.ENDPOINT);
-        define("@file", Type.FILE);
-        define("@detail", Type.DETAIL);
-        define("@report", Type.REPORT);
-        define("@header", Type.HEADER);
-        define("@cookie", Type.COOKIE);
-        define("@timeout", Type.TIMEOUT);
-        define("@enum", Type.ENUM);
-        define("@accept", Type.ACCEPT);
-        define("@reject", Type.REJECT);
-        define("@option", Type.OPTION);
-        define("@split", Type.SPLIT);
-        define("@lock", Type.LOCK);
-        define("@unlock", Type.UNLOCK);
-        define("@graph", Type.GRAPH);
-        define("@from", Type.FROM);
-        define("@explain", Type.EXPLAIN);
-        define("@why", Type.WHY);
-        define("@message", Type.MESSAGE);
-        define("@browse", Type.BROWSE);
-        define("@merge", Type.MERGE_SERVICE);
-        define("@focus", Type.FOCUS);
-        define("@format", Type.FORMAT);
+        define("@debug", DEBUG);
+        define("@trace", TRACE);
+        define("@test", TEST);
+        define("@new", NEW);
+        define("@parallel", PARALLEL);
+        define("@sequence", SEQUENCE);
+        define("@variable", VARIABLE);
+        define("@provenance", PROVENANCE);
+        define("@log", LOG);
+        define("@duplicate", DUPLICATE);
+        define("@distinct", DISTINCT);
+        define("@count", COUNT);
+        define("@server", SERVER);
+        define("@export", PUBLIC);
+        define("@public", PUBLIC);
+        define("@more", MORE);
+        define("@relax", RELAX);
+        define("@federate", FEDERATE);
+        define("@federation", FEDERATION);
+        define("@sparql", SPARQL);
+        define("@index", INDEX);
+        define(LIMIT_STR, LIMIT);
+        define("@slice", SLICE);
+        define("@move", MOVE);
+        define("@bounce", BOUNCE);
+        define("@sparqlzero", SPARQL10);
+        define("@encoding", ENCODING);
+        define("@bind", BIND); // @event @bind
+        define("@binding", BINDING); // service bind: to differ from @event @bind
+        define("@import", IMPORT);
+        define("@display", DISPLAY);
+        define("@type", TYPE);
+        define("@compile", COMPILE);
+        define("@path", PATH);
+        define("@pathtype", PATH_TYPE);
+        define("@skip", SKIP);
+        define("@db", DB);
+        define("@dbfactory", DB_FACTORY);
+        define("@algebra", ALGEBRA);
+        define("@metadata", METADATA);
+        define("@visitor", VISITOR);
+        define("@trap", TRAP);
+        define("@ldpath", LDPATH);
+        define("@endpoint", ENDPOINT);
+        define("@file", FILE);
+        define("@detail", DETAIL);
+        define("@report", REPORT);
+        define("@header", HEADER);
+        define("@cookie", COOKIE);
+        define("@timeout", TIMEOUT);
+        define("@enum", ENUM);
+        define("@accept", ACCEPT);
+        define("@reject", REJECT);
+        define("@option", OPTION);
+        define("@split", SPLIT);
+        define("@lock", LOCK);
+        define("@unlock", UNLOCK);
+        define("@graph", GRAPH);
+        define("@from", FROM);
+        define("@explain", EXPLAIN);
+        define("@why", WHY);
+        define("@message", MESSAGE);
+        define("@browse", BROWSE);
+        define("@merge", MERGE_SERVICE);
+        define("@focus", FOCUS);
+        define("@format", FORMAT);
         // update query evaluated as select query
-        define("@select", Type.SELECT);
-        define("@selectrdfstar", Type.RDF_STAR_SELECT);
-        define("@deleterdfstar", Type.RDF_STAR_DELETE);
+        define("@select", SELECT);
+        define("@selectrdfstar", RDF_STAR_SELECT);
+        define("@deleterdfstar", RDF_STAR_DELETE);
 
-        define("@update", Type.UPDATE);
-        define("@event", Type.EVENT);
+        define("@update", UPDATE);
+        define("@event", EVENT);
+        // define(META_BEFORE, BEFORE);
+        // define(META_AFTER, AFTER);
+        // define(META_PRODUCE,PRODUCE);
+        // define(META_RESULT, RESULT);
+        // define(META_STATEMENT, STATEMENT);
     }
 
-    static void define(String str, Type type) {
+    static void define(String str, int type) {
         annotation.put(str, type);
         back.put(type, str);
     }
@@ -284,8 +291,8 @@ public class Metadata extends ASTObject
      * Subset of Metadata for xt:sparql() see PluginImpl
      */
     public Metadata selectSparql() {
-        if (hasMetadata(Type.REPORT)) {
-            return new Metadata().add(Type.REPORT);
+        if (hasMetadata(REPORT)) {
+            return new Metadata().add(REPORT);
         }
         return null;
     }
@@ -300,7 +307,7 @@ public class Metadata extends ASTObject
         return this;
     }
 
-    public Metadata add(Type type) {
+    public Metadata add(int type) {
         String name = name(type);
         if (name != null) {
             add(name);
@@ -308,7 +315,7 @@ public class Metadata extends ASTObject
         return this;
     }
 
-    public Metadata remove(Type type) {
+    public Metadata remove(int type) {
         String name = name(type);
         if (name != null) {
             map.remove(name);
@@ -316,7 +323,7 @@ public class Metadata extends ASTObject
         return this;
     }
 
-    public Metadata add(Type type, String value) {
+    public Metadata add(int type, String value) {
         String name = name(type);
         if (name != null) {
             add(name, value);
@@ -336,7 +343,7 @@ public class Metadata extends ASTObject
         }
     }
 
-    public void set(Type type, List<String> list) {
+    public void set(int type, List<String> list) {
         String name = name(type);
         if (name != null) {
             set(name, list);
@@ -358,7 +365,7 @@ public class Metadata extends ASTObject
         }
     }
 
-    public void add(Type type, IDatatype val) {
+    public void add(int type, IDatatype val) {
         add(name(type), val);
     }
 
@@ -370,7 +377,7 @@ public class Metadata extends ASTObject
         }
     }
 
-    public boolean hasMetadata(Type type) {
+    public boolean hasMetadata(int type) {
         String str = name(type);
         if (str == null) {
             return false;
@@ -378,8 +385,8 @@ public class Metadata extends ASTObject
         return hasMetadata(str);
     }
 
-    public boolean hasMetadata(Type... type) {
-        for (Type val : type) {
+    public boolean hasMetadata(int... type) {
+        for (int val : type) {
             if (hasMetadata(val)) {
                 return true;
             }
@@ -416,11 +423,11 @@ public class Metadata extends ASTObject
         return map;
     }
 
-    public String getValue(Type type) {
+    public String getValue(int type) {
         return getValue(name(type));
     }
 
-    public IDatatype getDatatypeValue(Type type) {
+    public IDatatype getDatatypeValue(int type) {
         return getDatatypeValue(name(type));
     }
 
@@ -428,7 +435,7 @@ public class Metadata extends ASTObject
         return literal.get(type);
     }
 
-    public int intValue(Type type) {
+    public int intValue(int type) {
         IDatatype dt = getDatatypeValue(type);
         if (dt == null) {
             return -1;
@@ -436,7 +443,7 @@ public class Metadata extends ASTObject
         return dt.intValue();
     }
 
-    public boolean hasDatatypeValue(Type type) {
+    public boolean hasDatatypeValue(int type) {
         return getDatatypeValue(type) != null;
     }
 
@@ -444,7 +451,7 @@ public class Metadata extends ASTObject
         return getDatatypeValue(type) != null;
     }
 
-    public String getStringValue(Type type) {
+    public String getStringValue(int type) {
         String value = getValue(type);
         if (value == null) {
             return null;
@@ -453,7 +460,7 @@ public class Metadata extends ASTObject
     }
 
     boolean hasReportKey(String key) {
-        List<String> list = getValues(Type.REPORT);
+        List<String> list = getValues(REPORT);
         if (list == null) {
             return true;
         }
@@ -464,16 +471,16 @@ public class Metadata extends ASTObject
         return list.contains(key);
     }
 
-    public boolean hasValue(Type meta) {
+    public boolean hasValue(int meta) {
         return getValue(meta) != null;
     }
 
-    public boolean hasValue(Type meta, String value) {
+    public boolean hasValue(int meta, String value) {
         String str = getValue(meta);
         return str != null && str.equals(value);
     }
 
-    public boolean hasValues(Type meta, String value) {
+    public boolean hasValues(int meta, String value) {
         List<String> list = getValues(meta);
         if (list == null) {
             return false;
@@ -492,7 +499,7 @@ public class Metadata extends ASTObject
         return list.get(0);
     }
 
-    public List<String> getValues(Type type) {
+    public List<String> getValues(int type) {
         return getValues(name(type));
     }
 
@@ -512,15 +519,15 @@ public class Metadata extends ASTObject
         return map.keySet();
     }
 
-    public Type type(String name) {
-        Type i = annotation.get(name);
+    public int type(String name) {
+        Integer i = annotation.get(name);
         if (i == null) {
-            i = Type.UNDEFINED;
+            i = UNDEFINED;
         }
         return i;
     }
 
-    public String name(Type type) {
+    public String name(int type) {
         return back.get(type);
     }
 
@@ -562,8 +569,8 @@ public class Metadata extends ASTObject
 
     // @graph <server1> <g1> <g2> <server2> <g3>
     public List<String> getGraphList(String service) {
-        List<String> graphList = getValues(Type.FROM);
-        List<String> serverList = getValues(Type.FEDERATE);
+        List<String> graphList = getValues(FROM);
+        List<String> serverList = getValues(FEDERATE);
         ArrayList<String> res = new ArrayList<>();
         boolean find = false;
         if (graphList != null && serverList != null) {

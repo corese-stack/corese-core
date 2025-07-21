@@ -7,12 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SQLFun {
-
-	private static final Logger logger = LoggerFactory.getLogger(SQLFun.class);
 	
 	static final String DERBY_DRIVER = "org.apache.derby.jdbc.ClientDriver";
 
@@ -29,13 +25,13 @@ public class SQLFun {
 				driver = Class.forName(dd.getLabel()).newInstance();
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
-				logger.error("Operation failure", e);
+				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
-				logger.error("Operation failure", e);
+				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
-				logger.error("Operation failure", e);
+				e.printStackTrace();
 			}
 		}
 		return sql(uri, login, passwd, query);
@@ -53,13 +49,13 @@ public class SQLFun {
 					driver = Class.forName(DERBY_DRIVER).newInstance();
 				} catch (InstantiationException e) {
 					// TODO Auto-generated catch block
-					logger.error("Operation failure", e);
+					e.printStackTrace();
 				} catch (IllegalAccessException e) {
 					// TODO Auto-generated catch block
-					logger.error("Operation failure", e);
+					e.printStackTrace();
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
-					logger.error("Operation failure", e);
+					e.printStackTrace();
 				}
 			}
         	Connection con = 
@@ -76,7 +72,7 @@ public class SQLFun {
         }
         catch (SQLException e) {
         	// TODO Auto-generated catch block
-        	logger.error("Operation failure", e);
+        	e.printStackTrace();
         }  
         return null;
 	}

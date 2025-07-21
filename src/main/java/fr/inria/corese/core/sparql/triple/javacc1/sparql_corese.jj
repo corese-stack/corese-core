@@ -415,12 +415,12 @@ void UpdateQuery2() : {
 	}
 	
 	(
-		<LOAD> {ope = Basic.create(Update.Keyword.LOAD);} 
+		<LOAD> {ope = Basic.create(Update.LOAD);} 
 		(<SILENT> 	{ope.setSilent(true);} ) ?  
 		uri = IRIrefConst() {ope.setURI(uri);} 
 		( <INTO> <GRAPH> graph = IRIrefConst() {ope.setTarget(graph);} ) ?
 	|
-		(<CLEAR>  	{ope = Basic.create(Update.Keyword.CLEAR);} | <DROP> {ope = Basic.create(Update.Keyword.DROP);})
+		(<CLEAR>  	{ope = Basic.create(Update.CLEAR);} | <DROP> {ope = Basic.create(Update.DROP);})
 		
 		(<SILENT> 	{ope.setSilent(true);} ) ?  
 			
@@ -432,12 +432,12 @@ void UpdateQuery2() : {
 
 		
 	|
-		<CREATE> {ope = Basic.create(Update.Keyword.CREATE);} (<SILENT> {ope.setSilent(true);} ) ?  
+		<CREATE> {ope = Basic.create(Update.CREATE);} (<SILENT> {ope.setSilent(true);} ) ?  
 		<GRAPH> graph = IRIrefConst() {ope.setGraph(graph);}
 	|
-		(<ADD>  {ope = Basic.create(Update.Keyword.ADD);}  | 
-		 <MOVE> {ope = Basic.create(Update.Keyword.MOVE);} | 
-		 <COPY> {ope = Basic.create(Update.Keyword.COPY);})
+		(<ADD>  {ope = Basic.create(Update.ADD);}  | 
+		 <MOVE> {ope = Basic.create(Update.MOVE);} | 
+		 <COPY> {ope = Basic.create(Update.COPY);})
 		
 		(<SILENT> {ope.setSilent(true);} ) ?
 		   
@@ -471,7 +471,7 @@ void DeleteInsertData() : {Exp exp; Composite ope, upd;}
 		exp = QuadPattern() 
 		
 		{astq.setInsertData(false); 
-		 ope = Composite.create(Update.Keyword.INSERT, exp); }
+		 ope = Composite.create(Update.INSERT, exp); }
 	
 	|
 	
@@ -481,14 +481,14 @@ void DeleteInsertData() : {Exp exp; Composite ope, upd;}
                             exp =   QuadPattern() 
                             {handler.leaveDeleteData();} 
 
-			{ope = Composite.create(Update.Keyword.DELETE, exp);}
+			{ope = Composite.create(Update.DELETE, exp);}
 			
 			|
 			<WHERE>  { handler.enterWhere(); }  exp = QuadPattern() { handler.leaveWhere(); }
 			
 			{
-				upd = Composite.create(Update.Keyword.COMPOSITE); upd.setBody(exp); 
-				ope = Composite.create(Update.Keyword.DELETE);    ope.setPattern(exp); 
+				upd = Composite.create(Update.COMPOSITE); upd.setBody(exp); 
+				ope = Composite.create(Update.DELETE);    ope.setPattern(exp); 
 				upd.add(ope);
 				ope = upd;
 			}
@@ -507,7 +507,7 @@ void DeleteInsertData() : {Exp exp; Composite ope, upd;}
 
 void DeleteInsertWhere() : {Exp exp; Composite upd, ope; Constant uri; Values values;}
 {
-	{upd = Composite.create(Update.Keyword.COMPOSITE);}
+	{upd = Composite.create(Update.COMPOSITE);}
 	
 	( <WITH> uri = IRIrefConst() 
 	
@@ -521,12 +521,12 @@ void DeleteInsertWhere() : {Exp exp; Composite upd, ope; Constant uri; Values va
                     exp = QuadPattern() 
                     { handler.leaveDelete(); }
 		
-		{ope = Composite.create(Update.Keyword.DELETE); ope.setPattern(exp); upd.add(ope);}
+		{ope = Composite.create(Update.DELETE); ope.setPattern(exp); upd.add(ope);}
 		
 		
 		( <INSERT> exp = QuadPattern() 
 		
-		  {ope = Composite.create(Update.Keyword.INSERT); ope.setPattern(exp); upd.add(ope);}
+		  {ope = Composite.create(Update.INSERT); ope.setPattern(exp); upd.add(ope);}
 		
 		) ?
 		
@@ -534,7 +534,7 @@ void DeleteInsertWhere() : {Exp exp; Composite upd, ope; Constant uri; Values va
 		
 		<INSERT> exp = QuadPattern()
 		
-	    {ope = Composite.create(Update.Keyword.INSERT); ope.setPattern(exp); upd.add(ope);}
+	    {ope = Composite.create(Update.INSERT); ope.setPattern(exp); upd.add(ope);}
 		
 	)
 	

@@ -26,11 +26,11 @@ public class JsonldLoader {
     /**
      * logger from log4j
      */
-    private static final Logger logger = LoggerFactory.getLogger(JsonldLoader.class);
+    private static Logger logger = LoggerFactory.getLogger(JsonldLoader.class);
 
     private Reader reader;
     private InputStream is;
-    private final String base;
+    private String base;
 
     JsonldLoader(InputStream r, String base) {
         this.is = r;
@@ -59,7 +59,7 @@ public class JsonldLoader {
             JsonldLoader p = new JsonldLoader(read, file);
             return p;
         } catch (FileNotFoundException e) {
-            logger.error("An error has occurred", e);
+            e.printStackTrace();
         }
         return null;
     }

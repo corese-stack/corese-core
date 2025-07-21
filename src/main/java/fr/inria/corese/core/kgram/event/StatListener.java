@@ -1,8 +1,6 @@
 package fr.inria.corese.core.kgram.event;
 
 import java.text.NumberFormat;
-import java.util.EnumMap;
-import java.util.Map;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.ExpType;
@@ -23,7 +21,7 @@ public class StatListener extends EvalListener {
 	result = 0, query = 0, total = 0, imax =0;
 	
 	int[] stat = new int[Event.END + 1];
-	Map<ExpType.Type, Integer> statExp = new EnumMap<>(ExpType.Type.class);
+	int[] statExp = new int[ExpType.TITLE.length]; 
 	
 	int[] 
 	    counter = new int[MAX],
@@ -46,8 +44,8 @@ public class StatListener extends EvalListener {
 		for (int i=0; i<stat.length; i++){
 			stat[i] = 0;
 		}
-		for (ExpType.Type i : ExpType.Type.values()){
-			statExp.put(i, 0);
+		for (int i=0; i<statExp.length; i++){
+			statExp[i] = 0;
 		}
 		for (int i=0; i<counter.length; i++){
 			counter[i] = 0;
@@ -71,7 +69,7 @@ public class StatListener extends EvalListener {
 		switch (e.getSort()){
 		
 		case Event.START:
-			statExp.put(e.getExp().type(), statExp.get(e.getExp().type()) + 1);
+			statExp[e.getExp().type()]++;
 			break;
 		
 		case Event.ENUM:
@@ -127,10 +125,10 @@ public class StatListener extends EvalListener {
 			}
 		}
 		
-		for (ExpType.Type typei : ExpType.Type.values()){
-			String title = typei.getTitle();
+		for (int i=ExpType.EMPTY; i<=ExpType.EVAL; i++){
+			String title = ExpType.TITLE[i];
 			if (title != null){
-				str += title + ": " + statExp.get(typei) + "\n";
+				str += title + ": " + statExp[i] + "\n";
 			}
 		}
 

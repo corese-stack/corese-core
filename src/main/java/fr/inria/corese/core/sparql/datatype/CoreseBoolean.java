@@ -22,7 +22,7 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
  */
 public class CoreseBoolean extends CoreseStringLiteral {
 
-    static IDatatype.Datatype code = IDatatype.Datatype.BOOLEAN;
+    static int code = BOOLEAN;
     static String STRUE = "true";
     static String SFALSE = "false";
     public static final CoreseBoolean TRUE = new CoreseBoolean(true);
@@ -100,7 +100,7 @@ public class CoreseBoolean extends CoreseStringLiteral {
     }
 
     @Override
-    public IDatatype.Datatype getCode() {
+    public int getCode() {
         return code;
     }
 

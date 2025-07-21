@@ -313,9 +313,9 @@ public class ExtensionLocal extends Core {
     IDatatype mytest() {
         try {
             QueryProcess exec = QueryProcess.create(getGraph());
-            logger.info("before mytest");
+            System.out.println("before mytest");
             Mappings map = exec.query("insert { graph us:g1 { [] rdf:value ?v } } where { bind (rand() as ?v) }");
-            logger.info("after mytest");
+            System.out.println("after mytest");
         } catch (EngineException ex) {
             logger.error(ex.getMessage());
         }
@@ -325,20 +325,19 @@ public class ExtensionLocal extends Core {
      IDatatype mytest2() {
         Service s = new Service("http://localhost:8080/sparql");
         try {
-            logger.info("before mytest");
+            System.out.println("before mytest");
             Mappings map = s.select("insert { graph us:g1 { [] rdf:value ?v } } where { bind (rand() as ?v) }");
-            logger.info("after mytest");
+            System.out.println("after mytest");
         } catch (LoadException ex) {
-            logger.error("Error execution: {}", ex.getMessage(), ex);
-
+            System.out.println(ex);
         } catch (EngineException ex) {
-            logger.error("Error execution: {}", ex.getMessage(), ex);
+            System.out.println(ex);
         }
         return DatatypeMap.TRUE;
     }
     
      public IDatatype mytest1() {
-        logger.info("mytest 1");
+        System.out.println("mytest 1");
         return DatatypeMap.TRUE;
     }
     

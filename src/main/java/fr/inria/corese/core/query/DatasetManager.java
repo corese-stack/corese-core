@@ -1,5 +1,11 @@
 package fr.inria.corese.core.query;
 
+import java.security.InvalidParameterException;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.rule.RuleEngine;
@@ -7,11 +13,6 @@ import fr.inria.corese.core.storage.CoreseGraphDataManagerBuilder;
 import fr.inria.corese.core.storage.DataManagerJava;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.util.Property;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.security.InvalidParameterException;
-import java.util.List;
 
 /**
  * Manage dataset and/or db storage according to Property
@@ -20,7 +21,7 @@ import java.util.List;
  * STORAGE_MODE = dataset|db|db_all
  */
 public class DatasetManager {
-    private static final Logger logger = LoggerFactory.getLogger(DatasetManager.class);
+    private static Logger logger = LoggerFactory.getLogger(DatasetManager.class);
 
     private DataManager dataManager;
     private String id;
@@ -31,17 +32,24 @@ public class DatasetManager {
     public DatasetManager init() {
         List<List<String>> storages = Property.getStorageparameters();
 
-        if (storages != null && !storages.isEmpty()) {
+        if (storages != null && storages.size() > 0) {
             defineDataManager(storages);
 
             if (isStorage()) {
                 // default mode is db storage
-                setDataManager(StorageFactory.getSingleton().getDataManager(getId()));
+                setDataManager(StorageFactory.getDataManager(getId()));
                 logger.info("Storage: " + getId());
             }
         }
 
         return this;
+    }
+
+    public enum TypeDataBase {
+        RDF4J_MODEL,
+        JENA_TDB1,
+        CORESE_GRAPH,
+        JAVA,
     }
 
     // Create one DataManager in StorageFactory for each db path
@@ -87,9 +95,9 @@ public class DatasetManager {
     public void defineDataManager(TypeDataBase typeDB, String id, String param) {
         logger.info("Create data manager " + typeDB + " with id " + id + " with config " + param);
         if (typeDB == TypeDataBase.JAVA) {
-            StorageFactory.getSingleton().defineDataManager(param, new DataManagerJava(param));
+            StorageFactory.defineDataManager(param, new DataManagerJava(param));
         } else if (typeDB == TypeDataBase.CORESE_GRAPH) {
-            StorageFactory.getSingleton().defineDataManager(id, new CoreseGraphDataManagerBuilder().build());
+            StorageFactory.defineDataManager(id, new CoreseGraphDataManagerBuilder().build());
         }
     }
 
@@ -112,8 +120,8 @@ public class DatasetManager {
     }
 
     public QueryProcess createStorageQueryProcessList(Graph g) {
-        DataManager[] dmList = StorageFactory.getSingleton().getDataManagerList()
-                .toArray(new DataManager[StorageFactory.getSingleton().getDataManagerList().size()]);
+        DataManager[] dmList = StorageFactory.getDataManagerList()
+                .toArray(new DataManager[StorageFactory.getDataManagerList().size()]);
         return QueryProcess.create(g, dmList);
     }
 
@@ -158,7 +166,7 @@ public class DatasetManager {
     }
 
     public DataManager getDataManager(String path) {
-        return StorageFactory.getSingleton().getDataManager(path);
+        return StorageFactory.getDataManager(path);
     }
 
     public String getId() {
@@ -167,13 +175,6 @@ public class DatasetManager {
 
     public void setId(String path) {
         this.id = path;
-    }
-
-    public enum TypeDataBase {
-        RDF4J_MODEL,
-        JENA_TDB1,
-        CORESE_GRAPH,
-        JAVA,
     }
 
 }

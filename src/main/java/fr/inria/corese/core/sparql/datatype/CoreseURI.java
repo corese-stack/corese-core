@@ -18,7 +18,7 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
  */
 
 public class CoreseURI extends CoreseResource {
-    static IDatatype.Datatype  code=IDatatype.Datatype.URI;
+    static int  code=URI;
 
   public CoreseURI(String value) {
       super(value);
@@ -35,7 +35,7 @@ public class CoreseURI extends CoreseResource {
   }
 
     @Override
-  public IDatatype.Datatype getCode() {
+  public int getCode() {
     return code;
   }
   

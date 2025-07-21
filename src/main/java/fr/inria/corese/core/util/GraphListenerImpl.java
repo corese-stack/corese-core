@@ -58,6 +58,7 @@ public class GraphListenerImpl implements GraphListener {
 	 */
 	public void setProperty(String name, Triple t){
 		if (name.equals(Pragma.LISTEN_INSERT)){
+			System.out.println("kg:insert " + t);
 			linsert.add(t);
 		}
 		else if (name.equals(Pragma.LISTEN_DELETE)){
@@ -87,6 +88,7 @@ public class GraphListenerImpl implements GraphListener {
 	
 	public void insert(Graph g, Edge ent) {
 		if (isInsert){
+			System.out.println("Insert: " + ent);
 		}
 		else {
 			linsert(g, ent);
@@ -98,6 +100,11 @@ public class GraphListenerImpl implements GraphListener {
 	 * Test if edge matches a triple pattern 
 	 */
 	private void linsert(Graph g, Edge ent) {
+		for (Triple t : linsert){
+			if (match(t, ent)){
+				System.out.println("insert: " + ent);
+			}
+		}
 	}
 	
 	

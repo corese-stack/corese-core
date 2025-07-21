@@ -131,6 +131,9 @@ public class LDScript extends TermEval {
     public Function getDefineMethod(Environment env, String name, IDatatype type, IDatatype[] param) {
         ASTExtension ext = env.getExtension();
         if (ext != null) {
+            if (env.getQuery().isDebug()) {
+                ext.setDebug(true);
+            }
             Function ee = ext.getMethod(name, type, param);
             if (ee != null) {
                 return ee;

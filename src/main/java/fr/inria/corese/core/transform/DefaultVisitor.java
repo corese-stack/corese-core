@@ -10,9 +10,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Transformer Visitor to be used in a transformation
@@ -27,8 +26,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class DefaultVisitor implements TemplateVisitor {
-
-    private static final Logger logger = LoggerFactory.getLogger(DefaultVisitor.class);
     static final String STL         = NSManager.STL;
     static final String TRACE       = STL + "trace";
     static final String GRAPH       = STL + "graph";
@@ -45,11 +42,11 @@ public class DefaultVisitor implements TemplateVisitor {
     HashMap <String, Boolean> map;
     HashMap <IDatatype, List<IDatatype>> errors;
     private ArrayList<IDatatype> visitedList;
-    private HashMap<IDatatype, IDatatype> distinct;
-    private final HashMap<IDatatype, IDatatype> value;
+    private HashMap<IDatatype, IDatatype> distinct, value;
     
     private String transform = Transformer.TURTLE;
-    private final String NL = "\n";
+    private boolean silent = true;
+    private String NL = "\n";
     // boolean value (if any) that means that visitor must consider visited node
     // use case: st:visit(st:exp, ?x, ?suc)
     // if (?suc = acceptValue) node ?x is considered
@@ -102,8 +99,14 @@ public class DefaultVisitor implements TemplateVisitor {
         if (obj.equals(GRAPH)){
             addGraph((Graph) arg.getPointerObject());
         }
+        else if (obj.equals(TRACE)){
+            silent = ! getValue(arg);
+        }
         else if (obj.equals(TRANSFORM)){
             setTransform(arg.getLabel());
+        }
+        else if (obj.equals(SILENT)){
+            silent = getValue(arg);
         }
         else if (obj.equals(ACCEPT)){
             // accept node when boolean value is arg
@@ -123,6 +126,21 @@ public class DefaultVisitor implements TemplateVisitor {
     void process(IDatatype name, IDatatype obj, IDatatype arg) {
        if (accept(name) && accept(arg)){
             store(name, obj);
+            if (! silent){
+                trace(name, obj);
+            }
+        }
+    }
+    
+    void trace(IDatatype name, IDatatype obj) {
+        try {
+            Transformer t = Transformer.create(graph, getTransform());
+            IDatatype dt = t.process(obj);
+            System.out.println(name);
+            System.out.println((dt != null) ? dt.getLabel() : obj);
+            System.out.println();
+        } catch (EngineException ex) {
+            Logger.getLogger(DefaultVisitor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -190,7 +208,7 @@ public class DefaultVisitor implements TemplateVisitor {
                     sb.append(NL).append(NL);
                 }
             } catch (EngineException ex) {
-                logger.error("An unexpected error has occurred", ex);
+                Logger.getLogger(DefaultVisitor.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }

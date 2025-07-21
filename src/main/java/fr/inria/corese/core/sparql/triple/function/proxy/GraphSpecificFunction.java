@@ -90,6 +90,12 @@ public class GraphSpecificFunction extends LDScript {
                         return proc.similarity(env, p, param[0], param[1]);
                     default: return null;
                 }
+                
+            case APPROXIMATE:
+                  return proc.approximate(this, env, p, param);
+                  
+             case APP_SIM:
+                  return proc.approximate(this, env, p);
                   
              case STL_INDEX: 
                  return proc.index(env, p);
@@ -204,7 +210,7 @@ public class GraphSpecificFunction extends LDScript {
    }
    
    
-    public IDatatype io(Computer eval, Binding b, Environment env, Producer p, IDatatype[] param) throws EngineException {
+    public IDatatype io(Computer eval, Binding b, Environment env, Producer p, IDatatype[] param) throws SafetyException, EngineException {
         GraphProcessor proc = eval.getGraphProcessor();
         if (param.length == 0) {
             return null;
@@ -410,8 +416,8 @@ public class GraphSpecificFunction extends LDScript {
         switch (param.length) {
             case 1: node = param[0]; break;
             case 2: node = param[0]; 
-            if (param[1].isNumber()){index = param[1];} else {pred = param[1];}
-                break;
+            if (param[1].isNumber()){index = param[1];} else {pred = param[1];};
+            break;
             case 3: node = param[0]; pred = param[1]; index = param[2];  break;
             default: return null;
         }
@@ -437,8 +443,8 @@ public class GraphSpecificFunction extends LDScript {
             case 2: node = param[0]; 
             min = param[1]; break;
             case 3: node = param[0]; 
-            if (param[1].isNumber()){index = param[1];} else {pred = param[1];}
-                min = param[2];
+            if (param[1].isNumber()){index = param[1];} else {pred = param[1];};
+            min = param[2];
             break;
             case 4: node = param[0]; pred = param[1]; index = param[2];  
             min = param[3];

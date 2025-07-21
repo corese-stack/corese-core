@@ -21,7 +21,7 @@ import org.slf4j.Logger;
  */
 public class Extension extends LDScript {
 
-    private static final Logger logger = LoggerFactory.getLogger(Extension.class);
+    private static Logger logger = LoggerFactory.getLogger(Extension.class);
     Function function;
     boolean isUnary = false, isBinary = false, isSystem = false;
     private boolean tailRecursion = false;

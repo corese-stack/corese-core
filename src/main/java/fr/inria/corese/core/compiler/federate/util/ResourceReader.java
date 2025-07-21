@@ -1,13 +1,20 @@
 package fr.inria.corese.core.compiler.federate.util;
 
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ *
+ */
 public class ResourceReader {
-
+    
     public String readWE(String name) throws IOException {
         String query = "", str = "";
         Reader fr;
@@ -19,15 +26,19 @@ public class ResourceReader {
         } else {
             fr = new FileReader(name);
         }
+
+        if (fr == null) {
+            throw new IOException(name);
+        }
         query = read(fr);
 
-        if (query.equals("")) {
+        if (query == "") {
             return null;
         }
         return query;
     }
-
-    boolean isURL(String path) {
+    
+     boolean isURL(String path) {
         try {
             new URL(path);
         } catch (MalformedURLException e) {
@@ -35,16 +46,17 @@ public class ResourceReader {
         }
         return true;
     }
-
+    
     public String getResource(String name) throws IOException {
         InputStream stream = ResourceReader.class.getResourceAsStream(name);
         if (stream == null) {
             throw new IOException(name);
         }
         Reader fr = new InputStreamReader(stream);
-        return read(fr);
+        String str = read(fr);
+        return str;
     }
-
+    
     String read(Reader fr) throws IOException {
         BufferedReader fq = new BufferedReader(fr);
         StringBuilder sb = new StringBuilder();
@@ -63,9 +75,10 @@ public class ResourceReader {
                 isnl = true;
             }
             sb.append(str);
+            //sb.append(NL);
         }
         return sb.toString();
     }
-
-
+    
+    
 }

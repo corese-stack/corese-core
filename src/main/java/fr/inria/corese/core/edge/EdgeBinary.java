@@ -8,14 +8,16 @@ import fr.inria.corese.core.kgram.api.core.Node;
  * Graph Edge for the defaultGraph
  *
  * @author Olivier Corby, Wimmics, INRIA I3S, 2014
+ *
  */
 public abstract class EdgeBinary extends EdgeTop implements Edge {
+    public static boolean displayGraph = true;
     protected Node subject, object;
 
-    protected EdgeBinary() {
+    public EdgeBinary() {
     }
 
-    protected EdgeBinary(Node subject, Node object) {
+    public EdgeBinary(Node subject, Node object) {
         this.subject = subject;
         this.object = object;
     }
@@ -24,7 +26,7 @@ public abstract class EdgeBinary extends EdgeTop implements Edge {
     public boolean contains(Node node) {
         return getNode(0).same(node) || getNode(1).same(node);
     }
-
+   
     @Override
     public Node getNode(int n) {
         switch (n) {

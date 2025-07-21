@@ -16,7 +16,7 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
  */
 
 public class CoreseString extends CoreseStringLiteral { 
-  static IDatatype.Datatype code=IDatatype.Datatype.STRING;
+  static int code=STRING;
   static final CoreseURI datatype=new CoreseURI(RDF.xsdstring);
 
 
@@ -37,7 +37,7 @@ public class CoreseString extends CoreseStringLiteral {
      }
 
   @Override
-  public IDatatype.Datatype getCode() {
+  public int getCode() {
     return code;
   }
 

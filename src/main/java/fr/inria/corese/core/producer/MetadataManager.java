@@ -1,13 +1,19 @@
 package fr.inria.corese.core.producer;
 
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.logic.Distance;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import java.io.IOException;
+import java.util.HashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
+import fr.inria.corese.core.load.QueryLoad;
+import fr.inria.corese.core.logic.Distance;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 /**
  * Corese object associated to DataManager
@@ -15,10 +21,11 @@ import java.util.HashMap;
  * Distance, transitiveRelation
  */
 public class MetadataManager {
-    private static final Logger logger = LoggerFactory.getLogger(MetadataManager.class);
+    private static Logger logger = LoggerFactory.getLogger(MetadataManager.class);
 
     private DataManager dataManager;
     private Distance distance;
+    private boolean debug = false;
 
     public MetadataManager() {
     }
@@ -29,25 +36,41 @@ public class MetadataManager {
 
     // called by StorageFactory
     public void startDataManager() {
+        trace("create data manager");
     }
 
     void start() {
+        try {
+            QueryLoad ql = QueryLoad.create();
+            String q = ql.getResource("/query/indexproperty.rq");
+            QueryProcess exec = QueryProcess.create(getDataManager());
+            Mappings map = exec.query(q);
+            System.out.println("Storage content:\n");
+            System.out.println(map);
+        } catch (IOException | EngineException ex) {
+            logger.error(ex.getMessage());
+        }
     }
 
     public void endDataManager() {
+        trace("end data manager");
     }
 
     public void startReadTransaction() {
+        trace("start read");
     }
 
     public void endReadTransaction() {
+        trace("end read");
     }
 
     public void startWriteTransaction() {
+        trace("start write");
     }
 
     public void endWriteTransaction() {
         clean();
+        trace("end write");
     }
 
     void clean() {
@@ -117,6 +140,20 @@ public class MetadataManager {
 
     public void setDataManager(DataManager dataManager) {
         this.dataManager = dataManager;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public void trace(String mes, Object... list) {
+        if (isDebug()) {
+            logger.info(String.format(mes, list));
+        }
     }
 
 }

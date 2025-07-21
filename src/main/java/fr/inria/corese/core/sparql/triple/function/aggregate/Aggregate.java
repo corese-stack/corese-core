@@ -14,9 +14,8 @@ import fr.inria.corese.core.kgram.core.Group;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.sparql.triple.function.script.LDScript;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -24,8 +23,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class Aggregate extends LDScript {
-
-    private static final Logger logger = LoggerFactory.getLogger(Aggregate.class);
     static final String NL = "\n";
     static boolean compareIndex = false;
     Group group;
@@ -48,7 +45,7 @@ public class Aggregate extends LDScript {
             fill(agg);
             return agg;
         } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error("An unexpected error has occurred", ex);
+            Logger.getLogger(Aggregate.class.getName()).log(Level.SEVERE, null, ex);
         }
         return this;
     }

@@ -5,35 +5,30 @@ import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.parser.TopExp;
 
-import java.util.EnumMap;
-
 /**
  *
  * @author Olivier Corby, Edelweiss, INRIA 2011
  */
 public class Update extends TopExp {
 
-    public enum Keyword {
-        LOAD, CLEAR, DROP, CREATE, ADD, MOVE, COPY, PROLOG, INSERT, DELETE, COMPOSITE
-    }
+    static final String[] NAME
+            = {"load", "clear", "drop", "create", "add", "move", "copy", "prolog",
+                "insert", "delete", "composite"};
 
-    static final EnumMap<Keyword, String> NAME = new EnumMap<>(Keyword.class);
+    public static final int LOAD = 0;
+    public static final int CLEAR = 1;
+    public static final int DROP = 2;
+    public static final int CREATE = 3;
+    public static final int ADD = 4;
+    public static final int MOVE = 5;
+    public static final int COPY = 6;
+    public static final int PROLOG = 7;
 
-    static {
-        NAME.put(Keyword.LOAD, "load");
-        NAME.put(Keyword.CLEAR, "clear");
-        NAME.put(Keyword.DROP, "drop");
-        NAME.put(Keyword.CREATE, "create");
-        NAME.put(Keyword.ADD, "add");
-        NAME.put(Keyword.MOVE, "move");
-        NAME.put(Keyword.COPY, "copy");
-        NAME.put(Keyword.PROLOG, "prolog");
-        NAME.put(Keyword.INSERT, "insert");
-        NAME.put(Keyword.DELETE, "delete");
-        NAME.put(Keyword.COMPOSITE, "composite");
-    }
+    public static final int INSERT = 8;
+    public static final int DELETE = 9;
+    public static final int COMPOSITE = 10;
 
-    Update.Keyword type;
+    int type;
     ASTUpdate astu;
     // Update operation may have a local prolog
     // otherwise use the global one
@@ -60,10 +55,10 @@ public class Update extends TopExp {
     }
 
     String title() {
-        return NAME.get(type);
+        return NAME[type];
     }
 
-    public Update.Keyword type() {
+    public int type() {
         return type;
     }
 

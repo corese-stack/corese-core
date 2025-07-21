@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LogManager implements LogKey {
 
-    private static final Logger logger = LoggerFactory.getLogger(LogManager.class);
+    private static Logger logger = LoggerFactory.getLogger(LogManager.class);
  
     ContextLog log;
     StringBuilder sb;
@@ -229,6 +229,8 @@ public class LogManager implements LogKey {
                 if (resp.getHeaderString("Date") != null) {
                     log.set(sub, DATE, resp.getHeaderString("Date"));
                 }
+
+                trace(e.getURL(), resp);
             }
         }
 
@@ -250,6 +252,32 @@ public class LogManager implements LogKey {
             return resp.getHeaderString("Server");
         }
         return resp.getHeaderString("server");
+    }
+
+    void trace(URLServer url, Response resp) {
+        if (isDebug()) {
+            System.out.println("LogManager: " + url.getURL());
+            System.out.println(resp.getStatusInfo() + " " + resp.getStatus());
+            for (String name : resp.getHeaders().keySet()) {
+                System.out.println(String.format("header %s=%s", name, resp.getHeaderString(name)));
+            }
+            for (String name : resp.getCookies().keySet()) {
+                System.out.println(String.format("cookie %s=%s", name, resp.getCookies().get(name)));
+            }
+            for (Link name : resp.getLinks()) {
+                System.out.println(String.format("link %s", name));
+            }
+            System.out.println();
+        }
+    }
+
+    // trace
+    public void trace(List<EngineException> list) {
+        for (EngineException e : list) {
+            if (e.getCause() instanceof ResponseProcessingException) {
+                Response resp = (Response) e.getObject();
+            }
+        }
     }
 
     StringBuilder sb() {

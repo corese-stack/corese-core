@@ -6,7 +6,6 @@ import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -14,6 +13,7 @@ import java.util.List;
  * Expr api refer to sparql.triple.parser.Expression
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
+ *
  */
 public interface Expr {
 
@@ -26,9 +26,9 @@ public interface Expr {
 
     boolean isPublic();
 
-    void setPublic(boolean b);
-
     boolean isDynamic();
+
+    void setPublic(boolean b);
 
     boolean isTrace();
 
@@ -119,7 +119,7 @@ public interface Expr {
     boolean hasMetadata(String name);
 
     IDatatype evalWE(Computer eval, Binding b, Environment env, Producer p) throws EngineException;
-
+    
     default boolean test(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
         IDatatype dt = evalWE(eval, b, env, p);
         if (dt == null) {
@@ -127,5 +127,5 @@ public interface Expr {
         }
         return dt.isTrueTest();
     }
-
+   
 }

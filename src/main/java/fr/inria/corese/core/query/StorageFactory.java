@@ -1,49 +1,42 @@
-package fr.inria.corese.core.query;
 
-import fr.inria.corese.core.query.DatasetManager.TypeDataBase;
-import fr.inria.corese.core.sparql.triple.parser.URLServer;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+package fr.inria.corese.core.query;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
+
+import fr.inria.corese.core.query.DatasetManager.TypeDataBase;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
 
 /**
  *
  */
 public class StorageFactory {
 
-    private static StorageFactory singleton = null;
-
     private HashMap<String, DataManager> map;
+    private static StorageFactory singleton;
+
+    static {
+        setSingleton(new StorageFactory());
+    }
 
     public StorageFactory() {
         setMap(new HashMap<>());
     }
 
-    public static StorageFactory getSingleton() {
-        if (singleton == null) {
-            singleton = new StorageFactory();
-        }
-        return singleton;
-    }
-
-    public static void defineDataManager(TypeDataBase typeDB, String id, String param) {
-    }
-
-    public void defineDataManager(String id, DataManager man) {
+    public static void defineDataManager(String id, DataManager man) {
         defineDataManager(new URLServer(id), man);
     }
 
-    public void defineDataManager(URLServer id, DataManager man) {
+    public static void defineDataManager(URLServer id, DataManager man) {
 
         // Check if id already exists
-        if (getMap().containsKey(id.getServer())) {
+        if (getSingleton().getMap().containsKey(id.getServer())) {
             throw new InvalidParameterException("DataManager already exists for id: " + id.getServer());
         }
 
-        getMap().put(id.getServer(), man);
+        getSingleton().getMap().put(id.getServer(), man);
         man.getCreateMetadataManager();
         man.start(id.getMap());
         if (man.hasMetadataManager()) {
@@ -51,20 +44,31 @@ public class StorageFactory {
         }
     }
 
-    public DataManager getDataManager(String id) {
-        return getMap().get(id);
+    public static DataManager getDataManager(String id) {
+        return getSingleton().getMap().get(id);
     }
 
-    public Collection<DataManager> getDataManagerList() {
-        return getMap().values();
+    public static Collection<DataManager> getDataManagerList() {
+        return getSingleton().getMap().values();
     }
 
-    public Map<String, DataManager> getMap() {
+    public HashMap<String, DataManager> getMap() {
         return map;
     }
 
-    public void setMap(Map<String, DataManager> map) {
-        this.map = (HashMap<String, DataManager>) map;
+    public void setMap(HashMap<String, DataManager> map) {
+        this.map = map;
+    }
+
+    public static StorageFactory getSingleton() {
+        return singleton;
+    }
+
+    public static void setSingleton(StorageFactory aSingleton) {
+        singleton = aSingleton;
+    }
+
+    public static void defineDataManager(TypeDataBase typeDB, String id, String param) {
     }
 
 }

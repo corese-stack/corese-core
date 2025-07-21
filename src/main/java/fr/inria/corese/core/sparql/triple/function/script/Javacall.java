@@ -15,9 +15,8 @@ import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Call Corese Java function with parameters as getObject() or
@@ -67,7 +66,7 @@ public class Javacall extends JavaFunction {
             IDatatype res = DatatypeMap.getValue(obj);
             return res;
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            logger.error("An unexpected error has occurred", ex);
+            Logger.getLogger(Javacall.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
 
@@ -93,20 +92,20 @@ public class Javacall extends JavaFunction {
     // default cast
     void cast(IDatatype val, int i, Object[] values, Class[] types) {
         switch (val.getCode()) {
-            case INTEGER:
+            case IDatatype.INTEGER:
                 values[i] = val.intValue();
                 break;
-            case DOUBLE:
-            case FLOAT:
-            case DECIMAL:
+            case IDatatype.DOUBLE:
+            case IDatatype.FLOAT:
+            case IDatatype.DECIMAL:
                 values[i] = val.doubleValue();
                 break;
-            case STRING:
-            case LITERAL:
-            case URI:
+            case IDatatype.STRING:
+            case IDatatype.LITERAL:
+            case IDatatype.URI:
                 values[i] = val.stringValue();
                 break;
-            case BOOLEAN:
+            case IDatatype.BOOLEAN:
                 values[i] = val.booleanValue();
                 break;
             default:

@@ -1,8 +1,10 @@
 package fr.inria.corese.core.kgram.sorter.impl.qpv1;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
-
-import fr.inria.corese.core.kgram.api.core.ExpType;
+import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
+import static fr.inria.corese.core.kgram.api.core.ExpType.FILTER;
+import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
+import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPHNODE;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.sorter.core.AbstractCostModel;
@@ -47,7 +49,7 @@ public class QPGNodeCostModel extends AbstractCostModel {
         //todo with GNode
         Node gNode = null;
 
-        if (n.getType() == ExpType.Type.EDGE) {
+        if (n.getType() == EDGE) {
             Edge e = n.getExp().getEdge();
 
             //the value of S P O G can be: 0[bound], ?[length of constant list], Integer.MAX_VALUE[unbound]
@@ -58,9 +60,9 @@ public class QPGNodeCostModel extends AbstractCostModel {
 
             // get the variables in the triple pattern
             n.getExp().getVariables(variables);
-        } else if (n.getType() == ExpType.Type.GRAPH) {
+        } else if (n.getType() == GRAPH) {
             //obtain the graph node
-            if (n.getExp().size() > 0 && n.getExp().get(0).type() == ExpType.Type.GRAPHNODE) {
+            if (n.getExp().size() > 0 && n.getExp().get(0).type() == GRAPHNODE) {
                 //GRAPH{GRAPHNODE{NODE{data:aliceFoaf } } AND...}   
                 gNode = n.getExp().get(0).get(0).getNode();
                 this.pattern[G] = getNodeType(gNode, bindings);
@@ -112,7 +114,7 @@ public class QPGNodeCostModel extends AbstractCostModel {
     // FV: filter variables
     // FF: filter number
     private void setFilterNumber(QPGraph graph) {
-        List<QPGNode> nodes = graph.getAllNodes(ExpType.Type.FILTER);
+        List<QPGNode> nodes = graph.getAllNodes(FILTER);
 
         int noOfFilter = 0, noOfVariable = 0;
 
@@ -194,18 +196,18 @@ public class QPGNodeCostModel extends AbstractCostModel {
     public static int compareModel(QPGNodeCostModel m1, QPGNodeCostModel m2, final int[][] bp, final IProducerQP ip) {
         //GRAPH
         //rule 1: GRAPH has more priority than EDGE
-        ExpType.Type type1 = m1.node.getExp().type();
-        ExpType.Type type2 = m2.node.getExp().type();
+        int type1 = m1.node.getExp().type();
+        int type2 = m2.node.getExp().type();
 
         //to/can be extended!!
         //when comparing EDGE/GRAPH, EDGE has priority except if EDGE = (? ? ?)
         //R1
-        if (type1 == ExpType.Type.GRAPH && type2 == ExpType.Type.EDGE) {
+        if (type1 == GRAPH && type2 == EDGE) {
             return (m2.match(bp) == (bp.length - 1)) ? -1 : 1;
-        } else if (type1 == ExpType.Type.EDGE && type2 == ExpType.Type.GRAPH) {
+        } else if (type1 == EDGE && type2 == GRAPH) {
             return (m1.match(bp) == (bp.length - 1)) ? 1 : -1;
             //when comparing two GRAPHs, compare by the type of named graph (bound, unbound, etc...)
-        } else if (type1 == ExpType.Type.GRAPH && type2 == ExpType.Type.GRAPH) {
+        } else if (type1 == GRAPH && type2 == GRAPH) {
             return m1.pattern[G] > m2.pattern[G] ? 1 : -1;
         } else {//EDGE - EDGE
             //EDGE
@@ -255,8 +257,12 @@ public class QPGNodeCostModel extends AbstractCostModel {
 
     @Override
     public boolean isParametersOK(List params) {
-        return params != null && params.size() == 2 && params.get(0) instanceof Integer
-                && params.get(1) instanceof Integer;
+        if (params == null || params.size() != 2 || !(params.get(0) instanceof Integer)
+                || !(params.get(1) instanceof Integer)) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

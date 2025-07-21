@@ -36,14 +36,14 @@ public class Composite extends Update {
     private Values values;
     private ASTQuery ast;
 
-    Composite(Update.Keyword t) {
+    Composite(int t) {
         type = t;
         list = new ArrayList<>();
         ds = Dataset.create();
 
     }
 
-    Composite(Update.Keyword t, Exp d) {
+    Composite(int t, Exp d) {
         this(t);
         data = d;
     }
@@ -58,11 +58,11 @@ public class Composite extends Update {
         return  this;
     }
 	
-    public static Composite create(Update.Keyword type) {
+    public static Composite create(int type) {
         return new Composite(type);
     }
 
-    public static Composite create(Update.Keyword type, Exp d) {
+    public static Composite create(int type, Exp d) {
         Composite ope = new Composite(type, d);
         return ope;
     }
@@ -70,7 +70,7 @@ public class Composite extends Update {
     @Override
     public boolean isInsert() {      
         for (Composite cc : getUpdates()) {
-            if (cc.type() == Update.Keyword.INSERT) {
+            if (cc.type() == INSERT) {
                 return true;
             }
         }
@@ -80,7 +80,7 @@ public class Composite extends Update {
     @Override
     public boolean isDelete() {       
         for (Composite cc : getUpdates()) {
-            if (cc.type() == Update.Keyword.DELETE) {
+            if (cc.type() == DELETE) {
                 return true;
             }
         }
@@ -89,18 +89,18 @@ public class Composite extends Update {
     
     @Override
     public boolean isInsertData() {
-        return type() == Update.Keyword.INSERT;
+        return type() == INSERT;
     }
     
     @Override
     public boolean isDeleteData() {
-        return type() == Update.Keyword.DELETE;
+        return type() == DELETE;
     }
 
     @Override
     public ASTBuffer toString(ASTBuffer sb) {
 
-        if (type() != Update.Keyword.COMPOSITE) {
+        if (type() != COMPOSITE) {
             sb.append(title(), " ");
         }
 
@@ -138,14 +138,14 @@ public class Composite extends Update {
     }
     
     public Exp getDelete() {
-        return getPattern(Update.Keyword.DELETE);
+        return getPattern(DELETE);
     }
     
     public Exp getInsert() {
-        return getPattern(Update.Keyword.INSERT);
+        return getPattern(INSERT);
     }
     
-    Exp getPattern(Update.Keyword type) {
+    Exp getPattern(int type) {
         for (Composite cc : getUpdates()) {
             if (cc.type() == type) {
                 return cc.getPattern();

@@ -7,6 +7,7 @@ import fr.inria.corese.core.api.DataBroker;
 import fr.inria.corese.core.api.DataBrokerConstruct;
 import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.api.Log;
+import fr.inria.corese.core.approximate.ext.ASTRewriter;
 import fr.inria.corese.core.compiler.eval.Interpreter;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
@@ -74,8 +75,8 @@ public class QueryProcess extends QuerySolver {
     static final String DB_INPUT = "fr.inria.corese.tinkerpop.dbinput";
     static final String FUNLIB = "/function/";
     private static final String EVENT = "event";
-    private static final Logger logger = LoggerFactory.getLogger(QueryProcess.class);
     static HashMap<String, Producer> dbmap;
+    private static Logger logger = LoggerFactory.getLogger(QueryProcess.class);
     private static ProducerImpl dbProducer;
     private static String solverVisitorName = null;
     private static String serverVisitorName = null;
@@ -111,7 +112,7 @@ public class QueryProcess extends QuerySolver {
 
     protected QueryProcess(Producer p, Interpreter e, Matcher m) {
         super(p, e, m);
-
+        Graph g = getGraph(p);
         complete();
         init();
     }
@@ -472,7 +473,8 @@ public class QueryProcess extends QuerySolver {
 
     @Override
     public Mappings query(String squery) throws EngineException {
-        return doQuery(squery, null, null);
+        Mappings map = doQuery(squery, null, null);
+        return map;
     }
 
     // rdf is a turtle document
@@ -551,6 +553,10 @@ public class QueryProcess extends QuerySolver {
 
     @Override
     public Query compile(String squery, Dataset ds) throws EngineException {
+        if (!hasVisitor()) {
+            // Rewrite query when @relax annotation, otherwise do nothing
+            addVisitor(new ASTRewriter());
+        }
         Query q = super.compile(squery, ds);
         if (q.getAST().getLog().getASTSelect() != null) {
             getLog().share(q.getAST().getLog());
@@ -569,7 +575,7 @@ public class QueryProcess extends QuerySolver {
     }
 
     public Query compile(String squery, Context c) throws EngineException {
-        return compile(squery, (c == null) ? null : new Dataset(c));
+        return compile(squery, (c == null) ? (Dataset) null : new Dataset(c));
     }
 
     public ASTQuery ast(String q) throws EngineException {
@@ -616,9 +622,11 @@ public class QueryProcess extends QuerySolver {
      * example: visitor init()
      */
     Mappings protectQuery(Node gNode, Query query, Mapping m, Dataset ds) throws EngineException {
-        if ((query.isUpdate()) && (lock.getReadLockCount() > 0 && !isReentrant() && !isSynchronized())) {
-            logger.info("Update rejected to avoid deadlock");
-            return Mappings.create(query);
+        if (query.isUpdate()) {
+            if (lock.getReadLockCount() > 0 && !isReentrant() && !isSynchronized()) {
+                logger.info("Update rejected to avoid deadlock");
+                return Mappings.create(query);
+            }
         }
         return basicQuery(gNode, query, m, ds);
     }
@@ -661,8 +669,8 @@ public class QueryProcess extends QuerySolver {
         if (ds != null) {
             ast.setDefaultDataset(ds);
         }
-        Transformer queryTransformer = transformer();
-        Query query = queryTransformer.transform(ast);
+        Transformer transformer = transformer();
+        Query query = transformer.transform(ast);
         try {
             return query(null, query, null, ds);
         } catch (EngineException e) {
@@ -674,8 +682,8 @@ public class QueryProcess extends QuerySolver {
      * equivalent of std query(ast) but for update
      */
     public Mappings update(ASTQuery ast) throws EngineException {
-        Transformer updateTransformer = transformer();
-        Query query = updateTransformer.transform(ast);
+        Transformer transformer = transformer();
+        Query query = transformer.transform(ast);
         return query(query);
     }
 
@@ -727,7 +735,7 @@ public class QueryProcess extends QuerySolver {
      */
     Mappings basicQuery(Node gNode, Query q, Mapping m, Dataset ds) throws EngineException {
         String path = q.getAST().getDataset().getStoragePath();
-        if (path != null && StorageFactory.getSingleton().getDataManager(path) != null) {
+        if (path != null && StorageFactory.getDataManager(path) != null) {
             return basicQueryStorage(gNode, q, m, ds);
         }
         return basicQueryProcess(gNode, q, m, ds);
@@ -735,8 +743,10 @@ public class QueryProcess extends QuerySolver {
 
     Mappings basicQueryProcess(Node gNode, Query q, Mapping m, Dataset ds) throws EngineException {
         ASTQuery ast = getAST(q);
-        if ((ast.isLDScript()) && (Access.reject(Feature.LDSCRIPT, getLevel(m, ds)))) {
-            throw new EngineException("LDScript unauthorized");
+        if (ast.isLDScript()) {
+            if (Access.reject(Feature.LDSCRIPT, getLevel(m, ds))) {
+                throw new EngineException("LDScript unauthorized");
+            }
         }
         m = completeMappings(q, m, ds);
         pragma(q);
@@ -790,7 +800,7 @@ public class QueryProcess extends QuerySolver {
     // @todo: copy this QueryProcess
     Mappings basicQueryStorage(Node gNode, Query q, Mapping m, Dataset ds) throws EngineException {
         return QueryProcess.create(getGraph(),
-                StorageFactory.getSingleton().getDataManager(q.getAST().getDataset().getStoragePath()))
+                StorageFactory.getDataManager(q.getAST().getDataset().getStoragePath()))
                 .basicQueryProcess(gNode, q, m, ds);
     }
 
@@ -801,12 +811,12 @@ public class QueryProcess extends QuerySolver {
 
     void dbProducer(Query q) {
         ASTQuery ast = q.getAST();
-        if (ast.hasMetadata(Metadata.Type.DB)) {
+        if (ast.hasMetadata(Metadata.DB)) {
             String factory = DB_FACTORY;
-            if (ast.hasMetadata(Metadata.Type.DB_FACTORY)) {
-                factory = ast.getMetadataValue(Metadata.Type.DB_FACTORY);
+            if (ast.hasMetadata(Metadata.DB_FACTORY)) {
+                factory = ast.getMetadataValue(Metadata.DB_FACTORY);
             }
-            Producer prod = getCreateProducer(getGraph(), factory, ast.getMetadataValue(Metadata.Type.DB));
+            Producer prod = getCreateProducer(getGraph(), factory, ast.getMetadataValue(Metadata.DB));
             setProducer(prod);
         }
     }
@@ -817,7 +827,7 @@ public class QueryProcess extends QuerySolver {
             finishEval.finish(q, map);
             map.setEval(null);
         }
-        if (q.getAST().hasMetadata(Metadata.Type.LOG)) {
+        if (q.getAST().hasMetadata(Metadata.LOG)) {
             processLog(q, map);
         }
         if (!getLog().getLinkList().isEmpty()) {
@@ -866,7 +876,7 @@ public class QueryProcess extends QuerySolver {
 
     void processLog(Query q, Mappings map) {
         LogManager man = getLogManager(map);
-        String fileName = q.getAST().getMetadata().getValue(Metadata.Type.LOG);
+        String fileName = q.getAST().getMetadata().getValue(Metadata.LOG);
 
         try {
             man.toFile(fileName);
@@ -1003,7 +1013,7 @@ public class QueryProcess extends QuerySolver {
      * Implement SPARQL compliance
      */
     Mappings sparqlQueryUpdate(String squery, Dataset ds, int entail) throws EngineException {
-        getEvaluator().setMode(Evaluator.Mode.SPARQL_MODE);
+        getEvaluator().setMode(Evaluator.SPARQL_MODE);
         setSPARQLCompliant(true);
 
         if (entail != STD_ENTAILMENT) {
@@ -1204,7 +1214,7 @@ public class QueryProcess extends QuerySolver {
     public void event(Event name, Event e, Object o) throws EngineException {
         IDatatype[] param = (o == null) ? param(DatatypeMap.createObject(e))
                 : param(DatatypeMap.createObject(e), DatatypeMap.createObject(o));
-
+        EventManager mgr = getGraph().getEventManager();
         method(NSManager.USER + name.toString().toLowerCase(), NSManager.USER + e.toString(), param);
     }
 
@@ -1249,12 +1259,12 @@ public class QueryProcess extends QuerySolver {
 
     // @todo: clean Binding/Context AccessLevel
     IDatatype call(String name, Function function, Context c, Binding b, IDatatype... param) throws EngineException {
-        Eval callEval = getCreateEval();
-        callEval.getEnvironment().getQuery().setContext(c);
-        Binding bind = callEval.getBinding();
+        Eval eval = getCreateEval();
+        eval.getEnvironment().getQuery().setContext(c);
+        Binding bind = eval.getBinding();
         bind.share(b, c);
-        return new Funcall(name).callWE(callEval.getEvaluator(),
-                bind, callEval.getEnvironment(), callEval.getProducer(), function, param);
+        return new Funcall(name).callWE(eval.getEvaluator(),
+                bind, eval.getEnvironment(), eval.getProducer(), function, param);
     }
 
     // Use case: funcall @public functions
@@ -1338,11 +1348,11 @@ public class QueryProcess extends QuerySolver {
             if (obj instanceof ProcessVisitor) {
                 return (ProcessVisitor) obj;
             } else {
-                logger.error("Incorrect QuerySolverVisitor: {}", name);
+                logger.error("Incorrect QuerySolverVisitor: ", name);
             }
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            logger.error("Undefined QuerySolverVisitor: {}", name);
+            logger.error("Undefined QuerySolverVisitor: ", name);
         }
 
         return null;
@@ -1351,6 +1361,7 @@ public class QueryProcess extends QuerySolver {
     Function getLinkedFunction(String name, IDatatype[] param) throws EngineException {
         Function function = getFunction(name, param);
         if (function == null) {
+            // setLinkedFunction(true);
             getLinkedFunction(name);
             function = getFunction(name, param);
         }

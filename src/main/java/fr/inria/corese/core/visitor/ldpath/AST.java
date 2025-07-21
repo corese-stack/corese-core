@@ -211,7 +211,7 @@ public class AST {
     Expression function(int i) {
         ASTExtension ext = ldp.getAST().getDefine();
         if (ext != null) {
-            Function exp = ext.get(OBJECT_FUN);
+            Function exp = (Function) ext.get(OBJECT_FUN);
             if (exp != null) {
                 if (exp.getSignature().size() == 1) {
                     Variable var = variable(i);

@@ -20,7 +20,11 @@ public class StringHelper {
 	public static boolean equalsIgnoreAccent(String s1, String s2) {
 	     if ((s1 != null) && (s2 != null)) {
 	            return removeAccent(s1).equals(removeAccent(s2));
-	     } else return (s1 == null) && (s2 == null);
+	     } else if ((s1 == null) && (s2 == null)) {
+	            return true;
+	     } else {
+	            return false;
+	     }
 	}
 	
 	/**
@@ -33,7 +37,11 @@ public class StringHelper {
 	public static boolean equalsIgnoreCaseAndAccent(String s1, String s2) {
 	     if ((s1 != null) && (s2 != null)) {
 	            return removeAccent(s1).equalsIgnoreCase(removeAccent(s2));
-	     } else return (s1 == null) && (s2 == null);
+	     } else if ((s1 == null) && (s2 == null)) {
+	            return true;
+	     } else {
+	            return false;
+	     }
 	}
 	
 	/**
@@ -54,7 +62,11 @@ public class StringHelper {
 	    		 tmp2 = tmp2.substring(0, tmp2.length()-1);
 	    	 }
 	         return tmp1.equalsIgnoreCase(tmp2);
-	     } else return (s1 == null) && (s2 == null);
+	     } else if ((s1 == null) && (s2 == null)) {
+	         return true;
+	     } else {
+	         return false;
+	     }
 	}
 
 	/**
@@ -236,14 +248,19 @@ public class StringHelper {
 		} 
 	   	if (word.endsWith("s") || word.endsWith("x")) {
 	   		word = word.substring(0, word.length()-1);
-            return text.contains(word) && containsWord(text, word);
+	   		if (text.contains(word) && containsWord(text, word)) {
+	   			return true;
+			} 
 	   	} else {
 	   		if (text.contains(word+"s") && containsWord(text, word+"s")) {
 	   			return true;
-			}
-            return text.contains(word + "x") && containsWord(text, word + "x");
+			} 
+	   		if (text.contains(word+"x") && containsWord(text, word+"x")) {
+	   			return true;
+			} 
 	   	}
-    }
+		return false;
+	}
 	
 	/**
 	 * Returns the index within the text of the first occurrence of the specified word (or groups of words).
@@ -358,7 +375,7 @@ public class StringHelper {
      * qualifier, scientific notation and numbers marked with a type
      * qualifier (e.g. 123L).
      *
-     * @see org.apache.commons.lang3.math.NumberUtils
+     * @see org.apache.commons.lang.math.NumberUtils
      * @param str the string to check
      * @return true if the string denotes a correctly formatted number, false otherwise.
      */

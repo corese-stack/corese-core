@@ -17,7 +17,7 @@ import fr.inria.corese.core.kgram.api.core.Loopable;
  */
 
 public class CoreseXMLLiteral extends CoreseStringLiteral {
-    static IDatatype.Datatype code=IDatatype.Datatype.XMLLITERAL;
+    static int code=XMLLITERAL;
     static final CoreseURI datatype=new CoreseURI(RDF.XMLLITERAL);
     //  to store an object such as an XML DOM (see xslt() xpath())
 	private Object object; 
@@ -52,7 +52,7 @@ public class CoreseXMLLiteral extends CoreseStringLiteral {
     }
     
     @Override
-    public  IDatatype.Datatype getCode(){
+    public  int getCode(){
     	return code;
     }
     

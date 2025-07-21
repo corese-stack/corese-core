@@ -1,9 +1,14 @@
 package fr.inria.corese.core.kgram.sorter.impl.qpv1;
 
-import fr.inria.corese.core.kgram.api.core.ExpType;
+import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
+import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
 import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.sorter.core.*;
-
+import fr.inria.corese.core.kgram.sorter.core.AbstractCostModel;
+import fr.inria.corese.core.kgram.sorter.core.QPGEdge;
+import fr.inria.corese.core.kgram.sorter.core.QPGNode;
+import fr.inria.corese.core.kgram.sorter.core.QPGraph;
+import fr.inria.corese.core.kgram.sorter.core.IEstimate;
+import fr.inria.corese.core.kgram.sorter.core.IProducerQP;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +38,9 @@ public class HeuristicsBasedEstimation implements IEstimate {
         // 1. get all models of nodes in QPG
         List<QPGNodeCostModel> models = new ArrayList<QPGNodeCostModel>();
         for (QPGNode n : this.graph.getAllNodes()) {
-            if (n.getType() == ExpType.Type.EDGE || n.getType() == ExpType.Type.GRAPH) {
+            if (n.getType() == EDGE || n.getType() == GRAPH) {
                 QPGNodeCostModel p = n.getCostModel();
-                if (n.getType() == ExpType.Type.EDGE) {
+                if (n.getType() == EDGE) {
                     p.setParameters(graph);
                 }
                 models.add(p);

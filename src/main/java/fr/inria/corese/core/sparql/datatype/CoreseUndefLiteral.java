@@ -26,7 +26,7 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
  */
 public class CoreseUndefLiteral extends CoreseStringLiteral {
 
-    static final IDatatype.Datatype code = IDatatype.Datatype.UNDEF;
+    static final int code = UNDEF;
     static final CoreseUndefLiteral ERROR, UNBOUND;
 
     IDatatype datatype = null;
@@ -54,7 +54,7 @@ public class CoreseUndefLiteral extends CoreseStringLiteral {
     }
 
     @Override
-    public IDatatype.Datatype getCode() {
+    public int getCode() {
         return code;
     }
 

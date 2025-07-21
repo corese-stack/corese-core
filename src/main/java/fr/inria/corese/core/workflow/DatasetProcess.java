@@ -80,8 +80,11 @@ public class DatasetProcess extends WorkflowProcess {
         
         try {
             SemanticWorkflow sw = new WorkflowParser().parse(wg);
-            return sw.process(input);
-        } catch (LoadException | EngineException ex) {
+            Data res = sw.process(input);
+            return res;
+        } catch (LoadException ex) {
+            LoggerFactory.getLogger(DatasetProcess.class.getName()).error( "", ex);
+        } catch (EngineException ex) {
             LoggerFactory.getLogger(DatasetProcess.class.getName()).error( "", ex);
         }
 
@@ -100,11 +103,12 @@ public class DatasetProcess extends WorkflowProcess {
             if (res != null) {
                 Graph g = res.getGraph();
                 for (Data dd : data.getDataList()) {                   
-                    if (dd.getName() != null && dd.getGraph() != null) {
+                    if (dd.getName() != null && dd.getGraph() != null) { // && dd != res) {  
                         namedGraph(g, dd);
                     }
                 }
-                return new Data(this, g);
+                Data value = new Data(this, g);
+                return value;
             }
         }
         return data;

@@ -146,7 +146,7 @@ public class ASTQuery
     boolean describeAll = false;
     boolean isBind = false;
     private boolean ldscript = false;
-    private final boolean insideWhere = false;
+    private boolean insideWhere = false;
     private boolean federateVisit = false;
     // max cg result
     int MaxResult = LIMIT_DEFAULT;
@@ -197,7 +197,7 @@ public class ASTQuery
     List<Expression> sort = new ArrayList<>();
     List<Expression> lGroup = new ArrayList<>();
     // group by (exp as var)
-    private final HashMap<String, Expression> groupBy = new HashMap<>();
+    private HashMap<String, Expression> groupBy = new HashMap<>();
     List<Atom> relax = new ArrayList<>();
     private List<QueryVisitor> visitList;
     private Dataset // Triple store default dataset
@@ -228,7 +228,7 @@ public class ASTQuery
     ASTTemplate atemp;
     
     private boolean renameBlankNode = true;
-    private final String groupSeparator = " ";
+    private String groupSeparator = " ";
     private boolean isTemplate = false;
     private boolean isAllResult = false;
     private boolean submitTriple = true;
@@ -240,10 +240,9 @@ public class ASTQuery
     private final Map<String, List<String>> approximateSearchOptions = new HashMap<String, List<String>>();
     private String service;
     private List<Atom> serviceList;
-    private final List<Constant> predicateList;
+    private List<Constant> predicateList;
     // triple without path, triple with path
-    private final List<Triple> tripleList;
-    private List<Triple> pathList;
+    private List<Triple> tripleList, pathList;
     private fr.inria.corese.core.kgram.core.Query updateQuery;
     private AccessRight accessRight;
     private ASTSelector astSelector;
@@ -336,7 +335,7 @@ public class ASTQuery
     }    
     
     public boolean isFederateVisitorable() {
-        return hasMetadata(Metadata.Type.FEDERATION) ||
+        return hasMetadata(Metadata.FEDERATION) || 
                 (getServiceList() != null && getServiceList().size()>1);
     } 
     
@@ -358,7 +357,7 @@ public class ASTQuery
     }
 
     class ExprTable extends HashMap<Expression, Expression> {
-    }
+    };
 
     /**
      * The constructor of the class 
@@ -1034,7 +1033,7 @@ public class ASTQuery
    
     Constant functionName(){
         UUID uuid = UUID.randomUUID();
-        return createQName(FUN_PREF + uuid);
+        return createQName(FUN_PREF +  uuid.toString());
     }
 
     /**
@@ -1137,7 +1136,7 @@ public class ASTQuery
          metadata = m;
     }
     
-    public void setMetadata(Metadata.Type type) {
+    public void setMetadata(int type) {
         getCreateMetadata().add(type);
     }
     
@@ -1172,20 +1171,23 @@ public class ASTQuery
     }
     
     public boolean isFederateIndex() {
-        if (hasMetadata(Metadata.Type.INDEX)) {
+        if (hasMetadata(Metadata.INDEX)) {
             return true;
         }
-        return !getDataset().getIndex().isEmpty();
+        if (!getDataset().getIndex().isEmpty()) {
+            return true;
+        }
+        return false;
     }
     
     public boolean isFederate() {
-        return getGlobalAST().hasMetadata(Metadata.Type.FEDERATE)
-            || getGlobalAST().hasMetadata(Metadata.Type.FEDERATION);
+        return getGlobalAST().hasMetadata(Metadata.FEDERATE) 
+            || getGlobalAST().hasMetadata(Metadata.FEDERATION); 
     }
 
     // hasMetadata functions for string value only
     // not for other datatype value such as number, boolean
-    public boolean hasMetadata(Metadata.Type type) {
+    public boolean hasMetadata(int type) {
         return getMetadata() != null && getMetadata().hasMetadata(type);
     }
     
@@ -1198,15 +1200,15 @@ public class ASTQuery
         return metadata != null && metadata.hasMetadata(type);
     }
     
-    public boolean hasMetadata(Metadata.Type type, String value) {
+    public boolean hasMetadata(int type, String value) {
         return metadata != null && metadata.hasValue(type, value);
     }
     
-    public boolean hasMetadataValue(Metadata.Type type, String value) {
+    public boolean hasMetadataValue(int type, String value) {
         return metadata != null && metadata.hasValues(type, value);
     }
     
-    public boolean hasMetadataValue(Metadata.Type type) {
+    public boolean hasMetadataValue(int type) {
         return metadata != null && metadata.getValues(type)!=null;
     }
     
@@ -1215,7 +1217,7 @@ public class ASTQuery
     }
     
     // string value only
-    public String getMetadataValue(Metadata.Type type) {
+    public String getMetadataValue(int type) {
         if (getMetadata() == null) {
             return null;
         }
@@ -1223,7 +1225,7 @@ public class ASTQuery
     }
     
     // datatype value other than string, e.g. number, boolean
-    public IDatatype getMetadataDatatypeValue(Metadata.Type type) {
+    public IDatatype getMetadataDatatypeValue(int type) {
         if (getMetadata() == null) {
             return null;
         }
@@ -1231,7 +1233,7 @@ public class ASTQuery
     }
     
     // datatype value other than string, e.g. number, boolean
-    public IDatatype getMetaValue(Metadata.Type type) {
+    public IDatatype getMetaValue(int type) {
         return getMetadataDatatypeValue(type);
     }
     
@@ -1266,16 +1268,16 @@ public class ASTQuery
     public void annotate(Metadata meta) {
         for (String m : meta) {
             switch (meta.type(m)) {
-                case MORE:
+                case Metadata.MORE:
                     setMore(true);
                     break;
-                case RELAX:
+                case Metadata.RELAX:
                     setRelax(true);
                     break;
-                case DEBUG:
+                case Metadata.DEBUG:
                     setDebug(true);
                     break;
-                case FEDERATE:
+                case Metadata.FEDERATE:
                     defService(meta.getValues(m));
                     break;
             }
@@ -2146,10 +2148,14 @@ public class ASTQuery
     }
 
     private boolean knownDatatype(String datatype) {
-        return datatype.startsWith(RDFS.XSD)
+        if (datatype.startsWith(RDFS.XSD)
                 || datatype.startsWith(RDFS.XSDPrefix)
                 || datatype.startsWith(RDFS.RDF)
-                || datatype.startsWith(RDFS.RDFPrefix);
+                || datatype.startsWith(RDFS.RDFPrefix)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void setCorrect(boolean b) {
@@ -2940,7 +2946,7 @@ public class ASTQuery
     }
     
     public void cleanSelect() {
-        selectVar.clear();
+        selectVar.clear();;
         selectAllVar.clear();
         selectFunctions.clear();
         selectExp.clear();
@@ -3614,6 +3620,9 @@ public class ASTQuery
         return getLog();
     }
 
+    /**
+     * @param groupBy the groupBy to set
+     */
     public HashMap<String, Expression> getGroupByMap() {
         return groupBy;
     }
@@ -3623,7 +3632,7 @@ public class ASTQuery
      * Mappings map is result of source selection
      */
     public ArrayList<Expression> getUndefinedTriple(Mappings map) {
-        Map<String, Integer> res = map.countBooleanValue();
+        HashMap<String, Integer> res = map.countBooleanValue();
         Exp body = getServiceBody();
         ArrayList<Expression> list = new ArrayList<>();
         

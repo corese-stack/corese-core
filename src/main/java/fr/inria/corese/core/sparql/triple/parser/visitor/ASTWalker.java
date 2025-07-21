@@ -69,6 +69,11 @@ public class ASTWalker implements Walker {
     // global AST and subquery AST
     
     @Override
+    public void enter(ASTQuery ast) {
+        trace("Walker enter ast");
+    }
+    
+    @Override
     public void leave(ASTQuery ast) {
     }
     
@@ -90,6 +95,12 @@ public class ASTWalker implements Walker {
     @Override
     public  void leave(Function fun) {
     }
+    
+    void trace(String str) {
+        if (trace) {
+            System.out.println(str);
+        }
+    }
 
     /**
      * Statement
@@ -99,6 +110,7 @@ public class ASTWalker implements Walker {
     
     @Override
     public void enter(Exp exp) {
+        trace("Walker enter statement: " + exp);
         if (exp.isService()) {
             enter(exp.getService());
         }
@@ -121,6 +133,7 @@ public class ASTWalker implements Walker {
     
     @Override
     public void enter(Expression exp) {
+        trace("Walker enter expression: " + exp);
         process(exp);
         processService(exp);       
     }

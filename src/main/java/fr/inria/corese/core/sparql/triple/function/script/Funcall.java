@@ -66,7 +66,7 @@ public class Funcall extends LDScript {
                     function = getDefineGenerate(this, env, name, n);
                 }
                 if (function == null) {
-                    throw new UndefinedExpressionException(UNDEFINED_EXPRESSION_MESS + ": " + this);
+                    throw new UndefinedExpressionException(UNDEFINED_EXPRESSION_MESS + ": " + toString());
                 }
             }
         }

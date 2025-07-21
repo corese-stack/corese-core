@@ -17,7 +17,7 @@ public interface ISort {
      * @param unsorted graph
      * @return List of sorted QPG Node
      */
-    List<QPGNode> sort(QPGraph unsorted);
+    public List<QPGNode> sort(QPGraph unsorted);
 
     /**
      * Rewrite the SPARQL exp according to give order of nodes
@@ -25,5 +25,5 @@ public interface ISort {
      * @param nodes 
      * @param start 
      */
-    void rewrite(Exp exp, List<QPGNode> nodes, int start);
+    public void rewrite(Exp exp, List<QPGNode> nodes, int start);
 }

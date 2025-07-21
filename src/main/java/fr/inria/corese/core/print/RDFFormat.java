@@ -13,14 +13,14 @@ import org.apache.commons.text.StringEscapeUtils;
 
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.logic.OWL;
+import fr.inria.corese.core.logic.RDF;
+import fr.inria.corese.core.logic.RDFS;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.logic.OWL;
-import fr.inria.corese.core.logic.RDF;
-import fr.inria.corese.core.logic.RDFS;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
@@ -360,7 +360,9 @@ public class RDFFormat {
         }
 
         if (with.size() > 0) {
-            return with.contains(gname.getLabel());
+            if (!with.contains(gname.getLabel())) {
+                return false;
+            }
         }
 
         return true;

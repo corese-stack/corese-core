@@ -18,7 +18,7 @@ public class CoreseDatatypeException extends CoreseException {
 	/** Use to keep the class version, to be consistent with the interface Serializable.java */
 	private static final long serialVersionUID = 1L;
 	
-	private static final String message = "Datatype error: ";
+	private static String message = "Datatype error: ";
 
 	public CoreseDatatypeException() {
 		super();

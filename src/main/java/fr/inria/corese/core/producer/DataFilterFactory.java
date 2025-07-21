@@ -24,6 +24,10 @@ import fr.inria.corese.core.kgram.api.core.Node;
  *
  */
 public class DataFilterFactory {
+    public static final int SUBJECT  = DataFilter.SUBJECT;
+    public static final int OBJECT   = DataFilter.OBJECT;
+    public static final int PROPERTY = DataFilter.PROPERTY;
+    public static final int GRAPH    = DataFilter.GRAPH;
     
     DataFilter filter;
     
@@ -35,34 +39,34 @@ public class DataFilterFactory {
     }
     
     public int graph(){
-        return DataFilter.GRAPH;
+        return GRAPH;
     }
     
     public int subject(){
-        return DataFilter.SUBJECT;
+        return SUBJECT;
     }
     
     public int property(){
-        return DataFilter.PROPERTY;
+        return PROPERTY;
     }
     
     public int object(){
-        return DataFilter.OBJECT;
+        return OBJECT;
     }
     
       /**
      * @param filter the filter to set
      */
-    public void setFilter(DataFilter filter) {
-        if (this.filter == null){
-            this.filter = filter;
+    public void setFilter(DataFilter f) {
+        if (filter == null){
+            filter = f;
         }
-        else if (this.filter.isBoolean()){
-           this.filter.setFilter(filter);
+        else if (filter.isBoolean()){
+           filter.setFilter(f);
         }
         else {
             // use case: filter = from(g1)
-            this.filter = new DataFilterAnd(this.filter, filter);
+            filter = new DataFilterAnd(filter, f);
         }
     }
     

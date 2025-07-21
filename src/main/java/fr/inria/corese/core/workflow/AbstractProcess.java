@@ -11,9 +11,9 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  */
 public interface AbstractProcess {
     
-    String PREF = NSManager.SWL;
-    String GRAPH = PREF + "graph";
-    String PROBE = PREF + "probe";
+    static final String PREF = NSManager.SWL;
+    static final String GRAPH = PREF + "graph";
+    static final String PROBE = PREF + "probe";
             
    
     void subscribe(SemanticWorkflow w);
@@ -28,9 +28,17 @@ public interface AbstractProcess {
 
     void inherit(Dataset ds);
     
+    void setDebug(boolean b);
+    
+    boolean isDisplay();
+    
+    boolean isDebug();
+    
     boolean isTransformation();
     
     void setProbe(boolean b);
+
+    void setDisplay(boolean b);
     
     void setResult(String r);
     

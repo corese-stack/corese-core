@@ -30,7 +30,7 @@ import java.util.List;
 public class Constant extends Atom {
     public static boolean DISPLAY_AS_PREFIX = true;
     public static Constant rootProperty;
-    private static final Logger logger = LoggerFactory.getLogger(Constant.class);
+    private static Logger logger = LoggerFactory.getLogger(Constant.class);
     static DatatypeMap dm;
     private static boolean stringDatatype = false;
     boolean isQName = false;
@@ -239,7 +239,21 @@ public class Constant extends Atom {
         } else {
             sb.append(KeywordPP.OPEN).append(getLongName()).append(KeywordPP.CLOSE);
         }
+        if (display) {
+            completeDisplay();
+        }
         return sb;
+    }
+    
+    void completeDisplay() {
+        if (isTriple() && getTriple()!=null) {
+            Triple t = getTriple();
+            System.out.println(String.format("%s = triple(%s %s %s)", getLabel(), 
+                    t.getSubject().getDatatypeValue(), t.getPredicate().getDatatypeValue(), t.getObject().getDatatypeValue()));
+            if (t.getObject().isTriple()) {
+                t.getObject().getConstant().completeDisplay();
+            }
+        }
     }
 
     public StringBuffer toString2(StringBuffer sb) {
@@ -301,7 +315,7 @@ public class Constant extends Atom {
                     continue;
                 case '\'':
                     if (quote) {
-                        retval.append("\\'");
+                        retval.append("\\\'");
                     } else {
                         retval.append(str.charAt(i));
                     }

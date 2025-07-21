@@ -38,7 +38,7 @@ import fr.inria.corese.core.sparql.triple.parser.URLServer;
  * 2- iterate edges with ldscript function us:iterate()
  */
 public class DataManagerJava extends CoreseGraphDataManager {
-    private static final Logger logger = LoggerFactory.getLogger(DataManagerJava.class);
+    private static Logger logger = LoggerFactory.getLogger(DataManagerJava.class);
     private static final String QUERY = "query";
     private static final String PATH = "path";
     private static final String PARAM = "param";

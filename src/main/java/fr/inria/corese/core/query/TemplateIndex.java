@@ -1,34 +1,35 @@
 package fr.inria.corese.core.query;
 
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.logic.RDF;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * Index templates by type of focus Used by QueryEngine, PPrinter
- * <p>
+ *
  * sql:Query -> ( template {} where { ?in a sql:Query } ) sql:Plus -> ( template
  * {} where { ?in a ?class } values ?class { sql:Plus }
- * <p>
+ *
  * Templates with no rdf:type stored in a list
  *
  * @author Olivier Corby, Wimmics Inria I3S, 2013
+ *
  */
 class TemplateIndex extends HashMap<String, List<Query>> {
 
     // templates not indexed because they have no ?in rdf:type
-    private final List<Query> list = new ArrayList<>();
+    List<Query> list = new ArrayList<Query>();
 
     List<Query> getTemplates(String type) {
         if (type == null) {
@@ -73,18 +74,19 @@ class TemplateIndex extends HashMap<String, List<Query>> {
 
                     if (type.isConstant()) {
                         // ?in rdf:type sql:Select
-                        IDatatype dt = type.getValue();
+                        IDatatype dt =  type.getValue();
                         add(dt.getLabel(), q);
                         suc = true;
-                    } else {
+                    } 
+                    else {
                         // ?in rdf:type ?class
                         Mappings map = anyMappings(q, body);
-                        if (map != null) {
+                       if (map != null) {
                             // ?in rdf:type ?class . values ?class { ... }
                             for (Mapping m : map) {
                                 Node node = m.getNode(type);
                                 if (node != null) {
-                                    IDatatype dt = node.getValue();
+                                    IDatatype dt =  node.getValue();
                                     add(dt.getLabel(), q);
                                     suc = true;
                                 }
@@ -107,7 +109,7 @@ class TemplateIndex extends HashMap<String, List<Query>> {
 
     Mappings anyMappings(Exp exp) {
         for (Exp ee : exp) {
-            if (ee.type() == ExpType.Type.VALUES) {
+            if (ee.type() == Exp.VALUES) {
                 return ee.getMappings();
             }
         }
@@ -115,12 +117,12 @@ class TemplateIndex extends HashMap<String, List<Query>> {
     }
 
     void add(String type, Query q) {
-        List<Query> addList = get(type);
-        if (addList == null) {
-            addList = new ArrayList<>();
-            put(type, addList);
+        List<Query> list = get(type);
+        if (list == null) {
+            list = new ArrayList<Query>();
+            put(type, list);
         }
-        addList.add(q);
+        list.add(q);
     }
 
     /**
@@ -131,7 +133,6 @@ class TemplateIndex extends HashMap<String, List<Query>> {
                 && edge.getNode(0).getLabel().equals(ASTQuery.IN);
     }
 
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (String dt : keySet()) {
@@ -155,15 +156,21 @@ class TemplateIndex extends HashMap<String, List<Query>> {
     }
 
     void sort(List<Query> list) {
-        list.sort((q1, q2) -> {
-            int p1 = getLevel(q1);
-            int p2 = getLevel(q2);
-            return Integer.compare(p1, p2);
+        Collections.sort(list, new Comparator<Query>() {
+            public int compare(Query q1, Query q2) {
+                int p1 = getLevel(q1);
+                int p2 = getLevel(q2);
+                return compare(p1, p2);
+            }
+
+            int compare(int x, int y) {
+                return (x < y) ? -1 : ((x == y) ? 0 : 1);
+            }
         });
     }
 
     int getLevel(Query q) {
-        ASTQuery ast = q.getAST();
+        ASTQuery ast =  q.getAST();
         return ast.getPriority();
     }
 }

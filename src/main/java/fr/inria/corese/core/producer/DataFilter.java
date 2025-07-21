@@ -29,7 +29,7 @@ public class DataFilter implements ExprType {
     
     private int test;
     int index, other = 1;
-    AccessRight.AccessRights level = AccessRight.DEFAULT;
+    byte level = AccessRight.DEFAULT;
     private AccessRight accessRight;
     private boolean nested = false;
     
@@ -51,7 +51,7 @@ public class DataFilter implements ExprType {
        this(test, null, index);
     }
     
-    public DataFilter(int test, AccessRight.AccessRights level){
+    public DataFilter(int test, byte level){
        this.test = test;
        this.level = level;
     }
@@ -143,7 +143,7 @@ public class DataFilter implements ExprType {
                 // if query edge is
                 // nested:   asserted edge ok, nested edge ok
                 // asserted: asserted edge ok, nested edge not ok
-                return isNested() || RDF_STAR_SELECT || edge.isAsserted();
+                return (isNested() || RDF_STAR_SELECT) ? true : edge.isAsserted();
                 
             default:
                 IDatatype dt =  getValue(edge, index);

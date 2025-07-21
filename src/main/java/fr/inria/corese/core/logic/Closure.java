@@ -28,6 +28,7 @@ public class Closure {
     boolean isDistinct = true;
     private boolean isConnect = false;
     boolean isMessage = true;
+    private boolean isTrace = false;
     // send index to data manager edge iterator 
     private boolean filterEdgeIndex = true;
 
@@ -64,8 +65,9 @@ public class Closure {
                 for (Edge ent : graph.getEdges(predicate1)) {
                     connect(ent.getNode(0), ent.getNode(1));
                 }
-            } catch (OutOfMemoryError e) {
+            } catch (OutOfMemoryError E) {
                 setConnect(false);
+                System.out.println("Skip Cache Out Of Memory:  " + predicate1);
             }
         }
     }
@@ -84,6 +86,7 @@ public class Closure {
                     } catch (OutOfMemoryError E) {
                         if (isMessage) {
                             isMessage = false;
+                            System.out.println("Skip Cache Out Of Memory:  " + p);
                             return graph.exist(p, n1, n2);
                         }
                     }
@@ -104,6 +107,7 @@ public class Closure {
                     } catch (OutOfMemoryError E) {
                         if (isMessage) {
                             isMessage = false;
+                            System.out.println("Skip Cache Out Of Memory:  " + predicate1);
                         }
                         return;
                     }
@@ -133,12 +137,17 @@ public class Closure {
        
         ArrayList<Edge> edgeListNew = new ArrayList<>(),
                 edgeListTemp = new ArrayList<>();
-
+        
+        if (isTrace) {
+            System.out.println("Closure: 0 " + graph.size(predicate1));
+        }
         while (go) {
 
             Iterable<Edge> it1 = edgeListNew;
             if (n == 0) {
                 it1 = getEdges(predicate1);
+            } else if (isTrace) {
+                System.out.println("Closure: " + n + " " + +edgeListNew.size());
             }
             n++;
 
@@ -187,6 +196,9 @@ public class Closure {
             if (Graph.isTopRelation(p)) {
                 p = null;
             }
+            if (isTrace) {
+                System.out.println("Closure: new " + edgeListTemp.size());
+            }
             insert(p, edgeListTemp);
             edgeListNew = edgeListTemp;
             edgeListTemp = new ArrayList<>();
@@ -219,6 +231,20 @@ public class Closure {
      */
     public void setConnect(boolean Connect) {
         this.isConnect = Connect;
+    }
+
+    /**
+     * @return the isTrace
+     */
+    public boolean isTrace() {
+        return isTrace;
+    }
+
+    /**
+     * @param isTrace the isTrace to set
+     */
+    public void setTrace(boolean isTrace) {
+        this.isTrace = isTrace;
     }
 
     Node ruleGraphNode() {

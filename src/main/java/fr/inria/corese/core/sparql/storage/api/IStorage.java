@@ -10,8 +10,8 @@ package fr.inria.corese.core.sparql.storage.api;
 public interface IStorage {
 
     //public final static int STORAGE_RAM = 10;
-    int STORAGE_DB = 20;
-    int STORAGE_FILE = 30;
+    public final static int STORAGE_DB = 20;
+    public final static int STORAGE_FILE = 30;
 
     /**
      * Write the string to persistent storage
@@ -20,7 +20,7 @@ public interface IStorage {
      * @param literal
      * @return 
      */
-    boolean write(int id, String literal);
+    public boolean write(int id, String literal);
 
     /**
      * Read the string by id
@@ -28,14 +28,14 @@ public interface IStorage {
      * @param id
      * @return
      */
-    String read(int id);
+    public String read(int id);
 
     /**
      * Delete the string by its id
      *
      * @param id
      */
-    void delete(int id);
+    public void delete(int id);
 
     /**
      * Check if the current manager can be used
@@ -43,39 +43,39 @@ public interface IStorage {
      * @param str
      * @return
      */
-    boolean check(String str);
-    boolean check(int length);
+    public boolean check(String str);
+    public boolean check(int length);
 
     /**
      * Get the status of manager
      * 
      * @return 
      */
-    boolean enabled();
+    public boolean enabled();
 
     /**
      * Enable or distable the manager
      * 
      * @param enabled 
      */
-    void enable(boolean enabled);
+    public void enable(boolean enabled);
 
     /**
      * Return the type of storage that current manager manages
      *
      * @return
      */
-    int getStorageType();
+    public int getStorageType();
 
     /**
      * Initialization, ex, setup connection, set parameters, etc
      */
-    void init();
+    public void init();
 
     /**
      * Clean up, ex, close connections
      */
-    void clean();
+    public void clean();
   
     
 }

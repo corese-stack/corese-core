@@ -1,20 +1,22 @@
 package fr.inria.corese.core;
 
 
-import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.core.TripleStore;
-import fr.inria.corese.core.kgram.path.Path;
-import fr.inria.corese.core.sparql.api.IDatatype;
-
 import java.util.Objects;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.path.Path;
 
 /**
  * Node
  *
  * @author Olivier Corby, Edelweiss INRIA 2010
+ *
  */
-public class NodeImpl extends GraphObject implements Node {
+public class NodeImpl extends GraphObject implements Node
+        //,  Comparable<NodeImpl> 
+{
 
     // true means graph nodes are IDatatype instead of NodeImpl
     // todo: duplicate IDatatype when insert node in new graph, e.g. construct
@@ -23,13 +25,12 @@ public class NodeImpl extends GraphObject implements Node {
     int index = -1;
     IDatatype dt;
 
-    public NodeImpl() {
-    }
-
+    public NodeImpl() {}
+    
     NodeImpl(IDatatype val) {
         dt = val;
     }
-
+    
     NodeImpl(IDatatype val, Graph g) {
         graph = g;
         dt = val;
@@ -48,7 +49,7 @@ public class NodeImpl extends GraphObject implements Node {
         }
         return new NodeImpl(val, g);
     }
-
+    
     static Node createDatatype(IDatatype val, Graph g) {
         if (val.getTripleStore() != null && val.getTripleStore() != g) {
             val = val.copy();
@@ -64,17 +65,12 @@ public class NodeImpl extends GraphObject implements Node {
 
     @Override
     public int compare(Node node) {
-        return getValue().compareTo(node.getValue());
+        return getValue().compareTo( node.getValue());
     }
 
     @Override
     public int getIndex() {
         return index;
-    }
-
-    @Override
-    public void setIndex(int n) {
-        index = n;
     }
 
     @Override
@@ -86,12 +82,12 @@ public class NodeImpl extends GraphObject implements Node {
     public IDatatype getValue() {
         return dt;
     }
-
+    
     @Override
     public IDatatype getDatatypeValue() {
         return dt;
     }
-
+    
     @Override
     public void setDatatypeValue(IDatatype dt) {
         this.dt = dt;
@@ -111,20 +107,20 @@ public class NodeImpl extends GraphObject implements Node {
     public boolean isVariable() {
         return false;
     }
-
+    
     @Override
-    public boolean isFuture() {
+    public boolean isFuture(){
         return dt.isFuture();
     }
 
     @Override
     public boolean same(Node node) {
-        return getValue().sameTerm(node.getValue());
+        return getValue().sameTerm( node.getValue());
     }
-
-    @Override
+    
+     @Override
     public boolean match(Node node) {
-        return getValue().match(node.getValue());
+        return getValue().match( node.getValue());
     }
 
     @Override
@@ -138,7 +134,16 @@ public class NodeImpl extends GraphObject implements Node {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this.dt);
+		return Objects.hashCode(this.dt);
+//		int hash = 7;
+//		// hash = 67 * hash + (this.key != null ? this.key.hashCode() : 0);
+//		hash = 67 * hash + (this.dt != null ? this.dt.hashCode() : 0);
+//		return hash;
+    }
+
+    @Override
+    public void setIndex(int n) {
+        index = n;
     }
 
     @Override
@@ -158,20 +163,31 @@ public class NodeImpl extends GraphObject implements Node {
 
     @Override
     public Object getNodeObject() {
-        return dt.getNodeObject();
+         return dt.getNodeObject();
     }
 
     @Override
     public void setObject(Object o) {
         dt.setObject(o);
     }
-
+    
     @Override
-    public Path getPath() {
+    public Path getPath() {       
         return dt.getPath();
     }
 
 
+//    @Override
+//    public Object getProperty(int p) {
+//        return null;
+//    }
+//
+//    @Override
+//    public void setProperty(int p, Object o) {
+//    }
+
+ 
+    
     @Override
     public String getKey() {
         return null;
@@ -179,7 +195,7 @@ public class NodeImpl extends GraphObject implements Node {
 
     @Override
     public void setKey(String str) {
-
+        
     }
 
 
@@ -192,4 +208,9 @@ public class NodeImpl extends GraphObject implements Node {
     public TripleStore getTripleStore() {
         return graph;
     }
+
+//	@Override
+//	public int compareTo(NodeImpl o) {
+//		return o.dt.compareTo(dt);
+//	}
 }

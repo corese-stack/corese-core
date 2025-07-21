@@ -44,6 +44,10 @@ public class ServiceParser implements URLParam {
     public ServiceParser(String url) {
         this(new URLServer(url));
     }
+   
+//    public Mappings parseMapping(String str) throws LoadException {
+//        return parseMapping(null, "", str, ENCODING);
+//    }
 
     public Mappings parseMapping(Query q, String query, String str, String encoding) 
             throws LoadException {
@@ -170,6 +174,10 @@ public class ServiceParser implements URLParam {
         IDatatype dt;
         try {
             dt = QueryProcess.create().funcall(fname, getBind(), DatatypeMap.newInstance(str));
+            if (getURL().hasParameter(MODE, SHOW)) {
+                System.out.println("wrap: "+ name);
+                System.out.println(dt);
+            }
         } catch (EngineException ex) {
             Service.logger.error("Service wrapper error: " + name);
             throw new LoadException(ex);

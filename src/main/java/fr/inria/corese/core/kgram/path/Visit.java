@@ -159,6 +159,9 @@ public class Visit {
 
         void remove(Node n) {
             if (isReverse) {
+                if (!list.get(list.size() - 1).equals(n)) {
+                    System.out.println("** ERROR Visit: " + n + " " + list);
+                }
                 list.remove(list.size() - 1);
             } else {
                 table.remove(n);
@@ -486,5 +489,281 @@ public class Visit {
     Integer getLength(Node n, Regex exp) {
         return ltable.getLength(n, exp);
     }
+
+//    void setRegex(Node n, Regex e) {
+//        n.setProperty(Node.REGEX, e);
+//    }
+//
+//    Regex getRegex(Node n) {
+//        return (Regex) n.getProperty(Node.REGEX);
+//    }
+
+    /**
+     * ***********************************
+     * Old version
+     */
+//    boolean loop(Regex exp, Node start) {
+//        if (isReverse) {
+//            insert(exp, start);
+//            if (revLoop(exp)) {
+//                remove(exp, start);
+//                return true;
+//            }
+//        } else if (eLoop(exp, start)) {
+//            return true;
+//        } else {
+//            insert(exp, start);
+//        }
+//
+//        return false;
+//    }
+//
+//    void start(Node node) {
+//        for (Regex exp : regexList) {
+//            add(exp, node);
+//        }
+//    }
+//
+//    void leave(Node node) {
+//        for (Regex exp : regexList) {
+//            remove(exp, node);
+//        }
+//    }
+//
+//    void set(Regex exp, Table t) {
+//        if (t != null) {
+//            eetable.put(exp, t);
+//        }
+//    }
+//
+//    Table unset(Regex exp) {
+//        Table t = eetable.get(exp);
+//        eetable.remove(exp);
+//        return t;
+//    }
+//
+//    void insert(Regex exp, Node start) {
+//        if (start == null) {
+//            // subscribe exp to start() above because start node is not bound yet
+//            regexList.add(exp);
+//        } else {
+//            add(exp, start);
+//        }
+//    }
+//
+//    void add(Regex exp, Node node) {
+//        if (isReverse) {
+//            ladd(exp, node);
+//        } else {
+//            eadd(exp, node);
+//        }
+//    }
+//
+//    // reverse case: add node in list
+//    void ladd(Regex exp, Node node) {
+//        List<Node> list = etable.get(exp);
+//        if (list == null) {
+//            list = new ArrayList<Node>();
+//            etable.put(exp, list);
+//        }
+//        list.add(node);
+//    }
+//
+//    // forward case: add in table
+//    void eadd(Regex exp, Node node) {
+//        if (speedUp) {
+//            node.setProperty(Node.STATUS, true);
+//            return;
+//        }
+//        Table table = eetable.get(exp);
+//        if (table == null) {
+//            table = new Table();
+//            eetable.put(exp, table);
+//        }
+//        table.put(node, node);
+//    }
+//
+//    void remove(Regex exp, Node node) {
+//        if (node == null) {
+//            regexList.remove(exp);
+//            return;
+//        }
+//
+//        if (isReverse) {
+//            lremove(exp, node);
+//        } else {
+//            eremove(exp, node);
+//        }
+//    }
+//
+//    // reverse case
+//    void lremove(Regex exp, Node node) {
+//        List<Node> list = etable.get(exp);
+//        if (!list.get(list.size() - 1).equals(node)) {
+//            System.out.println("** ERROR Visit: " + node + " " + list);
+//        }
+//        list.remove(list.size() - 1);
+//    }
+//
+//    // forward case
+//    void eremove(Regex exp, Node node) {
+//        if (speedUp) {
+//            node.setProperty(Node.STATUS, false);
+//            return;
+//        }
+//        Table table = eetable.get(exp);
+//        table.remove(node);
+//    }
+//
+//    // forward case
+//    boolean eLoop(Regex exp, Node start) {
+//        if (speedUp) {
+//            return (start != null && start.getProperty(Node.STATUS) == Boolean.TRUE);
+//        }
+//        Table table = eetable.get(exp);
+//        if (table == null) {
+//            return false;
+//        }
+//        return table.containsKey(start);
+//    }
+//
+//    /**
+//     * Test if there is a loop on path of exp path isReverse
+//     */
+//    boolean revLoop(Regex exp) {
+//
+//        List<Node> list = etable.get(exp);
+//        if (list == null || list.size() < 2) {
+//            return false;
+//        }
+//        int last = list.size() - 1;
+//
+//        // use case: ?s {2,} ex:uri
+//        // Walk through the list backward (from <uri> to ?s), skip 2 first nodes
+//        // cf W3C pp test case
+//        Node node = null;
+//        int count = 0;
+//        int min = exp.getMin();
+//        for (int i = last; i >= 0; i--) {
+//            if (count < min) {
+//                count++;
+//                continue;
+//            } else if (count == min) {
+//                node = list.get(i);
+//            } else {
+//                if (list.get(i).equals(node)) {
+//                    return true;
+//                }
+//            }
+//            count++;
+//        }
+//
+//        return false;
+//    }
+
+    /**
+     * *******************
+     *
+     * States are deprecated
+     */
+//    List<Node> get(State state) {
+//        return table.get(state);
+//    }
+//
+//    void put(State state, List<Node> list) {
+//        table.put(state, list);
+//    }
+//
+//    public void add(State state, Node node) {
+//        List<Node> list = get(state);
+//        if (list == null) {
+//            list = new ArrayList<Node>();
+//            put(state, list);
+//        }
+//        list.add(node);
+//    }
+//
+//    public void remove(State state, Node node) {
+//        List<Node> list = get(state);
+//        if (!list.get(list.size() - 1).equals(node)) {
+//            System.out.println("** ERROR Visit: " + node + " " + list);
+//        }
+//        list.remove(list.size() - 1);
+//    }
+//
+//    /**
+//     * Check whether the last visited node has already been visited as an
+//     * intermediate node use case: ?x p{2,} ?y : skip the first two nodes (no
+//     * loop with two first) ?x p{2,} ex:uri : walk backward through the list
+//     *
+//     * @deprecated
+//     *
+//     */
+//    public boolean loop(State state) {
+//        if (!state.isCheckLoop()) {
+//            return false;
+//        }
+//
+//        List<Node> list = get(state);
+//        if (list == null || list.size() < 2) {
+//            return false;
+//        }
+//        int last = list.size() - 1;
+//        int min = 0;
+//        if (state.isBound() && !state.isPlus()) {
+//            min = state.getMin();
+//        }
+//
+//        if (isReverse) {
+//            // use case: ?s {2,} ex:uri
+//            // Walk through the list backward (from <uri> to ?s), skip 2 first nodes
+//            // cf W3C pp test case
+//            Node node = null;
+//            int count = 0;
+//            for (int i = last; i >= 0; i--) {
+//                if (count < min) {
+//                    count++;
+//                    continue;
+//                } else if (count == min) {
+//                    node = list.get(i);
+//                } else {
+//                    if (list.get(i).equals(node)) {
+//                        return true;
+//                    }
+//                }
+//                count++;
+//            }
+//        } else {
+//            Node node = list.get(last);
+//            for (int i = 0; i < last; i++) {
+//                if (i < min) {
+//                    continue;
+//                }
+//                if (list.get(i).equals(node)) {
+//                    return true;
+//                }
+//            }
+//        }
+//
+//        return false;
+//    }
+//
+//    /**
+//     * @deprecated
+//     */
+//    public boolean loop2(State state) {
+//        List<Node> list = get(state);
+//        if (list == null || list.size() < 2) {
+//            return false;
+//        }
+//        int last = list.size() - 1;
+//        Node node = list.get(last);
+//        for (int i = 0; i < last; i++) {
+//            if (list.get(i).equals(node)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
 }

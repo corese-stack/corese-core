@@ -36,7 +36,7 @@ import org.w3c.dom.Document;
 
 public class XPathFun {
 
-    private static final Logger logger = LoggerFactory.getLogger(XPathFun.class);
+    private static Logger logger = LoggerFactory.getLogger(XPathFun.class);
 
     NSManager nsm;
     NamespaceContext context;
@@ -89,7 +89,7 @@ public class XPathFun {
     void setNSM(final NSManager nsm) {
         if (xpath != null) {
             context = new NamespaceContext() {
-                final NSManager nm = nsm;
+                NSManager nm = nsm;
 
                 public String getNamespaceURI(String prefix) {
                     return nm.getNamespace(prefix);
@@ -117,9 +117,9 @@ public class XPathFun {
         fac.setNamespaceAware(true);
         DocumentBuilder builder = fac.newDocumentBuilder();
         switch (idoc.getCode()) {
-            case XMLLITERAL:
-            case LITERAL:
-            case STRING:
+            case IDatatype.XMLLITERAL:
+            case IDatatype.LITERAL:
+            case IDatatype.STRING:
                 // doc is XML markup String
                 InputSource sin = new InputSource(new StringReader(name));
                 doc = builder.parse(sin);

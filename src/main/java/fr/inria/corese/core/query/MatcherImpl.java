@@ -1,28 +1,46 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.core.Graph;
+import java.util.HashMap;
+
+import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Matcher;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.Entailment;
-import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  * Match
- * <p>
+ *
  * Draft subsumption for xxx rdf:type c:Person Exploits graph subClassOf
  * properties, use a cache
- * <p>
+ *
  * TODO: Remove dichotomy on constant class in EdgeIndex if entailment does not
  * process rdfs:subClassOf TODO: ?x rdf:type ?c ?y rdf:type ?c
  *
+ *
  * @author Olivier Corby, Edelweiss INRIA 2010
+ *
  */
 public class MatcherImpl implements Matcher {
+    private static boolean byIndex = false;
     public static boolean RDF_STAR_VALIDATION = true;
 
+    /**
+     * @return the byIndex
+     */
+    public static boolean isByIndex() {
+        return byIndex;
+    }
+
+    /**
+     * @param aByIndex the byIndex to set
+     */
+    public static void setCompareIndex(boolean aByIndex) {
+        byIndex = aByIndex;
+    }
     Graph graph;
     Entailment entail;
     Cache table;
@@ -32,7 +50,7 @@ public class MatcherImpl implements Matcher {
 
     MatcherImpl(Graph g) {
         graph = g;
-        entail = g.getEntailment();
+        entail = g.getEntailment();        
         bnode = new MatchBNode(g);
     }
 
@@ -47,7 +65,7 @@ public class MatcherImpl implements Matcher {
     @Override
     public boolean match(Edge q, Edge r, Environment env) {
 
-        if (graph.getProxy().isType(q)) {
+        if (graph.getProxy().isType(q)) { 
             return matchType(q, r, env);
         }
 
@@ -62,9 +80,10 @@ public class MatcherImpl implements Matcher {
 
         int max = q.nbNode();
         if (max > r.nbNode()) {
-            if (max == r.nbNode() + 1 && q.getNode(q.nbNode() - 1).isMatchNodeList()) {
+            if (max == r.nbNode() + 1 && q.getNode(q.nbNode() -1).isMatchNodeList()) {
                 //ok
-            } else {
+            }
+            else {
                 return false;
             }
         }
@@ -72,8 +91,9 @@ public class MatcherImpl implements Matcher {
             Node qNode = q.getNode(i);
             if (qNode.isMatchNodeList()) {
                 return true;
-            } else {
-                Node node = r.getNode(i);
+            }
+            else {
+                Node node  = r.getNode(i);
                 if (!match(q, r, qNode, node, env)) {
                     return false;
                 }
@@ -99,7 +119,7 @@ public class MatcherImpl implements Matcher {
         }
 
         Node qnode = q.getNode(1);
-
+        
         switch (localMode) {
             case STRICT:
                 return match(qnode, r.getNode(1), env);
@@ -156,42 +176,47 @@ public class MatcherImpl implements Matcher {
      * query (via the environment)
      */
     public boolean isSubClassOf(Node t, Node q, Environment env) {
-        Cache tableCache = getTable(env);
-        Boolean b = tableCache.get(q, t);
+        Cache table = getTable(env);
+        Boolean b = table.get(q, t);
         if (b == null) {
             // PRAGMA: use graph because entail may be null (cf PluginImpl)			
             b = graph.isSubClassOf(t, q);
-            tableCache.put(q, t, b);
+            table.put(q, t, b);
         }
         return b;
     }
 
     Cache getTable(Environment env) {
-        Cache tableCache = (Cache) env.getObject();
-        if (tableCache == null) {
-            tableCache = new Cache(env.getQuery());
-            env.setObject(tableCache);
+        Cache table = (Cache) env.getObject();
+        if (table == null) {
+            table = new Cache(env.getQuery());
+            env.setObject(table);
         }
-        return tableCache;
+        return table;
+    }
+
+    boolean isSubClassOf2(Node t, Node q, Environment env) {
+        boolean b = graph.isSubClassOf(t, q);
+        return b;
     }
 
     @Override
-    public boolean same(Node node, Node n1, Node n2, Environment env) {
-        return same(n1, n2);
+    public boolean same(Node node, Node n1, Node n2, Environment env) {        
+        return same(n1, n2);  
     }
-
-    boolean same(Node n1, Node n2) {
-        return n1.match(n2);
+       
+    boolean same(Node n1, Node n2){        
+       return n1.match(n2); 
+    }
+    
+    @Override
+    public void setMode(int mode) {
+        this.mode = mode;
     }
 
     @Override
     public int getMode() {
         return mode;
-    }
-
-    @Override
-    public void setMode(int mode) {
-        this.mode = mode;
     }
 
     @Override
@@ -202,7 +227,7 @@ public class MatcherImpl implements Matcher {
 
         return q.getValue().match(t.getValue());
     }
-
+    
     public boolean match(Edge query, Edge target, Node q, Node t, Environment env) {
         if (q.isBlank()) {
             return true;
@@ -211,7 +236,7 @@ public class MatcherImpl implements Matcher {
             return true;
         }
         IDatatype qdt = q.getValue();
-        IDatatype tdt = t.getValue();
+        IDatatype tdt = t.getValue();        
 
         if (RDF_STAR_VALIDATION && query.isNested()) {
             // nested triple require same-term on literal
@@ -222,4 +247,7 @@ public class MatcherImpl implements Matcher {
         return qdt.match(tdt);
     }
 
+  public MatchBNode getMatchBNode(){
+      return bnode;
+  }
 }

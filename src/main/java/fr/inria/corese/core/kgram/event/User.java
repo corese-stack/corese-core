@@ -8,9 +8,9 @@ package fr.inria.corese.core.kgram.event;
  */
 public interface User {
 	
-	int get();
+	public int get();
 	
-	String help();
+	public String help();
 
 
 }

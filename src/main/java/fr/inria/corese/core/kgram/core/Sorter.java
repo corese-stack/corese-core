@@ -71,6 +71,7 @@ public class Sorter {
 
         if (!connect) {
             q.addInfo("Disconnected: ", exp);
+            System.out.println("Disconnect: " + exp);
         }
     }
 
@@ -119,7 +120,9 @@ public class Sorter {
             if (e1.bind(map)) {
                 return false;
             }
-            return e2.bind(map);
+            if (e2.bind(map)) {
+                return true;
+            }
         }
         return false;
     }

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class VariableLocal extends Variable {
-    private static final Logger logger = LoggerFactory.getLogger(VariableLocal.class);
+    private static Logger logger = LoggerFactory.getLogger(VariableLocal.class);
     
     public VariableLocal(String name){
         super(name);

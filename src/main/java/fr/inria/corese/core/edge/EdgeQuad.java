@@ -6,6 +6,7 @@ import fr.inria.corese.core.kgram.api.core.Node;
  * Graph Edge as Quad
  *
  * @author Olivier Corby, Wimmics, INRIA I3S, 2014
+ *
  */
 public class EdgeQuad extends EdgeTriple {
     protected Node graph;
@@ -13,13 +14,13 @@ public class EdgeQuad extends EdgeTriple {
     public EdgeQuad() {
     }
 
-
+    
     EdgeQuad(Node g, Node pred, Node subject, Node object) {
         super(pred, subject, object);
         this.graph = g;
     }
-
-
+    
+     
     public static EdgeQuad create(Node g, Node subject, Node pred, Node object) {
         return new EdgeQuad(g, pred, subject, object);
     }

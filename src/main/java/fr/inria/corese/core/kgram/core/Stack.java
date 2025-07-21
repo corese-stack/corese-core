@@ -108,7 +108,7 @@ public class Stack extends ArrayList<Exp> implements ExpType {
 	 * begin: WATCH
 	 * next:  CONTINUE/BACKJUMP
 	 */
-	Stack watch(Exp exp, ExpType.Type start, ExpType.Type next, boolean skip, int n){
+	Stack watch(Exp exp, int start, int next, boolean skip, int n){
 		Exp end   =  Exp.create(next);
 		Exp begin =  Exp.create(start, end);
 		end.add(begin);

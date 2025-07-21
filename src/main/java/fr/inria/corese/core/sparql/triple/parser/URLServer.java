@@ -6,7 +6,6 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,7 +22,7 @@ public class URLServer implements URLParam {
     static HashMap<String, Boolean> encode;
     
     // whole URL: http://corese.inria.fr/sparql?param=value
-    private final String url;
+    private String url;
     // server part of URL: http://corese.inria.fr/sparql
     private String server;
     // param=value&...
@@ -74,8 +73,21 @@ public class URLServer implements URLParam {
         }
         if (getParam()!=null) {
             hashmap(getCreateMap(), getParam());
+            if (hasParameter(DISPLAY, PARAM)) {
+                display();
+            }
         }
     }
+    
+    void completeParameter() {
+    }
+    
+    public void display() {
+        getMap().keySet().forEach((key) -> {
+            System.out.println(String.format("%s=%s", key, getParameterList(key)));
+        });
+    }
+    
     
     String server(String url) {
         int index = url.indexOf("?");
@@ -88,6 +100,10 @@ public class URLServer implements URLParam {
 
     
     String parameter(String url) {
+//        try {
+//            URLDecoder.decode(url, StandardCharsets.UTF_8.toString());
+//        } catch (UnsupportedEncodingException ex) {
+        //}
         int index = url.indexOf("?");
         if (index == -1) {
             return null;
@@ -126,7 +142,10 @@ public class URLServer implements URLParam {
         if (skip != null && skip.contains(var)) {
             return false;
         }
-        return focus == null || focus.contains(var);
+        if (focus != null && ! focus.contains(var)) {
+            return false;
+        }
+        return true;
     } 
     
     public boolean hasParameter() {
@@ -202,7 +221,8 @@ public class URLServer implements URLParam {
         String[] params = param.split("&");
         
         for (String str : params) {
-             String[] keyval = str.split("=");
+            //System.out.println("URL param: " + str);
+            String[] keyval = str.split("=");
             
             if (keyval.length>=2)   {
                 String key = keyval[0];
@@ -267,7 +287,10 @@ public class URLServer implements URLParam {
         if (name.startsWith(SERVER)) {
             return true;
         }
-        return encode.containsKey(name);
+        if (encode.containsKey(name)) {
+            return true;
+        }
+        return false;
     }
     
     static boolean isShare(String name) {
@@ -314,7 +337,11 @@ public class URLServer implements URLParam {
             if (i++ > 0) {
                 format = "%s&%s=%s";
             }
-            url = String.format(format, url, key, URLEncoder.encode(getMap().getFirst(key), StandardCharsets.UTF_8));
+            try {
+                url = String.format(format, url, key, URLEncoder.encode(getMap().getFirst(key), "UTF-8"));
+            } catch (UnsupportedEncodingException ex) {
+                
+            }
         }
         
         return url;

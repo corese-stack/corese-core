@@ -10,5 +10,5 @@ public interface DataManagerBuilder {
      * 
      * @return a new DataManager associated to the current configuration.
      */
-    DataManager build();
+    public DataManager build();
 }

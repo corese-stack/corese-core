@@ -12,11 +12,11 @@ import fr.inria.corese.core.kgram.api.core.Node;
  */
 public interface IStats {
 
-    int NA = 0;
-    int SUBJECT = 1;
-    int PREDICATE = 2;
-    int OBJECT = 3;
-    int TRIPLE = 4;
+    public static final int NA = 0;
+    public static final int SUBJECT = 1;
+    public static final int PREDICATE = 2;
+    public static final int OBJECT = 3;
+    public static final int TRIPLE = 4;
 
     /**
      * Get the number of all triples in a graph

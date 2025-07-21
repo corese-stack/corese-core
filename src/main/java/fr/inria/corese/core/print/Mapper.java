@@ -94,7 +94,7 @@ public class Mapper {
 	void getMapEdges(Node node, Mapping map, List<Edge> list){
 		for (Edge edge : map.getEdges()){
 			if (edge instanceof Edge){
-				Edge ent = edge;
+				Edge ent = (Edge) edge;
 				if (edge.getNode(0).equals(node) && ! list.contains(ent)){
 					list.add(ent);
 				}

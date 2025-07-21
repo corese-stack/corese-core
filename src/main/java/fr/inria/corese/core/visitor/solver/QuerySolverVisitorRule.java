@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class QuerySolverVisitorRule extends QuerySolverVisitorBasic {
 
   
-    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitorRule.class);
+    private static Logger logger = LoggerFactory.getLogger(QuerySolverVisitorRule.class);
     
     private RuleEngine re;
     // should rule engine call entailment 
@@ -151,7 +151,7 @@ public class QuerySolverVisitorRule extends QuerySolverVisitorBasic {
             }
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            logger.error("An unexpected error has occurred", ex);
+            java.util.logging.Logger.getLogger(QueryProcess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             logger.error("Undefined Visitor: " + name);
         }
 

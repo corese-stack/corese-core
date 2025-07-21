@@ -72,9 +72,11 @@ public class GraphListen implements GraphListener {
     void init() {
         try {
             if (query != null){
+                System.out.println("Listen: " + query.getAST());
                 eval = QueryProcess.createEval(graph, query);
             }
             else if (init != null) {
+                System.out.println("Listen: " + init);
                 eval = QueryProcess.createEval(graph, init);
             }
         } catch (EngineException ex) {
@@ -122,6 +124,7 @@ public class GraphListen implements GraphListener {
      * @param name
      */
     IDatatype exec(String name, IDatatype[] param) {
+        //return (IDatatype) eval.eval(name, param);
         return DatatypeMap.TRUE;
     }
 

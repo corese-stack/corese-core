@@ -1,9 +1,9 @@
 package fr.inria.corese.core.compiler.eval;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 public class HashTest {
-    @org.junit.jupiter.api.Test
+    @org.junit.Test
     public void test1()
     {
         Hash hash = new Hash( "abc" );

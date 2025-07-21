@@ -88,7 +88,7 @@ public class UnaryFunction extends TermEval {
     
     IDatatype abs(IDatatype dt) {
         switch (dt.getCode()){
-            case INTEGER: return DatatypeMap.newInteger(Math.abs(dt.longValue()));
+            case IDatatype.INTEGER: return DatatypeMap.newInteger(Math.abs(dt.longValue()));
             default:                return DatatypeMap.newInstance(Math.abs(dt.doubleValue()));
         }
     }

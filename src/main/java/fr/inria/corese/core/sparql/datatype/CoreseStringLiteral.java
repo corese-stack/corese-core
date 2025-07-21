@@ -20,11 +20,12 @@ import fr.inria.corese.core.sparql.storage.api.IStorage;
  * Project: Acacia</p>
  * <br>
  * Subsume String Literal XMLLiteral UndefLiteral and Boolean In Corese they
- * compare with &lt;= &lt; >= > but not with = !=
+ * compare with <= < >= > but not with = !=
  */
 public class CoreseStringLiteral extends CoreseStringableImpl {
 
-    private static final Logger logger = LoggerFactory.getLogger(CoreseStringLiteral.class);
+    static int code = STRING;
+    private static Logger logger = LoggerFactory.getLogger(CoreseStringLiteral.class);
 
     private IStorage manager;
     private int id;

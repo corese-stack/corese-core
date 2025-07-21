@@ -33,7 +33,7 @@ public class Basic extends Update {
     // for additional prefix namespace, only for pretty print
     Exp prolog = new And();
 
-    Basic(Update.Keyword t) {
+    Basic(int t) {
         type = t;
     }
 
@@ -49,20 +49,20 @@ public class Basic extends Update {
 
     @Override
     public boolean isInsert() {
-        return type() == Update.Keyword.INSERT;
+        return type() == INSERT;
     }
 
     @Override
     public boolean isDelete() {
-        return type() == Update.Keyword.DELETE;
+        return type() == DELETE;
     }
     
     @Override
     public boolean isLoad() {
-        return type() == Update.Keyword.LOAD;
+        return type() == LOAD;
     }
 
-    public static Basic create(Update.Keyword type) {
+    public static Basic create(int type) {
         Basic b = new Basic(type);
         return b;
     }

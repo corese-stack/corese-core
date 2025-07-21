@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
  */
 public class TestSuite {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String args[]) throws IOException {
         testSpeedInSingleFiles();
         //testCorrectness();
         //testSpeed();
@@ -35,30 +35,38 @@ public class TestSuite {
         new TestSuite(Test1, 100, Test1.length, 256 * MB).test();
     }
 
-    // private static void testSpeed() throws IOException {
-    //     int[][] Test1 = {
-    //         {400 * KB, 1 * MB},
-    //         {1 * MB, 3 * MB}
-    //     };
+    private static void testSpeed() throws IOException {
+        int[][] Test1 = {
+            {400 * KB, 1 * MB},
+            {1 * MB, 3 * MB}
+        };
 
-    //     int[][] Test2 = {
-    //         {64, 512},
-    //         {512, KB},
-    //         {1 * KB, 16 * KB},
-    //         {16 * KB, 64 * KB},
-    //         {64 * KB, 128 * KB},
-    //         {128 * KB, 256 * KB},
-    //         {256 * KB, 512 * KB}
-    //     };
+        int[][] Test2 = {
+            {64, 512},
+            {512, KB},
+            {1 * KB, 16 * KB},
+            {16 * KB, 64 * KB},
+            {64 * KB, 128 * KB},
+            {128 * KB, 256 * KB},
+            {256 * KB, 512 * KB}
+        };
 
-    //     new TestSuite(Test2, 1000, Test2.length).test();
+        new TestSuite(Test2, 1000, Test2.length).test();
+//        
+//        int[] buffer_size = {1 * MB, 2 * MB, 4 * MB, 8 * MB, 16 * MB, 32 * MB};
+//        for (int c : buffer_size) {
+//            System.out.println("\n======= " + convert(c, true) + " ========");
+//            //Parameters.BUF_SIZE = c;
+//            
+//            new TestSuite(Test1, 100, Test1.length).test();
+//        }
 
-    // }
+    }
 
-    // private static void testCorrectness() {
-    //     Test tCorrectness = new Test(KB, 1 * MB);
-    //     tCorrectness.testCorrectness(50, 10, true);
-    // }
+    private static void testCorrectness() {
+        Test tCorrectness = new Test(KB, 1 * MB);
+        tCorrectness.testCorrectness(50, 10, true);
+    }
     private final static String[] titles = {
         "Length (min):",
         "Length (max):",
@@ -71,9 +79,9 @@ public class TestSuite {
         "R. (ms):   "
     };
 
-    private final int[][] tests;
-    private final int numOfTests;
-    private final int runTimes;
+    private int[][] tests;
+    private int numOfTests;
+    private int runTimes;
     private int fileSize = -1;
 
     public TestSuite(int[][] tests, int runTimes, int numOfTests) {
@@ -135,6 +143,8 @@ public class TestSuite {
                 sb.append(bytesAll + NL + NL);
             }
         }
+
+        System.out.println(sb);
     }
 
     public static String convert(long bytes, boolean precise) {

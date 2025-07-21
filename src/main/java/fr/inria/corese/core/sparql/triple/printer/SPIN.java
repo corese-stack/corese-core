@@ -2,18 +2,38 @@ package fr.inria.corese.core.sparql.triple.printer;
 
 import fr.inria.corese.core.sparql.triple.api.ASTVisitor;
 import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
-import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.ASTBuffer;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.And;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Binding;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Exist;
+import fr.inria.corese.core.sparql.triple.parser.Exp;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Minus;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.Optional;
+import fr.inria.corese.core.sparql.triple.parser.Union;
+import fr.inria.corese.core.sparql.triple.parser.Processor;
+import fr.inria.corese.core.sparql.triple.parser.Query;
+import fr.inria.corese.core.sparql.triple.parser.Service;
+import fr.inria.corese.core.sparql.triple.parser.Source;
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Values;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 import fr.inria.corese.core.sparql.triple.update.Basic;
 import fr.inria.corese.core.sparql.triple.update.Composite;
 import fr.inria.corese.core.sparql.triple.update.Update;
-
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * Pretty Printer: SPARQL AST to SPIN Turtle
- *
+ * Pretty Printer: SPARQL AST to SPIN Turtle 
  * @author Wimmics Inria I3S, 2013
+ *
  */
 public class SPIN implements ASTVisitor {
 
@@ -55,51 +75,53 @@ public class SPIN implements ASTVisitor {
     private static final String SPFROM_NAMED = "sp:fromNamed";
     private static final String OSBRACKET = KeywordPP.OPEN_SQUARE_BRACKET;
     private static final String CSBRACKET = KeywordPP.CLOSE_SQUARE_BRACKET;
-    private static final String OPAREN = KeywordPP.OPEN_PAREN;
-    private static final String CPAREN = KeywordPP.CLOSE_PAREN;
-    private static final String SPACE = KeywordPP.SPACE;
-
+    private static final String OPAREN   = KeywordPP.OPEN_PAREN;
+    private static final String CPAREN   = KeywordPP.CLOSE_PAREN;
+    private static final String SPACE    = KeywordPP.SPACE;
+    
     private final static String BN = "_:sb";
-
+    
     ASTBuffer sb;
-    int vcount = 0;
-    // var -> blank node
-    HashMap<String, String> tvar, tbnode;
     private int counter = 0;
-    private Boolean subQuery = false;
+    int vcount = 0;
 
+    private Boolean subQuery = false; 
+    
+    // var -> blank node
+    HashMap <String, String> tvar, tbnode;
 
+    
     SPIN() {
         setBuffer(new ASTBuffer());
-        tvar = new HashMap<>();
-        tbnode = new HashMap<>();
+        tvar   = new HashMap <> ();
+        tbnode = new HashMap <> ();        
+    }
+    
+    public void init(){
+        tvar.clear();
+        tbnode.clear();
+        subQuery = false;
+        counter = 0;
+    }
+    
+    public void nl(){
+        sb.append(NL);
     }
 
     public static SPIN create() {
         return new SPIN();
     }
 
-    public void init() {
-        tvar.clear();
-        tbnode.clear();
-        subQuery = false;
-        counter = 0;
-    }
-
-    public void nl() {
-        sb.append(NL);
+    public void setBuffer(ASTBuffer s) {
+        sb = s;
     }
 
     public ASTBuffer getBuffer() {
         return sb;
     }
-
-    public void setBuffer(ASTBuffer s) {
-        sb = s;
-    }
-
+    
     @Override
-    public String toString() {
+    public String toString(){
         return sb.toString();
     }
 
@@ -110,24 +132,24 @@ public class SPIN implements ASTVisitor {
     public void visit(ASTQuery ast) {
         visit(ast, null);
     }
-
+    
     public void visit(ASTQuery ast, String src) {
-        visitProlog(ast);
-        if (src != null) {
+        visitProlog(ast); 
+        if (src != null){
             sb.append("graph ");
             sb.append(src);
             sb.append(" {");
             sb.append(NL);
         }
         process(ast);
-        displayVar();
-        if (src != null) {
-            sb.append("}");
-            sb.append(NL);
+        displayVar();        
+        if (src != null){
+           sb.append("}");
+           sb.append(NL);
         }
     }
-
-    void process(ASTQuery ast) {
+    
+    void process(ASTQuery ast){
 
         if (ast.isAsk()) {
             ttype(SP_ASK);
@@ -135,15 +157,20 @@ public class SPIN implements ASTVisitor {
             where(ast);
             sb.append(PT_COMMA);
             counter--;
-        } else if (ast.isSelect()) {
+        } 
+        else if (ast.isSelect()) {
             visitSelect(ast);
-        } else if (ast.isDescribe()) {
+        } 
+        else if (ast.isDescribe()) {
             visitDescribe(ast);
-        } else if (ast.isConstruct()) {
-            visitConstruct(ast);
-        } else if (ast.isUpdate()) {
-            visitUpdate(ast);
-        } else {
+        } 
+        else if (ast.isConstruct()) {
+            visitConstruct(ast);            
+        } 
+        else if (ast.isUpdate()) {
+            visitUpdate(ast);           
+        } 
+        else {
             Exp exp = ast.getBody();
             for (Exp ee : exp.getBody()) {
                 visit(ee);
@@ -151,24 +178,24 @@ public class SPIN implements ASTVisitor {
         }
 
         counter++;
-
-        if (!ast.isAsk()) {
+        
+        if (! ast.isAsk()) {
             visitModifier(ast);
-        }
-
+        }     
+       
         counter--;
-
-
-        if (!ast.isUpdate()) {
+        
+        
+        if (! ast.isUpdate()) {
             sb.append(tab() + CSBRACKET + NL);
         }
-
-
+        
+ 
     }
-
-
-    void visitModifier(ASTQuery ast) {
-        //GROUP BY
+    
+    
+    void visitModifier(ASTQuery ast){
+         //GROUP BY
         if (ast.getGroupBy().size() > 0) {
 
             sb.append(tab() + SPGROUP_BY + SPACE + OPAREN);
@@ -184,13 +211,14 @@ public class SPIN implements ASTVisitor {
         }
 
 
+
         //ORDER BY
         if (ast.getSort().size() > 0) {
             sb.append(tab() + SPORDER_BY + SPACE + OPAREN);
             counter++;
 
             sb.append(SPACE);
-
+            
             for (int i = 0; i < ast.getOrderBy().size(); i++) {
                 if (ast.getReverse().get(i) == true) {
                     type(SP_DESC);
@@ -199,7 +227,7 @@ public class SPIN implements ASTVisitor {
                     sb.append(CPAREN);
                     sb.append(CSBRACKET);
                 } else {
-                    visit(ast.getOrderBy().get(i));
+                    visit(ast.getOrderBy().get(i));                    
                 }
                 sb.append(SPACE);
             }
@@ -225,25 +253,27 @@ public class SPIN implements ASTVisitor {
             visit(ast.getHaving());
             sb.append(tab() + CPAREN + PT_COMMA);
         }
-
-        if (ast.getValues() != null) {
-            sb.append(tab() + "sp:values" + SPACE + NL);
+        
+        if (ast.getValues() != null){
+            sb.append(tab() + "sp:values" + SPACE  + NL);
             visit(ast.getValues());
         }
 
     }
-
+    
+    
 
     void visitProlog(ASTQuery ast) {
-        sb.append("@prefix sp: <" + SPIN + "> .\n");
+        sb.append("@prefix sp: <" + SPIN +"> .\n");
         subQuery = true;
         for (int i = 0; i < ast.getPrefixExp().size(); i++) {
             Triple t = ast.getPrefixExp().get(i).getTriple();
-            if (!t.getObject().getName().equals(SPIN) ||
-                    t.getSubject().getLabel().equals(KeywordPP.BASE)) {
-                if (t.getSubject().getLabel().equals(KeywordPP.BASE)) {
+            if (! t.getObject().getName().equals(SPIN) || 
+                  t.getSubject().getLabel().equals(KeywordPP.BASE)){
+                if (t.getSubject().getLabel().equals(KeywordPP.BASE)){
                     sb.append("@base ");
-                } else {
+                }
+                else {
                     sb.append("@prefix " + t.getPredicate().getName());
                     sb.append(": ");
                 }
@@ -254,25 +284,25 @@ public class SPIN implements ASTVisitor {
             }
         }
     }
+    
+    void visitConstruct(ASTQuery ast){
+         sb.append(tab() + OSBRACKET + SPACE + ATAB);
+            counter++;
+            sb.append(SP_CONSTRUCT + PT_COMMA);
+            dataset(ast);
+            sb.append(tab() + SPTEMPLATES );
 
-    void visitConstruct(ASTQuery ast) {
-        sb.append(tab() + OSBRACKET + SPACE + ATAB);
-        counter++;
-        sb.append(SP_CONSTRUCT + PT_COMMA);
-        dataset(ast);
-        sb.append(tab() + SPTEMPLATES);
+            counter++;
+            visit(ast.getConstruct());           
+            counter--;
+            sb.append(PT_COMMA);
 
-        counter++;
-        visit(ast.getConstruct());
-        counter--;
-        sb.append(PT_COMMA);
-
-        //WHERE
-        where(ast);
-        sb.append(PT_COMMA);
-        counter--;
-    }
-
+            //WHERE
+            where(ast);
+            sb.append(PT_COMMA);
+            counter--;
+}
+    
     // TODO
     void visitDescribe(ASTQuery ast) {
         sb.append(tab() + OSBRACKET + SPACE + ATAB);
@@ -280,12 +310,12 @@ public class SPIN implements ASTVisitor {
         sb.append(SP_DESCRIBE + PT_COMMA);
         sb.append(tab() + SPRESULT_NODES + SPACE + OPAREN);
         counter++;
-
+        
         for (Atom at : ast.getDescribe()) {
             visit(at);
             sb.append(SPACE);
         }
-
+        
         counter--;
         sb.append(CPAREN + PT_COMMA);
 
@@ -316,18 +346,18 @@ public class SPIN implements ASTVisitor {
             sb.append(tab() + SPSTAR + SPACE + TRUE + PT_COMMA);
         }
 
-        visitSelectVar(ast);
-
-        dataset(ast);
+       visitSelectVar(ast);
+       
+       dataset(ast);
 
         where(ast);
         sb.append(PT_COMMA);
         counter--;
 
-    }
-
-    void dataset(ASTQuery ast) {
-        if (ast.getFrom().size() != 0) {
+    } 
+    
+    void dataset(ASTQuery ast){
+         if (ast.getFrom().size() != 0) {
 
             sb.append(tab() + SPFROM + SPACE + OPAREN + SPACE);
 
@@ -348,45 +378,47 @@ public class SPIN implements ASTVisitor {
             sb.append(CPAREN + PT_COMMA);
         }
     }
-
-
-    void visitSelectVar(ASTQuery ast) {
+    
+    
+    void visitSelectVar(ASTQuery ast){
         if (!ast.getSelectVar().isEmpty()) {
             sb.append(tab() + SPRESULT_VARIABLES + SPACE + OPAREN + NL);
             counter++;
-
+            
             for (Variable var : ast.getSelectVar()) {
-
+                
                 Expression e = ast.getSelectFunctions().get(var.getName());
 
                 if (e == null) {
                     tab(sb);
                     visit(var);
                     sb.append(NL);
-                } else {
+                }
+                else {
                     sb.append(tab() + OSBRACKET + SPACE + SPEXPRESSION + SPACE);
                     counter++;
                     visit(e);
                     counter--;
                     sb.append(PT_COMMA);
                     tab(sb);
-
-                    if (var.getVariableList() != null) {
+                    
+                    if (var.getVariableList() != null){
                         sb.append("sp:varList" + SPACE + OPAREN);
                         int i = 0;
-                        for (Variable v : var.getVariableList()) {
-                            if (i++ > 0) {
+                        for (Variable v : var.getVariableList()){
+                            if (i++ > 0){
                                 sb.append(" ");
                             }
                             visit(v);
                         }
-                        sb.append(CPAREN);
-                    } else {
+                        sb.append(CPAREN);                      
+                    }
+                    else {
                         sb.append(SPVARNAME + SPACE);
                         sb.append(toTirer(var.getName()));
                     }
                     sb.append(CSBRACKET + NL);
-                }
+                }              
             }
             counter--;
             sb.append(tab() + CPAREN + PT_COMMA);
@@ -395,39 +427,50 @@ public class SPIN implements ASTVisitor {
 
     /**
      * **********************************************************
-     * <p>
+     *
      * Methods visit for the Exp part
-     * <p>
-     * **********************************************************
+     *
+     ***********************************************************
      */
     @Override
     public void visit(Exp exp) {
-        if (exp.isBind()) {
+        if (exp.isBind()){
             visit(exp.getBind());
-        } else if (exp.isAnd()) {
+        }
+        else if (exp.isAnd()) {
             visit((And) exp);
-        } else if (exp.isFilter()) {
+        } 
+        else if (exp.isFilter()) {
             visitFilter(exp.getFilter());
-        } else if (exp.isTriple()) {
+        }
+        else if (exp.isTriple()) {
             visit(exp.getTriple());
-        } else if (exp.isQuery()) {
+        } 
+        else if (exp.isQuery()) {
             ASTQuery ast = exp.getAST();
-            if (ast.isBind()) {
+            if (ast.isBind()){
                 visitBind((Query) exp);
-            } else {
+            }
+            else {
                 visit((Query) exp);
             }
-        } else if (exp.isOption()) {
+        }
+        else if (exp.isOption()) {
             visit(exp.getOptional());
-        } else if (exp.isOptional()) {
+        } 
+        else if (exp.isOptional()) {
             visitOptional(exp.getOptional());
-        } else if (exp.isValues()) {
+        } 
+        else if (exp.isValues()) {
             visit((Values) exp);
-        } else if (exp.isUnion()) {
+        } 
+        else if (exp.isUnion()) {
             visit(exp.getUnion());
-        } else if (exp.isMinus()) {
+        } 
+        else if (exp.isMinus()) {
             visit(exp.getMinus());
-        } else {
+        } 
+        else {
             for (Exp ee : exp.getBody()) {
                 visit(ee);
             }
@@ -435,7 +478,7 @@ public class SPIN implements ASTVisitor {
 
 
     }
-
+    
     void visitFilter(Expression exp) {
         sb.append(tab() + OSBRACKET + SPACE + ATAB);
         counter++;
@@ -485,8 +528,8 @@ public class SPIN implements ASTVisitor {
         sb.append(tab() + SPSUBJECT + SPACE);
         visit(triple.getSubject());
         sb.append(PT_COMMA);
-
-        if (triple.getVariable() != null && !triple.getVariable().isBlankNode()) {
+        
+        if (triple.getVariable() != null && ! triple.getVariable().isBlankNode()){
             sb.append(tab() + "sp:pathVariable" + SPACE);
             visit(triple.getVariable());
             sb.append(PT_COMMA);
@@ -510,7 +553,7 @@ public class SPIN implements ASTVisitor {
         sb.append(name);
         sb.append(PT_COMMA);
     }
-
+    
     void ttype(String name) {
         tab(sb);
         sb.append(DECL);
@@ -533,7 +576,7 @@ public class SPIN implements ASTVisitor {
             path(exp.getArg(1));
             counter--;
             sb.append(CSBRACKET);
-        } else if (exp.getArg(0) != null) {
+        } else if (exp.getArg(0) != null){
             sb.append(SPACE);
             type(oper(exp));
             counter++;
@@ -583,22 +626,23 @@ public class SPIN implements ASTVisitor {
 
         //variables
         sb.append(tab() + "sp:variables" + SPACE + OPAREN);
-        for (Variable var : values.getVarList()) {
+        for (Variable var : values.getVarList()){
             visit(var);
             sb.append(SPACE);
         }
         sb.append(CPAREN + PT_COMMA);
-
+       
         //values
         sb.append(tab() + "sp:values" + SPACE + OPAREN + NL);
         counter++;
 
         for (List<Constant> list : values.getValues()) {
             sb.append(tab() + OPAREN);
-            for (Constant cst : list) {
-                if (cst != null) {
+            for (Constant cst : list){
+                if (cst != null){
                     visit(cst);
-                } else {
+                }
+                else {
                     type("sp:Undef");
                     sb.append(CSBRACKET);
                 }
@@ -630,24 +674,25 @@ public class SPIN implements ASTVisitor {
         counter--;
         sb.append(NL + tab() + CSBRACKET + NL);
     }
-
-
+    
+    
     /**
+     * 
      * subquery is a bind(exp as var)
      */
     public void visitBind(Query query) {
         ASTQuery ast = query.getAST();
-        Variable var = ast.getSelectVar().get(0);
+        Variable var   = ast.getSelectVar().get(0);
         Expression exp = ast.getExpression(var);
         bind(exp, var);
     }
-
-    public void visit(Binding exp) {
+    
+     public void visit(Binding exp) {
         bind(exp.getFilter(), exp.getVariable());
     }
-
-
-    void bind(Expression exp, Variable var) {
+        
+        
+     void bind(Expression exp, Variable var) {
         ttype("sp:Bind");
         counter++;
 
@@ -672,14 +717,14 @@ public class SPIN implements ASTVisitor {
         counter++;
 
         for (int i = 0; i < or.size(); i++) {
-            Exp e = or.eget(i);
-            if (!e.isBGP()) {
-                sb.append(OPAREN);
-            }
-            visit(e);
-            if (!e.isBGP()) {
-                sb.append(CPAREN);
-            }
+           Exp e = or.eget(i);
+           if (! e.isBGP()){
+               sb.append(OPAREN);
+           }
+           visit(e);
+           if (! e.isBGP()){
+               sb.append(CPAREN);
+           }
         }
 
         counter--;
@@ -694,7 +739,7 @@ public class SPIN implements ASTVisitor {
     public void visit(And and) {
         if (and.isService()) {
             visit((Service) and);
-        }
+        }  
 //       else if (and.isMinus()) {
 //            visit((Minus) and);
 //        } 
@@ -729,14 +774,14 @@ public class SPIN implements ASTVisitor {
         counter--;
         sb.append(tab() + CSBRACKET + NL);
     }
-
-    void visitOptional(Optional option) {
+    
+     void visitOptional(Optional option) {
 
         visit(option.eget(0));
-
+        
         sb.append(tab() + OSBRACKET + SPACE + ATAB);
         sb.append("sp:Optional" + PT_COMMA);
-        sb.append(tab() + SPELEMENTS + SPACE);
+        sb.append(tab() + SPELEMENTS + SPACE );
         counter++;
 
         visit(option.eget(1));
@@ -751,7 +796,7 @@ public class SPIN implements ASTVisitor {
 
         visit(minus.get(0));
         ttype("sp:Minus");
-        sb.append(tab() + SPELEMENTS + SPACE);
+        sb.append(tab() + SPELEMENTS + SPACE );
         visit(minus.eget(1));
         sb.append(tab() + CSBRACKET + NL);
 
@@ -765,7 +810,7 @@ public class SPIN implements ASTVisitor {
         sb.append(tab() + OSBRACKET + SPACE + ATAB);
         counter++;
         sb.append("sp:Exists" + PT_COMMA);
-        sb.append(tab() + SPELEMENTS + SPACE + NL);
+        sb.append(tab() + SPELEMENTS + SPACE +  NL);
         counter++;
 
         for (int i = 0; i < exist.size(); i++) {
@@ -786,11 +831,11 @@ public class SPIN implements ASTVisitor {
         if (bgp.isExist()) {
             visit((Exist) bgp);
         } else {
-            sb.append(tab() + OPAREN + NL);
+            sb.append(tab() +  OPAREN + NL);
             for (Exp ee : bgp.getBody()) {
                 visit(ee);
             }
-            sb.append(tab() + CPAREN);
+            sb.append(tab() +  CPAREN );
         }
     }
 
@@ -800,13 +845,13 @@ public class SPIN implements ASTVisitor {
         sb.append(tab() + OSBRACKET + SPACE + ATAB);
         counter++;
         sb.append("sp:Service" + PT_COMMA);
-        if (service.isSilent()) {
+        if (service.isSilent()){
             sb.append(tab() + "sp:silent" + SPACE + TRUE + PT_COMMA);
         }
         sb.append(tab() + "sp:serviceURI" + SPACE);
         visit(service.getServiceName());
         sb.append(PT_COMMA);
-        sb.append(tab() + SPELEMENTS + SPACE + NL);
+        sb.append(tab() + SPELEMENTS + SPACE +  NL);
         counter++;
 
         for (Exp ee : service.getBody()) {
@@ -845,10 +890,10 @@ public class SPIN implements ASTVisitor {
 
     /**
      * **********************************************************
-     * <p>
+     *
      * Methods visit for the Expression part
-     * <p>
-     * **********************************************************
+     *
+     ***********************************************************
      */
     @Override
     public void visit(Expression expression) {
@@ -862,22 +907,22 @@ public class SPIN implements ASTVisitor {
     @Override
     public void visit(Term term) {
         if (term.isExist()) {
-            visit(term.getExist());
+            visit((Exist) term.getExist());
         } else {
             boolean isIn = term.getName().equalsIgnoreCase(Processor.IN);
-
+            
             sb.append(tab() + OSBRACKET + SPACE + ATAB + opeName(term) + SPACE + PT_COMMA);
-
+            
             counter++;
-
+            
             if (term.isDistinct()) {
                 sb.append(tab() + SPDISTINCT + SPACE + TRUE + PT_COMMA);
             }
-
+            
             int i = 1;
             List<Expression> args = term.getArgs();
-
-            if (isIn) {
+            
+            if (isIn){
                 //  ?x in (aa, bb) 
                 // ?x is sp:arg1
                 // list elements starts at sp:arg2
@@ -885,21 +930,21 @@ public class SPIN implements ASTVisitor {
                 visit(term.getArg(0));
                 sb.append(PT_COMMA);
                 args = term.getArg(1).getArgs();
-            }
-
+           }
+            
             for (Expression exp : args) {
                 sb.append(tab() + "sp:arg" + i++ + SPACE);
                 visit(exp);
                 sb.append(PT_COMMA);
             }
-
-            if (term.getModality() != null && term.isAggregate()) {
+            
+            if (term.getModality() != null && term.isAggregate()){
                 // group concat separator
                 sb.append(tab() + "sp:separator" + SPACE);
                 Constant.toString(term.getModality(), sb);
                 sb.append(PT_COMMA);
             }
-
+            
             counter--;
             sb.append(tab() + CSBRACKET);
         }
@@ -908,7 +953,7 @@ public class SPIN implements ASTVisitor {
 
     String opeName(Term term) {
         if (term.isFunction()) {
-            if (term.getCName() != null) {
+            if (term.getCName() != null){
                 return term.getCName().toString();
             }
             return funName(term);
@@ -938,17 +983,18 @@ public class SPIN implements ASTVisitor {
 
     @Override
     public void visit(Variable var) {
-        if (var.isBlankNode()) {
+        if (var.isBlankNode()){
             // Plays the role of beeing a BN
             // pprint it as a BN
             //var.toString(sb);
             sb.append(getName(var, tbnode));
-        } else {
-            sb.append(getName(var, tvar));
-            //process(var);
+        }
+        else {
+           sb.append(getName(var, tvar));
+           //process(var); 
         }
     }
-
+    
     String getName(Variable var, HashMap tvar) {
         String bn = (String) tvar.get(var.getLabel());
         if (bn == null) {
@@ -957,34 +1003,34 @@ public class SPIN implements ASTVisitor {
         }
         return bn;
     }
-
-    void process(Variable var) {
+      
+    void process(Variable var) {                    
         String name = var.getLabel();
         String bn = tvar.get(name);
-        if (bn == null) {
+        if (bn == null){
             bn = blank(var);
             tvar.put(name, bn);
-        }
-
-        sb.append(bn);
+       }
+        
+       sb.append(bn);
     }
-
-    void displayVar() {
-        for (String var : tvar.keySet()) {
+    
+    void displayVar(){
+        for (String var : tvar.keySet()){
             displayVar(var);
         }
     }
-
-    void displayVar(String name) {
-        String bn = tvar.get(name);
-
+    
+     void displayVar(String name){
+        String bn = tvar.get(name);       
+        
         sb.append(bn + SPACE);
         sb.append("sp:varName" + SPACE + "\"");
         sb.append(name.substring(1) + "\" ." + NL);
     }
-
-
-    String blank(Variable var) {
+    
+    
+    String blank(Variable var){
         return BN + vcount++;
     }
 
@@ -1000,7 +1046,7 @@ public class SPIN implements ASTVisitor {
      * @param ast
      */
     private void where(ASTQuery ast) {
-        sb.append(tab() + SP + KeywordPP.WHERE + SPACE);
+        sb.append(tab() + SP + KeywordPP.WHERE + SPACE );
         counter++;
         visit(ast.getBody());
         counter--;
@@ -1010,30 +1056,30 @@ public class SPIN implements ASTVisitor {
 
     /**
      * **********************************************************
-     * <p>
+     *
      * Methods visit for the Update part
-     * <p>
-     * **********************************************************
+     *
+     ***********************************************************
      */
-
+    
     void visitUpdate(ASTQuery ast) {
         boolean list = ast.getUpdate().getUpdates().size() > 1;
-        if (list) {
-            type("sp:SPARQLUpdate");
-            sb.append("sp:updates" + SPACE + OPAREN + NL);
+        if (list){
+           type("sp:SPARQLUpdate");
+           sb.append("sp:updates" + SPACE + OPAREN + NL);
         }
-
-        for (Update u : ast.getUpdate().getUpdates()) {
-            visit(u);
+        
+        for (Update u : ast.getUpdate().getUpdates()) {           
+            visit(u);   
             sb.append(NL);
         }
-
-        if (list) {
+        
+        if (list){
             sb.append(CPAREN);
             sb.append(CSBRACKET);
         }
     }
-
+    
     @Override
     public void visit(Update update) {
         if (update.isComposite()) {
@@ -1063,7 +1109,7 @@ public class SPIN implements ASTVisitor {
                     sb.append("sp:DeleteWhere" + PT_COMMA);
 
                     //Where
-                    sb.append(tab() + "sp:where");
+                    sb.append(tab() + "sp:where" );
                     counter++;
                     visit(composite.getBody());
                     counter--;
@@ -1102,7 +1148,7 @@ public class SPIN implements ASTVisitor {
             counter++;
 
             //Delete
-            if (c.type() == Update.Keyword.DELETE) {
+            if (c.type() == Update.DELETE) {
                 sb.append(tab() + "sp:deletePattern");
             } //Insert
             else {
@@ -1138,8 +1184,8 @@ public class SPIN implements ASTVisitor {
             counter++;
             for (Constant c : composite.getNamed()) {
                 visit(c);
-                sb.append(SPACE);
-            }
+                 sb.append(SPACE);
+           }
             counter--;
             sb.append(tab() + CPAREN + PT_COMMA);
             counter--;
@@ -1147,7 +1193,7 @@ public class SPIN implements ASTVisitor {
 
         //Where
         counter++;
-        sb.append(tab() + "sp:where");
+        sb.append(tab() + "sp:where" );
         counter++;
         visit(composite.getBody());
         counter--;
@@ -1163,21 +1209,21 @@ public class SPIN implements ASTVisitor {
         sb.append(tab() + OSBRACKET + SPACE + ATAB);
         counter++;
 
-        if (composite.type() == Update.Keyword.DELETE) {
+        if (composite.type() == Update.DELETE) {
             sb.append("sp:DeleteData" + PT_COMMA);
         }
 
         //INSERT query
-        if (composite.type() == Update.Keyword.INSERT) {
+        if (composite.type() == Update.INSERT) {
             sb.append("sp:InsertData" + PT_COMMA);
         }
 
         //DATA
-        sb.append(tab() + "sp:data");
+        sb.append(tab() + "sp:data" );
         counter++;
         visit(composite.getData());
         counter--;
-        sb.append(NL);
+        sb.append( NL);
         counter--;
         sb.append(CSBRACKET);
     }
@@ -1187,14 +1233,14 @@ public class SPIN implements ASTVisitor {
 
 
         switch (basic.type()) {
-
-            case LOAD:
+            
+            case Basic.LOAD:
                 sb.append(tab() + OSBRACKET + SPACE + ATAB);
 
                 counter++;
                 sb.append("sp:Load" + PT_COMMA);
-
-                if (basic.isSilent()) {
+                
+                 if (basic.isSilent()) {
                     sb.append(tab() + "sp:silent" + SPACE + TRUE + PT_COMMA);
                 }
 
@@ -1215,7 +1261,9 @@ public class SPIN implements ASTVisitor {
 
                 break;
 
-            case CREATE:
+           
+
+            case Basic.CREATE:
                 sb.append(tab() + OSBRACKET + SPACE + ATAB);
 
                 counter++;
@@ -1228,19 +1276,21 @@ public class SPIN implements ASTVisitor {
                     sb.append(tab() + "sp:graphIRI" + SPACE);
                     visit(basic.getGraphName());
                     sb.append(NL);
-                } else if (basic.isDefault()) {
-                    sb.append(tab() + "sp:default" + SPACE + TRUE + NL);
                 }
-
+                
+                else if (basic.isDefault()) {
+                    sb.append(tab() + "sp:default" + SPACE + TRUE + NL);
+                } 
+                
                 counter--;
                 sb.append(tab() + CSBRACKET);
 
                 break;
 
-
-            case CLEAR:
-            case DROP:
-
+                
+            case Basic.CLEAR:               
+            case Basic.DROP:
+                              
                 ttype(type(basic));
 
                 counter++;
@@ -1253,11 +1303,14 @@ public class SPIN implements ASTVisitor {
                     sb.append(tab() + "sp:graphIRI" + SPACE);
                     visit(basic.getGraphName());
                     sb.append(NL);
-                } else if (basic.isAll()) {
+                } 
+                else if (basic.isAll()) {
                     sb.append(tab() + "sp:all" + SPACE + TRUE + NL);
-                } else if (basic.isDefault()) {
+                } 
+                else if (basic.isDefault()) {
                     sb.append(tab() + "sp:default" + SPACE + TRUE + NL);
-                } else if (basic.isNamed()) {
+                } 
+                else if (basic.isNamed()) {
                     sb.append(tab() + "sp:named" + SPACE + TRUE + NL);
                 }
 
@@ -1265,51 +1318,48 @@ public class SPIN implements ASTVisitor {
                 sb.append(tab() + CSBRACKET);
 
                 break;
-
-
-            case COPY:
-            case MOVE:
-            case ADD:
-
+                
+                
+            case Basic.COPY:
+            case Basic.MOVE:
+            case Basic.ADD:
+                
                 ttype(type(basic));
-
-                if (basic.isSilent()) {
+                
+                 if (basic.isSilent()) {
                     sb.append(tab() + "sp:silent" + SPACE + TRUE + PT_COMMA);
                 }
-
-                if (basic.getGraphName() != null) {
-                    sb.append(tab() + "sp:from" + SPACE + basic.getGraphName() + PT_COMMA);
-                } else {
-                    sb.append(tab() + "sp:from" + SPACE + "sp:default" + PT_COMMA);
+                
+                if (basic.getGraphName() != null){
+                       sb.append(tab() + "sp:from" + SPACE + basic.getGraphName() + PT_COMMA);
                 }
-
-                if (basic.getCTarget() != null) {
-                    sb.append(tab() + "sp:to" + SPACE + basic.getCTarget() + PT_COMMA);
-                } else {
-                    sb.append(tab() + "sp:to" + SPACE + "sp:default" + PT_COMMA);
+                else {
+                       sb.append(tab() + "sp:from" + SPACE + "sp:default" + PT_COMMA);
                 }
-
+                
+                if (basic.getCTarget() != null){
+                        sb.append(tab() + "sp:to" + SPACE + basic.getCTarget() + PT_COMMA);                   
+                }
+                else {
+                        sb.append(tab() + "sp:to" + SPACE + "sp:default" + PT_COMMA);                                     
+                }
+                
                 sb.append(tab() + CSBRACKET);
-
+                
                 break;
 
-
+            
         }
 
     }
-
-    String type(Basic basic) {
-        switch (basic.type()) {
-            case CLEAR:
-                return "sp:Clear";
-            case DROP:
-                return "sp:Drop";
-            case COPY:
-                return "sp:Copy";
-            case MOVE:
-                return "sp:Move";
-            case ADD:
-                return "sp:Add";
+    
+    String type(Basic basic){
+        switch(basic.type()){
+            case Basic.CLEAR: return "sp:Clear";
+            case Basic.DROP:  return "sp:Drop";
+            case Basic.COPY:  return "sp:Copy";
+            case Basic.MOVE:  return "sp:Move";
+            case Basic.ADD:   return "sp:Add";
         }
         return "sp:Unknown";
     }
@@ -1317,10 +1367,10 @@ public class SPIN implements ASTVisitor {
 
     /**
      * **********************************************************
-     * <p>
+     *
      * Auxiliary methods
-     * <p>
-     * **********************************************************
+     *
+     ***********************************************************
      */
     private String toTirer(String s) {
         if (s.startsWith("?")) {
@@ -1345,14 +1395,15 @@ public class SPIN implements ASTVisitor {
 
         return t;
     }
-
-    private void tab(ASTBuffer sb) {
+    
+     private void tab(ASTBuffer sb) {
         for (int j = 0; j < counter; j++) {
             sb.append(SPACE);
         }
     }
 
     /**
+     *
      * @param s
      * @return
      */
@@ -1383,11 +1434,14 @@ public class SPIN implements ASTVisitor {
             return "sp:mul";
         } else if (s.equals("/")) {
             return "sp:divide";
-        } else if (s.equals("~")) {
+        } 
+        else if (s.equals("~")) {
             return "kg:tilda";
-        } else if (s.equals("^")) {
+        } 
+         else if (s.equals("^")) {
             return "sp:strstarts";
-        } else {
+        } 
+        else {
             return SP + s;
         }
     }

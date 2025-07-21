@@ -10,15 +10,12 @@ import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author corby
  */
 public class SPARQLRDFResult {
-    private static final Logger logger = LoggerFactory.getLogger(SPARQLRDFResult.class);
     
     public Mappings parse(String result) throws LoadException {
         return parse(result, Loader.format.TURTLE_FORMAT);
@@ -48,7 +45,7 @@ public class SPARQLRDFResult {
         try {
             map = exec.query(query);
         } catch (EngineException e) {
-            logger.error("", e);
+            System.out.println(e.getMessage());
         }
         Mappings res = translate(map);
         return res;

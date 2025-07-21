@@ -13,7 +13,7 @@ import fr.inria.corese.core.sparql.triple.api.Walker;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.logging.Level;
 //import static java.util.logging.Level.ALL;
 
 /**
@@ -39,9 +39,9 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
     /**
      * logger from log4j
      */
-    private static final Logger logger = LoggerFactory.getLogger(Exp.class);
+    private static Logger logger = LoggerFactory.getLogger(Exp.class);
 
-    private final ArrayList<Exp> body;
+    private ArrayList<Exp> body;
 
     public Exp() {
         body = new ArrayList<>();
@@ -203,7 +203,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
     }
 
     /**
-     * Variables that are surely bound in this Exp left part of optional &amp;
+     * Variables that are surely bound in this Exp left part of optional &
      * minus, common variables of union branchs It is not the list of all
      * variables
      */
@@ -290,7 +290,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
             }
             return exp;
         } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error("An unexpected error has occurred", ex);
+            java.util.logging.Logger.getLogger(Exp.class.getName()).log(Level.SEVERE, null, ex);
         }
         return this;
     }
@@ -354,7 +354,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
 
     public Exp eget(int i) {
         if (this.size() > i) {
-            return get(i);
+            return (Exp) get(i);
         } else {
             return null;
         }
@@ -567,7 +567,7 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
     }
 
     public void walk(Walker walker) {
-        //logger.debug("walk stmt: {}" , this);
+        //System.out.println("walk stmt: " + this);
         walker.enter(this);
         for (Exp exp : getBody()) {
             exp.walk(walker);

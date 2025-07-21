@@ -45,7 +45,7 @@ public class ProcessVisitorDefault implements ProcessVisitor {
     
     
     void visit(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
-        if (eval.getQuery().getGlobalAST().hasMetadata(Metadata.Type.REPORT)) {
+        if (eval.getQuery().getGlobalAST().hasMetadata(Metadata.REPORT)) {
             eval.getBind().visit(e, g, m1, m2);
         }
     }

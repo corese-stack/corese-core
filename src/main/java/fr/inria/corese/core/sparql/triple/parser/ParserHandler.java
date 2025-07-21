@@ -57,7 +57,7 @@ public class ParserHandler {
             int n)
             throws ParseException {
         for (Expression object : objectList) {
-            n = createTripleWithAnnotation(ast, stack, subject.getAtom(), predicate, object.getAtom(), n);
+            createTripleWithAnnotation(ast, stack, subject.getAtom(), predicate, object.getAtom());
         }
         return stack;
     }
@@ -67,7 +67,7 @@ public class ParserHandler {
      * we may have s p o whith o.reference = t and o.annotation = (t q v)
      * create triple s p o t and add its annotation t q v after triple in stack
      */
-    int createTripleWithAnnotation(ASTQuery ast, Exp stack, Atom subject, Atom predicate, Atom object, int n)
+    Exp createTripleWithAnnotation(ASTQuery ast, Exp stack, Atom subject, Atom predicate, Atom object)
             throws ParseException {
 
         boolean turtleLoaderStatus = isTurtleLoader();
@@ -88,18 +88,15 @@ public class ParserHandler {
         if (isTurtleLoader()) {
             // edge created in graph
             processTurtleAnnotation(ast, object);
-        } else
-        // triple created in stack
-        if (object.getAnnotation() == null) {
-            stack.add(n++, triple);
         } else {
-            stack.add(triple);
+            // triple created in stack
+            stack.add(triple); // stack.add(n++, triple);
             processSparqlAnnotation(ast, stack, triple, object);
         }
 
         setTurtleLoader(turtleLoaderStatus);
 
-        return n;
+        return stack;
     }
 
     /**
@@ -274,7 +271,7 @@ public class ParserHandler {
     }
 
     /**
-     * &lt;&lt;s p o>>
+     * <<s p o>>
      * return Constant cst(dt) with:
      * dt=bnode triple reference isTriple() == true
      * when sparql: cst.triple = triple(s p o)
@@ -319,7 +316,7 @@ public class ParserHandler {
 
     /**
      * Generate ref st:
-     * &lt;&lt;s p o>> q v
+     * <<s p o>> q v
      * triple(s p o ref) . ref q v
      */
     public Atom createTripleReference(ASTQuery ast) {

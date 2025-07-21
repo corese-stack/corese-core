@@ -4,8 +4,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import fr.inria.corese.core.sparql.exceptions.QuerySemanticException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 /**
  * <p>
  * Title: Corese</p>
@@ -24,8 +23,6 @@ import org.slf4j.LoggerFactory;
  * @author Virginie Bottollier
  */
 public class BasicGraphPattern extends And {
-
-    private static final Logger logger = LoggerFactory.getLogger(BasicGraphPattern.class);
 
     /**
      * Use to keep the class version, to be consistent with the interface
@@ -160,7 +157,7 @@ public class BasicGraphPattern extends And {
     
     boolean similar(Atom a1, Atom a2, Atom b1, Atom b2) {
         boolean res = a1.equals(a2) == b1.equals(b2);
-        //logger.debug(String.format("%s %s %s %s %s ", res, a1, a2, b1, b2));
+        //System.out.println(String.format("%s %s %s %s %s ", res, a1, a2, b1, b2));
         return res;
     }
     
@@ -298,7 +295,7 @@ public class BasicGraphPattern extends And {
     void check() throws QuerySemanticException {
         if (size() == 1 && get(0).isFilter()) {
             throw new QuerySemanticException("Unbound variable in Filter: "
-                    + this);
+                    + this.toString());
         }
     }
 

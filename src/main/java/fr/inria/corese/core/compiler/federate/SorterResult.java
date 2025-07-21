@@ -1,7 +1,10 @@
 package fr.inria.corese.core.compiler.federate;
 
-import fr.inria.corese.core.sparql.triple.parser.*;
-
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.Triple;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.VariableScope;
 import java.util.List;
 
 /**
@@ -45,7 +48,9 @@ public class SorterResult {
     }
 
     void addTriple(Triple t) {
-        if ((getTriple() == null) || (subScore(t) > subScore(getTriple()))) {
+        if (getTriple() == null) {
+            setTriple(t);
+        } else if (subScore(t) > subScore(getTriple())) {
             // prefer local predicate vs system predicate
             setTriple(t);
         }

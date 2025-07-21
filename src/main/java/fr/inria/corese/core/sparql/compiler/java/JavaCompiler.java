@@ -1,68 +1,94 @@
 package fr.inria.corese.core.sparql.compiler.java;
 
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
 import fr.inria.corese.core.sparql.triple.function.script.ForLoop;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.script.Let;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.Processor;
 import fr.inria.corese.core.sparql.triple.function.script.Statement;
-import fr.inria.corese.core.sparql.triple.parser.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import fr.inria.corese.core.sparql.triple.parser.Term;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import static fr.inria.corese.core.kgram.api.core.ExprType.AND;
+import static fr.inria.corese.core.kgram.api.core.ExprType.DIV;
+import static fr.inria.corese.core.kgram.api.core.ExprType.EQ;
+import static fr.inria.corese.core.kgram.api.core.ExprType.FOR;
+import static fr.inria.corese.core.kgram.api.core.ExprType.GE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.GT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.IF;
+import static fr.inria.corese.core.kgram.api.core.ExprType.LE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.LET;
+import static fr.inria.corese.core.kgram.api.core.ExprType.LT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.MINUS;
+import static fr.inria.corese.core.kgram.api.core.ExprType.MULT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.NEQ;
+import static fr.inria.corese.core.kgram.api.core.ExprType.OR;
+import static fr.inria.corese.core.kgram.api.core.ExprType.PLUS;
+import static fr.inria.corese.core.kgram.api.core.ExprType.RETURN;
+import static fr.inria.corese.core.kgram.api.core.ExprType.SEQUENCE;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import static fr.inria.corese.core.kgram.api.core.ExprType.*;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Java Compiler for LDScript Take an AST as input and compile the LDScript
  * function definitions in Java
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2017-2019
+ *
  */
 public class JavaCompiler {
 
-    public static final String VAR_EXIST = "?_b";
+    private static Logger logger = LoggerFactory.getLogger(JavaCompiler.class);
     static final String NL = "\n";
+    // where to write the Java code
+    private String path =
+      "/user/corby/home/NetBeansProjects/corese-github-v4/" +
+      "corese-core/src/main/java/fr/inria/corese/core/extension/";
     static final String SPACE = " ";
     static final int STEP = 2;
     static final String IDATATYPE = "IDatatype";
-    private static final Logger logger = LoggerFactory.getLogger(JavaCompiler.class);
+
+    public static final String VAR_EXIST = "?_b";
+    private String pack = "fr.inria.corese.core.extension";
+
     int margin = 0;
     int count = 0;
     int level = 0;
     String name = "Extension";
+
     StringBuilder sb;
     Header head;
     Datatype dtc;
     ASTQuery ast;
-    // stack of bound variables (function parameter, let)
-    Stack stack;
-    HashMap<String, Boolean> skip;
-    HashMap<String, String> functionName;
-    HashMap<String, String> javaName;
-    HashMap<Integer, String> termName;
-    // where to write the Java code
-    private String path =
-            "/user/corby/home/NetBeansProjects/corese-github-v4/" +
-                    "corese-core/src/main/java/fr/inria/corese/core/extension/";
-    private String pack = "fr.inria.corese.core.extension";
     private Function current;
     // current function processing
     private Function function;
+    // stack of bound variables (function parameter, let)
+    Stack stack;
+
+    HashMap<String, Boolean> skip;
+    HashMap<String, String> functionName, javaName;
+    HashMap<Integer, String> termName;
 
     public JavaCompiler() {
         sb = new StringBuilder();
         dtc = new Datatype();
         stack = new Stack();
         head = new Header(this);
-        skip = new HashMap<>();
+        skip = new HashMap<String, Boolean>();
         functionName = new HashMap<>();
         javaName = new HashMap<>();
         termName = new HashMap<>();
@@ -70,6 +96,7 @@ public class JavaCompiler {
     }
 
     /**
+     *
      * target Java class name
      */
     public JavaCompiler(String name) {
@@ -77,6 +104,7 @@ public class JavaCompiler {
         record(name);
     }
 
+  
 
     @Override
     public String toString() {
@@ -97,18 +125,22 @@ public class JavaCompiler {
         return this;
     }
 
-    public JavaCompiler compile(Query q) throws IOException {
-        this.ast = q.getAST();
+    public JavaCompiler compile(Query q) throws IOException, EngineException {
+        ASTQuery ast =  q.getAST();
+        this.ast = ast;
         path(ast);
         head.process(getPackage(), name);
+        //compile((ASTExtension) q.getExtension());
+        //toJava(ast.getDefineLambda());
         trailer();
         write();
         return this;
     }
 
-    public void compile(ASTExtension ext) throws EngineException {
+    public void compile(ASTExtension ext) throws IOException, EngineException {
         for (Function exp : ext.getFunctionList()) {
-            if (!exp.hasMetadata(Metadata.Type.SKIP)) {
+            //System.out.println(exp);
+            if (!exp.hasMetadata(Metadata.SKIP)) {
                 compile(exp);
                 append(NL);
             }
@@ -153,7 +185,14 @@ public class JavaCompiler {
         append("}");
         nl();
     }
-
+    
+    
+    
+    
+    
+    
+    
+ 
 
     public void toJava(Expression exp) {
         exp.toJava(this, false);
@@ -200,6 +239,15 @@ public class JavaCompiler {
                 return;
         }
     }
+    
+    
+    
+    
+    
+    
+    
+    
+
 
 
     void functionDeclaration(Function fun) {
@@ -230,8 +278,8 @@ public class JavaCompiler {
         }
         return str;
     }
-
-
+    
+    
     String name(Variable var) {
         return var.getSimpleName();
     }
@@ -253,6 +301,7 @@ public class JavaCompiler {
         decrlevel();
     }
 
+ 
 
     void let(Let term) {
         incrlevel();
@@ -338,7 +387,8 @@ public class JavaCompiler {
         toJava(term.getArg(0), arg);
         append(")");
     }
-
+    
+   
 
     void functionCall(Term term, boolean arg) {
         switch (term.oper()) {
@@ -378,9 +428,17 @@ public class JavaCompiler {
 
         call(term);
     }
-
-
+    
+    
+    
+    
+    
+     
+    
+    
+    
     /**
+     *
      * map(ex:fun(?x), ?list)
      */
     void map(Term term) {
@@ -444,7 +502,7 @@ public class JavaCompiler {
         append(")");
     }
 
-
+   
     /**
      * Generic function call
      */
@@ -461,14 +519,15 @@ public class JavaCompiler {
 
     /**
      * generate dt.method()
+     * 
      */
     void methodcall(Term term, Method met) {
         method(term, met.getReturnType() != IDatatype.class);
     }
 
-
+   
     /**
-     * Search IDatatype method
+     * Search IDatatype method 
      */
     Method getMethod(Term term) {
         if (term.getArgs().isEmpty()) {
@@ -524,7 +583,7 @@ public class JavaCompiler {
     /**
      * Generate an IDatatype method call on first argument of term
      * dt.method()
-     * wrap = true : cast method call into IDatatype
+     * wrap = true : cast method call into IDatatype 
      * because metodh return type is a Java type instead of a IDatatype
      * DatatypeMap.newInstance(dt.method())
      */
@@ -549,7 +608,10 @@ public class JavaCompiler {
     String getFunctionName(String name) {
         return functionName.get(name);
     }
-
+    
+    
+    
+    
 
     void ifthenelse(Term term, boolean arg) {
         incrlevel();
@@ -602,6 +664,7 @@ public class JavaCompiler {
         }
     }
 
+   
 
     void toStatement(Expression exp) {
         if (exp.isConstant() || exp.isVariable()) {
@@ -628,8 +691,9 @@ public class JavaCompiler {
             nl();
         }
     }
-
-
+    
+    
+    
     /*
      * st:apply-templates-with(trans, var)
      */
@@ -652,7 +716,8 @@ public class JavaCompiler {
         return false;
     }
 
-
+    
+    
     boolean isReturnable(Expression exp) {
         switch (exp.oper()) {
             case RETURN:
@@ -664,11 +729,11 @@ public class JavaCompiler {
         }
         return true;
     }
-
+    
     void define(int oper, String name) {
         termName.put(oper, name);
     }
-
+    
     void defineTermName() {
         define(EQ, "eq");
         define(NEQ, "neq");
@@ -676,28 +741,29 @@ public class JavaCompiler {
         define(LT, "lt");
         define(GT, "gt");
         define(GE, "ge");
-
+        
         define(PLUS, "plus");
         define(MINUS, "minus");
         define(MULT, "mult");
         define(DIV, "div");
-
+        
         define(AND, "&&");
         define(OR, "||");
     }
-
+    
     /**
      * Java name in let (select where) in function
-     * sh:path() -> jc:sh_path()
+     * sh:path() -> jc:sh_path() 
+     * 
      */
     public void setJavaName(String name, String java) {
         javaName.put(name, java);
     }
-
+    
     public String getJavaName(String name) {
         return javaName.get(name);
     }
-
+    
     void defineFunctionName() {
         functionName.put("isURI", "isURINode");
         functionName.put("isBlank", "isBlankNode");
@@ -706,7 +772,7 @@ public class JavaCompiler {
         functionName.put(Processor.XT_GEN_REST, "Rest.rest");
         functionName.put(Processor.XT_GEN_GET, "GetGen.gget");
         functionName.put(Processor.XT_GET, "Get.get");
-
+        
         functionName.put(Processor.XT_EDGES, "edge");
         functionName.put(Processor.XT_SET, "set");
         functionName.put(Processor.XT_HAS, "has");
@@ -738,7 +804,8 @@ public class JavaCompiler {
         return VAR_EXIST + count++;
     }
 
-
+    
+    
     /**
      * name = DataShape or fr.inria.corese.core.extension.DataShape extract
      * package name if any
@@ -750,13 +817,15 @@ public class JavaCompiler {
             setPackage(name.substring(0, index));
             this.name = name.substring(index + 1);
         }
+        System.out.println("package: " + this.getPackage());
+        System.out.println("class: " + this.name);
     }
 
     void init() {
         skip.put(NSManager.SHAPE + "class", true);
         skip.put(NSManager.STL + "default", true);
         skip.put(NSManager.STL + "aggregate", true);
-
+                
         defineFunctionName();
         defineTermName();
     }
@@ -767,9 +836,10 @@ public class JavaCompiler {
     }
 
     void path(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.Type.PATH)) {
-            setPath(ast.getMetadata().getValue(Metadata.Type.PATH));
+        if (ast.hasMetadata(Metadata.PATH)) {
+            setPath(ast.getMetadata().getValue(Metadata.PATH));
         }
+        System.out.println("path: " + getPath());
     }
 
     void trailer() {
@@ -790,8 +860,21 @@ public class JavaCompiler {
                 break;
         }
     }
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     void incrlevel() {
         level++;
     }
@@ -803,7 +886,7 @@ public class JavaCompiler {
     int getLevel() {
         return level;
     }
-
+    
     void nl() {
         append(NL);
         for (int i = 0; i < margin; i++) {

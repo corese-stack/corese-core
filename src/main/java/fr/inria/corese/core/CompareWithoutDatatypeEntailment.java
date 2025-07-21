@@ -1,7 +1,6 @@
 package fr.inria.corese.core;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
-
 import java.util.Comparator;
 
 
@@ -9,12 +8,12 @@ import java.util.Comparator;
  * TreeMap Node index comparator without D-entailment
  * Assign Node index for:
  * 1) graph match node join without D-entailment
- * 2) sorting graph Index edge list
+ * 2) sorting graph Index edge list 
  * Assign same node index when same datatype and same value (and possibly
- * different labels)
+ * different labels) 
  * 1 and 01  have same index
  * integer|decimal and double|float have different index
- * '1'^^xsd:boolean and true have same index
+ *'1'^^xsd:boolean and true have same index
  */
 class CompareWithoutDatatypeEntailment implements Comparator<IDatatype> {
 

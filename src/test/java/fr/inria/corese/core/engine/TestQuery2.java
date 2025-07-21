@@ -1,8 +1,8 @@
 package fr.inria.corese.core.engine;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
@@ -20,7 +20,7 @@ public class TestQuery2 {
         static String data = Thread.currentThread().getContextClassLoader().getResource("data/").getPath();
 
         @Test
-        public void test5() throws SparqlException {
+        public void test5() throws EngineException, SparqlException {
                 String i = "insert data {"
                                 + "us:John foaf:knows us:Jim, us:James ;"
                                 + "foaf:age 20 ."
@@ -45,7 +45,7 @@ public class TestQuery2 {
         }
 
         @Test
-        public void test4() throws SparqlException {
+        public void test4() throws EngineException, SparqlException {
                 String i = "insert data {"
                                 + "us:John foaf:knows us:Jim, us:James ;"
                                 + "foaf:age 20 ."
@@ -69,7 +69,7 @@ public class TestQuery2 {
         }
 
         @Test
-        public void test3() throws SparqlException {
+        public void test3() throws EngineException, SparqlException {
                 String i = "insert data {"
                                 + "us:John foaf:knows us:Jim, us:James ;"
                                 + "foaf:age 20 ."
@@ -96,7 +96,7 @@ public class TestQuery2 {
         }
 
         @Test
-        public void test2() throws SparqlException {
+        public void test2() throws EngineException, SparqlException {
                 String i = "insert data {"
                                 + "us:John foaf:knows us:Jim, us:James ;"
                                 + "foaf:age 20 ."
@@ -122,7 +122,7 @@ public class TestQuery2 {
         }
 
         @Test
-        public void test1() throws SparqlException {
+        public void test1() throws EngineException, SparqlException {
                 String i = "insert data {"
                                 + "us:John foaf:knows us:Jim, us:James ;"
                                 + "foaf:age 20 ."

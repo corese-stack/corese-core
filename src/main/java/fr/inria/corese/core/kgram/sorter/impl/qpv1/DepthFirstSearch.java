@@ -1,12 +1,21 @@
 package fr.inria.corese.core.kgram.sorter.impl.qpv1;
 
-import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.sorter.core.QPGraph;
+import fr.inria.corese.core.kgram.sorter.core.QPGNode;
+import fr.inria.corese.core.kgram.sorter.core.ISort;
+import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
+import static fr.inria.corese.core.kgram.api.core.ExpType.FILTER;
+import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
+import static fr.inria.corese.core.kgram.api.core.ExpType.VALUES;
 import fr.inria.corese.core.kgram.core.Exp;
-import fr.inria.corese.core.kgram.sorter.core.*;
-
-import java.util.*;
-
-import static fr.inria.corese.core.kgram.api.core.ExpType.*;
+import fr.inria.corese.core.kgram.sorter.core.QPGEdge;
+import fr.inria.corese.core.kgram.sorter.core.IEstimate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation for sorting the triple pattern Pure depth-first greedy
@@ -30,8 +39,8 @@ public class DepthFirstSearch implements ISort {
     public List<QPGNode> sort(QPGraph graph) {
         this.g = graph;
         //EDGE GRAPH
-        List<QPGNode> sortableNodes = g.getAllNodes(ExpType.Type.EDGE);
-        sortableNodes.addAll(g.getAllNodes(ExpType.Type.GRAPH));
+        List<QPGNode> sortableNodes = g.getAllNodes(EDGE);
+        sortableNodes.addAll(g.getAllNodes(GRAPH));
         notVisited.addAll(sortableNodes);
 
         //each loop is a sub graph
@@ -104,14 +113,21 @@ public class DepthFirstSearch implements ISort {
     private List<QPGNode> getChildren(QPGNode n) {
         // get the linked nodes to a node and sort it (define the sequence of searching)
         List<QPGNode> lNodes = this.g.getLinkedNodes(n),
-                children = new ArrayList<>();
+                children = new ArrayList<QPGNode>();
         //1 sort the list by selectivity of nodes
         children.addAll(lNodes);
-        Collections.sort(children, (o1, o2) -> Double.valueOf(o1.getCost()).compareTo(Double.valueOf(o2.getCost())));
+        Collections.sort(children, new Comparator<QPGNode>() {
+            @Override
+            public int compare(QPGNode o1, QPGNode o2) {
+                return Double.valueOf(o1.getCost()).compareTo(Double.valueOf(o2.getCost()));
+            }
+        });
 
         //1 remvoe visited nodes
         for (QPGNode node : visited) {
-            children.remove(node);
+            if (children.contains(node)) {
+                children.remove(node);
+            }
         }
 
         return children;
@@ -140,7 +156,9 @@ public class DepthFirstSearch implements ISort {
 
         //1 remvoe visited nodes
         for (QPGNode node : visited) {
-            children.remove(node);
+            if (children.contains(node)) {
+                children.remove(node);
+            }
         }
 
         return children;
@@ -161,7 +179,7 @@ public class DepthFirstSearch implements ISort {
     //for a filter, if all linked vairables have been visited, 
     //then add this filter just after these triple patterns
     private void addFilters() {
-        List<QPGNode> filters = this.g.getAllNodes(ExpType.Type.FILTER);
+        List<QPGNode> filters = this.g.getAllNodes(FILTER);
         //others.addAll(g.getNodeList(VALUES));
 
         for (QPGNode f : filters) {
@@ -190,7 +208,7 @@ public class DepthFirstSearch implements ISort {
 
     //for VALUES, put it just before the vairables being used 
     private void addValues(QPGNode min) {
-        List<QPGNode> values = this.g.getAllNodes(ExpType.Type.VALUES);
+        List<QPGNode> values = this.g.getAllNodes(VALUES);
 
         for (QPGNode v : values) {
             if (visited.contains(v)) {
