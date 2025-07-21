@@ -33,25 +33,33 @@ sonar {
     }
 }
 
+// === Generated sources directories ===
+val javaccGeneratedDir = layout.buildDirectory.dir("generated-src/javacc").get().asFile
+val antlrGeneratedDir = layout.buildDirectory.dir("generated-src/antlr").get().asFile
+val antlrPackageDir = layout.buildDirectory.dir("generated-src/antlr/fr/inria/corese/core/next/impl/parser/antlr").get().asFile
+
 // JavaCC configuration
 javacc {
     configs {
         register("sparqlCorese") {
             inputFile = file("src/main/java/fr/inria/corese/core/sparql/triple/javacc1/sparql_corese.jj")
             packageName = "fr.inria.corese.core.sparql.triple.javacc1"
+            outputDir = javaccGeneratedDir
         }
     }
 }
 
-// Ajoute les fichiers générés par JavaCC comme source Java
+// Configure source sets to include generated sources
 sourceSets {
     main {
         java {
-            srcDir(layout.buildDirectory.dir("generated-src/javacc"))
+            srcDir(javaccGeneratedDir)
+            srcDir(antlrGeneratedDir)
         }
     }
 }
 
+// Ensure JavaCC generation happens before compilation
 tasks.named("compileJava") {
     dependsOn("javaccSparqlCorese")
 }
@@ -338,34 +346,50 @@ tasks.withType<PublishToMavenRepository>().configureEach {
 
 // === Antlr generated sources configuration ===
 
-// Path where Antlr will generate sources
-val generatedSourcesPath = "src/main/generated"
-
-// Add the generated sources directory to the main source set
-sourceSets["main"].java.srcDir(file(generatedSourcesPath))
-
 // Configure the Antlr task to generate parser code with specific arguments
 tasks.named<AntlrTask>("generateGrammarSource") {
     arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.impl.parser.antlr"))
-    outputDirectory = file("$buildDir/generated-src/antlr/main")
-    outputs.dirs(outputDirectory)
+    outputDirectory = antlrPackageDir
+    inputs.files(fileTree("src/main/antlr"))
+    outputs.dir(antlrPackageDir)
 }
 
-// Ensure Java compilation depends on Antlr code generation
+// Ensure Java compilation depends on both JavaCC and Antlr code generation
 tasks.named("compileJava") {
-    dependsOn("generateGrammarSource" /*, "copyAntlrGenerated" */)
+    dependsOn("generateGrammarSource", "javaccSparqlCorese")
 }
 
-// Ensure sources JAR includes generated sources and depends on Antlr code generation
+// Ensure sources JAR includes generated sources and depends on code generation
 tasks.named<Jar>("sourcesJar") {
-    dependsOn("generateGrammarSource" /*, "copyAntlrGenerated" */)
-    from(generatedSourcesPath)
+    dependsOn("generateGrammarSource", "javaccSparqlCorese")
+    from(javaccGeneratedDir)
+    from(antlrGeneratedDir)
     includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 // Clean up generated sources on clean
 tasks.clean {
     doLast {
-        file(generatedSourcesPath).deleteRecursively()
+        delete(javaccGeneratedDir)
+        delete(antlrGeneratedDir)
     }
+}
+
+// Ensure generated directories exist before generation
+tasks.register("createGeneratedDirs") {
+    doLast {
+        javaccGeneratedDir.mkdirs()
+        antlrGeneratedDir.mkdirs()
+        antlrPackageDir.mkdirs()
+    }
+}
+
+// Make generation tasks depend on directory creation
+tasks.named("generateGrammarSource") {
+    dependsOn("createGeneratedDirs")
+}
+
+tasks.named("javaccSparqlCorese") {
+    dependsOn("createGeneratedDirs")
 }
