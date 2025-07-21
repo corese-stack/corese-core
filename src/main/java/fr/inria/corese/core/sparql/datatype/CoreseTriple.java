@@ -6,13 +6,13 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
 /**
  * Edge reference datatype for edge reference node
- * <<s p o>> q v -> edge(s p o t)  t q v 
+ * &lt;&lt;s p o&gt;&gt; q v -&gt; edge(s p o t)  t q v
  * where t is reference node
  * e.referenceNode = t
  * t.edge = edge(s p o t)
  */
 public class CoreseTriple extends CoreseResource {
-    static int code = TRIPLE;
+    static IDatatype.Datatype code = IDatatype.Datatype.TRIPLE;
     
     private Edge edge;
 
@@ -21,7 +21,7 @@ public class CoreseTriple extends CoreseResource {
     }
     
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
     

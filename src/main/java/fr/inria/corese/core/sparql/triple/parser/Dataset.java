@@ -3,6 +3,8 @@ package fr.inria.corese.core.sparql.triple.parser;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -432,11 +434,7 @@ public class Dataset extends ASTObject {
     }
     
     String encode(String url) {
-        try {
-            return URLEncoder.encode(url, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            return url;
-        }
+        return URLEncoder.encode(url, StandardCharsets.UTF_8);
     }
     
     // select *

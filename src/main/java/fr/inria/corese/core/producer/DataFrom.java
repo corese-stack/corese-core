@@ -49,11 +49,14 @@ public class DataFrom extends DataFilter {
         return this;
     }
 
+    /**
+    * WARNING: This function takes a list of nodes and sets the from field to the first node in the list.
+     */
     DataFrom from(List<Node> list) {
         setFrom(list);
         if (list != null && list.size() == 1) {
             setOneFrom(true);
-            setFromNode(graph.getGraphNode(getFrom().get(0)));
+            setFromNode(graph.getGraphNode(getFrom().getFirst()));
             if (getFromNode() == null) {
                 setOneFrom(false);
             }

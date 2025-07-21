@@ -2,21 +2,15 @@ package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Query;
+
 import java.util.HashMap;
 
 /**
- *
  * Cache: store subsumption between query and target node
  */
 public class Cache {
-   
+
     STable table;
-
-    class BTable extends HashMap<String, Boolean> {
-    }
-
-    class STable extends HashMap<String, BTable> {
-    }
 
     Cache(Query q) {
         table = new STable();
@@ -39,6 +33,12 @@ public class Cache {
     void put(Node q, Node t, Boolean b) {
         BTable bt = getTable(q);
         bt.put(t.getLabel(), b);
+    }
+
+    static class BTable extends HashMap<String, Boolean> {
+    }
+
+    static class STable extends HashMap<String, BTable> {
     }
 }
 

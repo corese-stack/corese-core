@@ -74,7 +74,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PathFinder {
 
-    private static Logger logger = LoggerFactory.getLogger(PathFinder.class);
+    private static final Logger logger = LoggerFactory.getLogger(PathFinder.class);
     public static long cedge = 0, cresult = 0, ctest = 0;
     // thread that enumerates the path
     private GraphPath path;
@@ -100,29 +100,29 @@ public class PathFinder {
     private int index = 0;
     // the inverse of the index (i.e. the other arg)
     private int other;
-    private boolean isStop = false,
-            hasEvent = false,
-            hasListener = false,
-            // true if breadth first (else depth first)
-            isBreadth,
-            isDistinct = !true,
-            defaultBreadth = !true,
-            // true if accept subproperty in regexp
-            isSubProperty,
-            isReverse,
-            isShort,
-            isOne,
-            // if true: return list of path instead of thread buffer: 50% faster but enumerate all path
-            isList = false,
-            checkLoop = false,
-            isCountPath = false,
-            isCache = !true,
-            trace = true;
+    private boolean isStop = false;
+    private boolean hasEvent = false;
+    private boolean hasListener = false;
+    private boolean// true if breadth first (else depth first)
+            isBreadth;
+    private boolean isDistinct = !true;
+    private boolean defaultBreadth = !true;
+    private boolean// true if accept subproperty in regexp
+            isSubProperty;
+    private boolean isReverse;
+    private boolean isShort;
+    private boolean isOne;
+    private boolean// if true: return list of path instead of thread buffer: 50% faster but enumerate all path
+            isList = false;
+    private boolean checkLoop = false;
+    private boolean isCountPath = false;
+    private boolean isCache = !true;
+    private final boolean trace = true;
     private int maxLength = Integer.MAX_VALUE,
             min = 0, max = maxLength,
             userMin = -1,
             userMax = -1;
-    private int count = 0;
+    private final int count = 0;
     private Regex regexp1, regexp;
     // depth or width first 
     private String mode = "";
@@ -412,7 +412,7 @@ public class PathFinder {
     }
 
     /**
-     * init at creation time, no need to change. pmax comes from pathLength() <=
+     * init at creation time, no need to change. pmax comes from pathLength() &lt;=
      * pmax
      */
     public void init(Regex exp, Object smode, int pmin, int pmax) {
@@ -527,7 +527,7 @@ public class PathFinder {
      * memory the list of edges
      */
     private Mapping result(Path path, Node gNode, Node src, Node start, boolean isReverse) {
-        //if (edge.getIndex()==1)System.out.println(producer.getGraphNode(edge, edge) + " " + edge);
+        //if (edge.getIndex()==1)logger.debug(producer.getGraphNode(edge, edge) + " " + edge);
         Edge ee = edge;
         int length = 3;
         int ip = 2, is = 3;
@@ -609,18 +609,13 @@ public class PathFinder {
             if (!matcher.match(edge.getNode(1), n1, memory)) { 
                 return false;
             }
-            if (targetNode != null && !targetNode.match(n1)) {
-                return false;
-            }
+            return targetNode == null || targetNode.match(n1);
         } else {
             if (!matcher.match(edge.getNode(0), n0, memory)) { 
                 return false;
             }
-            if (targetNode != null && !targetNode.match(n0)) {
-                return false;
-            }
+            return targetNode == null || targetNode.match(n0);
         }
-        return true;
     }
    
     /**
@@ -770,7 +765,7 @@ public class PathFinder {
 
         Regex exp = stack.pop();
 
-        //System.out.println(exp.toString() + " " + start);
+        //logger.debug(exp.toString() + " " + start);
 
         switch (exp.retype()) {
 
@@ -1319,10 +1314,6 @@ public class PathFinder {
             //visit.nunset(exp); // @todo
         }
 
-    }
-
-    void trace(Object str) {
-        System.out.println("** PF: " + str);
     }
 
     /**

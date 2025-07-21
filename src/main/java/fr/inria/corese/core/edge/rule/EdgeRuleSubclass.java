@@ -1,22 +1,21 @@
 package fr.inria.corese.core.edge.rule;
 
-import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.kgram.api.core.Node;
 
 /**
  * Edge entailed by a Rule
  * index and provenance
- * 
- * @author Olivier Corby, Wimmics INRIA I3S, 2016
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */
 public class EdgeRuleSubclass extends EdgeRuleTop {
 
     EdgeRuleSubclass(Node subject, Node object) {
         super(subject, object);
     }
-    
-    public static EdgeRuleSubclass create(Node source, Node subject, Node predicate, Node object){
+
+    public static EdgeRuleSubclass create(Node source, Node subject, Node predicate, Node object) {
         return new EdgeRuleSubclass(subject, object);
     }
 

@@ -23,7 +23,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  * rdfs:domain rdfs:range rdfs:subPropertyOf rdfs:subClassOf
  * owl:SymmetricProperty owl:inverseOf
  *
- * subPropertyOf & subClassOf are not transitive in the graph but their
+ * subPropertyOf &amp; subClassOf are not transitive in the graph but their
  * instances are typed according to transitivity
  *
  * @author Olivier Corby, Edelweiss INRIA 2010
@@ -31,7 +31,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
  */
 public class Entailment implements Engine {
 
-    private static Logger logger = LoggerFactory.getLogger(Entailment.class);
+    private static final Logger logger = LoggerFactory.getLogger(Entailment.class);
     private static final String S_TYPE = RDF.TYPE;
     private static final String S_BLI = RDF.BLI;
     private static final String S_PROPERTY = RDF.PROPERTY;
@@ -923,9 +923,7 @@ public class Entailment implements Engine {
             if (dt.isLiteral()) {
                 return DatatypeMap.check(dt, range);
             }
-        } else if (dt.isLiteral()) {
-            return false;
-        }
+        } else return !dt.isLiteral();
 
         return true;
     }
@@ -962,7 +960,7 @@ public class Entailment implements Engine {
     }
 
     @Override
-    public int type() {
-        return RDFS_ENGINE;
+    public Type type() {
+        return Type.RDFS_ENGINE;
     }
 }

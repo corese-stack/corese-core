@@ -25,7 +25,7 @@ import org.slf4j.MarkerFactory;
  * functions.<br>
  * It subsumes URI, Literal, xsd:string<br>
  * We can compare URI with URI, string and literal/XMLLiteral with string and
- * literal/XMLLiteral (they can be <= modulo lang)<br> e.g. : titi <=
+ * literal/XMLLiteral (they can be &lt;= modulo lang)<br> e.g. : titi &lt;=
  * toto@en<br> This class factorize util functions such as contains and plus
  * <br>
  *
@@ -36,10 +36,10 @@ public abstract class CoreseStringableImpl extends CoreseDatatype {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(CoreseStringableImpl.class);
-    private Marker fatal = MarkerFactory.getMarker("FATAL");
+    private static final Logger logger = LoggerFactory.getLogger(CoreseStringableImpl.class);
+    private final Marker fatal = MarkerFactory.getMarker("FATAL");
 
-    static int code = STRINGABLE;
+    static IDatatype.Datatype code = IDatatype.Datatype.STRINGABLE;
     public static int count = 0;
     String value = "";
 
@@ -86,7 +86,7 @@ public abstract class CoreseStringableImpl extends CoreseDatatype {
     }
 
     @Override
-    public int getCode() {
+    public IDatatype.Datatype getCode() {
         return code;
     }
 

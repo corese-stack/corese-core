@@ -52,7 +52,7 @@ public class Access {
         
         PUBLIC(1), RESTRICTED(2), PRIVATE(3), DENIED(4), SUPER_USER(5)  ; 
         
-        private int value;
+        private final int value;
         
         // default feature access level 
         public static Level DEFAULT = PRIVATE;
@@ -65,7 +65,7 @@ public class Access {
         public static Level DENY    = DENIED;
 
         
-        private Level(int n) {
+        Level(int n) {
             value = n;
         }
         
@@ -86,8 +86,8 @@ public class Access {
             return getValue() >= featureLevel.getValue();
         }
     
-    } ;
-    
+    }
+
     public enum Feature  {  
         EVENT,
         // @import <http://myfun.org/fun.rq> 
@@ -143,7 +143,7 @@ public class Access {
                
     }
     
-    private FeatureLevel table;
+    private final FeatureLevel table;
     
     private static boolean protect = false;
     
@@ -243,18 +243,18 @@ public class Access {
     public static boolean reject(Feature feature, Level actionLevel) {
         return ! accept(feature, actionLevel);
     }
-    
+
     /**
      * feature = LINKED_TRANSFORMATION uri=st:turtle
      * feature = IMPORT_FUNCTION       uri=ex:myfun.rq
-     * check uri: 
+     * check uri:
      * action level means user query level (action = query)
      * action level >= DEFAULT -> if accept is empty, every namespace is authorized
-     * action level < DEFAULT  -> access to explicitely authorized namespace only
+     * action level &lt; DEFAULT  -> access to explicitly authorized namespace only
      * hint: LINKED_TRANSFORMATION is public and there is a list
      * of authorized namespace in server myprofile.ttl
      * st:access st:namespace uri1, uri2 .
-    */
+     */
     public static boolean accept(Feature feature, Level actionLevel, String uri) {
 //        logger.info(feature + " " + actionLevel + " " + accept(feature, actionLevel));
 //        logger.info(uri + " " + acceptNamespace(feature, actionLevel, uri));
@@ -423,7 +423,7 @@ public class Access {
     public static void setMode(Mode m) {
         mode = m;
         singleton.initMode();
-        //System.out.println(singleton);
+        //logger.info("setMode : ", singleton);
     }
     
     public static boolean isServerMode() {
@@ -531,7 +531,7 @@ public class Access {
         if (m == null || m.getBind() == null) {
             return level;
         }
-        return ((fr.inria.corese.core.sparql.triple.function.term.Binding)m.getBind()).getAccessLevel();
+        return m.getBind().getAccessLevel();
     }
 
     public static boolean isDefaultResultWhenEmptyAccept() {

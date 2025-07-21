@@ -26,6 +26,7 @@ import java.io.InputStream;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import jakarta.ws.rs.RedirectionException;
@@ -67,7 +68,7 @@ public class Service implements URLParam {
 
     static HashMap<String, String> redirect;
     
-    private ClientBuilder clientBuilder;
+    private final ClientBuilder clientBuilder;
 
     private boolean isDebug = false;
     private boolean post = true;
@@ -83,7 +84,7 @@ public class Service implements URLParam {
     private ServiceReport report;
     private Response response;
     private boolean log = false;
-    private double time = 0;
+    private final double time = 0;
     
     static {
         redirect = new HashMap<>();
@@ -281,10 +282,8 @@ public class Service implements URLParam {
                 getCreateReport().setLocation(myUrl);
                 return post(myUrl, query, mime);
             }
-               
-            trace(resp);
+
             logger.info("Response status: " + resp.getStatus());
-            //logger.info("From " + getURL().getURL());
             
             if (resp.getMediaType()!=null) {
                 recordFormat(resp.getMediaType().toString());
@@ -303,8 +302,7 @@ public class Service implements URLParam {
                 }               
                 throw ex;
             }
-            
-            trace(res);
+
             return res;
         } catch (RedirectionException ex) {
             String uri = ex.getLocation().toString();
@@ -324,22 +322,6 @@ public class Service implements URLParam {
     void redirect(String url1, String url2) {
         logger.info(String.format("Record %s redirect to %s", url1, url2));
         redirect.put(url1, url2);
-    }
-    
-    void trace(Response res) {
-        if (getURL().hasParameter(DISPLAY, HEADER)) {
-            System.out.println("service header: " + getURL().getURL());
-            for (String name : res.getHeaders().keySet()) {
-                System.out.println("header: " + name + "=" + res.getHeaderString(name));
-            }
-        }
-    }
-    
-    void trace(String str) {
-        if (isShowResult()) {
-            System.out.println("Service string result");
-            System.out.println(str);
-        }
     }
     
     @Deprecated
@@ -467,15 +449,11 @@ public class Service implements URLParam {
 
     public String get(String uri, String query, String mime) {        
         String url;
-        try {
-            if (isDebug()) {
-                logger.info(URLEncoder.encode(query, "UTF-8"));
-            }
-
-            url = complete(uri, URLEncoder.encode(query, "UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            url = complete(uri, query);
+        if (isDebug()) {
+            logger.info(URLEncoder.encode(query, StandardCharsets.UTF_8));
         }
+
+        url = complete(uri, URLEncoder.encode(query, StandardCharsets.UTF_8));
         return getBasic(url, mime);
     }
     
@@ -527,7 +505,7 @@ public class Service implements URLParam {
     public String getBasic(String url, String mime) {
         Response resp = getResponse(url, mime);
         String res = resp.readEntity(String.class);
-        trace(res);
+
         getCreateReport().setResult(res);
         return res;
     }
@@ -633,8 +611,8 @@ public class Service implements URLParam {
     }
 
     String encoding(ASTQuery ast) {
-        if (ast.hasMetadata(Metadata.ENCODING)) {
-            return ast.getMetadata().getStringValue(Metadata.ENCODING);
+        if (ast.hasMetadata(Metadata.Type.ENCODING)) {
+            return ast.getMetadata().getStringValue(Metadata.Type.ENCODING);
         }
         return ENCODING;
     }
@@ -757,10 +735,7 @@ public class Service implements URLParam {
         if (getURL().hasParameter(MODE, SHOW)) {
             setShowResult(true);
         }
-        if (ast.getGlobalAST().isDebug()) {
-            System.out.println(isPost()?"POST":"GET");
-        }
-        getCreateParser().setTrap(getURL().hasParameter(MODE, TRAP) || ast.getGlobalAST().hasMetadata(Metadata.TRAP));
+        getCreateParser().setTrap(getURL().hasParameter(MODE, TRAP) || ast.getGlobalAST().hasMetadata(Metadata.Type.TRAP));
         if (! isShowResult()) {
             setShowResult(ast.getGlobalAST().hasMetadata(Metadata.SHOW));
             getCreateParser().setShowResult(isShowResult());        
@@ -770,8 +745,8 @@ public class Service implements URLParam {
     // use case for limit: @federate with one URL -> direct service
     void limit(ASTQuery ast) {
         if (!ast.hasLimit()) {
-            if (ast.getMetaValue(Metadata.LIMIT)!=null) {
-                ast.setLimit(ast.getMetaValue(Metadata.LIMIT).intValue());
+            if (ast.getMetaValue(Metadata.Type.LIMIT)!=null) {
+                ast.setLimit(ast.getMetaValue(Metadata.Type.LIMIT).intValue());
             } else {
                 Integer lim = getURL().intValue(LIMIT);
                 if (lim != -1) {

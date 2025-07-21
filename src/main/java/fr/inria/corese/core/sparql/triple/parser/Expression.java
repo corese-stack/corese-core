@@ -32,6 +32,8 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.api.Walker;
 import fr.inria.corese.core.sparql.triple.parser.visitor.ExpressionVisitorVariable;
 import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Title: Corese</p>
@@ -49,10 +51,11 @@ import java.util.Collection;
 public class Expression extends TopExp
         implements Regex, Filter, Expr, Pointerable {
 
-    public static final int STDFILTER = 0;
-    public static final int ENDFILTER = 1;
-    public static final int POSFILTER = 2;
-    public static final int BOUND = 4;
+    private static final Logger logger = LoggerFactory.getLogger(Expression.class);
+
+    public enum Type {
+        STDFILTER, ENDFILTER, POSFILTER, BOUND
+    }
     static ArrayList<Expr> empty = new ArrayList<Expr>(0);
     int retype = Regex.UNDEF;
     boolean isSystem = false;
@@ -464,7 +467,7 @@ public class Expression extends TopExp
         return false;
     }
 
-    public boolean isType(ASTQuery ast, int type) {
+    public boolean isType(ASTQuery ast, Expression.Type  type) {
         return false;
     }
 
@@ -528,8 +531,8 @@ public class Expression extends TopExp
     }
 
     /**
-     * Translate some terms like : different(?x ?y ?z) -> (?x != ?y && ?y != ?z
-     * && ?x != ?z)
+     * Translate some terms like : different(?x ?y ?z) -> (?x != ?y &amp;&amp; ?y != ?z
+     * &amp;&amp; ?x != ?z)
      */
     public Expression process() {
         return this;
@@ -549,7 +552,7 @@ public class Expression extends TopExp
     /**
      * ***********************************************************
      *
-     * KGRAM Filter & Exp
+     * KGRAM Filter &amp; Exp
      *
      */
     @Override
@@ -902,7 +905,7 @@ public class Expression extends TopExp
     }
     
     public void walk(Walker walker) {
-        //System.out.println("walk exp: " + this);
+        //logger.debug("walk exp: {}" , this);
         walker.enter(this);
         for (Expression exp : getArgs()) {
             exp.walk(walker);

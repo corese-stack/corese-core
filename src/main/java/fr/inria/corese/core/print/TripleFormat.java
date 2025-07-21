@@ -11,7 +11,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.util.List;
 
 /**
- * Turtle & Trig Format
+ * Turtle &amp; Trig Format
  * 
  * Olivier Corby, Wimmics INRIA 2013
  */

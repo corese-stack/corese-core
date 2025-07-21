@@ -1,15 +1,8 @@
 package fr.inria.corese.core.sparql.api;
 
-import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.core.kgram.api.core.DatatypeValue;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.ExpType;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.core.Pointerable;
-import fr.inria.corese.core.kgram.api.core.Loopable;
-import fr.inria.corese.core.kgram.api.core.PointerType;
-import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.api.core.*;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 import fr.inria.corese.core.sparql.storage.api.IStorage;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
@@ -21,87 +14,68 @@ import java.util.Map;
 
 /**
  * Interface for Corese XSD datatypes
- * 
+ *
  * @author Olivier Corby & Olivier Savoie & Virginie Bottollier
  */
 public interface IDatatype
-        extends Iterable<IDatatype>,  Node, Loopable, DatatypeValue, Comparable {
-    
-    public enum NodeKind {
-        URI(0), BNODE(1), TRIPLE(2), LITERAL(3), UNDEF(4);
-        int index;
-        
-        NodeKind(int n) {
-            index = n;
-        }
+        extends Iterable<IDatatype>, Node, Loopable, DatatypeValue, Comparable {
 
-        public int getIndex() {
-            return index;
-        }
-        
-        static public int size() {
-            return NodeKind.values().length;
-        }
-    };
+    int VALUE = -1;
+    int RESULT = -2;
 
-    static final int VALUE = -1;
-    static final int RESULT = -2;
     // use case: cast
-    static final int UNDEFINED = -1;
-    static final int LITERAL = 0;
-    static final int STRING = 1;
-    static final int XMLLITERAL = 2;
-    static final int NUMBER = 3;
-    static final int DATE = 4;
-    static final int BOOLEAN = 5;
-    static final int STRINGABLE = 6;
-    static final int URI = 7;
-    static final int UNDEF = 8;
-    static final int BLANK = 9;
-    static final int DOUBLE = 11;
-    static final int FLOAT = 12;
-    static final int DECIMAL = 13;
-    static final int LONG = 14;
-    static final int INTEGER = 15;
-    static final int URI_LITERAL = 16;
-    static final int TRIPLE = 17;
+    enum Datatype {
+        UNDEFINED,
+        LITERAL,
+        STRING,
+        XMLLITERAL,
+        NUMBER,
+        DATE,
+        BOOLEAN,
+        STRINGABLE,
+        URI,
+        UNDEF,
+        BLANK,
+        DOUBLE,
+        FLOAT,
+        DECIMAL,
+        LONG,
+        INTEGER,
+        URI_LITERAL,
+        TRIPLE,
+        // Pseudo codes (target is Integer or String ...)
+        DAY,
+        MONTH,
+        YEAR,
+        DURATION,
+        DATETIME,
+        GENERIC_INTEGER
+    }
+    String KGRAM = ExpType.KGRAM;
+    String RULE = KGRAM + "Rule";
+    String QUERY = KGRAM + "Query";
+    String GRAPH = KGRAM + "Graph";
+    String MAPPINGS = KGRAM + "Mappings";
+    String ENTITY_DATATYPE = ExpType.DT + "entity";
+    String RESOURCE_DATATYPE = ExpType.DT + "resource";
+    String URI_DATATYPE = ExpType.DT + "uri";
+    String BNODE_DATATYPE = ExpType.DT + "bnode";
+    String LITERAL_DATATYPE = ExpType.DT + "literal";
+    String STANDARD_DATATYPE = ExpType.DT + "standard";
+    String EXTENDED_DATATYPE = ExpType.DT + "extended";
+    String ERROR_DATATYPE = ExpType.DT + "error";
+    String GRAPH_DATATYPE = ExpType.DT + "graph";    // same as PointerType.GRAPH.name;
+    String MAPPINGS_DATATYPE = ExpType.DT + "mappings"; // same as PointerType.MAPPINGS.name;
+    String MAPPING_DATATYPE = ExpType.DT + "mapping"; // same as PointerType.MAPPING.name;
+    String ITERATE_DATATYPE = ExpType.DT + "iterate";
+    String MAP_DATATYPE = ExpType.DT + "map";
+    String LIST_DATATYPE = ExpType.DT + "list";
+    String JSON_DATATYPE = ExpType.DT + "json";
+    String XML_DATATYPE = ExpType.DT + "xml";
+    String SYSTEM = ExpType.DT + "system";
 
-    // Pseudo codes (target is Integer or String ...)
-    static final int DAY = 21;
-    static final int MONTH = 22;
-    static final int YEAR = 23;
-    static final int DURATION = 24;
-    static final int DATETIME = 25;
-    static final int GENERIC_INTEGER = 26;
-
-    static final String KGRAM = ExpType.KGRAM;
-    public static final String RULE = KGRAM + "Rule";
-    public static final String QUERY = KGRAM + "Query";
-    public static final String GRAPH = KGRAM + "Graph";
-    public static final String MAPPINGS = KGRAM + "Mappings";
-
-    public static final String ENTITY_DATATYPE = ExpType.DT + "entity";
-    public static final String RESOURCE_DATATYPE = ExpType.DT + "resource";
-    public static final String URI_DATATYPE = ExpType.DT + "uri";
-    public static final String BNODE_DATATYPE = ExpType.DT + "bnode";
-    public static final String LITERAL_DATATYPE = ExpType.DT + "literal";
-    public static final String STANDARD_DATATYPE = ExpType.DT + "standard";
-    public static final String EXTENDED_DATATYPE = ExpType.DT + "extended";
-    public static final String ERROR_DATATYPE = ExpType.DT + "error";
-
-    public static final String GRAPH_DATATYPE    = ExpType.DT + "graph";    // same as PointerType.GRAPH.name; 
-    public static final String MAPPINGS_DATATYPE = ExpType.DT + "mappings"; // same as PointerType.MAPPINGS.name;  
-    public static final String MAPPING_DATATYPE  = ExpType.DT + "mapping"; // same as PointerType.MAPPING.name;  
-
-    public static final String ITERATE_DATATYPE = ExpType.DT + "iterate";
-    public static final String MAP_DATATYPE     = ExpType.DT + "map";
-    public static final String LIST_DATATYPE = ExpType.DT + "list";
-    public static final String JSON_DATATYPE = ExpType.DT + "json";
-    public static final String XML_DATATYPE = ExpType.DT + "xml";
-    public static final String SYSTEM = ExpType.DT + "system";
-    
     IDatatype copy();
-    
+
     boolean isSkolem();
 
     boolean isXMLLiteral();
@@ -128,7 +102,7 @@ public interface IDatatype
     }
 
     List<IDatatype> getValues();
-    
+
     default IDatatype keys() {
         return DatatypeMap.newList();
     }
@@ -137,7 +111,7 @@ public interface IDatatype
     List<IDatatype> getValueList();
 
     @Override
-    IDatatype getValue(String var, int n);
+    IDatatype getValue(String varString, int n);
 
     IDatatype toList();
 
@@ -159,7 +133,7 @@ public interface IDatatype
     IDatatype get(int n);
 
     IDatatype get(IDatatype name);
-    
+
     // json is newInstance, map is newResource
     default IDatatype get(String name) {
         if (name == null) {
@@ -167,74 +141,74 @@ public interface IDatatype
         }
         return get(DatatypeMap.newResource(name));
     }
-    
+
     // xml to json
     default IDatatype json() {
         return null;
     }
-    
+
     // json pointer
     default IDatatype path(IDatatype list) {
         return null;
     }
-    
+
     default IDatatype path(IDatatype list, int n) {
         return null;
     }
 
     IDatatype set(IDatatype name, IDatatype value);
-    
+
     /**
      * Utilitary functions
      */
-    default IDatatype set(String name, Object value){
+    default IDatatype set(String name, Object value) {
         if (value == null) {
             return null;
         }
         return set(name, value.toString());
     }
-    
+
     /**
-     * @todo
-     * CoreseMap set(name, value) use newResource(name) 
+     * @todo CoreseMap set(name, value) use newResource(name)
      * whereas here we use key/newInstance(name)
      * ServiceReport make the assumption that it is key/newInstance
      */
-    default IDatatype set(String name, IDatatype value){
+    default IDatatype set(String name, IDatatype value) {
         if (value == null) {
             return null;
         }
         return set(DatatypeMap.key(name), value);
     }
-    
-    default IDatatype set(String name, Date value){
+
+    default IDatatype set(String name, Date value) {
         if (value == null) {
             return null;
         }
         return set(DatatypeMap.key(name), DatatypeMap.newInstance(value));
     }
-    
-    default IDatatype set(String name, String value){
+
+    default IDatatype set(String name, String value) {
         if (value == null) {
             return null;
         }
         return set(DatatypeMap.key(name), DatatypeMap.newInstance(value));
     }
-    
-    default IDatatype set(String name, int value){
+
+    default IDatatype set(String name, int value) {
         return set(DatatypeMap.key(name), DatatypeMap.newInstance(value));
     }
-    
-    default IDatatype set(String name, double value){
+
+    default IDatatype set(String name, double value) {
         return set(DatatypeMap.key(name), DatatypeMap.newInstance(value));
     }
-    
-    default IDatatype set(String name, boolean value){
+
+    default IDatatype set(String name, boolean value) {
         return set(DatatypeMap.key(name), DatatypeMap.newInstance(value));
     }
-    
-     /**
+
+    /**
      * this datatype: iterable of json (or map)
+     *
      * @param keys: iterable of key
      * @return list of (key_i (val_i1 .. val_in))
      */
@@ -250,14 +224,14 @@ public interface IDatatype
                     alist.add(dt);
                 }
             }
-            
-            if (!alist.isEmpty()){
+
+            if (!alist.isEmpty()) {
                 list.add(DatatypeMap.newList(key, DatatypeMap.newList(alist)));
             }
         }
         return DatatypeMap.newList(list);
     }
-    
+
     /**
      * Use case: complete ServiceReport
      */
@@ -266,8 +240,7 @@ public interface IDatatype
             for (IDatatype dt : this) {
                 dt.set(key, value);
             }
-        }
-        else {
+        } else {
             set(key, value);
         }
         return this;
@@ -310,49 +283,49 @@ public interface IDatatype
 
     @Override
     Pointerable getPointerObject();
+
     default void setPointerObject(Pointerable o) {
     }
-    
-    @Override
-    default void setEdge(Edge e) {
-        setPointerObject(e);
-    }
-    
+
     @Override
     default Edge getEdge() {
-        if (getPointerObject()!=null && 
-                getPointerObject().getEdge()!=null) {
+        if (getPointerObject() != null &&
+                getPointerObject().getEdge() != null) {
             return getPointerObject().getEdge();
         }
         return null;
     }
-    
+
+    @Override
+    default void setEdge(Edge e) {
+        setPointerObject(e);
+    }
+
     @Override
     default boolean isTriple() {
         return false;
     }
-    
+
     default void setTriple(boolean b) {
     }
-    
+
     // triple reference with edge inside
     @Override
     default boolean isTripleWithEdge() {
         return isTriple() && getEdge() != null;
     }
 
-    
     void setTripleStore(TripleStore store);
 
     /**
      * Compare 2 datatypes
      *
-     * @param dt2 another datatype
+     * @param dt another datatype
      * @return 0 if they are equals, an int > 0 if the datatype is greater than
-     * dt2, an int < 0 if the datatype is lesser
+     * dt2, an int &lt; 0 if the datatype is lesser
      */
     int compareTo(IDatatype dt);
-    
+
     int compareTriple(IDatatype dt) throws CoreseDatatypeException;
 
     // for TreeMap
@@ -367,7 +340,6 @@ public interface IDatatype
      * @param datatype ex: xsd:integer
      * @return the datatype casted
      */
-    //IDatatype cast(IDatatype target, IDatatype javaType);
     IDatatype cast(IDatatype datatype);
 
     IDatatype cast(String datatype);
@@ -385,20 +357,20 @@ public interface IDatatype
     String toSparql(boolean prefix);
 
     String toSparql(boolean prefix, boolean xsd);
-    
+
     String toSparql(boolean prefix, boolean xsd, NSManager nsm);
 
     String toSparql(boolean prefix, boolean xsd, boolean skipUndefPrefix, NSManager nsm);
-    
+
     default String trace() {
-        return String.format("trace: %s code: %s datatype: %s label: %s", 
+        return String.format("trace: %s code: %s datatype: %s label: %s",
                 this,
                 getCode(),
                 getDatatypeURI(),
                 getLabel());
     }
 
-    // Used by XMLLiteral to store a XML DOM 
+    // Used by XMLLiteral to store a XML DOM
     @Override
     void setObject(Object obj);
 
@@ -407,11 +379,12 @@ public interface IDatatype
 
     @Deprecated
     IDatatype getPublicDatatypeValue();
+
     @Deprecated
     IDatatype setPublicDatatypeValue(IDatatype dt);
 
     String getContent();
-    
+
     default String pretty() {
         return toString();
     }
@@ -425,15 +398,16 @@ public interface IDatatype
     void setValue(BigDecimal n);
 
     /**
-     * ************************************************************************
-     */
-    /**
      * test if this.getLowerCaseLabel() contains iod.getLowerCaseLabel()
      *
      * @param iod the instance to be tested with
      * @return this.getLowerCaseLabel() contains iod.getLowerCaseLabel()
      */
     boolean contains(IDatatype iod);
+
+    /*
+     * ************************************************************************
+     */
 
     /**
      * test if this.getLowerCaseLabel() starts with iod.getLowerCaseLabel()
@@ -463,23 +437,20 @@ public interface IDatatype
     boolean sameTerm(IDatatype iod);
 
     /**
-     *
      * @param iod
-     * @return iod.getValue() < this.getValue() @throws Core seDatatypeException
+     * @return iod.getValue() &lt; this.getValue() @throws Core seDatatypeException
      */
     boolean less(IDatatype iod) throws CoreseDatatypeException;
 
     /**
-     *
      * @param iod
-     * @return iod.getValue() <= to this.getValue() @throws CoreseDa
+     * @return iod.getValue() &lt;= to this.getValue() @throws CoreseDa
      * tatypeException
      */
     boolean lessOrEqual(IDatatype iod)
             throws CoreseDatatypeException;
 
     /**
-     *
      * @param iod
      * @return iod.getValue() > this.getValue()
      * @throws CoreseDatatypeException
@@ -487,7 +458,6 @@ public interface IDatatype
     boolean greater(IDatatype iod) throws CoreseDatatypeException;
 
     /**
-     *
      * @param iod
      * @return iod.getValue() >= to this.getValue()
      * @throws CoreseDatatypeException
@@ -521,27 +491,24 @@ public interface IDatatype
 
     IDatatype minus(long val);
 
-    /**
+    IDatatype getDatatype();
+
+    /*
      * ************************************************************************
      */
-    /**
-     * @return the datatype of this
-     */
-    //IDatatype datatype();
 
-    IDatatype getDatatype();
+    void setDatatype(String uri);
 
     // IDatatype value of Pointer Object (eg XML TEXT Node as xsd:string)
     IDatatype getObjectDatatypeValue();
-
-    // same as getDatatype but URI return rdfs:Resource
-    //IDatatype getIDatatype();
 
     /**
      * @return the lang of this ('fr', 'en',...)
      */
     @Override
     String getLang();
+
+    void setLang(String str);
 
     /**
      * @return the datatype of this as a URI
@@ -555,6 +522,7 @@ public interface IDatatype
      */
     @Override
     String getLabel();
+
     // <<s p o>>
     String getPrettyLabel();
 
@@ -571,20 +539,22 @@ public interface IDatatype
     boolean isNumber();
 
     boolean isDecimalInteger();
-    
+
     // exact datatype xsd:integer
-    default boolean isXSDInteger() { return false;}
+    default boolean isXSDInteger() {
+        return false;
+    }
 
     boolean isDate();
 
     @Override
     boolean isBoolean();
 
-    Class getJavaClass();
-
-    /**
+    /*
      * ************************************************
      */
+
+    Class getJavaClass();
 
     @Deprecated
     String getNormalizedLabel();
@@ -592,18 +562,18 @@ public interface IDatatype
     @Deprecated
     String getLowerCaseLabel();
 
-    int getCode();
-    
+    Datatype getCode();
+
     default NodeKind getNodeKind() {
         return NodeKind.UNDEF;
     }
-    
+
     boolean hasLang();
 
     boolean isTrue() throws CoreseDatatypeException;
-    
+
     default boolean isTrueTest() {
-        try {            
+        try {
             return isTrue();
         } catch (CoreseDatatypeException e) {
             return false;
@@ -612,22 +582,35 @@ public interface IDatatype
 
     boolean isTrueAble();
 
-    void setDatatype(String uri);
-
     void setValue(String str) throws CoreseDatatypeException;
 
     void setValue(String str, int id, IStorage pmgr);
 
     void setValue(IDatatype dt);
 
-    void setLang(String str);
-    
-    default IDatatype duplicate () {
+    default IDatatype duplicate() {
         return this;
     }
-    
-    default IDatatype dispatch (String name) {
+
+    default IDatatype dispatch(String name) {
         return this;
     }
-    
+
+    enum NodeKind {
+        URI(0), BNODE(1), TRIPLE(2), LITERAL(3), UNDEF(4);
+        int index;
+
+        NodeKind(int n) {
+            index = n;
+        }
+
+        public static int size() {
+            return NodeKind.values().length;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+    }
+
 }

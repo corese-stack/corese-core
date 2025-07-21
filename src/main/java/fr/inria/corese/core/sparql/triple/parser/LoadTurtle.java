@@ -31,7 +31,7 @@ public class LoadTurtle {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(LoadTurtle.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoadTurtle.class);
 
     SparqlCorese parser;
     Creator create;
@@ -63,7 +63,7 @@ public class LoadTurtle {
             LoadTurtle p = new LoadTurtle(read, cr, file);
             return p;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
         return null;
     }
@@ -96,7 +96,7 @@ public class LoadTurtle {
             parser.setASTQuery(ast);
             parser.set(c);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
     }
 

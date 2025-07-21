@@ -1,23 +1,17 @@
 package fr.inria.corese.core.kgram.sorter.impl.qpv1;
 
-import static fr.inria.corese.core.kgram.api.core.ExpType.BIND;
-import fr.inria.corese.core.kgram.sorter.core.QPGraph;
-import fr.inria.corese.core.kgram.sorter.core.QPGNode;
-import fr.inria.corese.core.kgram.sorter.core.ISort;
-import static fr.inria.corese.core.kgram.api.core.ExpType.EDGE;
-import static fr.inria.corese.core.kgram.api.core.ExpType.FILTER;
-import static fr.inria.corese.core.kgram.api.core.ExpType.GRAPH;
-import static fr.inria.corese.core.kgram.api.core.ExpType.VALUES;
 import fr.inria.corese.core.kgram.core.Exp;
-import fr.inria.corese.core.kgram.sorter.core.QPGEdge;
-import fr.inria.corese.core.kgram.sorter.core.IEstimate;
+import fr.inria.corese.core.kgram.sorter.core.*;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static fr.inria.corese.core.kgram.api.core.ExpType.*;
+
 /**
- * An implementation for sorting the triple pattern depth-first & best greedy
+ * An implementation for sorting the triple pattern depth-first &amp; best greedy
  * algorithm
  *
  * 1 start with the one with least cost, if there are more than 2 with same cost
@@ -27,7 +21,7 @@ import java.util.Map;
  *
  * 3 recursively search until all nodes have been visited
  *
- * 4 every time one node is added to visited, check FILTER & VALUES
+ * 4 every time one node is added to visited, check FILTER &amp; VALUES
  * ++ 4.1 now also check BIND 20Jan2015
  *
  * @author Fuqi Song, Wimmics Inria I3S
@@ -48,10 +42,10 @@ public class DepthFirstBestSearch implements ISort {
     public List<QPGNode> sort(QPGraph graph) {
         this.g = graph;
         //EDGE GRAPH
-        List<QPGNode> sortableNodes = g.getAllNodes(EDGE);
-        sortableNodes.addAll(g.getAllNodes(GRAPH));
+        List<QPGNode> sortableNodes = g.getAllNodes(Type.EDGE);
+        sortableNodes.addAll(g.getAllNodes(Type.GRAPH));
         notVisited.addAll(sortableNodes);
-        binds.addAll(g.getAllNodes(BIND));
+        binds.addAll(g.getAllNodes(Type.BIND));
 
         //each loop is a sub graph
         while (!notVisited.isEmpty()) {
@@ -148,7 +142,7 @@ public class DepthFirstBestSearch implements ISort {
     //for a filter, if all linked vairables have been visited, 
     //then add this filter just after these triple patterns
     private void addFilters() {
-        List<QPGNode> filters = this.g.getAllNodes(FILTER);
+        List<QPGNode> filters = this.g.getAllNodes(Type.FILTER);
         //others.addAll(g.getNodeList(VALUES));
 
         for (QPGNode f : filters) {
@@ -162,7 +156,7 @@ public class DepthFirstBestSearch implements ISort {
 
     //for VALUES, put it just before the vairables being used 
     private void addValues(QPGNode min) {
-        List<QPGNode> values = this.g.getAllNodes(VALUES);
+        List<QPGNode> values = this.g.getAllNodes(Type.VALUES);
 
         for (QPGNode v : values) {
             //if the VALUES use this (first) triple pattern, then add it to
@@ -211,7 +205,7 @@ public class DepthFirstBestSearch implements ISort {
 
             //for BIND, it also can have FILTERs and VALUES, and also it can depends on the
             //other BINDs expressions, so need to check recusively
-            while (q.getType()== BIND && !visited.contains(q) && !intersect(linkedBinds, notVisited, binds)) {
+            while (q.getType()== Type.BIND && !visited.contains(q) && !intersect(linkedBinds, notVisited, binds)) {
                 this.addValues(q);
 
                 visited.add(q);

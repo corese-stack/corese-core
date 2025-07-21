@@ -1,8 +1,8 @@
 package fr.inria.corese.core.compiler.federate;
 
 import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,11 +33,7 @@ class BGP2URI extends HashMap<BasicGraphPattern, List<String>> {
     }
 
     List<BasicGraphPattern> sort(List<BasicGraphPattern> list) {
-        list.sort(new Comparator<>() {
-            public int compare(BasicGraphPattern bgp1, BasicGraphPattern bgp2) {
-                return -Integer.compare(bgp1.size(), bgp2.size());
-            }
-        });
+        list.sort((bgp1, bgp2) -> -Integer.compare(bgp1.size(), bgp2.size()));
         return list;
     }
 
@@ -69,10 +65,8 @@ class BGP2URI extends HashMap<BasicGraphPattern, List<String>> {
     // intersection of bgp with other bgp
     boolean intersect(BasicGraphPattern bgp) {
         for (BasicGraphPattern exp : keySet()) {
-            if (exp != bgp) {
-                if (!bgp.intersectionTriple(exp).isEmpty()) {
-                    return true;
-                }
+            if (exp != bgp && (!bgp.intersectionTriple(exp).isEmpty())) {
+                return true;
             }
         }
         return false;

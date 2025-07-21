@@ -12,7 +12,7 @@ public class HashingUtility {
     /**
      * Represents the hash algorithm to use.
      */
-    public static enum HashAlgorithm {
+    public enum HashAlgorithm {
         /**
          * Represents the SHA-256 hash algorithm.
          */
@@ -25,7 +25,7 @@ public class HashingUtility {
 
         private final String algorithm;
 
-        private HashAlgorithm(String algorithm) {
+        HashAlgorithm(String algorithm) {
             this.algorithm = algorithm.replace("-", "");
         }
 

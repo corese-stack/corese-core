@@ -101,7 +101,6 @@ public class Automaton {
 		if (pending.size()>0){
 			// complete pending transitions to final state
 			out = create();
-			//System.out.println("** A1: " + out);
 			for (Step step : pending){
 				step.setState(out);
 			}
@@ -110,12 +109,9 @@ public class Automaton {
 		else {
 			// use case: star(Exp)
 			out = current;
-			//System.out.println("** A2: " + out);
 		}
 		out.setOut(true);
 		compile();
-		
-		//System.out.println(this);
 	}
 
 	void compile(){
@@ -135,8 +131,6 @@ public class Automaton {
 	 * s0: exp->s0 , eps -> s1
 	 */
 	void compute(Regex exp, Regex star, boolean or,  boolean inverse, boolean reverse){
-		
-		//if (exp.getExpr()!=null) System.out.println("** A: " + exp + " " + exp.getExpr() + " " + exp.isSeq());
 		
 		if (exp.isReverse()){
 			// ?x ^ ex:prop ?y
@@ -227,7 +221,6 @@ public class Automaton {
 					// csave: A->? ; B->?
 					compute(e, star, true,  inverse, reverse);
 					current = csave;
-					//System.out.println("**A2: " + current);
 				}
 				// A->? ; B->?
 				psave.addAll(pending);

@@ -1,27 +1,19 @@
 package fr.inria.corese.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.tool.DistinctNode;
 import fr.inria.corese.core.kgram.tool.MetaIterator;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
- *
  * Manage Nodes of a graph, for each graph name
  *
  * @author Olivier Corby, Wimmics INRIA 2018
- *
  */
 public class NodeGraphIndex {
-
-    class NodeTable extends HashMap<Node, Node> {
-    }
-
-    class GraphTable extends HashMap<Node, NodeTable> {
-    }
 
     GraphTable table;
 
@@ -57,7 +49,7 @@ public class NodeGraphIndex {
             gt.put(node, new NodeGraph(node, graph));
         }
     }
-    
+
     boolean contains(Node graph, Node node) {
         NodeTable gt = table.get(graph);
         if (gt == null) {
@@ -93,7 +85,7 @@ public class NodeGraphIndex {
         }
         return meta;
     }
-    
+
     // return iterable of NodeGraph(node, graph)
     // MUST perform n.getNode() to get the node
     // return distinct nodes
@@ -101,9 +93,14 @@ public class NodeGraphIndex {
         return new DistinctNode(getNodes());
     }
 
-    
     public HashMap<Node, NodeTable> getGraphTable() {
         return table;
+    }
+
+    class NodeTable extends HashMap<Node, Node> {
+    }
+
+    class GraphTable extends HashMap<Node, NodeTable> {
     }
 
 }

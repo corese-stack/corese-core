@@ -2,25 +2,26 @@ package fr.inria.corese.core.workflow;
 
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.Dataset;
+
 import java.util.List;
 
 
 /**
  * Super class of Process with a Process List (Test, Parallel, ..)
- * @author Olivier Corby, Wimmics INRIA I3S, 2016
  *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */
 public class SemanticProcess extends CompositeProcess {
-    
-    SemanticProcess(List<WorkflowProcess> l){
+
+    SemanticProcess(List<WorkflowProcess> l) {
         super(l);
     }
-    
-    SemanticProcess (){
+
+    SemanticProcess() {
         super();
     }
-    
-     @Override
+
+    @Override
     public void subscribe(SemanticWorkflow w) {
         super.subscribe(w);
         for (WorkflowProcess p : getProcessList()) {
@@ -44,7 +45,5 @@ public class SemanticProcess extends CompositeProcess {
         }
     }
 
-   
-    
 
 }

@@ -104,7 +104,7 @@ public final class StringManager implements IStorage {
 
     @Override
     public boolean check(String str) {
-        return (str == null) ? false : check(str.length());
+        return str != null && check(str.length());
     }
 
     @Override

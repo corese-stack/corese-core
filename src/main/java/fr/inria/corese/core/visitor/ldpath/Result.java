@@ -17,8 +17,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;;
 
 /**
  * Results managed in a table ASTQuery -> Mappings
@@ -27,6 +28,8 @@ import java.util.logging.Logger;
  *
  */
 public class Result {
+
+    private static final Logger logger = LoggerFactory.getLogger(Result.class);
     static final String NL = "\n";
     static final String LDP = "http://ns.inria.fr/ldpath/" ;
     static final String TTL = ".ttl";
@@ -93,10 +96,9 @@ public class Result {
                 alist.add(ast);
                 table.put(ast, map);
                 try {
-                    process((ASTQuery)map.getAST(), map, alist.size());
+                    process(map.getAST(), map, alist.size());
                 } catch (IOException ex) {
-                    Logger.getLogger(Result.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                    logger.error("An unexpected error has occurred", ex);                }
             }
         }
     }
@@ -188,57 +190,11 @@ public class Result {
         }
     }
     
-//    int process2(ASTQuery ast, Mappings map, int i) throws IOException {
-//        DatatypeValue dt1 = map.getValue(AST.COUNT_VAR);
-//        DatatypeValue dt2 = map.getValue(AST.DISTINCT_VAR);
-//        if (dt1 != null || dt2 != null){ 
-//            List<Constant> path = path(ast);
-//            DatatypeValue dtp = map.getValue(AST.PROPERTY_VAR);
-//            DatatypeValue dtg = map.getValue(AST.GRAPH2_VAR);
-//            Constant uri2 = getEndpoint(map);
-//            Constant type = type(ast);
-//            if (dtp == null) {
-//                // // path with constant p as predicate
-//                for (Mapping m : map) {
-//                    result(i++, type, path, empty, uri2, m);
-//                }
-//            } else if (uri2 == null && dtg == null) {
-//                // local path with variable ?p as predicate
-//                for (Mapping m : map) {
-//                    // each Mapping contains ?p = predicate ; ?count = n
-//                    IDatatype dtpred = (IDatatype) m.getValue(AST.PROPERTY_VAR);
-//                    if (dtpred != null) {
-//                        path.add(Constant.create(dtpred));
-//                        result(i++, type, path, empty, uri2, m);
-//                        path.remove(path.size() -1);
-//                    }
-//                }
-//            } else {
-//                // remote endpoint with variable ?p as predicate
-//                for (Mapping m : map) {
-//                    // each Mapping contains ?p = predicate ; ?count = n
-//                    IDatatype dtpred = (IDatatype) m.getValue(AST.PROPERTY_VAR);
-//                    if (dtpred != null) {
-//                        List<Constant> list = new ArrayList<>();
-//                        list.add(Constant.create(dtpred));
-//                        result(i++, type, path, list, uri2, m);
-//                    }
-//                }
-//            }
-//        }
-//        return i;
-//    }
-    
-//    void result(int i, Constant type, List<Constant> path, List<Constant> list, Constant uri, Mapping m) throws IOException {
-//        write(rdf(i, type, path, list, uri, m));
-//    }
-    
     void write(String str) throws IOException {
         if (file != null) {
             save(str);
             save(NL);
         }
-        System.out.println(str);
     }
     
     void setFile(String name) {
@@ -304,7 +260,7 @@ public class Result {
                 String slot = map.get(name);
                 if (ddt == null && (slot.contains("min") || slot.contains("max") || slot.contains("avg"))) {
                     // skip
-                } else if (dd.getCode() == IDatatype.DECIMAL) {
+                } else if (dd.getCode() == IDatatype.Datatype.DECIMAL) {
                     slot(sb, slot, String.format("%.3f", dd.doubleValue()));
                 }
                 else {

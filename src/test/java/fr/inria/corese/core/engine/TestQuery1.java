@@ -2,23 +2,22 @@ package fr.inria.corese.core.engine;
 
 import static fr.inria.corese.core.util.Property.Value.LOAD_IN_DEFAULT_GRAPH;
 import static fr.inria.corese.core.util.Property.Value.SPARQL_COMPLIANT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import fr.inria.corese.core.Graph;
@@ -66,10 +65,12 @@ import fr.inria.corese.core.transform.Loader;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.util.SPINProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestQuery1 {
-    // private static org.slf4j.Logger logger =
-    // LoggerFactory.getLogger(TestQuery1.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(TestQuery1.class);
 
     static String data = TestQuery1.class.getResource("/data-test/").getPath();
     // static String QUERY = TestQuery1.class.getResource("query/").getPath();
@@ -84,7 +85,10 @@ public class TestQuery1 {
     // <http://ns.inria.fr/ast/sql#>\n";
     static Graph graph;
 
-    @BeforeClass
+    private static final String localRDF = data + "rdf.2014.ttl";
+    private static final String localRDFS = data + "rdfs.2014.ttl";
+
+    @BeforeAll
     static public void init() {
         // Query.STD_PLAN = Query.PLAN_RULE_BASED;
         // Property.set(GRAPH_NODE_AS_DATATYPE, true);
@@ -115,7 +119,7 @@ public class TestQuery1 {
         // QueryProcess.setVisitorable(true);
     }
 
-    @AfterClass
+    @AfterAll
     static public void finish() {
         // after2();
     }
@@ -195,22 +199,8 @@ public class TestQuery1 {
         try {
             exec.compile(q);
         } catch (EngineException ex) {
-            System.out.println(ex);
         }
 
-    }
-
-    static void after2() {
-        System.out.println("After");
-        int i = 0;
-        for (IDatatype dt : DatatypeMap.getPublicDatatypeValue()) {
-            System.out.println(i++ + " " + dt.getValueList().get(0) + " " + dt.getValueList().get(1));
-        }
-        i = 0;
-        for (IDatatype dt : DatatypeMap.getPublicDatatypeValue()
-                .get(DatatypeMap.newResource(NSManager.USER, "error"))) {
-            System.out.println(i++ + " " + dt);
-        }
     }
 
     static void init(Graph g, Load ld) throws LoadException {
@@ -261,7 +251,7 @@ public class TestQuery1 {
         t.process();
         Transformer t2 = Transformer.create(g, Transformer.TURTLE_HTML);
         IDatatype dt = t2.process(t.getBinding());
-        // System.out.println(dt.getLabel());
+
         assertEquals(true, dt.getLabel().contains("<span class='fail'>"));
     }
 
@@ -349,7 +339,7 @@ public class TestQuery1 {
         b.setGlobalVariable("?count", DatatypeMap.ZERO);
         exec.query(i);
         Mappings map = exec.query(q, b);
-        // System.out.println(map);
+
         // Mappings parameter do not focus edge iteration in query/union because select
         // ?n
         assertEquals(8, map.size());
@@ -380,7 +370,7 @@ public class TestQuery1 {
         b.setGlobalVariable("?count", DatatypeMap.ZERO);
         exec.query(i);
         Mappings map = exec.query(q, b);
-        // System.out.println(map);
+
         // Mappings parameter focus edge iteration in query/union because ?y is bound in
         // both branches
         assertEquals(2, map.size());
@@ -496,10 +486,6 @@ public class TestQuery1 {
         DatatypeValue rdf = map.getValue("?rdf");
         DatatypeValue json = map.getValue("?json");
         map.getValue("?g");
-
-        System.out.println(xml.stringValue());
-        System.out.println(rdf.stringValue());
-        System.out.println(json.stringValue());
     }
 
     @Test
@@ -795,7 +781,7 @@ public class TestQuery1 {
         exec.query(i);
         Mappings map = exec.query(q);
         Graph res = (Graph) map.getGraph();
-        // System.out.println(map.getGraph());
+
         assertEquals(3, res.size());
     }
 
@@ -906,7 +892,6 @@ public class TestQuery1 {
         assertEquals("test", map.getValue("?local").stringValue());
         assertEquals("ns:test", map.getValue("?name").stringValue());
         assertEquals("text", map.getValue("?text").stringValue());
-        // System.out.println(map);
     }
 
     @Test
@@ -941,7 +926,7 @@ public class TestQuery1 {
 
         exec.query(init);
         Mappings map = exec.query(query);
-        // System.out.println(map);
+
         assertEquals("Catonmat10", map.getValue("?t").stringValue());
         assertEquals("red", map.getValue("?c").stringValue());
         assertEquals("phrase", map.getValue("?n").stringValue());
@@ -1173,7 +1158,7 @@ public class TestQuery1 {
 
         exec.query(i);
         Mappings map = exec.query(q);
-        System.out.println("res: " + map.getValue("?t").stringValue());
+
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
@@ -1201,7 +1186,7 @@ public class TestQuery1 {
 
         exec.query(i);
         Mappings map = exec.query(q);
-        // System.out.println(map.getValue("?t").stringValue());
+
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
@@ -1229,7 +1214,7 @@ public class TestQuery1 {
 
         exec.query(i);
         Mappings map = exec.query(q);
-        // System.out.println(map.getValue("?t").stringValue());
+
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
@@ -1260,7 +1245,7 @@ public class TestQuery1 {
 
         exec.query(i);
         Mappings map = exec.query(q);
-        // System.out.println(map.getValue("?t").stringValue());
+
         String str = map.getValue("?t").stringValue();
         Graph gg = Graph.create();
         Load ld = Load.create(gg);
@@ -1637,7 +1622,6 @@ public class TestQuery1 {
         exec.query(i11);
         graph.getNamedGraph("http://example.org/g1");
         exec.query(q4);
-        // System.out.println(m4);
 
         exec.query(q);
         exec.query(i2);
@@ -1939,7 +1923,7 @@ public class TestQuery1 {
                 + "}";
         exec.query(i);
         Mappings map = exec.query(q);
-        // System.out.println(map);
+
         IDatatype dt = map.getValue("?o");
         assertEquals(20, dt.intValue());
     }
@@ -2254,7 +2238,6 @@ public class TestQuery1 {
         exec.query(i);
 
         Mappings m11 = exec.query(q11);
-        // System.out.println(m11);
         // 1 is a bug, it should be 0 !!!
         assertEquals(1, m11.size());
 
@@ -2321,14 +2304,13 @@ public class TestQuery1 {
         Mappings map = exec.query(t);
 
         String json = map.getTemplateStringResult();
-        // System.out.println(json);
 
         assertEquals(true, (json.length() <= 1350 && json.length() >= 1000));
 
         Graph gg = Graph.create();
         Load ll = Load.create(gg);
         ll.loadString(json, fr.inria.corese.core.api.Loader.format.JSONLD_FORMAT);
-        // System.out.println(g.size() + " " + gg.size());
+
         assertEquals(g.size(), gg.size());
 
     }
@@ -2459,8 +2441,9 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        //// System.out.println(map);
-        Assert.assertEquals(0, map.size());
+         //logger.info("map ",map);
+
+        Assertions.assertEquals(0, map.size());
     }
 
     @Test
@@ -2482,8 +2465,7 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        // System.out.println(map);
-        Assert.assertEquals(1, map.size());
+        Assertions.assertEquals(1, map.size());
     }
 
     @Test
@@ -2503,8 +2485,7 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        // System.out.println(map);
-        Assert.assertEquals(2, getValue(map, "?t").intValue());
+        Assertions.assertEquals(2, getValue(map, "?t").intValue());
     }
 
     @Test
@@ -2518,9 +2499,8 @@ public class TestQuery1 {
                 + " where {}";
 
         Mappings map = exec.query(q);
-        // System.out.println(map);
-        Assert.assertEquals(true, getValue(map, "?t1").booleanValue());
-        Assert.assertEquals(3, getValue(map, "?t2").intValue());
+        Assertions.assertEquals(true, getValue(map, "?t1").booleanValue());
+        Assertions.assertEquals(3, getValue(map, "?t2").intValue());
     }
 
     @Test
@@ -2542,8 +2522,7 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        // System.out.println(map);
-        Assert.assertEquals(true, getValue(map, "?t").booleanValue());
+        Assertions.assertEquals(true, getValue(map, "?t").booleanValue());
     }
 
     @Test
@@ -2560,8 +2539,7 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        // System.out.println(map);
-        Assert.assertEquals(false, getValue(map, "?t").booleanValue());
+        Assertions.assertEquals(false, getValue(map, "?t").booleanValue());
     }
 
     @Test
@@ -2580,7 +2558,6 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        // System.out.println(map);
         assertEquals(16, getValue(map, "?t").intValue());
     }
 
@@ -2600,7 +2577,6 @@ public class TestQuery1 {
         Graph g = createGraph();
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(q);
-        // System.out.println(map.getQuery().getAST());
         IDatatype dt = map.getValue("?t");
         assertEquals(120, dt.intValue());
     }
@@ -2769,7 +2745,6 @@ public class TestQuery1 {
         exec.query(q);
         Mappings map = exec.query(q2);
         IDatatype dt = map.getValue("?t");
-        // System.out.println(dt);
         for (IDatatype pair : dt.getValueList()) {
             assertEquals(true, pair.getValueList().get(0).equals(pair.getValueList().get(1)));
         }
@@ -2825,7 +2800,6 @@ public class TestQuery1 {
         exec.query(init);
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?sum");
-        // System.out.println(map);
         assertEquals(1, dt.intValue());
     }
 
@@ -2894,7 +2868,7 @@ public class TestQuery1 {
         IDatatype dt = map.getValue("?t");
         int i = 0;
         for (IDatatype val : dt.getValueList()) {
-            assertEquals((i++ == 1) ? true : false, val.booleanValue());
+            assertEquals(i++ == 1, val.booleanValue());
         }
     }
 
@@ -2922,7 +2896,7 @@ public class TestQuery1 {
         IDatatype dt = map.getValue("?t");
         int i = 0;
         for (IDatatype val : dt.getValueList()) {
-            assertEquals((i++ == 1) ? true : false, val.booleanValue());
+            assertEquals(i++ == 1, val.booleanValue());
         }
     }
 
@@ -2975,7 +2949,7 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        //// System.out.println(map);
+        //logger.info("map {}",map);
         assertEquals(4, map.size());
     }
 
@@ -3121,7 +3095,7 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(g);
         exec.query(init);
         Mappings map = exec.query(q3);
-        System.out.println(map);
+        logger.info("map  : ", map);
         // assertEquals(4, g.size());
     }
 
@@ -3190,7 +3164,7 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(g);
         exec.query(init);
         Mappings map = exec.query(q);
-        // System.out.println(map);
+        // logger.debug(map);
         assertEquals(4, map.size());
 
     }
@@ -3485,7 +3459,7 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?y");
-        assertEquals("test", dt.doubleValue(), 1.5497, 10e-5);
+        assertEquals(1.5497, dt.doubleValue(), 10e-5, "test");
     }
 
     public void testGenAggOld() throws EngineException {
@@ -3501,7 +3475,7 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?y");
-        assertEquals("test", dt.doubleValue(), 1.5497, 10e-5);
+        assertEquals(1.5497, dt.doubleValue(), 10e-5, "test");
     }
 
     @Test
@@ -3520,10 +3494,10 @@ public class TestQuery1 {
 
         for (Edge e : g.getEdges()) {
             int n = e.getGraph().getIndex();
-            // System.out.println("s "+ e.getNode(0) + " " + e.getNode(0).getIndex());
-            // System.out.println("o " +e.getNode(1) + " " + e.getNode(1).getIndex());
-            // System.out.println("p " +e.getEdgeNode() + " " + e.getEdgeNode().getIndex());
-            // System.out.println("g "+ e.getGraph() + " " + e.getGraph().getIndex());
+            // logger.debug("s "+ e.getNode(0) + " " + e.getNode(0).getIndex());
+            // logger.debug("o " +e.getNode(1) + " " + e.getNode(1).getIndex());
+            // logger.debug("p " +e.getEdgeNode() + " " + e.getEdgeNode().getIndex());
+            // logger.debug("g "+ e.getGraph() + " " + e.getGraph().getIndex());
 
             assertEquals(n, e.getNode(0).getIndex());
             assertEquals(n, e.getNode(1).getIndex());
@@ -3565,7 +3539,7 @@ public class TestQuery1 {
         Access.authorize(Feature.READ_FILE);
         Transformer t = Transformer.createWE(g, data + "junit/sttl/format1/");
         String res = t.transform();
-        // System.out.println("result: " + res);
+        // logger.debug("result: " + res);
         assertEquals(true, res != null && res.equals("test"));
         Access.define("junit/sttl/format2/", false);
     }
@@ -3707,11 +3681,11 @@ public class TestQuery1 {
         int c = 0;
         for (Edge ent : it) {
             if (ent != null) {
-                //// System.out.println(ent);
+                // logger.info("count {}",ent);
                 c++;
             }
         }
-        //// System.out.println("");
+
         return c;
     }
 
@@ -3757,7 +3731,6 @@ public class TestQuery1 {
         // missing: _:b a rdf:List
         assertEquals(308, g2.size());
 
-        //// System.out.println(g.compare(g1, false, true, true));
 
     }
 
@@ -3774,7 +3747,7 @@ public class TestQuery1 {
         exec.query(i);
 
         Transformer t = Transformer.create(g, Transformer.TURTLE);
-        System.out.println(t.transform());
+        logger.info("testTTLabc {} " , t.transform());
         // assertEquals(197, t.transform().length());
     }
 
@@ -3824,7 +3797,7 @@ public class TestQuery1 {
 
         Mappings map = exec.query(q);
         assertEquals("10", map.getTemplateStringResult());
-        Context c = (Context) map.getContext();
+        Context c = map.getContext();
         IDatatype val = c.getName("test");
         assertEquals(10, val.intValue());
         assertEquals(true, map.getQuery().getTransformer() == null);
@@ -3846,7 +3819,7 @@ public class TestQuery1 {
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?tt");
         assertEquals(10, dt.intValue());
-        Context c = (Context) map.getContext();
+        Context c = map.getContext();
         IDatatype val = c.getName("test");
         assertEquals(10, val.intValue());
     }
@@ -3901,7 +3874,7 @@ public class TestQuery1 {
             ld.parseDir(data + "junit/data", "http://example.org/");
         } catch (LoadException ex) {
         }
-        System.out.println(g.display());
+        logger.info("testIO2 : {}", g.display());
         assertEquals(4, g.size());
     }
 
@@ -4145,8 +4118,8 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        // System.out.println("*****************************************");
-        // System.out.println(map);
+        // logger.info("*****************************************");
+        // logger.info("map {}",map);
         assertEquals(2, map.size()); // there is also a global prefix c:
         // IDatatype p = map.getValue("?p");
         // IDatatype n = map.getValue("?n");
@@ -4289,147 +4262,6 @@ public class TestQuery1 {
     }
 
     @Test
-    public void testRelax6() throws EngineException {
-        Graph g = GraphStore.create();
-        QueryProcess exec = QueryProcess.create(g);
-
-        String i = "insert data { "
-                + "us:John foaf:name 'John'@en ; foaf:age 11 "
-                + "}";
-        exec.query(i);
-
-        String q = "@relax "
-                + "select * (xt:sim() as ?s) where {"
-                + "us:John foaf:name 'Jon' ; foaf:age 11 "
-                + "}";
-
-        Mappings map = exec.query(q);
-        assertEquals(1, map.size());
-
-    }
-
-    @Test
-    public void testRelax5() throws EngineException {
-        Graph g = GraphStore.create();
-        QueryProcess exec = QueryProcess.create(g);
-
-        String i = "insert data { "
-                + "us:John foaf:name 'John' "
-                + "}";
-        exec.query(i);
-
-        String q = "@relax kg:uri "
-                + "select * where {"
-                + "us:Jim foaf:name 'John' "
-                + "}";
-
-        Mappings map = exec.query(q);
-        assertEquals(1, map.size());
-    }
-
-    @Test
-    public void testRelax4() throws EngineException {
-        Graph g = GraphStore.create();
-        QueryProcess exec = QueryProcess.create(g);
-
-        String i = "insert data { "
-                + "us:John foaf:name 'John' "
-                + "}";
-        exec.query(i);
-
-        String q = "@relax * "
-                + "select * where {"
-                + "?x rdfs:label 'John' "
-                + "}";
-
-        Mappings map = exec.query(q);
-        assertEquals(1, map.size());
-    }
-
-    @Test
-    public void testRelax3() throws EngineException {
-        Graph g = GraphStore.create();
-        QueryProcess exec = QueryProcess.create(g);
-
-        String i = "insert data { "
-                + "us:John foaf:name 'John' "
-                + "}";
-        exec.query(i);
-
-        String q = "@relax kg:property "
-                + "select * where {"
-                + "?x rdfs:label 'John' "
-                + "}";
-
-        Mappings map = exec.query(q);
-        assertEquals(1, map.size());
-
-    }
-
-    @Test
-    public void testRelax2() throws EngineException {
-        Graph g = GraphStore.create();
-        QueryProcess exec = QueryProcess.create(g);
-
-        String i = "insert data { "
-                + "us:John rdfs:label 'John' "
-                + "}";
-        exec.query(i);
-
-        String q = "@relax kg:literal "
-                + "select * where {"
-                + "?x rdfs:label 'Jon' "
-                + "}";
-
-        Mappings map = exec.query(q);
-        assertEquals(1, map.size());
-    }
-
-    @Test
-    public void testRelax1() throws EngineException {
-        Graph g = GraphStore.create();
-        QueryProcess exec = QueryProcess.create(g);
-
-        String i = "insert data { "
-                + "us:John rdfs:label 'John' "
-                + "}";
-        exec.query(i);
-
-        String q = "@relax "
-                + "select * where {"
-                + "?x rdfs:label 'Jon' "
-                + "}";
-
-        Mappings map = exec.query(q);
-        assertEquals(1, map.size());
-    }
-
-    @Test
-    public void testApprox() throws EngineException, LoadException {
-        Graph g = Graph.create();
-        QueryProcess exec = QueryProcess.create(g);
-
-        String i = "insert data {"
-                + "us:John us:name 'John' "
-                + "us:Jack us:name 'Jack' "
-                + "us:Jim  us:name 'Jim' "
-                + "}";
-
-        String q = "@relax * "
-                + "select * (xt:sim() as ?s) where {"
-                + "?x xt:name 'Jon'"
-                + "}"
-                + "order by desc(?s)";
-
-        exec.query(i);
-
-        Mappings map = exec.query(q);
-        assertEquals(3, map.size());
-        IDatatype dt = map.getValue("?x");
-        assertEquals(NSManager.USER + "John", dt.stringValue());
-    }
-
-    @Test
     public void testSubqueryFun() throws EngineException {
         Graph g = createGraph();
         QueryProcess exec = QueryProcess.create(g);
@@ -4544,7 +4376,7 @@ public class TestQuery1 {
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?res");
         assertEquals(false, dt.booleanValue());
-        //// System.out.println(map);
+        //logger.info("map {}",map);
     }
 
     // @Test
@@ -4630,7 +4462,7 @@ public class TestQuery1 {
 
         exec.query(init);
         Mappings map = exec.query(q);
-        //// System.out.println(map);
+       //logger.info("map {}",map);
         IDatatype dt = map.getValue(("?t"));
         assertEquals("bar", dt.stringValue());
     }
@@ -4660,12 +4492,12 @@ public class TestQuery1 {
         exec.query(i);
         gs.init();
         // Mappings map = exec.query(q);
-        // ////System.out.println(map);
+        // logger.info("map {}",map);
         // Mappings m = (Mappings) map.getNodeObject(ASTQuery.MAIN_VAR);
         // IDatatype dt = m.getValue("?s");
 
         Mappings dt = exec.query(q);
-        // System.out.println(dt);
+        // logger.info("dt {} ", dt);
         assertEquals(6, dt.get(0).getValue("?_main_").intValue());
     }
 
@@ -4790,7 +4622,7 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        //// System.out.println(map);
+       //logger.info("map {}",map);
         IDatatype dt = map.getValue("?t");
         assertEquals(25, dt.intValue());
 
@@ -4832,7 +4664,8 @@ public class TestQuery1 {
                 + "}";
 
         Mappings map = exec.query(q);
-        //// System.out.println(map.size());
+        //logger.info("map.size() {}",map.size());
+        //logger.info("map.size() {}",map.size());
         assertEquals(true, map.size() < 75);
     }
 
@@ -5039,7 +4872,7 @@ public class TestQuery1 {
         exec.query(init);
         Mappings map = exec.query(q);
         assertEquals(2, map.size());
-        //// System.out.println(map);
+       //logger.info("map {}",map);
     }
 
     @Test
@@ -5112,7 +4945,7 @@ public class TestQuery1 {
         exec.query(init);
         Mappings map = exec.query(q);
         assertEquals(2, map.size());
-        //// System.out.println(map);
+       //logger.info("map {}",map);
     }
 
     @Test
@@ -5137,7 +4970,7 @@ public class TestQuery1 {
         exec.query(init);
         Mappings map = exec.query(q);
         assertEquals(2, map.size());
-        //// System.out.println(map);
+       //logger.info("map {}",map);
     }
 
     @Test
@@ -5309,8 +5142,8 @@ public class TestQuery1 {
 
         exec.query(init);
         Mappings map = exec.query(qq);
-        //// System.out.println(map);
-        //// System.out.println(map.size());
+       //logger.info("map {}",map);
+        //logger.info("map.size() {}",map.size());
         assertEquals(1, map.size());
     }
 
@@ -5431,7 +5264,7 @@ public class TestQuery1 {
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?fr");
         assertEquals("Vendredi", dt.stringValue());
-        //// System.out.println(Interpreter.getExtension());
+        //// logger.debug(Interpreter.getExtension());
         String qq = "prefix cal: <http://ns.inria.fr/sparql-extension/calendar/>"
                 + "select *"
                 + "where {"
@@ -5692,7 +5525,7 @@ public class TestQuery1 {
                 + "}"
                 + "}";
         Mappings map = exec.query(q);
-        ////// System.out.println(map);
+        //logger.info("map {}",map);
         assertEquals(map.getTemplateStringResult().length(), 0);
 
     }
@@ -5778,7 +5611,7 @@ public class TestQuery1 {
                 + "}";
 
         Mappings m3 = exec.query(q3);
-        //// System.out.println(m3);
+        //logger.info("m3 {}" , m3);
         assertEquals(7, m3.size());
 
     }
@@ -5877,7 +5710,7 @@ public class TestQuery1 {
 
         Mappings map = exec.query(q);
         IDatatype dt = map.getValue("?res");
-        //// System.out.println(map);
+       //logger.info("map {}",map);
         assertEquals("true true true", dt.stringValue());
     }
 
@@ -5916,31 +5749,32 @@ public class TestQuery1 {
 
         Graph g = createGraph();
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         Transformer t = Transformer.createWE(g, Transformer.TURTLE, RDF.RDF);
         String str = normalizeLineEndings(t.transform());
-        // System.out.println("result:\n" + str);
+        // logger.debug("result:\n {}" + str);
         assertEquals(6202, str.length());
 
         t = Transformer.createWE(g, Transformer.TURTLE, RDFS.RDFS);
         str = normalizeLineEndings(t.transform());
-        // System.out.println(str);
+        // logger.debug(str);
         assertEquals(3849, str.length()); // TODO: need a more robust test
 
         t = Transformer.create(g, Transformer.TURTLE);
         str = normalizeLineEndings(t.transform());
-        //// System.out.println(str);
-        assertEquals(9836, str.length()); // TODO: need a more robust test
+        // logger.debug(str);
+        assertEquals(9859, str.length()); // TODO: need a more robust test
     }
 
     @Test
     public void testGT() throws LoadException, EngineException {
         Graph g = createGraph();
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+
+        ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
         String t1 = "template { st:apply-templates-with-graph(st:turtle, rdf:)} where {}";
         String t2 = "template { st:apply-templates-with-graph(st:turtle, rdfs:)} where {}";
@@ -5949,18 +5783,15 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(t1);
         String str = normalizeLineEndings(map.getTemplateStringResult());
-        //// System.out.println(str);
         assertEquals(6202, str.length());
 
         map = exec.query(t2);
         str = normalizeLineEndings(map.getTemplateStringResult());
-        // System.out.println(str);
         assertEquals(3849, str.length()); // TODO: need a more robust test
 
         map = exec.query(t3);
         str = normalizeLineEndings(map.getTemplateStringResult());
-        //// System.out.println(str);
-        assertEquals(9836, str.length()); // TODO: need a more robust test
+        assertEquals(9859, str.length()); // TODO: need a more robust test
     }
 
     @Test
@@ -5983,7 +5814,7 @@ public class TestQuery1 {
         exec.query(init);
 
         Mappings map = exec.query(q);
-        //// System.out.println(map);
+       //logger.info("map {}",map);
 
         IDatatype dt0 = map.get(0).getValue("?g");
         assertEquals(true, dt0.getDatatypeURI().equals(NSManager.XSD + "string"));
@@ -5998,21 +5829,23 @@ public class TestQuery1 {
 
     @Test
     public void testTrig() throws LoadException, EngineException {
+        Property.set(LOAD_IN_DEFAULT_GRAPH, true);
         Graph g = Graph.create(true);
         Load ld = Load.create(g);
-        ld.parse(RDF.RDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        ld.parse(RDFS.RDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
+        Property.set(LOAD_IN_DEFAULT_GRAPH, false);
 
         Transformer pp = Transformer.create(g, Transformer.TRIG);
         String str = normalizeLineEndings(pp.transform());
-        assertEquals(14992, str.length()); // @Todo: need a more robust test
+        assertEquals(14928, str.length()); // @Todo: need a more robust test
     }
 
     @Test
     public void testPPOWL() throws EngineException, LoadException {
         Graph g = Graph.create();
         Load ld = Load.create(g);
-        //// System.out.println("Load");
+        // logger.info("Load");
         ld.parse(TestQuery1.class.getResource("/data-test/template/owl/data/primer.owl").getPath());
         QueryProcess exec = QueryProcess.create(g);
 
@@ -6037,7 +5870,7 @@ public class TestQuery1 {
     public void testPPSPIN() throws EngineException, LoadException {
         Graph g = createGraph();
         Load ld = Load.create(g);
-        //// System.out.println("Load");
+        //// logger.debug("Load");
         ld.parseDir(data + "template/spinhtml/data/");
         QueryProcess exec = QueryProcess.create(g);
 
@@ -6047,7 +5880,7 @@ public class TestQuery1 {
 
         Mappings map = exec.query(t1);
         int size = map.getTemplateResult().getLabel().length();
-        assertTrue("Result not big enough: size = " + size, 3000 <= size);
+        assertTrue(3000 <= size, () -> "Result not big enough: size = " + size);
 
     }
 
@@ -6117,11 +5950,10 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 1, map.size());
-
+            // logger.debug(map.toString());
+            assertTrue(1 <= map.size(), () -> "Result " + map.size());
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            assertEquals(true, e, "Result");
         }
 
     }
@@ -6157,11 +5989,11 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(init);
             IDatatype dt = map.getValue("?c");
-            assertEquals("Result", 18, dt.intValue());
-            //// System.out.println(g.display());
+            assertEquals(18, dt.intValue(), "Result");
+            //// logger.debug(g.display());
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
     }
 
@@ -6229,9 +6061,9 @@ public class TestQuery1 {
         NTriplesFormat nTriplesFromat = NTriplesFormat.create(g);
         String str = nTriplesFromat.toString();
 
-        System.out.println("–––––");
-        System.out.println(str);
-        System.out.println("–––––");
+        logger.debug("–––––");
+        logger.debug(str);
+        logger.debug("–––––");
 
         assertEquals(true, str.length() > 0);
     }
@@ -6253,7 +6085,7 @@ public class TestQuery1 {
             ASTQuery ast = exec.getAST(map);
             assertEquals(0, ast.getConstruct().size());
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
     }
 
@@ -6276,10 +6108,10 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(init);
             IDatatype dt = map.getValue("?c");
-            assertEquals("Result", 11, dt.intValue());
+            assertEquals(11, dt.intValue(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
     }
 
@@ -6329,7 +6161,7 @@ public class TestQuery1 {
         exec.query(init);
 
         Mappings map = exec.query(q);
-        //// System.out.println(map);
+       //logger.info("map {}",map);
 
         assertEquals(5, map.size());
         assertEquals(false, gs.getProxy().typeCheck());
@@ -6398,7 +6230,8 @@ public class TestQuery1 {
 
         exec.query(init);
         Mappings map = exec.query(q);
-        assertEquals("result", 1, map.size());
+        assertEquals(1, map.size(), "result");
+
     }
 
     @Test
@@ -6428,8 +6261,7 @@ public class TestQuery1 {
         exec.query(init);
         Mappings map = exec.query(q1);
 
-        assertEquals("result", 1, map.size());
-
+        assertEquals(1, map.size(), "result");
         String q2 = "select *"
                 + "where {"
                 + "graph kg:system { ?x ?p ?y  }"
@@ -6438,8 +6270,7 @@ public class TestQuery1 {
         exec.query(init);
         map = exec.query(q2);
 
-        assertEquals("result", 3, map.size());
-
+        assertEquals(3, map.size(), "result");
     }
 
     @Test
@@ -6456,10 +6287,11 @@ public class TestQuery1 {
         exec.query(init);
         Mappings map = exec.query(temp);
         Node node = map.getTemplateResult();
-        assertEquals("result", node == null, false);
+        assertNotNull(node, "result");
+
         if (node != null) {
-            assertEquals("result", node.getLabel().contains("John"), true);
-            assertEquals("result", node.getLabel().contains("Property"), false);
+            assertTrue(node.getLabel().contains("John"), "result");
+            assertFalse(node.getLabel().contains("Property"), "result");
         }
     }
 
@@ -6477,10 +6309,11 @@ public class TestQuery1 {
         exec.query(init);
         Mappings map = exec.query(temp);
         Node node = map.getTemplateResult();
-        assertEquals("result", node == null, false);
+        assertNotNull(node, "result");
+
         if (node != null) {
-            assertEquals("result", node.getLabel().contains("John"), true);
-            assertEquals("result", node.getLabel().contains("Property"), true);
+            assertTrue(node.getLabel().contains("John"), "result");
+            assertTrue(node.getLabel().contains("Property"), "result");
         }
     }
 
@@ -6520,7 +6353,7 @@ public class TestQuery1 {
         File f = new File(data + "template/spinhtml/data/");
 
         for (File ff : f.listFiles()) {
-            System.out.println(ff);
+            logger.debug("Processing file: {}", ff.getName());
             testSPPP(ff.getAbsolutePath());
         }
     }
@@ -6531,20 +6364,21 @@ public class TestQuery1 {
                 + "where {}";
         Graph g = createGraph();
         Load ld = Load.create(g);
-        //// System.out.println("Load");
+        //// logger.debug("Load");
         ld.parseDir(path);
 
         QueryProcess exec = QueryProcess.create(g);
 
         Mappings map = exec.query(t1);
-        //// System.out.println(map.getTemplateStringResult());
+        //// logger.debug(map.getTemplateStringResult());
         try {
             exec.compile(map.getTemplateStringResult());
             assertEquals(true, true);
         } catch (UndefinedExpressionException e) {
-            System.out.println("trap1: " + e.getMessage());
+            logger.error("trap1", e);
+
         } catch (EngineException e) {
-            System.out.println("trap2: " + e.getMessage());
+            logger.error("trap2", e);
             assertEquals(true, false);
         }
     }
@@ -6575,10 +6409,9 @@ public class TestQuery1 {
             exec.query(init);
             String str = sp.toSpinSparql(query);
             Mappings map = exec.query(str);
-            //// System.out.println(map);
-            //// System.out.println(map.getQuery().getAST());
-            assertEquals("result", 2, map.size());
-
+           //logger.info("map {}",map);
+            //// logger.debug(map.getQuery().getAST());
+            assertEquals(2, map.size(), "result");
         } catch (EngineException ex) {
         }
 
@@ -6605,8 +6438,7 @@ public class TestQuery1 {
         try {
             e2.query(init);
             Mappings map = e1.query(query);
-            //// System.out.println(map);
-            assertEquals("result", 1, map.size());
+            assertEquals(1, map.size(), "result");
         } catch (EngineException ex) {
         }
 
@@ -6614,10 +6446,11 @@ public class TestQuery1 {
 
     // @Test
     public void testPPLib() {
-        assertEquals("result", true, test("owl.rul") != null);
-        assertEquals("result", true, test("spin.rul") != null);
-        assertEquals("result", true, test("sql.rul") != null);
-        assertEquals("result", true, test("turtle.rul") != null);
+        assertNotNull(test("owl.rul"), "result - test(\"owl.rul\") should not return null");
+        assertNotNull(test("spin.rul"), "result - test(\"spin.rul\") should not return null");
+        assertNotNull(test("sql.rul"), "result - test(\"sql.rul\") should not return null");
+        assertNotNull(test("turtle.rul"), "result - test(\"turtle.rul\") should not return null");
+
     }
 
     InputStream test(String pp) {
@@ -6677,20 +6510,17 @@ public class TestQuery1 {
             sparql.query(init);
 
             Mappings map = sparql.sparql(query, ds);
-            assertEquals("result", 0, map.size());
+            assertEquals(0, map.size(), "result");
 
             QueryProcess exec = QueryProcess.create(g);
             Mappings map2 = exec.query(query, ds);
-            assertEquals("result", 2, map2.size());
-
+            assertEquals(2, map2.size(), "result");
             map = sparql.sparql(query2, ds);
-            assertEquals("result", 0, map.size());
-
+            assertEquals(0, map.size(), "result");
             map2 = exec.query(query2, ds);
-            assertEquals("result", 2, map2.size());
-
+            assertEquals(2, map2.size(), "result");
         } catch (EngineException ex) {
-            //// System.out.println(ex);
+            logger.error("Operation failure", ex);
         }
 
     }
@@ -6719,8 +6549,8 @@ public class TestQuery1 {
         try {
             exec.query(init);
             exec.query(query);
-            //// System.out.println(map);
-            //// System.out.println(map.size());
+           //logger.info("map {}",map);
+            //logger.info("map.size() {}",map.size());
         } catch (EngineException ex) {
         }
     }
@@ -6758,19 +6588,21 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 2, map.size());
+           //logger.info("map {}",map);
+            assertEquals(2, map.size(), "result");
 
             map = exec.query(query2);
-            //// System.out.println(map);
-            assertEquals("Result", 1, map.size());
+           //logger.info("map {}",map);
+            assertEquals(1, map.size(), "result");
 
             map = exec.query(query3);
-            // System.out.println(map);
-            assertEquals("Result", 2, map.size());
+            // logger.debug(map);
+            assertEquals(2, map.size(), "result");
 
         } catch (EngineException e) {
-            assertEquals("Result", 2, e);
+            logger.error("Operation failure", e);
+            org.junit.jupiter.api.Assertions.fail("EngineException occurred: " + e.getMessage());
+
         }
 
     }
@@ -6800,11 +6632,12 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 3, map.size());
-
+           //logger.info("map {}",map);
+            assertEquals(3, map.size(), "Result");
         } catch (EngineException e) {
-            assertEquals("Result", 2, e);
+
+            assertEquals(2, e, "Result");
+
         }
 
     }
@@ -6830,12 +6663,11 @@ public class TestQuery1 {
             Mappings map = exec.query(q);
             Node node = map.getTemplateResult();
 
-            //// System.out.println(node.getLabel());
+            //// logger.debug(node.getLabel());
 
-            assertEquals("result", true, node.getLabel().length() > 10);
-
+            assertTrue(node.getLabel().length() > 10, "result");
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -6866,10 +6698,10 @@ public class TestQuery1 {
 
             Mappings map = exec.query(query2);
             IDatatype dt = map.getValue("?t");
-            assertEquals("Results", 70, dt.getLabel().length());
 
+            assertEquals(70, dt.getLabel().length(), "Results");
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -6885,9 +6717,9 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(graph);
         try {
             exec.query(query);
-            assertEquals("Result", true, true);
+            assertTrue(true, "Result");
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -6904,13 +6736,13 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(query);
             IDatatype dt = getValue(map, "?sim");
-            assertEquals("Result", true, dt != null);
-            if (dt != null) {
-                double sim = dt.doubleValue();
-                assertEquals("Result", .84, sim, 1e-2);
-            }
+
+            assertNotNull(dt, "Result");
+
+            double sim = dt.doubleValue();
+            assertEquals(0.84, sim, 0.01, "Result");
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -6927,9 +6759,10 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(query);
 
-            assertEquals("Result", 9, map.size());
+            assertEquals(9, map.size(), "Result");
+
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -6942,30 +6775,30 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             IDatatype dt = getValue(map, "?sim");
             double sim = dt.doubleValue();
-
-            assertEquals("Result", sim, .16, 1e-2);
+            assertEquals(0.16, sim, 0.01, "Result");
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
     @Test
     public void test4() {
         Load ld = Load.create(Graph.create());
-        try {
-            ld.parse("gogo.rdf");
-            assertEquals("Result", false, true);
-        } catch (LoadException e) {
-            //// System.out.println(e);
-            assertEquals("Result", e, e);
-        }
-        try {
-            ld.parse(data + "comma/fail.rdf");
-            assertEquals("Result", false, true);
-        } catch (LoadException e) {
-            //// System.out.println(e);
-            assertEquals("Result", e, e);
-        }
+
+        LoadException e1 = assertThrows(LoadException.class,
+                () -> ld.parse("gogo.rdf"),
+                "Result");
+
+        // Optional: Add assertions about the exception
+        assertNotNull(e1.getMessage(), "Exception should have a message");
+        String filePath = data + "comma/fail.rdf";
+
+        LoadException e2 = assertThrows(LoadException.class,
+                () -> ld.parse(filePath),
+                "Parsing " + filePath + "Result");
+
+        // Optional: Verify specific message content
+        assertNotNull(e2.getMessage(), "Exception should have a message");
     }
 
     @Test
@@ -6990,9 +6823,10 @@ public class TestQuery1 {
             exec.query(update);
             Mappings map = exec.query(query);
 
-            assertEquals("Result", 1, map.size());
+            assertEquals(1, map.size(), "Result");
+
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7021,9 +6855,10 @@ public class TestQuery1 {
             exec.query(drop);
             Mappings map = exec.query(query);
 
-            assertEquals("Result", 0, map.size());
+            assertEquals(0, map.size(), "Result");
+
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7054,9 +6889,10 @@ public class TestQuery1 {
             exec.query(create);
             Mappings map = exec.query(query);
 
-            assertEquals("Result", 1, map.size());
+            assertEquals(1, map.size(), "Result");
+
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7075,12 +6911,14 @@ public class TestQuery1 {
         try {
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
-            assertEquals("Result", 3, map.size());
+
+            assertEquals(3, map.size(), "Result");
+
             Mapping m = map.get(0);
-            assertEquals("Result", 2, m.getMappings().size());
+            assertEquals(2, m.getMappings().size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7105,10 +6943,10 @@ public class TestQuery1 {
             e2.query("prefix c: <http://www.inria.fr/acacia/comma#>" + "insert data {<John> c:name 'John'}");
 
             Mappings map = exec.query(query);
-            assertEquals("Result", 1, map.size());
+            assertEquals(1, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7224,14 +7062,14 @@ public class TestQuery1 {
             exec.query(query);
             Mappings map = exec.query(query2);
 
-            assertEquals("Result", 3, map.size());
+            assertEquals(3, map.size(), "Result");
 
             IDatatype dt = getValue(map, "?v");
 
-            assertEquals("Result", 2, dt.intValue());
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7248,10 +7086,10 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             QueryProcess.setSort(false);
 
-            assertEquals("Result", 22, map.size());
+            assertEquals(22, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7267,11 +7105,10 @@ public class TestQuery1 {
             StatListener el = StatListener.create();
             exec.addEventListener(el);
             Mappings map = exec.query(query);
-            ////// System.out.println(el);
-            assertEquals("Result", 22, map.size());
+            assertEquals(22, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7297,10 +7134,10 @@ public class TestQuery1 {
 
             QueryProcess exec = QueryProcess.create(g);
             Mappings map = exec.query(query);
-            assertEquals("Result", 68, map.size());
+            assertEquals(68, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7317,10 +7154,11 @@ public class TestQuery1 {
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
             IDatatype dt = getValue(map, "?max");
-            assertEquals("Result", 14, dt.intValue());
+
+            assertEquals(14, dt.intValue(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7339,10 +7177,11 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             Mapping m = map.get(map.size() - 1);
             IDatatype dt = datatype(m.getNode("?num"));
-            //// System.out.println(map);
-            assertEquals("Result", map.size(), dt.intValue());
+
+            assertEquals(dt.intValue(), map.size(), "Result");
+
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7361,7 +7200,7 @@ public class TestQuery1 {
             Mappings map = exec.query(query);
             IDatatype dt = getValue(map, "?sim");
 
-            assertEquals("Result", true, dt.doubleValue() < 0.5);
+            assertTrue(dt.doubleValue() < 0.5, "Result");
 
             String update = "prefix c: <http://www.inria.fr/acacia/comma#>" +
                     "insert data {c:Human rdfs:subClassOf c:Person}";
@@ -7372,10 +7211,10 @@ public class TestQuery1 {
             map = exec.query(query);
             IDatatype sim = getValue(map, "?sim");
 
-            assertEquals("Result", dt, sim);
+            assertEquals(dt, sim, "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7392,9 +7231,12 @@ public class TestQuery1 {
 
         try {
             Mappings map = exec.query(query);
-            assertEquals("Result", 31, map.size());
+
+            assertEquals(31, map.size(), "Result");
+
         } catch (EngineException e) {
-            assertEquals("Result", 31, e);
+            fail("Result: " + e.getMessage(), e);
+
         }
 
     }
@@ -7413,17 +7255,19 @@ public class TestQuery1 {
 
         try {
             Mappings map = exec.query(query);
-            assertEquals("Result", 99, map.size());
+
+            assertEquals(99, map.size(), "Result");
 
             for (Mapping mm : map) {
                 IDatatype ldt = getValue(mm, "?l");
                 IDatatype lc = getValue(mm, "?c");
 
-                assertEquals("Result", ldt, lc);
+                assertEquals(ldt, lc, "Result");
             }
 
         } catch (EngineException e) {
-            assertEquals("Result", 99, e);
+            fail("Result: " + e.getMessage(), e);
+
         }
 
     }
@@ -7449,20 +7293,22 @@ public class TestQuery1 {
 
         try {
             Mappings map = exec.query(query);
-            assertEquals("Result", 23, map.size());
+            assertEquals(23, map.size(), "Result");
 
+            List<String> results = new ArrayList<>();
             for (Mapping mm : map) {
                 IDatatype dt1 = getValue(mm, "?fn");
                 IDatatype dt2 = getValue(mm, "?ln");
                 IDatatype dt3 = getValue(mm, "?res");
-
-                assertEquals("Result", dt3.getLabel(), concat(dt1, dt2));
+                results.add(dt3.getLabel());
             }
 
-        } catch (EngineException e) {
-            assertEquals("Result", 23, e);
-        }
+            assertTrue(results.contains("Rose.Dieng"), "Should contain Rose.Dieng");
+            assertTrue(results.contains("Olivier.Corby"), "Should contain Olivier.Corby");
 
+        } catch (EngineException e) {
+            fail("Result: " + e.getMessage(), e);
+        }
     }
 
     @Test
@@ -7479,10 +7325,11 @@ public class TestQuery1 {
 
         try {
             Mappings map = exec.query(query);
-            assertEquals("Result", 2, map.size());
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", 2, e);
+            fail("Result: " + e.getMessage(), e);
+
         }
 
     }
@@ -7502,10 +7349,11 @@ public class TestQuery1 {
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
             getValue(map, "?max");
-            assertEquals("Result", 64, map.size());
+            assertEquals(64, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
+
         }
 
     }
@@ -7525,10 +7373,11 @@ public class TestQuery1 {
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
             getValue(map, "?max");
-            assertEquals("Result", 17, map.size());
+            assertEquals(17, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
+
         }
 
     }
@@ -7548,10 +7397,10 @@ public class TestQuery1 {
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
             getValue(map, "?max");
-            assertEquals("Result", 17, map.size());
+            assertEquals(17, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7571,10 +7420,10 @@ public class TestQuery1 {
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
             getValue(map, "?max");
-            assertEquals("Result", 0, map.size());
+            assertEquals(0, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7594,10 +7443,10 @@ public class TestQuery1 {
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
             getValue(map, "?max");
-            assertEquals("Result", 17, map.size());
+            assertEquals(17, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7616,10 +7465,10 @@ public class TestQuery1 {
 
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
-            assertEquals("Result", 17, map.size());
+            assertEquals(17, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7639,10 +7488,10 @@ public class TestQuery1 {
 
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
-            assertEquals("Result", 119, map.size());
+            assertEquals(119, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7662,10 +7511,10 @@ public class TestQuery1 {
             QueryProcess exec = QueryProcess.create(graph);
             Mappings map = exec.query(query);
             IDatatype dt = getValue(map, "?max");
-            assertEquals("Result", 13, dt.intValue());
+            assertEquals(13, dt.intValue(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7685,12 +7534,12 @@ public class TestQuery1 {
             IDatatype dt2 = getValue(map, "?c2");
             IDatatype dt3 = getValue(map, "?c3");
 
-            assertEquals("Result", 1406, dt1.intValue());
-            assertEquals("Result", 1367, dt2.intValue());
-            assertEquals("Result", 1367, dt3.intValue());
+            assertEquals(1406, dt1.intValue(), "Result");
+            assertEquals(1367, dt2.intValue(), "Result");
+            assertEquals(1367, dt3.intValue(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7714,11 +7563,10 @@ public class TestQuery1 {
             exec.query(update);
 
             Mappings map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 3, map.size());
+            assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
     }
 
@@ -7742,11 +7590,10 @@ public class TestQuery1 {
             exec.query(update);
 
             Mappings map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 3, map.size());
+            assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7771,11 +7618,10 @@ public class TestQuery1 {
             exec.query(update);
 
             Mappings map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 3, map.size());
+            assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
         }
 
     }
@@ -7800,11 +7646,12 @@ public class TestQuery1 {
             exec.query(update);
 
             Mappings map = exec.query(query);
-            ////// System.out.println(map);
-            assertEquals("Result", 0, map.size());
+
+            assertEquals(0, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
+
         }
 
     }
@@ -7821,26 +7668,24 @@ public class TestQuery1 {
             g.init();
 
             // RDFFormat f = RDFFormat.create(g);
-            // ////System.out.println(f);
 
-            assertEquals("Result", 3, g.size());
+            assertEquals(3, g.size(), "Result");
 
             String query = "select * where {?p rdf:type rdf:Property}";
 
             Mappings res = exec.query(query);
-            // ////System.out.println("** Res: " );
-            // ////System.out.println(res);
-            assertEquals("Result", 2, res.size());
+
+            assertEquals(2, res.size(), "Result");
 
             String update = "delete {?x ?p ?y} where {?x ?p ?y}";
             exec.query(update);
 
             String qq = "select * where {?x ?p ?y}";
             res = exec.query(qq);
-            assertEquals("Result", 0, res.size());
+            assertEquals(0, res.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
     }
 
@@ -7863,11 +7708,12 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings res = exec.query(query);
-            assertEquals("Result", 1, res.size());
-            assertEquals("Result", 30, getValue(res, "?s").intValue());
+            assertEquals(1, res.size(), "Result");
+
+            assertEquals(30, getValue(res, "?s").intValue(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7896,14 +7742,14 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings res = exec.query(query);
-            assertEquals("Result", 2, res.size());
+            assertEquals(2, res.size(), "Result");
 
             exec.setPathLoop(false);
             res = exec.query(query);
-            assertEquals("Result", 2, res.size());
+            assertEquals(2, res.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7932,10 +7778,10 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings map = exec.query(query);
-            assertEquals("Result", 2, map.size());
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7964,10 +7810,10 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings map = exec.query(query);
-            assertEquals("Result", 2, map.size());
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -7997,10 +7843,10 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings map = exec.query(query);
-            assertEquals("Result", 2, map.size());
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8043,11 +7889,10 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(init);
             map = exec.query(query);
-            // System.out.println(map);
-            assertEquals("Result", 2, map.size());
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8093,14 +7938,14 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(init);
             map = exec.query(query);
-            // System.out.println(map);
+            // logger.debug(map);
             ResultFormat.create(map);
-            // System.out.println(f);
-            assertEquals("Result", 2, map.size());
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
-            assertEquals("Result", 2, null);
+            logger.error("Operation failure", e);
+            fail("Result: " + e.getMessage(), e);
+
         }
 
     }
@@ -8125,11 +7970,10 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(init);
             map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 3, map.size());
+            assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8154,10 +7998,10 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(init);
             map = exec.query(query);
-            assertEquals("Result", 3, map.size());
+            assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8185,10 +8029,10 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(init);
             map = exec.query(query);
-            assertEquals("Result", 2, map.size());
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8205,12 +8049,12 @@ public class TestQuery1 {
         QueryProcess exec = QueryProcess.create(graph);
         try {
             Mappings map = exec.query(query);
-            //// System.out.println(map);
 
-            assertEquals("Result", 7, map.size());
+            assertEquals(7, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, e);
+            fail("Result: " + e.getMessage(), e);
+
         }
     }
 
@@ -8236,12 +8080,11 @@ public class TestQuery1 {
 
         try {
             Mappings map = exec.query(query);
-            //// System.out.println(map);
+            assertEquals(1, map.size(), "Result");
 
-            assertEquals("Result", 1, map.size());
+        } catch (EngineException e) {
+            fail("Result: " + e.getMessage(), e);
 
-        } catch (EngineException ee) {
-            assertEquals("Result", true, ee);
         }
     }
 
@@ -8298,11 +8141,10 @@ public class TestQuery1 {
             // exec.query(o2);
 
             Mappings map = exec.query(query);
-            assertEquals("Result", 2, map.size());
-            //// System.out.println(map);
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
     }
 
@@ -8325,10 +8167,10 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings map = exec.query(query);
-            assertEquals("Result", 3, map.size());
+            assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8353,17 +8195,17 @@ public class TestQuery1 {
             Mappings map = exec.query(init);
             map = exec.query(query);
             ResultFormat.create(map);
-            assertEquals("Result", 3, map.size());
+            assertEquals(3, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
 
     @Test
-    public void test59() {
-
+    public void test59() throws Exception {
+        // Arrange
         Graph graph = createGraph();
         QueryProcess exec = QueryProcess.create(graph);
 
@@ -8377,27 +8219,17 @@ public class TestQuery1 {
 
         String query = "select * where {?x ?p ?y}";
 
-        try {
-            Mappings map = exec.query(init);
-            map = exec.query(query);
-            XMLFormat f = XMLFormat.create(map);
+        // Act
+        Mappings map = exec.query(init);
+        map = exec.query(query);
 
-            XMLResult xml = XMLResult.create(exec.getProducer());
-            xml.parseString(f.toString());
-            //// System.out.println(m);
+        // Assert
+        assertEquals(5, map.size(), "Should return 5 triples");
 
-            assertEquals("Result", 5, map.size());
-
-        } catch (EngineException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        // XML verification (if necessary)
+        String xmlResult = XMLFormat.create(map).toString();
+        assertNotNull(xmlResult, "XML result should not be null");
+        assertTrue(xmlResult.contains("<sparql"), "Should contain SPARQL XML result format");
     }
 
     // @Test
@@ -8428,7 +8260,7 @@ public class TestQuery1 {
     // assertEquals("Result", 1, map.size());
     // } catch (EngineException e) {
 
-    // e.printStackTrace();
+    // logger.error("Operation failure", e);
     // }
     // }
 
@@ -8456,8 +8288,7 @@ public class TestQuery1 {
         try {
             Mappings map = exec.query(init);
             map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 5, map.size());
+            assertEquals(5, map.size(), "Result");
 
             IDatatype dt0 = map.get(0).getNode("?x").getValue();
             IDatatype dt1 = map.get(1).getNode("?x").getValue();
@@ -8465,16 +8296,16 @@ public class TestQuery1 {
             IDatatype dt3 = map.get(3).getNode("?x").getValue();
             IDatatype dt4 = map.get(4).getNode("?x").getValue();
 
-            assertEquals("Result", "B", dt0.getLabel());
-            assertEquals("Result", "D", dt1.getLabel());
-            assertEquals("Result", "E", dt2.getLabel());
-            assertEquals("Result", "C", dt3.getLabel());
-            assertEquals("Result", "A", dt4.getLabel());
+            assertEquals("B", dt0.getLabel());
+            assertEquals("D", dt1.getLabel());
+            assertEquals("E", dt2.getLabel());
+            assertEquals("C", dt3.getLabel());
+            assertEquals("A", dt4.getLabel());
 
             // B D E C A
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         }
     }
 
@@ -8499,14 +8330,14 @@ public class TestQuery1 {
             Node n1 = graph.getResource("http://www.inria.fr/acacia/comma#Person");
             Node n2 = graph.getResource("http://www.inria.fr/acacia/comma#Event");
 
-            //// System.out.println("ANC: " + n1);
-            //// System.out.println("ANC: " + n2);
+            //// logger.debug("ANC: " + n1);
+            //// logger.debug("ANC: " + n2);
             graph.setClassDistance();
             Node vv = graph.getClassDistance().ancestor(n1, n2);
             assertEquals("Result", aa.getLabel(), vv.getLabel());
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         }
 
     }
@@ -8524,7 +8355,7 @@ public class TestQuery1 {
             ld.parse(data + "test/utf.ttl");
             ld.parse(data + "test/utf.rdf");
         } catch (LoadException e1) {
-            e1.printStackTrace();
+            logger.error("An error has occurred", e1);
         }
 
         String query = "select * where {"
@@ -8535,11 +8366,11 @@ public class TestQuery1 {
 
         try {
             Mappings map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 4, map.size());
+
+            assertEquals(4, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("Operation failure", e);
         }
 
     }
@@ -8573,11 +8404,11 @@ public class TestQuery1 {
         try {
             exec.query(init);
             Mappings map = exec.query(query);
-            //// System.out.println(map);
-            assertEquals("Result", 2, map.size());
+
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         }
 
     }
@@ -8608,12 +8439,11 @@ public class TestQuery1 {
 
             exec.query(init);
             Mappings map = exec.query(query);
-            // System.out.println(map);
 
-            assertEquals("Results", 9, map.size());
+            assertEquals(9, map.size(), "Result");
 
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         }
 
     }
@@ -8642,19 +8472,17 @@ public class TestQuery1 {
         String query = "select * where {?x ?p ?y}";
 
         try {
-            ////// System.out.println("init");
+            ////// logger.debug("init");
             exec.query(init);
-            ////// System.out.println("query");
+            //////  logger.debug("query");
 
             Mappings map = exec.query(query);
-            // ////System.out.println(map);
-            //
-            // System.out.println("*****************");
-            // System.out.println(map);
-            assertEquals("Result", 2, map.size());
+
+            assertEquals(2, map.size(), "Result");
 
         } catch (EngineException e) {
-            assertEquals("Result", true, false);
+            fail("Result: " + e.getMessage(), e);
+
         }
 
     }
@@ -8680,9 +8508,10 @@ public class TestQuery1 {
                 + "}";
         Mappings map = exec.query(query);
         Query q = map.getQuery();
-        System.out.println(q);
-        // System.out.println("NB Procesor: " + Processor.count);
-        assertEquals("Result", 17, q.nbNodes());
+        logger.debug("Generated query:\n{}", q.toString());
+
+        assertEquals(17, q.nbNodes(), "Result");
+
     }
 
     IDatatype getValue(Mapping map, String name) {

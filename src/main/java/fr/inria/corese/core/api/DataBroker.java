@@ -1,15 +1,15 @@
 package fr.inria.corese.core.api;
 
 import fr.inria.corese.core.Graph;
-import java.util.List;
-
 import fr.inria.corese.core.NodeImpl;
-import fr.inria.corese.core.logic.RDF;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.logic.RDF;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+
+import java.util.List;
 
 /**
  * Broker between ProducerImpl and graph DataManager

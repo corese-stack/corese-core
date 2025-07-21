@@ -60,8 +60,6 @@ public class MappingComparator {
                 ok = compare(kres, w3cres);
 
                 if (ok) {
-                    //if (kgram.getSelect().size() != w3cres.size()) ok = false;
-
                     for (Node qNode : kgram.getSelect()) {
                         // check that kgram has no additional binding 
                         if (kres.getNode(qNode) != null) {
@@ -81,17 +79,13 @@ public class MappingComparator {
             if (!ok) {
                 result = false;
 
-                System.out.println("** Failure");
                 if (printed == false) {
-                    System.out.println(kgram);
                     printed = true;
                 }
                 for (Node var : w3cres.getQueryNodes()) {
                     // for each w3c variable/value
                     Node val = w3cres.getNode(var);
-                    System.out.println(var + " [" + val + "]");
                 }
-                System.out.println("--");
             }
 
         }
@@ -148,11 +142,7 @@ public class MappingComparator {
             } else {
                 if (!ok) {
                     // compare them at 10^-10
-                    ok
-                            = Math.abs((kdt.doubleValue() - wdt.doubleValue())) < 10e-10;
-                    if (ok) {
-                        System.out.println("** Consider as equal: " + kdt.toSparql() + " = " + wdt.toSparql());
-                    }
+                    ok = Math.abs((kdt.doubleValue() - wdt.doubleValue())) < 10e-10;
                 }
             }
 
@@ -166,9 +156,6 @@ public class MappingComparator {
                 ok = kdt.getDatatype().sameTerm(wdt.getDatatype());
             } else if (kdt.getDatatype() != wdt.getDatatype()){
                 ok = false;
-            }
-            if (!ok) {
-                System.out.println("** Datatype differ: " + kdt.toSparql() + " " + wdt.toSparql());
             }
         }
 

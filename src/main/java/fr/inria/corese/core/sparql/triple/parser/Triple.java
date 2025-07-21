@@ -45,7 +45,7 @@ public class Triple extends Exp implements Pointerable {
     /**
      * logger from log4j
      */
-    private static Logger logger = LoggerFactory.getLogger(Triple.class);
+    private static final Logger logger = LoggerFactory.getLogger(Triple.class);
 
 //	final static String SDT = KeywordPP.SDT;
 //	final static String LANG = KeywordPP.LANG;
@@ -465,8 +465,8 @@ public class Triple extends Exp implements Pointerable {
     
     /**
      * When printing rdf star triple, terms that are nested triples are printed 
-     * as <<s p o>> except in one case: s p o {| q v |}
-     * <<s p o>> is printed by Atom toNestedTriple() 
+     * as &lt;&lt;s p o>> except in one case: s p o {| q v |}
+     * &lt;&lt;s p o>> is printed by Atom toNestedTriple()
      * called by Constant or Variable toString()
      * When printing AST, rdf star triples to be printed are selected by Exp isDisplayable()
      * hence we do not print here every physical triple in a BGP 
@@ -914,10 +914,7 @@ public class Triple extends Exp implements Pointerable {
 
     @Override
     public boolean validateDelete() {
-        if (subject.isBlankNode()||object.isBlankNode()) {
-            return false;
-        }
-        return true;
+        return !subject.isBlankNode() && !object.isBlankNode();
     }
 
     public boolean contains(Atom at) {

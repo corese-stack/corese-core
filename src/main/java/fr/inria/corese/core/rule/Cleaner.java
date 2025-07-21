@@ -1,23 +1,22 @@
 package fr.inria.corese.core.rule;
 
-import static fr.inria.corese.core.util.Property.Value.LOG_RULE_CLEAN;
-import static fr.inria.corese.core.util.Property.Value.OWL_CLEAN_QUERY;
-
-import java.io.IOException;
-import java.util.Date;
-
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.load.QueryLoad;
-import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.kgram.api.query.Evaluator;
 import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.load.QueryLoad;
+import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.util.Property;
+
+import java.io.IOException;
+
+import static fr.inria.corese.core.util.Property.Value.LOG_RULE_CLEAN;
+import static fr.inria.corese.core.util.Property.Value.OWL_CLEAN_QUERY;
 
 /**
  * Remove redundant bnodes from an RDF/OWL graph
@@ -26,7 +25,9 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
  *
  */
 public class Cleaner {
-    public static final int OWL = 0;
+    public enum Mode {
+        OWL
+    }
     static final String data = "/query/clean/";
     static final String[] queries = { "allsome.rq", "card.rq", "intersection.rq", "union.rq" };
 
@@ -44,12 +45,9 @@ public class Cleaner {
         graph = g;
     }
 
-    void clean(int mode) throws IOException, EngineException, LoadException {
-        switch (mode) {
-
-            case OWL:
-                process();
-                break;
+    void clean(Mode mode) throws IOException, EngineException, LoadException {
+        if (mode == Mode.OWL) {
+            process();
         }
     }
 
@@ -65,7 +63,6 @@ public class Cleaner {
      * by same bnode
      */
     void clean(Graph g, String[] lq, boolean resource) throws IOException, EngineException, LoadException {
-        Date d1 = new Date();
         QueryLoad ql = QueryLoad.create();
         QueryProcess exec = QueryProcess.create(g, getDataManager());
         // escape QueryProcess write lock in case
@@ -78,7 +75,6 @@ public class Cleaner {
         }
         for (String q : lq) {
             String qq = (resource) ? ql.getResource(data + q) : ql.readWE(q);
-             try {
            Mappings map = exec.query(qq, createMapping(getVisitor()));
              
              if (Property.getBooleanValue(LOG_RULE_CLEAN) && map.size() > 0) {
@@ -88,14 +84,7 @@ public class Cleaner {
             if (isDebug()) {
                 RuleEngine.logger.info(q + " nb res: " + map.size());
             }
-            }
-             catch(Exception e){
-                 RuleEngine.logger.equals(e);
-                 throw e;
-             }
         }
-        Date d2 = new Date();
-        System.out.println("Clean: " + ((d2.getTime() - d1.getTime()) / 1000.0));
     }
 
     Mapping createMapping(ProcessVisitor vis) {
@@ -118,11 +107,11 @@ public class Cleaner {
         // remove triples with obsolete bnodes as subject
         String clean = ql.getResource("/query/clean.rq");
         // tell Transformer to cache st:hash transformation result
-        exec.getEvaluator().setMode(Evaluator.CACHE_MODE);
+        exec.getEvaluator().setMode(Evaluator.Mode.CACHE_MODE);
         // replace duplicate OWL expressions by one of them
-        Mappings m1 = exec.query(unify);
-        Mappings m2 = exec.query(clean);
-        exec.getEvaluator().setMode(Evaluator.NO_CACHE_MODE);
+        exec.query(unify);
+        exec.query(clean);
+        exec.getEvaluator().setMode(Evaluator.Mode.NO_CACHE_MODE);
     }
 
     /**

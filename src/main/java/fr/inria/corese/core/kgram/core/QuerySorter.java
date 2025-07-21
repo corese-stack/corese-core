@@ -19,8 +19,8 @@ import java.util.List;
  */
 public class QuerySorter implements ExpType {
 
-    private boolean isSort = true;
-    private boolean testJoin = false;
+    private final boolean isSort = true;
+    private final boolean testJoin = false;
 
     private Sorter sort;
     private Query query;
@@ -88,7 +88,7 @@ public class QuerySorter implements ExpType {
      * the List of variables already bound
      */
     Exp compile(Exp exp, VString varList, boolean option) {
-        int type = exp.type();
+        Type type = exp.type();
         switch (type) {
 
             case EDGE:
@@ -120,7 +120,7 @@ public class QuerySorter implements ExpType {
             // continue with subquery body
             default:
 
-                if (type == OPTIONAL || type == UNION || type == MINUS) {
+                if (type == Type.OPTIONAL || type == Type.UNION || type == Type.MINUS) {
                     option = true;
                 }
 
@@ -149,7 +149,7 @@ public class QuerySorter implements ExpType {
 
                 varList.clear(size);
 
-                if (testJoin && exp.type() == AND) {
+                if (testJoin && exp.type() == Type.AND) {
                     // group in separate BGP statements that are not connected
                     // by variables
                     // generate a JOIN between BGP.
@@ -268,13 +268,13 @@ public class QuerySorter implements ExpType {
     void setBind(Exp exp, List<Exp> bindings) {
         for (Exp bid : bindings) {
             Node n = bid.get(0).getNode();
-            if (bid.type() == OPT_BIND
+            if (bid.type() == ExpType.Type.OPT_BIND
                     // no bind (?x = ?y) in case of JOIN
                     && (!Query.testJoin || bid.isBindCst())) {
 
                 for (Exp g : exp) {
                     if (((g.isEdge() || g.isPath()) && g.getEdge().contains(n))
-                            && (bid.isBindCst() ? g.bind(bid.first().getNode()) : true)) {
+                            && (!bid.isBindCst() || g.bind(bid.first().getNode()))) {
                         if (g.getBind() == null) {
                             bid.status(true);
                             g.setBind(bid);
@@ -302,9 +302,6 @@ public class QuerySorter implements ExpType {
     void compile(Expr exp, VString lVar, boolean opt) {
         if (exp.oper() == ExprType.EXIST) {
             compile(getQuery().getPattern(exp), lVar, opt);
-            if (getQuery().isValidate()) {
-                System.out.println("QuerySorter exists: \n" + getQuery().getPattern(exp));
-            }
         } else {
             for (Expr ee : exp.getExpList()) {
                 compile(ee, lVar, opt);
@@ -390,7 +387,7 @@ public class QuerySorter implements ExpType {
     }
 
     /**
-     * Identify remarkable filter ?x < ?y ?x = ?y or ?x = cst or !bound() filter
+     * Identify remarkable filter ?x &lt; ?y ?x = ?y or ?x = cst or !bound() filter
      * is tagged
      */
     public List<Exp> findBindings(Exp exp) {
@@ -430,8 +427,8 @@ public class QuerySorter implements ExpType {
     
     boolean isService(Exp exp) {
         switch (exp.type()) {
-            case Exp.SERVICE: return true;
-            case Exp.UNION:  return unionService(exp);
+            case SERVICE: return true;
+            case UNION:  return unionService(exp);
         }
         return false;
     }
@@ -464,7 +461,7 @@ public class QuerySorter implements ExpType {
         int count = 0;
         int i = 0;
 
-        Exp and = Exp.create(Exp.AND);
+        Exp and = Exp.create(ExpType.Type.AND);
 
         while (count < nbService) {
             // there are services
@@ -481,8 +478,8 @@ public class QuerySorter implements ExpType {
             if (and.size() == 0) {
                 and.add(exp.get(i));
             } else {
-                Exp join = Exp.create(Exp.JOIN, and, exp.get(i));
-                and = Exp.create(Exp.AND);
+                Exp join = Exp.create(ExpType.Type.JOIN, and, exp.get(i));
+                and = Exp.create(ExpType.Type.AND);
                 and.add(join);
             }
 

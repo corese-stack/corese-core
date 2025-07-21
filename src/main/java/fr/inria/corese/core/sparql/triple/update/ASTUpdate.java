@@ -24,7 +24,7 @@ public class ASTUpdate {
 
     ASTUpdate() {
         list = new ArrayList<Update>();
-        prolog = Basic.create(Update.PROLOG);
+        prolog = Basic.create(Update.Keyword.PROLOG);
     }
 
     public static ASTUpdate create() {
@@ -47,7 +47,7 @@ public class ASTUpdate {
     public ASTBuffer toString(ASTBuffer sb) {
         for (Update ast : list) {
             ast.toString(sb);
-            if (ast.type() != Update.PROLOG) {
+            if (ast.type() != Update.Keyword.PROLOG) {
                 sb.append(PV);
                 sb.nl();
             }
@@ -164,7 +164,7 @@ public class ASTUpdate {
             NSManager nsm = getNSM().copy();
             prolog.setLocalNSM(nsm);
             add(prolog);
-            prolog = Basic.create(Update.PROLOG);
+            prolog = Basic.create(Update.Keyword.PROLOG);
         }
     }
 

@@ -1,68 +1,69 @@
 package fr.inria.corese.core.extension;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.query.PluginImpl;
-import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.PointerType;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.query.PluginImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import fr.inria.corese.core.sparql.triple.function.core.FunctionEvaluator;
 import fr.inria.corese.core.sparql.triple.function.extension.IOFunction;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.transform.Transformer;
+
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Super class for Java extension function class 
- * public class Myclass extends Core 
+ * Super class for Java extension function class
+ * public class Myclass extends Core
  * Extension function called with prefix:
  * function://fr.inria.corese.core.extension.Myclass
  * See sparql.triple.function.core.Extern
- * 
+ * <p>
  * Use case: JavaCompiler compiles SHACL Interpreter
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2017-2019
  */
 public class Core extends PluginImpl implements FunctionEvaluator {
 
+    private static final Logger logger = LoggerFactory.getLogger(Core.class);
+
     private static final String MSH = "http://ns.inria.fr/shacl/";
     static Class<IDatatype>[][] signature;
     static HashMap<String, String> prefix;
-    HashMap <String, String> functionName;
 
     static {
         init();
+    }
+
+    HashMap<String, String> functionName;
+
+    public Core() {
+        functionName = new HashMap<>();
+        defFunction();
     }
 
     static void init() {
         defSignature();
         defNamespace();
     }
-    
-    public Core() {
-        functionName = new HashMap<>();
-        defFunction();
-    }
-    
+
     static HashMap<String, String> getPrefix() {
         return prefix;
     }
-    
+
     static void define(String pref, String ns) {
         prefix.put(pref, ns);
     }
-    
+
     /**
      * Define prefix namespace for funcall(sh:fun)
      * because functions are defined as sh_fun()
@@ -72,7 +73,7 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         define("sh", NSManager.SHAPE);
         define("msh", MSH);
     }
-    
+
     static void defSignature() {
         signature = new Class[20][];
         for (int i = 0; i < signature.length; i++) {
@@ -81,26 +82,21 @@ public class Core extends PluginImpl implements FunctionEvaluator {
             signature[i] = sig;
         }
     }
-    
+
     void defFunction() {
-        functionName.put(NSManager.EXT+"member", "member");
+        functionName.put(NSManager.EXT + "member", "member");
     }
 
     @Override
     public void setProducer(Producer producer) {
         super.setProducer(producer);
     }
-    
+
     @Override
     public void setEnvironment(Environment env) {
         super.setEnvironment(env);
     }
-    
-    
-    
-    
-    
-    
+
 
     /**
      * Mappings map Return value of var in first Mapping Use case: bind (exists
@@ -114,21 +110,11 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         if (map.size() == 0) {
             return null;
         }
-        return  map.getValue(var.getLabel());
-    }
-
-    IDatatype xt_print(IDatatype... dt) {
-        for (IDatatype val : dt) {
-            System.out.print(dt);
-            System.out.println(" ");
-        }
-        System.out.println();
-        return TRUE;
+        return map.getValue(var.getLabel());
     }
 
     IDatatype xt_load(IDatatype... dt) {
         try {
-            //return new GraphSpecificFunction("load").load(this, dt, null, null, Level.DEFAULT);
             return load(null, dt[0], null, null, null, Level.USER_DEFAULT);
         } catch (SafetyException ex) {
             logger.error(ex.getMessage());
@@ -147,23 +133,6 @@ public class Core extends PluginImpl implements FunctionEvaluator {
     IDatatype xt_value(IDatatype s, IDatatype p) {
         return value(null, getProducer(), null, s, p, 1);
     }
-
-//    IDatatype xt_objects(IDatatype s, IDatatype p) {
-//        return enumerate(s, p, null, 1);
-//    }
-//
-//    IDatatype xt_subjects(IDatatype p, IDatatype o) {
-//        return enumerate(null, p, o, 0);
-//    }
-//
-//    IDatatype enumerate(IDatatype s, IDatatype p, IDatatype o, int n) {
-//        ArrayList<IDatatype> list = new ArrayList<>();
-//        for (IDatatype dt : edge(null, getProducer(), s, p, o)) {
-//            Edge edge = dt.getPointerObject().getEdge();
-//            list.add( edge.getNode(n).getDatatypeValue());
-//        }
-//        return DatatypeMap.newList(list);
-//    }
 
     IDatatype xt_insert(IDatatype... ldt) {
         return insert(null, getProducer(), ldt);
@@ -185,14 +154,14 @@ public class Core extends PluginImpl implements FunctionEvaluator {
                 Transformer t = Transformer.create(getGraph(x), Transformer.TURTLE);
                 return t.process();
             } catch (EngineException ex) {
-                Logger.getLogger(Core.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                logger.error("An unexpected error has occurred", ex);
             }
         } else {
             Transformer t = Transformer.create(getGraph(), Transformer.TURTLE);
             try {
                 return t.process(x);
             } catch (EngineException ex) {
-                Logger.getLogger(Core.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                logger.error("An unexpected error has occurred", ex);
             }
         }
         return x;
@@ -203,21 +172,11 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         try {
             return t.process(x);
         } catch (EngineException ex) {
-            Logger.getLogger(Core.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return x;
     }
-    
 
-
-    void trace(Object... lobj) {
-        for (Object obj : lobj) {
-            System.out.print(obj);
-            System.out.print(" ");
-        }
-        System.out.println("");
-    }
-    
     /**
      * funcall(sh:shacl)
      * ->
@@ -235,38 +194,28 @@ public class Core extends PluginImpl implements FunctionEvaluator {
                     return name;
                 }
             }
-        }
-        else {
+        } else {
             return name;
         }
-        //functionName.put(str, str);
         return str;
     }
-    
+
     public HashMap<String, String> getFunctionName() {
         return functionName;
     }
-    
-   public void trace() {
-        HashMap<String, String> map = getFunctionName();
-        int i = 0;
-        for (String key : map.keySet()) {
-            System.out.println(i++ + " " + map.get(key));
-        }
-    }
-   
-   public IDatatype safe(IDatatype dt) {
-       return (dt == null) ? FALSE : TRUE;
-   }
 
-   // rq:gt -> gt
-   String datatypeName(String name) {
-       if (name.startsWith(NSManager.SPARQL)) {
-           return name.substring(NSManager.SPARQL.length());
-       }
-       return null;
-   }
-   
+    public IDatatype safe(IDatatype dt) {
+        return (dt == null) ? DatatypeMap.FALSE : DatatypeMap.TRUE;
+    }
+
+    // rq:gt -> gt
+    String datatypeName(String name) {
+        if (name.startsWith(NSManager.SPARQL)) {
+            return name.substring(NSManager.SPARQL.length());
+        }
+        return null;
+    }
+
 
     void prepare(IDatatype[] ldt) {
         for (int i = 1; i < ldt.length; i++) {
@@ -276,8 +225,6 @@ public class Core extends PluginImpl implements FunctionEvaluator {
             }
         }
     }
-
-  
 
 
     IDatatype dt_list(IDatatype dt) {
@@ -302,10 +249,6 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         return new IOFunction("validURI").validURI(dt);
     }
 
-//    IDatatype xt_sparql(IDatatype q, IDatatype... dt) {
-//        return kgram(q, dt);
-//    }
-
     IDatatype xt_replace(IDatatype str, IDatatype x, IDatatype y) {
         return DatatypeMap.newInstance(str.getLabel().replace(x.getLabel(), y.getLabel()));
     }
@@ -322,6 +265,5 @@ public class Core extends PluginImpl implements FunctionEvaluator {
         return xt_turtle(dt);
     }
 
-   
 
 }

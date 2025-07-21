@@ -1,32 +1,29 @@
 package fr.inria.corese.core.rule;
 
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.printer.SPIN;
+import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
-import java.util.List;
-
-import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.logic.Closure;
-import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
-import fr.inria.corese.core.util.SPINProcess;
+import fr.inria.corese.core.logic.Closure;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.core.UUIDFunction;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.printer.SPIN;
+import fr.inria.corese.core.util.SPINProcess;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class Rule {
     public static final String RULE_TYPE = NSManager.RULE + "rule";
     public static final String CONSTRAINT_TYPE = NSManager.RULE + "constraint";
     public static final String AXIOM = NSManager.OWL + "propertyChainAxiom";
-
-    static String TRANS_QUERY = "";
-    static String TRANS_PSEUDO_QUERY = "";
     static final String TPVAR = "?t";
     static final int UNDEF = -1;
     static final int DEFAULT = 0;
@@ -37,21 +34,9 @@ public class Rule {
     static final int GENERIC_TRANSITIVE = 2;
     // s type c2 where s type c1 . c1 subClassOf c2
     static final int PSEUDO_TRANSITIVE = 3;
+    static String TRANS_QUERY = "";
+    static String TRANS_PSEUDO_QUERY = "";
     static int COUNT = 0;
-    Query query;
-    List<Node> predicates;
-    private Closure closure;
-    private Record record;
-    String name;
-    int num;
-    private double time = 0.0;
-    int rtype = UNDEF;
-    private boolean isGeneric = false;
-    private boolean isClosure = false;
-    private Node provenance;
-    private String type = RULE_TYPE;
-    private boolean constraint = false;
-    private boolean optimize = true;
 
     static {
         try {
@@ -59,47 +44,53 @@ public class Rule {
             TRANS_QUERY = ql.readWE(Rule.class.getResourceAsStream("/query/transitive.rq"));
             TRANS_PSEUDO_QUERY = ql.readWE(Rule.class.getResourceAsStream("/query/transitivepseudo.rq"));
         } catch (LoadException ex) {
-            LoggerFactory.getLogger(Rule.class.getName()).error( "", ex);
+            LoggerFactory.getLogger(Rule.class.getName()).error("", ex);
         }
     }
+
+    Query query;
+    List<Node> predicates;
+    String name;
+    int num;
+    int rtype = UNDEF;
+    private Closure closure;
+    private Record ruleRecord;
+    private double time = 0.0;
+    private boolean isGeneric = false;
+    private boolean isClosure = false;
+    private Node provenance;
+    private String type = RULE_TYPE;
+    private boolean constraint = false;
+    private boolean optimize = true;
 
     public Rule(String n, Query q) {
         query = q;
         name = n;
         q.setURI(n);
     }
-    
+
     public Rule(String n, Query q, String type) {
         this(n, q);
-        if (type != null){
+        if (type != null) {
             setRuleType(type);
             setConstraint(type.equals(CONSTRAINT_TYPE));
         }
-//        if (n!=null){
-//            //@todo : clean with slot mode = basic
-//            if (n.equals(AXIOM)){
-//                setOptimize(false);
-//            }
-//        }
     }
 
     public static Rule create(String n, Query q) {
-        Rule r = new Rule(n, q);
-        return r;
+        return new Rule(n, q);
     }
-    
+
     public static Rule create(String n, Query q, String type) {
-        Rule r = new Rule(n, q, type);
-        return r;
+        return new Rule(n, q, type);
     }
 
     public static Rule create(Query q) {
-        Rule r = new Rule(UUIDFunction.getUUID(), q);
-        return r;
+        return new Rule(UUIDFunction.getUUID(), q);
     }
-    
-    String toGraph(){
-        ASTQuery ast =  getQuery().getAST();
+
+    String toGraph() {
+        ASTQuery ast = getQuery().getAST();
         SPIN sp = SPIN.create();
         sp.visit(ast, "kg:r" + getIndex());
         return sp.toString();
@@ -107,10 +98,6 @@ public class Rule {
 
     void set(List<Node> list) {
         predicates = list;
-    }
-    
-    boolean isDebug() {
-        return getQuery().isDebug();
     }
 
     List<Node> getPredicates() {
@@ -132,8 +119,8 @@ public class Rule {
     public int getIndex() {
         return num;
     }
-    
-    public void setIndex(int n){
+
+    public void setIndex(int n) {
         num = n;
     }
 
@@ -145,12 +132,12 @@ public class Rule {
         return -1;
     }
 
-    void setGeneric(boolean b) {
-        isGeneric = true;
-    }
-
     public boolean isGeneric() {
         return isGeneric;
+    }
+
+    void setGeneric(boolean b) {
+        isGeneric = true;
     }
 
     public int type() {
@@ -179,8 +166,7 @@ public class Rule {
                     // with ?p a owl:TransitiveProperty
                     res = GENERIC_TRANSITIVE;
                 }
-            } 
-            else {
+            } else {
                 map = exec.query(TRANS_PSEUDO_QUERY);
                 if (map.size() > 0) {
                     // s type c2 where s type c1 . c1 subClassOf c2
@@ -190,7 +176,6 @@ public class Rule {
             return res;
 
         } catch (EngineException ex) {
-            System.out.println("R: error:  " + getAST());
             return DEFAULT;
         }
 
@@ -224,29 +209,25 @@ public class Rule {
     }
 
     public boolean isPseudoTransitive() {
-        return (type() == PSEUDO_TRANSITIVE); 
+        return (type() == PSEUDO_TRANSITIVE);
     }
-    
+
     /**
-     * this = x type c2        :- x type c1        & c1 subclassof c2
-     * r    = c1 subclassof c3 :- c1 subclassof c2 & c2 subclassof c3
+     * this = x type c2        :- x type c1        &amp; c1 subclassof c2
+     * r    = c1 subclassof c3 :- c1 subclassof c2 &amp; c2 subclassof c3
      */
     public boolean isPseudoTransitive(Rule r) {
-        if (isPseudoTransitive() && r.isTransitive()){            
-            Node p  = r.getUniquePredicate();
-            Node pp = getQuery().getBody().get(1).getEdge().getEdgeNode();                      
+        if (isPseudoTransitive() && r.isTransitive()) {
+            Node p = r.getUniquePredicate();
+            Node pp = getQuery().getBody().get(1).getEdge().getEdgeNode();
             return p.equals(pp);
         }
         return false;
     }
-    
+
 
     public boolean isClosure() {
         return isClosure;
-    }
-
-    public void setClosure(boolean b) {
-        isClosure = b;
     }
 
     public Node getPredicate(int i) {
@@ -271,6 +252,10 @@ public class Rule {
         return closure;
     }
 
+    public void setClosure(boolean b) {
+        isClosure = b;
+    }
+
     /**
      * @param closure the closure to set
      */
@@ -280,7 +265,7 @@ public class Rule {
 
     public void clean() {
         closure = null;
-        record = null;
+        ruleRecord = null;
     }
 
     /**
@@ -314,15 +299,19 @@ public class Rule {
     /**
      * @return the record
      */
-    public Record getRecord() {
-        return record;
+    public Record getRuleRecord() {
+        return ruleRecord;
     }
 
     /**
-     * @param record the record to set
+     * @param ruleRecord the record to set
      */
-    public void setRecord(Record record) {
-        this.record = record;
+    public void setRuleRecord(Record ruleRecord) {
+        this.ruleRecord = ruleRecord;
+    }
+
+    public String getRuleType() {
+        return type;
     }
 
     /**
@@ -330,10 +319,6 @@ public class Rule {
      */
     public void setRuleType(String type) {
         this.type = type;
-    }
-    
-    public String getRuleType() {
-        return  type;
     }
 
     /**

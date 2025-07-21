@@ -1,28 +1,16 @@
 package fr.inria.corese.core.rule;
 
-import static fr.inria.corese.core.rule.RuleEngine.Profile.OWLRL;
-import static fr.inria.corese.core.rule.RuleEngine.Profile.OWLRL_EXT;
-import static fr.inria.corese.core.rule.RuleEngine.Profile.OWLRL_LITE;
-import static fr.inria.corese.core.rule.RuleEngine.Profile.RDFS;
-import static fr.inria.corese.core.rule.RuleEngine.Profile.STDRL;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-
-import fr.inria.corese.core.api.Loader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.EventManager;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.api.Engine;
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.query.Graphable;
+import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.*;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
@@ -33,34 +21,29 @@ import fr.inria.corese.core.query.Construct;
 import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.query.update.GraphManager;
-import static fr.inria.corese.core.rule.RuleEngine.Profile.OWLRL_TEST;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.util.Property;
-import fr.inria.corese.core.util.Tool;
-import fr.inria.corese.core.visitor.solver.QuerySolverVisitorRule;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.query.Graphable;
-import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.core.kgram.core.Distinct;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.kgram.core.Sorter;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.core.UUIDFunction;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.sparql.triple.parser.AccessRight;
-import fr.inria.corese.core.sparql.triple.parser.Context;
-import fr.inria.corese.core.sparql.triple.parser.Dataset;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.printer.SPIN;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.util.Property;
+import fr.inria.corese.core.visitor.solver.QuerySolverVisitorRule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+
+import static fr.inria.corese.core.rule.RuleEngine.Profile.*;
 
 /**
  * Forward Rule Engine
@@ -72,40 +55,36 @@ import fr.inria.corese.core.sparql.triple.printer.SPIN;
  * Focus on new triples using specific Graph Index sorted by timestamp
  * Eval transitive rule at saturation using specific Java code
  * Eval pseudo transitive rule just after it's transitive rule
- * (cf rdf:type & rdfs:subClassOf)
- * 
+ * (cf rdf:type &amp; rdfs:subClassOf)
+ * <p>
  * OWL_RL profile load specific rule base
- * 
+ *
  * @author Olivier Corby, Edelweiss INRIA 2011
- *         Wimmics INRIA I3S, 2014
+ * Wimmics INRIA I3S, 2014
  */
 public class RuleEngine implements Engine, Graphable {
 
+    public enum ProfileType {
+        OWL_RL_FULL, STD, OWL_RL, OWL_RL_LITE, OWL_RL_EXT, OWL_RL_TEST, RDFS_RL
+    }
+
+    public static final Logger logger = LoggerFactory.getLogger(RuleEngine.class);
     static final String NL = "\n";
     static final String OWL_RL_PROFILE = NSManager.OWL_RL_PROFILE;
-    public static final int OWL_RL_FULL = -1;
-    public static final int STD = 0;
-    public static final int OWL_RL = 1;
-    public static final int OWL_RL_LITE = 2;
-    public static final int OWL_RL_EXT = 3;
-    public static final int OWL_RL_TEST = 4;
-    public static final int RDFS_RL = 5;
     public static boolean OWL_CLEAN = true;
-    public static boolean RULE_DATAMANAGER_OPTIMIZE = false; 
-
-    private static final String UNKNOWN = "unknown";
-    public static Logger logger = LoggerFactory.getLogger(RuleEngine.class);
+    public static boolean RULE_DATAMANAGER_OPTIMIZE = false;
     Graph graph;
+    QueryProcess exec;
+    List<Record> records;
+    STable stable;
+    Profile profile = STDRL;
     private GraphManager graphManager;
     private DataManager dataManager;
-    QueryProcess exec;
     private QueryEngine qengine;
     private List<Rule> rules;
     private Rule rule;
-    List<Record> records;
     private Object spinGraph;
     private Dataset ds;
-    STable stable;
     // check that kgram solutions contain a newly entailed edge
     private ResultWatcher resultWatcher;
     // kgram ResultListener create edges instead of create Mappings
@@ -120,12 +99,7 @@ public class RuleEngine implements Engine, Graphable {
     // true when a set of optimizations is possible, e.g. with std graph
     // false with DataManager
     private boolean optimizable = true;
-    private boolean debug = false;
-    boolean trace = false;
-    private boolean simpleTrace = false;
     private boolean test = false;
-    // int loop = 0;
-    Profile profile = STDRL;
     private boolean isActivate = true;
     // optimize transitive rule
     private boolean isOptTransitive = false;
@@ -134,41 +108,17 @@ public class RuleEngine implements Engine, Graphable {
     private boolean optimizeRuleDataManager = RULE_DATAMANAGER_OPTIMIZE;
     // closure specific connectivity test: set it to false (too expensive)
     private boolean isConnect = false;
-    // private boolean isDuplicate = false;
+
     private boolean isSkipPath = false;
     private boolean synchronize = false;
     private boolean event = true;
-    private boolean record = false;
+    private boolean isRecord = false;
     private Context context;
     private ProcessVisitor visitor;
     private String base;
     private Level level = Level.USER_DEFAULT;
     private AccessRight accessRight;
     private List<RuleError> errorList;
-
-    public enum Profile {
-
-        STDRL,
-        OWLRL("/rule/owlrl.rul"),
-        OWLRL_TEST("/rule/owlrltest.rul"),
-        OWLRL_LITE("/rule/owlrllite.rul"),
-        OWLRL_EXT("/rule/owlrlext.rul"),
-        RDFS("/rule/rdfs.rul");
-
-        String path;
-
-        Profile() {
-        }
-
-        Profile(String path) {
-            this.path = path;
-        }
-
-        String getPath() {
-            return path;
-        }
-
-    };
 
     public RuleEngine() {
         rules = new ArrayList<>();
@@ -209,6 +159,10 @@ public class RuleEngine implements Engine, Graphable {
         return eng;
     }
 
+    public static String getRuleID() {
+        return UUIDFunction.getUUID();
+    }
+
     void set(Graph g) {
         graph = g;
     }
@@ -220,22 +174,6 @@ public class RuleEngine implements Engine, Graphable {
     public void set(QueryProcess p) {
         exec = p;
         p.setListPath(true);
-    }
-
-    public void setProfile(Profile p) throws LoadException {
-        profile = p;
-        loadProfile(p);
-    }
-
-    public void setProfile(String p) throws LoadException {
-        switch (p) {
-            case OWL_RL_PROFILE:
-                setProfile(OWL_RL);
-                break;
-
-            default:
-                throw new LoadException(new EngineException("Undefined Rule Base: " + p));
-        }
     }
 
     void loadProfile(Profile p) throws LoadException {
@@ -262,7 +200,7 @@ public class RuleEngine implements Engine, Graphable {
      * setProfile(OWL_RL) load OWL RL rule base and clean the OWL/RDF graph
      * 
      */
-    public void setProfile(int n) {
+    public void setProfile(ProfileType n) {
         try {
             switch (n) {
                 case OWL_RL:
@@ -313,7 +251,7 @@ public class RuleEngine implements Engine, Graphable {
     }
 
     /**
-     * 
+     *
      */
     public void optimizeOWLRL() {
         if (isOptimizable()) {
@@ -335,12 +273,11 @@ public class RuleEngine implements Engine, Graphable {
      */
     public void cleanOWL() throws IOException, EngineException, LoadException {
         Cleaner cl = new Cleaner(getGraphStore(), getDataManager());
-        cl.setDebug(isDebug());
         if (isEvent()) {
             cl.setVisitor(getVisitor());
         }
         beforeClean();
-        cl.clean(Cleaner.OWL);
+        cl.clean(Cleaner.Mode.OWL);
         afterClean();
     }
 
@@ -361,6 +298,19 @@ public class RuleEngine implements Engine, Graphable {
 
     public Profile getProfile() {
         return profile;
+    }
+
+    public void setProfile(Profile p) throws LoadException {
+        profile = p;
+        loadProfile(p);
+    }
+
+    public void setProfile(String p) throws LoadException {
+        if (OWL_RL_PROFILE.equals(p)) {
+            setProfile(OWLRL);
+        } else {
+            throw new LoadException(new EngineException("Undefined Rule Base: " + p));
+        }
     }
 
     public QueryProcess getQueryProcess() {
@@ -384,9 +334,7 @@ public class RuleEngine implements Engine, Graphable {
         setOptimize(b);
         setConstructResult(b);
         setOptTransitive(b);
-        //setFunTransitive(b);
-        if (getDataManager()==null) {
-            //setOptTransitive(b);
+        if (getDataManager() == null) {
             setFunTransitive(b);
         }
         getQueryProcess().setListPath(b);
@@ -397,12 +345,7 @@ public class RuleEngine implements Engine, Graphable {
         return DatatypeMap.TRUE;
     }
 
-    public void setTrace(boolean b) {
-        trace = b;
-    }
-
     /**
-     * 
      * @return true if there is no Constraint Violation
      */
     public boolean success() {
@@ -411,9 +354,7 @@ public class RuleEngine implements Engine, Graphable {
             QueryProcess ex = QueryProcess.create(graph);
             Mappings map = ex.query(q);
             return map.size() == 0;
-        } catch (IOException ex) {
-            logger.error(ex.getMessage());
-        } catch (EngineException ex) {
+        } catch (IOException | EngineException ex) {
             logger.error(ex.getMessage());
         }
         return true;
@@ -459,11 +400,11 @@ public class RuleEngine implements Engine, Graphable {
             afterProcess();
         }
     }
-    
-    int protectGraphSize(){
+
+    int protectGraphSize() {
         return getGraphManager().size();
     }
-    
+
     int graphSize() {
         return getGraphManager().size();
     }
@@ -472,15 +413,14 @@ public class RuleEngine implements Engine, Graphable {
     /**
      * Process Rule engine without interfering with Graph Workflow if any,
      * in particular with RDFS entailment when cleaning the Ontology
-     * 
+     *
      * @return
      */
     public boolean processWithoutWorkflow() throws EngineException {
         boolean status = getGraphStore().getWorkflow().isActivate();
         getGraphStore().getWorkflow().setActivate(false);
         try {
-            boolean b = process();
-            return b;
+            return process();
         } finally {
             getGraphStore().getWorkflow().setActivate(status);
         }
@@ -512,18 +452,12 @@ public class RuleEngine implements Engine, Graphable {
         }
         getQueryProcess().setSynchronized(isSynchronized());
         getGraphStore().getEventManager().start(Event.InferenceEngine, getClass().getName());
-        if (isTraceMemory()) {
-            logger.info("Memory before rule engine: " + Tool.getMemoryUsageMegabytes());
-            logger.info("Graph size: " + protectGraphSize());
-        }
+
         if (Property.get(Property.Value.RULE_TRANSITIVE_FUNCTION) != null) {
             setFunTransitive(Property.getBooleanValue(Property.Value.RULE_TRANSITIVE_FUNCTION));
         }
         if (Property.get(Property.Value.RULE_TRANSITIVE_OPTIMIZE) != null) {
             setOptTransitive(Property.getBooleanValue(Property.Value.RULE_TRANSITIVE_OPTIMIZE));
-        }
-        if (Property.hasValue(Property.Value.RULE_TRACE, true)) {
-            setSimpleTrace(true);
         }
         if (hasDataManager() && isOptimizeRuleDataManager()) {
             getDataManager().setRuleDataManager(true);
@@ -540,22 +474,10 @@ public class RuleEngine implements Engine, Graphable {
         if (!getErrorList().isEmpty()) {
             throw new EngineException("RuleEngine Constraint Error", getErrorList());
         }
-        if (isTraceMemory()) {
-            logger.info("Memory after rule engine: " + Tool.getMemoryUsageMegabytes());
-            logger.info("Graph size: " + protectGraphSize());
-        }
-    }
-
-    boolean isTraceMemory() {
-        return Property.getBooleanValue(Property.Value.TRACE_MEMORY);
     }
 
     public Graph getRDFGraph() {
         return graph;
-    }
-
-    public void setDebug(boolean b) {
-        debug = b;
     }
 
     public void clear() {
@@ -572,9 +494,7 @@ public class RuleEngine implements Engine, Graphable {
             QueryProcess ex = QueryProcess.create(graph);
             Mappings map = ex.query(q);
             return map.getTemplateStringResult();
-        } catch (IOException ex) {
-            LoggerFactory.getLogger(RuleEngine.class.getName()).error("", ex);
-        } catch (EngineException ex) {
+        } catch (IOException | EngineException ex) {
             LoggerFactory.getLogger(RuleEngine.class.getName()).error("", ex);
         }
         return null;
@@ -591,10 +511,6 @@ public class RuleEngine implements Engine, Graphable {
         defRule(Rule.create(getRuleID(), rule));
     }
 
-    public static String getRuleID() {
-        return UUIDFunction.getUUID();
-    }
-
     public void defRule(Rule rule) {
         declare(rule);
         getRules().add(rule);
@@ -604,7 +520,7 @@ public class RuleEngine implements Engine, Graphable {
         try {
             defRule(rule);
         } catch (EngineException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         }
     }
 
@@ -618,7 +534,7 @@ public class RuleEngine implements Engine, Graphable {
     }
 
     public void remove(List<String> uriList) {
-        for (int i = 0; i < getRules().size();) {
+        for (int i = 0; i < getRules().size(); ) {
             Rule r = getRules().get(i);
             if (r.getQuery().getURI() != null && match(r.getQuery().getURI(), uriList)) {
                 getRules().remove(i);
@@ -645,11 +561,18 @@ public class RuleEngine implements Engine, Graphable {
         return rules;
     }
 
+    /**
+     * @param rules the rules to set
+     */
+    public void setRules(List<Rule> rules) {
+        this.rules = rules;
+    }
+
     public Query defRule(String name, String rule) throws EngineException {
         return defRule(name, rule, Rule.RULE_TYPE);
     }
 
-    public Query defRule(String name, String rule, String type) throws EngineException {      
+    public Query defRule(String name, String rule, String type) throws EngineException {
         if (isTransformation()) {
             if (getQueryEngine() == null) {
                 setQueryEngine(QueryEngine.create(getGraphStore()));
@@ -657,14 +580,14 @@ public class RuleEngine implements Engine, Graphable {
             getQueryEngine().setLevel(getLevel());
             return getQueryEngine().defQuery(rule);
         } else {
-           Rule r = defInferenceRule(name, rule, type);
-           if (r == null){
-               return null;
-           }
-           return r.getQuery();
+            Rule r = defInferenceRule(name, rule, type);
+            if (r == null) {
+                return null;
+            }
+            return r.getQuery();
         }
     }
-    
+
     public Rule defInferenceRule(String name, String rule, String type) throws EngineException {
         if (type == null) {
             type = Rule.RULE_TYPE;
@@ -716,13 +639,10 @@ public class RuleEngine implements Engine, Graphable {
      */
     int entail(Mapping m, Binding b) throws EngineException {
         begin();
-        
+
         int start = getGraphManager().size();
         try {
             infer(m, b);
-            if (trace) {
-                // traceSize();
-            }
             return getGraphManager().size() - start;
         } catch (OutOfMemoryError e) {
             throw new EngineException(e);
@@ -764,39 +684,15 @@ public class RuleEngine implements Engine, Graphable {
         getGraphStore().getEventManager().finish(Event.RuleEngine);
     }
 
-    void traceSize() {
-        // Get current size of heap in bytes
-        long heapSize = Runtime.getRuntime().totalMemory();
-        System.out.println("size: " + heapSize / 1000000);
-
-        // Get maximum size of heap in bytes. The heap cannot grow beyond this size.
-        // Any attempt will result in an OutOfMemoryException.
-        long heapMaxSize = Runtime.getRuntime().maxMemory();
-        System.out.println("max size: " + heapMaxSize / 1000000);
-
-        // Get amount of free memory within the heap in bytes. This size will increase
-        // after garbage collection and decrease as new objects are created.
-        long heapFreeSize = Runtime.getRuntime().freeMemory();
-        System.out.println("free size: " + heapFreeSize / 1000000);
-    }
-
     // loop on rules until nothing new happens
     void infer(Mapping mapping, Binding bind) throws EngineException {
-        int size = getGraphManager().size(),
-                start = size;
+        int size = getGraphManager().size();
+
         // number of loop on rule base
         int loop = 0;
-        int skip = 0,
-                // index of rule currently applied
-                nbrule = 0,
-                // timestamp incremented at each rule application
-                timestamp = 0,
-                // number of skipped rules
-                tskip = 0,
-                // number of applied rules
-                trun = 0,
-                // number of results
-                tnbres = 0;
+        int nbrule = 0;
+        int timestamp = 0;
+
         boolean go = true;
         Record newRecord = null;
         // Rule manager with rule index
@@ -815,87 +711,45 @@ public class RuleEngine implements Engine, Graphable {
             getEventManager().start(Event.InferenceCycle);
             if (isEvent())
                 getVisitor().loopEntailment(getPath());
-            skip = 0;
             nbrule = 0;
-            tnbres = 0;
-            if (trace) {
-                System.out.println("Loop: " + loop);
-            }
 
             if (isOptimize()) {
                 getResultWatcher().start(loop);
-                getResultWatcher().setTrace(trace);
             }
-            logger.info("rules: "+getRules().size());
-            for (Rule rule : getRules()) {
-                if (isDebug()) {
-                    rule.getQuery().setDebug(true);
-                }
-                if (isSimpleTrace()) logger.info("rule: " +rule.getName() + " " + loop + " " +  timestamp);
-                int nbres = 0;
+            logger.info("rules: " + getRules().size());
+            for (Rule possibleRule : getRules()) {
 
-                if (isOptimize() && rule.isOptimize()) {
+                if (isOptimize() && possibleRule.isOptimize()) {
                     // start exec ResultWatcher, it checks that each solution
                     // of rule contains at least one new edge
-                    getResultWatcher().start(rule);
+                    getResultWatcher().start(possibleRule);
                     // run rules for which new edges have been created
                     // since previous run
-                    newRecord = record(rule, timestamp, loop);
+                    newRecord = record(possibleRule, timestamp, loop);
 
-                    if (loop == 0 || newRecord.accept(rule.getRecord())) {
-
-                        if (trace && loop > 0) {
-                            rule.getRecord().trace(newRecord);
-                        }
+                    if (loop == 0 || newRecord.accept(possibleRule.getRuleRecord())) {
 
                         if (loop > 0) {
-                            getResultWatcher().start(rule.getRecord(), newRecord);
+                            getResultWatcher().start(possibleRule.getRuleRecord(), newRecord);
                         }
-                        nbres = process(rule, mapping, bind, newRecord, loop, timestamp, nbrule);
-                        if (isClosure(rule) && isOptTransitive()) {
+                        process(possibleRule, mapping, bind, newRecord, loop, timestamp, nbrule);
+                        if (isClosure(possibleRule) && isOptTransitive()) {
                             // rule run at saturation: record nb edge after execution
-                            newRecord = record(rule, timestamp + 1, loop);
+                            newRecord = record(possibleRule, timestamp + 1, loop);
                         }
-                        setRecord(rule, newRecord);
-                        tnbres += nbres;
+                        setRecord(possibleRule, newRecord);
                         nbrule++;
                         timestamp++;
-                    } else {
-                        skip++;
                     }
 
-                    getResultWatcher().finish(rule);
+                    getResultWatcher().finish(possibleRule);
                 } else {
-                    //nbres = process(rule, mapping, bind, null, loop, -1, nbrule);
-                   nbres = process(rule, mapping, bind, null, loop, isOptimize()?timestamp++:-1, nbrule);
+                    process(possibleRule, mapping, bind, null, loop, isOptimize() ? timestamp++ : -1, nbrule);
                     nbrule++;
                 }
-
-                if (trace) {
-                    stable.record(rule, nbres);
-                }
-            }
-            
-            int graphSize = getGraphManager().size(); 
-
-            if (isTraceMemory()) {
-                System.out.println("Loop: " + loop);
-                System.out.println("Memory used: " + Tool.getMemoryUsageMegabytes());
-                System.out.println("Grah size: " + graphSize);
             }
 
-            if (trace) {
-                System.out.println("NBrule: " + nbrule);
-                System.out.println("Graph: " + graphSize);
-            }
-
-            if (isDebug()) {
-                System.out.println("Skip: " + skip);
-                System.out.println("Run: " + nbrule);
-                System.out.println("Graph: " + graphSize);
-                tskip += skip;
-                trun += nbrule;
-            }
+            int graphSize = getGraphManager().size();
 
             if (graphSize > size) {
                 // There are new edges: entailment again
@@ -907,19 +761,13 @@ public class RuleEngine implements Engine, Graphable {
 
             getEventManager().finish(Event.InferenceCycle);
         }
-
-        if (isDebug()) {
-            System.out.println("Total Skip: " + tskip);
-            System.out.println("Total Run: " + trun);
-            logger.debug("** Rule: " + (getGraphManager().size() - start));
-        }
     }
 
     void initOptimize() {
         // kgram return solutions that contain newly entailed edge
         setResultWatcher(new ResultWatcher(getGraphStore()));
         getResultWatcher().setOptimizeRuleDataManager(isOptimizeRuleDataManager());
-        // resultWatcher.setSkipPath(isSkipPath);
+
         if (isConstructResult) {
             // Construct will take care of duplicates
             getResultWatcher().setDistinct(false);
@@ -941,14 +789,12 @@ public class RuleEngine implements Engine, Graphable {
             // transitive rule at saturation
             return true;
         }
-        if (rule.isPseudoTransitive()) {
+        if ((rule.isPseudoTransitive()) && (rule.getIndex() > 0)) {
             // rule = rdf:type ; preceding = rdfs:subClassOf
-            if (rule.getIndex() > 0) {
-                Rule precedingRule = getRules().get(rule.getIndex() - 1);
-                if (precedingRule.isClosure()) {
-                    // rdfs:subClassOf
-                    return rule.isPseudoTransitive(precedingRule);
-                }
+            Rule precedingRule = getRules().get(rule.getIndex() - 1);
+            if (precedingRule.isClosure()) {
+                // rdfs:subClassOf
+                return rule.isPseudoTransitive(precedingRule);
             }
         }
         return false;
@@ -957,12 +803,6 @@ public class RuleEngine implements Engine, Graphable {
     void cleanRules() {
         for (Rule r : getRules()) {
             r.clean();
-        }
-    }
-
-    public void trace() {
-        for (Rule r : stable.sort()) {
-            System.out.println(stable.get(r) + " " + r.getQuery().getAST());
         }
     }
 
@@ -975,26 +815,12 @@ public class RuleEngine implements Engine, Graphable {
         cleanRules();
     }
 
-    void trace(String mes, Object... obj) {
-        if (trace) {
-            System.out.println(String.format(mes, obj));
-        }
-    }
-
     /**
      * Process one rule
      */
     int process(Rule rule, Mapping m, Binding bind, Record newRecord, int loop, int timestamp, int nbr)
             throws EngineException {
-
-        if (trace) {
-            trace("loop %s: %s: %s %s",
-                    loop, nbr, rule.getIndex(), ((getResultWatcher() != null) ? getResultWatcher().isNew() : ""));
-            System.out.println(rule.getAST());
-        }
         getEventManager().start(Event.Rule);
-
-        Date d1 = new Date();
         boolean isConstruct = isOptimize() && isConstructResult;
 
         Query qq = rule.getQuery();
@@ -1027,11 +853,8 @@ public class RuleEngine implements Engine, Graphable {
             // Java code compute transitive closure
             Date dd = new Date();
             Closure clos = getClosure(rule);
-            int index = (rule.getRecord() == null) ? -1 : rule.getRecord().getTimestamp();
+            int index = (rule.getRuleRecord() == null) ? -1 : rule.getRuleRecord().getTimestamp();
             clos.closure(loop, timestamp, index);
-            if (isSimpleTrace()) {
-                logger.info("Closure time: " + Tool.time(dd));
-            }
         } else {
             process(rule, m, bind, cons);
             if (isOptimize() && isOptTransitive() && rule.isAnyTransitive()
@@ -1042,11 +865,10 @@ public class RuleEngine implements Engine, Graphable {
             }
         }
 
-        trace(d1, new Date(), rule, start);
         getEventManager().finish(Event.Rule);
         return graphSize() - start;
     }
-    
+
     /**
      * Transitive Rule is executed at saturation in a loop
      * for loops after first one, sparql take new edge list into account
@@ -1079,7 +901,6 @@ public class RuleEngine implements Engine, Graphable {
     Closure getClosure(Rule r) {
         if (r.getClosure() == null) {
             Closure c = createClosure(getGraphStore(), getResultWatcher().getDistinct());
-            c.setTrace(isSimpleTrace());
             r.setClosure(c);
             c.setQuery(r.getQuery());
             c.setConnect(isConnect());
@@ -1088,7 +909,7 @@ public class RuleEngine implements Engine, Graphable {
         }
         return r.getClosure();
     }
-    
+
     Closure createClosure(Graph g, Distinct d) {
         if (hasDataManager()) {
             return new ClosureDataManager(g, getDataManager(), d);
@@ -1103,25 +924,13 @@ public class RuleEngine implements Engine, Graphable {
             getVisitor().beforeRule(qq);
         Date d1 = new Date();
         Mappings map = getQueryProcess().query(qq, m);
-        if (isSimpleTrace()) logger.info("time exec rule query: "+Tool.time(d1));
-        
+
         getGraphManager().startRule();
         if (cons.isBuffer()) {
             // cons insert list contains only new edges that do not exist
-            if (r.isDebug()) {
-                System.out.println();
-                logger.info(String.format("rule %s", r.getName()));
-                for (Edge edge : cons.getInsertList()){
-                    logger.info(String.format("%s ", edge));
-                }
-
-            }            
             cons.getGraphManager().insert(r.getUniquePredicate(), cons.getInsertList());
         } else {
             // create edges from Mappings as usual
-            if (r.isDebug()) {
-                logger.info(String.format("rule %s %s ", r.getName(), map.toString(true)));
-            }
             cons.entailment(map);
         }
         getGraphManager().endRule();
@@ -1149,20 +958,6 @@ public class RuleEngine implements Engine, Graphable {
             return new RuleError(r, cons.getInsertList());
         } else {
             return new RuleError(r, map);
-        }
-    }
-
-    void trace(Date d1, Date d2, Rule rule, int start) {
-        if (trace) {
-            double tt = (d2.getTime() - d1.getTime()) / (1000.0);
-            if (tt > 1) {
-                System.out.println("Time : " + tt);
-                // System.out.println(rule.getAST());
-                rule.setTime(tt + rule.getTime());
-            }
-            System.out.println("New: " + (getGraphManager().size() - start));
-            System.out.println("Size: " + getGraphManager().size());
-
         }
     }
 
@@ -1227,14 +1022,6 @@ public class RuleEngine implements Engine, Graphable {
         this.isConnect = isConnect;
     }
 
-    // public boolean isDuplicate() {
-    // return isDuplicate;
-    // }
-    //
-    // public void setDuplicate(boolean isDuplicate) {
-    // this.isDuplicate = isDuplicate;
-    // }
-
     public boolean isSkipPath() {
         return isSkipPath;
     }
@@ -1292,33 +1079,33 @@ public class RuleEngine implements Engine, Graphable {
             }
 
             @Override
-            public void setGraph(Object obj) {
+            public Object getGraph() {
+                return null;
             }
 
             @Override
-            public Object getGraph() {
-                return null;
+            public void setGraph(Object obj) {
             }
 
         };
     }
 
     public String toRDFRecord() {
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for (Record r : records) {
-            str += r.toRDF();
+            str.append(r.toRDF());
         }
-        return str;
-    }
-
-    @Override
-    public void setGraph(Object obj) {
-        spinGraph = obj;
+        return str.toString();
     }
 
     @Override
     public Object getGraph() {
         return spinGraph;
+    }
+
+    @Override
+    public void setGraph(Object obj) {
+        spinGraph = obj;
     }
 
     public Context getContext() {
@@ -1349,35 +1136,6 @@ public class RuleEngine implements Engine, Graphable {
         this.base = base;
     }
 
-    class STable extends Hashtable<Rule, Integer> {
-
-        void record(Rule r, int n) {
-            Integer i = get(r);
-            if (i == null) {
-                i = 0;
-            }
-            put(r, i + n);
-        }
-
-        List<Rule> sort() {
-            ArrayList<Rule> list = new ArrayList<>();
-
-            for (Rule r : keySet()) {
-                list.add(r);
-            }
-
-            Collections.sort(list,
-                    new Comparator<>() {
-                        @Override
-                        public int compare(Rule o1, Rule o2) {
-                            return get(o2).compareTo(get(o1));
-                        }
-                    });
-
-            return list;
-        }
-    }
-
     /**
      * Put pseudo transitive rule after it's transitive rule
      * tr = c1 subclassof c3 :- c1 subclassof c2 & c2 subclassof c3
@@ -1406,40 +1164,12 @@ public class RuleEngine implements Engine, Graphable {
         }
     }
 
-    /**
-     * Record predicates cardinality in graph
-     */
-     Record record2(Rule r, int timestamp, int loop) {
-        Record itable = new Record(r, timestamp, loop);
-        Date d1 = new Date();
-        int n = 0;
-        boolean fail = false;
-        
-        for (Node pred : r.getPredicates()) {
-            if (fail) {
-                itable.put(pred, 0);
-            }
-            else {
-                int size = getGraphManager().size(pred);
-                itable.put(pred, size);
-                if (n == 0 && size == 0) {
-                    fail = true;
-                }
-            }
-            n++;
-        }
-        if (isSimpleTrace()) logger.info("time record: "+Tool.time(d1));
-        return itable;
-    }
-     
     Record record(Rule r, int timestamp, int loop) {
         Record itable = new Record(r, timestamp, loop);
-        Date d1 = new Date();
         for (Node pred : r.getPredicates()) {
             int size = getGraphManager().size(pred);
             itable.put(pred, size);
         }
-        if (isSimpleTrace()) logger.info("time record: "+Tool.time(d1));
         return itable;
     }
 
@@ -1448,7 +1178,7 @@ public class RuleEngine implements Engine, Graphable {
     }
 
     void setRecord(Rule r, Record t) {
-        r.setRecord(t);
+        r.setRuleRecord(t);
         records.add(t);
     }
 
@@ -1469,13 +1199,13 @@ public class RuleEngine implements Engine, Graphable {
     }
 
     @Override
-    public void setActivate(boolean b) {
-        isActivate = b;
+    public boolean isActivate() {
+        return isActivate;
     }
 
     @Override
-    public boolean isActivate() {
-        return isActivate;
+    public void setActivate(boolean b) {
+        isActivate = b;
     }
 
     @Override
@@ -1485,8 +1215,8 @@ public class RuleEngine implements Engine, Graphable {
     }
 
     @Override
-    public int type() {
-        return RULE_ENGINE;
+    public Type type() {
+        return Type.RULE_ENGINE;
     }
 
     /**
@@ -1518,13 +1248,6 @@ public class RuleEngine implements Engine, Graphable {
      */
     public void setVisitor(ProcessVisitor visitor) {
         this.visitor = visitor;
-    }
-
-    /**
-     * @param rules the rules to set
-     */
-    public void setRules(List<Rule> rules) {
-        this.rules = rules;
     }
 
     public Level getLevel() {
@@ -1571,10 +1294,6 @@ public class RuleEngine implements Engine, Graphable {
         this.errorList = errorList;
     }
 
-    public boolean isDebug() {
-        return debug;
-    }
-
     public GraphManager getGraphManager() {
         return graphManager;
     }
@@ -1592,11 +1311,11 @@ public class RuleEngine implements Engine, Graphable {
     }
 
     public boolean isRecord() {
-        return record;
+        return isRecord;
     }
 
-    public void setRecord(boolean record) {
-        this.record = record;
+    public void setRecord(boolean isRecord) {
+        this.isRecord = isRecord;
     }
 
     public boolean isOptimize() {
@@ -1614,9 +1333,9 @@ public class RuleEngine implements Engine, Graphable {
     public void setResultWatcher(ResultWatcher resultWatcher) {
         this.resultWatcher = resultWatcher;
     }
-    
+
     public boolean hasDataManager() {
-        return getDataManager()!=null;
+        return getDataManager() != null;
     }
 
     public DataManager getDataManager() {
@@ -1643,12 +1362,40 @@ public class RuleEngine implements Engine, Graphable {
         this.optimizeRuleDataManager = optimizeRuleDataManager;
     }
 
-    public boolean isSimpleTrace() {
-        return simpleTrace;
+    public enum Profile {
+
+        STDRL,
+        OWLRL("/rule/owlrl.rul"),
+        OWLRL_TEST("/rule/owlrltest.rul"),
+        OWLRL_LITE("/rule/owlrllite.rul"),
+        OWLRL_EXT("/rule/owlrlext.rul"),
+        RDFS("/rule/rdfs.rul");
+
+        String path;
+
+        Profile() {
+        }
+
+        Profile(String path) {
+            this.path = path;
+        }
+
+        String getPath() {
+            return path;
+        }
+
     }
 
-    public void setSimpleTrace(boolean simpleTrace) {
-        this.simpleTrace = simpleTrace;
+    class STable extends Hashtable<Rule, Integer> {
+
+        List<Rule> sort() {
+
+            ArrayList<Rule> list = new ArrayList<>(keySet());
+
+            list.sort((o1, o2) -> get(o2).compareTo(get(o1)));
+
+            return list;
+        }
     }
 
 }

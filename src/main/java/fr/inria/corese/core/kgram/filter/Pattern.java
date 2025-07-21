@@ -27,8 +27,8 @@ public class Pattern implements ExprType, Expr {
 	String label;
 	// recursive pattern, ako *
 	boolean rec = false, 
-		matchConstant = true;;
-	List<Expr> args;
+		matchConstant = true;
+    List<Expr> args;
 	Expr exp;
 
 	Pattern(){

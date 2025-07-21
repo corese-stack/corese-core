@@ -1,8 +1,5 @@
 package fr.inria.corese.core.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Query;
@@ -14,6 +11,9 @@ import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.update.Basic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Broker between GraphManager and graph DataManager for sparql query construct
  * and sparql update Refined by core.producer.DataBrokerConstructLocal for
@@ -23,7 +23,6 @@ import fr.inria.corese.core.sparql.triple.update.Basic;
 public interface DataBrokerConstruct extends DataBroker {
 
     default void startRuleEngine() {
-        // System.out.println("DataBrokerConstruct startRuleEngine");
     }
 
     default void endRuleEngine() {
@@ -59,7 +58,7 @@ public interface DataBrokerConstruct extends DataBroker {
     /**
      * Edge may be an rdf star triple, asserted or nested
      * RDF star triple design
-     * <<s p o>> q v   -> <<edge(s p o t)>> t q v
+     * &lt;&lt;s p o>> q v   -> &lt;&lt;edge(s p o t)>> t q v
      * s p o {| q v |} -> edge(s p o t)     t q v
      * g1 s p o t g2 s p o t
      * t is additional Node, similar to subject/object
@@ -73,13 +72,13 @@ public interface DataBrokerConstruct extends DataBroker {
      * IDatatype dt = t.getDatatypeValue()
      * dt.isTriple() == true|false
      * dt.getEdge() = s p o t
-     * 
+     * <p>
      * operation find, insert, delete may have as argument a rdf star edge
      * where subject/object may be a reference node and/or edge may have reference
      * node
      * DataManager must process these subject/object/reference using the api above
-     * for example: find/insert/delete t q v where t = <<s p o>>
-     * Note that it can be recursive: t = <<<<s p o>> r u>>
+     * for example: find/insert/delete t q v where t = &lt;&lt;s p o>>
+     * Note that it can be recursive: t = &lt;&lt;&lt;&lt;s p o>> r u>>
      * .
      */
 

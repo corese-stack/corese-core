@@ -1,31 +1,5 @@
 package fr.inria.corese.core.compiler.result;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.parser.CompilerFacKgram;
 import fr.inria.corese.core.kgram.api.core.Node;
@@ -33,32 +7,41 @@ import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import java.io.BufferedReader;
-import java.io.Reader;
-import java.util.Collection;
-import java.util.logging.Level;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.BasicGraphPattern;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 
 /**
  * SPARQL XML Results Format Parser into Mappings
  *
  * @author Olivier Corby, Wimmics, INRIA 2012
- *
  */
 @Deprecated
 public class XMLResult {
 
-    private static Logger logger = LoggerFactory.getLogger(XMLResult.class);
     static final String NL = "\n";
-
-    // create target Node
-    Producer producer;
-    // create query Node
-    	private fr.inria.corese.core.compiler.parser.Compiler compiler;
-    HashMap<String, Integer> table;
-    ArrayList<Node> varList;
+    private static final Logger logger = LoggerFactory.getLogger(XMLResult.class);
     private static final int UNKNOWN = -1;
     private static final int RESULT = 1;
     private static final int BINDING = 2;
@@ -72,9 +55,12 @@ public class XMLResult {
     private static final int SUBJECT = 10;
     private static final int PREDICATE = 11;
     private static final int OBJECT = 12;
-    
-    
-    private boolean debug = false;
+    // create target Node
+    Producer producer;
+    HashMap<String, Integer> table;
+    ArrayList<Node> varList;
+    // create query Node
+    private fr.inria.corese.core.compiler.parser.Compiler compiler;
     private boolean trapError = false;
     private boolean showResult = false;
     private List<String> link;
@@ -96,33 +82,15 @@ public class XMLResult {
         return new XMLResult(p);
     }
 
-    public class VTable extends HashMap<String, Variable> {
-
-        public Variable get(String name) {
-            Variable var = super.get(name);
-            if (var == null) {
-                var = new Variable("?" + name);
-                put(name, var);
-            }
-            return var;
-        }
-    }
-   
     /**
      * parse SPARQL XML Result as Mappings
      */
-    public Mappings parse(InputStream stream) throws ParserConfigurationException, SAXException, IOException 
-    {
-        
+    public Mappings parse(InputStream stream) throws ParserConfigurationException, SAXException, IOException {
+
         if (isShowResult()) {
             String str = read(stream);
-            System.out.println(str);
             setShowResult(false);
             return parseString(str);
-        }
-        
-        if (debug) {
-            System.out.println("start parse XML result");
         }
         Mappings map = new Mappings();
 
@@ -131,20 +99,18 @@ public class XMLResult {
         factory.setNamespaceAware(true);
         try {
             SAXParser parser = factory.newSAXParser();
-            InputStreamReader r = new InputStreamReader(stream, "UTF-8");
+            InputStreamReader r = new InputStreamReader(stream, StandardCharsets.UTF_8);
             parser.parse(new InputSource(r), handler);
             complete(map);
             map.setLinkList(getLink());
             return map;
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            if (isTrapError()) {                
+            if (isTrapError()) {
                 logger.error(e.toString());
                 complete(map);
                 map.setError(true);
-                System.out.println("Return partial result of size: " + map.size());
                 return map;
-            }
-            else {
+            } else {
                 throw e;
             }
         }
@@ -158,7 +124,7 @@ public class XMLResult {
         try {
             ASTQuery ast = ASTQuery.create();
             ast.setBody(BasicGraphPattern.create());
-            for (Node n : varList) { 
+            for (Node n : varList) {
                 ast.setSelect(new Variable(n.getLabel()));
             }
             QuerySolver qs = QuerySolver.create();
@@ -167,7 +133,7 @@ public class XMLResult {
             map.setQuery(q);
             map.init(q);
         } catch (EngineException ex) {
-            java.util.logging.Logger.getLogger(XMLResult.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
     }
 
@@ -176,18 +142,18 @@ public class XMLResult {
         varList = new ArrayList<>();
         setCompiler(new CompilerFacKgram().newInstance());
         table = new HashMap<>();
-        table.put("result",  RESULT);
+        table.put("result", RESULT);
         table.put("binding", BINDING);
-        table.put("uri",     URI);
-        table.put("bnode",   BNODE);
+        table.put("uri", URI);
+        table.put("bnode", BNODE);
         table.put("literal", LITERAL);
         table.put("boolean", BOOLEAN);
-        table.put("variable",VARIABLE);
-        table.put("link",   LINK);
-        table.put("triple",   TRIPLE);        
-        table.put("subject",   SUBJECT);    
-        table.put("predicate",   PREDICATE);    
-        table.put("object",   OBJECT);    
+        table.put("variable", VARIABLE);
+        table.put("link", LINK);
+        table.put("triple", TRIPLE);
+        table.put("subject", SUBJECT);
+        table.put("predicate", PREDICATE);
+        table.put("object", OBJECT);
     }
 
     int type(String name) {
@@ -213,280 +179,36 @@ public class XMLResult {
 
     public Node getURI(String str) {
         IDatatype dt = DatatypeMap.createResource(str);
-        Node n = producer.getNode(dt);
-        return n;
+        return producer.getNode(dt);
     }
 
     public Node getBlank(String str) {
         IDatatype dt = DatatypeMap.createBlank(str);
-        Node n = producer.getNode(dt);
-        return n;
+        return producer.getNode(dt);
     }
 
     public Node getLiteral(String str, String datatype, String lang) {
         IDatatype dt = DatatypeMap.createLiteral(str, datatype, lang);
-        Node n = producer.getNode(dt);
-        return n;
-    }
-    
-    public void defineVariable(Node var) {
-       varList.add(var);
+        return producer.getNode(dt);
     }
 
-    /**
-     *
-     * SAX Handler
-     */
-    public class MyHandler extends DefaultHandler {
-
-        Mappings maps;
-        //Mapping map;
-        List<Node> lvar, lval;
-        String var;
-        VTable vtable;
-        boolean // true for variable binding
-                isContent = false,
-                // true for ask SPARQL Query
-                isBoolean = false,
-                isURI = false,
-                isLiteral = false,
-                isBlank = false,
-                isVariable = false;
-        int     triple = 0;
-        String text, datatype, lang;
-
-        MyHandler(Mappings m) {
-            maps = m;
-            vtable = new VTable();
-            lvar = new ArrayList<>();
-            lval = new ArrayList<>();
-        }
-
-        @Override
-        public void startDocument() {
-            if (debug) {
-                System.out.println("start document");
-            }
-        }
-
-        // called for each binding
-        void clear() {
-            isURI = false;
-            isLiteral = false;
-            isBlank = false;
-            text = null;
-            datatype = null;
-            lang = null;
-            isVariable = false;
-            triple = 0;
-        }
-
-        /**
-         * result is represented by Mapping add one binding to current Mapping
-         */
-        void add(String var, Node nval) {
-            Node nvar = getVariable(var);
-            lvar.add(nvar);
-            lval.add(nval);
-        }
-        
-        Node getVariable(String var) {
-            return getCompiler().createNode(vtable.get(var));
-        }
-        
-
-        @Override
-        public void startElement(String namespaceURI, String simpleName,
-                String qualifiedName, Attributes atts) {
-            if (debug) {
-                System.out.println("open: " + qualifiedName);
-            }
-            isContent = false;
-
-            switch (type(simpleName)) {
-                
-                case LINK:
-                    addLink(atts.getValue("href"));                    
-                    break;
-
-                case RESULT:
-                    //map =  Mapping.create();
-                    //maps.add(map);
-                    lval.clear();
-                    lvar.clear();
-                    break;
-                    
-                case VARIABLE:
-                   String name = atts.getValue("name");
-                   defineVariable(getVariable(name));
-                   break;
-
-                case BINDING:
-                    var = atts.getValue("name");
-                    clear();
-                    break;
-
-                case URI:
-                    isContent = true;
-                    isURI = true;
-                    break;
-
-                case LITERAL:
-                    isContent = true;
-                    isLiteral = true;
-                    datatype = atts.getValue("datatype");
-                    lang = atts.getValue("xml:lang");
-                    break;
-
-                case BNODE:
-                    isContent = true;
-                    isBlank = true;
-                    break;
-
-                case BOOLEAN:
-                    isBoolean = true;
-                    isContent = true;
-                    break; 
-                    
-                case TRIPLE:
-                    triple++;
-                    break;               
-            }
-        }
-        
-        void pushSubject(Node node) {
-        
-        }
-        void pushPredicate(Node node) {
-        
-        } 
-        void pushObject(Node node) {
-        
-        }
-        Node getSubject() {
-            return null;
-        }        
-        Node getPredicate() {
-            return null;
-        }  
-        Node getObject() {
-            return null;
-        } 
-        
-        void edge(Node sub, Node pred, Node obj) {
-        
-        }
-        
-        // inside triple and possibly inside triple element
-        void triple(String namespaceURI, String simpleName, String qualifiedName) {
-                        
-            switch (type(simpleName)) {
-                case SUBJECT:
-                    pushSubject(getNode());
-                    break;
-                case PREDICATE:
-                    pushPredicate(getNode());
-                    break;                    
-                case OBJECT:
-                    pushObject(getNode());
-                    break;                    
-                case TRIPLE:
-                    
-            }
-        }
-        
-        Node getNode() {
-            if (isURI) {
-                isURI=false;
-                return getURI(text);
-            } else if (isBlank) {
-                isBlank=false;
-                return getBlank(text);
-            } else if (isLiteral) {
-                isLiteral=false;
-                return getLiteral(text, datatype, lang);
-            }
-            else {
-                return null;
-            }
-        }
-        
-
-        @Override
-        public void endElement(String namespaceURI, String simpleName, String qualifiedName) {
-            if (debug) {
-                System.out.println("close: " + qualifiedName);
-            }
-            
-            if (triple > 0) {
-                triple(namespaceURI, simpleName, qualifiedName);
-                triple--;
-            }         
-            else if (isContent) {
-                isContent = false;
-
-                if (text == null) {
-                    // may happen with empty literal 
-                    text = "";
-                }
-
-                if (isURI) {
-                    add(var, getURI(text));
-                } else if (isBlank) {
-                    add(var, getBlank(text));
-                } else if (isLiteral) {
-                    add(var, getLiteral(text, datatype, lang));
-                } else if (isBoolean && text.equals("true")) {
-                    maps.add(Mapping.create());
-                }
-            } else {
-                switch (type(simpleName)) {
-
-                    case RESULT:
-                        Mapping map = Mapping.create(lvar, lval);
-                        if (debug) {
-                            System.out.println(map);
-                        }
-                        maps.add(map);
-                }
-            }
-        }
-
-        /**
-         * In some case, there may be several calls to this function in one
-         * element.
-         */
-        @Override
-        public void characters(char buf[], int offset, int len) {
-            if (isContent) {
-                String s = new String(buf, offset, len);
-                if (text == null) {
-                    text = s;
-                } else {
-                    text += s;
-                }
-            }
-        }
-
-        @Override
-        public void endDocument() {
-        }
+    public void defineVariable(Node node) {
+        varList.add(node);
     }
 
     InputStream getStream(String path) throws FileNotFoundException {
         try {
             URL uri = new URL(path);
             return uri.openStream();
-        } catch (MalformedURLException e) {
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
 
         FileInputStream stream;
         stream = new FileInputStream(path);
         return stream;
     }
-    
-        /**
+
+    /**
      * @return the trapError
      */
     public boolean isTrapError() {
@@ -499,11 +221,11 @@ public class XMLResult {
     public void setTrapError(boolean trapError) {
         this.trapError = trapError;
     }
-    
-    public String read(InputStream stream) throws IOException  {
-       return read(new InputStreamReader(stream));
+
+    public String read(InputStream stream) throws IOException {
+        return read(new InputStreamReader(stream));
     }
-    
+
     String read(Reader fr) throws IOException {
         BufferedReader fq = new BufferedReader(fr);
         StringBuilder sb = new StringBuilder();
@@ -515,14 +237,12 @@ public class XMLResult {
                 fq.close();
                 break;
             }
-            if (isnl){
+            if (isnl) {
                 sb.append(NL);
-            }
-            else {
+            } else {
                 isnl = true;
             }
             sb.append(str);
-            //sb.append(NL);
         }
         return sb.toString();
     }
@@ -562,8 +282,244 @@ public class XMLResult {
     public void setLink(List<String> link) {
         this.link = link;
     }
-    
+
     public void addLink(String link) {
         getLink().add(link);
+    }
+
+    public class VTable extends HashMap<String, Variable> {
+
+        public Variable get(String name) {
+            Variable var = super.get(name);
+            if (var == null) {
+                var = new Variable("?" + name);
+                put(name, var);
+            }
+            return var;
+        }
+    }
+
+    /**
+     * SAX Handler
+     */
+    public class MyHandler extends DefaultHandler {
+
+        Mappings maps;
+        List<Node> lvar, lval;
+        String var;
+        VTable vtable;
+        boolean // true for variable binding
+                isContent = false,
+        // true for ask SPARQL Query
+        isBoolean = false,
+                isURI = false,
+                isLiteral = false,
+                isBlank = false,
+                isVariable = false;
+        int triple = 0;
+        String text, datatype, lang;
+
+        MyHandler(Mappings m) {
+            maps = m;
+            vtable = new VTable();
+            lvar = new ArrayList<>();
+            lval = new ArrayList<>();
+        }
+
+        @Override
+        public void startDocument() {
+        }
+
+        // called for each binding
+        void clear() {
+            isURI = false;
+            isLiteral = false;
+            isBlank = false;
+            text = null;
+            datatype = null;
+            lang = null;
+            isVariable = false;
+            triple = 0;
+        }
+
+        /**
+         * result is represented by Mapping add one binding to current Mapping
+         */
+        void add(String var, Node nval) {
+            Node nvar = getVariable(var);
+            lvar.add(nvar);
+            lval.add(nval);
+        }
+
+        Node getVariable(String varString) {
+            return getCompiler().createNode(vtable.get(varString));
+        }
+
+
+        @Override
+        public void startElement(String namespaceURI, String simpleName,
+                                 String qualifiedName, Attributes atts) {
+            isContent = false;
+
+            switch (type(simpleName)) {
+
+                case LINK:
+                    addLink(atts.getValue("href"));
+                    break;
+
+                case RESULT:
+                    lval.clear();
+                    lvar.clear();
+                    break;
+
+                case VARIABLE:
+                    String name = atts.getValue("name");
+                    defineVariable(getVariable(name));
+                    break;
+
+                case BINDING:
+                    var = atts.getValue("name");
+                    clear();
+                    break;
+
+                case URI:
+                    isContent = true;
+                    isURI = true;
+                    break;
+
+                case LITERAL:
+                    isContent = true;
+                    isLiteral = true;
+                    datatype = atts.getValue("datatype");
+                    lang = atts.getValue("xml:lang");
+                    break;
+
+                case BNODE:
+                    isContent = true;
+                    isBlank = true;
+                    break;
+
+                case BOOLEAN:
+                    isBoolean = true;
+                    isContent = true;
+                    break;
+
+                case TRIPLE:
+                    triple++;
+                    break;
+            }
+        }
+
+        void pushSubject(Node node) {
+
+        }
+
+        void pushPredicate(Node node) {
+
+        }
+
+        void pushObject(Node node) {
+
+        }
+
+        Node getSubject() {
+            return null;
+        }
+
+        Node getPredicate() {
+            return null;
+        }
+
+        Node getObject() {
+            return null;
+        }
+
+        void edge(Node sub, Node pred, Node obj) {
+
+        }
+
+        // inside triple and possibly inside triple element
+        void triple(String namespaceURI, String simpleName, String qualifiedName) {
+
+            switch (type(simpleName)) {
+                case SUBJECT:
+                    pushSubject(getNode());
+                    break;
+                case PREDICATE:
+                    pushPredicate(getNode());
+                    break;
+                case OBJECT:
+                    pushObject(getNode());
+                    break;
+                case TRIPLE:
+
+            }
+        }
+
+        Node getNode() {
+            if (isURI) {
+                isURI = false;
+                return getURI(text);
+            } else if (isBlank) {
+                isBlank = false;
+                return getBlank(text);
+            } else if (isLiteral) {
+                isLiteral = false;
+                return getLiteral(text, datatype, lang);
+            } else {
+                return null;
+            }
+        }
+
+
+        @Override
+        public void endElement(String namespaceURI, String simpleName, String qualifiedName) {
+            if (triple > 0) {
+                triple(namespaceURI, simpleName, qualifiedName);
+                triple--;
+            } else if (isContent) {
+                isContent = false;
+
+                if (text == null) {
+                    // may happen with empty literal
+                    text = "";
+                }
+
+                if (isURI) {
+                    add(var, getURI(text));
+                } else if (isBlank) {
+                    add(var, getBlank(text));
+                } else if (isLiteral) {
+                    add(var, getLiteral(text, datatype, lang));
+                } else if (isBoolean && text.equals("true")) {
+                    maps.add(Mapping.create());
+                }
+            } else {
+                if (type(simpleName) == RESULT) {
+                    Mapping map = Mapping.create(lvar, lval);
+                    maps.add(map);
+                }
+            }
+        }
+
+        /**
+         * In some case, there may be several calls to this function in one
+         * element.
+         */
+        @Override
+        public void characters(char[] buf, int offset, int len) {
+            if (isContent) {
+                String s = new String(buf, offset, len);
+                if (text == null) {
+                    text = s;
+                } else {
+                    text += s;
+                }
+            }
+        }
+
+        @Override
+        public void endDocument() {
+        }
     }
 }

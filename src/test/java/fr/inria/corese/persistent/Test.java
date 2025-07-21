@@ -1,7 +1,5 @@
 package fr.inria.corese.persistent;
 
-import fr.inria.corese.core.sparql.storage.api.IStorage;
-import fr.inria.corese.core.sparql.storage.fs.StringManager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +9,9 @@ import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import fr.inria.corese.core.sparql.storage.api.IStorage;
+import fr.inria.corese.core.sparql.storage.fs.StringManager;
+
 /**
  * Test.java
  *
@@ -19,9 +20,10 @@ import org.apache.commons.lang3.RandomStringUtils;
  */
 public class Test {
 
-    private IStorage manager;
-    private Map<Integer, String> literalsAll = new HashMap<Integer, String>();
-    private int min, max;
+    private final IStorage manager;
+    private final Map<Integer, String> literalsAll = new HashMap<Integer, String>();
+    private final int min;
+    private final int max;
     private int index = 1;
 
     public Test(int min, int max) {
@@ -39,7 +41,7 @@ public class Test {
         int c = 0;
         r[c++] = this.min;
         r[c++] = this.max;
-        //Constants.MAX_LIT_LEN = min;
+        // Constants.MAX_LIT_LEN = min;
 
         double[] writeNIO = this.writeNIO(num, true);
         r[c++] = writeNIO[0];
@@ -49,7 +51,6 @@ public class Test {
         double[] read = this.read(false, 0, true);
         r[c++] = read[0];
         r[c++] = read[1];
-        System.out.println(manager.toString());
         return r;
     }
 
@@ -63,12 +64,11 @@ public class Test {
             read(true, 1 * feed, true);
             delete(2 * feed);
             read(true, 1 * feed, true);
-            System.out.println(manager);
         }
     }
 
     private long generate(Map<Integer, String> literalStrings, int count) {
-        //Generate ramdom strings
+        // Generate ramdom strings
         Random r = new Random();
         int c = count;
         long length = 0;
@@ -76,16 +76,16 @@ public class Test {
         String s;
 
         while (c-- > 0) {
-            s = RandomStringUtils.random(r.nextInt(max - min) + min, true, true);
+            s = RandomStringUtils.random(r.nextInt(max - min) + min, 0, 0, true, true, null, r);
             length += s.length();
             literalStrings.put(index++, s);
         }
 
         this.literalsAll.putAll(literalStrings);
-        System.out.println("[Generate]: " + count + " records generated.");
+
         return length / count;
     }
-        
+
     public double[] writeNIO(int nRecords, boolean generated) {
         // === 1 generate strings ===
         Map<Integer, String> literalsTmp = new HashMap<Integer, String>();
@@ -99,14 +99,14 @@ public class Test {
         for (Map.Entry<Integer, String> entrySet : literalsTmp.entrySet()) {
             Integer key = entrySet.getKey();
             String value = entrySet.getValue();
-            //if (manager.check(value)) {
-                manager.write(key, value);
-                counter++;
-            //}
+            // if (manager.check(value)) {
+            manager.write(key, value);
+            counter++;
+            // }
         }
         long time = System.currentTimeMillis() - start;
-        System.out.println("[Write]: " + (generated ? nRecords : TestSuite.texts.length) + " records wrote to file.");
-        return new double[]{(double) avg, time * 1.0 / 1000, time * 1.0 / counter};
+
+        return new double[] { (double) avg, time * 1.0 / 1000, time * 1.0 / counter };
     }
 
     private long generate(Map<Integer, String> literalStrings, String[] strings) {
@@ -131,7 +131,7 @@ public class Test {
         // Writes the content to the file
 
         for (Map.Entry<Integer, String> entrySet : literalsAll.entrySet()) {
-            //Integer key = entrySet.getKey();
+            // Integer key = entrySet.getKey();
             String value = entrySet.getValue();
             if (manager.check(value)) {
                 writer.write(value);
@@ -142,12 +142,13 @@ public class Test {
         writer.close();
         long time = System.currentTimeMillis() - start;
 
-        return new double[]{time * 1.0 / 1000, time * 1.0 / counter};
+        return new double[] { time * 1.0 / 1000, time * 1.0 / counter };
     }
 
     public double[] read(boolean random, int nRecords, boolean check) {
         Map<Integer, String> literalsRead = new HashMap<Integer, String>();
         long start = System.currentTimeMillis();
+        @SuppressWarnings("unused")
         int correct = 0;
 
         if (random) {
@@ -158,10 +159,10 @@ public class Test {
             Integer[] keys = literalsAll.keySet().toArray(new Integer[size]);
             while (counter > 0) {
                 int key = keys[r.nextInt(size)];
-                //if(literalsRead.containsKey(ind)){
+                // if(literalsRead.containsKey(ind)){
                 literalsRead.put(key, manager.read(key));
                 counter--;
-                //}
+                // }
             }
         } else {
             for (Map.Entry<Integer, String> entrySet : literalsAll.entrySet()) {
@@ -172,27 +173,22 @@ public class Test {
 
         long time = System.currentTimeMillis() - start;
         if (check) {
-            //check if read correctly
+            // check if read correctly
             for (Map.Entry<Integer, String> entrySet : literalsRead.entrySet()) {
                 Integer key = entrySet.getKey();
 
                 if (literalsAll.get(key).equals(literalsRead.get(key))) {
                     correct++;
-                } else {
-                   // System.out.println("[Read Error]: "+((StringManager)manager).getLiteralsOnDiskMeta(key)+" ====");
-                    //System.out.println("=== orginal literal ===\n" + literalsAll.get(key));
-                    //System.out.println("\n=== read literal ===\n" + literalsRead.get(key));
                 }
-            }
 
-            System.out.println("[Read]: " + literalsRead.size() + " / " + correct + ", "
-                    + (literalsRead.size() == correct ? "!! OK !!" : "** FAI L**"));
+            }
         }
-        return new double[]{time * 1.0 / 1000, time * 1.0 / literalsRead.size()};
+        return new double[] { time * 1.0 / 1000, time * 1.0 / literalsRead.size() };
     }
 
+    @SuppressWarnings("unused")
     public void delete(int nRecords) {
-        //generate randomly the literals to delete
+        // generate randomly the literals to delete
         int size = literalsAll.size();
         Random r = new Random();
         int counter = nRecords;
@@ -200,14 +196,13 @@ public class Test {
         Integer[] ids = literalsAll.keySet().toArray(new Integer[literalsAll.size()]);
         while (counter-- > 0) {
             int id = ids[r.nextInt(size)];
-            if (literalsAll.containsKey(id)) {//maybe has been deleted
+            if (literalsAll.containsKey(id)) {// maybe has been deleted
                 manager.delete(id);
                 literalsAll.remove(id);
                 nDeleted++;
             }
         }
 
-        System.out.println("[Delete from RAM]: " + nDeleted + " records deleted.");
         if (literalsAll.isEmpty()) {
             System.exit(0);
         }

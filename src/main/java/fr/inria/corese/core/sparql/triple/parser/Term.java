@@ -26,8 +26,8 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Title: Corese</p>
@@ -39,6 +39,8 @@ import java.util.logging.Logger;
  * @author Olivier Corby & Olivier Savoie
  */
 public class Term extends Expression {
+
+    private static final Logger logger = LoggerFactory.getLogger(Term.class);
 
     public static final String NL = "\n";
     static final String RE_CHECK = "check";
@@ -95,7 +97,7 @@ public class Term extends Expression {
     String modality;
     int type = ExprType.UNDEF, oper = ExprType.UNDEF;
     int min = -1, max = -1;
-    private int place = -1;
+    private final int place = -1;
     private int arity = 0;
 
     static {
@@ -1152,7 +1154,7 @@ public class Term extends Expression {
             }
             return t;
         } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(Term.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return this;
     }
@@ -1181,7 +1183,7 @@ public class Term extends Expression {
             complete(t);          
             return t;
         } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(Term.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
         }
         return this;
     }
@@ -1411,7 +1413,7 @@ public class Term extends Expression {
     }
 
     @Override
-    public boolean isType(ASTQuery ast, int type) {
+    public boolean isType(ASTQuery ast, Expression.Type type) {
         return isType(ast, null, type);
     }
 
@@ -1419,20 +1421,14 @@ public class Term extends Expression {
      * 1. Is the exp of type aggregate or bound ? 2. When var!=null: if exp
      * contains var return false (sem checking)
      */
-    @Override
-    public boolean isType(ASTQuery ast, Variable var, int type) {
-        if (isFunction()) {
-            if (isType(getName(), type)) {
-                return true;
-            }
-        } else if (isOr()) {
-            // if type is BOUND : return true
+    public boolean isType(ASTQuery ast, Variable var, Expression.Type type) {
+        if (isFunction() || (isOr() && isType(getName(), type) )) {
             if (isType(getName(), type)) {
                 return true;
             }
         }
         for (Expression arg : getArgs()) {
-            if (var != null && arg == var && type == BOUND) {
+            if (var != null && arg == var && type == Expression.Type.BOUND) {
                 // it is not bound() hence we return false
                 return false;
             }
@@ -1443,13 +1439,13 @@ public class Term extends Expression {
         return false;
     }
 
-    boolean isType(String name, int type) {
+    boolean isType(String name, Expression.Type type) {
         switch (type) {
-            case Expression.ENDFILTER:
+            case ENDFILTER:
                 return name.equalsIgnoreCase(SIM) || name.equalsIgnoreCase(SCORE);
-            case Expression.POSFILTER:
+            case POSFILTER:
                 return isAggregate(name);
-            case Expression.BOUND:
+            case BOUND:
                 // see compiler
                 return name.equalsIgnoreCase(SBOUND) || name.equals(SEOR);
         }
@@ -1923,6 +1919,6 @@ public class Term extends Expression {
 
     @Override
     public IDatatype eval(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
-        throw new EngineException("Undefined expression: " + this.toString());
+        throw new EngineException("Undefined expression: " + this);
     }
 }

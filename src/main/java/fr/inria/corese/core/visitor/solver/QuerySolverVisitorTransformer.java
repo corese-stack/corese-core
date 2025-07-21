@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
 
    
-    private static Logger logger = LoggerFactory.getLogger(QuerySolverVisitorTransformer.class);
+    private static final Logger logger = LoggerFactory.getLogger(QuerySolverVisitorTransformer.class);
     
     private static String visitorName;
     
@@ -37,27 +37,22 @@ public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
    
 
     public IDatatype beforeTransformer(String uri) {
-        //System.out.println("beforeTransformer: " + uri);
         return callback(BEFORE_TRANSFORMER, toArray(getTransformer(), uri));
     }
 
     public IDatatype afterTransformer(String uri, String res) {
-//        System.out.println("afterTransformer: " + uri);
-//        System.out.println(res);
         return callback(AFTER_TRANSFORMER, toArray(getTransformer(), uri, res));
     }
     
     
     
     public IDatatype beforeWorkflow(Context ctx, Data data) {
-        //System.out.println("beforeWorkflow:");
         return callback(BEFORE_WORKFLOW, toArray(
             ctx, data.getGraph()));
     }
     
     
     public IDatatype afterWorkflow(Context ctx, Data data) {
-        //System.out.println("beforeWorkflow: " + data);
         return callback(AFTER_WORKFLOW, toArray(ctx, data));
     }
     
@@ -84,7 +79,7 @@ public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
             }
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            java.util.logging.Logger.getLogger(QueryProcess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
             logger.error("Undefined Visitor: " + name);
         }
 
@@ -114,7 +109,7 @@ public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
             }
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
                 | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            java.util.logging.Logger.getLogger(QueryProcess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            logger.error("An unexpected error has occurred", ex);
             logger.error("Undefined Visitor: " + name);
         }
 

@@ -83,7 +83,7 @@ public class ParserLoaderSesame {
 		config.addNonFatalError(NTriplesParserSettings.FAIL_ON_NTRIPLES_INVALID_LINES);
 		parser.setParserConfig(config);
 		parser.setRDFHandler(handler);
-		//System.out.println(this.base+format);
+		//logger.info("Saving data: {}{}", this.base, format);
 		parser.parse(this.reader, this.base);
 	}
 }

@@ -27,11 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class QueryLoad extends Load {
 
-    private static Logger logger = LoggerFactory.getLogger(QueryLoad.class);
-    static final String HTTP = "http://";
-    static final String FILE = "file://";
-    static final String FTP = "ftp://";
-    static final String[] PROTOCOLS = {HTTP, FILE, FTP};
+    private static final Logger logger = LoggerFactory.getLogger(QueryLoad.class);
     static final String NL = "\n";
     QueryEngine engine;
 
@@ -298,7 +294,7 @@ public class QueryLoad extends Load {
             fq.flush();
             fr.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("An error has occurred", e);
         } catch (IOException e) {
         }
         

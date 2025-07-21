@@ -1,9 +1,9 @@
 package fr.inria.corese.core.load;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.util.Property;
@@ -19,7 +19,7 @@ public class OwlImportTest {
 
     private static final String RESOURCE_FOLDER = OwlImportTest.class.getResource("/data-test/owl_imports/").getPath();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // Ensure OWL auto-import is disabled before starting tests
         Property.set(Value.OWL_AUTO_IMPORT, false);

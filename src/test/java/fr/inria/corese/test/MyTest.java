@@ -8,7 +8,7 @@ import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import java.util.Date;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -29,8 +29,7 @@ public class MyTest {
 
         QueryProcess exec = QueryProcess.create(g);
         Mappings map = exec.query(q);
-        IDatatype dt = (IDatatype) map.getValue("?res");
-        System.out.println(dt.getNodeObject());
+        IDatatype dt = map.getValue("?res");
         Date d;
         //assertEquals(10, dt.intValue());
     } 
