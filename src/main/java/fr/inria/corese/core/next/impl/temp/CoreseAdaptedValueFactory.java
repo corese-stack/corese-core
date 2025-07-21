@@ -1,15 +1,5 @@
 package fr.inria.corese.core.next.impl.temp;
 
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.impl.exception.InternalException;
-import fr.inria.corese.core.next.impl.temp.literal.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.temporal.ChronoField;
@@ -19,12 +9,35 @@ import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import fr.inria.corese.core.next.api.BNode;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.Triple;
+import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.api.ValueFactory;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.exception.InternalException;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseBNode;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseBoolean;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseDate;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseDatetime;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseDecimal;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseDuration;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseInteger;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseTime;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
+
 /**
  * Factory for all the Corese adapted values.
  */
 public class CoreseAdaptedValueFactory implements ValueFactory {
-
-    private static Logger logger = LoggerFactory.getLogger(CoreseAdaptedValueFactory.class);
 
     private final AtomicLong nodeID = new AtomicLong(ThreadLocalRandom.current().nextLong());
 

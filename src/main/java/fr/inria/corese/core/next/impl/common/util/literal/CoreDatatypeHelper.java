@@ -5,10 +5,6 @@ import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 public class CoreDatatypeHelper {
 
     private CoreDatatypeHelper() {

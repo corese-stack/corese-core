@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractLineBasedSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsOption;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,21 +1,22 @@
 package fr.inria.corese.core.next.impl.common.literal;
 
-import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.Period;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 
 public class BasicDurationTest {
-
-    private static Logger logger = LoggerFactory.getLogger(BasicDurationTest.class);
 
     @Test
     public void testParse() {
@@ -41,7 +42,8 @@ public class BasicDurationTest {
         BasicDuration durationP8 = BasicDuration.parse(positiveExample8);
 
         assertEquals(Period.of(1, 2, 3).toString(), durationP1.getLabel());
-        assertEquals(Duration.ofHours(1).plusMinutes(2).plusSeconds(3).plusNanos(400000000).toString(), durationP2.getLabel());
+        assertEquals(Duration.ofHours(1).plusMinutes(2).plusSeconds(3).plusNanos(400000000).toString(),
+                durationP2.getLabel());
         assertEquals(Period.of(1347, 0, 0).toString(), durationP3.getLabel());
         assertEquals(Period.of(0, 1347, 0).toString(), durationP4.getLabel());
         assertEquals(positiveExample5, durationP5.getLabel());
@@ -217,7 +219,7 @@ public class BasicDurationTest {
 
     @Test
     public void testTemporalAmountValueAddition() {
-        LocalTime time = LocalTime.of(12,0);
+        LocalTime time = LocalTime.of(12, 0);
         BasicDuration basicPositiveDuration = BasicDuration.parse("PT3H");
         BasicDuration basicNegativeDuration = BasicDuration.parse("-PT5H30M");
         BasicDuration tooBigDuration = BasicDuration.parse("P3DT6H");
@@ -233,7 +235,7 @@ public class BasicDurationTest {
 
     @Test
     public void testTemporalAmountValueSubtraction() {
-        LocalTime time = LocalTime.of(12,0);
+        LocalTime time = LocalTime.of(12, 0);
         BasicDuration basicPositiveDuration = BasicDuration.parse("PT5H30M");
         BasicDuration basicNegativeDuration = BasicDuration.parse("-PT3H");
         BasicDuration tooBigDuration = BasicDuration.parse("P3DT6H");

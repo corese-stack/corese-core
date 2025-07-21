@@ -1,16 +1,16 @@
 package fr.inria.corese.core.next.impl.io.serialization.ntriples;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractLineBasedSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesOption;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Objects;
 
 /**
  * Serializes a Corese {@link Model} into N-Triples format.

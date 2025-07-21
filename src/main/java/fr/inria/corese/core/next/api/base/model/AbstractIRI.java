@@ -1,18 +1,14 @@
 package fr.inria.corese.core.next.api.base.model;
 
-import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
+import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 
 /**
- * Base class for IRI implementations. Includes base functionality for IRI handling.
+ * Base class for IRI implementations. Includes base functionality for IRI
+ * handling.
  */
-public abstract class AbstractIRI implements IRI, Comparable<IRI>, Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractIRI.class);
+public abstract class AbstractIRI implements IRI, Comparable<IRI> {
 
     private static final long serialVersionUID = -1005683238501772511L;
 
@@ -26,8 +22,8 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI>, Serializable 
      * @throws IncorrectFormatException if the IRI format is incorrect
      */
     protected AbstractIRI(String fullIRI) {
-        if(! IRIUtils.isStandardIRI(fullIRI)) {
-            throw new IncorrectFormatException("IRI '"+ fullIRI +"' must be a valid IRI");
+        if (!IRIUtils.isStandardIRI(fullIRI)) {
+            throw new IncorrectFormatException("IRI '" + fullIRI + "' must be a valid IRI");
         }
         this.namespace = IRIUtils.guessNamespace(fullIRI);
         this.localName = IRIUtils.guessLocalName(fullIRI);
@@ -41,8 +37,8 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI>, Serializable 
      * @throws IncorrectFormatException if the IRI format is incorrect
      */
     protected AbstractIRI(String namespace, String localName) {
-        if(! IRIUtils.isStandardIRI(namespace + localName)) {
-            throw new IncorrectFormatException("IRI '"+ namespace + localName +"' must be a valid IRI");
+        if (!IRIUtils.isStandardIRI(namespace + localName)) {
+            throw new IncorrectFormatException("IRI '" + namespace + localName + "' must be a valid IRI");
         }
         this.namespace = namespace;
         this.localName = localName;
@@ -75,8 +71,10 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI>, Serializable 
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         AbstractIRI that = (AbstractIRI) o;
         return this.stringValue().equals(that.stringValue());
     }

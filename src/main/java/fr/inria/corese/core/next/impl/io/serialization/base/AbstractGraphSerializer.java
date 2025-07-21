@@ -157,7 +157,6 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * if auto-declaration is enabled and they are not already mapped.
      */
     protected void collectUsedNamespaces() {
-        AbstractSerializerOption tFamilyConfig = getTFamilyOption();
 
         Set<String> namespaces = model.stream()
                 .flatMap(stmt -> {
@@ -546,7 +545,6 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected boolean writeRDFList(Writer writer, Resource listHead) throws IOException {
-        AbstractSerializerOption tFamilyConfig = getTFamilyOption();
 
         List<Value> items = new ArrayList<>();
         Resource current = listHead;

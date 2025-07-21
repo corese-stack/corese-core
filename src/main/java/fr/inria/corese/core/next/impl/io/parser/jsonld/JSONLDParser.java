@@ -1,5 +1,9 @@
 package fr.inria.corese.core.next.impl.io.parser.jsonld;
 
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URI;
+
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.document.Document;
@@ -7,18 +11,20 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.processor.ToRdfProcessor;
 import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
+
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.option.TitaniumJSONLDProcessorOption;
-
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URI;
 
 /**
  * Parser for JSON-LD RDF files. This parser is based on the Titanium JSON-LD library.
@@ -28,14 +34,25 @@ import java.net.URI;
  */
 public class JSONLDParser extends AbstractRDFParser {
 
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(JSONLDParser.class);
-
     private static final String JSONLD_JAVA_DEFAULT_GRAPH = "@default";
 
+    /**
+     * Constructor for JSONLDParser that initializes the model and value factory.
+     *
+     * @param model   the model to be populated by the parser
+     * @param factory the value factory used to create RDF values
+     */
     public JSONLDParser(Model model, ValueFactory factory) {
         super(model, factory, new TitaniumJSONLDProcessorOption.Builder().build());
     }
 
+    /**
+     * Constructor for JSONLDParser that initializes the model, value factory, and configuration options.
+     *
+     * @param model   the model to be populated by the parser
+     * @param factory the value factory used to create RDF values
+     * @param config  optional configuration options for the parser
+     */
     public JSONLDParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);
     }
@@ -93,6 +110,12 @@ public class JSONLDParser extends AbstractRDFParser {
         }
     }
 
+    /**
+     * Returns a consumer that will handle the RDF quads parsed from the JSON-LD document.
+     * This consumer will create statements in the model using the value factory.
+     *
+     * @return a RdfQuadConsumer that processes RDF quads
+     */
     private RdfQuadConsumer getConsumer() {
         return new RdfQuadConsumer() {
             @Override

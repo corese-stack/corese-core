@@ -35,30 +35,30 @@ public class TestSuite {
         new TestSuite(Test1, 100, Test1.length, 256 * MB).test();
     }
 
-    private static void testSpeed() throws IOException {
-        int[][] Test1 = {
-            {400 * KB, 1 * MB},
-            {1 * MB, 3 * MB}
-        };
+    // private static void testSpeed() throws IOException {
+    //     int[][] Test1 = {
+    //         {400 * KB, 1 * MB},
+    //         {1 * MB, 3 * MB}
+    //     };
 
-        int[][] Test2 = {
-            {64, 512},
-            {512, KB},
-            {1 * KB, 16 * KB},
-            {16 * KB, 64 * KB},
-            {64 * KB, 128 * KB},
-            {128 * KB, 256 * KB},
-            {256 * KB, 512 * KB}
-        };
+    //     int[][] Test2 = {
+    //         {64, 512},
+    //         {512, KB},
+    //         {1 * KB, 16 * KB},
+    //         {16 * KB, 64 * KB},
+    //         {64 * KB, 128 * KB},
+    //         {128 * KB, 256 * KB},
+    //         {256 * KB, 512 * KB}
+    //     };
 
-        new TestSuite(Test2, 1000, Test2.length).test();
+    //     new TestSuite(Test2, 1000, Test2.length).test();
 
-    }
+    // }
 
-    private static void testCorrectness() {
-        Test tCorrectness = new Test(KB, 1 * MB);
-        tCorrectness.testCorrectness(50, 10, true);
-    }
+    // private static void testCorrectness() {
+    //     Test tCorrectness = new Test(KB, 1 * MB);
+    //     tCorrectness.testCorrectness(50, 10, true);
+    // }
     private final static String[] titles = {
         "Length (min):",
         "Length (max):",

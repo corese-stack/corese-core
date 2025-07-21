@@ -11,14 +11,22 @@ import fr.inria.corese.core.next.api.io.parser.RDFParserFactory;
  */
 public abstract class AbstractRDFParserFactory implements RDFParserFactory {
 
+    /**
+     * Default constructor for AbstractRDFParserFactory.
+     * 
+     * The constructor is protected to prevent instantiation from outside the
+     * package.
+     */
     protected AbstractRDFParserFactory() {
     }
 
     /**
      * Creates a new RDF parser for the given RDF format and model.
-     * @param format The {@link RDFFormat} to use for parsing.
-     * @param model  The {@link Model} to which the parsed data will be added.
-     * @param factory The {@link ValueFactory} factory to use for creating RDF values.
+     * 
+     * @param format  The {@link RDFFormat} to use for parsing.
+     * @param model   The {@link Model} to which the parsed data will be added.
+     * @param factory The {@link ValueFactory} factory to use for creating RDF
+     *                values.
      * @return
      */
     @Override

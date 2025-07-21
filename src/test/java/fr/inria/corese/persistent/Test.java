@@ -76,7 +76,7 @@ public class Test {
         String s;
 
         while (c-- > 0) {
-            s = RandomStringUtils.random(r.nextInt(max - min) + min, true, true);
+            s = RandomStringUtils.random(r.nextInt(max - min) + min, 0, 0, true, true, null, r);
             length += s.length();
             literalStrings.put(index++, s);
         }
@@ -148,6 +148,7 @@ public class Test {
     public double[] read(boolean random, int nRecords, boolean check) {
         Map<Integer, String> literalsRead = new HashMap<Integer, String>();
         long start = System.currentTimeMillis();
+        @SuppressWarnings("unused")
         int correct = 0;
 
         if (random) {
@@ -185,6 +186,7 @@ public class Test {
         return new double[] { time * 1.0 / 1000, time * 1.0 / literalsRead.size() };
     }
 
+    @SuppressWarnings("unused")
     public void delete(int nRecords) {
         // generate randomly the literals to delete
         int size = literalsAll.size();

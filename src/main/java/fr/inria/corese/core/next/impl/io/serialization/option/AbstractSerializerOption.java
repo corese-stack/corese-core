@@ -303,6 +303,7 @@ public abstract class AbstractSerializerOption implements SerializationOption {
          *
          * @return The concrete builder instance.
          */
+        @SuppressWarnings("unchecked")
         protected final S self() {
             return (S) this;
         }

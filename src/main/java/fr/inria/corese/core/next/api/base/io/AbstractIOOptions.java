@@ -7,6 +7,9 @@ import fr.inria.corese.core.next.api.io.IOOptions;
  */
 public abstract  class AbstractIOOptions implements IOOptions {
 
+    /**
+     * Builder class for constructing instances of IOOptions.
+     */
      public abstract static class Builder< T extends IOOptions> {
         protected Builder() {
 

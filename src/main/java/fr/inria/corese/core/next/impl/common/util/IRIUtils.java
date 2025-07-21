@@ -1,8 +1,5 @@
 package fr.inria.corese.core.next.impl.common.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,8 +9,6 @@ import java.util.regex.Pattern;
  * Intended to facilitate string manipulation related to IRI.
  */
 public class IRIUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(IRIUtils.class);
 
     private static final Pattern IRI_PATTERN = Pattern.compile("^(([\\w\\-]+:\\/\\/([\\w\\-_:]+\\.)*[\\w\\-_:]*)(\\/([\\w\\-\\._\\:]+\\/)*))([\\w\\-\\._\\:]+)(\\?[\\w\\-_\\:\\?\\=]+)?((\\#)?([\\w\\-_]+))?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");

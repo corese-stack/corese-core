@@ -264,7 +264,7 @@ class AbstractModelTest {
     void testContextsView() {
         model.add(subject1, predicate1, object1, context1);
         model.add(subject1, predicate1, object1, context2);
-        model.add(subject2, predicate2, object2, null);
+        model.add(subject2, predicate2, object2, (Resource) null);
 
         Set<Resource> contexts = model.contexts();
         assertEquals(3, contexts.size());
@@ -303,7 +303,7 @@ class AbstractModelTest {
         assertFalse(collected2.contains(stmt1));
         assertFalse(collected2.contains(stmt4));
 
-        Iterable<Statement> filteredByNullContext = model.getStatements(null, null, null, null);
+        Iterable<Statement> filteredByNullContext = model.getStatements(null, null, null, (Resource[]) null);
         Set<Statement> collected3 = new HashSet<>();
         filteredByNullContext.forEach(collected3::add);
         assertEquals(1, collected3.size());
@@ -436,7 +436,7 @@ class AbstractModelTest {
         assertFalse(filteredBySubjectAndPredicate.contains(stmt1));
         assertTrue(filteredBySubjectAndPredicate.contains(stmt4));
 
-        Model filteredByNullContext = model.filter(null, null, null, null);
+        Model filteredByNullContext = model.filter(null, null, null, (Resource[]) null);
         assertEquals(1, filteredByNullContext.size());
         assertTrue(filteredByNullContext.contains(stmt4));
 

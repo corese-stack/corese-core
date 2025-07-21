@@ -1,23 +1,31 @@
 package fr.inria.corese.core.next.impl.common.literal;
 
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.api.base.model.literal.AbstractDuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.HOURS;
+import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.MONTHS;
+import static java.time.temporal.ChronoUnit.NANOS;
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.time.temporal.ChronoUnit.YEARS;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.time.temporal.ChronoUnit.*;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractDuration;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
 
 /**
  * A basic implementation of the {@link Literal} interface for durations.
@@ -27,7 +35,6 @@ import static java.time.temporal.ChronoUnit.*;
  */
 public class BasicDuration extends AbstractDuration {
 
-    private static final Logger logger = LoggerFactory.getLogger(BasicDuration.class);
     private final XSDDuration temporalAmount;
 
     /**
