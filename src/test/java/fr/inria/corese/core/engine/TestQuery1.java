@@ -6603,7 +6603,7 @@ public class TestQuery1 {
     }
 
     @Test
-    public void testValues2()  throws EngineException {
+    void testValues2()  throws EngineException {
         String init = "prefix foaf: <http://xmlns.com/foaf/0.1/> "
                 + "insert data {"
                 + "<John>  foaf:name 'http://www.inria.fr' "
@@ -6626,7 +6626,6 @@ public class TestQuery1 {
 
             exec.query(init);
             Mappings map = exec.query(query);
-           //logger.info("map {}",map);
             assertEquals(3, map.size(), "Result");
 
 
