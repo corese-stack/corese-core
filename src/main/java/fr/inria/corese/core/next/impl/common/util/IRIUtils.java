@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  */
 public class IRIUtils {
 
-    private static final Pattern IRI_PATTERN = Pattern.compile("^(([\\w\\-]+:\\/\\/([\\w\\-_:]+\\.)*[\\w\\-_:]*)(\\/([\\w\\-\\._\\:]+\\/)*))([\\w\\-\\._\\:]+)(\\?[\\w\\-_\\:\\?\\=]+)?((\\#)?([\\w\\-_]+))?$");
+    private static final Pattern IRI_PATTERN = Pattern.compile("^(([\\w\\-]+:\\/\\/([\\w\\-_:]+\\.)*[\\w\\-_:]*)(\\/([\\w\\-\\._\\:]+\\/)*))([\\w\\-\\._\\:]+)?(\\?[\\w\\-_\\:\\?\\=]+)?((\\#)?([\\w\\-_]+))?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
 
     /**
