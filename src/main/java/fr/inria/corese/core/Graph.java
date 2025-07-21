@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -122,18 +123,18 @@ public class Graph extends GraphObject implements
     // edge Index for RuleEngine where edge are sorted newest first
     EdgeManagerIndexer ruleEdgeIndex;
     // predefined individual Node such as kg:default named graph
-    HashMap<String, Node> system;
+    ConcurrentHashMap<String, Node> system;
     // key -> URI Node ; member of graph nodes (subject/object)
-    Hashtable<String, Node> individual;
+    ConcurrentHashMap<String, Node> individual;
     // label -> Blank Node ; member of graph nodes (subject/object)
-    Hashtable<String, Node> blank;
+    ConcurrentHashMap<String, Node> blank;
     // Triple Reference Node
-    Hashtable<String, Node> triple;
+    ConcurrentHashMap<String, Node> triple;
     // named graph id nodes: key -> named graph id Node (possibly not subject/object
     // Node)
-    Hashtable<String, Node> graph;
+    ConcurrentHashMap<String, Node> graph;
     // property nodes: label -> property Node (possibly not subject/object Node)
-    Hashtable<String, Node> property;
+    ConcurrentHashMap<String, Node> property;
     // key -> Node for value management in external memory
     Map<String, Node> vliteral;
     ValueResolver values;
@@ -247,15 +248,15 @@ public class Graph extends GraphObject implements
         // deprecated:
         vliteral = Collections.synchronizedMap(new HashMap<>());
         // URI Node
-        individual = new Hashtable<>();
+        individual = new ConcurrentHashMap<>();
         // Blank Node
-        blank = new Hashtable<>();
+        blank = new ConcurrentHashMap<>();
         // rdf star triple reference node
-        triple = new Hashtable<>();
+        triple = new ConcurrentHashMap<>();
         // Named Graph Node
-        graph = new Hashtable<>();
+        graph = new ConcurrentHashMap<>();
         // Property Node
-        property = new Hashtable<>();
+        property = new ConcurrentHashMap<>();
 
         // Index of nodes of named graphs
         // Use case: SPARQL Property Path
@@ -568,7 +569,7 @@ public class Graph extends GraphObject implements
      * on demand
      */
     void initSystem() {
-        system = new HashMap<>();
+        system = new ConcurrentHashMap<>();
         systemNode = new ArrayList<>();
         for (String uri : PREDEFINED) {
             Node n = createSystemNode(uri);
@@ -2463,7 +2464,7 @@ public class Graph extends GraphObject implements
             }
         }
         if (meta.isEmpty()) {
-            return new ArrayList<Edge>();
+            return new ArrayList<>();
         }
         return meta;
     }
@@ -2621,7 +2622,7 @@ public class Graph extends GraphObject implements
         return triple.values();
     }
 
-    public Hashtable<String, Node> getTripleNodeMap() {
+    public Map<String, Node> getTripleNodeMap() {
         return triple;
     }
 
@@ -3536,7 +3537,8 @@ public class Graph extends GraphObject implements
         // labels
         // they should have different ID
         if (dt.isDate()) {
-            if ("Z".equals(DatatypeMap.getTZ(dt).toString())) {
+            Object tz = DatatypeMap.getTZ(dt);
+            if (tz != null && "Z".equals(tz.toString())) {
                 return String.format("d%s", n.getIndex());
             }
         }
