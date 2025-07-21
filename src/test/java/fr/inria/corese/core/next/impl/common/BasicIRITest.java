@@ -3,9 +3,6 @@ package fr.inria.corese.core.next.impl.common;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.IRITest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class BasicIRITest extends IRITest {
     @Override
     public IRI createIRI(String iri) {

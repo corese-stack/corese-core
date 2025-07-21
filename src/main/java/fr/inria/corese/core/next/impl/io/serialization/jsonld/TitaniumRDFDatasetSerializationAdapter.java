@@ -7,8 +7,6 @@ import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -29,9 +27,13 @@ import static fr.inria.corese.core.next.impl.io.serialization.util.Serialization
  */
 public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
-    private static final Logger logger = LoggerFactory.getLogger(TitaniumRDFDatasetSerializationAdapter.class);
     private Model model;
 
+    /**
+     * Constructor for TitaniumRDFDatasetSerializationAdapter that initializes the model.
+     *
+     * @param model the model to be adapted
+     */
     public TitaniumRDFDatasetSerializationAdapter(Model model) {
         this.model = model;
     }

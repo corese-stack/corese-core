@@ -14,6 +14,12 @@ import fr.inria.corese.core.next.impl.io.parser.turtle.ANTLRTurtleParser;
  */
 public class ParserFactory extends AbstractRDFParserFactory {
 
+    /**
+     * Default constructor for ParserFactory.
+     * 
+     * The constructor is protected to prevent instantiation from outside the
+     * package.
+     */
     public ParserFactory() {
         super();
     }

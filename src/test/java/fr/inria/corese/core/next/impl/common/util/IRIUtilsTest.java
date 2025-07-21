@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.impl.common.util;
 
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class IRIUtilsTest {
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(IRIUtilsTest.class);
 
     private static final String uriSchema = "http://schema.org/test/test/name";
     private static final String uriWithFragment = "http://www.w3.org/2001/XMLSchema#string";

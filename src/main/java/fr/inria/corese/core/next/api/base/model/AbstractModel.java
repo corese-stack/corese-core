@@ -387,7 +387,12 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         protected abstract void removeIteration(Iterator<Statement> iterator, V term);
 
         protected void closeIterator(Iterator<?> iterator) {
-            AbstractModel.this.closeIterator(((ValueSetIterator) iterator).statementIterator);
+            // Only close iterators of our own ValueSetIterator type
+            if (iterator.getClass().getSimpleName().equals("ValueSetIterator")) {
+                @SuppressWarnings("unchecked")
+                ValueSetIterator valueSetIterator = (ValueSetIterator) iterator;
+                AbstractModel.this.closeIterator(valueSetIterator.statementIterator);
+            }
         }
 
         private void closeIterator(Collection<?> collection, Iterator<?> iterator) {
@@ -584,8 +589,8 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
     // ValueSet.ValueSetIterator
     // when Java 17+ is used
     protected void closeIterator(Iterator<?> iterator) {
-        if (iterator instanceof ValueSet.ValueSetIterator) {
-            ValueSet.ValueSetIterator valueSetIterator = (ValueSet.ValueSetIterator) iterator;
+        if (iterator instanceof ValueSet<?>.ValueSetIterator) {
+            ValueSet<?>.ValueSetIterator valueSetIterator = (ValueSet<?>.ValueSetIterator) iterator;
             closeIterator(valueSetIterator.statementIterator);
         }
     }

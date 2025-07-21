@@ -1,13 +1,13 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.sparql.datatype.CoreseNumber;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 
 public class CoreseIntegerTest extends AbstractCoreseNumberTest {
 

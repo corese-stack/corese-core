@@ -1,20 +1,23 @@
 package fr.inria.corese.core.next.impl.temp;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.api.model.ValueFactoryTest;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.model.ValueFactoryTest;
+import fr.inria.corese.core.next.impl.common.literal.RDF;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
+import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
 
 public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
 

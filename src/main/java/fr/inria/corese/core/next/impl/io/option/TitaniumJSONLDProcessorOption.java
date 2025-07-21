@@ -1,59 +1,86 @@
 package fr.inria.corese.core.next.impl.io.option;
 
-import com.apicatalog.jsonld.JsonLdOptions;
-import com.apicatalog.jsonld.JsonLdVersion;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
-import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
-import fr.inria.corese.core.next.api.io.parser.RDFParserOptions;
-
 import java.net.URI;
 import java.time.Duration;
 
+import com.apicatalog.jsonld.JsonLdOptions;
+import com.apicatalog.jsonld.JsonLdVersion;
+
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
+import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
+
 /**
- * Wrapper around the JsonLdOptions class for the Titanium JSONLD parser and serializer.
- * @see <a href="https://javadoc.io/doc/com.apicatalog/titanium-json-ld/latest/com/apicatalog/jsonld/JsonLdOptions.html">JsonLdOptions</a>
+ * Wrapper around the JsonLdOptions class for the Titanium JSONLD parser and
+ * serializer.
+ * 
+ * @see <a href=
+ *      "https://javadoc.io/doc/com.apicatalog/titanium-json-ld/latest/com/apicatalog/jsonld/JsonLdOptions.html">JsonLdOptions</a>
  */
-public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements RDFParserOptions, RDFParserBaseIRIOptions {
+public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements RDFParserBaseIRIOptions {
 
     private final Builder builder;
 
+    /**
+     * Creates a new TitaniumJSONLDProcessorOption with the specified builder.
+     * 
+     * @param builder the builder containing the options for this processor
+     */
     protected TitaniumJSONLDProcessorOption(Builder builder) {
         this.builder = builder;
     }
 
     /**
-     * @return it true, the serializer will compact arrays of length 1 with a single object item will be compacted to use only that object instead. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-compactarrays">See standard.</a>
+     * @return if true, the serializer will compact arrays of length 1 with a single
+     *         object item will be compacted to use only that object instead.
+     *         <a href=
+     *         "https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-compactarrays">See
+     *         standard.</a>
      */
     public boolean compactsArrays() {
         return this.builder.options.isCompactArrays();
     }
 
     /**
-     * @return if true, the serializer will compact IRIs to be relative to document base. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-compacttorelative">See standard.</a>
+     * @return if true, the serializer will compact IRIs to be relative to document
+     *         base. <a href=
+     *         "https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-compacttorelative">See
+     *         standard.</a>
      */
     public boolean compactsToRelative() {
         return this.builder.options.isCompactToRelative();
     }
 
     /**
-     * @return If  true, when extracting JSON-LD script elements from HTML, unless a specific fragment identifier is targeted, extracts all encountered JSON-LD script elements using an array form, if necessary. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-extractallscripts">See standard.</a>
+     * @return If true, when extracting JSON-LD script elements from HTML, unless a
+     *         specific fragment identifier is targeted, extracts all encountered
+     *         JSON-LD script elements using an array form, if necessary. <a href=
+     *         "https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-extractallscripts">See
+     *         standard.</a>
      */
     public boolean isExtractAllScripts() {
         return this.builder.options.isExtractAllScripts();
     }
 
+    /**
+     * @return If true, the serializer will omit the @default graph in the output.
+     */
     public boolean omitsDefault() {
         return this.builder.options.isOmitDefault();
     }
 
+    /**
+     * @return If true, the serializer will omit the @graph in the output.
+     */
     public boolean omitGraphs() {
         return this.builder.options.isOmitGraph();
     }
 
     /**
      *
-     * @return If true, the serializer will produce ordered JSON-LD. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-ordered">See standard.</a>
+     * @return If true, the serializer will produce ordered JSON-LD. <a href=
+     *         "https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-ordered">See
+     *         standard.</a>
      */
     public boolean isOrdered() {
         return this.builder.options.isOrdered();
@@ -61,7 +88,9 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
 
     /**
      *
-     * @return the version of the JSON-LD standard used for processing. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-processingmode">See standard.</a>
+     * @return the version of the JSON-LD standard used for processing. <a href=
+     *         "https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-processingmode">See
+     *         standard.</a>
      */
     public JsonLdVersion getProcessingMode() {
         return this.builder.options.getProcessingMode();
@@ -75,14 +104,19 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
     }
 
     /**
-     * @return If true, the serializer will produce JSON-LD using native types. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-usenativetypes">See standard.</a>
+     * @return If true, the serializer will produce JSON-LD using native types.
+     *         <a href=
+     *         "https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-usenativetypes">See
+     *         standard.</a>
      */
     public boolean usesNativeTypes() {
         return this.builder.options.isUseNativeTypes();
     }
 
     /**
-     * @return If true, the serializer will produce JSON-LD using RDF type. <a href="https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-userdftype">See standard.</a>
+     * @return If true, the serializer will produce JSON-LD using RDF type. <a href=
+     *         "https://www.w3.org/TR/json-ld11-api/#dom-jsonldoptions-userdftype">See
+     *         standard.</a>
      */
     public boolean usesRdfType() {
         return this.builder.options.isUseRdfType();
@@ -101,6 +135,11 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
         return this.builder.options.getBase().toString();
     }
 
+    /**
+     * Builder for creating instances of TitaniumJSONLDProcessorOption.
+     *
+     * @return the builder for this option.
+     */
     public static class Builder extends AbstractIOOptions.Builder<TitaniumJSONLDProcessorOption> {
 
         private final JsonLdOptions options = new JsonLdOptions();
@@ -129,8 +168,8 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
         }
 
         /**
-         *
-         * @param compactArrays if true, arrays of length 1 with a single object item will be compacted to use only that object instead.
+         * @param compactArrays if true, arrays of length 1 with a single object item
+         *                      will be compacted to use only that object instead.
          * @return this builder
          */
         public Builder compactArrays(boolean compactArrays) {
@@ -139,7 +178,8 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
         }
 
         /**
-         * @param compactToRelative if true, compact IRIs to be relative to document base.
+         * @param compactToRelative if true, compact IRIs to be relative to document
+         *                          base.
          * @return this builder
          */
         public Builder compactToRelative(boolean compactToRelative) {
@@ -148,7 +188,11 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
         }
 
         /**
-         * @param extractAllScripts If set to true, when extracting JSON-LD script elements from HTML, unless a specific fragment identifier is targeted, extracts all encountered JSON-LD script elements using an array form, if necessary.
+         * @param extractAllScripts If set to true, when extracting JSON-LD script
+         *                          elements from HTML, unless a specific fragment
+         *                          identifier is targeted, extracts all encountered
+         *                          JSON-LD script elements using an array form, if
+         *                          necessary.
          * @return this builder
          */
         public Builder extractAllScripts(boolean extractAllScripts) {
@@ -156,11 +200,20 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
             return this;
         }
 
+        /**
+         * @param omitGraph If set to true, the graph will be omitted from the output.
+         * @return this builder
+         */
         public Builder omitGraph(boolean omitGraph) {
             this.options.setOmitGraph(omitGraph);
             return this;
         }
 
+        /**
+         * @param omitDefault If set to true, the @default graph will be omitted from
+         *                    the output.
+         * @return this builder
+         */
         public Builder omitDefault(boolean omitDefault) {
             this.options.setOmitDefault(omitDefault);
             return this;
@@ -168,7 +221,8 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
 
         /**
          *
-         * @param ordered If set to true, certain algorithm processing steps where indicated are ordered lexicographically.
+         * @param ordered If set to true, certain algorithm processing steps where
+         *                indicated are ordered lexicographically.
          * @return this builder
          */
         public Builder ordered(boolean ordered) {
@@ -195,7 +249,9 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
         }
 
         /**
-         * @param useNativeTypes Causes the Serialize RDF as JSON-LD Algorithm to use native JSON values in value objects avoiding the need for an explicitly @type.
+         * @param useNativeTypes Causes the Serialize RDF as JSON-LD Algorithm to use
+         *                       native JSON values in value objects avoiding the need
+         *                       for an explicitly @type.
          * @return this builder
          */
         public Builder useNativeTypes(boolean useNativeTypes) {

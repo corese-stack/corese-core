@@ -1,13 +1,5 @@
 package fr.inria.corese.core.next.api.base.model.literal;
 
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.temporal.TemporalAccessor;
@@ -15,10 +7,18 @@ import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
+
 /**
  * Base class for all literals. All value accessors throw an exception by default.
  */
-public abstract class AbstractLiteral implements Literal, Serializable {
+public abstract class AbstractLiteral implements Literal {
 
     protected IRI datatype;
 

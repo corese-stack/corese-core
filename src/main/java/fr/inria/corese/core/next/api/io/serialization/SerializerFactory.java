@@ -15,6 +15,15 @@ import fr.inria.corese.core.next.api.base.io.RDFFormat;
  */
 public interface SerializerFactory {
 
-
+    /**
+     * Creates a new RDF serializer for the specified format and model.
+     * 
+     * @param format The {@link RDFFormat} to use for serialization.
+     * @param model  The {@link Model} to be serialized.
+     * @param config The {@link SerializationOption} configuration to use for
+     *               serialization.
+     * @return A new instance of an RDF serializer for the specified format and
+     *         model.
+     */
     RDFSerializer createSerializer(RDFFormat format, Model model, SerializationOption config);
 }

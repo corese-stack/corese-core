@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.api.io.serialization;
 
+import java.io.Writer;
+
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-
-import java.io.Writer;
 
 /**
  * Factory interface for creating {@link RDFSerializer} instances.
