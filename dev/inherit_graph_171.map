@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1core_1_1IEstimate.html" title="Interface for estimating the cost of nodes and edges in QPGraph." alt="" coords="5,5,89,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,51,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1query_1_1LogImpl.html" title="Log activity (load, query, etc.)" alt="" coords="99,5,173,31"/>
+<area shape="poly" id="edge427_Node000000_Node000001" title=" " alt="" coords="65,15,98,15,98,21,65,21"/>
 </map>

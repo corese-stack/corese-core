@@ -1,5 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,149,31"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorUser.html" title=" " alt="" coords="197,5,372,31"/>
-<area shape="poly" id="edge518_Node000000_Node000001" title=" " alt="" coords="163,15,197,15,197,21,163,21"/>
+<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1RewriteTriple.html" title="Rewrite one triple into one service with several URI from, from named and named graph have two rewrit..." alt="" coords="5,5,112,31"/>
 </map>

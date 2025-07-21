@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SorterResult.html" title="Manage criteria to evaluate which bgp deserve to be first bgp criteria: triple with constant subject/..." alt="" coords="5,5,108,31"/>
+<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Util.html" title=" " alt="" coords="5,55,51,80"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1PrepareBGP.html" title="Group connected triple in bgp wrt service url." alt="" coords="111,5,209,31"/>
+<area shape="poly" id="edge552_Node000000_Node000001" title=" " alt="" coords="63,52,124,28,126,33,65,57"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Simplify.html" title="Merge several service with same URI into one service." alt="" coords="123,55,197,80"/>
+<area shape="poly" id="edge553_Node000000_Node000002" title=" " alt="" coords="64,65,123,65,123,70,64,70"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1SimplifyService.html" title="Heuristics: Group and restrict federated services on the intersection of their URL list." alt="" coords="99,104,221,129"/>
+<area shape="poly" id="edge554_Node000000_Node000003" title=" " alt="" coords="65,78,126,101,124,106,63,83"/>
 </map>

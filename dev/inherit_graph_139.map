@@ -1,5 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,84,31"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ExtensionFilter.html" title=" " alt="" coords="132,5,251,31"/>
-<area shape="poly" id="edge429_Node000000_Node000001" title=" " alt="" coords="98,15,132,15,132,21,98,21"/>
+<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1cache_1_1ICache.html" title="Interface for implementing cache ICache.java." alt="" coords="7,5,129,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1cache_1_1LRUCache.html" title="Latest recently used cache Cache.java." alt="" coords="179,31,323,56"/>
+<area shape="poly" id="edge377_Node000000_Node000001" title=" " alt="" coords="144,26,179,31,178,36,143,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,55,131,80"/>
+<area shape="poly" id="edge378_Node000002_Node000001" title=" " alt="" coords="144,55,178,50,179,55,145,60"/>
 </map>

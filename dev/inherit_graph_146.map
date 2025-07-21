@@ -1,45 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,80,144,105"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Core.html" title="Super class for Java extension function class public class Myclass extends Core Extension function ca..." alt="" coords="192,31,244,56"/>
-<area shape="poly" id="edge432_Node000000_Node000001" title=" " alt="" coords="124,73,191,50,193,55,126,78"/>
-<area shape="rect" id="Node000021" href="$classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1core_1_1Core.html" title="Root of external java function evaluator for SPARQL extension function with JavaCompiler : class Data..." alt="" coords="192,80,244,105"/>
-<area shape="poly" id="edge436_Node000000_Node000021" title=" " alt="" coords="158,90,192,90,192,95,158,95"/>
-<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Callback.html" title=" " alt="" coords="304,55,383,80"/>
-<area shape="poly" id="edge433_Node000001_Node000002" title=" " alt="" coords="258,48,304,57,303,62,257,53"/>
-<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Extension.html" title="Generic Java Extension function public class prefix fun: &lt;function://fr.inria.corese...." alt="" coords="300,5,387,31"/>
-<area shape="poly" id="edge434_Node000001_Node000003" title=" " alt="" coords="257,33,299,24,300,29,258,38"/>
-<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1extension_1_1Report.html" title=" " alt="" coords="481,17,547,43"/>
-<area shape="poly" id="edge435_Node000003_Node000004" title=" " alt="" coords="401,19,481,25,481,30,400,25"/>
-<area shape="rect" id="Node000020" title=" " alt="" coords="29,31,120,56"/>
-<area shape="poly" id="edge437_Node000020_Node000001" title=" " alt="" coords="134,41,192,41,192,46,134,46"/>
-<area shape="rect" id="Node000018" title=" " alt="" coords="305,104,381,129"/>
-<area shape="rect" id="Node000017" href="$classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ProviderImpl.html" title="Implements service expression There may be local QueryProcess for some URI (use case: W3C test case) ..." alt="" coords="461,91,567,116"/>
-<area shape="poly" id="edge438_Node000018_Node000017" title=" " alt="" coords="395,110,461,105,461,110,396,115"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="292,509,395,535"/>
-<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1FederateVisitor.html" title="Prototype for federated query." alt="" coords="453,387,575,412"/>
-<area shape="poly" id="edge439_Node000007_Node000006" title=" " alt="" coords="361,497,396,459,441,422,467,410,470,414,444,427,400,463,365,500"/>
-<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1ExpandList.html" title="Replace RDF List by Property Path rdf:rest* / rdf:first in SPARQL Query." alt="" coords="467,633,561,659"/>
-<area shape="poly" id="edge440_Node000007_Node000008" title=" " alt="" coords="364,544,399,583,444,620,468,631,466,636,441,624,395,586,360,547"/>
-<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1ExpandPath.html" title="Rewrite Property Path into BGP Expand path and loop (+ and *) with a chain of length at most n Implem..." alt="" coords="465,436,563,461"/>
-<area shape="poly" id="edge441_Node000007_Node000009" title=" " alt="" coords="380,501,442,472,474,459,476,464,444,476,382,506"/>
-<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1visitor_1_1MetadataVisitor.html" title="Metadata Visitor." alt="" coords="451,485,577,511"/>
-<area shape="poly" id="edge442_Node000007_Node000010" title=" " alt="" coords="408,510,450,504,451,510,409,516"/>
-<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1transform_1_1TransformerVisitor.html" title="QueryVisitor for Transformation templates May optimize template execution." alt="" coords="443,535,585,560"/>
-<area shape="poly" id="edge443_Node000007_Node000011" title=" " alt="" coords="409,529,443,534,442,539,408,534"/>
-<area shape="rect" id="Node000012" href="$classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1ldpath_1_1LinkedDataPath.html" title="Given query, endpoint URI and size compute paths starting from query solution resources with path siz..." alt="" coords="453,584,575,609"/>
-<area shape="poly" id="edge444_Node000007_Node000012" title=" " alt="" coords="380,539,444,570,473,581,471,586,442,575,378,544"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="299,213,388,239"/>
-<area shape="poly" id="edge446_Node000005_Node000004" title=" " alt="" coords="357,200,400,132,441,76,464,56,488,40,491,45,467,60,445,80,404,135,362,203"/>
-<area shape="poly" id="edge451_Node000005_Node000017" title=" " alt="" coords="360,201,395,162,441,125,465,114,467,118,444,130,399,166,364,205"/>
-<area shape="poly" id="edge445_Node000005_Node000006" title=" " alt="" coords="357,250,391,312,415,345,444,373,463,384,461,389,441,377,411,348,386,315,353,253"/>
-<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1Service.html" title="Send a SPARQL query to a SPARQL endpoint Return a Mappings." alt="" coords="479,337,549,363"/>
-<area shape="poly" id="edge447_Node000005_Node000013" title=" " alt="" coords="364,248,399,287,444,324,480,339,477,344,441,328,395,290,360,251"/>
-<area shape="rect" id="Node000014" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ServiceParser.html" title="Parser for service result." alt="" coords="459,140,569,165"/>
-<area shape="poly" id="edge448_Node000005_Node000014" title=" " alt="" coords="378,205,442,174,471,163,473,168,444,179,381,209"/>
-<area shape="rect" id="Node000015" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1ServiceReport.html" title="Generate service execution report as IDatatype json object recorded in Mappings as additional variabl..." alt="" coords="457,189,571,215"/>
-<area shape="poly" id="edge449_Node000005_Node000015" title=" " alt="" coords="401,215,457,207,458,213,402,220"/>
-<area shape="rect" id="Node000016" href="$classfr_1_1inria_1_1corese_1_1core_1_1query_1_1CompileService.html" title=" " alt="" coords="452,239,576,264"/>
-<area shape="poly" id="edge450_Node000005_Node000016" title=" " alt="" coords="402,232,452,239,451,245,402,237"/>
-<area shape="rect" id="Node000019" href="$classfr_1_1inria_1_1corese_1_1core_1_1query_1_1ProviderService.html" title="Service call Service Report is recorded by ServiceParser &#45;&gt; ServiceReport." alt="" coords="452,288,576,313"/>
-<area shape="poly" id="edge452_Node000005_Node000019" title=" " alt="" coords="380,243,444,274,473,285,471,290,442,279,378,248"/>
+<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1Index.html" title="Interface for Index for Graph." alt="" coords="5,5,64,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1index_1_1EdgeManagerIndexer.html" title="Table property node &#45;&gt; List&lt;Edge&gt; Edge may be stored using internal structure without property Node t..." alt="" coords="112,5,271,31"/>
+<area shape="poly" id="edge383_Node000000_Node000001" title=" " alt="" coords="78,15,112,15,112,21,78,21"/>
 </map>

@@ -85,14 +85,80 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aad95e8f8d8352565e79f0c75c1ab18dd" id="r_aad95e8f8d8352565e79f0c75c1ab18dd"><td class="memItemLeft" align="right" valign="top"><a id="aad95e8f8d8352565e79f0c75c1ab18dd" name="aad95e8f8d8352565e79f0c75c1ab18dd"></a>
-default Mappings&#160;</td><td class="memItemRight" valign="bottom"><b>service</b> (Node serv, Exp exp, Mappings map, Eval eval)  throws SparqlException </td></tr>
+<tr class="memitem:aad95e8f8d8352565e79f0c75c1ab18dd" id="r_aad95e8f8d8352565e79f0c75c1ab18dd"><td class="memItemLeft" align="right" valign="top">default Mappings&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Provider.html#aad95e8f8d8352565e79f0c75c1ab18dd">service</a> (Node serv, Exp exp, Mappings map, Eval eval)  throws SparqlException </td></tr>
+<tr class="memdesc:aad95e8f8d8352565e79f0c75c1ab18dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute the request in exp on the serv node, with the env environment, and returns the mapping obtained.  <br /></td></tr>
 <tr class="separator:aad95e8f8d8352565e79f0c75c1ab18dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd2db2eff57c55176a5ec8f95122b9a6" id="r_afd2db2eff57c55176a5ec8f95122b9a6"><td class="memItemLeft" align="right" valign="top"><a id="afd2db2eff57c55176a5ec8f95122b9a6" name="afd2db2eff57c55176a5ec8f95122b9a6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set</b> (String uri, double version)</td></tr>
+<tr class="separator:afd2db2eff57c55176a5ec8f95122b9a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72213beedd38adc94ac5441ac5530537" id="r_a72213beedd38adc94ac5441ac5530537"><td class="memItemLeft" align="right" valign="top"><a id="a72213beedd38adc94ac5441ac5530537" name="a72213beedd38adc94ac5441ac5530537"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isSparql0</b> (Node serv)</td></tr>
+<tr class="separator:a72213beedd38adc94ac5441ac5530537"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Service Provider. </p>
 <dl class="section author"><dt>Author</dt><dd>Olivier Corby, Edelweiss, INRIA 2011 </dd></dl>
-</div><hr/>The documentation for this interface was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aad95e8f8d8352565e79f0c75c1ab18dd" name="aad95e8f8d8352565e79f0c75c1ab18dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad95e8f8d8352565e79f0c75c1ab18dd">&#9670;&#160;</a></span>service()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">default Mappings service </td>
+          <td>(</td>
+          <td class="paramtype">Node&#160;</td>
+          <td class="paramname"><em>serv</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Exp&#160;</td>
+          <td class="paramname"><em>exp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Mappings&#160;</td>
+          <td class="paramname"><em>map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eval&#160;</td>
+          <td class="paramname"><em>eval</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> throws SparqlException</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Execute the request in exp on the serv node, with the env environment, and returns the mapping obtained. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">serv</td><td>Server on which to execute the query. </td></tr>
+    <tr><td class="paramname">exp</td><td>SPARQL request. </td></tr>
+    <tr><td class="paramname">env</td><td>Environment to use when applying the request. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The mapping of the variables to their values. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">map</td><td>Pre-existing mappings. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section see"><dt>See also</dt><dd>#service(<a class="el" href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1Node.html" title="Interface of Node provided by graph implementation and also by KGRAM query Node.">fr.inria.corese.core.kgram.api.core.Node</a>, <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Exp.html" title="KGRAM/SPARQL expressions: bgp, union, optional, etc.">fr.inria.corese.core.kgram.core.Exp</a>, <a class="el" href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Environment.html" title="Interface of the binding environment provided by KGRAM e.g.">fr.inria.corese.core.kgram.api.query.Environment</a>) </dd></dl>
+
+</div>
+</div>
+<hr/>The documentation for this interface was generated from the following file:<ul>
 <li>/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/kgram/api/query/<b>Provider.java</b></li>
 </ul>
 </div><!-- contents -->

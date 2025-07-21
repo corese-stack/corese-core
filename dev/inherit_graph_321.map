@@ -1,21 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,153,132,179"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1EngineException.html" title="This class gathers all the exceptions that can be thrown in Corese." alt="" coords="180,153,311,179"/>
-<area shape="poly" id="edge549_Node000000_Node000001" title=" " alt="" coords="146,163,180,163,180,169,146,169"/>
-<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1LDScriptException.html" title=" " alt="" coords="400,5,540,31"/>
-<area shape="poly" id="edge550_Node000001_Node000002" title=" " alt="" coords="260,140,299,89,326,62,357,40,399,24,401,29,360,44,330,66,303,92,264,143"/>
-<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1QueryLexicalException.html" title="This exception is used when errors are detected by the lexical analyser" alt="" coords="385,55,555,80"/>
-<area shape="poly" id="edge551_Node000001_Node000003" title=" " alt="" coords="271,142,311,114,358,89,392,78,393,83,360,94,313,119,274,147"/>
-<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1QuerySemanticException.html" title="This exception is used for semantic errors: (one exception is raised for all the semantic errors that..." alt="" coords="377,104,563,129"/>
-<area shape="poly" id="edge552_Node000001_Node000004" title=" " alt="" coords="315,148,358,138,409,127,410,132,359,143,316,153"/>
-<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1QuerySyntaxException.html" title="This exception is thrown when there is an error in the syntax of the query." alt="" coords="385,153,555,179"/>
-<area shape="poly" id="edge554_Node000001_Node000006" title=" " alt="" coords="325,163,384,163,384,169,325,169"/>
-<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1SafetyException.html" title=" " alt="" coords="406,203,534,228"/>
-<area shape="poly" id="edge555_Node000001_Node000007" title=" " alt="" coords="318,179,412,200,411,205,316,184"/>
-<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1StopException.html" title=" " alt="" coords="413,252,527,277"/>
-<area shape="poly" id="edge556_Node000001_Node000008" title=" " alt="" coords="275,185,314,212,360,237,413,253,412,258,358,242,311,217,272,190"/>
-<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1UndefinedExpressionException.html" title=" " alt="" coords="359,301,581,327"/>
-<area shape="poly" id="edge557_Node000001_Node000009" title=" " alt="" coords="264,188,304,239,330,265,360,286,388,299,386,304,357,291,327,269,300,242,260,192"/>
-<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1exceptions_1_1CompileException.html" title=" " alt="" coords="629,104,769,129"/>
-<area shape="poly" id="edge553_Node000004_Node000005" title=" " alt="" coords="577,114,629,114,629,119,577,119"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,120,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1ValueResolverImpl.html" title="Manage Node values in a table: key &#45;&gt; IDatatype key is MD5 hash of IDatatype label." alt="" coords="168,5,312,31"/>
+<area shape="poly" id="edge555_Node000000_Node000001" title=" " alt="" coords="134,15,168,15,168,21,134,21"/>
 </map>

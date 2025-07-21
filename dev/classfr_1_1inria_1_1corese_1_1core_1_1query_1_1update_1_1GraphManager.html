@@ -92,9 +92,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a68094105c2273acfa51e51a1fd41cac7" id="r_a68094105c2273acfa51e51a1fd41cac7"><td class="memItemLeft" align="right" valign="top"><a id="a68094105c2273acfa51e51a1fd41cac7" name="a68094105c2273acfa51e51a1fd41cac7"></a>
 <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getGraph</b> ()</td></tr>
 <tr class="separator:a68094105c2273acfa51e51a1fd41cac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79a1779ccc5e6e8a0d57ad3b4127744a" id="r_a79a1779ccc5e6e8a0d57ad3b4127744a"><td class="memItemLeft" align="right" valign="top"><a id="a79a1779ccc5e6e8a0d57ad3b4127744a" name="a79a1779ccc5e6e8a0d57ad3b4127744a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setGraph</b> (<a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a> graph)</td></tr>
-<tr class="separator:a79a1779ccc5e6e8a0d57ad3b4127744a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8af0512d5821ddd29807a21b58d9286" id="r_aa8af0512d5821ddd29807a21b58d9286"><td class="memItemLeft" align="right" valign="top"><a id="aa8af0512d5821ddd29807a21b58d9286" name="aa8af0512d5821ddd29807a21b58d9286"></a>
 boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isRDFStar</b> ()</td></tr>
 <tr class="separator:aa8af0512d5821ddd29807a21b58d9286"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,6 +115,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>start</b> (<a class="
 void&#160;</td><td class="memItemRight" valign="bottom"><b>finish</b> (<a class="el" href="enumfr_1_1inria_1_1corese_1_1core_1_1Event.html">Event</a> e)</td></tr>
 <tr class="memdesc:aed7d6a1f13e9523e4912aa249df03087"><td class="mdescLeft">&#160;</td><td class="mdescRight">After construct/insert/delete completes Tell the graph to recompile its Index. <br /></td></tr>
 <tr class="separator:aed7d6a1f13e9523e4912aa249df03087"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eefd296822e958338e14a7b7d8ada29" id="r_a5eefd296822e958338e14a7b7d8ada29"><td class="memItemLeft" align="right" valign="top"><a id="a5eefd296822e958338e14a7b7d8ada29" name="a5eefd296822e958338e14a7b7d8ada29"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>trace</b> ()</td></tr>
+<tr class="separator:a5eefd296822e958338e14a7b7d8ada29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a7ce67b2576b601c031cc8840038612" id="r_a1a7ce67b2576b601c031cc8840038612"><td class="memItemLeft" align="right" valign="top"><a id="a1a7ce67b2576b601c031cc8840038612" name="a1a7ce67b2576b601c031cc8840038612"></a>
 <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1GraphManager.html">GraphManager</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getNamedGraph</b> (String label)</td></tr>
 <tr class="memdesc:a1a7ce67b2576b601c031cc8840038612"><td class="mdescLeft">&#160;</td><td class="mdescRight">Corese extension: Additional system named graph Optional. <br /></td></tr>
@@ -177,11 +177,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>addPropertyNode</b> (
 <tr class="separator:a41e3a06d8aa46e8bb8edb2eb32cd622f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9003db241b77c7e06ff556205e4706ce" id="r_a9003db241b77c7e06ff556205e4706ce"><td class="memItemLeft" align="right" valign="top"><a id="a9003db241b77c7e06ff556205e4706ce" name="a9003db241b77c7e06ff556205e4706ce"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addGraphNode</b> (Node node)</td></tr>
-<tr class="memdesc:a9003db241b77c7e06ff556205e4706ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create temporary Edge for construct / update. <br /></td></tr>
 <tr class="separator:a9003db241b77c7e06ff556205e4706ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb6a67284572cced90e6bcedef3c0999" id="r_acb6a67284572cced90e6bcedef3c0999"><td class="memItemLeft" align="right" valign="top"><a id="acb6a67284572cced90e6bcedef3c0999" name="acb6a67284572cced90e6bcedef3c0999"></a>
-Edge&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (Node source, Node subject, Node property, Node object)</td></tr>
-<tr class="memdesc:acb6a67284572cced90e6bcedef3c0999"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a candidate edge to be inserted Do not insert it yet, it will be done explicitely by insert(). <br /></td></tr>
+<tr class="memitem:acb6a67284572cced90e6bcedef3c0999" id="r_acb6a67284572cced90e6bcedef3c0999"><td class="memItemLeft" align="right" valign="top">Edge&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1GraphManager.html#acb6a67284572cced90e6bcedef3c0999">create</a> (Node source, Node subject, Node property, Node object)</td></tr>
+<tr class="memdesc:acb6a67284572cced90e6bcedef3c0999"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create temporary Edge for construct / update.  <br /></td></tr>
 <tr class="separator:acb6a67284572cced90e6bcedef3c0999"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaeacdb6cadfa4708cbc06eae15558298" id="r_aaeacdb6cadfa4708cbc06eae15558298"><td class="memItemLeft" align="right" valign="top"><a id="aaeacdb6cadfa4708cbc06eae15558298" name="aaeacdb6cadfa4708cbc06eae15558298"></a>
 Edge&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (Node source, Node property, List&lt; Node &gt; list)</td></tr>
@@ -229,6 +227,9 @@ DataBrokerConstruct&#160;</td><td class="memItemRight" valign="bottom"><b>getDat
 <tr class="memitem:a028eabdb51ac27227c652669b744fef9" id="r_a028eabdb51ac27227c652669b744fef9"><td class="memItemLeft" align="right" valign="top"><a id="a028eabdb51ac27227c652669b744fef9" name="a028eabdb51ac27227c652669b744fef9"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setDataBroker</b> (DataBrokerConstruct dataBroker)</td></tr>
 <tr class="separator:a028eabdb51ac27227c652669b744fef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79a1779ccc5e6e8a0d57ad3b4127744a" id="r_a79a1779ccc5e6e8a0d57ad3b4127744a"><td class="memItemLeft" align="right" valign="top"><a id="a79a1779ccc5e6e8a0d57ad3b4127744a" name="a79a1779ccc5e6e8a0d57ad3b4127744a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setGraph</b> (<a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a> graph)</td></tr>
+<tr class="separator:a79a1779ccc5e6e8a0d57ad3b4127744a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -240,6 +241,49 @@ static Load&#160;</td><td class="memItemRight" valign="bottom"><b>getLoader</b> 
 <div class="textblock"><p>Graph Manager for Construct and Update operations Partially used by RuleEngine By convention Edges are Quads, they all have a named graph which may be the default graph name. </p>
 <dl class="section author"><dt>Author</dt><dd>Olivier Corby, Wimmics INRIA I3S, 2016 </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="acb6a67284572cced90e6bcedef3c0999" name="acb6a67284572cced90e6bcedef3c0999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb6a67284572cced90e6bcedef3c0999">&#9670;&#160;</a></span>create()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Edge create </td>
+          <td>(</td>
+          <td class="paramtype">Node&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Node&#160;</td>
+          <td class="paramname"><em>subject</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Node&#160;</td>
+          <td class="paramname"><em>property</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Node&#160;</td>
+          <td class="paramname"><em>object</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create temporary Edge for construct / update. </p>
+<p>Create a candidate edge to be inserted Do not insert it yet, it will be done explicitely by insert(). </p>
+
+</div>
+</div>
 <a id="a49ad7c8814c7ee3f1210594f43020b91" name="a49ad7c8814c7ee3f1210594f43020b91"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a49ad7c8814c7ee3f1210594f43020b91">&#9670;&#160;</a></span>getQueryProcess()</h2>
 

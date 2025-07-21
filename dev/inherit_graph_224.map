@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1logic_1_1OWL.html" title=" " alt="" coords="5,5,57,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,148,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1util_1_1QueryGraphVisitorImpl.html" title="QueryGraph Visitor for query(RDF Graph) Replace RDF List by rdf:rest* / rdf:first in query graph Matc..." alt="" coords="196,5,367,31"/>
+<area shape="poly" id="edge435_Node000000_Node000001" title=" " alt="" coords="162,15,196,15,196,21,162,21"/>
 </map>

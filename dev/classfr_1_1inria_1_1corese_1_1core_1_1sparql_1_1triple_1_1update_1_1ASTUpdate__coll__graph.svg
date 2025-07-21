@@ -56,9 +56,9 @@
 </g>
 </g>
 <!-- Node2&#45;&gt;Node5 -->
-<g id="edge6_Node000005_Node000002" class="edge">
+<g id="edge5_Node000005_Node000002" class="edge">
 <title>Node2&#45;&gt;Node5</title>
-<g id="a_edge6_Node000005_Node000002"><a xlink:title=" ">
+<g id="a_edge5_Node000005_Node000002"><a xlink:title=" ">
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M124.5,-121.58C124.5,-109.63 124.5,-94.72 124.5,-85.41"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="121,-121.87 124.5,-131.87 128,-121.87 121,-121.87"/>
 </a>
@@ -83,16 +83,6 @@
 </a>
 </g>
 </g>
-<!-- Node3&#45;&gt;Node3 -->
-<g id="edge4_Node000003_Node000003" class="edge">
-<title>Node3&#45;&gt;Node3</title>
-<g id="a_edge4_Node000003_Node000003"><a xlink:title=" ">
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M224.97,-14.71C229.52,-13.79 232.5,-12.05 232.5,-9.5 232.5,-5.31 224.46,-3.32 214.7,-3.51"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="224.41,-11.25 214.7,-15.49 224.93,-18.23 224.41,-11.25"/>
-</a>
-</g>
-<text text-anchor="middle" x="245" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> type</text>
-</g>
 <!-- Node4 -->
 <g id="Node000004" class="node">
 <title>Node4</title>
@@ -112,9 +102,9 @@
 </g>
 </g>
 <!-- Node5&#45;&gt;Node3 -->
-<g id="edge5_Node000003_Node000005" class="edge">
+<g id="edge4_Node000003_Node000005" class="edge">
 <title>Node5&#45;&gt;Node3</title>
-<g id="a_edge5_Node000003_Node000005"><a xlink:title=" ">
+<g id="a_edge4_Node000003_Node000005"><a xlink:title=" ">
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M134.32,-56.81C138.49,-50.17 143.73,-42.82 149.5,-37 156.42,-30.02 165.42,-23.76 173.03,-19.08"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="131.1,-55.38 129.03,-65.77 137.12,-58.94 131.1,-55.38"/>
 </a>

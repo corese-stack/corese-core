@@ -97,9 +97,9 @@ Collaboration diagram for PluginImpl:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aba8ccf6caf16ac621e75042a5f1eeefb" id="r_aba8ccf6caf16ac621e75042a5f1eeefb"><td class="memItemLeft" align="right" valign="top"><a id="aba8ccf6caf16ac621e75042a5f1eeefb" name="aba8ccf6caf16ac621e75042a5f1eeefb"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setMode</b> (Evaluator.Mode mode)</td></tr>
-<tr class="separator:aba8ccf6caf16ac621e75042a5f1eeefb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f407b18ba6235cb96fa95611c1ea3a4" id="r_a9f407b18ba6235cb96fa95611c1ea3a4"><td class="memItemLeft" align="right" valign="top"><a id="a9f407b18ba6235cb96fa95611c1ea3a4" name="a9f407b18ba6235cb96fa95611c1ea3a4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setMode</b> (int mode)</td></tr>
+<tr class="separator:a9f407b18ba6235cb96fa95611c1ea3a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1951f25849e9c8eb2e23d7f3562f08c3" id="r_a1951f25849e9c8eb2e23d7f3562f08c3"><td class="memItemLeft" align="right" valign="top"><a id="a1951f25849e9c8eb2e23d7f3562f08c3" name="a1951f25849e9c8eb2e23d7f3562f08c3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>start</b> (Producer p, Environment env)</td></tr>
 <tr class="separator:a1951f25849e9c8eb2e23d7f3562f08c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,6 +125,12 @@ IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>format</b> (Mapp
 <tr class="memitem:ad3018d52086e38080b0aebc406793198" id="r_ad3018d52086e38080b0aebc406793198"><td class="memItemLeft" align="right" valign="top"><a id="ad3018d52086e38080b0aebc406793198" name="ad3018d52086e38080b0aebc406793198"></a>
 IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>format</b> (IDatatype[] ldt)</td></tr>
 <tr class="separator:ad3018d52086e38080b0aebc406793198"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac860f6b043b6cb1af20fca1d8a3b714c" id="r_ac860f6b043b6cb1af20fca1d8a3b714c"><td class="memItemLeft" align="right" valign="top"><a id="ac860f6b043b6cb1af20fca1d8a3b714c" name="ac860f6b043b6cb1af20fca1d8a3b714c"></a>
+IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>approximate</b> (Expr exp, Environment env, Producer p, IDatatype[] param)</td></tr>
+<tr class="separator:ac860f6b043b6cb1af20fca1d8a3b714c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7927c917af067d69eac49498ade68504" id="r_a7927c917af067d69eac49498ade68504"><td class="memItemLeft" align="right" valign="top"><a id="a7927c917af067d69eac49498ade68504" name="a7927c917af067d69eac49498ade68504"></a>
+IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>approximate</b> (Expr exp, Environment env, Producer p)</td></tr>
+<tr class="separator:a7927c917af067d69eac49498ade68504"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3798c601cd2e3f695939755f1c21616" id="r_ab3798c601cd2e3f695939755f1c21616"><td class="memItemLeft" align="right" valign="top"><a id="ab3798c601cd2e3f695939755f1c21616" name="ab3798c601cd2e3f695939755f1c21616"></a>
 IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>depth</b> (Environment env, Producer p, IDatatype dt)</td></tr>
 <tr class="separator:ab3798c601cd2e3f695939755f1c21616"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,7 +180,7 @@ IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>delete</b> (Envi
 <tr class="separator:a68094105c2273acfa51e51a1fd41cac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9630dede3bae97c3b8df80726a1e803f" id="r_a9630dede3bae97c3b8df80726a1e803f"><td class="memItemLeft" align="right" valign="top"><a id="a9630dede3bae97c3b8df80726a1e803f" name="a9630dede3bae97c3b8df80726a1e803f"></a>
 IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>triple</b> (Environment env, Producer prod, IDatatype s, IDatatype p, IDatatype o)</td></tr>
-<tr class="memdesc:a9630dede3bae97c3b8df80726a1e803f"><td class="mdescLeft">&#160;</td><td class="mdescRight">rdf star triple(s, p, o) filter bind &lt;&lt;s p o&gt;&gt; <br /></td></tr>
+<tr class="memdesc:a9630dede3bae97c3b8df80726a1e803f"><td class="mdescLeft">&#160;</td><td class="mdescRight">rdf star triple(s, p, o) filter bind &lt;<s>&gt; </s><br /></td></tr>
 <tr class="separator:a9630dede3bae97c3b8df80726a1e803f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1864df72c4bbb5d926b26145deadc03d" id="r_a1864df72c4bbb5d926b26145deadc03d"><td class="memItemLeft" align="right" valign="top"><a id="a1864df72c4bbb5d926b26145deadc03d" name="a1864df72c4bbb5d926b26145deadc03d"></a>
 IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>value</b> (Environment env, Producer prod, IDatatype graph, IDatatype node, IDatatype predicate, int n)</td></tr>
@@ -225,6 +231,12 @@ IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>getBufferedValue
 <tr class="memitem:a41484d2c1a3e1e4907f75796de484614" id="r_a41484d2c1a3e1e4907f75796de484614"><td class="memItemLeft" align="right" valign="top"><a id="a41484d2c1a3e1e4907f75796de484614" name="a41484d2c1a3e1e4907f75796de484614"></a>
 GraphProcessor&#160;</td><td class="memItemRight" valign="bottom"><b>getGraphProcessor</b> ()</td></tr>
 <tr class="separator:a41484d2c1a3e1e4907f75796de484614"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7d4a6e9995a1440a1c0e98abfbe50da" id="r_aa7d4a6e9995a1440a1c0e98abfbe50da"><td class="memItemLeft" align="right" valign="top"><a id="aa7d4a6e9995a1440a1c0e98abfbe50da" name="aa7d4a6e9995a1440a1c0e98abfbe50da"></a>
+AppxSearchPlugin&#160;</td><td class="memItemRight" valign="bottom"><b>getApproximateSearch</b> ()</td></tr>
+<tr class="separator:aa7d4a6e9995a1440a1c0e98abfbe50da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa90c9f287ad56658d42a119445414956" id="r_aa90c9f287ad56658d42a119445414956"><td class="memItemLeft" align="right" valign="top"><a id="aa90c9f287ad56658d42a119445414956" name="aa90c9f287ad56658d42a119445414956"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setApproximateSearch</b> (AppxSearchPlugin approximateSearch)</td></tr>
+<tr class="separator:aa90c9f287ad56658d42a119445414956"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -234,6 +246,9 @@ static <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Plugin
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
+<tr class="memitem:a5b27630dbcf231bfda3a7d79e1eefce5" id="r_a5b27630dbcf231bfda3a7d79e1eefce5"><td class="memItemLeft" align="right" valign="top"><a id="a5b27630dbcf231bfda3a7d79e1eefce5" name="a5b27630dbcf231bfda3a7d79e1eefce5"></a>
+static Logger&#160;</td><td class="memItemRight" valign="bottom"><b>logger</b> = LoggerFactory.getLogger(PluginImpl.class)</td></tr>
+<tr class="separator:a5b27630dbcf231bfda3a7d79e1eefce5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbf918dc632d6bef923adbb39175f117" id="r_abbf918dc632d6bef923adbb39175f117"><td class="memItemLeft" align="right" valign="top"><a id="abbf918dc632d6bef923adbb39175f117" name="abbf918dc632d6bef923adbb39175f117"></a>
 static final String&#160;</td><td class="memItemRight" valign="bottom"><b>METADATA</b> = EXT + &quot;metadata&quot;</td></tr>
 <tr class="separator:abbf918dc632d6bef923adbb39175f117"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -297,9 +312,6 @@ static final String&#160;</td><td class="memItemRight" valign="bottom"><b>BINDIN
 <tr class="memitem:a91dc4df7fdd497444d1de30ac701dd22" id="r_a91dc4df7fdd497444d1de30ac701dd22"><td class="memItemLeft" align="right" valign="top"><a id="a91dc4df7fdd497444d1de30ac701dd22" name="a91dc4df7fdd497444d1de30ac701dd22"></a>
 static final String&#160;</td><td class="memItemRight" valign="bottom"><b>DYNAMIC_CAPTURE</b> = EXT + &quot;dynamic&quot;</td></tr>
 <tr class="separator:a91dc4df7fdd497444d1de30ac701dd22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b27630dbcf231bfda3a7d79e1eefce5" id="r_a5b27630dbcf231bfda3a7d79e1eefce5"><td class="memItemLeft" align="right" valign="top"><a id="a5b27630dbcf231bfda3a7d79e1eefce5" name="a5b27630dbcf231bfda3a7d79e1eefce5"></a>
-static Logger&#160;</td><td class="memItemRight" valign="bottom"><b>logger</b> = LoggerFactory.getLogger(PluginImpl.class)</td></tr>
-<tr class="separator:a5b27630dbcf231bfda3a7d79e1eefce5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Plugin for filter evaluator Compute semantic similarity of classes and solutions Implement graph specific function for LDScript. </p>

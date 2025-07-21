@@ -246,7 +246,7 @@ var sectionId = 'dynsection-0';
 <!-- Node29 -->
 <g id="Node000029" class="node">
 <title>Node29</title>
-<g id="a_Node000029"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeImpl.html" target="_top" xlink:title="Graph Edge with n nodes (not only triple) RDF star triple with reference node t g &lt;&lt;s p o t&gt;&gt;">
+<g id="a_Node000029"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeImpl.html" target="_top" xlink:title="Graph Edge with n nodes (not only triple) RDF star triple with reference node t g &lt;&gt;">
 <polygon fill="white" stroke="#666666" points="428,-148 366,-148 366,-129 428,-129 428,-148"/>
 <text text-anchor="middle" x="397" y="-136" font-family="Helvetica,sans-Serif" font-size="10.00">EdgeImpl</text>
 </a>

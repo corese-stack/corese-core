@@ -1,5 +1,5 @@
 <map id="FunctionCompiler" name="FunctionCompiler">
-<area shape="rect" id="Node000001" title=" " alt="" coords="166,181,302,207"/>
+<area shape="rect" id="Node000001" title="@import &lt;url&gt; dereference URL at compile time LinkedFunction: 1) ff:foo() undefined extension functio..." alt="" coords="166,181,302,207"/>
 <area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1parser_1_1Transformer.html" title="Compiler of SPARQL AST to KGRAM Exp Query Use Corese.Core.Sparql parser Use an abstract compiler to g..." alt="" coords="184,93,284,119"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="237,133,237,181,231,181,231,133"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="5,5,81,31"/>

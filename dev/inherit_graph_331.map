@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1storage_1_1util_1_1StorageFactory.html" title="Generate the persistent manager." alt="" coords="5,5,124,31"/>
+<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1XMLResult.html" title="SPARQL XML Results Format Parser into Mappings." alt="" coords="5,5,96,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1SPARQLResult.html" title=" " alt="" coords="144,5,257,31"/>
+<area shape="poly" id="edge556_Node000000_Node000001" title=" " alt="" coords="110,15,144,15,144,21,110,21"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1SPARQLJSONResult.html" title=" " alt="" coords="305,5,451,31"/>
+<area shape="poly" id="edge557_Node000001_Node000002" title=" " alt="" coords="271,15,305,15,305,21,271,21"/>
 </map>

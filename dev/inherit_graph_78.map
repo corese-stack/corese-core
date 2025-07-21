@@ -1,17 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,153,136,179"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1exception_1_1IncorrectDatatypeException.html" title="Used to indicate that a literal object has been used incorrectly." alt="" coords="202,5,405,31"/>
-<area shape="poly" id="edge388_Node000000_Node000001" title=" " alt="" coords="85,140,125,88,152,62,183,40,209,28,211,33,185,44,155,66,129,92,89,143"/>
-<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1exception_1_1IncorrectFormatException.html" title="Used for any error raised from parsing of a string that should have been in a standard format (i...." alt="" coords="209,55,398,80"/>
-<area shape="poly" id="edge389_Node000000_Node000002" title=" " alt="" coords="96,142,136,114,183,89,217,78,219,83,185,94,138,119,99,147"/>
-<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1exception_1_1IncorrectOperationException.html" title="Used to indicate that a function should not be used with the current object or with the object in its..." alt="" coords="200,104,407,129"/>
-<area shape="poly" id="edge390_Node000000_Node000003" title=" " alt="" coords="140,148,183,138,238,127,239,132,185,143,141,153"/>
-<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1exception_1_1InternalException.html" title="Used for exception related to the inner workings of the system." alt="" coords="235,153,371,179"/>
-<area shape="poly" id="edge391_Node000000_Node000004" title=" " alt="" coords="149,163,235,163,235,169,149,169"/>
-<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1exception_1_1ParsingErrorException.html" title="Exception thrown when an error occurs during parsing." alt="" coords="221,203,385,228"/>
-<area shape="poly" id="edge392_Node000000_Node000005" title=" " alt="" coords="145,179,243,200,242,205,144,184"/>
-<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1exception_1_1SerializationException.html" title="Exception thrown during RDF serialization or deserialization failures." alt="" coords="220,252,387,277"/>
-<area shape="poly" id="edge393_Node000000_Node000006" title=" " alt="" coords="100,185,139,212,185,237,224,249,222,254,183,242,136,217,97,189"/>
-<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1exception_1_1UnsupportedFileFormatException.html" title="Exception thrown when a file format is not supported." alt="" coords="184,301,423,327"/>
-<area shape="poly" id="edge394_Node000000_Node000007" title=" " alt="" coords="89,188,129,239,155,265,185,286,214,299,212,304,183,291,152,269,125,243,85,192"/>
+<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1DQPFactory.html" title=" " alt="" coords="5,5,103,31"/>
 </map>

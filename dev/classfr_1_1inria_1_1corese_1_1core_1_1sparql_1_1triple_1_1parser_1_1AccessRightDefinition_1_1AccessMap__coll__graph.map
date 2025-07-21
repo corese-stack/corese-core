@@ -1,5 +1,5 @@
 <map id="AccessRightDefinition.AccessMap" name="AccessRightDefinition.AccessMap">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,93,247,119"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="13,5,239,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,59,129,93,123,93,123,59"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,247,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="31,5,221,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,44,129,79,123,79,123,44"/>
 </map>

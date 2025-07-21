@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['range_0',['range',['../enumfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1common_1_1vocabulary_1_1RDFS.html#a5a95c5aa27dc12b07af34405942b7849',1,'fr::inria::corese::core::next::impl::common::vocabulary::RDFS']]],
-  ['resource_1',['Resource',['../enumfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1common_1_1vocabulary_1_1RDFS.html#acf246a87e41f47012fc7628989d3fe95',1,'fr::inria::corese::core::next::impl::common::vocabulary::RDFS']]],
-  ['restriction_2',['Restriction',['../enumfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1common_1_1vocabulary_1_1OWL.html#a009e6a49ae66589e1bd624a5a8cf5044',1,'fr::inria::corese::core::next::impl::common::vocabulary::OWL']]]
+  ['object_0',['OBJECT',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html#af3de682d132a2d134885477fa5ea2095',1,'fr::inria::corese::core::sparql::triple::javacc1::SparqlCoreseConstants']]],
+  ['offset_1',['OFFSET',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html#a2a94117ec9f719d28a70ecfe9bb2953a',1,'fr::inria::corese::core::sparql::triple::javacc1::SparqlCoreseConstants']]],
+  ['optional_2',['OPTIONAL',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html#a1838ec8a5111b5460e605520906fc6f4',1,'fr::inria::corese::core::sparql::triple::javacc1::SparqlCoreseConstants']]],
+  ['order_3',['ORDER',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1SparqlCoreseConstants.html#a667c41c670f6b4845853604705c83fce',1,'fr::inria::corese::core::sparql::triple::javacc1::SparqlCoreseConstants']]]
 ];

@@ -36,7 +36,7 @@
 <area shape="poly" id="edge35_Node000015_Node000036" title=" " alt="" coords="429,380,474,408,526,436,555,447,553,452,524,440,472,413,426,385"/>
 <area shape="rect" id="Node000017" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseBlankNode.html" title="Title: Corese Description: A Semantic Search Engine Copyright: Copyright INRIA (c) 2007 Company: INRI..." alt="" coords="732,203,871,228"/>
 <area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="642,268,719,238,757,226,759,231,721,243,644,273"/>
-<area shape="rect" id="Node000018" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseTriple.html" title="Edge reference datatype for edge reference node &lt;&lt;s p o&gt;&gt; q v &#45;&gt; edge(s p o t) t q v where t is refer..." alt="" coords="750,252,853,277"/>
+<area shape="rect" id="Node000018" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseTriple.html" title="Edge reference datatype for edge reference node &lt;&gt; q v &#45;&gt; edge(s p o t) t q v where t is reference no..." alt="" coords="750,252,853,277"/>
 <area shape="poly" id="edge17_Node000016_Node000018" title=" " alt="" coords="675,277,750,268,750,273,676,282"/>
 <area shape="rect" id="Node000019" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseURI.html" title=" " alt="" coords="756,301,847,327"/>
 <area shape="poly" id="edge18_Node000016_Node000019" title=" " alt="" coords="676,296,756,306,755,311,675,301"/>
