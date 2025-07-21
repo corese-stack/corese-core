@@ -3536,7 +3536,7 @@ public class Graph extends GraphObject implements
         // labels
         // they should have different ID
         if (dt.isDate()) {
-            if (DatatypeMap.getTZ(dt).equals("Z")) {
+            if ("Z".equals(DatatypeMap.getTZ(dt).toString())) {
                 return String.format("d%s", n.getIndex());
             }
         }

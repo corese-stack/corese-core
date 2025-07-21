@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.temp;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
@@ -39,7 +40,9 @@ import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
  */
 public class CoreseAdaptedValueFactory implements ValueFactory {
 
-    private final AtomicLong nodeID = new AtomicLong(ThreadLocalRandom.current().nextLong());
+    private static final SecureRandom secureRandom = new SecureRandom();
+
+    private final AtomicLong nodeID = new AtomicLong(secureRandom.nextLong());
 
     public CoreseAdaptedValueFactory() {
     }

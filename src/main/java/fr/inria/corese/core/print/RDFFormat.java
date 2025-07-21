@@ -207,8 +207,8 @@ public class RDFFormat {
     public void write(String name) throws IOException {
 
         StringBuilder sb = getStringBuilder();
-        try (FileOutputStream fos = new FileOutputStream(name);
-             Writer out = new OutputStreamWriter(fos)) {
+        try (final FileOutputStream fos = new FileOutputStream(name);
+             final Writer out = new OutputStreamWriter(fos)) {
             out.write(sb.toString());
         }
     }

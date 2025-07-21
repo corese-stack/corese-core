@@ -131,8 +131,8 @@ public class TemplateFormat {
     }
 
     public void write(String name) throws IOException {
-        try (FileWriter fw = new FileWriter(name);
-             BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
+        try (final FileWriter fw = new FileWriter(name);
+             final BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
             String str = toString();
             bufferedWriter.write(str);
             bufferedWriter.flush();

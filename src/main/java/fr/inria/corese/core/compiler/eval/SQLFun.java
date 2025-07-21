@@ -61,8 +61,8 @@ public class SQLFun {
                 }
             }
 
-            try (Connection con = DriverManager.getConnection(uri.getLabel(), login.getLabel(), passwd.getLabel());
-                 Statement stmt = con.createStatement()) {
+            try (final Connection con = DriverManager.getConnection(uri.getLabel(), login.getLabel(), passwd.getLabel());
+                 final Statement stmt = con.createStatement()) {
                 return stmt.executeQuery(query.getLabel());
             }
         } catch (SQLException e) {

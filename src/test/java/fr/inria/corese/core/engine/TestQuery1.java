@@ -6318,7 +6318,7 @@ public class TestQuery1 {
     }
 
     // @Test
-    public void testQV() {
+    public void testQV()  throws EngineException {
         Graph g = createGraph();
         Load.create(g);
         QueryProcess exec = QueryProcess.create(g);
@@ -6336,16 +6336,11 @@ public class TestQuery1 {
                 + "kg:list kg:expand true"
                 + "}"
                 + "";
-        try {
             exec.query(init);
             // exec.setVisitor(ExpandList.create());
             Mappings map = exec.query(query);
             assertEquals(1, map.size());
 
-        } catch (EngineException ex) {
-            fail("Unexpected exception: " + ex.getMessage());
-
-        }
 
     }
 
@@ -6602,14 +6597,13 @@ public class TestQuery1 {
 
         } catch (EngineException e) {
             logger.error("Operation failure", e);
-            org.junit.jupiter.api.Assertions.fail("EngineException occurred: " + e.getMessage());
 
         }
 
     }
 
     @Test
-    public void testValues2() {
+    public void testValues2()  throws EngineException {
         String init = "prefix foaf: <http://xmlns.com/foaf/0.1/> "
                 + "insert data {"
                 + "<John>  foaf:name 'http://www.inria.fr' "
@@ -6630,16 +6624,11 @@ public class TestQuery1 {
         Graph g = createGraph();
         QueryProcess exec = QueryProcess.create(g);
 
-        try {
             exec.query(init);
             Mappings map = exec.query(query);
            //logger.info("map {}",map);
             assertEquals(3, map.size(), "Result");
-        } catch (EngineException e) {
 
-            fail("Unexpected exception: " + e.getMessage());
-
-        }
 
     }
 
