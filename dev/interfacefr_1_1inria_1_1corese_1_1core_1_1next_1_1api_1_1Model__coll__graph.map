@@ -1,0 +1,9 @@
+<map id="Model" name="Model">
+<area shape="rect" id="Node000001" title="This class represents an RDF model, a set of statements." alt="" coords="189,79,251,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,147,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,34,198,76,195,81,110,39"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="171,5,269,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="223,44,223,79,217,79,217,44"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1NamespaceAware.html" title="An interface for models or stores that support RDF namespaces." alt="" coords="294,5,434,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="330,39,245,81,242,76,328,34"/>
+</map>

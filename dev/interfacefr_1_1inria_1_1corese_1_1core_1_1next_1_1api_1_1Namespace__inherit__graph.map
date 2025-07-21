@@ -1,0 +1,9 @@
+<map id="Namespace" name="Namespace">
+<area shape="rect" id="Node000001" title="Represents a namespace with a prefix and the start of an IRI as its name." alt="" coords="93,79,192,104"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1AbstractNamespace.html" title="A base implementation of the Namespace interface." alt="" coords="66,152,219,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="145,118,145,152,140,152,140,118"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,37,130,76,127,81,78,41"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="128,5,336,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,41,159,81,156,76,205,37"/>
+</map>

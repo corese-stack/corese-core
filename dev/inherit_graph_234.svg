@@ -11,9 +11,9 @@
 <!-- Node0 -->
 <g id="Node000000" class="node">
 <title>Node0</title>
-<g id="a_Node000000"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1load_1_1rdfa_1_1RDFaLoader.html" target="_top" xlink:title="Load RDFa.">
+<g id="a_Node000000"><a xlink:href="enumfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1core_1_1PointerType.html" target="_top" xlink:title="Pointer type for object that can be object of CoresePointer.">
 <polygon fill="white" stroke="#666666" points="74,-19 0,-19 0,0 74,0 74,-19"/>
-<text text-anchor="middle" x="37" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">RDFaLoader</text>
+<text text-anchor="middle" x="37" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">PointerType</text>
 </a>
 </g>
 </g>

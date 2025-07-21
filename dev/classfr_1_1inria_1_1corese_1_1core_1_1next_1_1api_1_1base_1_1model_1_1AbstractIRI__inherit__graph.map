@@ -1,0 +1,13 @@
+<map id="AbstractIRI" name="AbstractIRI">
+<area shape="rect" id="Node000001" title="Base class for IRI implementations." alt="" coords="67,299,160,324"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1IRI.html" title="Represents an IRI." alt="" coords="35,225,74,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,260,106,297,102,300,71,263"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Resource.html" title="Super interface of all resources of an RDF graph (statements, IRI, blank nodes) as defined for RDF 1...." alt="" coords="13,152,96,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="57,191,57,225,52,225,52,191"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Value.html" title="Super interface of all elements of an RDF model (triple, nodes, etc)." alt="" coords="25,79,84,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="57,118,57,152,52,152,52,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="57,44,57,79,52,79,52,44"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="98,225,246,251"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="156,263,125,300,121,297,152,260"/>
+</map>

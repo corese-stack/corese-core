@@ -1,0 +1,5 @@
+<map id="CoreseEdgeAdapter" name="CoreseEdgeAdapter">
+<area shape="rect" id="Node000001" title="Interface that defines a wrapper for classes that represent Corese edges." alt="" coords="5,5,156,31"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1CoreseStatement.html" title="Represents a statement in Corese." alt="" coords="13,79,148,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,44,83,79,78,79,78,44"/>
+</map>

@@ -1,0 +1,29 @@
+<map id="CoreseNodeAdapter" name="CoreseNodeAdapter">
+<area shape="rect" id="Node000001" title="Wrapper for objects that are represented as Node in Corese code, e.g." alt="" coords="5,128,157,153"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1CoreseIRI.html" title="Wrapper for Corese Node that represents an IRI." alt="" coords="253,79,337,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,122,252,98,253,103,151,127"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseBNode.html" title="An implementation of a blank node (BNode) used by Corese." alt="" coords="239,128,350,153"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,138,239,138,239,143,171,143"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseDatatypeAdapter.html" title="Interface for Corese datatype adapter." alt="" coords="205,177,384,203"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="151,154,240,175,238,180,150,159"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1AbstractCoreseNumber.html" title="Super class for all the numeric based literal in the XSD datatype hierarchy." alt="" coords="453,29,626,55"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="376,169,382,164,393,152,400,140,405,115,411,89,418,76,430,64,451,52,454,56,434,68,423,79,416,91,410,116,405,142,398,155,386,168,379,173"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseBoolean.html" title="An implementation of the xsd:boolean datatype used by Corese." alt="" coords="479,79,599,104"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="371,170,383,164,397,152,406,139,415,126,431,113,454,103,478,96,480,101,456,108,433,118,419,129,410,142,401,155,385,168,373,175"/>
+<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseDate.html" title=" " alt="" coords="490,128,589,153"/>
+<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="371,172,489,148,490,153,372,177"/>
+<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseDatetime.html" title="CoreseDatetime class that represents a date and time literal in the Corese framework." alt="" coords="475,177,603,203"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="398,187,475,187,475,193,398,193"/>
+<area shape="rect" id="Node000012" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseDuration.html" title="CoreseDuration class that represents a duration literal in the Corese framework." alt="" coords="478,227,601,252"/>
+<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="372,203,479,224,477,230,371,208"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseLanguageTaggedStringLiteral.html" title="An implementation of a language&#45;tagged string literal used by Corese." alt="" coords="432,277,647,317"/>
+<area shape="poly" id="edge12_Node000004_Node000013" title=" " alt="" coords="329,207,377,235,433,262,465,274,463,279,431,267,375,240,326,212"/>
+<area shape="rect" id="Node000014" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseTyped.html" title="An implementation of the xsd:string datatype used by Corese." alt="" coords="487,341,592,367"/>
+<area shape="poly" id="edge13_Node000004_Node000014" title=" " alt="" coords="315,213,364,270,397,301,433,326,459,338,487,345,486,350,458,343,431,331,393,305,360,274,311,216"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseDecimal.html" title="Super class for all numeric literal containing floating points in the XD datatype hierarchy @ImplNote..." alt="" coords="695,5,816,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="639,28,694,22,695,27,640,33"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseInteger.html" title="Super class for all the integer based literal in the XD datatype hierarchy." alt="" coords="699,55,812,80"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="640,51,699,58,698,63,640,56"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseTime.html" title="There are no dedicated implementation to represent xsd:time in Corese." alt="" coords="705,177,805,203"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="617,187,705,187,705,193,617,193"/>
+</map>

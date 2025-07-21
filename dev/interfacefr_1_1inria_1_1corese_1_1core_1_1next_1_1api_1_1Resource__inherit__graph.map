@@ -1,0 +1,17 @@
+<map id="Resource" name="Resource">
+<area shape="rect" id="Node000001" title="Super interface of all resources of an RDF graph (statements, IRI, blank nodes) as defined for RDF 1...." alt="" coords="139,152,222,177"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1BNode.html" title="Represents a blank node in a RDF graph." alt="" coords="59,225,124,251"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="157,188,108,227,104,223,154,184"/>
+<area shape="rect" id="Node000006" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1IRI.html" title="Represents an IRI." alt="" coords="161,225,200,251"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="183,191,183,225,178,225,178,191"/>
+<area shape="rect" id="Node000008" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Triple.html" title=" " alt="" coords="224,225,281,251"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="204,185,243,223,239,227,201,189"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Value.html" title="Super interface of all elements of an RDF model (triple, nodes, etc)." alt="" coords="151,79,210,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,118,183,152,178,152,178,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="131,5,230,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="183,44,183,79,178,79,178,44"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1AbstractBNode.html" title="Abstract implementation of the BNode interface, providing common functionality for blank node represe..." alt="" coords="5,299,124,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="85,265,71,299,66,298,80,263"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1AbstractIRI.html" title="Base class for IRI implementations." alt="" coords="149,299,242,324"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="188,264,196,298,190,299,183,265"/>
+</map>

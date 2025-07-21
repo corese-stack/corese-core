@@ -1,0 +1,9 @@
+<map id="CoreseLanguageTaggedStringLiteral" name="CoreseLanguageTaggedStringLiteral">
+<area shape="rect" id="Node000001" title="An implementation of a language&#45;tagged string literal used by Corese." alt="" coords="70,152,285,192"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,160,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,111,156,150,153,154,105,115"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseDatatypeAdapter.html" title="Interface for Corese datatype adapter." alt="" coords="184,79,363,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="250,115,202,154,199,150,247,111"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1CoreseNodeAdapter.html" title="Wrapper for objects that are represented as Node in Corese code, e.g." alt="" coords="197,5,349,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="276,44,276,79,271,79,271,44"/>
+</map>

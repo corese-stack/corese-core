@@ -1,0 +1,9 @@
+<map id="RDFFormat" name="RDFFormat">
+<area shape="rect" id="Node000001" title="Describes a semantic RDF serialization format, extending file&#45;level metadata with RDF&#45;specific capabi..." alt="" coords="9,304,103,329"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1io_1_1FileFormat.html" title="Represents a general file format, including its name, associated file extensions, and MIME types." alt="" coords="5,5,96,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,44,58,303,53,304,48,44"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1io_1_1RDFFormat.html" title="Describes a semantic RDF serialization format, extending file&#45;level metadata with RDF&#45;specific capabi..." alt="" coords="73,111,167,137"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="68,41,114,109,110,112,64,43"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="114,151,62,305,57,303,109,149"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="182,111,190,116,194,124,186,135,168,139,167,134,183,131,189,124,187,120,180,116"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="CoreseIRI" name="CoreseIRI">
+<area shape="rect" id="Node000001" title="Wrapper for Corese Node that represents an IRI." alt="" coords="83,79,167,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,99,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,38,115,77,112,80,72,42"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1CoreseNodeAdapter.html" title="Wrapper for objects that are represented as Node in Corese code, e.g." alt="" coords="123,5,275,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,42,139,80,135,77,175,38"/>
+</map>

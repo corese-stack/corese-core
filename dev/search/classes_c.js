@@ -21,7 +21,7 @@ var searchData=
   ['matchiterator_18',['MatchIterator',['../classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatchIterator.html',1,'fr::inria::corese::core::query']]],
   ['memory_19',['Memory',['../classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Memory.html',1,'fr::inria::corese::core::kgram::core']]],
   ['merge_20',['Merge',['../classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Merge.html',1,'fr::inria::corese::core::kgram::core']]],
-  ['message_21',['message',['../classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1Message.html',1,'Message'],['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Message.html',1,'Message']]],
+  ['message_21',['message',['../interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Message.html',1,'Message'],['../classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1tool_1_1Message.html',1,'Message']]],
   ['metadata_22',['Metadata',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Metadata.html',1,'fr::inria::corese::core::sparql::triple::parser']]],
   ['metadatamanager_23',['MetadataManager',['../classfr_1_1inria_1_1corese_1_1core_1_1producer_1_1MetadataManager.html',1,'fr::inria::corese::core::producer']]],
   ['metadatavisitor_24',['MetadataVisitor',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1visitor_1_1MetadataVisitor.html',1,'fr::inria::corese::core::compiler::visitor']]],
@@ -32,7 +32,9 @@ var searchData=
   ['methodtypecall_29',['MethodTypeCall',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1script_1_1MethodTypeCall.html',1,'fr::inria::corese::core::sparql::triple::function::script']]],
   ['minus_30',['Minus',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Minus.html',1,'fr::inria::corese::core::sparql::triple::parser']]],
   ['minusterm_31',['MinusTerm',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1MinusTerm.html',1,'fr::inria::corese::core::sparql::triple::function::term']]],
-  ['mode_32',['mode',['../enumfr_1_1inria_1_1corese_1_1core_1_1GraphDistance_1_1Mode.html',1,'GraphDistance.Mode'],['../enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access_1_1Mode.html',1,'Access.Mode']]],
-  ['multterm_33',['MultTerm',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1MultTerm.html',1,'fr::inria::corese::core::sparql::triple::function::term']]],
-  ['myhandler_34',['myhandler',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1result_1_1XMLResult_1_1MyHandler.html',1,'XMLResult.MyHandler'],['../classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1XMLResult_1_1MyHandler.html',1,'XMLResult.MyHandler']]]
+  ['mode_32',['mode',['../enumfr_1_1inria_1_1corese_1_1core_1_1GraphDistance_1_1Mode.html',1,'GraphDistance.Mode'],['../enumfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Evaluator_1_1Mode.html',1,'Evaluator.Mode'],['../enumfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Cleaner_1_1Mode.html',1,'Cleaner.Mode'],['../enumfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1Access_1_1Mode.html',1,'Access.Mode']]],
+  ['model_33',['Model',['../interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Model.html',1,'fr::inria::corese::core::next::api']]],
+  ['modelnamespace_34',['ModelNamespace',['../classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1ModelNamespace.html',1,'fr::inria::corese::core::next::impl::temp']]],
+  ['multterm_35',['MultTerm',['../classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1function_1_1term_1_1MultTerm.html',1,'fr::inria::corese::core::sparql::triple::function::term']]],
+  ['myhandler_36',['myhandler',['../classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1result_1_1XMLResult_1_1MyHandler.html',1,'XMLResult.MyHandler'],['../classfr_1_1inria_1_1corese_1_1core_1_1load_1_1result_1_1XMLResult_1_1MyHandler.html',1,'XMLResult.MyHandler']]]
 ];

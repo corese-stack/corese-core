@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1query_1_1update_1_1UpdateProcess.html" title="SPARQL 1.1 Update." alt="" coords="5,5,124,31"/>
+<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Sorter.html" title="Sort KGRAM edges in connected order before query process." alt="" coords="5,5,67,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1SorterNew.html" title="A new sorter for QP." alt="" coords="115,5,205,31"/>
+<area shape="poly" id="edge547_Node000000_Node000001" title=" " alt="" coords="80,15,114,15,114,21,80,21"/>
 </map>

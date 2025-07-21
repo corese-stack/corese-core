@@ -1,0 +1,15 @@
+<map id="AbstractModel" name="AbstractModel">
+<area shape="rect" id="Node000001" title="Abstract class that implements the Model interface." alt="" coords="121,152,237,177"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1ReadOnlyModel.html" title="A read&#45;only wrapper for a Model." alt="" coords="116,225,241,251"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="181,191,181,225,176,225,176,191"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,200,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,111,168,150,164,154,123,115"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Model.html" title="This class represents an RDF model, a set of statements." alt="" coords="225,79,287,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="235,115,193,154,190,150,232,111"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="41,5,183,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="148,34,234,76,231,81,146,39"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="207,5,305,31"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="259,44,259,79,253,79,253,44"/>
+<area shape="rect" id="Node000006" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1NamespaceAware.html" title="An interface for models or stores that support RDF namespaces." alt="" coords="330,5,470,31"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="366,39,281,81,278,76,364,34"/>
+</map>

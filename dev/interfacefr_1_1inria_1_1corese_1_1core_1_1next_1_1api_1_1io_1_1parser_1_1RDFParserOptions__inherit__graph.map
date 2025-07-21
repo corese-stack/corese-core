@@ -1,0 +1,7 @@
+<map id="RDFParserOptions" name="RDFParserOptions">
+<area shape="rect" id="Node000001" title="Options for RDF parsers." alt="" coords="30,79,169,104"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1io_1_1parser_1_1RDFParserBaseIRIOptions.html" title="Options for RDF parsers that support a base IRI." alt="" coords="5,152,193,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="102,118,102,152,97,152,97,118"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1io_1_1IOOptions.html" title="Super&#45;interface for configuration objects for IO operations (i.e." alt="" coords="56,5,143,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,44,102,79,97,79,97,44"/>
+</map>

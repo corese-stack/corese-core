@@ -1,0 +1,11 @@
+<map id="Vocabulary" name="Vocabulary">
+<area shape="rect" id="Node000001" title="Common interface for the definition of enum&#45;based vocabularies." alt="" coords="97,5,192,31"/>
+<area shape="rect" id="Node000002" href="$enumfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1common_1_1vocabulary_1_1OWL.html" title="Defines the OWL (Web Ontology Language) vocabulary." alt="" coords="5,79,57,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,40,51,81,48,76,113,36"/>
+<area shape="rect" id="Node000003" href="$enumfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1common_1_1vocabulary_1_1RDF.html" title="Defines the RDF vocabulary." alt="" coords="81,79,131,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,44,115,80,110,77,129,42"/>
+<area shape="rect" id="Node000004" href="$enumfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1common_1_1vocabulary_1_1RDFS.html" title="Vocabulary for RDF Schema (RDFS)." alt="" coords="155,79,211,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="160,42,179,77,175,80,155,44"/>
+<area shape="rect" id="Node000005" href="$enumfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1common_1_1vocabulary_1_1XSD.html" title="Defines the XSD vocabulary." alt="" coords="236,79,285,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="176,35,243,76,240,81,173,40"/>
+</map>

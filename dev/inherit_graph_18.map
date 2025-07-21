@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1ASTBuffer.html" title=" " alt="" coords="5,5,92,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,189,45"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1rdfxml_1_1XmlOption_1_1Builder.html" title="Public Builder for XmlOption." alt="" coords="237,13,379,38"/>
+<area shape="poly" id="edge64_Node000000_Node000001" title=" " alt="" coords="204,23,237,23,237,28,204,28"/>
 </map>

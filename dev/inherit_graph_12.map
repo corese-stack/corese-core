@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$enumfr_1_1inria_1_1corese_1_1core_1_1approximate_1_1strategy_1_1AlgType.html" title="Enumeration of types of similarity measurement algorithms." alt="" coords="5,5,79,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,23,236,63"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1nquads_1_1NQuadsOption_1_1Builder.html" title="Public Builder for NQuadsOption." alt="" coords="284,5,451,31"/>
+<area shape="poly" id="edge42_Node000000_Node000001" title=" " alt="" coords="249,27,284,24,284,29,250,33"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1ntriples_1_1NTriplesOption_1_1Builder.html" title="Public Builder for NTriplesOption." alt="" coords="284,55,451,80"/>
+<area shape="poly" id="edge43_Node000000_Node000002" title=" " alt="" coords="250,53,284,57,284,62,250,59"/>
 </map>

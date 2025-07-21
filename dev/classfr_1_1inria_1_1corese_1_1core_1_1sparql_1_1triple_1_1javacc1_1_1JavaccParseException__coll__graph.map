@@ -1,12 +1,5 @@
 <map id="JavaccParseException" name="JavaccParseException">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,247,168,272"/>
-<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1ParseException.html" title="This exception is thrown when parse errors are encountered." alt="" coords="26,172,147,197"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,212,89,246,84,246,84,212"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="22,82,109,107"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="74,120,86,171,81,172,69,121"/>
-<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1javacc1_1_1Token.html" title="Describes the input token stream." alt="" coords="133,82,192,107"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="146,119,99,173,95,170,142,116"/>
-<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="207,86,215,89,219,95,210,103,192,104,192,99,208,98,213,94,212,93,205,91"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="113,5,212,31"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="165,44,165,82,160,82,160,44"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,168,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="26,5,147,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,44,89,79,84,79,84,44"/>
 </map>

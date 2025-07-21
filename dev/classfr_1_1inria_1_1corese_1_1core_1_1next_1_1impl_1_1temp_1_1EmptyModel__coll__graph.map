@@ -1,0 +1,5 @@
+<map id="EmptyModel" name="EmptyModel">
+<area shape="rect" id="Node000001" title="A model wrapper that blocks access to all statements, allowing only namespace operations." alt="" coords="11,79,115,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,121,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="66,44,66,79,61,79,61,44"/>
+</map>

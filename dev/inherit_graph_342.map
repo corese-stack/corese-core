@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,31,73,56"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Update.html" title=" " alt="" coords="121,31,191,56"/>
+<area shape="poly" id="edge632_Node000000_Node000001" title=" " alt="" coords="87,41,121,41,121,46,87,46"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Basic.html" title="load clear drop create add move copy" alt="" coords="256,5,313,31"/>
+<area shape="poly" id="edge633_Node000001_Node000002" title=" " alt="" coords="204,31,255,21,256,26,205,36"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1update_1_1Composite.html" title=" " alt="" coords="239,55,331,80"/>
+<area shape="poly" id="edge634_Node000001_Node000003" title=" " alt="" coords="205,50,239,56,238,61,204,55"/>
+</map>

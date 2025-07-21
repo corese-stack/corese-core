@@ -1,0 +1,13 @@
+<map id="AbstractNumber" name="AbstractNumber">
+<area shape="rect" id="Node000001" title="Abstract class representing a number literal in RDF." alt="" coords="100,299,228,324"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractLiteral.html" title="Base class for all literals." alt="" coords="5,225,123,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,256,149,296,146,301,90,261"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Literal.html" title="Represents a literal value in RDF." alt="" coords="33,152,95,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="67,191,67,225,61,225,61,191"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Value.html" title="Super interface of all elements of an RDF model (triple, nodes, etc)." alt="" coords="35,79,93,104"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="67,118,67,152,61,152,61,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="15,5,113,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="67,44,67,79,61,79,61,44"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="147,225,384,251"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="239,261,182,301,179,296,236,256"/>
+</map>

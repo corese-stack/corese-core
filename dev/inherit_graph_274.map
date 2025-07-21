@@ -1,3 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Sorter.html" title="Sort services in BGP until successive services share variables if possible Find best first bgp with c..." alt="" coords="5,5,67,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,80,115,105"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1base_1_1AbstractGraphSerializer.html" title="Abstract base class for RDF serializers based on TriG and Turtle syntax." alt="" coords="177,5,353,31"/>
+<area shape="poly" id="edge534_Node000000_Node000001" title=" " alt="" coords="94,71,162,40,199,28,201,33,164,44,96,76"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1base_1_1AbstractLineBasedSerializer.html" title="Base class for line&#45;based RDF serializers (N&#45;Triples, N&#45;Quads)." alt="" coords="163,55,367,80"/>
+<area shape="poly" id="edge535_Node000000_Node000002" title=" " alt="" coords="128,82,162,77,163,83,129,87"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1jsonld_1_1JSONLDSerializer.html" title="Serializer for JSON&#45;LD format." alt="" coords="199,104,331,129"/>
+<area shape="poly" id="edge536_Node000000_Node000003" title=" " alt="" coords="129,98,199,106,198,112,128,103"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1rdfxml_1_1XmlSerializer.html" title="Serializes a Model to RDF/XML format." alt="" coords="210,153,319,179"/>
+<area shape="poly" id="edge537_Node000000_Node000004" title=" " alt="" coords="98,109,164,138,211,152,209,157,162,143,96,114"/>
 </map>

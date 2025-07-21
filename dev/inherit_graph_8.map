@@ -1,3 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1parser_1_1AccessNamespace.html" title="Accept/reject namespace for @import and LinkedFunction define(ns, true|false) if there are accept ns,..." alt="" coords="5,5,149,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,80,121,105"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1inmemory_1_1InMemoryModel.html" title="InMemoryModel is a model that stores RDF data in memory." alt="" coords="169,5,297,31"/>
+<area shape="poly" id="edge34_Node000000_Node000001" title=" " alt="" coords="100,71,168,40,196,28,198,33,170,44,103,76"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1CoreseModel.html" title="CoreseModel provides an implementation of the RDF Model interface backed by a Corese Graph instance." alt="" coords="180,55,287,80"/>
+<area shape="poly" id="edge35_Node000000_Node000002" title=" " alt="" coords="135,79,179,73,180,78,136,85"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1EmptyModel.html" title="A model wrapper that blocks access to all statements, allowing only namespace operations." alt="" coords="181,104,285,129"/>
+<area shape="poly" id="edge36_Node000000_Node000003" title=" " alt="" coords="136,100,182,107,181,112,135,105"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1FilteredModel.html" title=" " alt="" coords="178,153,289,179"/>
+<area shape="poly" id="edge37_Node000000_Node000004" title=" " alt="" coords="105,109,170,138,200,151,198,156,168,143,103,114"/>
 </map>

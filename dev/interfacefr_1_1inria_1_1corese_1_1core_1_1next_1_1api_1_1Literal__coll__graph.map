@@ -1,0 +1,7 @@
+<map id="Literal" name="Literal">
+<area shape="rect" id="Node000001" title="Represents a literal value in RDF." alt="" coords="23,152,86,177"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Value.html" title="Super interface of all elements of an RDF model (triple, nodes, etc)." alt="" coords="25,79,84,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,118,57,152,52,152,52,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="57,44,57,79,52,79,52,44"/>
+</map>

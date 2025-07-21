@@ -1,0 +1,18 @@
+<map id="AbstractStringLiteral" name="AbstractStringLiteral">
+<area shape="rect" id="Node000001" title="Abstract class representing a string literal in Corese." alt="" coords="92,431,247,456"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractLiteral.html" title="Base class for all literals." alt="" coords="17,349,135,374"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,381,158,429,154,433,98,385"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Literal.html" title="Represents a literal value in RDF." alt="" coords="13,204,75,229"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="52,242,76,348,71,349,47,244"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Value.html" title="Super interface of all elements of an RDF model (triple, nodes, etc)." alt="" coords="25,80,84,105"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="55,119,48,204,42,204,50,119"/>
+<area shape="rect" id="Node000007" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Resource.html" title="Super interface of all resources of an RDF graph (statements, IRI, blank nodes) as defined for RDF 1...." alt="" coords="76,155,159,180"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="76,114,109,153,105,156,72,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="57,45,57,80,52,80,52,45"/>
+<area shape="rect" id="Node000006" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1IRI.html" title="Represents an IRI." alt="" coords="95,253,134,279"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="107,292,83,350,78,348,102,290"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="119,194,118,253,112,253,114,194"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="159,341,367,381"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="232,392,185,432,181,428,229,388"/>
+</map>

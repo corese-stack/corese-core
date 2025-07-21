@@ -1,3 +1,11 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Rule.html" title=" " alt="" coords="5,5,56,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,31,184,56"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorRule.html" title=" " alt="" coords="257,5,430,31"/>
+<area shape="poly" id="edge519_Node000000_Node000001" title=" " alt="" coords="197,30,256,24,257,29,198,36"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorTransformer.html" title=" " alt="" coords="232,55,455,80"/>
+<area shape="poly" id="edge521_Node000000_Node000003" title=" " alt="" coords="198,51,232,54,231,59,197,56"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorRuleUser.html" title=" " alt="" coords="527,5,730,31"/>
+<area shape="poly" id="edge520_Node000001_Node000002" title=" " alt="" coords="444,15,527,15,527,21,444,21"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1visitor_1_1solver_1_1QuerySolverVisitorTransformerUser.html" title=" " alt="" coords="503,55,755,80"/>
+<area shape="poly" id="edge522_Node000003_Node000004" title=" " alt="" coords="468,65,503,65,503,70,468,70"/>
 </map>

@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1compiler_1_1federate_1_1Selector.html" title="Ask remote endpoints if they contain predicates of the federated query Build a table: triple | predic..." alt="" coords="5,5,80,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,13,100,38"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1jsonld_1_1TitaniumRDFDatasetSerializationAdapter.html" title="Adapter class from Model to RdfDataset for usage in the JSON&#45;LD serialization process using the titan..." alt="" coords="148,5,387,45"/>
+<area shape="poly" id="edge525_Node000000_Node000001" title=" " alt="" coords="114,23,148,23,148,28,114,28"/>
 </map>

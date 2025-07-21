@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1MappingSet.html" title="Utilitary class for Join Minus Optional Compute common variables in left and right expression and whe..." alt="" coords="5,5,104,31"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,31,57,56"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1DepthFirstBestSearch.html" title="An implementation for sorting the triple pattern depth&#45;first &amp; best greedy algorithm." alt="" coords="105,5,268,31"/>
+<area shape="poly" id="edge472_Node000000_Node000001" title=" " alt="" coords="71,34,108,28,109,33,71,40"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1sorter_1_1impl_1_1qpv1_1_1DepthFirstSearch.html" title="An implementation for sorting the triple pattern Pure depth&#45;first greedy algorithm." alt="" coords="120,55,253,80"/>
+<area shape="poly" id="edge473_Node000000_Node000002" title=" " alt="" coords="71,47,120,54,119,60,70,52"/>
 </map>

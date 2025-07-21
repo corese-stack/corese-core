@@ -4,7 +4,7 @@
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="384,390,437,360,463,348,465,353,440,364,386,395"/>
 <area shape="rect" id="Node000024" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeGeneric.html" title="Buffer Edge as Quad to deliver complete edge for Producer." alt="" coords="448,375,552,400"/>
 <area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="404,401,447,394,448,399,405,406"/>
-<area shape="rect" id="Node000025" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeImpl.html" title="Graph Edge with n nodes (not only triple) RDF star triple with reference node t g &lt;&gt;" alt="" coords="459,424,541,449"/>
+<area shape="rect" id="Node000025" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeImpl.html" title="Graph Edge with n nodes (not only triple) RDF star triple with reference node t g &lt;&lt;s p o t&gt;&gt;" alt="" coords="459,424,541,449"/>
 <area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="405,418,459,427,458,433,404,424"/>
 <area shape="rect" id="Node000026" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTripleNode.html" title="Edge(g, t) where t = s p o and t : Node as triple reference s p o {| q v |} ::= Edge(g,..." alt="" coords="439,473,561,499"/>
 <area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="387,430,440,460,465,471,463,476,437,464,384,435"/>

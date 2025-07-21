@@ -344,7 +344,7 @@
 <!-- Node18 -->
 <g id="Node000018" class="node">
 <title>Node18</title>
-<g id="a_Node000018"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseTriple.html" target="_top" xlink:title="Edge reference datatype for edge reference node &lt;&gt; q v &#45;&gt; edge(s p o t) t q v where t is reference no...">
+<g id="a_Node000018"><a xlink:href="classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1CoreseTriple.html" target="_top" xlink:title="Edge reference datatype for edge reference node &lt;&lt;s p o&gt;&gt; q v &#45;&gt; edge(s p o t) t q v where t is refer...">
 <polygon fill="white" stroke="#666666" points="635.5,-305 558.5,-305 558.5,-286 635.5,-286 635.5,-305"/>
 <text text-anchor="middle" x="597" y="-293" font-family="Helvetica,sans-Serif" font-size="10.00">CoreseTriple</text>
 </a>

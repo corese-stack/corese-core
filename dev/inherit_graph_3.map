@@ -1,35 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AbstractProcess.html" title=" " alt="" coords="5,313,132,339"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1WorkflowProcess.html" title="Root class." alt="" coords="180,313,312,339"/>
-<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="146,323,180,323,180,329,146,329"/>
-<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1CompositeProcess.html" title=" " alt="" coords="374,140,517,165"/>
-<area shape="poly" id="edge5_Node000001_Node000002" title=" " alt="" coords="257,299,297,237,325,203,359,174,381,163,383,168,361,179,329,207,301,240,262,302"/>
-<area shape="rect" id="Node000010" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1DatasetProcess.html" title="Generic Process to be programmed Select behavior with sw:mode attribute Use cases: Produce a structur..." alt="" coords="384,189,507,215"/>
-<area shape="poly" id="edge13_Node000001_Node000010" title=" " alt="" coords="265,301,306,262,359,224,385,212,387,217,361,228,309,266,269,305"/>
-<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1FunctionProcess.html" title=" " alt="" coords="382,239,509,264"/>
-<area shape="poly" id="edge14_Node000001_Node000011" title=" " alt="" coords="284,305,359,273,394,262,396,267,361,278,286,310"/>
-<area shape="rect" id="Node000012" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1LoadProcess.html" title="Load a directory." alt="" coords="394,288,497,313"/>
-<area shape="poly" id="edge15_Node000001_Node000012" title=" " alt="" coords="325,313,393,305,394,310,326,319"/>
-<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ResultProcess.html" title=" " alt="" coords="389,337,502,363"/>
-<area shape="poly" id="edge16_Node000001_Node000013" title=" " alt="" coords="326,333,389,341,388,346,325,338"/>
-<area shape="rect" id="Node000014" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1RuleProcess.html" title=" " alt="" coords="395,387,496,412"/>
-<area shape="poly" id="edge17_Node000001_Node000014" title=" " alt="" coords="288,342,361,371,399,384,398,389,359,377,286,347"/>
-<area shape="rect" id="Node000015" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SPARQLProcess.html" title=" " alt="" coords="384,436,507,461"/>
-<area shape="poly" id="edge18_Node000001_Node000015" title=" " alt="" coords="270,347,310,385,361,421,391,434,389,438,359,426,307,389,267,351"/>
-<area shape="rect" id="Node000016" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TransformationProcess.html" title=" " alt="" coords="360,485,531,511"/>
-<area shape="poly" id="edge19_Node000001_Node000016" title=" " alt="" coords="262,349,301,410,329,443,361,470,386,483,384,488,359,475,325,447,297,414,258,352"/>
-<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticProcess.html" title="Super class of Process with a Process List (Test, Parallel, ..)" alt="" coords="583,104,717,129"/>
-<area shape="poly" id="edge6_Node000002_Node000003" title=" " alt="" coords="530,135,583,126,584,131,531,140"/>
-<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1SemanticWorkflow.html" title="Workflow of Query | Update | RuleBase | Transformation Each Process pass a Data with Graph to next Pr..." alt="" coords="579,177,721,203"/>
-<area shape="poly" id="edge11_Node000002_Node000008" title=" " alt="" coords="529,165,581,175,580,180,529,171"/>
-<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1AssertProcess.html" title=" " alt="" coords="774,5,887,31"/>
-<area shape="poly" id="edge7_Node000003_Node000004" title=" " alt="" coords="679,94,768,40,793,28,795,33,771,44,682,99"/>
-<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ParallelProcess.html" title="Run Processes as in parallel with copy of input Graph." alt="" coords="771,55,891,80"/>
-<area shape="poly" id="edge8_Node000003_Node000005" title=" " alt="" coords="710,98,782,78,784,83,711,103"/>
-<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ProbeProcess.html" title="Execute a sub Process but return the input Data Used for e.g trace purpose." alt="" coords="776,104,885,129"/>
-<area shape="poly" id="edge9_Node000003_Node000006" title=" " alt="" coords="731,114,775,114,775,119,731,119"/>
-<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1TestProcess.html" title=" " alt="" coords="781,153,880,179"/>
-<area shape="poly" id="edge10_Node000003_Node000007" title=" " alt="" coords="711,131,784,151,782,156,710,136"/>
-<area shape="rect" id="Node000009" href="$classfr_1_1inria_1_1corese_1_1core_1_1workflow_1_1ShapeWorkflow.html" title="Domain Specific Workflow to process DataShape on RDF Graph." alt="" coords="769,203,892,228"/>
-<area shape="poly" id="edge12_Node000008_Node000009" title=" " alt="" coords="735,199,770,204,769,209,735,205"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,31,181,56"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1trig_1_1TriGSerializer.html" title="Serializes a Model to TriG format with comprehensive syntax support." alt="" coords="235,5,343,31"/>
+<area shape="poly" id="edge27_Node000000_Node000001" title=" " alt="" coords="195,28,234,22,235,28,195,33"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1turtle_1_1TurtleSerializer.html" title="Serializes a Model to Turtle format with comprehensive syntax support." alt="" coords="229,55,348,80"/>
+<area shape="poly" id="edge28_Node000000_Node000002" title=" " alt="" coords="195,53,230,57,229,63,194,58"/>
 </map>

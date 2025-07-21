@@ -1,0 +1,9 @@
+<map id="Triple" name="Triple">
+<area shape="rect" id="Node000001" title=" " alt="" coords="26,225,83,251"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Resource.html" title="Super interface of all resources of an RDF graph (statements, IRI, blank nodes) as defined for RDF 1...." alt="" coords="13,152,96,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,191,57,225,52,225,52,191"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Value.html" title="Super interface of all elements of an RDF model (triple, nodes, etc)." alt="" coords="25,79,84,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="57,118,57,152,52,152,52,118"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,5,104,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="57,44,57,79,52,79,52,44"/>
+</map>

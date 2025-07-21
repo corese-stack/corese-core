@@ -1,0 +1,9 @@
+<map id="AbstractNFamilyOption" name="AbstractNFamilyOption">
+<area shape="rect" id="Node000001" title="An abstract base class for serialization configurations of N&#45;Family RDF formats (e...." alt="" coords="91,168,263,193"/>
+<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1option_1_1AbstractSerializerOption.html" title="An abstract base class for all RDF serialization configurations." alt="" coords="87,93,267,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,133,180,168,175,168,175,133"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,152,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,38,165,91,162,95,101,42"/>
+<area shape="rect" id="Node000004" href="$enumfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1option_1_1LiteralDatatypePolicyEnum.html" title="Defines the policy for serializing literal datatypes." alt="" coords="177,5,375,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="254,42,193,95,189,91,251,38"/>
+</map>

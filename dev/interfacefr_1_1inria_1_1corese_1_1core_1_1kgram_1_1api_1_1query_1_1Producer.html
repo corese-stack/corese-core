@@ -75,7 +75,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Producer-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">Producer Interface Reference</div></div>
 </div><!--header-->
@@ -95,13 +95,13 @@ default void&#160;</td><td class="memItemRight" valign="bottom"><b>start</b> (Qu
 <tr class="memitem:a808686bd6a421818a3dfddaf3b1b5f06" id="r_a808686bd6a421818a3dfddaf3b1b5f06"><td class="memItemLeft" align="right" valign="top"><a id="a808686bd6a421818a3dfddaf3b1b5f06" name="a808686bd6a421818a3dfddaf3b1b5f06"></a>
 default void&#160;</td><td class="memItemRight" valign="bottom"><b>finish</b> (Query q)</td></tr>
 <tr class="separator:a808686bd6a421818a3dfddaf3b1b5f06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d5cd1b72e1eed45146a3b5cb80d73d1" id="r_a5d5cd1b72e1eed45146a3b5cb80d73d1"><td class="memItemLeft" align="right" valign="top"><a id="a5d5cd1b72e1eed45146a3b5cb80d73d1" name="a5d5cd1b72e1eed45146a3b5cb80d73d1"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getMode</b> ()</td></tr>
+<tr class="separator:a5d5cd1b72e1eed45146a3b5cb80d73d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02d4fae30712a5dc6f826ddb7e0b4fd4" id="r_a02d4fae30712a5dc6f826ddb7e0b4fd4"><td class="memItemLeft" align="right" valign="top"><a id="a02d4fae30712a5dc6f826ddb7e0b4fd4" name="a02d4fae30712a5dc6f826ddb7e0b4fd4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setMode</b> (int n)</td></tr>
 <tr class="memdesc:a02d4fae30712a5dc6f826ddb7e0b4fd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A hook to tune Producer. <br /></td></tr>
 <tr class="separator:a02d4fae30712a5dc6f826ddb7e0b4fd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d5cd1b72e1eed45146a3b5cb80d73d1" id="r_a5d5cd1b72e1eed45146a3b5cb80d73d1"><td class="memItemLeft" align="right" valign="top"><a id="a5d5cd1b72e1eed45146a3b5cb80d73d1" name="a5d5cd1b72e1eed45146a3b5cb80d73d1"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>getMode</b> ()</td></tr>
-<tr class="separator:a5d5cd1b72e1eed45146a3b5cb80d73d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeecf8593d7bd1b0955cc941902a756a1" id="r_aeecf8593d7bd1b0955cc941902a756a1"><td class="memItemLeft" align="right" valign="top">Iterable&lt; Node &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Producer.html#aeecf8593d7bd1b0955cc941902a756a1">getGraphNodes</a> (Node gNode, List&lt; Node &gt; from, <a class="el" href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Environment.html">Environment</a> env)</td></tr>
 <tr class="memdesc:aeecf8593d7bd1b0955cc941902a756a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return all graph nodes that are known by the Producer.  <br /></td></tr>
 <tr class="separator:aeecf8593d7bd1b0955cc941902a756a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -139,7 +139,7 @@ Mappings&#160;</td><td class="memItemRight" valign="bottom"><b>getMappings</b> (
 <tr class="memdesc:a1f1d77b90aa0b631e63edbaeaa5cde16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return candidate edges for a path step for an elementary regex exp.  <br /></td></tr>
 <tr class="separator:a1f1d77b90aa0b631e63edbaeaa5cde16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcd9b01c8dd540b7636c9c07cbc760d3" id="r_adcd9b01c8dd540b7636c9c07cbc760d3"><td class="memItemLeft" align="right" valign="top">Node&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacefr_1_1inria_1_1corese_1_1core_1_1kgram_1_1api_1_1query_1_1Producer.html#adcd9b01c8dd540b7636c9c07cbc760d3">getNode</a> (Object value)</td></tr>
-<tr class="memdesc:adcd9b01c8dd540b7636c9c07cbc760d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">************** value to node *************  <br /></td></tr>
+<tr class="memdesc:adcd9b01c8dd540b7636c9c07cbc760d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a value from the filter language, return a Node that contains this value use case: select fun(?x) as ?y.  <br /></td></tr>
 <tr class="separator:adcd9b01c8dd540b7636c9c07cbc760d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac96ef31e466bc95f47cdd56ae799ef44" id="r_ac96ef31e466bc95f47cdd56ae799ef44"><td class="memItemLeft" align="right" valign="top"><a id="ac96ef31e466bc95f47cdd56ae799ef44" name="ac96ef31e466bc95f47cdd56ae799ef44"></a>
 IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>getValue</b> (Object value)</td></tr>
@@ -176,12 +176,12 @@ Query&#160;</td><td class="memItemRight" valign="bottom"><b>getQuery</b> ()</td>
 <tr class="memitem:a68094105c2273acfa51e51a1fd41cac7" id="r_a68094105c2273acfa51e51a1fd41cac7"><td class="memItemLeft" align="right" valign="top"><a id="a68094105c2273acfa51e51a1fd41cac7" name="a68094105c2273acfa51e51a1fd41cac7"></a>
 <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getGraph</b> ()</td></tr>
 <tr class="separator:a68094105c2273acfa51e51a1fd41cac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d80de5193b8c3d2aada93827526429f" id="r_a4d80de5193b8c3d2aada93827526429f"><td class="memItemLeft" align="right" valign="top"><a id="a4d80de5193b8c3d2aada93827526429f" name="a4d80de5193b8c3d2aada93827526429f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setGraphNode</b> (Node n)</td></tr>
-<tr class="separator:a4d80de5193b8c3d2aada93827526429f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf03907c7de5d3ec9e936661d82d6863" id="r_aaf03907c7de5d3ec9e936661d82d6863"><td class="memItemLeft" align="right" valign="top"><a id="aaf03907c7de5d3ec9e936661d82d6863" name="aaf03907c7de5d3ec9e936661d82d6863"></a>
 Node&#160;</td><td class="memItemRight" valign="bottom"><b>getGraphNode</b> ()</td></tr>
 <tr class="separator:aaf03907c7de5d3ec9e936661d82d6863"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d80de5193b8c3d2aada93827526429f" id="r_a4d80de5193b8c3d2aada93827526429f"><td class="memItemLeft" align="right" valign="top"><a id="a4d80de5193b8c3d2aada93827526429f" name="a4d80de5193b8c3d2aada93827526429f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setGraphNode</b> (Node n)</td></tr>
+<tr class="separator:a4d80de5193b8c3d2aada93827526429f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a58a2db6d62a9272660b144bcc30f91" id="r_a7a58a2db6d62a9272660b144bcc30f91"><td class="memItemLeft" align="right" valign="top"><a id="a7a58a2db6d62a9272660b144bcc30f91" name="a7a58a2db6d62a9272660b144bcc30f91"></a>
 Edge&#160;</td><td class="memItemRight" valign="bottom"><b>copy</b> (Edge ent)</td></tr>
 <tr class="separator:a7a58a2db6d62a9272660b144bcc30f91"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -192,17 +192,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> ()</td></tr
 String&#160;</td><td class="memItemRight" valign="bottom"><b>blankNode</b> ()</td></tr>
 <tr class="separator:abf8c0b45864841914a1ff07d3428a05e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
-Static Public Attributes</h2></td></tr>
-<tr class="memitem:abbf926f101bcae8d7e9a75b37d984698" id="r_abbf926f101bcae8d7e9a75b37d984698"><td class="memItemLeft" align="right" valign="top"><a id="abbf926f101bcae8d7e9a75b37d984698" name="abbf926f101bcae8d7e9a75b37d984698"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>DEFAULT</b> = 0</td></tr>
-<tr class="separator:abbf926f101bcae8d7e9a75b37d984698"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acba7ec19dabcc087ffe29c50bac006c7" id="r_acba7ec19dabcc087ffe29c50bac006c7"><td class="memItemLeft" align="right" valign="top"><a id="acba7ec19dabcc087ffe29c50bac006c7" name="acba7ec19dabcc087ffe29c50bac006c7"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>SKIP_DUPLICATE_TEST</b> = 1</td></tr>
-<tr class="separator:acba7ec19dabcc087ffe29c50bac006c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adfb184101878a1242ba1faf01374f573" id="r_adfb184101878a1242ba1faf01374f573"><td class="memItemLeft" align="right" valign="top"><a id="adfb184101878a1242ba1faf01374f573" name="adfb184101878a1242ba1faf01374f573"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>EXTENSION</b> = 2</td></tr>
-<tr class="separator:adfb184101878a1242ba1faf01374f573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:acb3e6407752a0950fcae6e22430c4d3d" id="r_acb3e6407752a0950fcae6e22430c4d3d"><td class="memItemLeft" align="right" valign="top"><a id="acb3e6407752a0950fcae6e22430c4d3d" name="acb3e6407752a0950fcae6e22430c4d3d"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>DEFAULT</b> = 0</td></tr>
+<tr class="separator:acb3e6407752a0950fcae6e22430c4d3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fb5f3d30112dd5f2710adb5e8eb1898" id="r_a9fb5f3d30112dd5f2710adb5e8eb1898"><td class="memItemLeft" align="right" valign="top"><a id="a9fb5f3d30112dd5f2710adb5e8eb1898" name="a9fb5f3d30112dd5f2710adb5e8eb1898"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>SKIP_DUPLICATE_TEST</b> = 1</td></tr>
+<tr class="separator:a9fb5f3d30112dd5f2710adb5e8eb1898"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adade6f948fb74d21d6fe1836fdf997d5" id="r_adade6f948fb74d21d6fe1836fdf997d5"><td class="memItemLeft" align="right" valign="top"><a id="adade6f948fb74d21d6fe1836fdf997d5" name="adade6f948fb74d21d6fe1836fdf997d5"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>EXTENSION</b> = 2</td></tr>
+<tr class="separator:adade6f948fb74d21d6fe1836fdf997d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interface for the Connector that produces candidate edges for KGRAM. </p>
@@ -324,7 +324,7 @@ static final int&#160;</td><td class="memItemRight" valign="bottom"><b>EXTENSION
 </div><div class="memdoc">
 
 <p>Return candidate edges for a path step for an elementary regex exp. </p>
-<p>Edge start at start Node, start is the node at index. Hence start can be edge.getNode(0) as well as edge.getNode(1)</p>
+<p>Edge start at start Node, start is the node at index. Hence start can be edge.getNode(0) as well as edge.getNode(1) </p>
 <p>isInverse = true means consider also target edge nodes in reverse order query: start = Bob ; ?a ^foaf:knows ?b target: Jack foaf:knows Bob return edge above because we consider also Bob foaf:knows Jack This is orthogonal to index = 1, in which case we also consider nodes in inverse order</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -405,8 +405,7 @@ static final int&#160;</td><td class="memItemRight" valign="bottom"><b>EXTENSION
       </table>
 </div><div class="memdoc">
 
-<p>************** value to node ************* </p>
-<p>Given a value from the filter language, return a Node that contains this value use case: select fun(?x) as ?y</p>
+<p>Given a value from the filter language, return a Node that contains this value use case: select fun(?x) as ?y. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">value</td><td>a target value from the filter language </td></tr>
@@ -478,7 +477,7 @@ static final int&#160;</td><td class="memItemRight" valign="bottom"><b>EXTENSION
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Iterable of start nodes for exp</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Iterable of start nodes for exp </dd></dl>
 <p>SPARQL 1.1 requires: ZeroLengthPath match all nodes of (current) graph, including Literals If the argument is a constant, it matches even if it is not a node of the graph </p>
 
 </div>
@@ -617,7 +616,7 @@ static final int&#160;</td><td class="memItemRight" valign="bottom"><b>EXTENSION
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">qNodes</td><td>the query nodes to bind with values of object </td></tr>
-    <tr><td class="paramname">object</td><td></td></tr>
+    <tr><td class="paramname">value</td><td></td></tr>
   </table>
   </dd>
 </dl>

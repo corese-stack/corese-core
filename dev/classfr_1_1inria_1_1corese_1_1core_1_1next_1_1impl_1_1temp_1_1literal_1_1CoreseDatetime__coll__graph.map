@@ -1,0 +1,9 @@
+<map id="CoreseDatetime" name="CoreseDatetime">
+<area shape="rect" id="Node000001" title="CoreseDatetime class that represents a date and time literal in the Corese framework." alt="" coords="156,152,284,177"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,216,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,109,204,150,201,154,138,114"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseDatatypeAdapter.html" title="Interface for Corese datatype adapter." alt="" coords="240,79,419,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="302,114,239,154,236,150,299,109"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1CoreseNodeAdapter.html" title="Wrapper for objects that are represented as Node in Corese code, e.g." alt="" coords="253,5,405,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="332,44,332,79,327,79,327,44"/>
+</map>

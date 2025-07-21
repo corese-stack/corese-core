@@ -1,0 +1,17 @@
+<map id="Literal" name="Literal">
+<area shape="rect" id="Node000001" title="Represents a literal value in RDF." alt="" coords="277,152,340,177"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractLiteral.html" title="Base class for all literals." alt="" coords="250,225,367,251"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="311,191,311,225,306,225,306,191"/>
+<area shape="rect" id="Node000002" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Value.html" title="Super interface of all elements of an RDF model (triple, nodes, etc)." alt="" coords="279,79,338,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="311,118,311,152,306,152,306,118"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="259,5,358,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="311,44,311,79,306,79,306,44"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractDuration.html" title="Abstract class representing a duration literal in RDF." alt="" coords="5,299,137,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="258,257,111,301,109,296,257,252"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractNumber.html" title="Abstract class representing a number literal in RDF." alt="" coords="162,299,290,324"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="287,262,241,300,238,296,283,258"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractStringLiteral.html" title="Abstract class representing a string literal in Corese." alt="" coords="314,299,469,324"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="334,258,380,296,376,300,331,262"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractTemporalPointLiteral.html" title="Represents a temporal literal representing a point in time." alt="" coords="493,299,703,324"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="369,251,552,296,551,301,368,257"/>
+</map>

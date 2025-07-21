@@ -1,0 +1,29 @@
+<map id="Value" name="Value">
+<area shape="rect" id="Node000001" title="Super interface of all elements of an RDF model (triple, nodes, etc)." alt="" coords="152,204,211,229"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Literal.html" title="Represents a literal value in RDF." alt="" coords="269,141,331,167"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="217,195,274,165,276,169,219,200"/>
+<area shape="rect" id="Node000009" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Resource.html" title="Super interface of all resources of an RDF graph (statements, IRI, blank nodes) as defined for RDF 1...." alt="" coords="259,228,341,253"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="224,223,259,230,258,235,223,228"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,204,104,229"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,214,152,214,152,219,118,219"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractLiteral.html" title="Base class for all literals." alt="" coords="389,104,507,129"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="344,140,396,127,398,132,345,145"/>
+<area shape="rect" id="Node000005" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractDuration.html" title="Abstract class representing a duration literal in RDF." alt="" coords="594,5,726,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="472,93,509,65,554,40,593,26,594,31,556,44,512,70,475,97"/>
+<area shape="rect" id="Node000006" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractNumber.html" title="Abstract class representing a number literal in RDF." alt="" coords="596,55,724,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="515,98,554,89,602,77,604,83,555,94,516,103"/>
+<area shape="rect" id="Node000007" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractStringLiteral.html" title="Abstract class representing a string literal in Corese." alt="" coords="583,104,737,129"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="521,114,583,114,583,119,521,119"/>
+<area shape="rect" id="Node000008" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1literal_1_1AbstractTemporalPointLiteral.html" title="Represents a temporal literal representing a point in time." alt="" coords="555,153,765,179"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="517,130,605,151,604,156,516,135"/>
+<area shape="rect" id="Node000010" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1BNode.html" title="Represents a blank node in a RDF graph." alt="" coords="415,203,481,228"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="355,229,415,218,415,223,355,234"/>
+<area shape="rect" id="Node000012" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1IRI.html" title="Represents an IRI." alt="" coords="429,252,467,277"/>
+<area shape="poly" id="edge11_Node000009_Node000012" title=" " alt="" coords="355,247,429,259,428,264,354,252"/>
+<area shape="rect" id="Node000014" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1Triple.html" title=" " alt="" coords="419,301,477,327"/>
+<area shape="poly" id="edge13_Node000009_Node000014" title=" " alt="" coords="336,258,391,288,420,301,418,306,388,292,333,263"/>
+<area shape="rect" id="Node000011" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1AbstractBNode.html" title="Abstract implementation of the BNode interface, providing common functionality for blank node represe..." alt="" coords="601,203,719,228"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="494,213,601,213,601,218,494,218"/>
+<area shape="rect" id="Node000013" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1base_1_1model_1_1AbstractIRI.html" title="Base class for IRI implementations." alt="" coords="613,252,707,277"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="481,262,613,262,613,267,481,267"/>
+</map>

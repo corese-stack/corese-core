@@ -1,5 +1,5 @@
 <map id="EdgeImpl" name="EdgeImpl">
-<area shape="rect" id="Node000001" title="Graph Edge with n nodes (not only triple) RDF star triple with reference node t g &lt;&gt;" alt="" coords="83,225,166,251"/>
+<area shape="rect" id="Node000001" title="Graph Edge with n nodes (not only triple) RDF star triple with reference node t g &lt;&lt;s p o t&gt;&gt;" alt="" coords="83,225,166,251"/>
 <area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1edge_1_1EdgeTop.html" title=" " alt="" coords="49,152,125,177"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,188,121,224,116,226,97,191"/>
 <area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1GraphObject.html" title=" " alt="" coords="9,79,112,104"/>

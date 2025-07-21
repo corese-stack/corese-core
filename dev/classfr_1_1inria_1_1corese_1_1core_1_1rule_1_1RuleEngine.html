@@ -100,6 +100,8 @@ Collaboration diagram for RuleEngine:</div>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine_1_1Profile.html">Profile</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine_1_1ProfileType.html">ProfileType</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>STable</b></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -111,16 +113,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acba2bd199c4d971df84111e8ef6bc6d4" id="r_acba2bd199c4d971df84111e8ef6bc6d4"><td class="memItemLeft" align="right" valign="top"><a id="acba2bd199c4d971df84111e8ef6bc6d4" name="acba2bd199c4d971df84111e8ef6bc6d4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>set</b> (QueryProcess p)</td></tr>
 <tr class="separator:acba2bd199c4d971df84111e8ef6bc6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab96b78f84a22dd4f3285dff6c5c34bed" id="r_ab96b78f84a22dd4f3285dff6c5c34bed"><td class="memItemLeft" align="right" valign="top"><a id="ab96b78f84a22dd4f3285dff6c5c34bed" name="ab96b78f84a22dd4f3285dff6c5c34bed"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setProfile</b> (<a class="el" href="enumfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine_1_1Profile.html">Profile</a> p)  throws LoadException </td></tr>
-<tr class="separator:ab96b78f84a22dd4f3285dff6c5c34bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af809b7d8599ff3fcde4ca9d4c955f97c" id="r_af809b7d8599ff3fcde4ca9d4c955f97c"><td class="memItemLeft" align="right" valign="top"><a id="af809b7d8599ff3fcde4ca9d4c955f97c" name="af809b7d8599ff3fcde4ca9d4c955f97c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setProfile</b> (String p)  throws LoadException </td></tr>
-<tr class="separator:af809b7d8599ff3fcde4ca9d4c955f97c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29953f1e875fe9d7c091c397e4233bfa" id="r_a29953f1e875fe9d7c091c397e4233bfa"><td class="memItemLeft" align="right" valign="top"><a id="a29953f1e875fe9d7c091c397e4233bfa" name="a29953f1e875fe9d7c091c397e4233bfa"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setProfile</b> (int n)</td></tr>
-<tr class="memdesc:a29953f1e875fe9d7c091c397e4233bfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">setProfile(OWL_RL) load OWL RL rule base and clean the OWL/RDF graph <br /></td></tr>
-<tr class="separator:a29953f1e875fe9d7c091c397e4233bfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad12f4f2f07948e69e490731b3b05d20b" id="r_ad12f4f2f07948e69e490731b3b05d20b"><td class="memItemLeft" align="right" valign="top"><a id="ad12f4f2f07948e69e490731b3b05d20b" name="ad12f4f2f07948e69e490731b3b05d20b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setProfile</b> (<a class="el" href="enumfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine_1_1ProfileType.html">ProfileType</a> n)</td></tr>
+<tr class="memdesc:ad12f4f2f07948e69e490731b3b05d20b"><td class="mdescLeft">&#160;</td><td class="mdescRight">setProfile(OWL_RL) load OWL RL rule base and clean the OWL/RDF graph <br /></td></tr>
+<tr class="separator:ad12f4f2f07948e69e490731b3b05d20b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47893e3efa5a910d241268fb76dfb883" id="r_a47893e3efa5a910d241268fb76dfb883"><td class="memItemLeft" align="right" valign="top"><a id="a47893e3efa5a910d241268fb76dfb883" name="a47893e3efa5a910d241268fb76dfb883"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>optimizeOWLRL</b> ()</td></tr>
 <tr class="separator:a47893e3efa5a910d241268fb76dfb883"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,6 +127,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>cleanOWL</b> ()  thro
 <tr class="memitem:a4eb79614380e3817bce3bdfef19b1585" id="r_a4eb79614380e3817bce3bdfef19b1585"><td class="memItemLeft" align="right" valign="top"><a id="a4eb79614380e3817bce3bdfef19b1585" name="a4eb79614380e3817bce3bdfef19b1585"></a>
 <a class="el" href="enumfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine_1_1Profile.html">Profile</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getProfile</b> ()</td></tr>
 <tr class="separator:a4eb79614380e3817bce3bdfef19b1585"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab96b78f84a22dd4f3285dff6c5c34bed" id="r_ab96b78f84a22dd4f3285dff6c5c34bed"><td class="memItemLeft" align="right" valign="top"><a id="ab96b78f84a22dd4f3285dff6c5c34bed" name="ab96b78f84a22dd4f3285dff6c5c34bed"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setProfile</b> (<a class="el" href="enumfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine_1_1Profile.html">Profile</a> p)  throws LoadException </td></tr>
+<tr class="separator:ab96b78f84a22dd4f3285dff6c5c34bed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af809b7d8599ff3fcde4ca9d4c955f97c" id="r_af809b7d8599ff3fcde4ca9d4c955f97c"><td class="memItemLeft" align="right" valign="top"><a id="af809b7d8599ff3fcde4ca9d4c955f97c" name="af809b7d8599ff3fcde4ca9d4c955f97c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setProfile</b> (String p)  throws LoadException </td></tr>
+<tr class="separator:af809b7d8599ff3fcde4ca9d4c955f97c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49ad7c8814c7ee3f1210594f43020b91" id="r_a49ad7c8814c7ee3f1210594f43020b91"><td class="memItemLeft" align="right" valign="top"><a id="a49ad7c8814c7ee3f1210594f43020b91" name="a49ad7c8814c7ee3f1210594f43020b91"></a>
 QueryProcess&#160;</td><td class="memItemRight" valign="bottom"><b>getQueryProcess</b> ()</td></tr>
 <tr class="separator:a49ad7c8814c7ee3f1210594f43020b91"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -144,9 +146,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setSpeedUp</b> (boole
 <tr class="memitem:a48166f29cb16ebd761cef77d28e9f3b7" id="r_a48166f29cb16ebd761cef77d28e9f3b7"><td class="memItemLeft" align="right" valign="top"><a id="a48166f29cb16ebd761cef77d28e9f3b7" name="a48166f29cb16ebd761cef77d28e9f3b7"></a>
 IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>setFast</b> (boolean b)</td></tr>
 <tr class="separator:a48166f29cb16ebd761cef77d28e9f3b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71219bb61c6e016decf27c87369612a6" id="r_a71219bb61c6e016decf27c87369612a6"><td class="memItemLeft" align="right" valign="top"><a id="a71219bb61c6e016decf27c87369612a6" name="a71219bb61c6e016decf27c87369612a6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setTrace</b> (boolean b)</td></tr>
-<tr class="separator:a71219bb61c6e016decf27c87369612a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85182b9f122dec8dfd2b618922535219" id="r_a85182b9f122dec8dfd2b618922535219"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine.html#a85182b9f122dec8dfd2b618922535219">success</a> ()</td></tr>
 <tr class="separator:a85182b9f122dec8dfd2b618922535219"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a996a6c482a11ac45c04824a1310e80bd" id="r_a996a6c482a11ac45c04824a1310e80bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine.html#a996a6c482a11ac45c04824a1310e80bd">constraint</a> ()</td></tr>
@@ -167,9 +166,6 @@ IDatatype&#160;</td><td class="memItemRight" valign="bottom"><b>getPath</b> ()</
 <tr class="memitem:aac6b13108b81b48bb1c1eee2c9a3abb4" id="r_aac6b13108b81b48bb1c1eee2c9a3abb4"><td class="memItemLeft" align="right" valign="top"><a id="aac6b13108b81b48bb1c1eee2c9a3abb4" name="aac6b13108b81b48bb1c1eee2c9a3abb4"></a>
 <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Graph.html">Graph</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getRDFGraph</b> ()</td></tr>
 <tr class="separator:aac6b13108b81b48bb1c1eee2c9a3abb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1ed3db5ffd42df3fdf5c2efb42ac004" id="r_aa1ed3db5ffd42df3fdf5c2efb42ac004"><td class="memItemLeft" align="right" valign="top"><a id="aa1ed3db5ffd42df3fdf5c2efb42ac004" name="aa1ed3db5ffd42df3fdf5c2efb42ac004"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setDebug</b> (boolean b)</td></tr>
-<tr class="separator:aa1ed3db5ffd42df3fdf5c2efb42ac004"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8bb3912a3ce86b15842e79d0b421204" id="r_ac8bb3912a3ce86b15842e79d0b421204"><td class="memItemLeft" align="right" valign="top"><a id="ac8bb3912a3ce86b15842e79d0b421204" name="ac8bb3912a3ce86b15842e79d0b421204"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
 <tr class="separator:ac8bb3912a3ce86b15842e79d0b421204"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,6 +200,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>remove</b> (List&lt; 
 <tr class="memitem:a2d8b5737a9aeed16ee2b845c254dcc7c" id="r_a2d8b5737a9aeed16ee2b845c254dcc7c"><td class="memItemLeft" align="right" valign="top"><a id="a2d8b5737a9aeed16ee2b845c254dcc7c" name="a2d8b5737a9aeed16ee2b845c254dcc7c"></a>
 List&lt; <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Rule.html">Rule</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getRules</b> ()</td></tr>
 <tr class="separator:a2d8b5737a9aeed16ee2b845c254dcc7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75f344ae88c08dfec3f11da47ee8e49e" id="r_a75f344ae88c08dfec3f11da47ee8e49e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine.html#a75f344ae88c08dfec3f11da47ee8e49e">setRules</a> (List&lt; <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Rule.html">Rule</a> &gt; rules)</td></tr>
+<tr class="separator:a75f344ae88c08dfec3f11da47ee8e49e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92ef4e3679d87cec91a94a03eb598047" id="r_a92ef4e3679d87cec91a94a03eb598047"><td class="memItemLeft" align="right" valign="top"><a id="a92ef4e3679d87cec91a94a03eb598047" name="a92ef4e3679d87cec91a94a03eb598047"></a>
 Query&#160;</td><td class="memItemRight" valign="bottom"><b>defRule</b> (String name, String rule)  throws EngineException </td></tr>
 <tr class="separator:a92ef4e3679d87cec91a94a03eb598047"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -213,9 +211,6 @@ Query&#160;</td><td class="memItemRight" valign="bottom"><b>defRule</b> (String 
 <tr class="memitem:a24b1b931fccc7ac8365782e7f302902f" id="r_a24b1b931fccc7ac8365782e7f302902f"><td class="memItemLeft" align="right" valign="top"><a id="a24b1b931fccc7ac8365782e7f302902f" name="a24b1b931fccc7ac8365782e7f302902f"></a>
 <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Rule.html">Rule</a>&#160;</td><td class="memItemRight" valign="bottom"><b>defInferenceRule</b> (String name, String rule, String type)  throws EngineException </td></tr>
 <tr class="separator:a24b1b931fccc7ac8365782e7f302902f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5eefd296822e958338e14a7b7d8ada29" id="r_a5eefd296822e958338e14a7b7d8ada29"><td class="memItemLeft" align="right" valign="top"><a id="a5eefd296822e958338e14a7b7d8ada29" name="a5eefd296822e958338e14a7b7d8ada29"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>trace</b> ()</td></tr>
-<tr class="separator:a5eefd296822e958338e14a7b7d8ada29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bbe646c052baf99f04a367ef6031d74" id="r_a2bbe646c052baf99f04a367ef6031d74"><td class="memItemLeft" align="right" valign="top"><a id="a2bbe646c052baf99f04a367ef6031d74" name="a2bbe646c052baf99f04a367ef6031d74"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>clean</b> ()</td></tr>
 <tr class="memdesc:a2bbe646c052baf99f04a367ef6031d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean index of edges that are stored when isOptim=true. <br /></td></tr>
@@ -276,12 +271,12 @@ Graphable&#160;</td><td class="memItemRight" valign="bottom"><b>getRecord</b> ()
 <tr class="memitem:a87fb9fbc17ed8c34f04f52797ce7e580" id="r_a87fb9fbc17ed8c34f04f52797ce7e580"><td class="memItemLeft" align="right" valign="top"><a id="a87fb9fbc17ed8c34f04f52797ce7e580" name="a87fb9fbc17ed8c34f04f52797ce7e580"></a>
 String&#160;</td><td class="memItemRight" valign="bottom"><b>toRDFRecord</b> ()</td></tr>
 <tr class="separator:a87fb9fbc17ed8c34f04f52797ce7e580"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a767d4cfd778026c6f5d73fb262aef52a" id="r_a767d4cfd778026c6f5d73fb262aef52a"><td class="memItemLeft" align="right" valign="top"><a id="a767d4cfd778026c6f5d73fb262aef52a" name="a767d4cfd778026c6f5d73fb262aef52a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setGraph</b> (Object obj)</td></tr>
-<tr class="separator:a767d4cfd778026c6f5d73fb262aef52a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a121b2d1217b0cd725231fef150d69b43" id="r_a121b2d1217b0cd725231fef150d69b43"><td class="memItemLeft" align="right" valign="top"><a id="a121b2d1217b0cd725231fef150d69b43" name="a121b2d1217b0cd725231fef150d69b43"></a>
 Object&#160;</td><td class="memItemRight" valign="bottom"><b>getGraph</b> ()</td></tr>
 <tr class="separator:a121b2d1217b0cd725231fef150d69b43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a767d4cfd778026c6f5d73fb262aef52a" id="r_a767d4cfd778026c6f5d73fb262aef52a"><td class="memItemLeft" align="right" valign="top"><a id="a767d4cfd778026c6f5d73fb262aef52a" name="a767d4cfd778026c6f5d73fb262aef52a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setGraph</b> (Object obj)</td></tr>
+<tr class="separator:a767d4cfd778026c6f5d73fb262aef52a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30cae6fed1b7ca8401b58dc58de99d8b" id="r_a30cae6fed1b7ca8401b58dc58de99d8b"><td class="memItemLeft" align="right" valign="top"><a id="a30cae6fed1b7ca8401b58dc58de99d8b" name="a30cae6fed1b7ca8401b58dc58de99d8b"></a>
 <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1Context.html">Context</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getContext</b> ()</td></tr>
 <tr class="separator:a30cae6fed1b7ca8401b58dc58de99d8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -318,18 +313,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>onInsert</b> (Node gN
 <tr class="memitem:a47aecc344561e91c09479f3a5e1b9dea" id="r_a47aecc344561e91c09479f3a5e1b9dea"><td class="memItemLeft" align="right" valign="top"><a id="a47aecc344561e91c09479f3a5e1b9dea" name="a47aecc344561e91c09479f3a5e1b9dea"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>onClear</b> ()</td></tr>
 <tr class="separator:a47aecc344561e91c09479f3a5e1b9dea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd69749e0e0917a63e4f96a2ba7f4f92" id="r_abd69749e0e0917a63e4f96a2ba7f4f92"><td class="memItemLeft" align="right" valign="top"><a id="abd69749e0e0917a63e4f96a2ba7f4f92" name="abd69749e0e0917a63e4f96a2ba7f4f92"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setActivate</b> (boolean b)</td></tr>
-<tr class="separator:abd69749e0e0917a63e4f96a2ba7f4f92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afac2e83b4d6cfe704a9d004dde718085" id="r_afac2e83b4d6cfe704a9d004dde718085"><td class="memItemLeft" align="right" valign="top"><a id="afac2e83b4d6cfe704a9d004dde718085" name="afac2e83b4d6cfe704a9d004dde718085"></a>
 boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isActivate</b> ()</td></tr>
 <tr class="separator:afac2e83b4d6cfe704a9d004dde718085"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd69749e0e0917a63e4f96a2ba7f4f92" id="r_abd69749e0e0917a63e4f96a2ba7f4f92"><td class="memItemLeft" align="right" valign="top"><a id="abd69749e0e0917a63e4f96a2ba7f4f92" name="abd69749e0e0917a63e4f96a2ba7f4f92"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setActivate</b> (boolean b)</td></tr>
+<tr class="separator:abd69749e0e0917a63e4f96a2ba7f4f92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fcb45e5d2428352eb36b487d1d4eea3" id="r_a1fcb45e5d2428352eb36b487d1d4eea3"><td class="memItemLeft" align="right" valign="top"><a id="a1fcb45e5d2428352eb36b487d1d4eea3" name="a1fcb45e5d2428352eb36b487d1d4eea3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>remove</b> ()</td></tr>
 <tr class="separator:a1fcb45e5d2428352eb36b487d1d4eea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3775081dae5d62a47eee5c62fa49995" id="r_ae3775081dae5d62a47eee5c62fa49995"><td class="memItemLeft" align="right" valign="top"><a id="ae3775081dae5d62a47eee5c62fa49995" name="ae3775081dae5d62a47eee5c62fa49995"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>type</b> ()</td></tr>
-<tr class="separator:ae3775081dae5d62a47eee5c62fa49995"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa05965e991db67fc1819457b1fe8af13" id="r_aa05965e991db67fc1819457b1fe8af13"><td class="memItemLeft" align="right" valign="top"><a id="aa05965e991db67fc1819457b1fe8af13" name="aa05965e991db67fc1819457b1fe8af13"></a>
+Type&#160;</td><td class="memItemRight" valign="bottom"><b>type</b> ()</td></tr>
+<tr class="separator:aa05965e991db67fc1819457b1fe8af13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba80d58e2e1d3d0490ad8d64f6ae1de2" id="r_aba80d58e2e1d3d0490ad8d64f6ae1de2"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine.html#aba80d58e2e1d3d0490ad8d64f6ae1de2">isSynchronized</a> ()</td></tr>
 <tr class="separator:aba80d58e2e1d3d0490ad8d64f6ae1de2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38586f66b7fd21629179880ffdf1dac6" id="r_a38586f66b7fd21629179880ffdf1dac6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine.html#a38586f66b7fd21629179880ffdf1dac6">setSynchronized</a> (boolean synchronize)</td></tr>
@@ -338,8 +333,6 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>type</b> ()</td></tr>
 <tr class="separator:a76a408d93369ddb825fdbd40b90d0560"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27367244583e36d4661383c8639dd31e" id="r_a27367244583e36d4661383c8639dd31e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine.html#a27367244583e36d4661383c8639dd31e">setVisitor</a> (ProcessVisitor visitor)</td></tr>
 <tr class="separator:a27367244583e36d4661383c8639dd31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75f344ae88c08dfec3f11da47ee8e49e" id="r_a75f344ae88c08dfec3f11da47ee8e49e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleEngine.html#a75f344ae88c08dfec3f11da47ee8e49e">setRules</a> (List&lt; <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1Rule.html">Rule</a> &gt; rules)</td></tr>
-<tr class="separator:a75f344ae88c08dfec3f11da47ee8e49e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3ccfd677fa662c8af08cebe99eafebf" id="r_ac3ccfd677fa662c8af08cebe99eafebf"><td class="memItemLeft" align="right" valign="top"><a id="ac3ccfd677fa662c8af08cebe99eafebf" name="ac3ccfd677fa662c8af08cebe99eafebf"></a>
 Level&#160;</td><td class="memItemRight" valign="bottom"><b>getLevel</b> ()</td></tr>
 <tr class="separator:ac3ccfd677fa662c8af08cebe99eafebf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -360,9 +353,6 @@ List&lt; <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleE
 <tr class="memitem:a8003653580bbedc3bd34c1e4d7bbcf0a" id="r_a8003653580bbedc3bd34c1e4d7bbcf0a"><td class="memItemLeft" align="right" valign="top"><a id="a8003653580bbedc3bd34c1e4d7bbcf0a" name="a8003653580bbedc3bd34c1e4d7bbcf0a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setErrorList</b> (List&lt; <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1rule_1_1RuleError.html">RuleError</a> &gt; errorList)</td></tr>
 <tr class="separator:a8003653580bbedc3bd34c1e4d7bbcf0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13e9e573fb1b450ab45ce49a5dfc3e41" id="r_a13e9e573fb1b450ab45ce49a5dfc3e41"><td class="memItemLeft" align="right" valign="top"><a id="a13e9e573fb1b450ab45ce49a5dfc3e41" name="a13e9e573fb1b450ab45ce49a5dfc3e41"></a>
-boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isDebug</b> ()</td></tr>
-<tr class="separator:a13e9e573fb1b450ab45ce49a5dfc3e41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21f7860cac945a6f40737ff27380062f" id="r_a21f7860cac945a6f40737ff27380062f"><td class="memItemLeft" align="right" valign="top"><a id="a21f7860cac945a6f40737ff27380062f" name="a21f7860cac945a6f40737ff27380062f"></a>
 GraphManager&#160;</td><td class="memItemRight" valign="bottom"><b>getGraphManager</b> ()</td></tr>
 <tr class="separator:a21f7860cac945a6f40737ff27380062f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -378,9 +368,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setOptimizable</b> (b
 <tr class="memitem:ae1efe133b8a40f26910587b00ddedb87" id="r_ae1efe133b8a40f26910587b00ddedb87"><td class="memItemLeft" align="right" valign="top"><a id="ae1efe133b8a40f26910587b00ddedb87" name="ae1efe133b8a40f26910587b00ddedb87"></a>
 boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isRecord</b> ()</td></tr>
 <tr class="separator:ae1efe133b8a40f26910587b00ddedb87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abfb9b0dcc697ef46ad1aa5afbaea894a" id="r_abfb9b0dcc697ef46ad1aa5afbaea894a"><td class="memItemLeft" align="right" valign="top"><a id="abfb9b0dcc697ef46ad1aa5afbaea894a" name="abfb9b0dcc697ef46ad1aa5afbaea894a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setRecord</b> (boolean record)</td></tr>
-<tr class="separator:abfb9b0dcc697ef46ad1aa5afbaea894a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd8ccc26f72142e11e838cda805d8f53" id="r_afd8ccc26f72142e11e838cda805d8f53"><td class="memItemLeft" align="right" valign="top"><a id="afd8ccc26f72142e11e838cda805d8f53" name="afd8ccc26f72142e11e838cda805d8f53"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setRecord</b> (boolean isRecord)</td></tr>
+<tr class="separator:afd8ccc26f72142e11e838cda805d8f53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a067fb49d270fab3c9fb1ce5b91b53986" id="r_a067fb49d270fab3c9fb1ce5b91b53986"><td class="memItemLeft" align="right" valign="top"><a id="a067fb49d270fab3c9fb1ce5b91b53986" name="a067fb49d270fab3c9fb1ce5b91b53986"></a>
 boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isOptimize</b> ()</td></tr>
 <tr class="separator:a067fb49d270fab3c9fb1ce5b91b53986"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -414,12 +404,6 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isOptimizeRuleData
 <tr class="memitem:a5f4bd990e5bf2da4266bc7ed9d524416" id="r_a5f4bd990e5bf2da4266bc7ed9d524416"><td class="memItemLeft" align="right" valign="top"><a id="a5f4bd990e5bf2da4266bc7ed9d524416" name="a5f4bd990e5bf2da4266bc7ed9d524416"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setOptimizeRuleDataManager</b> (boolean optimizeRuleDataManager)</td></tr>
 <tr class="separator:a5f4bd990e5bf2da4266bc7ed9d524416"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af224155a5adae73fe86116b56f359391" id="r_af224155a5adae73fe86116b56f359391"><td class="memItemLeft" align="right" valign="top"><a id="af224155a5adae73fe86116b56f359391" name="af224155a5adae73fe86116b56f359391"></a>
-boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isSimpleTrace</b> ()</td></tr>
-<tr class="separator:af224155a5adae73fe86116b56f359391"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a623b3d4ae45bb0979e2b8ad5d36443fe" id="r_a623b3d4ae45bb0979e2b8ad5d36443fe"><td class="memItemLeft" align="right" valign="top"><a id="a623b3d4ae45bb0979e2b8ad5d36443fe" name="a623b3d4ae45bb0979e2b8ad5d36443fe"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setSimpleTrace</b> (boolean simpleTrace)</td></tr>
-<tr class="separator:a623b3d4ae45bb0979e2b8ad5d36443fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -441,36 +425,15 @@ static String&#160;</td><td class="memItemRight" valign="bottom"><b>getRuleID</b
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a7ea109e17c98f70aeb8d923b555f60ee" id="r_a7ea109e17c98f70aeb8d923b555f60ee"><td class="memItemLeft" align="right" valign="top"><a id="a7ea109e17c98f70aeb8d923b555f60ee" name="a7ea109e17c98f70aeb8d923b555f60ee"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>OWL_RL_FULL</b> = -1</td></tr>
-<tr class="separator:a7ea109e17c98f70aeb8d923b555f60ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad380a813c0a57a92fc790982f4cc3145" id="r_ad380a813c0a57a92fc790982f4cc3145"><td class="memItemLeft" align="right" valign="top"><a id="ad380a813c0a57a92fc790982f4cc3145" name="ad380a813c0a57a92fc790982f4cc3145"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>STD</b> = 0</td></tr>
-<tr class="separator:ad380a813c0a57a92fc790982f4cc3145"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86fe69e6b784db7b282b4e5d15f5b19e" id="r_a86fe69e6b784db7b282b4e5d15f5b19e"><td class="memItemLeft" align="right" valign="top"><a id="a86fe69e6b784db7b282b4e5d15f5b19e" name="a86fe69e6b784db7b282b4e5d15f5b19e"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>OWL_RL</b> = 1</td></tr>
-<tr class="separator:a86fe69e6b784db7b282b4e5d15f5b19e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a520809b6084975a5a23bd3c90be38008" id="r_a520809b6084975a5a23bd3c90be38008"><td class="memItemLeft" align="right" valign="top"><a id="a520809b6084975a5a23bd3c90be38008" name="a520809b6084975a5a23bd3c90be38008"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>OWL_RL_LITE</b> = 2</td></tr>
-<tr class="separator:a520809b6084975a5a23bd3c90be38008"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8a12742d1789a87a98a31292d493d0b" id="r_af8a12742d1789a87a98a31292d493d0b"><td class="memItemLeft" align="right" valign="top"><a id="af8a12742d1789a87a98a31292d493d0b" name="af8a12742d1789a87a98a31292d493d0b"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>OWL_RL_EXT</b> = 3</td></tr>
-<tr class="separator:af8a12742d1789a87a98a31292d493d0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab240fda412fb73f4e449c0e3fe458594" id="r_ab240fda412fb73f4e449c0e3fe458594"><td class="memItemLeft" align="right" valign="top"><a id="ab240fda412fb73f4e449c0e3fe458594" name="ab240fda412fb73f4e449c0e3fe458594"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>OWL_RL_TEST</b> = 4</td></tr>
-<tr class="separator:ab240fda412fb73f4e449c0e3fe458594"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a482b63038aa3ded1c324e9dffdf3f07c" id="r_a482b63038aa3ded1c324e9dffdf3f07c"><td class="memItemLeft" align="right" valign="top"><a id="a482b63038aa3ded1c324e9dffdf3f07c" name="a482b63038aa3ded1c324e9dffdf3f07c"></a>
-static final int&#160;</td><td class="memItemRight" valign="bottom"><b>RDFS_RL</b> = 5</td></tr>
-<tr class="separator:a482b63038aa3ded1c324e9dffdf3f07c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f9eeb62de65b93e09eb6621998cc1f6" id="r_a7f9eeb62de65b93e09eb6621998cc1f6"><td class="memItemLeft" align="right" valign="top"><a id="a7f9eeb62de65b93e09eb6621998cc1f6" name="a7f9eeb62de65b93e09eb6621998cc1f6"></a>
+static final Logger&#160;</td><td class="memItemRight" valign="bottom"><b>logger</b> = LoggerFactory.getLogger(RuleEngine.class)</td></tr>
+<tr class="separator:a7f9eeb62de65b93e09eb6621998cc1f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96881d785500f1a5106936125bbcad4a" id="r_a96881d785500f1a5106936125bbcad4a"><td class="memItemLeft" align="right" valign="top"><a id="a96881d785500f1a5106936125bbcad4a" name="a96881d785500f1a5106936125bbcad4a"></a>
 static boolean&#160;</td><td class="memItemRight" valign="bottom"><b>OWL_CLEAN</b> = true</td></tr>
 <tr class="separator:a96881d785500f1a5106936125bbcad4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8bd2cf047951052d83298616ae6b262" id="r_ac8bd2cf047951052d83298616ae6b262"><td class="memItemLeft" align="right" valign="top"><a id="ac8bd2cf047951052d83298616ae6b262" name="ac8bd2cf047951052d83298616ae6b262"></a>
 static boolean&#160;</td><td class="memItemRight" valign="bottom"><b>RULE_DATAMANAGER_OPTIMIZE</b> = false</td></tr>
 <tr class="separator:ac8bd2cf047951052d83298616ae6b262"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b27630dbcf231bfda3a7d79e1eefce5" id="r_a5b27630dbcf231bfda3a7d79e1eefce5"><td class="memItemLeft" align="right" valign="top"><a id="a5b27630dbcf231bfda3a7d79e1eefce5" name="a5b27630dbcf231bfda3a7d79e1eefce5"></a>
-static Logger&#160;</td><td class="memItemRight" valign="bottom"><b>logger</b> = LoggerFactory.getLogger(RuleEngine.class)</td></tr>
-<tr class="separator:a5b27630dbcf231bfda3a7d79e1eefce5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Forward Rule Engine Use construct {} where {} SPARQL Query as Rule Optimizations: Do not create Mappings, create triples directly Consider rules for which new relevant triples are available Consider solutions with new triple Focus on new triples using specific Graph Index sorted by timestamp Eval transitive rule at saturation using specific Java code Eval pseudo transitive rule just after it's transitive rule (cf rdf:type &amp; rdfs:subClassOf) </p>
@@ -492,7 +455,7 @@ static Logger&#160;</td><td class="memItemRight" valign="bottom"><b>logger</b> =
       </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>a Graph of Constraint Violation, may be empty </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000007">Todo:</a></b></dt><dd>: DataManager </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000006">Todo:</a></b></dt><dd>: DataManager </dd></dl>
 
 </div>
 </div>

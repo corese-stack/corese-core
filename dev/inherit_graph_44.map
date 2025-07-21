@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1Closure.html" title="Transitive Closure of one property, e.g." alt="" coords="5,5,76,31"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1logic_1_1ClosureDataManager.html" title=" " alt="" coords="124,5,283,31"/>
-<area shape="poly" id="edge302_Node000000_Node000001" title=" " alt="" coords="90,15,124,15,124,21,90,21"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,95,31"/>
+<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1triple_1_1printer_1_1SPIN.html" title="Pretty Printer: SPARQL AST to SPIN Turtle." alt="" coords="143,5,195,31"/>
+<area shape="poly" id="edge356_Node000000_Node000001" title=" " alt="" coords="109,15,142,15,142,21,109,21"/>
 </map>

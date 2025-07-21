@@ -1,7 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,5,175,31"/>
-<area shape="rect" id="Node000001" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1function_1_1VariableResolver.html" title=" " alt="" coords="223,5,355,31"/>
-<area shape="poly" id="edge558_Node000000_Node000001" title=" " alt="" coords="188,15,222,15,222,21,188,21"/>
-<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1function_1_1VariableResolverImpl.html" title="Variable resolver for XPath see Processor and XPathFunction." alt="" coords="403,5,564,31"/>
-<area shape="poly" id="edge559_Node000001_Node000002" title=" " alt="" coords="368,15,402,15,402,21,368,21"/>
+<area shape="rect" id="Node000000" href="$classfr_1_1inria_1_1corese_1_1core_1_1sparql_1_1datatype_1_1function_1_1StringHelper.html" title="Extended functionalities on String objects like &quot;containsIgnoreCase&quot;." alt="" coords="5,5,108,31"/>
 </map>

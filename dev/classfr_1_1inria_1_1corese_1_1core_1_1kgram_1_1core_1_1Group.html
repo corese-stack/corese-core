@@ -116,6 +116,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>dispose</b> ()</td></
 <tr class="memitem:ad1be3b725e8a229ccff788fe99258888" id="r_ad1be3b725e8a229ccff788fe99258888"><td class="memItemLeft" align="right" valign="top"><a id="ad1be3b725e8a229ccff788fe99258888" name="ad1be3b725e8a229ccff788fe99258888"></a>
 List&lt; Node &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getNodeList</b> ()</td></tr>
 <tr class="separator:ad1be3b725e8a229ccff788fe99258888"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6416ad4e576530d84b6b80adc940229" id="r_ac6416ad4e576530d84b6b80adc940229"><td class="memItemLeft" align="right" valign="top"><a id="ac6416ad4e576530d84b6b80adc940229" name="ac6416ad4e576530d84b6b80adc940229"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setNodeList</b> (List&lt; Node &gt; nodes)</td></tr>
+<tr class="separator:ac6416ad4e576530d84b6b80adc940229"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac43f6c5fe0b883a798e7746de25fcf44" id="r_ac43f6c5fe0b883a798e7746de25fcf44"><td class="memItemLeft" align="right" valign="top"><a id="ac43f6c5fe0b883a798e7746de25fcf44" name="ac43f6c5fe0b883a798e7746de25fcf44"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setDistinct</b> (boolean b)</td></tr>
 <tr class="separator:ac43f6c5fe0b883a798e7746de25fcf44"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -138,9 +141,6 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isDistinct</b> (<a
 <tr class="memitem:a9eb46db06e5a0812bf42a848eb03da9a" id="r_a9eb46db06e5a0812bf42a848eb03da9a"><td class="memItemLeft" align="right" valign="top"><a id="a9eb46db06e5a0812bf42a848eb03da9a" name="a9eb46db06e5a0812bf42a848eb03da9a"></a>
 Map&lt; <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mapping.html">Mapping</a>, <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1_1Mappings.html">Mappings</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getTable</b> ()</td></tr>
 <tr class="separator:a9eb46db06e5a0812bf42a848eb03da9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6416ad4e576530d84b6b80adc940229" id="r_ac6416ad4e576530d84b6b80adc940229"><td class="memItemLeft" align="right" valign="top"><a id="ac6416ad4e576530d84b6b80adc940229" name="ac6416ad4e576530d84b6b80adc940229"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setNodeList</b> (List&lt; Node &gt; nodes)</td></tr>
-<tr class="separator:ac6416ad4e576530d84b6b80adc940229"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -159,7 +159,7 @@ static <a class="el" href="classfr_1_1inria_1_1corese_1_1core_1_1kgram_1_1core_1
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>select distinct ?x ?y select (count(distinct *) as ?c) </p>
-<p>group by ?x ?y min(?l, groupBy(?x, ?y))</p>
+<p>group by ?x ?y min(?l, groupBy(?x, ?y)) </p>
 <p>Compare Mapping using a TreeMap</p>
 <dl class="section author"><dt>Author</dt><dd>Olivier Corby, Edelweiss, INRIA 2011 </dd></dl>
 </div><hr/>The documentation for this class was generated from the following file:<ul>

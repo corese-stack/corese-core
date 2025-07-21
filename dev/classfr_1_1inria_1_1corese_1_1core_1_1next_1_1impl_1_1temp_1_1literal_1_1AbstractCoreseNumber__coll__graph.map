@@ -1,0 +1,9 @@
+<map id="AbstractCoreseNumber" name="AbstractCoreseNumber">
+<area shape="rect" id="Node000001" title="Super class for all the numeric based literal in the XSD datatype hierarchy." alt="" coords="63,152,236,177"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,123,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,110,137,150,134,154,86,115"/>
+<area shape="rect" id="Node000003" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1literal_1_1CoreseDatatypeAdapter.html" title="Interface for Corese datatype adapter." alt="" coords="147,79,325,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,115,165,154,162,150,210,110"/>
+<area shape="rect" id="Node000004" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1temp_1_1CoreseNodeAdapter.html" title="Wrapper for objects that are represented as Node in Corese code, e.g." alt="" coords="160,5,312,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="239,44,239,79,233,79,233,44"/>
+</map>

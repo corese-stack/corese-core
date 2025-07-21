@@ -1,9 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,55,83,80"/>
-<area shape="rect" id="Node000001" href="$classfr_1_1inria_1_1corese_1_1core_1_1Graph_1_1TreeNode.html" title="With CompareNode: manage 1, 01, 1.0 as different Node (with same index) With CompareIndex: manage IDa..." alt="" coords="153,5,279,31"/>
-<area shape="poly" id="edge548_Node000000_Node000001" title=" " alt="" coords="95,50,130,39,169,28,170,33,131,45,97,55"/>
-<area shape="rect" id="Node000002" href="$classfr_1_1inria_1_1corese_1_1core_1_1query_1_1Construct_1_1TreeNode.html" title=" " alt="" coords="141,55,291,80"/>
-<area shape="poly" id="edge549_Node000000_Node000002" title=" " alt="" coords="96,65,141,65,141,70,96,70"/>
-<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1query_1_1MatchBNode_1_1TreeNode.html" title=" " alt="" coords="131,104,301,129"/>
-<area shape="poly" id="edge550_Node000000_Node000003" title=" " alt="" coords="97,80,171,101,170,106,96,85"/>
+<area shape="rect" id="Node000000" href="$interfacefr_1_1inria_1_1corese_1_1core_1_1next_1_1api_1_1io_1_1serialization_1_1SerializerFactory.html" title="Factory interface for creating RDFSerializer instances." alt="" coords="5,5,136,31"/>
 </map>

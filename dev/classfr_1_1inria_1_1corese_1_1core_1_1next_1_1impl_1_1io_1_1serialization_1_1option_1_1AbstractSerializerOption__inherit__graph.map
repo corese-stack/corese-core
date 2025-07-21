@@ -1,0 +1,9 @@
+<map id="AbstractSerializerOption" name="AbstractSerializerOption">
+<area shape="rect" id="Node000001" title="An abstract base class for all RDF serialization configurations." alt="" coords="99,79,279,104"/>
+<area shape="rect" id="Node000003" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1option_1_1AbstractNFamilyOption.html" title="An abstract base class for serialization configurations of N&#45;Family RDF formats (e...." alt="" coords="5,152,177,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,114,109,154,106,150,160,110"/>
+<area shape="rect" id="Node000004" href="$classfr_1_1inria_1_1corese_1_1core_1_1next_1_1impl_1_1io_1_1serialization_1_1option_1_1AbstractTFamilyOption.html" title="An abstract base class for serialization configurations of Turtle Trig RDF formats (e...." alt="" coords="202,152,373,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="217,110,273,150,270,154,214,114"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="115,5,262,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,44,191,79,186,79,186,44"/>
+</map>
