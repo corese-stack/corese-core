@@ -105,7 +105,7 @@ public class QueryLoad extends Load {
         } catch (LoadException ex) {
             logger.error("Error loading query '{}'", name, ex);
         }
-        if (query == "") {
+        if ("".equals(query)) {
             return null;
         }
         return query;
@@ -130,7 +130,7 @@ public class QueryLoad extends Load {
     }
     
     public String readWE(String name) throws LoadException {
-        String query = "", str = "";
+        String query = "";
         Reader fr;
         try {
             if (NSManager.isResource(name)) {
@@ -233,7 +233,6 @@ public class QueryLoad extends Load {
         try {
             return File.createTempFile(getName(name), getSuffix(name));
         } catch (IOException e) {
-            logger.error("Failed to create temp file: {}", e.getMessage());
             throw new RuntimeException("Failed to create temp file", e);
         }
     }
@@ -246,8 +245,8 @@ public class QueryLoad extends Load {
      * @return true if write was successful, false otherwise
      */
     private boolean write(File file, String content) {
-        try (FileWriter fr = new FileWriter(file);
-             BufferedWriter writer = new BufferedWriter(fr)) {
+        try (final FileWriter fr = new FileWriter(file);
+             final BufferedWriter writer = new BufferedWriter(fr)) {
             writer.write(content);
             writer.flush();
             return true;
@@ -353,8 +352,8 @@ public class QueryLoad extends Load {
 
     public void write(String name, String str) {
         try {
-            try (FileWriter fr = new FileWriter(name);
-                 BufferedWriter fq = new BufferedWriter(fr)) {
+            try (final FileWriter fr = new FileWriter(name);
+                 final BufferedWriter fq = new BufferedWriter(fr)) {
                 fq.write(str);
                 fq.flush();
             }

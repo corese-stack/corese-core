@@ -123,10 +123,10 @@ public class JavaCompiler {
     }
 
     public void write(String path) throws IOException {
-        String fullFileName = String.format("%s%s.java", path, name);
+        final String fullFileName = String.format("%s%s.java", path, name);
 
-        try (FileWriter fw = new FileWriter(fullFileName);
-             BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
+        try (final FileWriter fw = new FileWriter(fullFileName);
+             final BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
             bufferedWriter.write(head.getStringBuilder().toString());
             bufferedWriter.write(dtc.getStringBuilder().toString());
             bufferedWriter.write(dtc.getStringBuilderVar().toString());

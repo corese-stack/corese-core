@@ -60,8 +60,8 @@ public class LogManager implements LogKey {
     
     public void toFile(String fileName) throws IOException {
 
-        try (FileWriter fileWriter = new FileWriter(fileName);
-             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+        try (final FileWriter fileWriter = new FileWriter(fileName);
+             final BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             bufferedWriter.write(toString());
             bufferedWriter.flush();

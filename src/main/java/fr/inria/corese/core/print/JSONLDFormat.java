@@ -406,7 +406,7 @@ public class JSONLDFormat extends RDFFormat {
     public void write(String name) throws IOException {
         StringBuilder sb = this.getJsonLdObject().toStringBuilder();
 
-        try (FileOutputStream fos = new FileOutputStream(name)) {
+        try (final FileOutputStream fos = new FileOutputStream(name)) {
             for (int i = 0; i < sb.length(); i++) {
                 fos.write(sb.charAt(i));
             }
