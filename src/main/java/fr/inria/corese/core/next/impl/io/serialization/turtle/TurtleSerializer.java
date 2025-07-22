@@ -1,15 +1,17 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.io.serialization.base.AbstractGraphSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
-import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.impl.io.serialization.base.AbstractGraphSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
+import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
 /**
  * Serializes a {@link Model} to Turtle format with comprehensive syntax support.

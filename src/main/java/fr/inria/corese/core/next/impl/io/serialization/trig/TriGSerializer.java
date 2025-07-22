@@ -1,15 +1,21 @@
 package fr.inria.corese.core.next.impl.io.serialization.trig;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractGraphSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.*;
 
 /**
  * Serializes a {@link Model} to TriG format with comprehensive syntax support.

@@ -1,25 +1,43 @@
 package fr.inria.corese.core.next.impl.io.serialization.jsonld;
 
-import com.apicatalog.rdf.*;
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.impl.common.util.IRIUtils;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
+import static fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants.DEFAULT_GRAPH_IRI;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import static fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants.DEFAULT_GRAPH_IRI;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import com.apicatalog.rdf.RdfDataset;
+import com.apicatalog.rdf.RdfGraph;
+import com.apicatalog.rdf.RdfLiteral;
+import com.apicatalog.rdf.RdfNQuad;
+import com.apicatalog.rdf.RdfResource;
+import com.apicatalog.rdf.RdfTriple;
+import com.apicatalog.rdf.RdfValue;
+
+import fr.inria.corese.core.next.api.BNode;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 /**
  * Adapter class from Model to RdfDataset for usage in the JSON-LD serialization process using the titanium library.

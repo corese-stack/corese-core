@@ -1,20 +1,34 @@
 package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
+import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
 /**
  * Serializes a {@link Model} to RDF/XML format.
