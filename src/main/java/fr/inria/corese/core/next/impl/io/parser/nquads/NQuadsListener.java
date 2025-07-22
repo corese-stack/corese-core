@@ -24,6 +24,13 @@ public class NQuadsListener extends NQuadsBaseListener {
     private IRI currentPredicate;
     private Resource currentGraph;
 
+    /**
+     * Constructor for the NQuadsListener.
+     *
+     * @param model   The RDF model to populate.
+     * @param factory The ValueFactory for creating RDF resources.
+     * @param options IOOptions for configuration (if any).
+     */
     public NQuadsListener(Model model, ValueFactory factory, IOOptions options) {
         this.model = model;
         this.factory = factory;

@@ -23,6 +23,13 @@ public class NTriplesListener extends NTriplesBaseListener {
     private Resource currentSubject;
     private IRI currentPredicate;
 
+    /**
+     * Constructor for the NTriplesListener.
+     *
+     * @param model   The RDF model to populate.
+     * @param factory The ValueFactory for creating RDF resources.
+     * @param options IOOptions for configuration (if any).
+     */
     public NTriplesListener(Model model, ValueFactory factory, IOOptions options) {
         this.model = model;
         this.factory = factory;

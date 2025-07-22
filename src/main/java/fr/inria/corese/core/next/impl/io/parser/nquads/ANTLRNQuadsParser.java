@@ -28,10 +28,23 @@ import java.nio.charset.StandardCharsets;
  */
 public class ANTLRNQuadsParser extends AbstractRDFParser {
 
+    /**
+     * Constructor for the ANTLRNQuadsParser.
+     *
+     * @param model   The RDF model to populate.
+     * @param factory The ValueFactory for creating RDF resources.
+     */
     public ANTLRNQuadsParser(Model model, ValueFactory factory) {
         super(model, factory);
     }
 
+    /**
+     * Constructor for the ANTLRNQuadsParser with configuration options.
+     *
+     * @param model   The RDF model to populate.
+     * @param factory The ValueFactory for creating RDF resources.
+     * @param config  The configuration options for parsing.
+     */
     public ANTLRNQuadsParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);
     }
