@@ -61,7 +61,7 @@ sourceSets {
 
 tasks.register("createJavaCCDir") {
     doLast {
-        mkdir("${layout.buildDirectory.get()}/generated/javacc/sparqlCorese/fr/inria/corese/core/sparql/triple/javacc1")
+        mkdir("${layout.buildDirectory.get()}/generated-src/javacc/fr/inria/corese/core/sparql/triple/javacc1")
     }
 }
 tasks.named("javaccSparqlCorese") {
