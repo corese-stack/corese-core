@@ -137,8 +137,8 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
 
     /**
      * Builder for creating instances of TitaniumJSONLDProcessorOption.
-     *
-     * @return the builder for this option.
+     * This nested static class provides a fluent API for configuring the
+     * various options before building the final {@code TitaniumJSONLDProcessorOption} object.
      */
     public static class Builder extends AbstractIOOptions.Builder<TitaniumJSONLDProcessorOption> {
 

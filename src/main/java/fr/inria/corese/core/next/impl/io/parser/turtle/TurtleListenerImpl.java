@@ -50,8 +50,8 @@ public class TurtleListenerImpl extends TurtleBaseListener {
      * Constructor for TurtleListenerImpl that initializes the model and value
      * factory.
      *
-     * @param model   the model to be populated by the parser
-     * @param factory the value factory used to create RDF values
+     * @param ctx The parse tree context for the {@code prefixID} rule,
+     * which provides access to the parsed prefix name and IRI reference tokens.
      */
     public void exitPrefixID(TurtleParser.PrefixIDContext ctx) {
         String prefix = ctx.PNAME_NS().getText();
