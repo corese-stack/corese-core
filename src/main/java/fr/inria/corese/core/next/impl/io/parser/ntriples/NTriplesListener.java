@@ -1,11 +1,14 @@
 package fr.inria.corese.core.next.impl.io.parser.ntriples;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesBaseListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Listener for the ANTLR4 generated parser for N-Triples.
@@ -14,10 +17,9 @@ import org.slf4j.LoggerFactory;
  */
 public class NTriplesListener extends NTriplesBaseListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(NTriplesListener.class);
-
     private final Model model;
     private final ValueFactory factory;
+    @SuppressWarnings("unused")
     private final IOOptions options;
 
     private Resource currentSubject;

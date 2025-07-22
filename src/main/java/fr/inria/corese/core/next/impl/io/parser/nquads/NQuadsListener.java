@@ -1,11 +1,14 @@
 package fr.inria.corese.core.next.impl.io.parser.nquads;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsBaseListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Listener for the ANTLR4 generated parser for N-Quads.
@@ -14,10 +17,9 @@ import org.slf4j.LoggerFactory;
  */
 public class NQuadsListener extends NQuadsBaseListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(NQuadsListener.class);
-
     private final Model model;
     private final ValueFactory factory;
+    @SuppressWarnings("unused")
     private final IOOptions options;
 
     private Resource currentSubject;
