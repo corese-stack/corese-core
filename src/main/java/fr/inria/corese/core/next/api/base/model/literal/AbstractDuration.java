@@ -1,12 +1,16 @@
 package fr.inria.corese.core.next.api.base.model.literal;
 
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-
 import java.time.DateTimeException;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import fr.inria.corese.core.next.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 
 /**
  * Abstract class representing a duration literal in RDF.
