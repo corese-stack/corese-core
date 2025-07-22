@@ -8,8 +8,6 @@ import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -26,15 +24,10 @@ public class RdfxmlParserTest {
     private Model parseRdfXml(String rdfXml) throws Exception {
         Model model = new CoreseModel();
         ValueFactory valueFactory = new CoreseAdaptedValueFactory();
-
         try (InputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8))) {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            SAXParser saxParser = factory.newSAXParser();
-            RdfXmlParser handler = new RdfXmlParser(model, valueFactory);
-            saxParser.parse(inputStream, handler);
+            RdfXmlParser parser = new RdfXmlParser(model, valueFactory);
+            parser.parse(inputStream);
         }
-
         return model;
     }
 

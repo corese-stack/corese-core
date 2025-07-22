@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.parser.RDFFormat;
-import fr.inria.corese.core.next.api.base.parser.RDFFormats;
-import fr.inria.corese.core.next.api.base.parser.RDFParser;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.io.parser.rdfxml.context.RdfXmlContext;
@@ -32,10 +32,10 @@ import static fr.inria.corese.core.next.impl.io.parser.rdfxml.RdfXmlUtils.*;
  * the supplied {@link ValueFactory}. This parser supports nested nodes,
  * blank nodes, typed nodes, and RDF collections.</p>
  */
-public class RdfXmlParser  extends DefaultHandler implements RDFParser {
+public class RdfXmlParser extends AbstractRDFParser {
 
     /** RDF/XML format identifier for this parser. */
-    private final RDFFormat format = RDFFormats.RDF_XML;
+    private final RDFFormat format = RDFFormat.RDFXML;
 
     /** Buffer for accumulating character data between start and end tags. */
     private StringBuilder characters = new StringBuilder();
@@ -50,17 +50,24 @@ public class RdfXmlParser  extends DefaultHandler implements RDFParser {
      * @param factory the RDF value factory for term creation
      */
     public RdfXmlParser(Model model, ValueFactory factory) {
-        this.ctx = new RdfXmlContext(model, factory);
+        this(model, factory, null);
+    }
+
+    /**
+     * Creates a new parser with a target RDF model, factory, and configuration options.
+     *
+     * @param model   the RDF model to populate
+     * @param factory the RDF value factory for term creation
+     * @param config  optional configuration options for the parser
+     */
+    public RdfXmlParser(Model model, ValueFactory factory, IOOptions config) {
+        super(model, factory, config);
+        this.ctx = new RdfXmlContext(getModel(), getValueFactory());
     }
 
     @Override
     public RDFFormat getRDFFormat() {
         return format;
-    }
-
-    @Override
-    public void parse(InputStream in) {
-        parse(in, null);
     }
 
     @Override
@@ -70,15 +77,10 @@ public class RdfXmlParser  extends DefaultHandler implements RDFParser {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
-            saxParser.parse(in, this);
+            saxParser.parse(in, new RdfXmlSaxHandler());
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse RDF/XML input stream", e);
         }
-    }
-
-    @Override
-    public void parse(Reader reader) {
-        parse(reader, null);
     }
 
     @Override
@@ -89,14 +91,37 @@ public class RdfXmlParser  extends DefaultHandler implements RDFParser {
             factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
             InputSource inputSource = new InputSource(reader);
-            saxParser.parse(inputSource, this);
+            saxParser.parse(inputSource, new RdfXmlSaxHandler());
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse RDF/XML input stream", e);
         }
     }
 
-    @Override
-    public void characters(char[] ch, int start, int length) {
+    /**
+     * Internal SAX handler that delegates to the parser's methods
+     */
+    private class RdfXmlSaxHandler extends DefaultHandler {
+
+        @Override
+        public void characters(char[] ch, int start, int length) {
+            RdfXmlParser.this.handleCharacters(ch, start, length);
+        }
+
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes attrs) {
+            RdfXmlParser.this.handleStartElement(uri, localName, qName, attrs);
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String qName) {
+            RdfXmlParser.this.handleEndElement(uri, localName, qName);
+        }
+    }
+
+    /**
+     * Handles character data between XML elements
+     */
+    private void handleCharacters(char[] ch, int start, int length) {
         characters.append(ch, start, length);
     }
 
@@ -105,8 +130,7 @@ public class RdfXmlParser  extends DefaultHandler implements RDFParser {
      * Identifies node elements, container constructs, properties,
      * and special parseType attributes, updating the parsing context accordingly.
      */
-    @Override
-    public void startElement(String uri, String localName, String qName, Attributes attrs) {
+    private void handleStartElement(String uri, String localName, String qName, Attributes attrs) {
         // Skip the top-level rdf:RDF wrapper element
         if (RdfXmlUtils.isRdfRDF(uri, localName)) return;
 
@@ -291,8 +315,7 @@ public class RdfXmlParser  extends DefaultHandler implements RDFParser {
     /**
      * Handles the end of an XML element, emitting a literal or cleaning up context stacks.
      */
-    @Override
-    public void endElement(String uri, String localName, String qName) {
+    private void handleEndElement(String uri, String localName, String qName) {
         String text = characters.toString().trim();
         characters.setLength(0);
 
