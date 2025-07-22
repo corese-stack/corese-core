@@ -59,14 +59,6 @@ sourceSets {
     }
 }
 
-tasks.register("createJavaCCDir") {
-    doLast {
-        mkdir("${layout.buildDirectory.get()}/generated-src/javacc/fr/inria/corese/core/sparql/triple/javacc1")
-    }
-}
-tasks.named("javaccSparqlCorese") {
-    dependsOn("createJavaCCDir")
-}
 // Ensure JavaCC generation happens before compilation
 tasks.named("compileJava") {
     dependsOn("javaccSparqlCorese")
@@ -357,8 +349,9 @@ tasks.withType<PublishToMavenRepository>().configureEach {
 // Configure the Antlr task to generate parser code with specific arguments
 tasks.named<AntlrTask>("generateGrammarSource") {
     arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.impl.parser.antlr"))
-    outputDirectory = layout.buildDirectory.dir("generated-src/antlr/main/fr/inria/corese/core/next/impl/parser/antlr").get().asFile
-    outputs.dirs(outputDirectory)
+    outputDirectory = antlrPackageDir
+    inputs.files(fileTree("src/main/antlr"))
+    outputs.dir(antlrPackageDir)
 }
 
 // Ensure Java compilation depends on both JavaCC and Antlr code generation
