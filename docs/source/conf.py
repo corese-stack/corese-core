@@ -96,7 +96,8 @@ html_theme_options = {
 }
 
 html_sidebars = {
-  "install": [],
+    "install": [],
+    "user_guide": [],
 }
 
 # -- MySt-parcer extension Options -------------------------------------------
