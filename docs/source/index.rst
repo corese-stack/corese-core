@@ -7,6 +7,13 @@
 .. image:: _static/logo/corese-core_doc_light.svg
    :align: center
    :width: 400px
+   :class: only-light
+
+.. image:: _static/logo/corese-core_doc_dark.svg
+   :align: center
+   :width: 400px
+   :class: only-dark
+
 
 Corese is a software platform that implements and extends the standards of the Semantic Web. It enables users to create, manipulate, parse, serialize, query, reason about, and validate RDF data.
 
