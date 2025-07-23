@@ -8,14 +8,14 @@
 <dependency>
     <groupId>fr.inria.corese</groupId>
     <artifactId>corese-core</artifactId>
-    <version>X.Y.Z</version> <!-- replace X.Y.Z with the version number -->
+    <version>4.6.4-SNAPSHOT</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```Groovy
-implementation 'fr.inria.corese:corese-core:X.Y.Z' // replace X.Y.Z with the version number
+implementation 'fr.inria.corese:corese-core:4.6.4-SNAPSHOT'
 ```
 
 **Jar:**
