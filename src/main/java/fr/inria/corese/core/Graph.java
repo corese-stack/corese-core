@@ -123,11 +123,11 @@ public class Graph extends GraphObject implements
     // edge Index for RuleEngine where edge are sorted newest first
     EdgeManagerIndexer ruleEdgeIndex;
     // predefined individual Node such as kg:default named graph
-    ConcurrentHashMap<String, Node> system;
+    ConcurrentHashMap<String, Node> nodeSystem;
     // key -> URI Node ; member of graph nodes (subject/object)
     ConcurrentHashMap<String, Node> individual;
     // label -> Blank Node ; member of graph nodes (subject/object)
-    ConcurrentHashMap<String, Node> blank;
+    ConcurrentHashMap<String, Node> nodeBlank;
     // Triple Reference Node
     ConcurrentHashMap<String, Node> triple;
     // named graph id nodes: key -> named graph id Node (possibly not subject/object
@@ -250,7 +250,7 @@ public class Graph extends GraphObject implements
         // URI Node
         individual = new ConcurrentHashMap<>();
         // Blank Node
-        blank = new ConcurrentHashMap<>();
+        nodeBlank = new ConcurrentHashMap<>();
         // rdf star triple reference node
         triple = new ConcurrentHashMap<>();
         // Named Graph Node
@@ -563,22 +563,22 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * System Node are predefined such as kg:default Node for default graph They
+     * nodeSystemNode are predefined such as kg:default Node for default graph They
      * have an index but they are not yet stored in any graph table but system
      * table They are retrieved by getResource, getNode, getGraph, getProperty
      * on demand
      */
     void initSystem() {
-        system = new ConcurrentHashMap<>();
+        nodeSystem= new ConcurrentHashMap<>();
         systemNode = new ArrayList<>();
         for (String uri : PREDEFINED) {
             Node n = createSystemNode(uri);
-            system.put(uri, n);
+            nodeSystem.put(uri, n);
             systemNode.add(n);
         }
-        defaultGraph = system.get(Entailment.DEFAULT);
-        ruleGraph = system.get(Entailment.RULE);
-        constraintGraph = system.get(Entailment.CONSTRAINT);
+        defaultGraph = nodeSystem.get(Entailment.DEFAULT);
+        ruleGraph = nodeSystem.get(Entailment.RULE);
+        constraintGraph = nodeSystem.get(Entailment.CONSTRAINT);
     }
 
     Node createSystemNode(String label) {
@@ -589,7 +589,7 @@ public class Graph extends GraphObject implements
     }
 
     Node getSystemNode(String name) {
-        return system.get(name);
+        return nodeSystem.get(name);
     }
 
     @Override
@@ -809,7 +809,7 @@ public class Graph extends GraphObject implements
         sb.appendPNL("kg:graph    ", graph.size());
         sb.appendPNL("kg:property ", getSubjectIndex().size());
         sb.appendPNL("kg:uri      ", individual.size());
-        sb.appendPNL("kg:bnode    ", blank.size());
+        sb.appendPNL("kg:bnode    ", nodeBlank.size());
         sb.appendPNL("kg:triple    ", triple.size());
         sb.appendPNL("kg:literal  ", getLiteralNodeManager().size());
         sb.appendPNL("kg:nodeManager  ", getNodeManager().isEffective());
@@ -835,7 +835,7 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * Generate an RDF Graph that describes the KGRAM system and the current RDF
+     * Generate an RDF Graph that describes the KGRAM nodeSystem and the current RDF
      * graph
      */
     public Graphable describe() {
@@ -1527,7 +1527,7 @@ public class Graph extends GraphObject implements
     }
 
     public int nbBlanks() {
-        return blank.size();
+        return nodeBlank.size();
     }
 
     public int nbTriples() {
@@ -1760,7 +1760,7 @@ public class Graph extends GraphObject implements
     // resource or blank
     public boolean isIndividual(Node node) {
         return individual.containsKey(getID(node))
-                || blank.containsKey(node.getLabel())
+                || nodeBlank.containsKey(node.getLabel())
                 || triple.containsKey(node.getLabel());
     }
 
@@ -1791,7 +1791,7 @@ public class Graph extends GraphObject implements
     }
 
     public Node getBlankNodeBasic(String name) {
-        return blank.get(name);
+        return nodeBlank.get(name);
     }
 
     // named graph id may be a bnode
@@ -1804,7 +1804,7 @@ public class Graph extends GraphObject implements
     }
 
     void addBlankNode(IDatatype dt, Node node) {
-        blank.put(node.getLabel(), node);
+        nodeBlank.put(node.getLabel(), node);
     }
 
     void addTripleNode(IDatatype dt, Node node) {
@@ -2615,7 +2615,7 @@ public class Graph extends GraphObject implements
     }
 
     public Iterable<Node> getBlankNodes() {
-        return blank.values();
+        return nodeBlank.values();
     }
 
     public Iterable<Node> getTripleNodes() {
@@ -3101,7 +3101,7 @@ public class Graph extends GraphObject implements
 
     void clearNodes() {
         individual.clear();
-        blank.clear();
+        nodeBlank.clear();
         triple.clear();
         getLiteralNodeManager().clear();
         property.clear();
