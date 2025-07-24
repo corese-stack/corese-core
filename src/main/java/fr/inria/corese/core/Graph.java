@@ -1722,13 +1722,13 @@ public class Graph extends GraphObject implements
     }
 
     public Node getLiteralNode(IDatatype dt, boolean create, boolean add) {
-        String key = getKey(dt);
-        Node node = getLiteralNode(key, dt);
+        String keyString = getKey(dt);
+        Node node = getLiteralNode(keyString, dt);
         if (node != null) {
             return node;
         }
         if (create) {
-            node = createNode(key, dt);
+            node = createNode(keyString, dt);
             if (add) {
                 addLiteralNode(dt, node);
             }
@@ -1888,8 +1888,8 @@ public class Graph extends GraphObject implements
             return node;
         }
         IDatatype dt = DatatypeMap.createResource(label);
-        String key = getID(label);
-        node = createNode(key, dt);
+        String keyString = getID(label);
+        node = createNode(keyString, dt);
         add(dt, node);
         return node;
     }
@@ -2275,7 +2275,7 @@ public class Graph extends GraphObject implements
             }
         }
         if (meta.isEmpty()) {
-            return new ArrayList<Edge>();
+            return new ArrayList<>();
         }
         return meta;
     }
@@ -2323,7 +2323,7 @@ public class Graph extends GraphObject implements
     }
 
     public List<Node> getList(Node node) {
-        List<Node> list = new ArrayList<Node>();
+        List<Node> list = new ArrayList<>();
         list(node, list);
         return list;
     }
@@ -2380,11 +2380,11 @@ public class Graph extends GraphObject implements
             Edge first = getEdge(RDF.FIRST, node, 0);
             Edge rest = getEdge(RDF.REST, node, 0);
             if (first == null || rest == null) {
-                return null;
+                return new ArrayList<>();
             }
             ArrayList<IDatatype> list = reclist(rest.getNode(1));
             if (list == null) {
-                return null;
+                return new ArrayList<>();
             }
             Node val = first.getNode(1);
 
@@ -2455,7 +2455,7 @@ public class Graph extends GraphObject implements
 
     // without NodeManager
     public Iterable<Edge> getSortedEdgesBasic(Node node, int n) {
-        MetaIterator<Edge> meta = new MetaIterator<Edge>();
+        MetaIterator<Edge> meta = new MetaIterator<>();
 
         for (Node pred : getSortedProperties()) {
             Iterable<Edge> it = getIndex(n).getEdges(pred, node);
@@ -2912,7 +2912,7 @@ public class Graph extends GraphObject implements
     public List<Graph> split() {
 
         if (graph.size() == 1) {
-            ArrayList<Graph> list = new ArrayList<Graph>();
+            ArrayList<Graph> list = new ArrayList<>();
             list.add(this);
             return list;
         }
@@ -2929,7 +2929,7 @@ public class Graph extends GraphObject implements
             g.addEdgeWithNode(ent);
         }
 
-        ArrayList<Graph> list = new ArrayList<Graph>();
+        ArrayList<Graph> list = new ArrayList<>();
         for (Graph g : map.values()) {
             list.add(g);
         }
@@ -2939,7 +2939,7 @@ public class Graph extends GraphObject implements
     }
 
     public List<Edge> getEdgeList(Node n) {
-        ArrayList<Edge> list = new ArrayList<Edge>();
+        ArrayList<Edge> list = new ArrayList<>();
         for (Edge e : getEdges(n, 0)) {
             list.add(e);
         }
@@ -2950,7 +2950,7 @@ public class Graph extends GraphObject implements
      * Without rule entailment
      */
     public List<Edge> getEdgeListSimple(Node n) {
-        ArrayList<Edge> list = new ArrayList<Edge>();
+        ArrayList<Edge> list = new ArrayList<>();
         for (Edge e : getEdges(n, 0)) {
             if (!getProxy().isRule(e)) {
                 list.add(e);
@@ -3012,8 +3012,8 @@ public class Graph extends GraphObject implements
         }
 
         if (res != null) {
-            logger.info("" + edge.getEdgeLabel());
-            logger.info("" + res);
+            logger.info("Edge label: {}", edge.getEdgeLabel());
+            logger.info("Result: {}", res);
             deleted(res);
         }
         return res;
@@ -3391,8 +3391,8 @@ public class Graph extends GraphObject implements
             e = fac.create(source, predicate, list);
         }
 
-        Edge ee = addEdge(e);
-        return ee;
+        e = addEdge(e);
+        return e;
     }
 
     /**

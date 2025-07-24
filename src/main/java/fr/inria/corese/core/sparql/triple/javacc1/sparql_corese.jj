@@ -2949,7 +2949,7 @@ String Q_IRI_ref() : { Token t; String s; }
 TOKEN_MGR_DECLS:{
 		
 	void CommonTokenAction(Token token) {
-		//System.out.println(token+" ");
+		//logger.trace("Token parsed: {}", token);
 	}
 }
 
