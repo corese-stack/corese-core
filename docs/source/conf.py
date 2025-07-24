@@ -85,7 +85,9 @@ html_js_files = []
 html_logo = "_static/logo/corese-core_doc_bar.svg"
 
 # Icon to put in the browser tab.
-html_favicon = "_static/logo/corese-core_doc_fav.svg"
+html_js_files = [
+    "js/favicon-theme.js"
+]
 
 # Modify the title to get good social-media links
 html_title = "Corese"
