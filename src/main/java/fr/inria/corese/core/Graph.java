@@ -123,18 +123,18 @@ public class Graph extends GraphObject implements
     // edge Index for RuleEngine where edge are sorted newest first
     EdgeManagerIndexer ruleEdgeIndex;
     // predefined individual Node such as kg:default named graph
-    ConcurrentHashMap<String, Node> nodeSystem;
+    private ConcurrentHashMap<String, Node> nodeSystem;
     // key -> URI Node ; member of graph nodes (subject/object)
-    ConcurrentHashMap<String, Node> individual;
+    private ConcurrentHashMap<String, Node> individual;
     // label -> Blank Node ; member of graph nodes (subject/object)
-    ConcurrentHashMap<String, Node> nodeBlank;
+    private ConcurrentHashMap<String, Node> nodeBlank;
     // Triple Reference Node
-    ConcurrentHashMap<String, Node> triple;
+    private ConcurrentHashMap<String, Node> triple;
     // named graph id nodes: key -> named graph id Node (possibly not subject/object
     // Node)
-    ConcurrentHashMap<String, Node> graph;
+    private ConcurrentHashMap<String, Node> graph;
     // property nodes: label -> property Node (possibly not subject/object Node)
-    ConcurrentHashMap<String, Node> property;
+    private ConcurrentHashMap<String, Node> property;
     // key -> Node for value management in external memory
     Map<String, Node> vliteral;
     ValueResolver values;
