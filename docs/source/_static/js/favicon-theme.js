@@ -1,17 +1,12 @@
-function setFaviconForSystemTheme(e) {
-  const prefersDark = e.matches;
+function setFavicon(e) {
+  const dark = e.matches;
   const favicon = document.getElementById("favicon");
-
   if (favicon) {
-    favicon.href = prefersDark
+    favicon.href = dark
       ? "_static/logo/corese-core_doc_fav_dark.svg"
       : "_static/logo/corese-core_doc_fav_light.svg";
   }
 }
 
-// Initialisation
-const matcher = window.matchMedia("(prefers-color-scheme: dark)");
-setFaviconForSystemTheme(matcher);
-
-// Écoute des changements de thème système
-matcher.addEventListener("change", setFaviconForSystemTheme);
+const mql = window.matchMedia("(prefers-color-scheme: dark)");
+mql.addEventListener("change", setFavicon);
