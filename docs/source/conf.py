@@ -20,6 +20,25 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 project = 'Corese'
 author = 'Wimmics'
 
+version = ""
+release = ""
+
+def setup(app):
+    def set_version(app, config):
+        smv = getattr(app.config, 'smv_current_version', None)
+        if smv:
+            config.version = smv
+            config.release = smv
+            # Pour le version switcher
+            html_theme_options["switcher"]["version_match"] = smv
+        else:
+            config.version = "dev"
+            config.release = "dev"
+            html_theme_options["switcher"]["version_match"] = "dev"
+
+    app.connect("config-inited", set_version)
+
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -91,7 +110,7 @@ html_theme_options = {
             "icon": "fab fa-github-square"
         }
     ],
-    "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json", "version_match": r"v\d+\.\d+\.\d+"}
+    "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json", "version_match": version}
 }
 
 html_sidebars = {
