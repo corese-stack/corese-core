@@ -57,7 +57,7 @@ public class QueryLoad extends Load {
             }
         }
     }
-    
+
     @Deprecated
     public void load(Reader read) throws LoadException {
         parse(read);
@@ -83,12 +83,12 @@ public class QueryLoad extends Load {
         }
         return true;
     }
-    
+
     @Deprecated
     public String read(InputStream stream) throws IOException {
         return read(new InputStreamReader(stream));
     }
-    
+
      public String readWE(InputStream stream) throws LoadException {
         try {
             return read(new InputStreamReader(stream));
@@ -110,15 +110,15 @@ public class QueryLoad extends Load {
         }
         return query;
     }
-       
+
     public String readURL(String name) throws LoadException {
         return readWE(name);
     }
-    
+
     public String readProtect(String name) throws LoadException {
         return readWE(name);
     }
-    
+
     public String readWE(String name, boolean protect) throws LoadException {
         return readWE(name);
     }
@@ -128,7 +128,7 @@ public class QueryLoad extends Load {
         check(Access.Feature.READ_WRITE, name, TermEval.READ_MESS);
         return readWE(name);
     }
-    
+
     public String readWE(String name) throws LoadException {
         String query = "";
         Reader fr;
@@ -165,17 +165,16 @@ public class QueryLoad extends Load {
         String str = read(fr);
         return str;
     }
-    
-    // TODO: clean 
+
     public String basicParse(String path) throws EngineException {
         String pp = (path.endsWith("/")) ? path.substring(0, path.length() - 1) : path;
         String str = null;
         try {
-            if (NSManager.isResource(pp)) { 
+            if (NSManager.isResource(pp)) {
                 // @import <function/test.rq> within transformation such as st:turtle
                 // the import uri is st:function/test.rq
                 // consider it as a resource
-                String name = NSManager.stripResource(pp); 
+                String name = NSManager.stripResource(pp);
                 str = getResource(name);
             } else {
                 str = readWE(pp);
@@ -210,51 +209,7 @@ public class QueryLoad extends Load {
         }
         return sb.toString();
     }
-    /**
-     * Creates a temporary file with the given name pattern and writes the string content to it.
-     *
-     * @param name The base name pattern for the temporary file
-     * @param str The string content to write to the file
-     * @return The absolute path of the created file, or null if an error occurs
-     */
-    public String writeTemp(String name, String str) {
-        File file = createTemp(name);
-        return write(file, str) ? file.toString() : null;
-    }
 
-    /**
-     * Creates a temporary file with the specified name pattern.
-     *
-     * @param name The base name pattern for the temporary file
-     * @return The created File object
-     * @throws RuntimeException if file creation fails
-     */
-    private File createTemp(String name) {
-        try {
-            return File.createTempFile(getName(name), getSuffix(name));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create temp file", e);
-        }
-    }
-
-    /**
-     * Writes content to the specified file.
-     *
-     * @param file The file to write to
-     * @param content The content to write
-     * @return true if write was successful, false otherwise
-     */
-    private boolean write(File file, String content) {
-        try (final FileWriter fr = new FileWriter(file);
-             final BufferedWriter writer = new BufferedWriter(fr)) {
-            writer.write(content);
-            writer.flush();
-            return true;
-        } catch (IOException e) {
-            logger.error("Failed to write to file {}: {}", file, e.getMessage());
-            return false;
-        }
-    }
 
     /**
      * Writes content to a temporary file and returns the file path.
@@ -329,7 +284,7 @@ public class QueryLoad extends Load {
             fq.write(dt.stringValue());
         }
     }
-     
+
     String getName(String name) {
          int index = name.indexOf(".");
          if (index == -1) {
@@ -337,7 +292,7 @@ public class QueryLoad extends Load {
          }
          return name.substring(0, index);
     }
-     
+
     String getSuffix(String name) {
          int index = name.indexOf(".");
          if (index == -1) {
@@ -345,7 +300,7 @@ public class QueryLoad extends Load {
          }
          return name.substring(index);
      }
-      
+
     public void write(String name, IDatatype dt) {
         write(name, dt.stringValue());
     }
