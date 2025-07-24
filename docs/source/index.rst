@@ -101,7 +101,6 @@ Home Page
 .. toctree::
    :hidden:
 
-   Accueil <index>
    Installation <install>
    User Guide <user_guide>
    Java API <java_api/library_root>

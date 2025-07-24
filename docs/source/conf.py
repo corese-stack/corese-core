@@ -29,7 +29,6 @@ def setup(app):
         if smv:
             config.version = smv
             config.release = smv
-            # Pour le version switcher
             html_theme_options["switcher"]["version_match"] = smv
         else:
             config.version = "dev"
@@ -82,7 +81,7 @@ html_css_files = [
 html_js_files = []
 
 # Project logo, to place at the top of the sidebar.
-html_logo = "_static/logo/corese-core_doc_bar.svg"
+html_logo = "_static/logo/corese-core.svg"
 
 # Icon to put in the browser tab.
 html_js_files = [
@@ -99,9 +98,9 @@ html_short_title = "Corese"
 # documentation.
 html_theme_options = {
      "logo": {
-         "image_relative": "_static/logo/corese-core_doc_light.svg",
-         "image_light": "_static/logo/corese-core_doc_light.svg",
-         "image_dark": "_static/logo/corese-core_doc_dark.svg"
+         "image_relative": "_static/logo/corese-core.svg",
+         "image_light": "_static/logo/corese-core.svg",
+         "image_dark": "_static/logo/corese-core.svg"
      },
     "theme_switcher": True,
     "navbar_center": [ "navbar-nav" ],
@@ -170,8 +169,6 @@ primary_domain = 'java'
 
 # Tell sphinx what the pygments highlight language should be.
 highlight_language = 'java'
-
-# Setup the sphinx.ext.todo extension 
 
 # Set to false in the final version
 todo_include_todos = True
