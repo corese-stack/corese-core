@@ -25,7 +25,7 @@ public class RdfxmlParserTest {
         Model model = new CoreseModel();
         ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         try (InputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8))) {
-            RdfXmlParser parser = new RdfXmlParser(model, valueFactory);
+            RDFXMLParser parser = new RDFXMLParser(model, valueFactory);
             parser.parse(inputStream);
         }
         return model;
@@ -311,7 +311,7 @@ public class RdfxmlParserTest {
                 """.trim();
         Model model = parseRdfXml(rdfXml);
         printModel(model);
-        assertEquals(1, model.size(), "Expected four RDF statements");
+        assertEquals(1, model.size(), "Expected one RDF statement");
     }
 
     /**
@@ -343,7 +343,7 @@ public class RdfxmlParserTest {
         printModel(model);
 
         // Assert or inspect the result
-        assertEquals(4, model.size(), "Expected five RDF statements");
+        assertEquals(4, model.size(), "Expected four RDF statements");
     }
 
     /**
@@ -421,7 +421,7 @@ public class RdfxmlParserTest {
 
         Model model = parseRdfXml(rdfXml);
         printModel(model);
-        assertEquals(2, model.size(), "Expected four RDF statements");
+        assertEquals(2, model.size(), "Expected two RDF statements");
     }
 
     /**

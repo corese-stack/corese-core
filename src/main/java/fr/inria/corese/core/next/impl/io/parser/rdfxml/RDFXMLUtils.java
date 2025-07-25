@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class RdfXmlUtils {
-    private RdfXmlUtils() {
+public class RDFXMLUtils {
+    private RDFXMLUtils() {
     }
 
     public static String expandQName(String uri, String localName, String qName) {
@@ -62,6 +62,10 @@ public class RdfXmlUtils {
                 attrs.getValue(RDF.type.getNamespace(), "ID") != null;
     }
 
+    public static String getParseType(Attributes attrs) {
+        return attrs.getValue(RDF.type.getNamespace(), "parseType");
+    }
+
     public static boolean isSyntaxAttribute(String uri, String localName, String qName) {
         if (uri != null && RDF.type.getNamespace().equals(uri)) {
             return switch (localName) {
@@ -109,9 +113,6 @@ public class RdfXmlUtils {
 
             current = next;
         }
-
         return head;
     }
-
-
 }
