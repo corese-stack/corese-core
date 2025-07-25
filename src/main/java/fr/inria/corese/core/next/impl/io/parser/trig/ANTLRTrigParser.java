@@ -22,10 +22,28 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * An ANTLR4-based parser for Trig format.
+ * This parser uses an ANTLR grammar to tokenize and parse Trig documents,
+ * then a listener to build the RDF model.
+ */
 public class ANTLRTrigParser extends AbstractRDFParser {
 
+    /**
+     * Constructor for the ANTLRTrigParser.
+     *
+     * @param model   The RDF model to populate.
+     * @param factory The ValueFactory for creating RDF resources.
+     */
     public ANTLRTrigParser(Model model, ValueFactory factory) { super(model, factory); }
 
+    /**
+     * Constructor for the ANTLRTrigParser with configuration options.
+     *
+     * @param model   The RDF model to populate.
+     * @param factory The ValueFactory for creating RDF resources.
+     * @param config  The configuration options for parsing.
+     */
     public ANTLRTrigParser(Model model, ValueFactory factory, IOOptions config) {super(model, factory, config);}
 
     @Override
@@ -51,6 +69,13 @@ public class ANTLRTrigParser extends AbstractRDFParser {
         parse(reader, null);
     }
 
+    /**
+     * Parses Trig data from a Reader using ANTLR4.
+     *
+     * @param reader  The Reader to read RDF data from.
+     * @param baseURI The base URI.
+     * @throws ParsingErrorException if a parsing or I/O error occurs.
+     */
     @Override
     public void parse(Reader reader, String baseURI) throws ParsingErrorException {
         try {
@@ -60,7 +85,7 @@ public class ANTLRTrigParser extends AbstractRDFParser {
             TriGParser triGParser = new TriGParser(tokens);
             ParseTreeWalker walker = new ParseTreeWalker();
             ParseTree tree = triGParser.trigDoc();
-            TriGListernerImpl listerner = new TriGListernerImpl(getModel(), getValueFactory(), this.getConfig());
+            TriGListerner listerner = new TriGListerner(getModel(), getValueFactory(), this.getConfig());
             walker.walk((ParseTreeListener) listerner, tree);
         } catch (IOException e) {
             throw new ParsingErrorException("Failed to parse TriG RDF: " + e.getMessage(), e);
