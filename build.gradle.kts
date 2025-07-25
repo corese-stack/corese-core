@@ -92,9 +92,9 @@ object Meta {
 java {
     withJavadocJar()                             // Include Javadoc JAR in publications
     withSourcesJar()                             // Include sources JAR in publications
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(21))
-  }
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 /////////////////////////
