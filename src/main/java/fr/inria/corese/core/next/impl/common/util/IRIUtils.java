@@ -42,7 +42,7 @@ public class IRIUtils {
                 if(matcher.group("path") != null) {
                     namespace.append(matcher.group("path"));
                 }
-                if(matcher.group("fragment") != null) {
+                if(matcher.group("fragment") != null && matcher.group("finalPath") != null) {
                     namespace.append(matcher.group("finalPath")).append("#");
                 }
                 return namespace.toString();
