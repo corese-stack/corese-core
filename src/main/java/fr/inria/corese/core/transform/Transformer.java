@@ -7,7 +7,10 @@ import fr.inria.corese.core.kgram.api.core.ExprType;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.*;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Memory;
+import fr.inria.corese.core.kgram.core.SparqlException;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.filter.Extension;
 import fr.inria.corese.core.load.Load;
@@ -22,15 +25,26 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.script.Funcall;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.*;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.Processor;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,7 +129,7 @@ public class Transformer implements TransformProcessor {
     private static final String NL = "\n";
     private static boolean isOptimizeDefault = false;
     private static boolean isExplainDefault = false;
-    public static int count = 0;
+    public int count = 0;
     static HashMap<String, Boolean> dmap;
     // private TemplateVisitor visitor;
     TransformerMapping tmap;
@@ -814,7 +828,7 @@ public class Transformer implements TransformProcessor {
         return process(temp, false, null, null, Mapping.create(b), ldt[0], (ldt.length == 1) ? null : ldt);
     }
 
-    public static int getCount() {
+    public int getCount() {
         return count;
     }
 

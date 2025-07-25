@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.common.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -156,14 +157,13 @@ public class IRIUtils {
      * Checks for patterns that might cause ReDoS attacks.
      */
     private static boolean containsSuspiciousPatterns(String input) {
-        // Check for excessive repetition of problematic characters
+        final Set<Character> SUSPICIOUS_CHARS = Set.of('.', '-', '_', ':');
         int consecutiveRepeats = 0;
         char lastChar = 0;
 
         for (char c : input.toCharArray()) {
-            if (c == lastChar && (c == '.' || c == '-' || c == '_' || c == ':')) {
-                consecutiveRepeats++;
-                if (consecutiveRepeats > 10) {
+            if (c == lastChar && SUSPICIOUS_CHARS.contains(c)) {
+                if (++consecutiveRepeats > 10) {
                     return true;
                 }
             } else {
@@ -171,7 +171,6 @@ public class IRIUtils {
             }
             lastChar = c;
         }
-
         return false;
     }
 
