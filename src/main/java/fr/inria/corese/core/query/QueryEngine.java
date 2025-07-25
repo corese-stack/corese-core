@@ -178,15 +178,18 @@ public class QueryEngine implements Engine {
      * Simple eviction of the oldest entry
      */
     private void evictOldestEntry() {
-        if (!compilationCache.isEmpty()) {
-
-            Iterator<CompilationKey> iterator = compilationCache.keySet().iterator();
-            if (iterator.hasNext()) {
-                CompilationKey oldestKey = iterator.next();
-                compilationCache.remove(oldestKey);
-                logger.debug("Evicted query from cache, cache size: {}", compilationCache.size());
-            }
+        if (compilationCache.isEmpty()) {
+            return;
         }
+
+        Optional<CompilationKey> oldestKey = compilationCache.keySet()
+                .stream()
+                .findFirst();
+
+        oldestKey.ifPresent(key -> {
+            compilationCache.remove(key);
+            logger.debug("Evicted query from cache, cache size: {}", compilationCache.size());
+        });
     }
 
     /**
