@@ -19,9 +19,7 @@ public class CanonicalizedDataset {
     private final Map<Node, String> blankNodesToIdentifiers = new LinkedHashMap<>();
     private Map<String, String> issuedIdentifierMap = new LinkedHashMap<>();
 
-    /////////////////
-    // Constructor //
-    /////////////////
+    // Constructor
 
     /**
      * Constructs a CanonicalizedDataset with a given graph.
@@ -33,9 +31,9 @@ public class CanonicalizedDataset {
         this.dataset = graph;
     }
 
-    ////////////////////////
-    // Dataset Management //
-    ////////////////////////
+    
+    // Dataset Management
+    
 
     /**
      * Retrieves the dataset associated with this CanonicalizedDataset.
@@ -46,9 +44,7 @@ public class CanonicalizedDataset {
         return dataset;
     }
 
-    ///////////////////////////////////////////////////
-    // Blank Nodes to Identifiers Mapping Management //
-    ///////////////////////////////////////////////////
+    // Blank Nodes to Identifiers Mapping Management
 
     /**
      * Adds a blank node and its identifier to the mapping.
@@ -85,9 +81,9 @@ public class CanonicalizedDataset {
         return Collections.unmodifiableCollection(blankNodesToIdentifiers.values());
     }
 
-    //////////////////////////////////////
-    // Issued Identifier Map Management //
-    //////////////////////////////////////
+    
+    // Issued Identifier Map Management
+    
 
     /**
      * Sets the issued identifier map.
@@ -116,9 +112,7 @@ public class CanonicalizedDataset {
         return Collections.unmodifiableMap(issuedIdentifierMap);
     }
 
-    ///////////////
-    // To String //
-    ///////////////
+    // To String
 
     @Override
     public String toString() {
