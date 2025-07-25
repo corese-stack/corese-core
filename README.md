@@ -11,7 +11,7 @@
 
 [![License: CECILL-C](https://img.shields.io/badge/License-CECILL--C-blue.svg)](https://cecill.info/licences/Licence_CeCILL-C_V1-en.html) [![Discussions](https://img.shields.io/badge/Discussions-GitHub-blue)](https://github.com/orgs/corese-stack/discussions)
 
-## ✨ Features
+## Features
 
 - Manipulate RDF graphs (parse, serialize, transform)
 - Execute SPARQL 1.1 queries and updates
@@ -21,7 +21,7 @@
 - Apply logic-based rules with SPARQL Rules
 - Extend functionality and scripting with LDScript
 
-## 🚀 Getting Started
+## Getting Started
 
 Integrate Corese-Core into your Java project using your preferred build tool.
 
@@ -45,10 +45,14 @@ implementation 'fr.inria.corese:corese-core:4.6.4-SNAPSHOT'
 
 Download the latest `.jar` file from:
 
-- [🔗 GitHub Releases](https://github.com/corese-stack/corese-core/releases)
-- [📦 Maven Central](https://central.sonatype.com/artifact/fr.inria.corese/corese-core)
+<a href='https://github.com/corese-stack/corese-core/releases'>
+    <img width='140' alt='Get it on GitHub' src='docs/source/_static/logo/badge_github.svg'/>
+</a>
+<a href='https://central.sonatype.com/artifact/fr.inria.corese/corese-core'>
+    <img width='140' alt='Get it on Maven Central' src='docs/source/_static/logo/badge_maven.svg'/>
+</a>
 
-## 📖 Documentation
+## Documentation
 
 - [Corese-Core api documentation](https://corese-stack.github.io/corese-core/v4.6.3/java_api/library_root.html)
 
@@ -67,7 +71,7 @@ Download the latest `.jar` file from:
 - [SPARQL Rule Engine](https://files.inria.fr/corese/doc/rule.html)
 - [LDScript Reference](https://files.inria.fr/corese/doc/ldscript.html)
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Here’s how to get involved:
 
@@ -75,7 +79,7 @@ We welcome contributions! Here’s how to get involved:
 - [Issue Tracker](https://github.com/corese-stack/corese-core/issues)
 - [Pull Requests](https://github.com/corese-stack/corese-core/pulls)
 
-## 🔗 Useful Links
+## Useful Links
 
 - [Corese Website](https://corese-stack.github.io/corese-core)
 - Mailing List: <corese-users@inria.fr>
