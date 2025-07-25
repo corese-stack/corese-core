@@ -78,7 +78,7 @@ Corese-Core is a Java library that provides the core functionalities of Corese. 
 .. _issue reports: https://github.com/corese-stack/corese-core/issues
 .. _pull requests: https://github.com/corese-stack/corese-core/pulls
 
-For support questions, comments, and any ideas for improvements you`d like to discuss, please use our `discussion forum`_. We welcome everyone to contribute to `issue reports`_, suggest new features, and create `pull requests`_.
+For any questions, comments, or improvement ideas, please use our `discussion forum`_. We welcome everyone to contribute via `issue reports`_, suggest new features, and create `pull requests`_.
 
 
 .. #############################################################################

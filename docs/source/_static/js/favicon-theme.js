@@ -3,8 +3,8 @@ function setFavicon(e) {
   const favicon = document.getElementById("favicon");
   if (favicon) {
     favicon.href = dark
-      ? "_static/logo/corese-core_doc_fav_dark.svg"
-      : "_static/logo/corese-core_doc_fav_light.svg";
+      ? "_static/logo/corese_fav_dark.svg"
+      : "_static/logo/corese_fav_light.svg";
   }
 }
 
