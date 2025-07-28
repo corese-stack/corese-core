@@ -2153,10 +2153,10 @@ public class Graph extends GraphObject implements
 
     public Iterable<Edge> insert(Node s, Node p, Node o, List<Node> contexts) {
         if (contexts == null || contexts.isEmpty()) {
-            Edge edge = insert(s, p, o);
+            insert(s, p, o);
         } else {
             for (Node g : contexts) {
-                Edge edge = insert(g, s, p, o);
+                insert(g, s, p, o);
             }
         }
         return emptyEdgeList;
@@ -2164,10 +2164,10 @@ public class Graph extends GraphObject implements
 
     public Iterable<Edge> delete(Node s, Node p, Node o, List<Node> contexts) {
         if (contexts == null || contexts.isEmpty()) {
-            List<Edge> edge = delete(s, p, o);
+            delete(s, p, o);
         } else {
             for (Node g : contexts) {
-                List<Edge> edge = delete(g, s, p, o);
+                delete(g, s, p, o);
             }
         }
         return emptyEdgeList;
@@ -2985,8 +2985,8 @@ public class Graph extends GraphObject implements
         }
 
         if (res != null) {
-            logger.info("" + edge);
-            logger.info("" + res);
+            logger.info("{}", edge);
+            logger.info("{}", res);
             deleted(res);
         }
         return res;
