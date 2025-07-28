@@ -180,20 +180,10 @@ signing {
 // Configure Nexus publishing and credentials
 nexusPublishing {
     repositories {
-        // Configure Sonatype OSSRH repository for publishing.
         sonatype {
-            // Retrieve Sonatype OSSRH credentials from environment variables.
-            val ossrhUsername = providers.environmentVariable("OSSRH_USERNAME")
-            val ossrhPassword = providers.environmentVariable("OSSRH_PASSWORD")
-
-            // Set the credentials for Sonatype OSSRH if they are available.
-            if (ossrhUsername.isPresent && ossrhPassword.isPresent) {
-                username.set(ossrhUsername.get())
-                password.set(ossrhPassword.get())
-            }
-
-            // Define the package group for this publication, typically following the group ID.
-            packageGroup.set(Meta.groupId)
+            // Set the URLs for the Nexus repository and snapshot repository.
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
     }
 }
