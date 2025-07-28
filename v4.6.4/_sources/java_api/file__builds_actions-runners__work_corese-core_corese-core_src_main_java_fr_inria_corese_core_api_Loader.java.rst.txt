@@ -1,0 +1,47 @@
+
+.. _file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api_Loader.java:
+
+File Loader.java
+================
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_api>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/api``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+Definition (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/api/Loader.java``)
+-------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+Includes
+--------
+
+
+- ``fr.inria.corese.core.rule.RuleEngine``
+
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__api`
+
+
+Enums
+-----
+
+
+- :ref:`exhale_enum_enumfr_1_1inria_1_1corese_1_1core_1_1api_1_1Loader_1_1format`
+

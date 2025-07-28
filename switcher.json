@@ -1,31 +1,37 @@
 [
 {
-    "name": "v4.6.3 (latest)",
-    "version": "stable",
-    "url": "https://corese-stack.github.io/corese-core/v4.6.3/",
+    "name": "v4.6.4 (latest)",
+    "version": "v4.6.4",
+    "url": "https://corese-stack.github.io/corese-core/v4.6.4/",
     "preferred": true
 },
 {
-    "name": "v4.6.2 (stable)",
-    "version": "stable",
+    "name": "v4.6.3",
+    "version": "v4.6.3",
+    "url": "https://corese-stack.github.io/corese-core/v4.6.3/",
+    "preferred": false
+},
+{
+    "name": "v4.6.2",
+    "version": "v4.6.2",
     "url": "https://corese-stack.github.io/corese-core/v4.6.2/",
     "preferred": false
 },
 {
-    "name": "v4.6.1 (stable)",
-    "version": "stable",
+    "name": "v4.6.1",
+    "version": "v4.6.1",
     "url": "https://corese-stack.github.io/corese-core/v4.6.1/",
     "preferred": false
 },
 {
-    "name": "v4.6.0 (stable)",
-    "version": "stable",
+    "name": "v4.6.0",
+    "version": "v4.6.0",
     "url": "https://corese-stack.github.io/corese-core/v4.6.0/",
     "preferred": false
 },
 {
     "name": "dev",
-    "version": "unstable",
+    "version": "dev",
     "url": "https://corese-stack.github.io/corese-core/dev/",
     "preferred": false
 }
