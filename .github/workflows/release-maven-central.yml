@@ -11,7 +11,6 @@ on:
         description: 'Tag to publish (e.g. v4.6.4)'
         required: true
 
-
 jobs:
   release-maven-central:
     runs-on: [self-hosted, corese-stack-ubuntu-24]
@@ -37,25 +36,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Build and publish to Sonatype (staging only)
+      - name: Publish to Maven Central via Vanniktech
         env:
-          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
-          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
-          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-          GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }}
-        run: ./gradlew publishToSonatype
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_SIGNING_PASSPHRASE }}
+        run: ./gradlew publishToMavenCentral
 
-      - name: Promote staging to Central Portal (automatic close+release)
-        env:
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-        run: |
-          echo "Promoting artifacts to Maven Central portal..."
+      - name: Manual Release Reminder
+        run: echo "Upload complete. Please finalize the deployment at https://central.sonatype.com/publishing/deployments"
 
-          ENCODED_CREDS=$(echo -n "$SONATYPE_USERNAME:$SONATYPE_PASSWORD" | base64)
-          NAMESPACE="fr.inria.corese"
-
-          curl -X POST \
-            -H "Authorization: Bearer $ENCODED_CREDS" \
-            "https://central.sonatype.com/service/local/manual/upload/defaultRepository/$NAMESPACE?publishing_type=automatic" \
-            --fail --silent --show-error
