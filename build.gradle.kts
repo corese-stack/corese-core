@@ -148,10 +148,13 @@ tasks.withType<JavaCompile>() {
 
 // Configure Javadoc tasks with UTF-8 encoding and disable failure on error.
 // This ensures that Javadoc generation won't fail due to minor issues.
-tasks.withType<Javadoc>() {
+tasks.withType<Javadoc>().configureEach {
     options.encoding = "UTF-8"
     isFailOnError = false
+    // Configure Javadoc tasks to disable doclint warnings.
+    (options as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
 }
+
 
 // Configure the shadow JAR task to include dependencies in the output JAR.
 // This creates a single JAR file with all dependencies bundled.
@@ -160,15 +163,6 @@ tasks {
     shadowJar {
         this.archiveClassifier = "jar-with-dependencies"
             }
-}
-
-// Configure Javadoc tasks to disable doclint warnings.
-tasks {
-    javadoc {
-        options {
-            (this as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
-        }
-    }
 }
 
 // Configure the build task to depend on the shadow JAR task.
@@ -208,11 +202,4 @@ tasks.withType<PublishToMavenLocal>().configureEach {
 // This guarantees that artifacts are signed before they are published to Maven repositories.
 tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
-}
-
-// Configure publication task dependency for Gradle 8 compatibility
-afterEvaluate {
-    tasks.named("generateMetadataFileForMavenPublication") {
-        dependsOn(tasks.named("plainJavadocJar"))
-    }
 }
