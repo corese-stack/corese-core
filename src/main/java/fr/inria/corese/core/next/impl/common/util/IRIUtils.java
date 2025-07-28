@@ -10,8 +10,9 @@ import java.util.regex.Pattern;
  */
 public class IRIUtils {
 
-    private static final Pattern IRI_PATTERN = Pattern.compile("^(([\\w\\-]+:\\/\\/([\\w\\-_:]+\\.)*[\\w\\-_:]*)(\\/([\\w\\-\\._\\:]+\\/)*))([\\w\\-\\._\\:]+)?(\\?[\\w\\-_\\:\\?\\=]+)?((\\#)?([\\w\\-_]+))?$");
+    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<namespace>(?<protocol>[\\w\\-]+):(?<dblSlashes>\\/\\/)?(?<domain>([\\w\\-_:@]+\\.)*[\\w\\-_:]*))((?<path>\\/([\\w\\-\\._\\:]+\\/)*)(?<finalPath>[\\w\\-\\._\\:]+)?(?<query>\\?[\\w\\-_\\:\\?\\=]+)?(\\#)?(?<fragment>([\\w\\-_]+))?)?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
+
 
     /**
      * Prevent instantiation of the utility class.
@@ -29,15 +30,24 @@ public class IRIUtils {
             Matcher matcher = IRI_PATTERN.matcher(iri);
 
             if(matcher.matches()) {
-                if((matcher.group(8) == null) || (matcher.group(6) == null && matcher.group(9) == null) ) { // If the IRI has no fragment or ends with a slash
-
-                    return matcher.group(1);
-                } else {
-                    // 1: Domain and path ending with a slash, 6: final path element without slash, 9: final # if there is a fragment
-                    return matcher.group(1) + matcher.group(6) + matcher.group(9);
+                if(matcher.group("protocol") != null && matcher.group("protocol").equals("_")) {
+                    return "";
                 }
+                StringBuilder namespace = new StringBuilder();
+                namespace.append(matcher.group("protocol")).append(":");
+                if(matcher.group("dblSlashes") != null) {
+                    namespace.append(matcher.group("dblSlashes"));
+                }
+                namespace.append(matcher.group("domain"));
+                if(matcher.group("path") != null) {
+                    namespace.append(matcher.group("path"));
+                }
+                if(matcher.group("fragment") != null && matcher.group("finalPath") != null) {
+                    namespace.append(matcher.group("finalPath")).append("#");
+                }
+                return namespace.toString();
             } else {
-                return "";
+                throw new IllegalStateException("No namespace found for the given IRI: " + iri + ".");
             }
         } catch (IllegalStateException e) {
             return "";
@@ -54,10 +64,10 @@ public class IRIUtils {
             Matcher matcher = IRI_PATTERN.matcher(iri);
 
             if(matcher.matches()) {
-                if(matcher.group(10) != null){ // If the IRI has a fragment
-                    return matcher.group(10);
-                } else if(matcher.group(6) != null ) { // If the IRI has no fragment but do not ends with a slash
-                    return matcher.group(6);
+                if(matcher.group("fragment") != null){ // If the IRI has a fragment
+                    return matcher.group("fragment");
+                } else if(matcher.group("finalPath") != null ) { // If the IRI has no fragment but do not ends with a slash
+                    return matcher.group("finalPath");
                 } else { // If the URI ends with a slash
                     return "";
                 }

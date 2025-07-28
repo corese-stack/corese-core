@@ -31,6 +31,21 @@ public class CoreseIRITest extends IRITest {
     }
 
     @Test
+    public void constructorStringTest_otherURIS() {
+        CoreseIRI coreseIRI_noSlash = new CoreseIRI("http://www.monicamurphy.org");
+        assertEquals("http://www.monicamurphy.org", coreseIRI_noSlash.stringValue());
+        assertEquals("http://www.monicamurphy.org", coreseIRI_noSlash.getCoreseNode().getLabel());
+        assertEquals("http://www.monicamurphy.org", coreseIRI_noSlash.getNamespace());
+        assertEquals("", coreseIRI_noSlash.getLocalName());
+
+        CoreseIRI coreseIRI_email = new CoreseIRI("mailto:monica@monicamurphy.org");
+        assertEquals("mailto:monica@monicamurphy.org", coreseIRI_email.stringValue());
+        assertEquals("mailto:monica@monicamurphy.org", coreseIRI_email.getCoreseNode().getLabel());
+        assertEquals("mailto:monica@monicamurphy.org", coreseIRI_email.getNamespace());
+        assertEquals("", coreseIRI_email.getLocalName());
+    }
+
+    @Test
     public void constructorIriTest() {
         CoreseIRI coreseIRI = new CoreseIRI("http://example.org/test");
         CoreseIRI coreseIRI2 = new CoreseIRI(coreseIRI.getCoreseNode());
