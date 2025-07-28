@@ -387,7 +387,7 @@ public class RuleEngine implements Engine, Graphable {
      * Binding may manage AccessRight which is shared by rule processing
      */
     public boolean process(Binding b) throws EngineException {
-        logger.info("process: " + getPath());
+        logger.info("process: {} " ,  getPath());
         beforeProcess(b);
         try {
             getGraphManager().startRuleEngine();
@@ -398,6 +398,7 @@ public class RuleEngine implements Engine, Graphable {
         } finally {
             getGraphManager().endRuleEngine();
             afterProcess();
+            clean();
         }
     }
 
@@ -707,7 +708,7 @@ public class RuleEngine implements Engine, Graphable {
 
         // loop while there is something new
         while (go) {
-            logger.info("loop: " + loop);
+            logger.info("loop: {} " , loop);
             getEventManager().start(Event.InferenceCycle);
             if (isEvent())
                 getVisitor().loopEntailment(getPath());
@@ -716,7 +717,7 @@ public class RuleEngine implements Engine, Graphable {
             if (isOptimize()) {
                 getResultWatcher().start(loop);
             }
-            logger.info("rules: " + getRules().size());
+            logger.info("rules: {} " , getRules().size());
             for (Rule possibleRule : getRules()) {
 
                 if (isOptimize() && possibleRule.isOptimize()) {
