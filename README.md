@@ -31,14 +31,14 @@ Integrate Corese-Core into your Java project using your preferred build tool.
 <dependency>
   <groupId>fr.inria.corese</groupId>
   <artifactId>corese-core</artifactId>
-  <version>4.6.4-SNAPSHOT</version>
+  <version>4.6.4</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'fr.inria.corese:corese-core:4.6.4-SNAPSHOT'
+implementation 'fr.inria.corese:corese-core:4.6.4'
 ```
 
 ### Manual JAR
@@ -54,7 +54,7 @@ Download the latest `.jar` file from:
 
 ## Documentation
 
-- [Corese-Core api documentation](https://corese-stack.github.io/corese-core/v4.6.3/java_api/library_root.html)
+- [Corese-Core api documentation](https://corese-stack.github.io/corese-core/v4.6.4/java_api/library_root.html)
 
 **W3C Standards:**
 
