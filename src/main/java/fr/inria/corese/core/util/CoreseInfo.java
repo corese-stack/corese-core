@@ -6,7 +6,7 @@ package fr.inria.corese.core.util;
  */
 public class CoreseInfo {
 
-    private static final String VERSION = "4.6.4-SNAPSHOT";
+    private static final String VERSION = "4.6.4";
 
     /**
      * Retrieves the current version of the Corese application.
