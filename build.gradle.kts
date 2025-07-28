@@ -209,3 +209,10 @@ tasks.withType<PublishToMavenLocal>().configureEach {
 tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
 }
+
+// Configure publication task dependency for Gradle 8 compatibility
+afterEvaluate {
+    tasks.named("generateMetadataFileForMavenPublication") {
+        dependsOn(tasks.named("plainJavadocJar"))
+    }
+}
