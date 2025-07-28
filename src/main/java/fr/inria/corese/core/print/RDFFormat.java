@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
@@ -397,7 +397,7 @@ public class RDFFormat {
     }
 
     String toXML(String str) {
-        return StringEscapeUtils.escapeXml(str);
+        return StringEscapeUtils.escapeXml11(str);
     }
 
     IDatatype getValue(Node node) {

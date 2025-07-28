@@ -1,4 +1,24 @@
+<!-- markdownlint-disable MD024 -->
 # Corese Changelog
+
+## Version 4.6.4 –
+
+### Changed
+
+- Removed ShEx implementation.
+- Removed LUBM benchmark.
+- Removed Java Platform Module System (JPMS) support.
+- Cleaned up unused resource files.
+- Updated and corrected documentation:
+  - Fixed typos in the Getting Started guide.
+  - Add imports to the Getting Started guide.
+- Improved GitHub Actions log messages for the documentation workflow (`run-name` is now clearer).
+- Added new GitHub Actions workflow to automatically publish a development pre-release (`dev-prerelease`) on pushes to the `develop` branch.
+- Added `slf4j-simple` as a development-only runtime dependency.
+
+### Fixed
+
+- QNAME parsing error with local names starting with digits and hyphens (e.g. `prefix:2-Systeme-ZBS...`). ([#133](https://github.com/.../issues/133))
 
 ## Version 4.6.3 – 2025-02-20
 

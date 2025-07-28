@@ -5,9 +5,11 @@ import java.io.StringWriter;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.util.ArrayList;
 
-import org.apache.commons.lang.StringEscapeUtils;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
@@ -194,7 +196,7 @@ public class XMLFormat extends AbstractNestedResultFormat {
             printf("<bnode>%s</bnode>", str);
         } 
         else if (dt.isURI()) {
-            printf("<uri>%s</uri>", StringEscapeUtils.escapeXml(str));
+            printf("<uri>%s</uri>", StringEscapeUtils.escapeXml11(str));
         }
     }
     

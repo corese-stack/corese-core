@@ -9,8 +9,7 @@ plugins {
     
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
-    id("org.gradlex.extra-java-module-info") version "1.9"      // Module metadata for JARs without module info
-    id("com.gradleup.shadow") version "8.3.5"                   // Bundles dependencies into a single JAR
+    id("com.gradleup.shadow") version "8.3.7"                   // Bundles dependencies into a single JAR
 }
 
 /////////////////////////
@@ -21,7 +20,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-core"
-    const val version = "4.6.3"
+    const val version = "4.6.4"
 
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
@@ -30,10 +29,6 @@ object Meta {
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-  
-    // Sonatype OSSRH publishing settings
-    const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-    const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
 ////////////////////////
@@ -59,38 +54,29 @@ repositories {
 
 // Define dependencies
 dependencies {
-    val jersey_version = "3.0.4"
-    val semargl_version = "0.7.1"
+    // === Logging ===
+    api("org.slf4j:slf4j-api:2.0.17")                                                  // Logging API only (SLF4J)
+    runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.0")                          // Log4j2 core for internal logging
+    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
 
-    api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                                          // RDF parser to handle RDF/XML files
-    implementation("org.apache.commons:commons-text:1.10.0")                             // Text manipulation utilities (Apache Commons)
-    implementation("commons-lang:commons-lang:2.4")                                      // Basic functions for handling strings and objects
-    implementation("org.json:json:20240303")                                             // JSON processing for reading, writing, and manipulating JSON objects
-    implementation("fr.inria.lille.shexjava:shexjava-core:1.0")                          // ShEx implementation for RDF validation
-    implementation("org.glassfish.jersey.core:jersey-client:${jersey_version}")          // REST client for creating HTTP requests
-    implementation("org.glassfish.jersey.inject:jersey-hk2:${jersey_version}")           // Dependency injection for Jersey
-    implementation("com.sun.activation:jakarta.activation:2.0.1")                        // JavaBeans Activation Framework for MIME data handling
-    implementation("javax.xml.bind:jaxb-api:2.3.1")                                      // JAXB API for converting between Java objects and XML
-    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:${semargl_version}") // RDFa parser to extract RDF metadata from HTML
-    implementation("fr.inria.corese.org.semarglproject:semargl-core:${semargl_version}") // Semargl core for RDF parsing and transformation
-    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                          // JSON-LD processing for Linked Data in JSON format
-    implementation("junit:junit:4.13.2")                                                 // JUnit framework for unit testing in Java
-    api("org.slf4j:slf4j-api:2.0.9")                                                     // Simple Logging Facade for Java (SLF4J)
+    // === Core dependencies ===
+    api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
+    implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:0.7.2")            // RDFa parser (Semargl)
+    implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
+
+    // === HTTP and XML ===
+    implementation("org.glassfish.jersey.core:jersey-client:3.1.10")                   // HTTP client (Jersey)
+    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")                    // Dependency injection for Jersey
+    implementation("com.sun.activation:jakarta.activation:2.0.1")                      // MIME type handling (Jakarta Activation)
+
+    // === Utilities ===
+    implementation("org.apache.commons:commons-text:1.13.1")                           // Text manipulation utilities (Commons Text)
+    implementation("org.json:json:20250517")                                           // JSON processing
+    implementation("com.typesafe:config:1.4.3")                                        // Configuration library (Typesafe Config)
+
+    // === Test dependencies ===
+    testImplementation("junit:junit:4.13.2")                                           // Unit testing framework
 }
-
-// Configure extra Java module information for dependencies without module-info
-extraJavaModuleInfo {
-    // If a library is missing module info, the build process will not fail.
-    failOnMissingModuleInfo.set(false)
-
-    // Map automatic module names for non-modular libraries.
-    automaticModule("fr.com.hp.hpl.jena.rdf.arp:arp", "arp") // Module for Jena RDF ARP
-    automaticModule("com.github.jsonld-java:jsonld-java", "jsonld.java") // Module for JSON-LD Java
-    automaticModule("commons-lang:commons-lang", "commons.lang") // Module for Commons Lang
-    automaticModule("fr.inria.lille.shexjava:shexjava-core", "shexjava.core")
-    automaticModule("org.eclipse.rdf4j:rdf4j-model", "rdf4j.model")
-}
-
 
 /////////////////////////
 // Publishing settings //
@@ -190,20 +176,10 @@ signing {
 // Configure Nexus publishing and credentials
 nexusPublishing {
     repositories {
-        // Configure Sonatype OSSRH repository for publishing.
         sonatype {
-            // Retrieve Sonatype OSSRH credentials from environment variables.
-            val ossrhUsername = providers.environmentVariable("OSSRH_USERNAME")
-            val ossrhPassword = providers.environmentVariable("OSSRH_PASSWORD")
-
-            // Set the credentials for Sonatype OSSRH if they are available.
-            if (ossrhUsername.isPresent && ossrhPassword.isPresent) {
-                username.set(ossrhUsername.get())
-                password.set(ossrhPassword.get())
-            }
-
-            // Define the package group for this publication, typically following the group ID.
-            packageGroup.set(Meta.groupId)
+            // Set the URLs for the Nexus repository and snapshot repository.
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
     }
 }

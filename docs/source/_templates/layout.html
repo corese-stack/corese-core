@@ -1,0 +1,16 @@
+{% extends "!layout.html" %}
+
+{% block extrahead %}
+<script>
+    const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const fav = document.createElement("link");
+    fav.id = "favicon";
+    fav.rel = "icon";
+    fav.type = "image/svg+xml";
+    fav.href = darkMode
+        ? "_static/logo/corese_fav_dark.svg"
+        : "_static/logo/corese_fav_light.svg";
+    document.head.appendChild(fav);
+</script>
+{{ super() }}
+{% endblock %}

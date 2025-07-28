@@ -1,5 +1,5 @@
 name: "Sphinx: Render production docs"
-run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
+run-name: ${{ github.actor }} triggered production documentation build on ${{ github.ref_name }}
 
 on:
   push:
@@ -11,8 +11,8 @@ permissions:
   contents: write
 
 jobs:
-  Continuous-Integration-Actions:
-    runs-on: self-hosted
+  build-production-docs:
+    runs-on: [self-hosted, corese-stack-ubuntu-24]
 
     env:
       PACKAGE_TOKEN: ${{ secrets.JLS_TOKEN }}

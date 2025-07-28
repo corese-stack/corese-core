@@ -10,7 +10,7 @@ fi
 json_output_file="$1"
 html_output_file="$2"
 
-# Set minimal version  (before which no documentation would be generated in a compatible way)
+# Set minimal version (before which no documentation would be generated in a compatible way)
 minimal_version="4.6.0"
 
 # Get all Git tags and filter by the form vX.Y.Z (semantic versioning)
@@ -53,19 +53,19 @@ for tag in $tags; do
             is_first=false
         else
             preferred="false"
-            name="$tag (stable)"
+            name="$tag"
         fi
 
         # Create a JSON object for the tag
-        json_object=$(cat <<EOF
+json_object=$(cat <<EOF
 {
     "name": "$name",
-    "version": "stable",
+    "version": "$tag",
     "url": "https://corese-stack.github.io/corese-core/$tag/",
     "preferred": $preferred
 }
 EOF
-                   )
+)
         # Add the JSON object to the array
         json_array+=("$json_object")
 
@@ -83,7 +83,7 @@ done
 json_object=$(cat <<EOF
 {
     "name": "dev",
-    "version": "unstable",
+    "version": "dev",
     "url": "https://corese-stack.github.io/corese-core/dev/",
     "preferred": false
 }

@@ -1,4 +1,5 @@
 name: Publish GitHub Release
+run-name: ${{ github.actor }} triggered GitHub release on ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
@@ -11,8 +12,8 @@ on:
       - "v*.*.*"
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  release-github:
+    runs-on: [self-hosted, corese-stack-ubuntu-24]
     permissions:
       contents: write
 

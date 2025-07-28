@@ -29,8 +29,7 @@ sphinx-multiversion docs/source build/html -D 'exhale_args.containmentFolder=${s
 To this end a script must be executed and write the output to the output html directory:
 
 ```shell
-./docs/switcher_generator.sh build/html/switcher.json build/html/index.html          # Production
-./docs/switcher_generator.sh docs/source/_static/switcher.json build/html/index.html # Local testing
+./docs/switcher_generator.sh build/html/switcher.json build/html/index.html
 ```
 
 Both sphinx-multiversion and switcher_generator work on tags following the ```^v[0-9]+\.[0-9]+\.[0-9]+$``` syntax and ordered by refname.

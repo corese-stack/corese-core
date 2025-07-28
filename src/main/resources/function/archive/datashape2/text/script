@@ -1,2 +1,0 @@
-sed -ri s/sh:service/xsh:service/ *.rq
-sed -ri s/sh:ldpath/xsh:ldpath/ *.rq
