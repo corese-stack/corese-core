@@ -180,6 +180,9 @@ nexusPublishing {
             // Set the URLs for the Nexus repository and snapshot repository.
             nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
             snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+
+            // Define the package group for this publication, typically following the group ID.
+            packageGroup.set(Meta.groupId)
         }
     }
 }
