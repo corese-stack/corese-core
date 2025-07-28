@@ -29,10 +29,6 @@ object Meta {
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-  
-    // Sonatype OSSRH publishing settings
-    const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-    const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
 ////////////////////////
