@@ -67,9 +67,6 @@ public class RdfXmlContext {
     /** Counter for rdf:li to rdf:_n expansion. */
     public int liIndex = 1;
 
-    /** Optional parseType value for the current element. */
-    public String parseType;
-
     /**
      * Constructs a new context for RDF/XML parsing.
      *

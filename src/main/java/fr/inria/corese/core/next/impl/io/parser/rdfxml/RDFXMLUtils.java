@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import org.xml.sax.*;
 
 import java.util.List;
@@ -40,15 +41,14 @@ public class RDFXMLUtils {
 
     public static String resolveAgainstBase(String iri, String baseURI) {
         if (iri == null) return null;
+        if (iri.isEmpty()) return baseURI;
         if (baseURI == null || iri.matches("^[a-zA-Z][a-zA-Z0-9+.-]*:.*")) {
-            // Absolute IRI or no base, return as-is
             return iri;
         }
-
         try {
             return new java.net.URI(baseURI).resolve(iri).toString();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to resolve IRI: " + iri + " against base: " + baseURI, e);
+            throw new IncorrectFormatException("Failed to resolve IRI: " + iri + " against base: " + baseURI, e);
         }
     }
 

@@ -140,6 +140,7 @@ public class RDFXMLParser extends AbstractRDFParser {
      * and special parseType attributes, updating the parsing context accordingly.
      */
     private void handleStartElement(String uri, String localName, String qName, Attributes attrs) {
+
         // Skip the top-level rdf:RDF wrapper element
         if (RDFXMLUtils.isRdfRDF(uri, localName)) return;
 
