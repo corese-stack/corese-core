@@ -37,8 +37,7 @@ object Meta {
 
 // Java compilation settings
 java {
-    withJavadocJar()                             // Include Javadoc JAR in publications
-    withSourcesJar()                             // Include sources JAR in publications
+    // Note: withJavadocJar() and withSourcesJar() are handled by com.vanniktech.maven.publish plugin
     sourceCompatibility = JavaVersion.VERSION_11 // Configure minimum Java version
 }
 
@@ -133,7 +132,11 @@ mavenPublishing {
     }
 
     publishToMavenCentral()
-    signAllPublications()
+    
+    // Only sign publications when GPG keys are available (CI environment)
+    if (project.hasProperty("signingInMemoryKey") || project.hasProperty("signing.keyId")) {
+        signAllPublications()
+    }
 }
 
 /////////////////////////
