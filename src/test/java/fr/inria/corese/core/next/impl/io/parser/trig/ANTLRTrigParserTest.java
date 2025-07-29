@@ -8,12 +8,31 @@ import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ANTLRTrigParserSpec {
+/**
+ * Unit tests for the ANTLRTrigParser class.
+ * These tests verify the parser's ability to correctly parse Trig
+ * and interact with the Model and ValueFactory, including error handling
+ * and unescaping of IRIs and literals, and named graphs.
+ */
+class ANTLRTrigParserTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(ANTLRTrigParserTest.class);
+
+    /**
+     * helper method to parse trig data into corese model
+     *
+     * @param trigData a string of rdf data in trig format
+     * @param baseURI the base uri
+     * @return Corese rdf model
+     * @throws Exception
+     */
 
     private Model parseFromString(String trigData, String baseURI) throws Exception {
         Model model = new CoreseModel();
@@ -30,34 +49,41 @@ public class ANTLRTrigParserSpec {
     private void printModel(Model model) {
         model.stream().forEach(stmt -> {
             Value obj = stmt.getObject();
+            String subjectString = stmt.getSubject().stringValue();
+            String predicateString = stmt.getPredicate().stringValue();
+
             if (obj instanceof Literal literal) {
-                if (literal.getLanguage().isPresent()) {
-                    System.out.printf("(%s, %s, \"%s\"@%s)%n",
-                            stmt.getSubject().stringValue(),
-                            stmt.getPredicate().stringValue(),
-                            literal.getLabel(),
-                            literal.getLanguage().get());
+                String label = String.valueOf(literal.getLabel());
+                String languageTag = literal.getLanguage().orElse(null);
+
+                if (languageTag != null) {
+                    logger.debug("({}, {}, \"{}\"@{})",
+                            subjectString,
+                            predicateString,
+                            label,
+                            languageTag);
                 } else {
-                    System.out.printf("(%s, %s, \"%s\")%n",
-                            stmt.getSubject().stringValue(),
-                            stmt.getPredicate().stringValue(),
-                            literal.getLabel());
+                    logger.debug("({}, {}, \"{}\")",
+                            subjectString,
+                            predicateString,
+                            label);
                 }
             } else {
-                System.out.printf("(%s, %s, %s)%n",
-                        stmt.getSubject().stringValue(),
-                        stmt.getPredicate().stringValue(),
+                logger.debug("({}, {}, {})",
+                        subjectString,
+                        predicateString,
                         obj.stringValue());
             }
         });
     }
 
     @Test
-    public void testNamedGraphParsing() throws Exception {
-        String trig = "@prefix ex: <http://example.org/> .\n" +
-                "ex:Graph1 {\n" +
-                "  ex:Alice ex:knows ex:Bob .\n" +
-                "}";
+    void testNamedGraphParsing() throws Exception {
+        String trig = """
+                @prefix ex: <http://example.org/> 
+                ex:Graph1 {
+                  ex:Alice ex:knows ex:Bob .
+                }""".trim();
 
         Model model = parseFromString(trig, null);
         printModel(model);
@@ -69,7 +95,7 @@ public class ANTLRTrigParserSpec {
     }
 
     @Test
-    public void testDocumentThatContainsOneGraphExample1() throws Exception {
+    void testDocumentThatContainsOneGraphExample1() throws Exception {
         String trig = """
                 # This document encodes one graph.
                 @prefix ex: <http://www.example.org/vocabulary#> .
@@ -94,7 +120,7 @@ public class ANTLRTrigParserSpec {
     }
 
     @Test
-    public void testDocumentThatContainsTwoGraphExample() throws Exception {
+    void testDocumentThatContainsTwoGraphExample() throws Exception {
         String trig = """
                 # This document contains a same data as the
                 # previous example.
@@ -134,7 +160,7 @@ public class ANTLRTrigParserSpec {
     }
 
     @Test
-    public void testNestedBlankNodesWithSharedIdentifiers() throws Exception {
+    void testNestedBlankNodesWithSharedIdentifiers() throws Exception {
         String trig = """
                 @prefix ex: <http://example.org/> .
                 
@@ -150,6 +176,8 @@ public class ANTLRTrigParserSpec {
                 """.trim();
         Model model = parseFromString(trig, null);
         printModel(model);
-    }
 
+        assertEquals(5, model.size());
+
+    }
 }

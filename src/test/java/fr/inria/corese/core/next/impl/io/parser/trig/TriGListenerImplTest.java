@@ -17,7 +17,12 @@ import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TriGListenerImplTest {
+/**
+ * Unit tests for the TriGListenerImpl class.
+ * These tests verify that the listener correctly processes ANTLR parse tree contexts
+ * to extract and unescape RDF terms (IRIs, Blank Nodes, Literals) and add them to the model.
+ */
+class TriGListenerImplTest {
     private Model parseTrig(String trigData) throws Exception {
         ValueFactory factory = new CoreseAdaptedValueFactory();
 
@@ -35,7 +40,7 @@ public class TriGListenerImplTest {
     }
 
     @Test
-    public void testSimpleNamedGraph() throws Exception {
+     void testSimpleNamedGraph() throws Exception {
         String trig = """
                 @prefix ex: <http://example.org/> .
 
@@ -50,7 +55,7 @@ public class TriGListenerImplTest {
     }
 
     @Test
-    public void testBlankNodeWithProperties() throws Exception {
+    void testBlankNodeWithProperties() throws Exception {
         String trig = """
                 @prefix ex: <http://example.org/> .
                 GRAPH ex:graph {
@@ -63,7 +68,7 @@ public class TriGListenerImplTest {
     }
 
     @Test
-    public void testMultipleGraphsAndBase() throws Exception {
+     void testMultipleGraphsAndBase() throws Exception {
         String trig = """
                 @base <http://example.org/> .
                 @prefix dc: <http://purl.org/dc/elements/1.1/> .
@@ -82,7 +87,7 @@ public class TriGListenerImplTest {
     }
 
     @Test
-    public void testTypedLiteralsAndLang() throws Exception {
+    void testTypedLiteralsAndLang() throws Exception {
         String trig = """
                 @prefix ex: <http://example.org/> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .

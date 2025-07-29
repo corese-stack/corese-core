@@ -12,6 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Listener for the ANTLR4 generated parser for TriG.
+ * This listener traverses the parse tree and builds the RDF model,
+ * supporting named graphs. It includes unescaping logic for URIs and literals.
+ */
 public class TriGListerner extends TriGBaseListener {
     private final Model model;
     private String baseURI;
@@ -37,6 +42,7 @@ public class TriGListerner extends TriGBaseListener {
         this.factory = factory;
     }
 
+    @Override
     public void exitPrefixID(TriGParser.PrefixIDContext ctx) {
         String prefix = ctx.PNAME_NS().getText();
         String iri = ctx.IRIREF().getText();
@@ -46,20 +52,24 @@ public class TriGListerner extends TriGBaseListener {
         model.setNamespace(prefix, iri);
     }
 
+    @Override
     public void exitSparqlBase(TriGParser.SparqlBaseContext ctx) {
         baseURI = ctx.IRIREF().getText().replaceAll("^<|>$", "");
     }
 
+    @Override
     public void enterBlock(TriGParser.BlockContext ctx) {
         currentGraph = ctx.Graph_w() != null && ctx.labelOrSubject() != null
                 ? extractLabelOrSubject(ctx.labelOrSubject())
                 : null;
     }
 
+    @Override
     public void exitBlock(TriGParser.BlockContext ctx) {
         currentGraph = null;
     }
 
+    @Override
     public void enterTriplesOrGraph(TriGParser.TriplesOrGraphContext ctx) {
         if (ctx.labelOrSubject() != null && ctx.predicateObjectList() != null) {
             currentSubject = extractLabelOrSubject(ctx.labelOrSubject());
@@ -67,6 +77,7 @@ public class TriGListerner extends TriGBaseListener {
         }
     }
 
+    @Override
     public void enterTriples(TriGParser.TriplesContext ctx) {
         currentSubject = extractSubject(ctx.subject());
         processPredicateObjectList(ctx.predicateObjectList());
