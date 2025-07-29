@@ -23,6 +23,13 @@ import java.io.BufferedReader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class QueryLoad extends Load {
 
@@ -254,7 +261,40 @@ public class QueryLoad extends Load {
      * @see #getSuffix(String)
      */
     private File createTempFile(String name) throws IOException {
-        return File.createTempFile(getName(name), getSuffix(name));
+        // Create with restrictive permissions upfront using PosixFilePermissions
+        Set<PosixFilePermission> perms = EnumSet.of(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE
+        );
+
+        FileAttribute<Set<PosixFilePermission>> attr =
+                PosixFilePermissions.asFileAttribute(perms);
+
+        Path tempFile;
+        try {
+            tempFile = Files.createTempFile(getName(name), getSuffix(name), attr);
+        } catch (UnsupportedOperationException e) {
+             tempFile = Files.createTempFile(getName(name), getSuffix(name));
+            File file = tempFile.toFile();
+
+             if (!file.setReadable(false, false) ||
+                    !file.setReadable(true, true) ||
+                    !file.setWritable(false, false) ||
+                    !file.setWritable(true, true)) {
+
+                 try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException ignored) {
+                     logger.error("IOException ignored");
+                    // Best effort cleanup
+                }
+                throw new IOException("Failed to set secure permissions on temporary file");
+            }
+        }
+
+        File file = tempFile.toFile();
+        file.deleteOnExit();
+        return file;
     }
 
     /**
