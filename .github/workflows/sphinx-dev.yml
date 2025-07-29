@@ -1,5 +1,5 @@
-name: "Sphinx: Render development docs"
-run-name: ${{ github.actor }} has launched CI process on ${{ github.ref_name }}
+name: "Docs: Render and Deploy Development Documentation"
+run-name: ${{ github.actor }} triggered a documentation build on branch ${{ github.ref_name }}
 
 on:
   push:
