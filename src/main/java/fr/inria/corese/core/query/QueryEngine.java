@@ -14,13 +14,13 @@ import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import fr.inria.corese.core.transform.Transformer;
+import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static fr.inria.corese.core.transform.Transformer.STL_PROFILE;
 
 /**
  * Equivalent of RuleEngine for Query and Template Run a set of query
@@ -295,7 +295,7 @@ public class QueryEngine implements Engine {
      * templates inherit template st:profile function definitions
      */
     public void profile() {
-        Query profile = getTemplate(STL_PROFILE);
+        Query profile = getTemplate(TransformerUtils.STL_PROFILE);
         if ((profile != null) && (profile.getExtension() != null)) {
             // share profile function definitions in templates
             fr.inria.corese.core.compiler.parser.Transformer tr = fr.inria.corese.core.compiler.parser.Transformer.create();
@@ -355,7 +355,7 @@ public class QueryEngine implements Engine {
     }
 
     public Query getTemplate() {
-        Query q = getTemplate(STL_PROFILE);
+        Query q = getTemplate(TransformerUtils.STL_PROFILE);
         if (q != null) {
             return q;
         } else if (getTemplates().isEmpty()) {

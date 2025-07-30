@@ -3,6 +3,8 @@ package fr.inria.corese.core.load;
 import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.transform.TransformerUtils;
+
 import java.util.HashMap;
 
 /**
@@ -82,10 +84,10 @@ public class LoadFormat {
         
         
         dtable = new HashMap<String, Loader.format>();
-        ddefine(Transformer.TURTLE, Loader.format.TURTLE_FORMAT);
+        ddefine(TransformerUtils.TURTLE, Loader.format.TURTLE_FORMAT);
         ddefine(NT_FORMAT,          Loader.format.NT_FORMAT);
-        ddefine(Transformer.RDFXML, Loader.format.RDFXML_FORMAT);
-        ddefine(Transformer.JSON,   Loader.format.JSONLD_FORMAT);
+        ddefine(TransformerUtils.RDFXML, Loader.format.RDFXML_FORMAT);
+        ddefine(TransformerUtils.JSON,   Loader.format.JSONLD_FORMAT);
         
    }
       

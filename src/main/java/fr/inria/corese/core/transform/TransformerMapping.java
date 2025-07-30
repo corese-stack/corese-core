@@ -2,8 +2,6 @@ package fr.inria.corese.core.transform;
 
 import fr.inria.corese.core.compiler.parser.NodeImpl;
 import fr.inria.corese.core.Graph;
-import static fr.inria.corese.core.transform.Transformer.IN;
-import static fr.inria.corese.core.transform.Transformer.IN2;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Query;
@@ -69,7 +67,7 @@ public class TransformerMapping {
     Mapping getSimpleMapping(IDatatype dt){
         Mapping map = getMapping();
         if (map == null){
-            map = Mapping.create(NodeImpl.createVariable(IN), getNode(dt));
+            map = Mapping.create(NodeImpl.createVariable(TransformerUtils.IN), getNode(dt));
             setMapping(map);
         }
         else {
@@ -134,8 +132,8 @@ public class TransformerMapping {
     
     String getArg(int n){
         switch (n){
-            case 0:  return IN;
-            default: return IN2;
+            case 0:  return TransformerUtils.IN;
+            default: return TransformerUtils.IN2;
         }
     }
 

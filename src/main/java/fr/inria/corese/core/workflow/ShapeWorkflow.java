@@ -11,6 +11,7 @@ import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.kgram.api.core.PointerType;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +30,12 @@ public class ShapeWorkflow extends SemanticWorkflow {
     public static final String SHAPE_TRANS_TEST     = "/user/corby/home/AAData/sttl/datashape/main";
     public static final String SHAPE_TRANS_TEST_LDS = "/user/corby/home/AAData/sttl/datashape/main";
     public static final String SHAPE_SHAPE          = "/data/shape4shape.ttl";
-    public static final String SHAPE_TRANS          = Transformer.DATASHAPE;
-    public static final String FORMAT               = Transformer.TURTLE;
-    public static final String FORMAT_HTML          = Transformer.TURTLE_HTML;
+    public static final String SHAPE_TRANS          = TransformerUtils.DATASHAPE;
+    public static final String FORMAT               = TransformerUtils.TURTLE;
+    public static final String FORMAT_HTML          = TransformerUtils.TURTLE_HTML;
     private static final String NL                  = "\n";
     
-    static final String MAIN = Transformer.STL_MAIN;
+    static final String MAIN = TransformerUtils.STL_MAIN;
     static final String SHAPE_NODE  = NSManager.SHAPE + "shapeNode";
     static final String SHAPE_GRAPH = NSManager.SHAPE + "shapeGraph";
     static final IDatatype dtnode  = DatatypeMap.newResource(SHAPE_NODE);

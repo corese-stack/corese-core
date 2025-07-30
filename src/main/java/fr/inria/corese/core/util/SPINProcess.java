@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
+import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -138,7 +139,7 @@ public class SPINProcess {
     }
 
     public String toSparql(Graph g, NSManager nsm) throws EngineException {
-        Transformer p = Transformer.create(g, Transformer.SPIN);
+        Transformer p = Transformer.create(g, TransformerUtils.SPIN);
         if (nsm != null) {
             p.setNSM(nsm);
         }

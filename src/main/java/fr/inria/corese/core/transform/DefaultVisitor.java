@@ -48,7 +48,7 @@ public class DefaultVisitor implements TemplateVisitor {
     private HashMap<IDatatype, IDatatype> distinct;
     private final HashMap<IDatatype, IDatatype> value;
     
-    private String transform = Transformer.TURTLE;
+    private String transform = TransformerUtils.TURTLE;
     private final String NL = "\n";
     // boolean value (if any) that means that visitor must consider visited node
     // use case: st:visit(st:exp, ?x, ?suc)

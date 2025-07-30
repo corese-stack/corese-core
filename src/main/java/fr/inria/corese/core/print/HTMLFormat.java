@@ -6,6 +6,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.transform.Transformer;
+import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.MappingsGraph;
 
 /**
@@ -19,9 +20,9 @@ import fr.inria.corese.core.util.MappingsGraph;
  *
  */
 public class HTMLFormat {
-    static final String defaultTransform   = Transformer.SPARQL;
-    static final String constructTransform = Transformer.SPARQL;
-    static final String selectTransform    = Transformer.SPARQL;
+    static final String defaultTransform   = TransformerUtils.SPARQL;
+    static final String constructTransform = TransformerUtils.SPARQL;
+    static final String selectTransform    = TransformerUtils.SPARQL;
     private String transformation;
     
     Mappings map;

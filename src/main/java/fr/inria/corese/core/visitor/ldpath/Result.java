@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;;
 
@@ -130,7 +131,7 @@ public class Result {
        Graph g = Graph.create();
        Load ld = Load.create(g);
        ld.parse(turtle(file));
-       Transformer t = Transformer.create(g, Transformer.JSON);
+       Transformer t = Transformer.create(g, TransformerUtils.JSON);
        t.write(json(file));
    }
    
