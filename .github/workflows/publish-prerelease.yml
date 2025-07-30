@@ -38,7 +38,11 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build project
-        run: ./gradlew build
+        run: ./gradlew shadowJar
+
+      - name: Generate timestamp
+        id: timestamp
+        run: echo "timestamp=$(date '+%d %B %Y, %H:%M:%S')" >> $GITHUB_OUTPUT
 
       - name: Publish single pre-release
         uses: ncipollo/release-action@v1
@@ -49,6 +53,12 @@ jobs:
           body: |
             🚧 This is the latest build from the `develop` branch.
             Not intended for production use.
+            
+            **Last Updated:** ${{ steps.timestamp.outputs.timestamp }}
+            **Build Info:**
+            - Branch: `${{ github.ref_name }}`
+            - Commit: `${{ github.sha }}`
+            - Build Time: `${{ steps.timestamp.outputs.timestamp }}`
           prerelease: true
           allowUpdates: true
           replacesArtifacts: true

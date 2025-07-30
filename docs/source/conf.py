@@ -20,6 +20,24 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 project = 'Corese'
 author = 'Wimmics'
 
+version = ""
+release = ""
+
+def setup(app):
+    def set_version(app, config):
+        smv = getattr(app.config, 'smv_current_version', None)
+        if smv:
+            config.version = smv
+            config.release = smv
+            html_theme_options["switcher"]["version_match"] = smv
+        else:
+            config.version = "dev"
+            config.release = "dev"
+            html_theme_options["switcher"]["version_match"] = "dev"
+
+    app.connect("config-inited", set_version)
+
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -63,14 +81,16 @@ html_css_files = [
 html_js_files = []
 
 # Project logo, to place at the top of the sidebar.
-html_logo = "_static/logo/corese-core_doc_bar.svg"
+html_logo = "_static/logo/corese-core.svg"
 
 # Icon to put in the browser tab.
-html_favicon = "_static/logo/corese-core_doc_fav.svg"
+html_js_files = [
+    "js/favicon-theme.js"
+]
 
 # Modify the title to get good social-media links
-html_title = "Corese"
-html_short_title = "Corese"
+html_title = "Corese-core Documentation"
+html_short_title = "Corese-core Docs"
 
 # -- Theme Options -----------------------------------------------------------
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -78,9 +98,9 @@ html_short_title = "Corese"
 # documentation.
 html_theme_options = {
      "logo": {
-         "image_relative": "_static/logo/corese-core_doc_light.svg",
-         "image_light": "_static/logo/corese-core_doc_light.svg",
-         "image_dark": "_static/logo/corese-core_doc_dark.svg"
+         "image_relative": "_static/logo/corese-core.svg",
+         "image_light": "_static/logo/corese-core.svg",
+         "image_dark": "_static/logo/corese-core.svg"
      },
     "theme_switcher": True,
     "navbar_center": [ "navbar-nav" ],
@@ -92,11 +112,12 @@ html_theme_options = {
             "icon": "fab fa-github-square"
         }
     ],
-    "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json", "version_match": r"v\d+\.\d+\.\d+"}
+    "switcher": {"json_url": "https://corese-stack.github.io/corese-core/switcher.json", "version_match": version}
 }
 
 html_sidebars = {
-  "install": [],
+    "install": [],
+    "user_guide": [],
 }
 
 # -- MySt-parcer extension Options -------------------------------------------
@@ -148,8 +169,6 @@ primary_domain = 'java'
 
 # Tell sphinx what the pygments highlight language should be.
 highlight_language = 'java'
-
-# Setup the sphinx.ext.todo extension 
 
 # Set to false in the final version
 todo_include_todos = True
