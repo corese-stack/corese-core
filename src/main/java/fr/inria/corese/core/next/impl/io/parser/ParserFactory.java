@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.impl.io.parser.jsonld.JSONLDParser;
 import fr.inria.corese.core.next.impl.io.parser.nquads.ANTLRNQuadsParser;
 import fr.inria.corese.core.next.impl.io.parser.ntriples.ANTLRNTriplesParser;
+import fr.inria.corese.core.next.impl.io.parser.trig.ANTLRTrigParser;
 import fr.inria.corese.core.next.impl.io.parser.turtle.ANTLRTurtleParser;
 
 /**
@@ -44,6 +45,8 @@ public class ParserFactory extends AbstractRDFParserFactory {
             return new ANTLRNTriplesParser(model, factory, config);
         } else if (format == RDFFormat.NQUADS) {
             return new ANTLRNQuadsParser(model, factory, config);
+        } else if (format == RDFFormat.TRIG) {
+            return new ANTLRTrigParser(model, factory, config);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
     }
@@ -65,6 +68,8 @@ public class ParserFactory extends AbstractRDFParserFactory {
             return new ANTLRNTriplesParser(model, factory);
         } else if (format == RDFFormat.NQUADS) {
             return new ANTLRNQuadsParser(model, factory);
+        } else if (format == RDFFormat.TRIG) {
+            return new ANTLRTrigParser(model, factory);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
     }
