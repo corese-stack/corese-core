@@ -23,13 +23,7 @@ import java.io.BufferedReader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.EnumSet;
-import java.util.Set;
+
 
 public class QueryLoad extends Load {
 
@@ -74,7 +68,6 @@ public class QueryLoad extends Load {
         }
     }
 
-    @Deprecated
     public void load(Reader read) throws LoadException {
         parse(read);
     }
@@ -91,7 +84,7 @@ public class QueryLoad extends Load {
     }
 
     @Override
-     boolean isURL(String path) {
+    boolean isURL(String path) {
         try {
             new URL(path);
         } catch (MalformedURLException e) {
@@ -100,12 +93,11 @@ public class QueryLoad extends Load {
         return true;
     }
 
-    @Deprecated
     public String read(InputStream stream) throws IOException {
         return read(new InputStreamReader(stream));
     }
 
-     public String readWE(InputStream stream) throws LoadException {
+    public String readWE(InputStream stream) throws LoadException {
         try {
             return read(new InputStreamReader(stream));
         } catch (IOException ex) {
@@ -113,15 +105,14 @@ public class QueryLoad extends Load {
         }
     }
 
-     @Deprecated
     public String read(String name) {
         String query = "";
         try {
             query = readWE(name);
         } catch (LoadException ex) {
-            logger.error("Error loading query '{}'", name, ex);
+            LoggerFactory.getLogger(QueryLoad.class.getName()).error("", ex);
         }
-        if ("".equals(query)) {
+        if (query == "") {
             return null;
         }
         return query;
@@ -147,29 +138,40 @@ public class QueryLoad extends Load {
 
     public String readWE(String name) throws LoadException {
         String query = "";
-        Reader fr;
-        try {
-            if (NSManager.isResource(name)) {
-                fr = new InputStreamReader(getClass().getResourceAsStream(NSManager.stripResource(name)));
-            }
-            else if (isURL(name)) {
-                URL url = new URL(name);
-                fr = new InputStreamReader(url.openStream());
-            } else {
-                fr = new FileReader(name);
-            }
-
+        try (Reader fr = getReaderForName(name)) {
             if (fr == null) {
-                throw LoadException.create(new IOException(name)).setPath(name);
+                throw LoadException.create(new IOException("Could not obtain reader for: " + name)).setPath(name);
             }
             query = read(fr);
         } catch (IOException ex) {
             throw LoadException.create(ex).setPath(name);
         }
-        if (query == "") {
+        if (query.isEmpty()) {
             return null;
         }
         return query;
+    }
+
+
+    /**
+     * Helper method to get a Reader based on the name (resource, URL, or file path).
+     * @param name The name of the resource/URL/file.
+     * @return A Reader for the given name.
+     * @throws IOException If an I/O error occurs or URL is malformed.
+     */
+    private Reader getReaderForName(String name) throws IOException {
+        if (NSManager.isResource(name)) {
+            InputStream stream = getClass().getResourceAsStream(NSManager.stripResource(name));
+            if (stream == null) {
+                throw new IOException("Resource not found: " + name);
+            }
+            return new InputStreamReader(stream);
+        } else if (isURL(name)) {
+            URL url = new URL(name);
+            return new InputStreamReader(url.openStream());
+        } else {
+            return new FileReader(name);
+        }
     }
 
     public String getResource(String name) throws IOException {
@@ -182,6 +184,7 @@ public class QueryLoad extends Load {
         return str;
     }
 
+    // TODO: clean
     public String basicParse(String path) throws EngineException {
         String pp = (path.endsWith("/")) ? path.substring(0, path.length() - 1) : path;
         String str = null;
@@ -221,29 +224,16 @@ public class QueryLoad extends Load {
                 isnl = true;
             }
             sb.append(str);
-            //sb.append(NL);
         }
         return sb.toString();
     }
 
 
-    /**
-     * Writes content to a temporary file and returns the file path.
-     * <p>
-     * Creates a temporary file with the specified name pattern, writes the given data to it,
-     * and returns the absolute path of the created file. If an error occurs during file operations,
-     * logs the error and returns null.
-     *
-     * @param name The base name pattern for the temporary file (used to generate the filename)
-     * @param dt The data content to be written to the file
-     * @return The absolute path of the created temporary file, or null if an error occurs
-     * @see java.io.File#createTempFile(String, String)
-     * @see java.io.BufferedWriter
-     */
     public String writeTemp(String name, IDatatype dt) {
         try {
-            File file = createTempFile(name);
+            File file = File.createTempFile(getName(name), getSuffix(name));
             writeToFile(file, dt);
+
             return file.toString();
         } catch (IOException e) {
             logger.error("Error writing to temporary file '{}': {}", name, e.getMessage(), e);
@@ -251,50 +241,34 @@ public class QueryLoad extends Load {
         }
     }
 
-    /**
-     * Creates a temporary file using the specified name pattern.
-     *
-     * @param name The base name pattern for the temporary file
-     * @return The created temporary File object
-     * @throws IOException If the file could not be created
-     * @see #getName(String)
-     * @see #getSuffix(String)
-     */
-    private File createTempFile(String name) throws IOException {
-        // Create with restrictive permissions upfront using PosixFilePermissions
-        Set<PosixFilePermission> perms = EnumSet.of(
-                PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE
-        );
-
-        FileAttribute<Set<PosixFilePermission>> attr =
-                PosixFilePermissions.asFileAttribute(perms);
-
-        Path tempFile;
-        try {
-            tempFile = Files.createTempFile(getName(name), getSuffix(name), attr);
-        } catch (UnsupportedOperationException e) {
-             tempFile = Files.createTempFile(getName(name), getSuffix(name));
-            File file = tempFile.toFile();
-
-             if (!file.setReadable(false, false) ||
-                    !file.setReadable(true, true) ||
-                    !file.setWritable(false, false) ||
-                    !file.setWritable(true, true)) {
-
-                 try {
-                    Files.deleteIfExists(tempFile);
-                } catch (IOException ignored) {
-                     logger.error("IOException ignored");
-                    // Best effort cleanup
-                }
-                throw new IOException("Failed to set secure permissions on temporary file");
-            }
+    String getName(String name) {
+        int index = name.indexOf(".");
+        if (index == -1) {
+            return name;
         }
+        return name.substring(0, index);
+    }
 
-        File file = tempFile.toFile();
-        file.deleteOnExit();
-        return file;
+    String getSuffix(String name) {
+        int index = name.indexOf(".");
+        if (index == -1) {
+            return ".txt";
+        }
+        return name.substring(index);
+    }
+
+    public void write(String name, IDatatype dt) {
+        write(name, dt.stringValue());
+    }
+
+    public void write(String name, String str) {
+        try (final FileWriter fr = new FileWriter(name);
+             final BufferedWriter fq = new BufferedWriter(fr)) {
+            fq.write(str);
+            fq.flush();
+        } catch (IOException e) {
+            logger.error("Error writing to file '{}': {}", name, e.getMessage(), e);
+        }
     }
 
     /**
@@ -333,37 +307,4 @@ public class QueryLoad extends Load {
             fq.write(dt.stringValue());
         }
     }
-
-    String getName(String name) {
-         int index = name.indexOf(".");
-         if (index == -1) {
-             return name;
-         }
-         return name.substring(0, index);
-    }
-
-    String getSuffix(String name) {
-         int index = name.indexOf(".");
-         if (index == -1) {
-             return ".txt";
-         }
-         return name.substring(index);
-     }
-
-    public void write(String name, IDatatype dt) {
-        write(name, dt.stringValue());
-    }
-
-    public void write(String name, String str) {
-        try {
-            try (final FileWriter fr = new FileWriter(name);
-                 final BufferedWriter fq = new BufferedWriter(fr)) {
-                fq.write(str);
-                fq.flush();
-            }
-        } catch (IOException e) {
-            logger.error("Error writing to file '{}': {}", name, e.getMessage(), e);
-        }
-    }
-
 }
