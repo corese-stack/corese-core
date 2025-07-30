@@ -251,7 +251,7 @@ public class TestQuery1 {
         Transformer t = Transformer.create(g, TransformerUtils.OWLRL);
         t.process();
         Transformer t2 = Transformer.create(g, TransformerUtils.TURTLE_HTML);
-        IDatatype dt = t2.process(t.getBinding());
+        IDatatype dt = t2.process(t.getContextManager().getBinding());
 
         assertEquals(true, dt.getLabel().contains("<span class='fail'>"));
     }

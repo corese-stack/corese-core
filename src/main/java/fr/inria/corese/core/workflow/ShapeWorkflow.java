@@ -214,7 +214,7 @@ public class ShapeWorkflow extends SemanticWorkflow {
     
     public Graph process(Graph g, Graph s, boolean graph, IDatatype... param) {
         Transformer t = Transformer.create(g, SHAPE_TRANS);
-        t.getContext().export(SHAPE_NAME, DatatypeMap.createObject(s));
+        t.getContextManager().getContext().export(SHAPE_NAME, DatatypeMap.createObject(s));
         try {
             if (graph) {
                 // check whole graph

@@ -115,7 +115,7 @@ public class HTMLFormat {
         Transformer t = Transformer.create(g, trans);
         context.setTransform(trans);        
         complete(context, graph);
-        t.setContext(context);
+        t.getContextManager().setContext(context);
         
 //        if (map != null && map.getQuery() != null){
 //            // Transformer inherit Query Transformer Visitor if any

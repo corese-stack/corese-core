@@ -13,6 +13,10 @@ public class LoadException extends Exception {
         this.set(ee);
     }
 
+    public LoadException(String message) {
+        super(message);
+    }
+
     public LoadException(String message, Throwable cause) {
         super(message, cause);
     }

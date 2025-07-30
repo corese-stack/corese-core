@@ -134,7 +134,7 @@ public class PluginTransform implements ComputerProxy {
      */
     Context getTransformerContext(Binding b, Environment env, Producer p) throws EngineException {
         Transformer t = getTransformerCurrent(b, env, p);
-        return t.getContext();
+        return t.getContextManager().getContext();
     }
 
     /**
@@ -214,7 +214,7 @@ public class PluginTransform implements ComputerProxy {
     void complete(Query q, Transformer t, IDatatype uri) {
         t.complete(q, (Transformer) q.getTransformer());
         if (uri != null) {
-            t.getContext().set(TransformerUtils.STL_TRANSFORM, uri);
+            t.getContextManager().getContext().set(TransformerUtils.STL_TRANSFORM, uri);
         }
     }
 

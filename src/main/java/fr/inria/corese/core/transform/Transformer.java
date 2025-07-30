@@ -33,11 +33,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.List;
 
-import static fr.inria.corese.core.transform.TransformerUtils.D3_ALL;
 
 /**
  * SPARQL Template Transformation Engine
@@ -69,8 +68,7 @@ public class Transformer implements TransformProcessor {
     NSManager nsm;
     QueryProcess exec;
     private Mapping mapping;
-    private Mappings map;
-    private Dataset ds;
+
     Stack stack;
     static Table table;
     String pp = TransformerUtils.PPRINTER;
@@ -90,9 +88,7 @@ public class Transformer implements TransformProcessor {
     // templates share this table
     // sub transformers share same table recursively
     private HashMap<String, Transformer> transformerMap;
-    private Binding binding;
-    // table accessible using st:set/st:get
-    private Context context;
+
     private QuerySolverVisitorTransformer eventVisitor;
     private boolean isHide = false;
     public boolean stat = !true;
@@ -112,6 +108,8 @@ public class Transformer implements TransformProcessor {
     // used when all templates fail
     // default is: return RDF term as is (effect is like xsd:string)
     private int defaut = ExprType.TURTLE;
+
+    private ContextManager contextManager;
 
     static {
         table = new Table();
@@ -133,38 +131,41 @@ public class Transformer implements TransformProcessor {
     void init(QueryProcess qp, String p, Level level) throws LoadException {
         setAccessLevel(level);
         setEvent(Access.accept(Feature.EVENT, level));
-        setContext(new Context());
         setTransformation(p);
-        set(qp);
-        nsm = NSManager.create();
+        set(qp); // This sets 'graph' and 'exec'
+
+        // 1. Initialize NSManager
+        this.nsm = NSManager.create();
+        // 2. Initialize TransformerMapping (needs graph from qp)
+        this.tmap = new TransformerMapping(qp.getGraph());
+        // 3. Initialize ContextManager (needs tmap and nsm)
+        this.contextManager = new ContextManager(this.tmap, this.nsm);
+
+        // Defensive null check for contextManager
+        if (this.contextManager == null) {
+            logger.error("Failed to instantiate ContextManager. It is null after constructor call.");
+            throw new LoadException("Initialization failed: ContextManager is null.");
+        }
+
+        // 4. Set context for ContextManager
+        this.contextManager.setContext(new Context());
+
         transformerMap = new HashMap<>();
         stack = new Stack(this, true);
         EMPTY = DatatypeMap.newLiteral(TransformerUtils.NULL);
         tcount = new HashMap<>();
         loaded = new HashMap<>();
         imported = new HashMap<>();
-        tmap = new TransformerMapping(qp.getGraph());
+
         try {
             setEventVisitor(QuerySolverVisitorTransformer.create(this, qp.getCreateEval()));
         } catch (EngineException ex) {
             logger.error(ex.getMessage());
         }
-        init(level);
+        init(level); // This calls the other init(Level) method
     }
 
-    /**
-     * Definition of synonym
-     * st:all -> (st:xml st:json ...)
-     */
-    static public List<String> getFormatList(String name) {
-        switch (name) {
-            case TransformerUtils.ALL:
-                return Arrays.asList(TransformerUtils.RESULT_FORMAT);
-            case D3_ALL:
-                return Arrays.asList(TransformerUtils.GRAPHIC_FORMAT);
-        }
-        return null;
-    }
+
 
     void initMap() {
         Query q = getTemplate(start);
@@ -215,7 +216,7 @@ public class Transformer implements TransformProcessor {
      */
     public static Transformer create(Graph g, Mappings map, String p) {
         Transformer t = create(g, p);
-        t.setMappings(map);
+        t.contextManager.setMappings(map);
         t.initMap();
         return t;
     }
@@ -285,7 +286,7 @@ public class Transformer implements TransformProcessor {
         }
 
         Transformer t = Transformer.create(gg);
-        t.setDataset(ds);
+        t.contextManager.setDataset(ds);
         t.setTemplates(trans, level);
         return t;
     }
@@ -352,7 +353,8 @@ public class Transformer implements TransformProcessor {
     }
 
     public void setNSM(NSManager n) {
-        nsm = n;
+        this.nsm = n;
+
     }
 
     public NSManager getNSM() {
@@ -465,17 +467,7 @@ public class Transformer implements TransformProcessor {
         return TransformerUtils.STL + name;
     }
 
-    /**
-     * uri#name
-     *
-     * @return uri
-     */
-    public static String getURI(String uri) {
-        if (uri != null && uri.contains("#")) {
-            return uri.substring(0, uri.indexOf("#"));
-        }
-        return uri;
-    }
+
 
     private void tune(QueryProcess exec) {
         exec.setListPath(true);
@@ -576,15 +568,15 @@ public class Transformer implements TransformProcessor {
      * Otherwise, apply the first template that matches without bindings.
      */
     public IDatatype process() throws EngineException {
-        if (getBinding() != null) {
-            return process(getBinding());
+        if (contextManager.getBinding() != null) {
+            return process(contextManager.getBinding());
         }
         return process(null, false, null, null, null);
     }
 
     public IDatatype process(Binding b) throws EngineException {
         if (b != null) {
-            setBinding(b);
+            contextManager.setBinding(b);
         }
         return process(null, false, null, null, (b == null) ? null : Mapping.create(b));
     }
@@ -630,9 +622,9 @@ public class Transformer implements TransformProcessor {
                 // remember start with qq for function pprint below
                 query = qq;
                 if (query.getName() != null) {
-                    context.setURI(TransformerUtils.STL_START, qq.getName());
+                    contextManager.getContext().setURI(TransformerUtils.STL_START, qq.getName());
                 } else {
-                    context.set(TransformerUtils.STL_START, (String) null);
+                    contextManager.getContext().set(TransformerUtils.STL_START, (String) null);
                 }
 
                 Mappings map = exec.query(qq, m);
@@ -702,12 +694,11 @@ public class Transformer implements TransformProcessor {
 
     /**
      * Record Binding in case of Workflow: next WorkflowProcess can get Binding
-     * 
-     * @param map
+     * * @param map
      */
     void save(Mappings map) {
-        if (getBinding() == null && map.getBinding() != null) {
-            setBinding(map.getBinding());
+        if (contextManager.getBinding() == null && map.getBinding() != null) {
+            contextManager.setBinding(map.getBinding());
         }
     }
 
@@ -988,6 +979,11 @@ public class Transformer implements TransformProcessor {
         return qe.getTemplate(name) != null;
     }
 
+    @Override
+    public Mappings getMappings() {
+        return contextManager.getMappings();
+    }
+
     /**
      * use case: result of st:apply-templates-all() list = list of ?out results
      * of templates create Mappings (?out = value) apply st:aggregate(?out) on
@@ -1172,21 +1168,21 @@ public class Transformer implements TransformProcessor {
      * display RDF Node in its Turtle syntax
      */
     public IDatatype turtle(IDatatype dt) {
-        return nsm.turtle(dt, false);
+        return contextManager.getNSM().turtle(dt, false);
     }
 
     /**
      * force = true: if no prefix generate prefix
      */
     public IDatatype turtle(IDatatype dt, boolean force) {
-        return nsm.turtle(dt, force);
+        return contextManager.getNSM().turtle(dt, force);
     }
 
     /**
      * if prefix exists, return qname, else return URI as is (without &lt;>)
      */
     public IDatatype qnameURI(IDatatype dt) {
-        String uri = nsm.toPrefix(dt.getLabel(), true);
+        String uri = contextManager.getNSM().toPrefix(dt.getLabel(), true);
         return DatatypeMap.newStringBuilder(uri);
     }
 
@@ -1218,7 +1214,7 @@ public class Transformer implements TransformProcessor {
         setOptimize(table.isOptimize(pp));
         qe = QueryEngine.create(graph);
         Loader load = new Loader(this, qe);
-        load.setDataset(ds);
+        load.setDataset(contextManager.getDataset());
         load.setLevel(level);
         load.load(getTransformation());
         // templates share profile functions
@@ -1259,13 +1255,6 @@ public class Transformer implements TransformProcessor {
         }
     }
 
-    /**
-     * *************************************************************
-     *
-     * Check templates that would never succeed
-     *
-     **************************************************************
-     */
     /**
      * Check if a template edges not exist in graph remove those templates from
      * the list to speed up PRAGMA: does not take RDFS entailments into account
@@ -1324,45 +1313,12 @@ public class Transformer implements TransformProcessor {
         this.hasDefault = hasDefault;
     }
 
-    public Dataset getDataset() {
-        return ds;
-    }
 
-    public void setDataset(Dataset dataset) {
-        this.ds = dataset;
-    }
 
     public String getTransformation() {
         return pp;
     }
 
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-        initContext();
-    }
-
-    /**
-     * Define prefix from Context slot st:prefix = ((ns uri))
-     */
-    void initContext() {
-        if (getContext() != null) {
-            if (getContext().hasValue(TransformerUtils.STL_PREFIX)) {
-                definePrefix();
-            }
-        }
-    }
-
-    void definePrefix() {
-        for (IDatatype def : getContext().get(TransformerUtils.STL_PREFIX).getValueList()) {
-            if (def.isList() && def.size() >= 2) {
-                getNSM().definePrefix(def.get(0).getLabel(), def.get(1).getLabel());
-            }
-        }
-    }
 
     /**
      * Query q is the calling template/query
@@ -1375,8 +1331,8 @@ public class Transformer implements TransformProcessor {
         Context c = getContext(q, ct);
         if (c != null) {
             // inherit context exported properties:
-            getContext().complete(c);
-            init(getContext());
+            contextManager.getContext().complete(c);
+            init(contextManager.getContext());
         }
         if (ct != null) {
             complete(ct);
@@ -1431,7 +1387,7 @@ public class Transformer implements TransformProcessor {
             return q.getContext();
 
         } else {
-            return ct.getContext();
+            return ct.contextManager.getContext();
         }
     }
 
@@ -1445,8 +1401,8 @@ public class Transformer implements TransformProcessor {
     }
 
     public TemplateVisitor getVisitor() {
-        if (getBinding() != null) {
-            return (TemplateVisitor) getBinding().getTransformerVisitor();
+        if (contextManager.getBinding() != null) {
+            return (TemplateVisitor) contextManager.getBinding().getTransformerVisitor();
         }
         return null;
     }
@@ -1459,21 +1415,9 @@ public class Transformer implements TransformProcessor {
         this.transformerMap = transformerMap;
     }
 
-    public Binding getBinding() {
-        return binding;
-    }
-
-    public void setBinding(Binding binding) {
-        this.binding = binding;
-    }
-
-    @Override
-    public Mappings getMappings() {
-        return map;
-    }
-
-    public void setMappings(Mappings map) {
-        this.map = map;
+    // Added public getter for contextManager
+    public ContextManager getContextManager() {
+        return contextManager;
     }
 
     public QuerySolverVisitorTransformer getEventVisitor() {

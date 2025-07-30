@@ -376,10 +376,10 @@ public class ResultFormat implements ResultFormatDef {
     String transformer() {
         Transformer t = Transformer.create(theGraph(), getMappings(), getTransformation());
         if (getContext() != null) {
-            t.setContext(getContext());
+            t.getContextManager().setContext(getContext());
         }
         if (getBind() != null) {
-            t.setBinding(getBind());
+            t.getContextManager().setBinding(getBind());
         }
         return t.toString();
     }
