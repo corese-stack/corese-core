@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.HashMap;
 
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Model;
@@ -121,7 +121,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
     private void writeStatementsWithContext(Writer writer) throws IOException {
         TriGOption trigConfig = getTriGConfig();
 
-        Map<Resource, List<Statement>> byContext = new LinkedHashMap<>();
+        Map<Resource, List<Statement>> byContext = new HashMap<>();
         model.stream()
                 .filter(stmt -> !isConsumed(stmt.getSubject()))
                 .forEach(stmt -> byContext.computeIfAbsent(stmt.getContext(), k -> new ArrayList<>()).add(stmt));
@@ -145,9 +145,9 @@ public class TriGSerializer extends AbstractGraphSerializer {
                 initialIndent = graphIndent;
             }
 
-            Map<Resource, List<Statement>> bySubject = trigConfig.sortSubjects() ?
-                    new TreeMap<>(Comparator.comparing(Resource::stringValue)) :
-                    new LinkedHashMap<>();
+            Map<Resource, List<Statement>> bySubject = trigConfig.sortSubjects()
+                    ? new TreeMap<>(Comparator.nullsFirst(Comparator.comparing(Resource::stringValue)))
+                    : new HashMap<>();
 
             statementsInContext.forEach(stmt -> bySubject.computeIfAbsent(stmt.getSubject(), k -> new ArrayList<>()).add(stmt));
 
@@ -158,7 +158,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
 
                 Map<IRI, List<Statement>> byPredicate = trigConfig.sortPredicates() ?
                         new TreeMap<>(Comparator.comparing(IRI::stringValue)) :
-                        new LinkedHashMap<>();
+                        new HashMap<>();
 
                 subjectEntry.getValue().forEach(stmt -> byPredicate.computeIfAbsent(stmt.getPredicate(), k -> new ArrayList<>()).add(stmt));
 

@@ -2,6 +2,7 @@ package fr.inria.corese.core.print;
 
 import static fr.inria.corese.core.sparql.triple.parser.URLParam.LINK;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
 import fr.inria.corese.core.transform.Transformer;
+import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.MappingsGraph;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mappings;
@@ -224,15 +226,15 @@ public class ResultFormat implements ResultFormatDef {
             return null;
         }
         switch (NSManager.nsm().toNamespace(trans)) {
-            case Transformer.XML:
+            case TransformerUtils.XML:
                 return create(m, ResultFormatDef.format.XML_FORMAT);
-            case Transformer.JSON:
+            case TransformerUtils.JSON:
                 return create(m, ResultFormatDef.format.JSON_FORMAT);
-            case Transformer.JSON_LD:
+            case TransformerUtils.JSON_LD:
                 return create(m, ResultFormatDef.format.JSONLD_FORMAT);
-            case Transformer.RDF:
+            case TransformerUtils.RDF:
                 return create(m, ResultFormatDef.format.RDF_FORMAT);
-            case Transformer.RDFXML:
+            case TransformerUtils.RDFXML:
                 return create(m, ResultFormatDef.format.RDF_XML_FORMAT);
             default:
                 return null;
@@ -374,10 +376,10 @@ public class ResultFormat implements ResultFormatDef {
     String transformer() {
         Transformer t = Transformer.create(theGraph(), getMappings(), getTransformation());
         if (getContext() != null) {
-            t.setContext(getContext());
+            t.getContextManager().setContext(getContext());
         }
         if (getBind() != null) {
-            t.setBinding(getBind());
+            t.getContextManager().setBinding(getBind());
         }
         return t.toString();
     }
@@ -407,7 +409,7 @@ public class ResultFormat implements ResultFormatDef {
     }
 
     static ResultFormatDef.format getSyntax(String syntax) {
-        if (syntax.equals(Transformer.RDFXML)) {
+        if (syntax.equals(TransformerUtils.RDFXML)) {
             return ResultFormatDef.format.RDF_XML_FORMAT;
         }
         return ResultFormatDef.format.TURTLE_FORMAT;
@@ -573,11 +575,13 @@ public class ResultFormat implements ResultFormatDef {
     }
 
     public void write(String name) throws IOException {
-        FileWriter fw = new FileWriter(name);
-        String str = toString();
-        fw.write(str);
-        fw.flush();
-        fw.close();
+        try (final FileWriter fw = new FileWriter(name);
+             final  BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
+
+            String str = toString();
+            bufferedWriter.write(str);
+            bufferedWriter.flush();
+        }
     }
 
     /**

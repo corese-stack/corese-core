@@ -1,6 +1,8 @@
 package fr.inria.corese.core.print;
 
 import fr.inria.corese.core.transform.Transformer;
+
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -129,11 +131,12 @@ public class TemplateFormat {
     }
 
     public void write(String name) throws IOException {
-        FileWriter fw = new FileWriter(name);
-        String str = toString();
-        fw.write(str);
-        fw.flush();
-        fw.close();
+        try (final FileWriter fw = new FileWriter(name);
+             final BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
+            String str = toString();
+            bufferedWriter.write(str);
+            bufferedWriter.flush();
+        }
     }
 
     public boolean isCheck() {

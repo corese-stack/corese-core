@@ -405,11 +405,13 @@ public class JSONLDFormat extends RDFFormat {
      */
     public void write(String name) throws IOException {
         StringBuilder sb = this.getJsonLdObject().toStringBuilder();
-        FileOutputStream fos = new FileOutputStream(name);
-        for (int i = 0; i < sb.length(); i++) {
-            fos.write(sb.charAt(i));
+
+        try (final FileOutputStream fos = new FileOutputStream(name)) {
+            for (int i = 0; i < sb.length(); i++) {
+                fos.write(sb.charAt(i));
+            }
+
         }
-        fos.close();
     }
 
     @Override

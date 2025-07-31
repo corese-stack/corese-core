@@ -19,9 +19,7 @@ public class CanonicalizationState {
     private final ListMap<String, String> hashToBlankNode = new ListMap<>();
     private final CanonicalIssuer canonicalIssuer = new CanonicalIssuer("c14n");
 
-    /////////////////
-    // Constructor //
-    /////////////////
+    // Constructor
 
     /**
      * Constructs a new CanonicalizationState instance.
@@ -29,9 +27,7 @@ public class CanonicalizationState {
     public CanonicalizationState() {
     }
 
-    ///////////////////////////////////
-    // Quad to Blank Node Management //
-    ///////////////////////////////////
+    // Quad to Blank Node Management
 
     /**
      * Maps a blank node identifier to a specific quad.
@@ -53,9 +49,7 @@ public class CanonicalizationState {
         return Collections.unmodifiableList(this.blankNodesToQuad.get(blankNodeId));
     }
 
-    ///////////////////////////////////
-    // Hash to Blank Node Management //
-    ///////////////////////////////////
+    // Hash to Blank Node Management
 
     /**
      * Maps a hash value to a specific blank node identifier.
@@ -116,9 +110,7 @@ public class CanonicalizationState {
         return Collections.unmodifiableList(sortedHashes);
     }
 
-    ////////////////////////////////////////
-    // Canonical Blank Node ID Management //
-    ////////////////////////////////////////
+    // Canonical Blank Node ID Management
 
     /**
      * Issues a canonical blank node identifier for a given blank node identifier.
@@ -164,9 +156,7 @@ public class CanonicalizationState {
         return this.canonicalIssuer.getIssuedIdentifierMap();
     }
 
-    ///////////////
     // To String //
-    ///////////////
 
     @Override
     public String toString() {

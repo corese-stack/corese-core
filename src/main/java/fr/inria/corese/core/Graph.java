@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -122,18 +123,18 @@ public class Graph extends GraphObject implements
     // edge Index for RuleEngine where edge are sorted newest first
     EdgeManagerIndexer ruleEdgeIndex;
     // predefined individual Node such as kg:default named graph
-    HashMap<String, Node> system;
+    private ConcurrentHashMap<String, Node> nodeSystem;
     // key -> URI Node ; member of graph nodes (subject/object)
-    Hashtable<String, Node> individual;
+    private ConcurrentHashMap<String, Node> individual;
     // label -> Blank Node ; member of graph nodes (subject/object)
-    Hashtable<String, Node> blank;
+    private ConcurrentHashMap<String, Node> nodeBlank;
     // Triple Reference Node
-    Hashtable<String, Node> triple;
+    private ConcurrentHashMap<String, Node> triple;
     // named graph id nodes: key -> named graph id Node (possibly not subject/object
     // Node)
-    Hashtable<String, Node> graph;
+    private ConcurrentHashMap<String, Node> graph;
     // property nodes: label -> property Node (possibly not subject/object Node)
-    Hashtable<String, Node> property;
+    private ConcurrentHashMap<String, Node> property;
     // key -> Node for value management in external memory
     Map<String, Node> vliteral;
     ValueResolver values;
@@ -247,15 +248,15 @@ public class Graph extends GraphObject implements
         // deprecated:
         vliteral = Collections.synchronizedMap(new HashMap<>());
         // URI Node
-        individual = new Hashtable<>();
+        individual = new ConcurrentHashMap<>();
         // Blank Node
-        blank = new Hashtable<>();
+        nodeBlank = new ConcurrentHashMap<>();
         // rdf star triple reference node
-        triple = new Hashtable<>();
+        triple = new ConcurrentHashMap<>();
         // Named Graph Node
-        graph = new Hashtable<>();
+        graph = new ConcurrentHashMap<>();
         // Property Node
-        property = new Hashtable<>();
+        property = new ConcurrentHashMap<>();
 
         // Index of nodes of named graphs
         // Use case: SPARQL Property Path
@@ -562,22 +563,22 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * System Node are predefined such as kg:default Node for default graph They
+     * nodeSystemNode are predefined such as kg:default Node for default graph They
      * have an index but they are not yet stored in any graph table but system
      * table They are retrieved by getResource, getNode, getGraph, getProperty
      * on demand
      */
     void initSystem() {
-        system = new HashMap<>();
+        nodeSystem= new ConcurrentHashMap<>();
         systemNode = new ArrayList<>();
         for (String uri : PREDEFINED) {
             Node n = createSystemNode(uri);
-            system.put(uri, n);
+            nodeSystem.put(uri, n);
             systemNode.add(n);
         }
-        defaultGraph = system.get(Entailment.DEFAULT);
-        ruleGraph = system.get(Entailment.RULE);
-        constraintGraph = system.get(Entailment.CONSTRAINT);
+        defaultGraph = nodeSystem.get(Entailment.DEFAULT);
+        ruleGraph = nodeSystem.get(Entailment.RULE);
+        constraintGraph = nodeSystem.get(Entailment.CONSTRAINT);
     }
 
     Node createSystemNode(String label) {
@@ -588,7 +589,7 @@ public class Graph extends GraphObject implements
     }
 
     Node getSystemNode(String name) {
-        return system.get(name);
+        return nodeSystem.get(name);
     }
 
     @Override
@@ -808,7 +809,7 @@ public class Graph extends GraphObject implements
         sb.appendPNL("kg:graph    ", graph.size());
         sb.appendPNL("kg:property ", getSubjectIndex().size());
         sb.appendPNL("kg:uri      ", individual.size());
-        sb.appendPNL("kg:bnode    ", blank.size());
+        sb.appendPNL("kg:bnode    ", nodeBlank.size());
         sb.appendPNL("kg:triple    ", triple.size());
         sb.appendPNL("kg:literal  ", getLiteralNodeManager().size());
         sb.appendPNL("kg:nodeManager  ", getNodeManager().isEffective());
@@ -834,7 +835,7 @@ public class Graph extends GraphObject implements
     }
 
     /**
-     * Generate an RDF Graph that describes the KGRAM system and the current RDF
+     * Generate an RDF Graph that describes the KGRAM nodeSystem and the current RDF
      * graph
      */
     public Graphable describe() {
@@ -1526,7 +1527,7 @@ public class Graph extends GraphObject implements
     }
 
     public int nbBlanks() {
-        return blank.size();
+        return nodeBlank.size();
     }
 
     public int nbTriples() {
@@ -1721,13 +1722,13 @@ public class Graph extends GraphObject implements
     }
 
     public Node getLiteralNode(IDatatype dt, boolean create, boolean add) {
-        String key = getKey(dt);
-        Node node = getLiteralNode(key, dt);
+        String keyString = getKey(dt);
+        Node node = getLiteralNode(keyString, dt);
         if (node != null) {
             return node;
         }
         if (create) {
-            node = createNode(key, dt);
+            node = createNode(keyString, dt);
             if (add) {
                 addLiteralNode(dt, node);
             }
@@ -1759,7 +1760,7 @@ public class Graph extends GraphObject implements
     // resource or blank
     public boolean isIndividual(Node node) {
         return individual.containsKey(getID(node))
-                || blank.containsKey(node.getLabel())
+                || nodeBlank.containsKey(node.getLabel())
                 || triple.containsKey(node.getLabel());
     }
 
@@ -1790,7 +1791,7 @@ public class Graph extends GraphObject implements
     }
 
     public Node getBlankNodeBasic(String name) {
-        return blank.get(name);
+        return nodeBlank.get(name);
     }
 
     // named graph id may be a bnode
@@ -1803,7 +1804,7 @@ public class Graph extends GraphObject implements
     }
 
     void addBlankNode(IDatatype dt, Node node) {
-        blank.put(node.getLabel(), node);
+        nodeBlank.put(node.getLabel(), node);
     }
 
     void addTripleNode(IDatatype dt, Node node) {
@@ -1887,8 +1888,8 @@ public class Graph extends GraphObject implements
             return node;
         }
         IDatatype dt = DatatypeMap.createResource(label);
-        String key = getID(label);
-        node = createNode(key, dt);
+        String keyString = getID(label);
+        node = createNode(keyString, dt);
         add(dt, node);
         return node;
     }
@@ -2152,10 +2153,10 @@ public class Graph extends GraphObject implements
 
     public Iterable<Edge> insert(Node s, Node p, Node o, List<Node> contexts) {
         if (contexts == null || contexts.isEmpty()) {
-            Edge edge = insert(s, p, o);
+            insert(s, p, o);
         } else {
             for (Node g : contexts) {
-                Edge edge = insert(g, s, p, o);
+                insert(g, s, p, o);
             }
         }
         return emptyEdgeList;
@@ -2163,10 +2164,10 @@ public class Graph extends GraphObject implements
 
     public Iterable<Edge> delete(Node s, Node p, Node o, List<Node> contexts) {
         if (contexts == null || contexts.isEmpty()) {
-            List<Edge> edge = delete(s, p, o);
+            delete(s, p, o);
         } else {
             for (Node g : contexts) {
-                List<Edge> edge = delete(g, s, p, o);
+                delete(g, s, p, o);
             }
         }
         return emptyEdgeList;
@@ -2274,7 +2275,7 @@ public class Graph extends GraphObject implements
             }
         }
         if (meta.isEmpty()) {
-            return new ArrayList<Edge>();
+            return new ArrayList<>();
         }
         return meta;
     }
@@ -2322,7 +2323,7 @@ public class Graph extends GraphObject implements
     }
 
     public List<Node> getList(Node node) {
-        List<Node> list = new ArrayList<Node>();
+        List<Node> list = new ArrayList<>();
         list(node, list);
         return list;
     }
@@ -2379,11 +2380,11 @@ public class Graph extends GraphObject implements
             Edge first = getEdge(RDF.FIRST, node, 0);
             Edge rest = getEdge(RDF.REST, node, 0);
             if (first == null || rest == null) {
-                return null;
+                return new ArrayList<>();
             }
             ArrayList<IDatatype> list = reclist(rest.getNode(1));
             if (list == null) {
-                return null;
+                return new ArrayList<>();
             }
             Node val = first.getNode(1);
 
@@ -2454,7 +2455,7 @@ public class Graph extends GraphObject implements
 
     // without NodeManager
     public Iterable<Edge> getSortedEdgesBasic(Node node, int n) {
-        MetaIterator<Edge> meta = new MetaIterator<Edge>();
+        MetaIterator<Edge> meta = new MetaIterator<>();
 
         for (Node pred : getSortedProperties()) {
             Iterable<Edge> it = getIndex(n).getEdges(pred, node);
@@ -2463,7 +2464,7 @@ public class Graph extends GraphObject implements
             }
         }
         if (meta.isEmpty()) {
-            return new ArrayList<Edge>();
+            return new ArrayList<>();
         }
         return meta;
     }
@@ -2614,14 +2615,14 @@ public class Graph extends GraphObject implements
     }
 
     public Iterable<Node> getBlankNodes() {
-        return blank.values();
+        return nodeBlank.values();
     }
 
     public Iterable<Node> getTripleNodes() {
         return triple.values();
     }
 
-    public Hashtable<String, Node> getTripleNodeMap() {
+    public Map<String, Node> getTripleNodeMap() {
         return triple;
     }
 
@@ -2911,7 +2912,7 @@ public class Graph extends GraphObject implements
     public List<Graph> split() {
 
         if (graph.size() == 1) {
-            ArrayList<Graph> list = new ArrayList<Graph>();
+            ArrayList<Graph> list = new ArrayList<>();
             list.add(this);
             return list;
         }
@@ -2928,7 +2929,7 @@ public class Graph extends GraphObject implements
             g.addEdgeWithNode(ent);
         }
 
-        ArrayList<Graph> list = new ArrayList<Graph>();
+        ArrayList<Graph> list = new ArrayList<>();
         for (Graph g : map.values()) {
             list.add(g);
         }
@@ -2938,7 +2939,7 @@ public class Graph extends GraphObject implements
     }
 
     public List<Edge> getEdgeList(Node n) {
-        ArrayList<Edge> list = new ArrayList<Edge>();
+        ArrayList<Edge> list = new ArrayList<>();
         for (Edge e : getEdges(n, 0)) {
             list.add(e);
         }
@@ -2949,7 +2950,7 @@ public class Graph extends GraphObject implements
      * Without rule entailment
      */
     public List<Edge> getEdgeListSimple(Node n) {
-        ArrayList<Edge> list = new ArrayList<Edge>();
+        ArrayList<Edge> list = new ArrayList<>();
         for (Edge e : getEdges(n, 0)) {
             if (!getProxy().isRule(e)) {
                 list.add(e);
@@ -2984,8 +2985,8 @@ public class Graph extends GraphObject implements
         }
 
         if (res != null) {
-            logger.info("" + edge);
-            logger.info("" + res);
+            logger.info("{}", edge);
+            logger.info("{}", res);
             deleted(res);
         }
         return res;
@@ -3011,8 +3012,8 @@ public class Graph extends GraphObject implements
         }
 
         if (res != null) {
-            logger.info("" + edge.getEdgeLabel());
-            logger.info("" + res);
+            logger.info("Edge label: {}", edge.getEdgeLabel());
+            logger.info("Result: {}", res);
             deleted(res);
         }
         return res;
@@ -3100,7 +3101,7 @@ public class Graph extends GraphObject implements
 
     void clearNodes() {
         individual.clear();
-        blank.clear();
+        nodeBlank.clear();
         triple.clear();
         getLiteralNodeManager().clear();
         property.clear();
@@ -3390,8 +3391,8 @@ public class Graph extends GraphObject implements
             e = fac.create(source, predicate, list);
         }
 
-        Edge ee = addEdge(e);
-        return ee;
+        e = addEdge(e);
+        return e;
     }
 
     /**
@@ -3536,7 +3537,8 @@ public class Graph extends GraphObject implements
         // labels
         // they should have different ID
         if (dt.isDate()) {
-            if (DatatypeMap.getTZ(dt).equals("Z")) {
+            Object tz = DatatypeMap.getTZ(dt);
+            if (tz != null && "Z".equals(tz.toString())) {
                 return String.format("d%s", n.getIndex());
             }
         }

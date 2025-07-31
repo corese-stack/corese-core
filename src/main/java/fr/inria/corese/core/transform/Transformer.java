@@ -1,38 +1,19 @@
 package fr.inria.corese.core.transform;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import fr.inria.corese.core.compiler.eval.Interpreter;
-import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.query.QueryEngine;
-import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
+import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.ExprType;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Memory;
+import fr.inria.corese.core.kgram.core.*;
 import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.kgram.core.SparqlException;
 import fr.inria.corese.core.kgram.filter.Extension;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.query.QueryEngine;
+import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.api.TransformProcessor;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
@@ -41,14 +22,21 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.script.Funcall;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.sparql.triple.parser.Context;
-import fr.inria.corese.core.sparql.triple.parser.Dataset;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.sparql.triple.parser.Processor;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+
+import java.util.HashMap;
+import java.util.List;
+
 
 /**
  * SPARQL Template Transformation Engine
@@ -67,68 +55,10 @@ public class Transformer implements TransformProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(Transformer.class);
 
-    private static final String NULL = "";
-    private static final String STL = NSManager.STL;
-    public static final String SQL = STL + "sql";
-    public static final String SPIN = STL + "spin";
-    public static final String TOSPIN = STL + "tospin";
-    public static final String OWL = STL + "owl";
-    public static final String OWLRL = STL + "owlrl";
-    public static final String OWL_RL = STL + "owlrl";
-    public static final String OWL_EL = STL + "owleltc";
-    public static final String OWL_QL = STL + "owlqltc";
-    public static final String OWL_TC = STL + "owltc";
-
-    public static final String OWL_MAIN = STL + "main";
-
-    public static final String PP_ERROR = STL + "pperror";
-    public static final String PP_ERROR_MAIN = STL + "main";
-    public static final String PP_ERROR_DISPLAY = STL + "display";
-    public static final String DATASHAPE = STL + "dsmain";
-    public static final String TEXT = STL + "text";
-    public static final String TURTLE = STL + "turtle";
-    public static final String TURTLE_HTML = STL + "hturtle";
-    public static final String RDFXML = STL + "rdfxml";
-    public static final String ALL = STL + "all";
-    public static final String XML = STL + "xml";
-    public static final String RDF = STL + "rdf";
-    public static final String JSON = STL + "json";
-    public static final String JSON_LD = STL + "jsonld";
-    public static final String TRIG = STL + "trig";
-    public static final String TABLE = STL + "table";
-    public static final String HTML = STL + "html";
-    public static final String SPARQL = STL + "sparql";
-    public static final String RDFRESULT = STL + "result";
-    public static final String NAVLAB = STL + "navlab";
-    public static final String RDFTYPECHECK = STL + "rdftypecheck";
-    public static final String SPINTYPECHECK = STL + "spintypecheck";
-    public static final String STL_PROFILE = STL + "profile";
-    public static final String STL_START = STL + "start";
-    public static final String STL_MAIN = STL + "main";
-    public static final String STL_TRACE = STL + "trace";
-    public static final String STL_DEFAULT = Processor.STL_DEFAULT;
-    public static final String STL_DEFAULT_NAMED = STL + "defaultNamed";
-    public static final String STL_OPTIMIZE = STL + "optimize";
-    public static final String STL_IMPORT = STL + "import";
-    public static final String STL_PROCESS = Processor.STL_PROCESS;
-    public static final String STL_AGGREGATE = Processor.STL_AGGREGATE;
-    public static final String STL_TRANSFORM = Context.STL_TRANSFORM;
-    public static final String STL_PREFIX = Context.STL_PREFIX;
-    public static final String D3 = NSManager.D3;
-    public static final String D3_ALL = D3 + "all";
-
-    public static final String[] RESULT_FORMAT = { XML, JSON, RDF };
-    public static final String[] GRAPHIC_FORMAT = { D3 + "graphic", D3 + "hierarchy" };
-
-    // default
-    public static final String PPRINTER = TURTLE;
-    private static final String OUT = ASTQuery.OUT;
-    public static final String IN = ASTQuery.IN;
-    public static final String IN2 = ASTQuery.IN2;
     private static final String NL = "\n";
     private static boolean isOptimizeDefault = false;
     private static boolean isExplainDefault = false;
-    public static int count = 0;
+    public int count = 0;
     static HashMap<String, Boolean> dmap;
     // private TemplateVisitor visitor;
     TransformerMapping tmap;
@@ -138,11 +68,10 @@ public class Transformer implements TransformProcessor {
     NSManager nsm;
     QueryProcess exec;
     private Mapping mapping;
-    private Mappings map;
-    private Dataset ds;
+
     Stack stack;
     static Table table;
-    String pp = PPRINTER;
+    String pp = TransformerUtils.PPRINTER;
     // separator of results of several templates st:apply-all-templates()
     String sepTemplate = NL;
     // separator of several results of one template
@@ -152,16 +81,14 @@ public class Transformer implements TransformProcessor {
     boolean isTurtle = false;
     int nbt = 0, max = 0, levelMax = Integer.MAX_VALUE, level = 0;
 
-    String start = STL_START;
+    String start = TransformerUtils.STL_START;
     HashMap<Query, Integer> tcount;
     HashMap<String, String> loaded, imported;
     // table of nested transformers for apply-templates-with
     // templates share this table
     // sub transformers share same table recursively
     private HashMap<String, Transformer> transformerMap;
-    private Binding binding;
-    // table accessible using st:set/st:get
-    private Context context;
+
     private QuerySolverVisitorTransformer eventVisitor;
     private boolean isHide = false;
     public boolean stat = !true;
@@ -181,6 +108,8 @@ public class Transformer implements TransformProcessor {
     // used when all templates fail
     // default is: return RDF term as is (effect is like xsd:string)
     private int defaut = ExprType.TURTLE;
+
+    private ContextManager contextManager;
 
     static {
         table = new Table();
@@ -202,38 +131,41 @@ public class Transformer implements TransformProcessor {
     void init(QueryProcess qp, String p, Level level) throws LoadException {
         setAccessLevel(level);
         setEvent(Access.accept(Feature.EVENT, level));
-        setContext(new Context());
         setTransformation(p);
-        set(qp);
-        nsm = NSManager.create();
+        set(qp); // This sets 'graph' and 'exec'
+
+        // 1. Initialize NSManager
+        this.nsm = NSManager.create();
+        // 2. Initialize TransformerMapping (needs graph from qp)
+        this.tmap = new TransformerMapping(qp.getGraph());
+        // 3. Initialize ContextManager (needs tmap and nsm)
+        this.contextManager = new ContextManager(this.tmap, this.nsm);
+
+        // Defensive null check for contextManager
+        if (this.contextManager == null) {
+            logger.error("Failed to instantiate ContextManager. It is null after constructor call.");
+            throw new LoadException("Initialization failed: ContextManager is null.");
+        }
+
+        // 4. Set context for ContextManager
+        this.contextManager.setContext(new Context());
+
         transformerMap = new HashMap<>();
         stack = new Stack(this, true);
-        EMPTY = DatatypeMap.newLiteral(NULL);
+        EMPTY = DatatypeMap.newLiteral(TransformerUtils.NULL);
         tcount = new HashMap<>();
         loaded = new HashMap<>();
         imported = new HashMap<>();
-        tmap = new TransformerMapping(qp.getGraph());
+
         try {
             setEventVisitor(QuerySolverVisitorTransformer.create(this, qp.getCreateEval()));
         } catch (EngineException ex) {
             logger.error(ex.getMessage());
         }
-        init(level);
+        init(level); // This calls the other init(Level) method
     }
 
-    /**
-     * Definition of synonym
-     * st:all -> (st:xml st:json ...)
-     */
-    static public List<String> getFormatList(String name) {
-        switch (name) {
-            case ALL:
-                return Arrays.asList(RESULT_FORMAT);
-            case D3_ALL:
-                return Arrays.asList(GRAPHIC_FORMAT);
-        }
-        return null;
-    }
+
 
     void initMap() {
         Query q = getTemplate(start);
@@ -284,7 +216,7 @@ public class Transformer implements TransformProcessor {
      */
     public static Transformer create(Graph g, Mappings map, String p) {
         Transformer t = create(g, p);
-        t.setMappings(map);
+        t.contextManager.setMappings(map);
         t.initMap();
         return t;
     }
@@ -306,15 +238,15 @@ public class Transformer implements TransformProcessor {
     }
 
     public static String turtle(Graph g) throws EngineException {
-        return create(g, TURTLE).transform();
+        return create(g, TransformerUtils.TURTLE).transform();
     }
 
     public static String rdfxml(Graph g) throws EngineException {
-        return create(g, RDFXML).transform();
+        return create(g, TransformerUtils.RDFXML).transform();
     }
 
     public static String json(Graph g) throws EngineException {
-        return create(g, JSON).transform();
+        return create(g, TransformerUtils.JSON).transform();
     }
 
     /**
@@ -354,7 +286,7 @@ public class Transformer implements TransformProcessor {
         }
 
         Transformer t = Transformer.create(gg);
-        t.setDataset(ds);
+        t.contextManager.setDataset(ds);
         t.setTemplates(trans, level);
         return t;
     }
@@ -403,11 +335,12 @@ public class Transformer implements TransformProcessor {
     }
 
     public void write(String name) throws IOException {
-        FileWriter fw = new FileWriter(name);
-        String str = toString();
-        fw.write(str);
-        fw.flush();
-        fw.close();
+        try (final FileWriter fw = new FileWriter(name);
+             final BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
+            String str = toString();
+            bufferedWriter.write(str);
+            bufferedWriter.flush();
+        }
     }
 
     public void write(OutputStream out) throws IOException {
@@ -420,7 +353,8 @@ public class Transformer implements TransformProcessor {
     }
 
     public void setNSM(NSManager n) {
-        nsm = n;
+        this.nsm = n;
+
     }
 
     public NSManager getNSM() {
@@ -509,7 +443,7 @@ public class Transformer implements TransformProcessor {
     void setStarter(String uri) {
         String name = getName(uri);
         if (name != null) {
-            setStart(STL + name);
+            setStart(TransformerUtils.STL + name);
         }
     }
 
@@ -530,20 +464,10 @@ public class Transformer implements TransformProcessor {
         if (name == null) {
             return null;
         }
-        return STL + name;
+        return TransformerUtils.STL + name;
     }
 
-    /**
-     * uri#name
-     *
-     * @return uri
-     */
-    public static String getURI(String uri) {
-        if (uri != null && uri.contains("#")) {
-            return uri.substring(0, uri.indexOf("#"));
-        }
-        return uri;
-    }
+
 
     private void tune(QueryProcess exec) {
         exec.setListPath(true);
@@ -644,15 +568,15 @@ public class Transformer implements TransformProcessor {
      * Otherwise, apply the first template that matches without bindings.
      */
     public IDatatype process() throws EngineException {
-        if (getBinding() != null) {
-            return process(getBinding());
+        if (contextManager.getBinding() != null) {
+            return process(contextManager.getBinding());
         }
         return process(null, false, null, null, null);
     }
 
     public IDatatype process(Binding b) throws EngineException {
         if (b != null) {
-            setBinding(b);
+            contextManager.setBinding(b);
         }
         return process(null, false, null, null, (b == null) ? null : Mapping.create(b));
     }
@@ -698,9 +622,9 @@ public class Transformer implements TransformProcessor {
                 // remember start with qq for function pprint below
                 query = qq;
                 if (query.getName() != null) {
-                    context.setURI(STL_START, qq.getName());
+                    contextManager.getContext().setURI(TransformerUtils.STL_START, qq.getName());
                 } else {
-                    context.set(STL_START, (String) null);
+                    contextManager.getContext().set(TransformerUtils.STL_START, (String) null);
                 }
 
                 Mappings map = exec.query(qq, m);
@@ -770,12 +694,11 @@ public class Transformer implements TransformProcessor {
 
     /**
      * Record Binding in case of Workflow: next WorkflowProcess can get Binding
-     * 
-     * @param map
+     * * @param map
      */
     void save(Mappings map) {
-        if (getBinding() == null && map.getBinding() != null) {
-            setBinding(map.getBinding());
+        if (contextManager.getBinding() == null && map.getBinding() != null) {
+            contextManager.setBinding(map.getBinding());
         }
     }
 
@@ -799,7 +722,7 @@ public class Transformer implements TransformProcessor {
 
     @Override
     public boolean isStart() {
-        return query != null && query.getName() != null && query.getName().equals(STL_START);
+        return query != null && query.getName() != null && query.getName().equals(TransformerUtils.STL_START);
     }
 
     public IDatatype process(Node node) throws EngineException {
@@ -826,7 +749,7 @@ public class Transformer implements TransformProcessor {
         return process(temp, false, null, null, Mapping.create(b), ldt[0], (ldt.length == 1) ? null : ldt);
     }
 
-    public static int getCount() {
+    public int getCount() {
         return count;
     }
 
@@ -864,7 +787,7 @@ public class Transformer implements TransformProcessor {
         try {
             if (level() >= levelMax) {
                 // return defaut(dt, q);
-                IDatatype res = eval(STL_DEFAULT, dt, (isBoolean() ? defaultBooleanResult() : turtle(dt)), env);
+                IDatatype res = eval(TransformerUtils.STL_DEFAULT, dt, (isBoolean() ? defaultBooleanResult() : turtle(dt)), env);
                 afterTransformer(astart, res);
                 return res;
             }
@@ -970,12 +893,12 @@ public class Transformer implements TransformProcessor {
             if (temp != null) {
                 // named template does not match focus node dt
                 // try funcall st:defaultNamed(dt)
-                IDatatype res = eval(STL_DEFAULT_NAMED, dt, (isBoolean() ? defaultBooleanResult() : EMPTY), env);
+                IDatatype res = eval(TransformerUtils.STL_DEFAULT_NAMED, dt, (isBoolean() ? defaultBooleanResult() : EMPTY), env);
                 afterTransformer(astart, res);
                 return res;
             } else if (isHasDefault()) {
                 // apply named template st:default
-                IDatatype res = process(STL_DEFAULT, allTemplates, sep, exp, env, dt, args);
+                IDatatype res = process(TransformerUtils.STL_DEFAULT, allTemplates, sep, exp, env, dt, args);
                 if (res != EMPTY) {
                     afterTransformer(astart, res);
                     return res;
@@ -984,7 +907,7 @@ public class Transformer implements TransformProcessor {
 
             // return a default result (may be dt)
             // may be overloaded by function st:default(?x) { st:turtle(?x) }
-            IDatatype res = eval(STL_DEFAULT, dt, (isBoolean() ? defaultBooleanResult() : turtle(dt)), env);
+            IDatatype res = eval(TransformerUtils.STL_DEFAULT, dt, (isBoolean() ? defaultBooleanResult() : turtle(dt)), env);
             afterTransformer(astart, res);
             return res;
         } finally {
@@ -1056,6 +979,11 @@ public class Transformer implements TransformProcessor {
         return qe.getTemplate(name) != null;
     }
 
+    @Override
+    public Mappings getMappings() {
+        return contextManager.getMappings();
+    }
+
     /**
      * use case: result of st:apply-templates-all() list = list of ?out results
      * of templates create Mappings (?out = value) apply st:aggregate(?out) on
@@ -1074,7 +1002,7 @@ public class Transformer implements TransformProcessor {
             mem.setEval(env.getEval());
         }
         mem.init(tq);
-        Node out = tq.getExtNode(OUT, true);
+        Node out = tq.getExtNode(TransformerUtils.OUT, true);
         Mappings map = Mappings.create(tq);
         for (Node node : list) {
             map.add(Mapping.create(out, node));
@@ -1240,21 +1168,21 @@ public class Transformer implements TransformProcessor {
      * display RDF Node in its Turtle syntax
      */
     public IDatatype turtle(IDatatype dt) {
-        return nsm.turtle(dt, false);
+        return contextManager.getNSM().turtle(dt, false);
     }
 
     /**
      * force = true: if no prefix generate prefix
      */
     public IDatatype turtle(IDatatype dt, boolean force) {
-        return nsm.turtle(dt, force);
+        return contextManager.getNSM().turtle(dt, force);
     }
 
     /**
      * if prefix exists, return qname, else return URI as is (without &lt;>)
      */
     public IDatatype qnameURI(IDatatype dt) {
-        String uri = nsm.toPrefix(dt.getLabel(), true);
+        String uri = contextManager.getNSM().toPrefix(dt.getLabel(), true);
         return DatatypeMap.newStringBuilder(uri);
     }
 
@@ -1286,7 +1214,7 @@ public class Transformer implements TransformProcessor {
         setOptimize(table.isOptimize(pp));
         qe = QueryEngine.create(graph);
         Loader load = new Loader(this, qe);
-        load.setDataset(ds);
+        load.setDataset(contextManager.getDataset());
         load.setLevel(level);
         load.load(getTransformation());
         // templates share profile functions
@@ -1297,10 +1225,10 @@ public class Transformer implements TransformProcessor {
         if (isCheck()) {
             check();
         }
-        setHasDefault(qe.getTemplate(STL_DEFAULT) != null);
-        Query profile = qe.getTemplate(STL_PROFILE);
+        setHasDefault(qe.getTemplate(TransformerUtils.STL_DEFAULT) != null);
+        Query profile = qe.getTemplate(TransformerUtils.STL_PROFILE);
         if (profile != null && profile.getExtension() != null) {
-            Expr exp = profile.getExtension().get(STL_AGGREGATE);
+            Expr exp = profile.getExtension().get(TransformerUtils.STL_AGGREGATE);
             if (exp != null) {
                 defAggregate = exp.getBody().oper();
             }
@@ -1327,13 +1255,6 @@ public class Transformer implements TransformProcessor {
         }
     }
 
-    /**
-     * *************************************************************
-     *
-     * Check templates that would never succeed
-     *
-     **************************************************************
-     */
     /**
      * Check if a template edges not exist in graph remove those templates from
      * the list to speed up PRAGMA: does not take RDFS entailments into account
@@ -1392,45 +1313,12 @@ public class Transformer implements TransformProcessor {
         this.hasDefault = hasDefault;
     }
 
-    public Dataset getDataset() {
-        return ds;
-    }
 
-    public void setDataset(Dataset dataset) {
-        this.ds = dataset;
-    }
 
     public String getTransformation() {
         return pp;
     }
 
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-        initContext();
-    }
-
-    /**
-     * Define prefix from Context slot st:prefix = ((ns uri))
-     */
-    void initContext() {
-        if (getContext() != null) {
-            if (getContext().hasValue(STL_PREFIX)) {
-                definePrefix();
-            }
-        }
-    }
-
-    void definePrefix() {
-        for (IDatatype def : getContext().get(STL_PREFIX).getValueList()) {
-            if (def.isList() && def.size() >= 2) {
-                getNSM().definePrefix(def.get(0).getLabel(), def.get(1).getLabel());
-            }
-        }
-    }
 
     /**
      * Query q is the calling template/query
@@ -1443,8 +1331,8 @@ public class Transformer implements TransformProcessor {
         Context c = getContext(q, ct);
         if (c != null) {
             // inherit context exported properties:
-            getContext().complete(c);
-            init(getContext());
+            contextManager.getContext().complete(c);
+            init(contextManager.getContext());
         }
         if (ct != null) {
             complete(ct);
@@ -1499,7 +1387,7 @@ public class Transformer implements TransformProcessor {
             return q.getContext();
 
         } else {
-            return ct.getContext();
+            return ct.contextManager.getContext();
         }
     }
 
@@ -1513,8 +1401,8 @@ public class Transformer implements TransformProcessor {
     }
 
     public TemplateVisitor getVisitor() {
-        if (getBinding() != null) {
-            return (TemplateVisitor) getBinding().getTransformerVisitor();
+        if (contextManager.getBinding() != null) {
+            return (TemplateVisitor) contextManager.getBinding().getTransformerVisitor();
         }
         return null;
     }
@@ -1527,21 +1415,9 @@ public class Transformer implements TransformProcessor {
         this.transformerMap = transformerMap;
     }
 
-    public Binding getBinding() {
-        return binding;
-    }
-
-    public void setBinding(Binding binding) {
-        this.binding = binding;
-    }
-
-    @Override
-    public Mappings getMappings() {
-        return map;
-    }
-
-    public void setMappings(Mappings map) {
-        this.map = map;
+    // Added public getter for contextManager
+    public ContextManager getContextManager() {
+        return contextManager;
     }
 
     public QuerySolverVisitorTransformer getEventVisitor() {

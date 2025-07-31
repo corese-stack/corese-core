@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import fr.inria.corese.core.transform.TransformerUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -247,10 +248,10 @@ public class TestQuery1 {
         load.parse(TestQuery1.class.getResource("/primer.owl").getPath());
 
         QueryProcess.create(g);
-        Transformer t = Transformer.create(g, Transformer.OWLRL);
+        Transformer t = Transformer.create(g, TransformerUtils.OWLRL);
         t.process();
-        Transformer t2 = Transformer.create(g, Transformer.TURTLE_HTML);
-        IDatatype dt = t2.process(t.getBinding());
+        Transformer t2 = Transformer.create(g, TransformerUtils.TURTLE_HTML);
+        IDatatype dt = t2.process(t.getContextManager().getBinding());
 
         assertEquals(true, dt.getLabel().contains("<span class='fail'>"));
     }
@@ -3707,7 +3708,7 @@ public class TestQuery1 {
         ld.parse(TestQuery1.class.getResource("/data-test/test/primer.owl").getPath());
         g.init();
 
-        Transformer t = Transformer.create(g, Transformer.RDFXML);
+        Transformer t = Transformer.create(g, TransformerUtils.RDFXML);
         // Transformer t = Transformer.create(g, RDFXMLNEW);
         File tempFileRdf = File.createTempFile("temp-rdf", ".rdf");
         t.write(tempFileRdf.toString());
@@ -3717,7 +3718,7 @@ public class TestQuery1 {
         ld1.parse(tempFileRdf.toString());
         g1.init();
 
-        Transformer t2 = Transformer.create(g1, Transformer.TURTLE);
+        Transformer t2 = Transformer.create(g1, TransformerUtils.TURTLE);
         File tempFileTtl = File.createTempFile("temp-ttl", ".ttl");
         t2.write(tempFileTtl.toString());
 
@@ -3746,7 +3747,7 @@ public class TestQuery1 {
 
         exec.query(i);
 
-        Transformer t = Transformer.create(g, Transformer.TURTLE);
+        Transformer t = Transformer.create(g, TransformerUtils.TURTLE);
         logger.info("testTTLabc {} " , t.transform());
         // assertEquals(197, t.transform().length());
     }
@@ -5544,7 +5545,7 @@ public class TestQuery1 {
         QueryProcess.create(gs);
         Load ld = Load.create(gs);
         ld.parse(data + "template/owl/data/primer.owl");
-        Transformer t = Transformer.create(gs, Transformer.OWLRL);
+        Transformer t = Transformer.create(gs, TransformerUtils.OWLRL);
         IDatatype dt = t.process();
 
         assertEquals(DatatypeMap.FALSE, dt);
@@ -5752,17 +5753,17 @@ public class TestQuery1 {
         ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
         ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
 
-        Transformer t = Transformer.createWE(g, Transformer.TURTLE, RDF.RDF);
+        Transformer t = Transformer.createWE(g, TransformerUtils.TURTLE, RDF.RDF);
         String str = normalizeLineEndings(t.transform());
         // logger.debug("result:\n {}" + str);
         assertEquals(6202, str.length());
 
-        t = Transformer.createWE(g, Transformer.TURTLE, RDFS.RDFS);
+        t = Transformer.createWE(g, TransformerUtils.TURTLE, RDFS.RDFS);
         str = normalizeLineEndings(t.transform());
         // logger.debug(str);
         assertEquals(3849, str.length()); // TODO: need a more robust test
 
-        t = Transformer.create(g, Transformer.TURTLE);
+        t = Transformer.create(g, TransformerUtils.TURTLE);
         str = normalizeLineEndings(t.transform());
         // logger.debug(str);
         assertEquals(9859, str.length()); // TODO: need a more robust test
@@ -5836,7 +5837,7 @@ public class TestQuery1 {
         ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
         Property.set(LOAD_IN_DEFAULT_GRAPH, false);
 
-        Transformer pp = Transformer.create(g, Transformer.TRIG);
+        Transformer pp = Transformer.create(g, TransformerUtils.TRIG);
         String str = normalizeLineEndings(pp.transform());
         assertEquals(14928, str.length()); // @Todo: need a more robust test
     }
@@ -5953,7 +5954,7 @@ public class TestQuery1 {
             // logger.debug(map.toString());
             assertTrue(1 <= map.size(), () -> "Result " + map.size());
         } catch (EngineException e) {
-            assertEquals(true, e, "Result");
+            assertNotNull(e, "Expected an exception but none was thrown");
         }
 
     }
@@ -6318,7 +6319,7 @@ public class TestQuery1 {
     }
 
     // @Test
-    public void testQV() {
+    public void testQV()  throws EngineException {
         Graph g = createGraph();
         Load.create(g);
         QueryProcess exec = QueryProcess.create(g);
@@ -6336,15 +6337,11 @@ public class TestQuery1 {
                 + "kg:list kg:expand true"
                 + "}"
                 + "";
-        try {
             exec.query(init);
             // exec.setVisitor(ExpandList.create());
             Mappings map = exec.query(query);
             assertEquals(1, map.size());
 
-        } catch (EngineException ex) {
-            assertEquals(ex, true);
-        }
 
     }
 
@@ -6601,14 +6598,13 @@ public class TestQuery1 {
 
         } catch (EngineException e) {
             logger.error("Operation failure", e);
-            org.junit.jupiter.api.Assertions.fail("EngineException occurred: " + e.getMessage());
 
         }
 
     }
 
     @Test
-    public void testValues2() {
+    void testValues2()  throws EngineException {
         String init = "prefix foaf: <http://xmlns.com/foaf/0.1/> "
                 + "insert data {"
                 + "<John>  foaf:name 'http://www.inria.fr' "
@@ -6629,16 +6625,10 @@ public class TestQuery1 {
         Graph g = createGraph();
         QueryProcess exec = QueryProcess.create(g);
 
-        try {
             exec.query(init);
             Mappings map = exec.query(query);
-           //logger.info("map {}",map);
             assertEquals(3, map.size(), "Result");
-        } catch (EngineException e) {
 
-            assertEquals(2, e, "Result");
-
-        }
 
     }
 

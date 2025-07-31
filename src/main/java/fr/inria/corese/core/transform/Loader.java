@@ -152,7 +152,7 @@ public class Loader {
     
     // remove #
     String clean(String uri){
-        return Transformer.getURI(uri);
+        return TransformerUtils.getURI(uri);
     }
         
 

@@ -73,7 +73,7 @@ public class TransformationProcess extends WorkflowProcess {
             res.setDatatypeValue(dt);
         }
         res.setProcess(this);
-        res.setBinding(t.getBinding());
+        res.setBinding(t.getContextManager().getBinding());
         complete(t, data, res);
         return res;
     }
@@ -85,10 +85,10 @@ public class TransformationProcess extends WorkflowProcess {
 
     void init(Transformer t, Data data, Context c) {
         if (c != null) {
-            t.setContext(c);
+            t.getContextManager().setContext(c);
         }
         if (data.getMappings() != null) {
-            t.getContext().set(Context.STL_MAPPINGS, DatatypeMap.createObject(data.getMappings()));
+            t.getContextManager().getContext().set(Context.STL_MAPPINGS, DatatypeMap.createObject(data.getMappings()));
         }
     }
 

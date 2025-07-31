@@ -19,6 +19,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.transform.DefaultVisitor;
 import fr.inria.corese.core.transform.TemplateVisitor;
 import fr.inria.corese.core.transform.Transformer;
+import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +134,7 @@ public class PluginTransform implements ComputerProxy {
      */
     Context getTransformerContext(Binding b, Environment env, Producer p) throws EngineException {
         Transformer t = getTransformerCurrent(b, env, p);
-        return t.getContext();
+        return t.getContextManager().getContext();
     }
 
     /**
@@ -213,7 +214,7 @@ public class PluginTransform implements ComputerProxy {
     void complete(Query q, Transformer t, IDatatype uri) {
         t.complete(q, (Transformer) q.getTransformer());
         if (uri != null) {
-            t.getContext().set(Transformer.STL_TRANSFORM, uri);
+            t.getContextManager().getContext().set(TransformerUtils.STL_TRANSFORM, uri);
         }
     }
 

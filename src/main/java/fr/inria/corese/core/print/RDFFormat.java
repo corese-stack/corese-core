@@ -205,11 +205,12 @@ public class RDFFormat {
     }
 
     public void write(String name) throws IOException {
+
         StringBuilder sb = getStringBuilder();
-        FileOutputStream fos = new FileOutputStream(name);
-        Writer out = new OutputStreamWriter(fos); // , "UTF8");
-        out.write(sb.toString());
-        out.close();
+        try (final FileOutputStream fos = new FileOutputStream(name);
+             final Writer out = new OutputStreamWriter(fos)) {
+            out.write(sb.toString());
+        }
     }
 
     public void write(OutputStream out) throws IOException {
