@@ -92,9 +92,9 @@ object Meta {
 java {
     withJavadocJar()                             // Include Javadoc JAR in publications
     withSourcesJar()                             // Include sources JAR in publications
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(21))
-  }
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 /////////////////////////
@@ -114,7 +114,7 @@ dependencies {
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
 
     // === Core dependencies ===
-    api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
+    api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                                        // RDF/XML parser (Jena ARP)
     implementation("fr.inria.corese.org.semarglproject:semargl-rdfa:0.7.2")            // RDFa parser (Semargl)
     implementation("com.github.jsonld-java:jsonld-java:0.13.4")                        // JSON-LD processing
 
@@ -122,24 +122,26 @@ dependencies {
     antlr("org.antlr:antlr4:4.13.2")                                                   // Antlr for parsing (ANTLR 4)
     implementation("org.antlr:antlr4-runtime:4.13.2")                                  // Antlr runtime for parsing
 
-
-    // === JSONLD
-    implementation("com.apicatalog:titanium-json-ld:1.6.0")
-    implementation("com.apicatalog:titanium-rdf-api:1.0.0")
-    implementation("org.eclipse.parsson:parsson:1.1.7")
-    implementation("jakarta.json:jakarta.json-api:2.1.3")
-
     // === HTTP and XML ===
     implementation("org.glassfish.jersey.core:jersey-client:3.1.10")                   // HTTP client (Jersey)
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")                    // Dependency injection for Jersey
     implementation("com.sun.activation:jakarta.activation:2.0.1")                      // MIME type handling (Jakarta Activation)
 
+    // === JSONLD Parsing ===
+    implementation("com.apicatalog:titanium-json-ld:1.6.0")                            // JSON-LD processing library
+    implementation("com.apicatalog:titanium-rdf-api:1.0.0")                            // Titanium RDF API for JSON-LD processing
+    implementation("org.eclipse.parsson:parsson:1.1.7")                                // JSON parser for JSON-LD
+    implementation("jakarta.json:jakarta.json-api:2.1.3")                              // Jakarta JSON API for JSON processing
+
+
+    // === XML parsing ===
+    implementation("com.typesafe.akka:akka-stream_2.13:2.6.20")                        // Akka Streams for reactive streams processing
+    implementation("com.lightbend.akka:akka-stream-alpakka-xml_2.13:3.0.4")            // Alpakka XML for XML processing with Akka Streams
+
     // === Utilities ===
     implementation("org.apache.commons:commons-text:1.13.1")                           // Text manipulation utilities (Commons Text)
     implementation("org.json:json:20250517")                                           // JSON processing
     implementation("com.typesafe:config:1.4.3")                                        // Configuration library (Typesafe Config)
-
-
 
     // === Test dependencies ===
     testImplementation(platform("org.junit:junit-bom:5.13.2"))                         // JUnit BOM for consistent test versions
