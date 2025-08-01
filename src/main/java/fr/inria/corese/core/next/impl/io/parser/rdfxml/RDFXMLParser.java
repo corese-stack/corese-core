@@ -182,16 +182,34 @@ public class RDFXMLParser extends AbstractRDFParser {
         cleanEndElement(uri, localName);
     }
 
+    /**
+     * Updates the base URI for IRI resolution using the xml:base attribute if present.
+     *
+     * @param attrs the XML attributes of the current element
+     */
     private void updateBase(Attributes attrs) {
         String xmlBase = attrs.getValue("xml:base");
         if (xmlBase != null) ctx.baseURI = xmlBase;
     }
 
+    /**
+     * Updates the language context using the xml:lang attribute if present.
+     * The language value is pushed onto a stack to support nested scope.
+     *
+     * @param attrs the XML attributes of the current element
+     */
     private void updateLang(Attributes attrs) {
         String xmlLang = attrs.getValue("xml:lang");
         if (xmlLang != null) ctx.langStack.push(xmlLang);
     }
 
+
+    /**
+     * Updates the datatype context using the rdf:datatype attribute if present.
+     * The datatype URI is pushed onto a stack to support nested scope.
+     *
+     * @param attrs the XML attributes of the current element
+     */
     private void updateDatatype(Attributes attrs) {
         String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
         if (datatype != null) {
@@ -199,6 +217,16 @@ public class RDFXMLParser extends AbstractRDFParser {
         }
     }
 
+    /**
+     * Processes the start of an RDF collection indicated by parseType="Collection".
+     * Initializes the internal collection structures and returns true if this is a collection.
+     *
+     * @param localName the local name of the element
+     * @param uri       the namespace URI
+     * @param qName     the qualified name
+     * @param attrs     the attributes of the element
+     * @return true if this element starts a collection, false otherwise
+     */
     private boolean processCollectionStart(String localName, String uri, String qName, Attributes attrs) {
         if (!"Collection".equals(getParseType(attrs))) return false;
         IRI predicate = ctx.factory.createIRI(RDFXMLUtils.expandQName(uri, localName, qName));
@@ -206,6 +234,11 @@ public class RDFXMLParser extends AbstractRDFParser {
         return true;
     }
 
+    /**
+     * Prepares internal context to collect RDF list elements for a collection.
+     *
+     * @param predicate the predicate that points to the collection
+     */
     private void prepareCollection(IRI predicate) {
         ctx.predicateStack.push(predicate);
         ctx.collectionSubject = ctx.subjectStack.peek();
@@ -214,6 +247,14 @@ public class RDFXMLParser extends AbstractRDFParser {
         ctx.inCollection = true;
     }
 
+    /**
+     * Processes an item inside an RDF collection. Adds the extracted subject to the collection list.
+     *
+     * @param localName the local name of the element
+     * @param uri       the namespace URI
+     * @param attrs     the attributes of the element
+     * @return true if the element is processed as a collection item, false otherwise
+     */
     private boolean processCollectionItem(String localName, String uri, Attributes attrs) {
         if (!ctx.inCollection || !RDFXMLUtils.isDescription(localName, uri)) return false;
 
@@ -224,6 +265,16 @@ public class RDFXMLParser extends AbstractRDFParser {
         return true;
     }
 
+    /**
+     * Processes RDF container elements like rdf:Bag, rdf:Seq, and code rdf:Alt,
+     * as well as container items like rdf:li and rdf:_n.
+     *
+     * @param localName the local name of the element
+     * @param uri       the namespace URI
+     * @param qName     the qualified name
+     * @param attrs     the attributes of the element
+     * @return true if the element is a container or container item, false otherwise
+     */
     private boolean processContainerElement(String localName, String uri, String qName, Attributes attrs) {
         // --- RDF Container Element ---
         if (isContainer(localName, uri)) {
@@ -256,6 +307,16 @@ public class RDFXMLParser extends AbstractRDFParser {
         return false;
     }
 
+    /**
+     * Processes an RDF node element such as rdf:Description or a typed node.
+     * Handles subject creation, optional rdf:type triple emission, and property attributes.
+     *
+     * @param localName the local name of the element
+     * @param uri       the namespace URI
+     * @param qName     the qualified name
+     * @param attrs     the element's attributes
+     * @return true if the element is processed as an RDF node, false otherwise
+     */
     private boolean processNodeElement(String localName, String uri, String qName, Attributes attrs) {
         boolean isNode = isDescription(localName, uri)
                 || (ctx.subjectStack.isEmpty() && RDFXMLUtils.isNodeElement(attrs));
@@ -283,7 +344,19 @@ public class RDFXMLParser extends AbstractRDFParser {
         return true;
     }
 
-    private void processPropertyElement(String localName, String uri, String qName, Attributes attrs) {
+    /**
+     * Processes an RDF property element and emits triples accordingly.
+     * Handles {@code rdf:resource}, {@code rdf:nodeID}, {@code parseType="Resource"},
+     * and inline property attributes.
+     *
+     * @param localName the local name of the property element
+     * @param uri       the namespace URI
+     * @param qName     the qualified name
+     * @param attrs     the element's attributes
+     *
+     * @return true if the element is processed as an RDF property element, false otherwise
+     */
+    private boolean processPropertyElement(String localName, String uri, String qName, Attributes attrs) {
         IRI predicate = ctx.factory.createIRI(RDFXMLUtils.expandQName(uri, localName, qName));
         ctx.predicateStack.push(predicate);
 
@@ -293,13 +366,13 @@ public class RDFXMLParser extends AbstractRDFParser {
         if (resource != null) {
             emitter.emitResourceTriple(ctx.subjectStack.peek(), predicate, resource, ctx.baseURI);
             ctx.predicateStack.pop();
-            return;
+            return true;
         }
 
         if (nodeID != null) {
             emitter.emitBNodeTriple(ctx.subjectStack.peek(), predicate, nodeID);
             ctx.predicateStack.pop();
-            return;
+            return true;
         }
 
         // parseType="Resource"
@@ -307,7 +380,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         if ("Resource".equals(parseType)) {
             Resource bnode = emitBnodePredicateObject(predicate);
             ctx.subjectStack.push(bnode);
-            return;
+            return true;
         }
 
         // Inline attributes
@@ -315,9 +388,17 @@ public class RDFXMLParser extends AbstractRDFParser {
             Resource bnode = emitBnodePredicateObject(predicate);
             emitter.emitPropertyAttributes(bnode, attrs);
             ctx.predicateStack.pop();
+            return true;
         }
+        return false;
     }
 
+    /**
+     * Checks if the given attributes contain any non-syntax (i.e., user-defined) attributes.
+     *
+     * @param attrs the XML attributes to inspect
+     * @return true if at least one attribute is not a reserved RDF or XML syntax attribute
+     */
     private boolean hasNonSyntaxAttributes(Attributes attrs) {
         for (int i = 0; i < attrs.getLength(); i++) {
             if (!isSyntaxAttribute(attrs.getURI(i), attrs.getLocalName(i), attrs.getQName(i))) {
@@ -327,6 +408,12 @@ public class RDFXMLParser extends AbstractRDFParser {
         return false;
     }
 
+    /**
+     * Emits a blank node as the object of the current predicate and links it to the subject.
+     *
+     * @param predicate the predicate of the triple
+     * @return the newly created blank node
+     */
     private Resource emitBnodePredicateObject(IRI predicate) {
         Resource parent = ctx.subjectStack.peek();
         Resource bnode = ctx.factory.createBNode();
@@ -337,7 +424,9 @@ public class RDFXMLParser extends AbstractRDFParser {
 
 
     /**
-     * Cleans up stacks and handles closing of collections, containers, and resource blocks.
+     * Cleans up parsing context stacks when an XML end element is encountered.
+     * @param uri        the namespace URI of the element
+     * @param localName  the local name of the element
      */
     private void cleanEndElement(String uri, String localName) {
         if (!ctx.langStack.isEmpty()) ctx.langStack.pop();

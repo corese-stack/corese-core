@@ -70,6 +70,8 @@ public class RDFXMLStatementEmitter {
         ));
     }
 
+
+
     public void emitTriple(Resource subject, IRI predicate, Resource object) {
         model.add(factory.createStatement(subject, predicate, object));
     }

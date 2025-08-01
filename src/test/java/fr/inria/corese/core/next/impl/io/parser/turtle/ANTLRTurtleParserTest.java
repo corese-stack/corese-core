@@ -11,6 +11,12 @@ import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the ANTLRTurtle class.
+ * These tests verify the parser's ability to correctly parse Turtle
+ * and interact with the Model and ValueFactory, including error handling
+ * and unescaping of IRIs and literals, and named graphs.
+ */
 public class ANTLRTurtleParserTest {
     private Model parseFromString(String turtleData, String baseURI) throws Exception {
         Model model = new CoreseModel();
