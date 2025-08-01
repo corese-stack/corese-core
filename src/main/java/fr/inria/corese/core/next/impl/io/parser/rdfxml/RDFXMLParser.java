@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.io.parser.rdfxml.context.RdfXmlContext;
+import fr.inria.corese.core.next.impl.io.parser.rdfxml.context.RDFXMLContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import static fr.inria.corese.core.next.impl.io.parser.rdfxml.RDFXMLUtils.*;
 
 /**
- * SAX-based RDF/XML parser using a shared parsing context ({@link RdfXmlContext}).
+ * SAX-based RDF/XML parser using a shared parsing context ({@link RDFXMLContext}).
  *
  * <p>This parser processes RDF/XML documents using the SAX streaming API.
  * It tracks RDF constructs (resources, properties, literals, containers, collections)
@@ -43,7 +43,7 @@ public class RDFXMLParser extends AbstractRDFParser {
     private StringBuilder characters = new StringBuilder();
 
     /** Shared state across SAX callbacks. */
-    private RdfXmlContext ctx;
+    private RDFXMLContext ctx;
 
     private final RDFXMLStatementEmitter emitter;
 
@@ -66,7 +66,7 @@ public class RDFXMLParser extends AbstractRDFParser {
      */
     public RDFXMLParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);
-        this.ctx = new RdfXmlContext(getModel(), getValueFactory());
+        this.ctx = new RDFXMLContext(getModel(), getValueFactory());
         this.emitter = new RDFXMLStatementEmitter(model, factory);
     }
 
@@ -336,7 +336,7 @@ public class RDFXMLParser extends AbstractRDFParser {
 
         // Emit rdf:type if typed node
         if (!isDescription(localName, uri)) {
-           emitter.emitType(newSubject, expandQName(uri, localName, qName));
+            emitter.emitType(newSubject, expandQName(uri, localName, qName));
         }
 
         // Handle non-syntax attributes

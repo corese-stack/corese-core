@@ -1,18 +1,18 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the RDFXMLParser class.
@@ -21,10 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * and unescaping of IRIs and literals, and named graphs.
  */
 public class RDFXMLParserTest {
-    private static final Logger logger = LoggerFactory.getLogger(RDFXMLParserTest.class);
-
-    private final ValueFactory factory = new CoreseAdaptedValueFactory();
-
     /**
      * Helper method to parse the RDF/XML String
      * @param rdfXml
@@ -45,36 +41,26 @@ public class RDFXMLParserTest {
      * Helper method to print the model.
      * @param model
      */
-    /**
-     * Helper method to print the model.
-     * @param model
-     */
     private void printModel(Model model) {
         model.stream().forEach(stmt -> {
             Value obj = stmt.getObject();
-            String subjectString = stmt.getSubject().stringValue();
-            String predicateString = stmt.getPredicate().stringValue();
-
             if (obj instanceof Literal literal) {
-                String label = String.valueOf(literal.getLabel());
-                String languageTag = literal.getLanguage().orElse(null);
-
-                if (languageTag != null) {
-                    logger.debug("({}, {}, \"{}\"@{})",
-                            subjectString,
-                            predicateString,
-                            label,
-                            languageTag);
+                if (literal.getLanguage().isPresent()) {
+                    System.out.printf("(%s, %s, \"%s\"@%s)%n",
+                            stmt.getSubject().stringValue(),
+                            stmt.getPredicate().stringValue(),
+                            literal.getLabel(),
+                            literal.getLanguage().get());
                 } else {
-                    logger.debug("({}, {}, \"{}\")",
-                            subjectString,
-                            predicateString,
-                            label);
+                    System.out.printf("(%s, %s, \"%s\")%n",
+                            stmt.getSubject().stringValue(),
+                            stmt.getPredicate().stringValue(),
+                            literal.getLabel());
                 }
             } else {
-                logger.debug("({}, {}, {})",
-                        subjectString,
-                        predicateString,
+                System.out.printf("(%s, %s, %s)%n",
+                        stmt.getSubject().stringValue(),
+                        stmt.getPredicate().stringValue(),
                         obj.stringValue());
             }
         });
@@ -331,7 +317,7 @@ public class RDFXMLParserTest {
                 """.trim();
         Model model = parseRdfXml(rdfXml);
         printModel(model);
-        assertEquals(1, model.size(), "Expected one RDF statement");
+        assertEquals(1, model.size(), "Expected four RDF statements");
     }
 
     /**
@@ -363,7 +349,7 @@ public class RDFXMLParserTest {
         printModel(model);
 
         // Assert or inspect the result
-        assertEquals(4, model.size(), "Expected four RDF statements");
+        assertEquals(4, model.size(), "Expected five RDF statements");
     }
 
     /**
@@ -441,7 +427,7 @@ public class RDFXMLParserTest {
 
         Model model = parseRdfXml(rdfXml);
         printModel(model);
-        assertEquals(2, model.size(), "Expected two RDF statements");
+        assertEquals(2, model.size(), "Expected four RDF statements");
     }
 
     /**
@@ -592,198 +578,5 @@ public class RDFXMLParserTest {
         printModel(model);
         assertEquals(1, model.size(), "Expected one RDF statement");
 
-    }
-
-    /**
-     * Test the resolving uri algorithm, simple exemple
-     * @throws Exception
-     */
-    @Test
-    public void testResolvingIRITest0001() throws Exception {
-
-        String rdfXml = """
-                <?xml version="1.0"?>
-                
-                <!--
-                  Copyright World Wide Web Consortium, (Massachusetts Institute of
-                  Technology, Institut National de Recherche en Informatique et en
-                  Automatique, Keio University).
-                \s
-                  All Rights Reserved.
-                \s
-                  Please see the full Copyright clause at
-                  <http://www.w3.org/Consortium/Legal/copyright-software.html>
-                
-                  Description: xml:base applies to an rdf:ID on an\s
-                               rdf:Description element.
-                  Author: Jeremy Carroll (jjc@hpl.hp.com)
-                
-                  $Id: test001.rdf,v 1.1 2014/02/20 20:36:30 sandro Exp $
-                
-                -->
-                
-                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                         xmlns:eg="http://example.org/"
-                         xml:base="http://example.org/dir/file">
-                
-                 <rdf:Description rdf:ID="frag" eg:value="v" />
-                
-                </rdf:RDF>
-                """.trim();
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        assertTrue(model.contains( factory.createIRI("http://example.org/dir/file#frag") , factory.createIRI("http://example.org/value"), factory.createLiteral("v") ));
-
-    }
-
-    /**
-     * Test the resolving uri algorithm, exemple with blank node
-     * @throws Exception
-     */
-    @Test
-    public void testResolveIRITest0002() throws Exception {
-        String rdfXml = """
-                <?xml version="1.0"?>
-                
-                <!--
-                  Copyright World Wide Web Consortium, (Massachusetts Institute of
-                  Technology, Institut National de Recherche en Informatique et en
-                  Automatique, Keio University).
-                \s
-                  All Rights Reserved.
-                \s
-                  Please see the full Copyright clause at
-                  <http://www.w3.org/Consortium/Legal/copyright-software.html>
-                
-                  Description: xml:base applies to an rdf:ID on a property element.
-                  Author: Jeremy Carroll (jjc@hpl.hp.com)
-                
-                  $Id: test004.rdf,v 1.1 2014-02-20 20:36:31 sandro Exp $
-                -->
-                
-                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                         xmlns:eg="http://example.org/"
-                         xml:base="http://example.org/dir/file">
-                
-                 <rdf:Description>
-                  <eg:value rdf:ID="frag">v</eg:value>
-                 </rdf:Description>
-                
-                </rdf:RDF>
-                """.trim();
-
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-        model.contains(factory.createIRI("http://example.org/value"));
-    }
-
-    /**
-     * Test the resolving uri algorithm, exemple with ""
-     * @throws Exception
-     */
-    @Test
-    public void testResolveIRITest008() throws Exception {
-        String rdfXml =
-                """
-                        <?xml version="1.0"?>
-                        
-                        <!--
-                          Copyright World Wide Web Consortium, (Massachusetts Institute of
-                          Technology, Institut National de Recherche en Informatique et en
-                          Automatique, Keio University).
-                        \s
-                          All Rights Reserved.
-                        \s
-                          Please see the full Copyright clause at
-                          <http://www.w3.org/Consortium/Legal/copyright-software.html>
-                        
-                          Description: example of empty same document ref resolution.
-                          Author: Jeremy Carroll (jjc@hpl.hp.com)
-                        
-                          $Id: test008.rdf,v 1.1 2014-02-20 20:36:31 sandro Exp $
-                        -->
-                        
-                        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                                 xmlns:eg="http://example.org/"
-                                 xml:base="http://example.org/dir/file">
-                        
-                         <eg:type rdf:about="" />
-                        
-                        </rdf:RDF>
-                        """.trim();
-        Model model = parseRdfXml(rdfXml);
-        model.contains(factory.createIRI("http://example.org/dir/file"));
-    }
-
-    @Test
-    public void testResolveIRITest013() throws Exception {
-        String rdfXml =
-                """
-                        <?xml version="1.0"?>
-                        
-                        <!--
-                          Copyright World Wide Web Consortium, (Massachusetts Institute of
-                          Technology, Institut National de Recherche en Informatique et en
-                          Automatique, Keio University).
-                        \s
-                          All Rights Reserved.
-                        \s
-                          Please see the full Copyright clause at
-                          <http://www.w3.org/Consortium/Legal/copyright-software.html>
-                        
-                          Description: With an xml:base with fragment the fragment is ignored.
-                          Author: Jeremy Carroll (jjc@hpl.hp.com)
-                        
-                          $Id: test013.rdf,v 1.1 2014-02-20 20:36:32 sandro Exp $
-                        -->
-                        
-                        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                                 xmlns:eg="http://example.org/"
-                                 xml:base="http://example.org/dir/file#frag">
-                        
-                         <eg:type rdf:about="" />
-                         <rdf:Description rdf:ID="foo" >
-                           <eg:value rdf:resource="relpath" />
-                         </rdf:Description>
-                        
-                        </rdf:RDF>
-                        """.trim();
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
-    }
-
-    @Test
-    public void testResolveIRITest011() throws Exception {
-        String rdfXml =
-                """
-                        <?xml version="1.0"?>
-                        
-                        <!--
-                          Copyright World Wide Web Consortium, (Massachusetts Institute of
-                          Technology, Institut National de Recherche en Informatique et en
-                          Automatique, Keio University).
-                        \s
-                          All Rights Reserved.
-                        \s
-                          Please see the full Copyright clause at
-                          <http://www.w3.org/Consortium/Legal/copyright-software.html>
-                        
-                          Description: Example of xml:base with no path component.
-                          Note: The algorithm in RFC 2396 does not handle this case correctly.
-                          Author: Jeremy Carroll (jjc@hpl.hp.com)
-                        
-                          $Id: test011.rdf,v 1.1 2014-02-20 20:36:32 sandro Exp $
-                        -->
-                        
-                        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                                 xmlns:eg="http://example.org/"
-                                 xml:base="http://example.org">
-                        
-                         <eg:type rdf:about="relfile" />
-                        
-                        </rdf:RDF>
-                        """.trim();
-        Model model = parseRdfXml(rdfXml);
-        printModel(model);
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
  * <p>This context is typically instantiated once per parsing session and passed
  * throughout the parsing logic.</p>
  */
-public class RdfXmlContext {
+public class RDFXMLContext {
 
     /** The RDF model to which parsed triples will be added. */
     public Model model;
@@ -73,7 +73,7 @@ public class RdfXmlContext {
      * @param model   the RDF model to populate with triples
      * @param factory the value factory used to create RDF terms
      */
-    public RdfXmlContext(Model model, ValueFactory factory) {
+    public RDFXMLContext(Model model, ValueFactory factory) {
         this.model = model;
         this.factory = factory;
     }
