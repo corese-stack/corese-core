@@ -1,10 +1,13 @@
 package fr.inria.corese.core.next.impl.io.serialization;
 
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.CanonicalOption;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.CanonicalSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsOption;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesOption;
@@ -15,6 +18,7 @@ import fr.inria.corese.core.next.impl.io.serialization.trig.TriGOption;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleOption;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
+import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +44,7 @@ public class DefaultSerializerFactory implements SerializerFactory {
     private static final Logger logger = LoggerFactory.getLogger(DefaultSerializerFactory.class);
 
     private final Map<RDFFormat, BiFunction<Model, SerializationOption, RDFSerializer>> registry;
+    ValueFactory coreseValueFactory = new CoreseAdaptedValueFactory();
 
     /**
      * Constructs a {@code DefaultSerializerFactory} and populates its registry
@@ -98,6 +103,16 @@ public class DefaultSerializerFactory implements SerializerFactory {
                 logger.warn("Provided config for RDFXML is not RDFXmlConfig (was {}). Using default RDFXmlConfig.",
                         genericConfig.getClass().getSimpleName());
                 return new XmlSerializer(model, XmlOption.defaultConfig());
+            }
+        });
+
+        tempRegistry.put(RDFFormat.CANONICAL_RDF, (model, genericConfig) -> {
+            if (genericConfig instanceof CanonicalOption specificConfig) {
+                return new CanonicalSerializer(model, specificConfig, coreseValueFactory);
+            } else {
+                logger.warn("Provided config for CANONICAL_RDF is not CanonicalOption (was {}). Using default CanonicalOption.",
+                        genericConfig.getClass().getSimpleName());
+                return new CanonicalSerializer(model, CanonicalOption.defaultConfig(), coreseValueFactory);
             }
         });
 
