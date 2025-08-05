@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.CanonicalSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlSerializer;
@@ -95,6 +96,18 @@ class DefaultSerializerFactoryTest {
             assertNotNull(serializer);
             assertTrue(serializer instanceof XmlSerializer);
             assertEquals(1, mockedConstruction.constructed().size(), "XmlSerializer constructor should be called once");
+        }
+    }
+
+    @Test
+    @DisplayName("createSerializer should return CanonicalSerializer for CANONICAL_RDF format")
+    void createSerializer_shouldReturnCanonicalSerializer_forCanonicalRdfFormat() {
+        try (MockedConstruction<CanonicalSerializer> mockedConstruction = mockConstruction(CanonicalSerializer.class)) {
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.CANONICAL_RDF, mockModel, mockConfig);
+
+            assertNotNull(serializer);
+            assertTrue(serializer instanceof CanonicalSerializer);
+            assertEquals(1, mockedConstruction.constructed().size(), "CanonicalSerializer constructor should be called once");
         }
     }
 
