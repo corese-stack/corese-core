@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Value;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException; // Import the custom exception
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesBaseListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
 
@@ -60,7 +61,13 @@ public class NTriplesListener extends NTriplesBaseListener {
             return factory.createIRI(unescapeUri(ctx.IRIREF().getText().substring(1, ctx.IRIREF().getText().length() - 1)));
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
-            return factory.createBNode(ctx.BLANK_NODE_LABEL().getText().substring(2));
+            String blankNodeLabel = ctx.BLANK_NODE_LABEL().getText().substring(2);
+            try {
+                validateBlankNodeLabel(blankNodeLabel);
+            } catch (ParsingErrorException e) {
+                throw new IllegalArgumentException("Invalid blank node label in subject: " + e.getMessage(), e);
+            }
+            return factory.createBNode(blankNodeLabel);
         }
         throw new IllegalArgumentException("Unsupported N-Triples subject: " + ctx.getText());
     }
@@ -83,7 +90,13 @@ public class NTriplesListener extends NTriplesBaseListener {
             return factory.createIRI(unescapeUri(ctx.IRIREF().getText().substring(1, ctx.IRIREF().getText().length() - 1)));
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
-            return factory.createBNode(ctx.BLANK_NODE_LABEL().getText().substring(2));
+            String blankNodeLabel = ctx.BLANK_NODE_LABEL().getText().substring(2);
+            try {
+                validateBlankNodeLabel(blankNodeLabel);
+            } catch (ParsingErrorException e) {
+                throw new IllegalArgumentException("Invalid blank node label in object: " + e.getMessage(), e);
+            }
+            return factory.createBNode(blankNodeLabel);
         }
         if (ctx.literal() != null) {
             return extractLiteral(ctx.literal());
@@ -108,6 +121,25 @@ public class NTriplesListener extends NTriplesBaseListener {
             return factory.createLiteral(label, lang);
         }
         return factory.createLiteral(label);
+    }
+
+    /**
+     * Validates a blank node label according to RDF N-Triples specification.
+     * Blank node labels must not be empty and must not contain a colon.
+     * They *can* start with a digit.
+     *
+     * @param label The blank node label (without the `_: `prefix).
+     * @throws ParsingErrorException if the label is invalid.
+     */
+    protected void validateBlankNodeLabel(String label) throws ParsingErrorException {
+        if (label == null || label.isEmpty()) {
+            throw new ParsingErrorException("Blank node label cannot be empty.");
+        }
+
+        if (label.contains(":")) {
+            throw new ParsingErrorException("Blank node label cannot contain a colon (':')");
+        }
+
     }
 
     /**
@@ -203,7 +235,7 @@ public class NTriplesListener extends NTriplesBaseListener {
 
     /**
      * Unescapes common N-Triples URI escape sequences.
-     * This method handles `\>`, `\\`, `\ uXXXX`, `\UXXXXXXXX`.
+     * This method handles `\>`, `\\`, `\ nXXXX`, `\UXXXXXXXX`.
      *
      * @param uri The escaped URI string.
      * @return The unescaped URI string.

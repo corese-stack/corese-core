@@ -11,6 +11,11 @@ ntriplesDoc
     : triple? (EOL* triple)* EOL*
     ;
 
+directive
+    : {notifyErrorListeners("Directives are not allowed in N-Triples");}
+      ('@prefix' | '@base')
+    ;
+
 triple
     : subject predicate object '.'
     ;
@@ -92,7 +97,7 @@ PN_CHARS_U
 // PN_CHARS_BASE | '_' | ':'
     : PN_CHARS_BASE
     | '_'
-//    | ':'
+    | ':'
     ;
 
 PN_CHARS
