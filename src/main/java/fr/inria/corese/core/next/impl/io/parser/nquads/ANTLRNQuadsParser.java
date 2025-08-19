@@ -82,20 +82,88 @@ public class ANTLRNQuadsParser extends AbstractRDFParser {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
             NQuadsLexer lexer = new NQuadsLexer(charStream);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+            CommonTokenStream tokens = new DirectiveAwareTokenStream(lexer);
+
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
 
             NQuadsParser antlrParser = new NQuadsParser(tokens);
-            ParseTreeWalker walker = new ParseTreeWalker();
+            antlrParser.removeErrorListeners();
+            antlrParser.addErrorListener(ThrowingErrorListener.INSTANCE);
+
             ParseTree tree = antlrParser.nquadsDoc();
+            ParseTreeWalker walker = new ParseTreeWalker();
 
             NQuadsListener listener = new NQuadsListener(getModel(), getValueFactory(), getConfig());
-
             walker.walk((ParseTreeListener) listener, tree);
 
         } catch (IOException e) {
             throw new ParsingErrorException("Failed to parse N-Quads: " + e.getMessage(), e);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            Throwable current = e;
+            while (current != null) {
+                if (current instanceof ParsingErrorException) {
+                    throw (ParsingErrorException) current;
+                }
+                current = current.getCause();
+            }
             throw new ParsingErrorException("Unexpected error during N-Quads parsing: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Custom TokenStream to check for and disallow directives like @base and @prefix in N-Quads.
+     * N-Quads format does not support directives.
+     */
+    private static class DirectiveAwareTokenStream extends CommonTokenStream {
+        public DirectiveAwareTokenStream(Lexer lexer) {
+            super(lexer);
+        }
+
+        @Override
+        public Token LT(int k) {
+            Token token = super.LT(k);
+            if (token != null) {
+                String text = token.getText();
+                if (text != null && (text.startsWith("@base") || text.startsWith("@prefix"))) {
+                    throw new ParsingErrorException("Directive not allowed in N-Quads: " + text);
+                }
+            }
+            return token;
+        }
+    }
+
+    /**
+     * Custom ANTLR ErrorListener that throws a ParsingErrorException on any syntax error.
+     * This ensures that parsing failures are immediately reported as application-specific exceptions.
+     */
+    private static class ThrowingErrorListener extends BaseErrorListener {
+        static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                int line, int charPositionInLine,
+                                String msg, RecognitionException e) {
+
+            if (offendingSymbol != null) {
+                String symbolText = offendingSymbol.toString();
+
+                if (msg != null && msg.contains("token recognition error") && symbolText.equals("':'")) {
+                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
+                }
+
+                if (msg != null && msg.contains("no viable alternative") && symbolText.contains("_:")) {
+                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
+                }
+
+                if (symbolText.contains("_:") && symbolText.contains(":") && !symbolText.equals("_:")) {
+                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
+                }
+            }
+
+            throw new ParsingErrorException(
+                    String.format("line %d:%d %s", line, charPositionInLine, msg));
         }
     }
 }

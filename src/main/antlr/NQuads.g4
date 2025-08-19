@@ -1,7 +1,7 @@
 grammar NQuads;
 
 nquadsDoc
-    : statement? (EOL* statement)* EOL*
+    : statement* WS*
     ;
 
 statement
@@ -41,8 +41,11 @@ EOL
     ;
 
 IRIREF
-//  	'<' ([^#x00-#x20<>"{}|^`\] | UCHAR)* '>'
-    : '<' [a-zA-Z0-9-]+':' ((~( [\u0000-\u0020] | '<' | '>' | '"' | '{'| '}' | '|'| '^'| '`' | '\\' )) | UCHAR)* '>'
+    : '<' ( IRI_CHAR | UCHAR )* '>'
+    ;
+
+fragment IRI_CHAR
+    : ~ ( '\u0000'..'\u0020' | '<' | '>' | '"' | '{' | '}' | '|' | '^' | '`' | '\\' )
     ;
 
 STRING_LITERAL_QUOTE
@@ -90,7 +93,7 @@ PN_CHARS_U
 // PN_CHARS_BASE | '_' | ':'
     : PN_CHARS_BASE
     | '_'
-//    | ':'
+    | ':'
     ;
 
 PN_CHARS
