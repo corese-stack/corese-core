@@ -1,7 +1,7 @@
 grammar NQuads;
 
 nquadsDoc
-    : statement* WS*
+    : statement? (EOL* statement)* EOL*
     ;
 
 statement
