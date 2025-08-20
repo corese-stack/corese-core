@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Value;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.impl.exception.ParsingErrorException; // Import the custom exception
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesBaseListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
 
