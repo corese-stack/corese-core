@@ -24,15 +24,15 @@ public class Table extends HashMap<String, String> {
 
     void init() {
         // namespace to pprinter
-        put(NSManager.OWL,  Transformer.OWL);
-        put(NSManager.SPIN, Transformer.SPIN);
-        put(NSManager.SQL,  Transformer.SQL);
+        put(NSManager.OWL,  TransformerUtils.OWL);
+        put(NSManager.SPIN, TransformerUtils.SPIN);
+        put(NSManager.SQL,  TransformerUtils.SQL);
 
         table = new HashMap<String, Boolean>();
         // pprinter is optimized ?
-        table.put(Transformer.OWL, false);
-        table.put(Transformer.SPIN, true);
-        table.put(Transformer.SQL, true);
+        table.put(TransformerUtils.OWL, false);
+        table.put(TransformerUtils.SPIN, true);
+        table.put(TransformerUtils.SQL, true);
 
     }
     

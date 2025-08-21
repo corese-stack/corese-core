@@ -36,9 +36,7 @@ public class CanonicalRdf10 {
     private int depthFactor = 5;
     private int permutationLimit = 50000;
 
-    //////////////////
-    // Constructors //
-    //////////////////
+    // Constructors
 
     /**
      * Constructs a new {@code CanonicalRdf10Format} with the specified RDF graph.
@@ -51,9 +49,7 @@ public class CanonicalRdf10 {
         this.canonicalizedDataset = new CanonicalizedDataset(graph);
     }
 
-    /////////////////////
-    // Factory methods //
-    /////////////////////
+    // Factory methods
 
     /**
      * Creates a new {@code CanonicalRdf10Format} instance for the given graph.
@@ -105,9 +101,7 @@ public class CanonicalRdf10 {
         return canonicalRdf10;
     }
 
-    ///////////////
-    // Accessors //
-    ///////////////
+    // Accessors
 
     /**
      * Returns the depth factor for the canonicalization algorithm.
@@ -165,9 +159,9 @@ public class CanonicalRdf10 {
         this.hashAlgorithm = hashAlgorithm;
     }
 
-    ////////////////////
-    // Main algorithm //
-    ////////////////////
+    
+    // Main algorithm
+    
 
     /**
      * Performs the canonicalization of an RDF 1.0 dataset.
@@ -257,9 +251,9 @@ public class CanonicalRdf10 {
         return this.canonicalizedDataset;
     }
 
-    ////////////////////
-    // Initialization //
-    ////////////////////
+    
+    // Initialization
+    
 
     /**
      * Extracts the quads for blank nodes from the RDF graph and adds them to the
@@ -306,9 +300,9 @@ public class CanonicalRdf10 {
         }
     }
 
-    //////////////////////////
+    
     // HashFirstDegreeQuads //
-    //////////////////////////
+    
 
     /**
      * Hashes the first degree quads for a given blank node identifier.
@@ -380,9 +374,7 @@ public class CanonicalRdf10 {
         }
     }
 
-    ///////////////
-    // Exception //
-    ///////////////
+    // Exception
 
     /**
      * Thrown to indicate that an error occurred during the canonicalization of an
@@ -404,9 +396,7 @@ public class CanonicalRdf10 {
 
     }
 
-    ///////////////////////
     // HashN-DegreeQuads //
-    ///////////////////////
 
     /**
      * Hashes the N-degree quads for a given blank node identifier.
@@ -475,7 +465,7 @@ public class CanonicalRdf10 {
                 CanonicalIssuer issuerCopy = new CanonicalIssuer(refIssuer);
 
                 // 4.8.3) Step 5.4.2
-                String path = "";
+                StringBuilder currentPathBuilder = new StringBuilder();
 
                 // 4.8.3) Step 5.4.3
                 List<String> recursionList = new ArrayList<>();
@@ -485,7 +475,7 @@ public class CanonicalRdf10 {
 
                     // 4.8.3) Step 5.4.4.1
                     if (this.canonicalizationState.hasCanonicalIdentifier(relatedBNId)) {
-                        path += "_:" + this.canonicalizationState.getCanonicalIdentifierFor(relatedBNId);
+                        currentPathBuilder.append("_:").append(this.canonicalizationState.getCanonicalIdentifierFor(relatedBNId));
                     }
                     // 4.8.3) Step 5.4.4.2
                     else {
@@ -494,12 +484,12 @@ public class CanonicalRdf10 {
                             recursionList.add(relatedBNId);
                         }
                         // 4.8.3) Step 5.4.4.2.2
-                        path += "_:" + issuerCopy.issueCanonicalIdentifier(relatedBNId);
+                        currentPathBuilder.append("_:").append(issuerCopy.issueCanonicalIdentifier(relatedBNId));
                     }
 
                     // 4.8.3) Step 5.4.4.3
-                    if (!chosenPath.isEmpty() && path.length() >= chosenPath.length()
-                            && path.compareTo(chosenPath) > 0) {
+                    if (!chosenPath.isEmpty() && currentPathBuilder.length() >= chosenPath.length()
+                            && currentPathBuilder.toString().compareTo(chosenPath) > 0) {
                         break;
                     }
                 }
@@ -510,24 +500,25 @@ public class CanonicalRdf10 {
                     Pair<String, CanonicalIssuer> result = this.hashNdegreeQuads(issuerCopy, relatedBNId, depth + 1);
 
                     // 4.8.3) Step 5.4.5.2
-                    path += "_:" + issuerCopy.issueCanonicalIdentifier(relatedBNId);
+                    currentPathBuilder.append("_:").append(issuerCopy.issueCanonicalIdentifier(relatedBNId));
 
                     // 4.8.3) Step 5.4.5.3
-                    path += "<" + result.getLeft() + ">";
+                    currentPathBuilder.append("<").append(result.getLeft()).append(">");
 
                     // 4.8.3) Step 5.4.5.4
                     issuerCopy = result.getRight();
 
                     // 4.8.3) Step 5.4.5.5
-                    if (!chosenPath.isEmpty() && path.length() >= chosenPath.length()
-                            && path.compareTo(chosenPath) > 0) {
+                    if (!chosenPath.isEmpty() && currentPathBuilder.length() >= chosenPath.length()
+                            && currentPathBuilder.toString().compareTo(chosenPath) > 0) {
                         break;
                     }
                 }
 
                 // 4.8.3) Step 5.4.6
-                if (chosenPath.isEmpty() || path.compareTo(chosenPath) < 0) {
-                    chosenPath = path;
+                String currentPath = currentPathBuilder.toString();
+                if (chosenPath.isEmpty() || currentPath.compareTo(chosenPath) < 0) {
+                    chosenPath = currentPath;
                     chosenIssuer = issuerCopy;
                 }
             }
@@ -542,6 +533,7 @@ public class CanonicalRdf10 {
         // 4.8.3) Step 6
         return Pair.of(HashingUtility.hash(data.toString(), this.hashAlgorithm), refIssuer);
     }
+
 
     /**
      * Generates all possible permutations of a given list.
@@ -597,9 +589,9 @@ public class CanonicalRdf10 {
         }
     }
 
-    //////////////////////////
-    // HashRelatedBlankNode //
-    //////////////////////////
+    
+    // HashRelatedBlankNode
+    
 
     /**
      * Hashes a related blank node.
@@ -647,9 +639,7 @@ public class CanonicalRdf10 {
         return HashingUtility.hash(input.toString(), this.hashAlgorithm);
     }
 
-    /////////////////////////
-    // Overriding toString //
-    /////////////////////////
+    // Overriding toString
 
     /**
      * Returns a string representation of the RDF graph in canonical form.

@@ -9,16 +9,18 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.transform.TransformerUtils;
+
 import java.util.Map;
 
 /**
  * OWL Profile type checker
  */
 public class OWLProfile {
-    public static final String OWL_RL = Transformer.OWL_RL;
-    public static final String OWL_EL = Transformer.OWL_EL;
-    public static final String OWL_QL = Transformer.OWL_QL;
-    public static final String OWL_TC = Transformer.OWL_TC;
+    public static final String OWL_RL = TransformerUtils.OWL_RL;
+    public static final String OWL_EL = TransformerUtils.OWL_EL;
+    public static final String OWL_QL = TransformerUtils.OWL_QL;
+    public static final String OWL_TC = TransformerUtils.OWL_TC;
     
     private Graph graph;
     private Map<IDatatype, IDatatype> error;
@@ -41,9 +43,9 @@ public class OWLProfile {
         b.setTransformerVisitor(vis);
         checker.process(b);
         
-        Transformer printer = Transformer.create(getGraph(), Transformer.PP_ERROR); 
+        Transformer printer = Transformer.create(getGraph(), TransformerUtils.PP_ERROR);
         IDatatype errors = vis.errors();
-        IDatatype dt = printer.process(Transformer.PP_ERROR_DISPLAY, b, 
+        IDatatype dt = printer.process(TransformerUtils.PP_ERROR_DISPLAY, b,
                 DatatypeMap.newInstance(getTitle(type)), errors);
         if (dt !=null) {
             setMessage(dt.stringValue());
@@ -65,7 +67,7 @@ public class OWLProfile {
         
     public IDatatype pretty(IDatatype dt) throws EngineException {
         if (dt.isBlank()) {
-            Transformer t = Transformer.create(getGraph(), Transformer.TURTLE);
+            Transformer t = Transformer.create(getGraph(), TransformerUtils.TURTLE);
             return t.process(dt);
         }
         else {

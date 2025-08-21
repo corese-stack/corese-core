@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -503,7 +502,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
         Map<Resource, List<Statement>> bySubject = tFamilyConfig.sortSubjects() ?
                 new TreeMap<>(Comparator.comparing(Resource::stringValue)) :
-                new LinkedHashMap<>();
+                new HashMap<>();
 
         model.stream()
                 .filter(stmt -> !isConsumed(stmt.getSubject()))
@@ -517,7 +516,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
             Map<IRI, List<Statement>> byPredicate = tFamilyConfig.sortPredicates() ?
                     new TreeMap<>(Comparator.comparing(IRI::stringValue)) :
-                    new LinkedHashMap<>();
+                    new HashMap<>();
 
             subjectEntry.getValue().forEach(stmt -> byPredicate.computeIfAbsent(stmt.getPredicate(), k -> new ArrayList<>()).add(stmt));
 

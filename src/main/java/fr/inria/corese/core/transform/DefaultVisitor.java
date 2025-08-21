@@ -48,7 +48,7 @@ public class DefaultVisitor implements TemplateVisitor {
     private HashMap<IDatatype, IDatatype> distinct;
     private final HashMap<IDatatype, IDatatype> value;
     
-    private String transform = Transformer.TURTLE;
+    private String transformType = TransformerUtils.TURTLE;
     private final String NL = "\n";
     // boolean value (if any) that means that visitor must consider visited node
     // use case: st:visit(st:exp, ?x, ?suc)
@@ -256,14 +256,14 @@ public class DefaultVisitor implements TemplateVisitor {
      * @return the transform
      */
     public String getTransform() {
-        return transform;
+        return transformType;
     }
     
     /**
      * @param transform the transform to set
      */
     public void setTransform(String transform) {
-        this.transform = transform;
+        this.transformType = transform;
     }
 
     /**

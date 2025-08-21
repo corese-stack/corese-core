@@ -29,5 +29,5 @@ public interface RDFSerializer {
      * @throws SerializationException if an error occurs during the serialization
      *                                process
      */
-    void write(Writer writer) throws SerializationException;
+    void write(final Writer writer) throws SerializationException;
 }

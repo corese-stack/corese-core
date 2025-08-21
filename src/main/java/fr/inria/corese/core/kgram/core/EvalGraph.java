@@ -94,7 +94,6 @@ public class EvalGraph {
         Memory env = eval.getMemory();
         Query qq = eval.getQuery();
         Matcher mm = eval.getMatcher();
-        int backtrack = n - 1;
         Node name = exp.getGraphName();
         Mappings res = null;
         Iterable<Node> graphNodes = null;
@@ -130,12 +129,11 @@ public class EvalGraph {
      * Exp exp: graph name { BGP }
      */
     private Mappings graph(Producer p, Node graph, Exp exp, Mappings map, int n) throws SparqlException {
-        int backtrack = n - 1;
         boolean external = false;
         Node graphNode = exp.getGraphName();
         Producer np = p;
         if (graph != null && p.isProducer(graph)) {
-            // graph ?g { }
+            // graph ? g { }
             // named graph in GraphStore 
             np = p.getProducer(graph, eval.getMemory());
             np.setGraphNode(graph);  // the new gNode
@@ -163,7 +161,7 @@ public class EvalGraph {
             Exp ee = body;
             Mappings data = null;
 
-            if (graph.getPath() == null) {
+            if (graph != null && graph.getPath() == null) {
                 // not a path pointer
                 if (Eval.isParameterGraphMappings()) {
                     // eval graph body with parameter map

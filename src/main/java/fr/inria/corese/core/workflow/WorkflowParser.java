@@ -18,6 +18,7 @@ import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.transform.ContextBuilder;
 import fr.inria.corese.core.transform.Transformer;
+import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -525,11 +526,11 @@ public class WorkflowParser {
     }
 
     Loader.format getFormat(String format) {
-        if (format.equals(Transformer.TURTLE)) {
+        if (format.equals(TransformerUtils.TURTLE)) {
             return Loader.format.TURTLE_FORMAT;
-        } else if (format.equals(Transformer.RDFXML)) {
+        } else if (format.equals(TransformerUtils.RDFXML)) {
             return Loader.format.RDFXML_FORMAT;
-        } else if (format.equals(Transformer.JSON)) {
+        } else if (format.equals(TransformerUtils.JSON)) {
             return Loader.format.JSONLD_FORMAT;
         }
         return Loader.format.UNDEF_FORMAT;

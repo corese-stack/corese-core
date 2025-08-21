@@ -16,9 +16,7 @@ public class CanonicalIssuer {
     // Use LinkedHashMap to preserve insertion order
     private final LinkedHashMap<String, String> issuedIdentifierMap;
 
-    /////////////////
     // Constructor //
-    /////////////////
 
     /**
      * Constructs a new CanonicalIssuer instance.
@@ -42,9 +40,7 @@ public class CanonicalIssuer {
         this.issuedIdentifierMap = new LinkedHashMap<>(ci.issuedIdentifierMap);
     }
 
-    /////////////
     // Methods //
-    /////////////
 
     /**
      * Issues a new canonical identifier for a blank node or returns an existing one

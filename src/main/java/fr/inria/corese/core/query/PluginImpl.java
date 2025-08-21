@@ -45,6 +45,7 @@ import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.transform.TemplateVisitor;
 import fr.inria.corese.core.transform.Transformer;
+import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.GraphListen;
 import fr.inria.corese.core.util.MappingsGraph;
 import fr.inria.corese.core.util.SPINProcess;
@@ -97,7 +98,7 @@ public class PluginImpl
     private static final IDatatype SUB_CLASS_OF = DatatypeMap.newResource(RDFS.SUBCLASSOF);
     private static final String QM = "?";
     static public Logger logger = LoggerFactory.getLogger(PluginImpl.class);
-    static String DEF_PPRINTER = Transformer.PPRINTER;
+    static String DEF_PPRINTER = TransformerUtils.PPRINTER;
     static int nbBufferedValue = 0;
     // draft storage for large literal values (not used)
     private static IStorage storageMgr;
@@ -460,7 +461,7 @@ public class PluginImpl
             if (expectedFormat == null) {
                 // use content negotiation for format
                 ld.parse(dt.getLabel(), getFormat(expectedFormat));
-            } else if (expectedFormat.getLabel().equals(Transformer.TEXT)) {
+            } else if (expectedFormat.getLabel().equals(TransformerUtils.TEXT)) {
                 // xt:load(uri, st:text, st:turtle)
                 ld.loadString(dt.stringValue(), getFormat(requiredFormat));
             } else {
