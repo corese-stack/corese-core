@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.impl.io.serialization.canonical;
 
+import fr.inria.corese.core.next.impl.io.serialization.option.CanonicalOption;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,7 @@ class CanonicalOptionTest {
         assertNotNull(config, "Default config should not be null");
         assertTrue(config.isStrictMode(), "Default strictMode should be true for canonicalization");
         assertTrue(config.validateURIs(), "Default validateURIs should be true for canonicalization");
-        assertTrue(config.escapeUnicode(), "Default escapeUnicode should be true for canonicalization");
+        assertFalse(config.escapeUnicode(), "Default escapeUnicode should be false for canonicalization");
         assertTrue(config.trailingDot(), "Default trailingDot should be true for canonicalization");
         assertFalse(config.includeContext(), "Default includeContext should be false for canonicalization (N-Triples like)");
     }
@@ -53,7 +54,7 @@ class CanonicalOptionTest {
 
         assertFalse(config.isStrictMode(), "strictMode should be overridden to false");
         assertTrue(config.validateURIs(), "validateURIs should remain default (true)");
-        assertTrue(config.escapeUnicode(), "escapeUnicode should remain default (true)");
+        assertFalse(config.escapeUnicode(), "escapeUnicode should remain default (false)");
         assertTrue(config.trailingDot(), "trailingDot should remain default (true)");
         assertFalse(config.includeContext(), "includeContext should remain default (false)");
     }

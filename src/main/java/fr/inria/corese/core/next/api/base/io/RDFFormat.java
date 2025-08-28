@@ -59,10 +59,10 @@ public class RDFFormat extends FileFormat {
             true,
             true);
 
-    public static final RDFFormat CANONICAL_RDF = new RDFFormat(
-            "Canonical RDF",
-            List.of("crd", "nq"),
-            List.of("application/n-quads-canonical", "application/n-quads"),
+    public static final RDFFormat RDFC_1_0 = new RDFFormat(
+            "RDFC-1.0",
+            List.of("nq"),
+            List.of("application/n-quads", "application/n-quads"),
             false,
             true);
 

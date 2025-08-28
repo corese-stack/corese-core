@@ -6,8 +6,10 @@ import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.canonical.CanonicalOption;
+import fr.inria.corese.core.next.impl.io.serialization.option.CanonicalOption;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.CanonicalSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.Rdfc10Canonicalizer;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.Rdfc10CanonicalizerImpl;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsOption;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesOption;
@@ -44,7 +46,7 @@ public class DefaultSerializerFactory implements SerializerFactory {
     private static final Logger logger = LoggerFactory.getLogger(DefaultSerializerFactory.class);
 
     private final Map<RDFFormat, BiFunction<Model, SerializationOption, RDFSerializer>> registry;
-    ValueFactory coreseValueFactory = new CoreseAdaptedValueFactory();
+    private final ValueFactory coreseValueFactory;
 
     /**
      * Constructs a {@code DefaultSerializerFactory} and populates its registry
@@ -54,6 +56,8 @@ public class DefaultSerializerFactory implements SerializerFactory {
      * it falls back to the format's default configuration.
      */
     public DefaultSerializerFactory() {
+        this.coreseValueFactory = new CoreseAdaptedValueFactory();
+
         Map<RDFFormat, BiFunction<Model, SerializationOption, RDFSerializer>> tempRegistry = new HashMap<>();
 
         tempRegistry.put(RDFFormat.TURTLE, (model, genericConfig) -> {
@@ -106,13 +110,24 @@ public class DefaultSerializerFactory implements SerializerFactory {
             }
         });
 
-        tempRegistry.put(RDFFormat.CANONICAL_RDF, (model, genericConfig) -> {
+        tempRegistry.put(RDFFormat.RDFC_1_0, (model, genericConfig) -> {
             if (genericConfig instanceof CanonicalOption specificConfig) {
-                return new CanonicalSerializer(model, specificConfig, coreseValueFactory);
+                Rdfc10Canonicalizer canonicalizer = new Rdfc10CanonicalizerImpl(
+                        specificConfig.getHashAlgorithm(),
+                        specificConfig.getPermutationLimit(),
+                        coreseValueFactory
+                );
+                return new CanonicalSerializer(model, specificConfig, coreseValueFactory, canonicalizer);
             } else {
-                logger.warn("Provided config for CANONICAL_RDF is not CanonicalOption (was {}). Using default CanonicalOption.",
-                        genericConfig.getClass().getSimpleName());
-                return new CanonicalSerializer(model, CanonicalOption.defaultConfig(), coreseValueFactory);
+                logger.warn("Provided config for RDFC_1_0 is not CanonicalOption (was {}). Using default CanonicalOption.",
+                        genericConfig != null ? genericConfig.getClass().getSimpleName() : "null");
+                CanonicalOption defaultConfig = CanonicalOption.defaultConfig();
+                Rdfc10Canonicalizer canonicalizer = new Rdfc10CanonicalizerImpl(
+                        defaultConfig.getHashAlgorithm(),
+                        defaultConfig.getPermutationLimit(),
+                        coreseValueFactory
+                );
+                return new CanonicalSerializer(model, defaultConfig, coreseValueFactory, canonicalizer);
             }
         });
 

@@ -103,7 +103,7 @@ class DefaultSerializerFactoryTest {
     @DisplayName("createSerializer should return CanonicalSerializer for CANONICAL_RDF format")
     void createSerializer_shouldReturnCanonicalSerializer_forCanonicalRdfFormat() {
         try (MockedConstruction<CanonicalSerializer> mockedConstruction = mockConstruction(CanonicalSerializer.class)) {
-            RDFSerializer serializer = factory.createSerializer(RDFFormat.CANONICAL_RDF, mockModel, mockConfig);
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFC_1_0, mockModel, mockConfig);
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof CanonicalSerializer);
