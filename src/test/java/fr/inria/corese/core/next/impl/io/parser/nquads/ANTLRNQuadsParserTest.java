@@ -194,4 +194,17 @@ class ANTLRNQuadsParserTest {
         parser.parse(new StringReader(nquad));
         verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, expectedGraphIRI);
     }
+
+    @Test
+    @DisplayName("Test parsing a document that contains a literal that is a malformed document")
+    void testMalformedDocumentInception() throws ParsingErrorException {
+        String doc = """
+                <http://example.org/#s> <http://example.org/#p> <http://example.org/#o> <http://example.org/#g> .
+                <http://example.org/#s> <http://example.org/#pp> \"\"\"@base <http://example.org/inner/> .
+                <http://example/#bogus
+                \"\"\"^^<http://example.org/datatype/#example>  <http://example.org/#g> .
+                """;
+        StringReader reader = new StringReader(doc);
+        parser.parse(reader);
+    }
 }
