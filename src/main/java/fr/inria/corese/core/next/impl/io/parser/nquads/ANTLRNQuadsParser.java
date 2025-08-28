@@ -81,7 +81,7 @@ public class ANTLRNQuadsParser extends AbstractRDFParser {
             CharStream charStream = CharStreams.fromReader(reader);
             NQuadsLexer lexer = new NQuadsLexer(charStream);
 
-            CommonTokenStream tokens = new DirectiveAwareTokenStream(lexer);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
 
             lexer.removeErrorListeners();
             lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
@@ -110,27 +110,6 @@ public class ANTLRNQuadsParser extends AbstractRDFParser {
         }
     }
 
-    /**
-     * Custom TokenStream to check for and disallow directives like @base and @prefix in N-Quads.
-     * N-Quads format does not support directives.
-     */
-    private static class DirectiveAwareTokenStream extends CommonTokenStream {
-        public DirectiveAwareTokenStream(Lexer lexer) {
-            super(lexer);
-        }
-
-        @Override
-        public Token LT(int k) {
-            Token token = super.LT(k);
-            if (token != null) {
-                String text = token.getText();
-                if (text != null && (text.startsWith("@base") || text.startsWith("@prefix"))) {
-                    throw new ParsingErrorException("Directive not allowed in N-Quads: " + text);
-                }
-            }
-            return token;
-        }
-    }
 
     /**
      * Custom ANTLR ErrorListener that throws a ParsingErrorException on any syntax error.

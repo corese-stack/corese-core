@@ -49,7 +49,8 @@ fragment IRI_CHAR
     ;
 
 STRING_LITERAL_QUOTE
-    : '"' ( ~( [\u0022] | [\u005C] | [\u000A] | [\u000D] ) | ECHAR | UCHAR )* '"'
+    : '"""' ( ~('"') | '"' ~('"') | '""' ~('"') | ECHAR | UCHAR )* '"""'
+    | '"' ( ~( [\u0022] | [\u005C] | [\u000A] | [\u000D] ) | ECHAR | UCHAR )* '"'
     ;
 
 BLANK_NODE_LABEL

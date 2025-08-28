@@ -91,6 +91,7 @@ class ANTLRNQuadsParserTest {
         lenient().when(mockValueFactory.createLiteral(eq("hello"), eq("en"))).thenReturn(mockLangLiteral);
         lenient().when(mockValueFactory.createLiteral(eq("123"), any(IRI.class))).thenReturn(mockTypedLiteral);
         lenient().when(mockValueFactory.createLiteral(eq("literal with \"quotes\" and \n newline"))).thenReturn(mockEscapedLiteral);
+        lenient().when(mockValueFactory.createLiteral(eq("@base <http://example.org/inner/> .\n<http://example/#bogus\n"), any(IRI.class))).thenReturn(mockTypedLiteral);
     }
 
     @Test
@@ -206,5 +207,7 @@ class ANTLRNQuadsParserTest {
                 """;
         StringReader reader = new StringReader(doc);
         parser.parse(reader);
+
+        verify(mockModel, times(2)).add(any(), any(), any(), any());
     }
 }

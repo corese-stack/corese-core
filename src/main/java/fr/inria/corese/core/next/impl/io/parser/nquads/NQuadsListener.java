@@ -147,11 +147,17 @@ public class NQuadsListener extends NQuadsBaseListener {
      * @return The created Literal value.
      */
     protected Literal extractLiteral(NQuadsParser.LiteralContext ctx) {
-        String label = ctx.STRING_LITERAL_QUOTE().getText();
-        label = unescapeLiteral(label);
+        String rawLiteralText;
+        if (ctx.STRING_LITERAL_QUOTE() != null) {
+            rawLiteralText = ctx.STRING_LITERAL_QUOTE().getText();
+        }
+        else {
+            throw new ParsingErrorException("Unsupported literal type or missing literal token: " + ctx.getText());
+        }
+        String label = unescapeLiteral(rawLiteralText);
 
         if (ctx.IRIREF() != null) {
-            IRI datatype = factory.createIRI(unescapeUri(ctx.IRIREF().getText().substring(1, ctx.IRIREF().getText().length() - 1)));
+            IRI datatype = factory.createIRI(unescapeUri(stripAngles(ctx.IRIREF().getText())));
             return factory.createLiteral(label, datatype);
         }
         if (ctx.LANGTAG() != null) {
@@ -172,7 +178,19 @@ public class NQuadsListener extends NQuadsBaseListener {
      * @throws ParsingErrorException if an invalid Unicode escape sequence is found.
      */
     protected String unescapeLiteral(String literalText) {
-        String unquotedLiteral = literalText.substring(1, literalText.length() - 1);
+        String unquotedLiteral;
+        int quoteLength = 0;
+
+        if (literalText.startsWith("\"\"\"") && literalText.endsWith("\"\"\"")) { // Triple quotes
+            quoteLength = 3;
+        } else if (literalText.startsWith("\"") && literalText.endsWith("\"")) { // Single quotes
+            quoteLength = 1;
+        } else {
+
+            throw new ParsingErrorException("Literal text does not start/end with expected N-Quads quotes: " + literalText);
+        }
+
+        unquotedLiteral = literalText.substring(quoteLength, literalText.length() - quoteLength);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < unquotedLiteral.length(); i++) {
