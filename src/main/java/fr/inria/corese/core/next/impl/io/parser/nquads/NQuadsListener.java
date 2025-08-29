@@ -179,14 +179,18 @@ public class NQuadsListener extends NQuadsBaseListener {
      */
     protected String unescapeLiteral(String literalText) {
         String unquotedLiteral;
-        int quoteLength = 0;
-
-        if (literalText.startsWith("\"\"\"") && literalText.endsWith("\"\"\"")) { // Triple quotes
+        int quoteLength;
+        if (literalText.startsWith("\"\"\"") && literalText.endsWith("\"\"\"")) {
+            if (literalText.length() < 6) {
+                throw new ParsingErrorException("Invalid triple-quoted string");
+            }
             quoteLength = 3;
-        } else if (literalText.startsWith("\"") && literalText.endsWith("\"")) { // Single quotes
+        } else if (literalText.startsWith("\"") && literalText.endsWith("\"")) {
+            if (literalText.length() < 2) {
+                throw new ParsingErrorException("Invalid single-quoted string");
+            }
             quoteLength = 1;
         } else {
-
             throw new ParsingErrorException("Literal text does not start/end with expected N-Quads quotes: " + literalText);
         }
 
