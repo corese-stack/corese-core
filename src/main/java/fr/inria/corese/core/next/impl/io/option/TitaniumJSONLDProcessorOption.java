@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.JsonLdVersion;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
+import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
 
 /**
  * Wrapper around the JsonLdOptions class for the Titanium JSONLD parser and
@@ -17,7 +18,8 @@ import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
  * @see <a href=
  *      "https://javadoc.io/doc/com.apicatalog/titanium-json-ld/latest/com/apicatalog/jsonld/JsonLdOptions.html">JsonLdOptions</a>
  */
-public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements RDFParserBaseIRIOptions {
+public class TitaniumJSONLDProcessorOption extends AbstractIOOptions
+        implements RDFParserBaseIRIOptions, SerializationOption {
 
     private final Builder builder;
 
@@ -138,7 +140,8 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions implements 
     /**
      * Builder for creating instances of TitaniumJSONLDProcessorOption.
      * This nested static class provides a fluent API for configuring the
-     * various options before building the final {@code TitaniumJSONLDProcessorOption} object.
+     * various options before building the final
+     * {@code TitaniumJSONLDProcessorOption} object.
      */
     public static class Builder extends AbstractIOOptions.Builder<TitaniumJSONLDProcessorOption> {
 
