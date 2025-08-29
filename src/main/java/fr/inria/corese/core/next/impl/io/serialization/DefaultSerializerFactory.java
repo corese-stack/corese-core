@@ -15,6 +15,8 @@ import fr.inria.corese.core.next.impl.io.serialization.trig.TriGOption;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleOption;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
+import fr.inria.corese.core.next.impl.io.option.TitaniumJSONLDProcessorOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +33,12 @@ import java.util.function.BiFunction;
  * to map each format to its corresponding serializer constructor,
  * providing a flexible and extensible way to manage serializer instances.
  *
- * <p>It adapts the generic {@link SerializationOption} provided to the specific
- * configuration type expected by each serializer in the hierarchy, with a fallback
- * to default configurations if an incompatible type is provided.</p>
+ * <p>
+ * It adapts the generic {@link SerializationOption} provided to the specific
+ * configuration type expected by each serializer in the hierarchy, with a
+ * fallback
+ * to default configurations if an incompatible type is provided.
+ * </p>
  */
 public class DefaultSerializerFactory implements SerializerFactory {
 
@@ -44,8 +49,10 @@ public class DefaultSerializerFactory implements SerializerFactory {
     /**
      * Constructs a {@code DefaultSerializerFactory} and populates its registry
      * with constructors for all known {@link RDFFormat} implementations.
-     * Each constructor attempts to cast the generic {@link SerializationOption} to the
-     * specific configuration type required by the serializer. If the cast is not possible,
+     * Each constructor attempts to cast the generic {@link SerializationOption} to
+     * the
+     * specific configuration type required by the serializer. If the cast is not
+     * possible,
      * it falls back to the format's default configuration.
      */
     public DefaultSerializerFactory() {
@@ -65,7 +72,8 @@ public class DefaultSerializerFactory implements SerializerFactory {
             if (genericConfig instanceof NTriplesOption specificConfig) {
                 return new NTriplesSerializer(model, specificConfig);
             } else {
-                logger.warn("Provided config for NTRIPLES is not NTriplesConfig (was {}). Using default NTriplesConfig.",
+                logger.warn(
+                        "Provided config for NTRIPLES is not NTriplesConfig (was {}). Using default NTriplesConfig.",
                         genericConfig.getClass().getSimpleName());
                 return new NTriplesSerializer(model, NTriplesOption.defaultConfig());
             }
@@ -101,18 +109,35 @@ public class DefaultSerializerFactory implements SerializerFactory {
             }
         });
 
+        tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> {
+            if (genericConfig instanceof TitaniumJSONLDProcessorOption specificConfig) {
+                return new JSONLDSerializer(model, specificConfig);
+            } else {
+                logger.warn(
+                        "Provided config for JSONLD is not TitaniumJSONLDProcessorOption (was {}). Using default TitaniumJSONLDProcessorOption.",
+                        genericConfig.getClass().getSimpleName());
+                return new JSONLDSerializer(model, new TitaniumJSONLDProcessorOption.Builder().build());
+            }
+        });
+
         this.registry = Collections.unmodifiableMap(tempRegistry);
     }
 
     /**
-     * Creates an {@link RDFSerializer} instance for the specified format, model, and configuration.
+     * Creates an {@link RDFSerializer} instance for the specified format, model,
+     * and configuration.
      *
-     * @param format the {@link RDFFormat} for which to create the serializer. Must not be null.
+     * @param format the {@link RDFFormat} for which to create the serializer. Must
+     *               not be null.
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link SerializationOption} to apply during serialization. Must not be null.
-     * @return a new instance of {@link RDFSerializer} configured for the specified format.
-     * @throws NullPointerException     if any of the arguments (format, model, config) are null.
-     * @throws IllegalArgumentException if the provided format is not supported by this factory.
+     * @param config the {@link SerializationOption} to apply during serialization.
+     *               Must not be null.
+     * @return a new instance of {@link RDFSerializer} configured for the specified
+     *         format.
+     * @throws NullPointerException     if any of the arguments (format, model,
+     *                                  config) are null.
+     * @throws IllegalArgumentException if the provided format is not supported by
+     *                                  this factory.
      */
     @Override
     public RDFSerializer createSerializer(RDFFormat format, Model model, SerializationOption config) {
