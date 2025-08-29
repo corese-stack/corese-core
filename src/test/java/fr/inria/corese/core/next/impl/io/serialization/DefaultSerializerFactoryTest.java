@@ -16,6 +16,7 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
+import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.Rdfc10Serializer;
 import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
@@ -108,18 +109,6 @@ class DefaultSerializerFactoryTest {
     }
 
     @Test
-    @DisplayName("createSerializer should return CanonicalSerializer for CANONICAL_RDF format")
-    void createSerializer_shouldReturnCanonicalSerializer_forCanonicalRdfFormat() {
-        try (MockedConstruction<Rdfc10Serializer> mockedConstruction = mockConstruction(Rdfc10Serializer.class)) {
-            RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFC_1_0, mockModel, mockConfig);
-
-            assertNotNull(serializer);
-            assertTrue(serializer instanceof Rdfc10Serializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "CanonicalSerializer constructor should be called once");
-        }
-    }
-
-    @Test
     @DisplayName("createSerializer should return JSONLDSerializer for JSONLD format")
     void createSerializer_shouldReturnJSONLDSerializer_forJSONLDFormat() {
         try (MockedConstruction<JSONLDSerializer> mockedConstruction = mockConstruction(JSONLDSerializer.class)) {
@@ -131,6 +120,20 @@ class DefaultSerializerFactoryTest {
                     "JSONLDSerializer constructor should be called once");
         }
     }
+
+    @Test
+    @DisplayName("createSerializer should return CanonicalSerializer for CANONICAL_RDF format")
+    void createSerializer_shouldReturnCanonicalSerializer_forCanonicalRdfFormat() {
+        try (MockedConstruction<Rdfc10Serializer> mockedConstruction = mockConstruction(Rdfc10Serializer.class)) {
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFC_1_0, mockModel, mockConfig);
+
+            assertNotNull(serializer);
+            assertTrue(serializer instanceof Rdfc10Serializer);
+            assertEquals(1, mockedConstruction.constructed().size(), "CanonicalSerializer constructor should be called once");
+        }
+    }
+
+
 
     @Test
     @DisplayName("createSerializer should throw NullPointerException for a null format")
