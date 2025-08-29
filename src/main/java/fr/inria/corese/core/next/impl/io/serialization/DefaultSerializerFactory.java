@@ -21,6 +21,8 @@ import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleOption;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
 import fr.inria.corese.core.next.impl.io.option.TitaniumJSONLDProcessorOption;
+import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
+import fr.inria.corese.core.next.impl.io.option.TitaniumJSONLDProcessorOption;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,6 +151,17 @@ public class DefaultSerializerFactory implements SerializerFactory {
             }
         });
 
+
+        tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> {
+            if (genericConfig instanceof TitaniumJSONLDProcessorOption specificConfig) {
+                return new JSONLDSerializer(model, specificConfig);
+            } else {
+                logger.warn(
+                        "Provided config for JSONLD is not TitaniumJSONLDProcessorOption (was {}). Using default TitaniumJSONLDProcessorOption.",
+                        genericConfig.getClass().getSimpleName());
+                return new JSONLDSerializer(model, new TitaniumJSONLDProcessorOption.Builder().build());
+            }
+        });
 
         this.registry = Collections.unmodifiableMap(tempRegistry);
     }

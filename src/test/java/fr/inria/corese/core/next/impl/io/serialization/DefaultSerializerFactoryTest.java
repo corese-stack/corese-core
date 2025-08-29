@@ -109,19 +109,6 @@ class DefaultSerializerFactoryTest {
     }
 
     @Test
-    @DisplayName("createSerializer should return JSONLDSerializer for JSONLD format")
-    void createSerializer_shouldReturnJSONLDSerializer_forJSONLDFormat() {
-        try (MockedConstruction<JSONLDSerializer> mockedConstruction = mockConstruction(JSONLDSerializer.class)) {
-            RDFSerializer serializer = factory.createSerializer(RDFFormat.JSONLD, mockModel, mockConfig);
-
-            assertNotNull(serializer);
-            assertTrue(serializer instanceof JSONLDSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(),
-                    "JSONLDSerializer constructor should be called once");
-        }
-    }
-
-    @Test
     @DisplayName("createSerializer should return CanonicalSerializer for CANONICAL_RDF format")
     void createSerializer_shouldReturnCanonicalSerializer_forCanonicalRdfFormat() {
         try (MockedConstruction<Rdfc10Serializer> mockedConstruction = mockConstruction(Rdfc10Serializer.class)) {
@@ -133,7 +120,18 @@ class DefaultSerializerFactoryTest {
         }
     }
 
+    @Test
+    @DisplayName("createSerializer should return JSONLDSerializer for JSONLD format")
+    void createSerializer_shouldReturnJSONLDSerializer_forJSONLDFormat() {
+        try (MockedConstruction<JSONLDSerializer> mockedConstruction = mockConstruction(JSONLDSerializer.class)) {
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.JSONLD, mockModel, mockConfig);
 
+            assertNotNull(serializer);
+            assertTrue(serializer instanceof JSONLDSerializer);
+            assertEquals(1, mockedConstruction.constructed().size(),
+                    "JSONLDSerializer constructor should be called once");
+        }
+    }
 
     @Test
     @DisplayName("createSerializer should throw NullPointerException for a null format")
