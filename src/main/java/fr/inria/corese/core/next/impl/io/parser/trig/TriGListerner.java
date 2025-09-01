@@ -37,9 +37,14 @@ public class TriGListerner extends TriGBaseListener {
      */
     public TriGListerner(Model model, ValueFactory factory, IOOptions options) {
         this.model = model;
-        this.baseURI = baseURI != null ? baseURI : "";
-        if (options != null && options instanceof RDFParserBaseIRIOptions);
         this.factory = factory;
+
+        if (options instanceof RDFParserBaseIRIOptions) {
+            RDFParserBaseIRIOptions baseIRIOptions = (RDFParserBaseIRIOptions) options;
+            this.baseURI = baseIRIOptions.getBase() != null ? baseIRIOptions.getBase() : "";
+        } else {
+            this.baseURI = "";
+        }
     }
 
     @Override
@@ -74,6 +79,9 @@ public class TriGListerner extends TriGBaseListener {
         if (ctx.labelOrSubject() != null && ctx.predicateObjectList() != null) {
             currentSubject = extractLabelOrSubject(ctx.labelOrSubject());
             processPredicateObjectList(ctx.predicateObjectList());
+        } else if (ctx.labelOrSubject() != null && ctx.predicateObjectList() == null) {
+            Resource potentialGraph = extractLabelOrSubject(ctx.labelOrSubject());
+            currentGraph = potentialGraph;
         }
     }
 
@@ -195,7 +203,7 @@ public class TriGListerner extends TriGBaseListener {
      */
     private Literal extractLiteral(TriGParser.LiteralContext ctx) {
         if (ctx.rDFLiteral() != null) {
-            String label = stripQuotes(ctx.rDFLiteral().string().getText());
+            String label = unescapeString(ctx.rDFLiteral().string().getText());
             if (ctx.rDFLiteral().LANGTAG() != null)
                 return factory.createLiteral(label, ctx.rDFLiteral().LANGTAG().getText().substring(1));
             if (ctx.rDFLiteral().iri() != null)
@@ -235,19 +243,60 @@ public class TriGListerner extends TriGBaseListener {
         return baseURI + raw;
     }
 
-    /**
-     * Strips surrounding quotes from a string literal, including single, double, and multi-line forms.
-     *
-     * @param text the quoted string
-     * @return the unquoted string
-     */
-    private String stripQuotes(String text) {
-        if (text == null || text.length() < 2) return text;
-        if ((text.startsWith("\"") && text.endsWith("\"")) ||
-                (text.startsWith("\"\"\"") && text.endsWith("\"\"\"")) ||
-                (text.startsWith("'''") && text.endsWith("'''"))) {
-            return text.substring(1, text.length() - 1);
+    private String unescapeString(String text) {
+        if (text == null || text.length() < 2) {
+            return text;
         }
-        return text;
+
+        boolean isMultiline = text.startsWith("\"\"\"") || text.startsWith("'''");
+        String content;
+        if (isMultiline) {
+            content = text.substring(3, text.length() - 3);
+        } else {
+            content = text.substring(1, text.length() - 1);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '\\' && i + 1 < content.length()) {
+                char next = content.charAt(i + 1);
+                switch (next) {
+                    case 't': sb.append('\t'); i++; break;
+                    case 'n': sb.append('\n'); i++; break;
+                    case 'r': sb.append('\r'); i++; break;
+                    case 'b': sb.append('\b'); i++; break;
+                    case 'f': sb.append('\f'); i++; break;
+                    case '\"': sb.append('\"'); i++; break;
+                    case '\'': sb.append('\''); i++; break;
+                    case '\\': sb.append('\\'); i++; break;
+                    case 'u':
+                    case 'U':
+                        int len = (next == 'u') ? 4 : 8;
+                        if (i + len + 1 <= content.length()) {
+                            try {
+                                String hex = content.substring(i + 2, i + 2 + len);
+                                int codePoint = Integer.parseInt(hex, 16);
+                                sb.appendCodePoint(codePoint);
+                                i += len + 1;
+                            } catch (NumberFormatException e) {
+                                sb.append(c).append(next);
+                                i++;
+                            }
+                        } else {
+                            sb.append(c).append(next);
+                            i++;
+                        }
+                        break;
+                    default:
+                        sb.append(c).append(next);
+                        i++;
+                        break;
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 }
