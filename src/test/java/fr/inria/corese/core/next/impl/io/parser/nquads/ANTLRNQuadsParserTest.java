@@ -91,6 +91,7 @@ class ANTLRNQuadsParserTest {
         lenient().when(mockValueFactory.createLiteral(eq("hello"), eq("en"))).thenReturn(mockLangLiteral);
         lenient().when(mockValueFactory.createLiteral(eq("123"), any(IRI.class))).thenReturn(mockTypedLiteral);
         lenient().when(mockValueFactory.createLiteral(eq("literal with \"quotes\" and \n newline"))).thenReturn(mockEscapedLiteral);
+        lenient().when(mockValueFactory.createLiteral(eq("@base <http://example.org/inner/> .\n<http://example/#bogus\n"), any(IRI.class))).thenReturn(mockTypedLiteral);
     }
 
     @Test
@@ -193,5 +194,20 @@ class ANTLRNQuadsParserTest {
 
         parser.parse(new StringReader(nquad));
         verify(mockModel).add(mockSubjectIRI, mockPredicateIRI, mockObjectIRI, expectedGraphIRI);
+    }
+
+    @Test
+    @DisplayName("Test parsing a document that contains a literal that is a malformed document")
+    void testMalformedDocumentInception() throws ParsingErrorException {
+        String doc = """
+                <http://example.org/#s> <http://example.org/#p> <http://example.org/#o> <http://example.org/#g> .
+                <http://example.org/#s> <http://example.org/#pp> \"\"\"@base <http://example.org/inner/> .
+                <http://example/#bogus
+                \"\"\"^^<http://example.org/datatype/#example>  <http://example.org/#g> .
+                """;
+        StringReader reader = new StringReader(doc);
+        parser.parse(reader);
+
+        verify(mockModel, times(2)).add(any(), any(), any(), any());
     }
 }

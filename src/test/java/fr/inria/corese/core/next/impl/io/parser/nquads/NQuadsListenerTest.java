@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.nquads;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -310,7 +311,7 @@ class NQuadsListenerTest {
         String input = "\"Invalid\\U0000XXX\"";
         java.lang.reflect.Method method = NQuadsListener.class.getDeclaredMethod("unescapeLiteral", String.class);
         method.setAccessible(true);
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ParsingErrorException.class,
                 () -> listener.unescapeLiteral(input),
                 "Should throw for malformed \\UXXXXXXXX escape sequence");
     }
@@ -346,13 +347,13 @@ class NQuadsListenerTest {
 
 
     @Test
-    @DisplayName("unescapeUri should throw IllegalArgumentException for invalid \\uXXXX")
+    @DisplayName("unescapeUri should throw ParsingErrorException for invalid \\uXXXX")
     void testUnescapeUriInvalidU() throws NoSuchMethodException {
         String input = "http://example.org/invalid\\uXXX";
         java.lang.reflect.Method method = NQuadsListener.class.getDeclaredMethod("unescapeUri", String.class);
         method.setAccessible(true);
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ParsingErrorException.class,
                 () -> listener.unescapeLiteral(input),
                 "Should throw unescapeUri should throw IllegalArgumentException for invalid \\uXXXX");
 

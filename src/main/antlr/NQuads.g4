@@ -41,12 +41,16 @@ EOL
     ;
 
 IRIREF
-//  	'<' ([^#x00-#x20<>"{}|^`\] | UCHAR)* '>'
-    : '<' [a-zA-Z0-9-]+':' ((~( [\u0000-\u0020] | '<' | '>' | '"' | '{'| '}' | '|'| '^'| '`' | '\\' )) | UCHAR)* '>'
+    : '<' ( IRI_CHAR | UCHAR )* '>'
+    ;
+
+fragment IRI_CHAR
+    : ~ ( '\u0000'..'\u0020' | '<' | '>' | '"' | '{' | '}' | '|' | '^' | '`' | '\\' )
     ;
 
 STRING_LITERAL_QUOTE
-    : '"' ( ~( [\u0022] | [\u005C] | [\u000A] | [\u000D] ) | ECHAR | UCHAR )* '"'
+    : '"""' ( ~('"') | '"' ~('"') | '""' ~('"') | ECHAR | UCHAR )* '"""'
+    | '"' ( ~( [\u0022] | [\u005C] | [\u000A] | [\u000D] ) | ECHAR | UCHAR )* '"'
     ;
 
 BLANK_NODE_LABEL
@@ -90,7 +94,7 @@ PN_CHARS_U
 // PN_CHARS_BASE | '_' | ':'
     : PN_CHARS_BASE
     | '_'
-//    | ':'
+    | ':'
     ;
 
 PN_CHARS

@@ -8,9 +8,7 @@ import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -82,20 +80,67 @@ public class ANTLRNQuadsParser extends AbstractRDFParser {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
             NQuadsLexer lexer = new NQuadsLexer(charStream);
+
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+
             NQuadsParser antlrParser = new NQuadsParser(tokens);
-            ParseTreeWalker walker = new ParseTreeWalker();
+            antlrParser.removeErrorListeners();
+            antlrParser.addErrorListener(ThrowingErrorListener.INSTANCE);
+
             ParseTree tree = antlrParser.nquadsDoc();
+            ParseTreeWalker walker = new ParseTreeWalker();
 
             NQuadsListener listener = new NQuadsListener(getModel(), getValueFactory(), getConfig());
-
             walker.walk((ParseTreeListener) listener, tree);
 
         } catch (IOException e) {
             throw new ParsingErrorException("Failed to parse N-Quads: " + e.getMessage(), e);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            Throwable current = e;
+            while (current != null) {
+                if (current instanceof ParsingErrorException) {
+                    throw (ParsingErrorException) current;
+                }
+                current = current.getCause();
+            }
             throw new ParsingErrorException("Unexpected error during N-Quads parsing: " + e.getMessage(), e);
+        }
+    }
+
+
+    /**
+     * Custom ANTLR ErrorListener that throws a ParsingErrorException on any syntax error.
+     * This ensures that parsing failures are immediately reported as application-specific exceptions.
+     */
+    private static class ThrowingErrorListener extends BaseErrorListener {
+        static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                int line, int charPositionInLine,
+                                String msg, RecognitionException e) {
+
+            if (offendingSymbol != null) {
+                String symbolText = offendingSymbol.toString();
+
+                if (msg != null && msg.contains("token recognition error") && symbolText.equals("':'")) {
+                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
+                }
+
+                if (msg != null && msg.contains("no viable alternative") && symbolText.contains("_:")) {
+                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
+                }
+
+                if (symbolText.contains("_:") && symbolText.contains(":") && !symbolText.equals("_:")) {
+                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
+                }
+            }
+
+            throw new ParsingErrorException(
+                    String.format("line %d:%d %s", line, charPositionInLine, msg));
         }
     }
 }
