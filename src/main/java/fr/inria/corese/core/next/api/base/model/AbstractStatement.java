@@ -59,10 +59,10 @@ public abstract class AbstractStatement implements Statement {
     @Override
     public String toString() {
         return "("
-                + getSubject()
-                + ", " + getPredicate()
-                + ", " + getObject()
-                + (getContext() == null ? "" : ", " + getContext())
+                + getSubject().stringValue()
+                + ", " + getPredicate().stringValue()
+                + ", " + getObject().stringValue()
+                + (getContext() == null ? "" : ", " + getContext().stringValue())
                 + ")";
     }
 }
