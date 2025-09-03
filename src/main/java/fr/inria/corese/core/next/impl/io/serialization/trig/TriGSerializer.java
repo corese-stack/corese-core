@@ -197,8 +197,6 @@ public class TriGSerializer extends AbstractGraphSerializer {
 
             if (context != null) {
                 writer.write(SerializationConstants.CLOSE_BRACE);
-                writer.write(SerializationConstants.SPACE);
-                writer.write(SerializationConstants.POINT);
                 writer.write(trigConfig.getLineEnding());
             }
             writer.write(trigConfig.getLineEnding());
