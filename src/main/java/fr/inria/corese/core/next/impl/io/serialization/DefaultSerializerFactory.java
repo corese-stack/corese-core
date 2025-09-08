@@ -6,10 +6,9 @@ import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.option.CanonicalOption;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.CanonicalOption;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.CanonicalSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.Rdfc10Canonicalizer;
-import fr.inria.corese.core.next.impl.io.serialization.canonical.Rdfc10CanonicalizerImpl;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsOption;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesOption;
@@ -112,7 +111,7 @@ public class DefaultSerializerFactory implements SerializerFactory {
 
         tempRegistry.put(RDFFormat.RDFC_1_0, (model, genericConfig) -> {
             if (genericConfig instanceof CanonicalOption specificConfig) {
-                Rdfc10Canonicalizer canonicalizer = new Rdfc10CanonicalizerImpl(
+                Rdfc10Canonicalizer canonicalizer = new Rdfc10Canonicalizer(
                         specificConfig.getHashAlgorithm(),
                         specificConfig.getPermutationLimit(),
                         coreseValueFactory
@@ -122,7 +121,7 @@ public class DefaultSerializerFactory implements SerializerFactory {
                 logger.warn("Provided config for RDFC_1_0 is not CanonicalOption (was {}). Using default CanonicalOption.",
                         genericConfig != null ? genericConfig.getClass().getSimpleName() : "null");
                 CanonicalOption defaultConfig = CanonicalOption.defaultConfig();
-                Rdfc10Canonicalizer canonicalizer = new Rdfc10CanonicalizerImpl(
+                Rdfc10Canonicalizer canonicalizer = new Rdfc10Canonicalizer(
                         defaultConfig.getHashAlgorithm(),
                         defaultConfig.getPermutationLimit(),
                         coreseValueFactory
@@ -130,6 +129,7 @@ public class DefaultSerializerFactory implements SerializerFactory {
                 return new CanonicalSerializer(model, defaultConfig, coreseValueFactory, canonicalizer);
             }
         });
+
 
         this.registry = Collections.unmodifiableMap(tempRegistry);
     }

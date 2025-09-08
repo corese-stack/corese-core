@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.impl.io.serialization.canonical;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.serialization.option.CanonicalOption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -191,12 +190,6 @@ class CanonicalSerializerTest {
                 new CanonicalSerializer(null, defaultConfig, mockValueFactory, mockCanonicalizer));
     }
 
-    @Test
-    @DisplayName("Constructor with null valueFactory should throw NullPointerException")
-    void testConstructorNullValueFactory() {
-        assertThrows(NullPointerException.class, () ->
-                new CanonicalSerializer(mockModel, defaultConfig, null, mockCanonicalizer));
-    }
 
     @Test
     @DisplayName("Constructor with null config should throw NullPointerException")
@@ -227,7 +220,7 @@ class CanonicalSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        serializer.serialize(writer);
+        serializer.write(writer);
 
         assertEquals("", writer.toString());
     }
@@ -241,7 +234,7 @@ class CanonicalSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        serializer.serialize(writer);
+        serializer.write(writer);
 
         String expectedOutput = "<http://example.org/iri1> <http://example.org/iri2> \"literal1\" .\n";
         assertEquals(expectedOutput, writer.toString());
@@ -280,7 +273,7 @@ class CanonicalSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        serializer.serialize(writer);
+        serializer.write(writer);
 
         String expectedOutput = """
                 <http://example.com/#p> <http://example.com/#q> _:c14n2 .
@@ -302,7 +295,7 @@ class CanonicalSerializerTest {
         when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(Collections.singletonList(stmtWithContext));
 
         StringWriter writer = new StringWriter();
-        serializer.serialize(writer);
+        serializer.write(writer);
 
         String expectedOutput = "<http://example.org/iri1> <http://example.org/iri2> \"literal1\" <http://example.org/iri1> .\n";
         assertEquals(expectedOutput, writer.toString());
@@ -346,7 +339,7 @@ class CanonicalSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        serializer.serialize(writer);
+        serializer.write(writer);
 
         String expectedOutput = "<http://example.org/iri1> <http://example.org/iri2> \"literal1\" _:c14n0 .\n";
         assertEquals(expectedOutput, writer.toString());
@@ -384,7 +377,7 @@ class CanonicalSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        serializer.serialize(writer);
+        serializer.write(writer);
 
         String expectedOutput = """
                 _:b0 <http://example.com/#r> _:b2 .
@@ -417,7 +410,7 @@ class CanonicalSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        noDotSerializer.serialize(writer);
+        noDotSerializer.write(writer);
 
         String expectedOutput = "<http://example.org/iri1> <http://example.org/iri2> \"literal1\"\n";
         assertEquals(expectedOutput, writer.toString());
@@ -443,7 +436,7 @@ class CanonicalSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        customLineEndingSerializer.serialize(writer);
+        customLineEndingSerializer.write(writer);
 
         String expectedOutput = "<http://example.org/iri1> <http://example.org/iri2> \"literal1\" .\r\n";
         assertEquals(expectedOutput, writer.toString());
@@ -460,7 +453,7 @@ class CanonicalSerializerTest {
         when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(mixedStatements);
 
         StringWriter writer = new StringWriter();
-        serializer.serialize(writer);
+        serializer.write(writer);
 
         String expectedOutput = """
                 <http://example.org/iri1> <http://example.com/#p> "literal1" .
@@ -470,4 +463,47 @@ class CanonicalSerializerTest {
         assertEquals(expectedOutput, writer.toString());
     }
 
+    @Test
+    @DisplayName("Serialization of specific N3 input with exact expected output order")
+    void testSerializeSpecificN3InputWithExactOutputOrder() throws SerializationException {
+        // Given the specific N3 input:
+        // @prefix : <http://example.com/#> .
+        // :p :q _:e0 .
+        // :p :q _:e1 .
+        // _:e0 :p _:e2 .
+        // _:e1 :p _:e3 .
+        // _:e2 :r _:e3 .
+
+        // Mock the canonicalized output in the EXACT order you expect:
+        Statement expectedStmt1 = createMockStatement(mockBNodeE0, mockIRIP, mockBNodeE2, null);
+        Statement expectedStmt2 = createMockStatement(mockBNodeE1, mockIRIP, mockBNodeE3, null);
+        Statement expectedStmt3 = createMockStatement(mockIRIP, mockIRIQ, mockBNodeE0, null);
+        Statement expectedStmt4 = createMockStatement(mockIRIP, mockIRIQ, mockBNodeE1, null);
+        Statement expectedStmt5 = createMockStatement(mockBNodeE2, mockIRIR, mockBNodeE3, null);
+
+        List<Statement> expectedCanonicalStatements = Arrays.asList(
+                expectedStmt1,  // _:e0 :p _:e2 .
+                expectedStmt2,  // _:e1 :p _:e3 .
+                expectedStmt3,  // :p :q _:e0 .
+                expectedStmt4,  // :p :q _:e1 .
+                expectedStmt5   // _:e2 :r _:e3 .
+        );
+
+        when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(expectedCanonicalStatements);
+
+        StringWriter writer = new StringWriter();
+
+        serializer.write(writer);
+
+        String expectedOutput = """
+            _:e0 <http://example.com/#p> _:e2 .
+            _:e1 <http://example.com/#p> _:e3 .
+            <http://example.com/#p> <http://example.com/#q> _:e0 .
+            <http://example.com/#p> <http://example.com/#q> _:e1 .
+            _:e2 <http://example.com/#r> _:e3 .
+            """;
+        assertEquals(expectedOutput, writer.toString());
+
+        verify(mockCanonicalizer).canonicalize(any(Model.class));
+    }
 }

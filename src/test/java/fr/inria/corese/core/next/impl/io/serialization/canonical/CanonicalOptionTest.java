@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.impl.io.serialization.canonical;
 
-import fr.inria.corese.core.next.impl.io.serialization.option.CanonicalOption;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

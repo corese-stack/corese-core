@@ -111,7 +111,7 @@ public class StatementUtils {
             sb.append(SerializationConstants.SPACE).append(serializeForComparison(statement.getContext()));
         }
 
-        sb.append(SerializationConstants.SPACE_POINT);
+        sb.append(SerializationConstants.SPACE).append(SerializationConstants.POINT);
         return sb.toString();
     }
 }
