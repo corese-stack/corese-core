@@ -80,7 +80,7 @@ class ANTLRTrigParserTest {
     @Test
     void testNamedGraphParsing() throws Exception {
         String trig = """
-                @prefix ex: <http://example.org/> 
+                @prefix ex: <http://example.org/> .
                 ex:Graph1 {
                   ex:Alice ex:knows ex:Bob .
                 }""".trim();

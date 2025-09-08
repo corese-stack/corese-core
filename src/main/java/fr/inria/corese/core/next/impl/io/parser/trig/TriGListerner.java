@@ -11,7 +11,8 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.net.URI;
+import java.net.URISyntaxException;
 /**
  * Listener for the ANTLR4 generated parser for TriG.
  * This listener traverses the parse tree and builds the RDF model,
@@ -48,18 +49,64 @@ public class TriGListerner extends TriGBaseListener {
     }
 
     @Override
+    public void exitBase(TriGParser.BaseContext ctx) {
+        String newBase = ctx.IRIREF().getText();
+        newBase = newBase.substring(1, newBase.length() - 1);
+
+        try {
+            URI currentBaseUri = new URI(this.baseURI);
+            URI resolvedBaseUri = currentBaseUri.resolve(newBase);
+            this.baseURI = resolvedBaseUri.toString();
+        } catch (URISyntaxException e) {
+            this.baseURI = newBase;
+        }
+
+    }
+
+    @Override
     public void exitPrefixID(TriGParser.PrefixIDContext ctx) {
         String prefix = ctx.PNAME_NS().getText();
         String iri = ctx.IRIREF().getText();
         prefix = prefix.substring(0, prefix.length() - 1);
         iri = iri.substring(1, iri.length() - 1);
-        prefixMap.put(prefix, iri);
-        model.setNamespace(prefix, iri);
+
+        String resolvedIRI;
+        try {
+            URI base = new URI(baseURI);
+            URI resolved = base.resolve(iri);
+            resolvedIRI = resolved.toString();
+        } catch (URISyntaxException e) {
+            resolvedIRI = baseURI + iri;
+        }
+        prefixMap.put(prefix, resolvedIRI);
+        model.setNamespace(prefix, resolvedIRI);
     }
 
     @Override
     public void exitSparqlBase(TriGParser.SparqlBaseContext ctx) {
-        baseURI = ctx.IRIREF().getText().replaceAll("^<|>$", "");
+        String newBase = ctx.IRIREF().getText();
+        newBase = newBase.substring(1, newBase.length() - 1);
+        baseURI = newBase;
+    }
+
+    // Add this new method to handle SPARQL-style PREFIX declarations
+    @Override
+    public void exitSparqlPrefix(TriGParser.SparqlPrefixContext ctx) {
+        String prefix = ctx.PNAME_NS().getText();
+        String iri = ctx.IRIREF().getText();
+        prefix = prefix.substring(0, prefix.length() - 1);
+        iri = iri.substring(1, iri.length() - 1);
+
+        String resolvedIRI;
+        try {
+            URI base = new URI(baseURI);
+            URI resolved = base.resolve(iri);
+            resolvedIRI = resolved.toString();
+        } catch (URISyntaxException e) {
+            resolvedIRI = baseURI + iri;
+        }
+        prefixMap.put(prefix, resolvedIRI);
+        model.setNamespace(prefix, resolvedIRI);
     }
 
     @Override
@@ -87,16 +134,34 @@ public class TriGListerner extends TriGBaseListener {
 
     @Override
     public void enterTriples(TriGParser.TriplesContext ctx) {
-        currentSubject = extractSubject(ctx.subject());
-        processPredicateObjectList(ctx.predicateObjectList());
+        if (ctx.subject() != null) {
+            currentSubject = extractSubject(ctx.subject());
+        } else if (ctx.blankNodePropertyList() != null) {
+            currentSubject = processBlankNodePropertyList(ctx.blankNodePropertyList());
+        }
+
+        if (ctx.predicateObjectList() != null) {
+            processPredicateObjectList(ctx.predicateObjectList());
+        }
     }
 
-    /**
-     * Processes a PredicateObjectList context, extracting verbs and corresponding object lists,
-     * and adding triples to the model for the current subject and graph.
-     *
-     * @param ctx the predicate-object list context from the parser
-     */
+    @Override
+    public void enterTriples2(TriGParser.Triples2Context ctx) {
+        if (ctx.blankNodePropertyList() != null) {
+            currentSubject = processBlankNodePropertyList(ctx.blankNodePropertyList());
+
+            if (ctx.predicateObjectList() != null) {
+                processPredicateObjectList(ctx.predicateObjectList());
+            }
+        } else if (ctx.collection() != null) {
+            currentSubject = processCollection(ctx.collection());
+
+            if (ctx.predicateObjectList() != null) {
+                processPredicateObjectList(ctx.predicateObjectList());
+            }
+        }
+    }
+
     private void processPredicateObjectList(TriGParser.PredicateObjectListContext ctx) {
         List<TriGParser.VerbContext> verbs = ctx.verb();
         List<TriGParser.ObjectListContext> objLists = ctx.objectList();
@@ -111,13 +176,6 @@ public class TriGListerner extends TriGBaseListener {
         }
     }
 
-    /**
-     * Extracts an RDF object from the ObjectContext.
-     * Supports IRIs, blank nodes, literals, and inline blank node property lists.
-     *
-     * @param ctx the object context
-     * @return the extracted RDF Value
-     */
     private Value extractObject(TriGParser.ObjectContext ctx) {
         if (ctx.iri() != null) return factory.createIRI(resolveIRI(ctx.iri().getText()));
         if (ctx.blank() != null) return extractBlank(ctx.blank());
@@ -126,81 +184,104 @@ public class TriGListerner extends TriGBaseListener {
         throw new RuntimeException("Unsupported object: " + ctx.getText());
     }
 
-    /**
-     * Processes an inline blank node with its property list, returning the blank node as a Resource.
-     * Temporarily updates the current subject to the new blank node during processing.
-     *
-     * @param ctx the blank node property list context
-     * @return the new blank node resource
-     */
     private Resource processBlankNodePropertyList(TriGParser.BlankNodePropertyListContext ctx) {
         Resource bnode = factory.createBNode();
         Resource savedSubject = currentSubject;
         currentSubject = bnode;
-        processPredicateObjectList(ctx.predicateObjectList());
+
+        if (ctx.predicateObjectList() != null) {
+            processPredicateObjectList(ctx.predicateObjectList());
+        }
+
         currentSubject = savedSubject;
         return bnode;
     }
 
-    /**
-     * Extracts a subject from a SubjectContext, which can be an IRI or a blank node.
-     *
-     * @param ctx the subject context
-     * @return the extracted subject as a Resource
-     */
     private Resource extractSubject(TriGParser.SubjectContext ctx) {
-        if (ctx.iri() != null) return factory.createIRI(resolveIRI(ctx.iri().getText()));
-        if (ctx.blank() != null) return extractBlank(ctx.blank());
+        if (ctx.iri() != null) {
+            return factory.createIRI(resolveIRI(ctx.iri().getText()));
+        }
+        if (ctx.blank() != null) {
+            TriGParser.BlankNodeContext node = ctx.blank().blankNode();
+            if (node != null) {
+                if (node.BLANK_NODE_LABEL() != null) {
+                    return factory.createBNode(node.BLANK_NODE_LABEL().getText().substring(2));
+                }
+                if (node.ANON() != null) {
+                    return factory.createBNode();
+                }
+            } else if (ctx.blank().collection() != null) {
+                return processCollection(ctx.blank().collection());
+            }
+        }
         throw new RuntimeException("Unsupported subject: " + ctx.getText());
     }
 
-    /**
-     * Extracts a blank node from a BlankContext, supporting labeled (_:b) and anonymous ([]) forms.
-     *
-     * @param ctx the blank context
-     * @return the blank node as a Resource
-     */
     private Resource extractBlank(TriGParser.BlankContext ctx) {
         TriGParser.BlankNodeContext node = ctx.blankNode();
         if (node != null) {
             if (node.BLANK_NODE_LABEL() != null)
-                return factory.createBNode(node.BLANK_NODE_LABEL().getText());
+                return factory.createBNode(node.BLANK_NODE_LABEL().getText().substring(2));
             if (node.ANON() != null)
                 return factory.createBNode();
         }
+
+        TriGParser.CollectionContext collection = ctx.collection();
+        if (collection != null) {
+            return processCollection(collection);
+        }
+
         throw new RuntimeException("Unsupported blank node structure: " + ctx.getText());
     }
 
-    /**
-     * Extracts a graph label or subject from a LabelOrSubjectContext.
-     * Supports IRI and blank node.
-     *
-     * @param ctx the label or subject context
-     * @return the extracted resource
-     */
+    private Resource processCollection(TriGParser.CollectionContext ctx) {
+        List<TriGParser.ObjectContext> objects = ctx.object();
+
+        if (objects.isEmpty()) {
+            return factory.createIRI(RDF.nil.getIRI().stringValue());
+        }
+
+        Resource head = factory.createBNode();
+        Resource current = head;
+
+        for (int i = 0; i < objects.size(); i++) {
+            Value object = extractObject(objects.get(i));
+
+            model.add(current, factory.createIRI(RDF.first.getIRI().stringValue()), object, currentGraph);
+
+            if (i == objects.size() - 1) {
+                model.add(current, factory.createIRI(RDF.rest.getIRI().stringValue()),
+                        factory.createIRI(RDF.nil.getIRI().stringValue()), currentGraph);
+            } else {
+                Resource next = factory.createBNode();
+                model.add(current, factory.createIRI(RDF.rest.getIRI().stringValue()), next, currentGraph);
+                current = next;
+            }
+        }
+
+        return head;
+    }
+
     private Resource extractLabelOrSubject(TriGParser.LabelOrSubjectContext ctx) {
-        if (ctx.iri() != null) return factory.createIRI(resolveIRI(ctx.iri().getText()));
-        if (ctx.blankNode() != null) return factory.createBNode(ctx.blankNode().getText());
+        if (ctx.iri() != null) {
+            return factory.createIRI(resolveIRI(ctx.iri().getText()));
+        }
+        if (ctx.blankNode() != null) {
+            if (ctx.blankNode().BLANK_NODE_LABEL() != null) {
+                return factory.createBNode(ctx.blankNode().BLANK_NODE_LABEL().getText().substring(2));
+            }
+            if (ctx.blankNode().ANON() != null) {
+                return factory.createBNode();
+            }
+        }
+
         throw new RuntimeException("Unsupported labelOrSubject: " + ctx.getText());
     }
 
-    /**
-     * Extracts a predicate IRI from a VerbContext.
-     * Handles the special keyword 'a' as rdf:type.
-     *
-     * @param ctx the verb context
-     * @return the extracted IRI
-     */
     private IRI extractVerb(TriGParser.VerbContext ctx) {
         return factory.createIRI(resolveIRI(ctx.getText()));
     }
 
-    /**
-     * Extracts a Literal from a LiteralContext, handling typed, language-tagged, boolean, and numeric literals.
-     *
-     * @param ctx the literal context
-     * @return the extracted Literal
-     */
     private Literal extractLiteral(TriGParser.LiteralContext ctx) {
         if (ctx.rDFLiteral() != null) {
             String label = unescapeString(ctx.rDFLiteral().string().getText());
@@ -223,24 +304,106 @@ public class TriGListerner extends TriGBaseListener {
         throw new RuntimeException("Unsupported literal: " + ctx.getText());
     }
 
-    /**
-     * Resolves an IRI or QName into a full URI string.
-     * Handles full IRIs in angle brackets, QNames using prefixes, and special case "a".
-     *
-     * @param raw the raw string
-     * @return the resolved URI string
-     */
     private String resolveIRI(String raw) {
         raw = raw.trim();
-        if (raw.startsWith("<") && raw.endsWith(">")) return raw.substring(1, raw.length() - 1);
-        if (raw.equals("a")) return RDF.type.getIRI().stringValue();
-        if (raw.contains(":")) {
-            String[] parts = raw.split(":", 2);
-            String ns = prefixMap.get(parts[0]);
-            if (ns != null) return ns + parts[1];
-            throw new IllegalArgumentException("Undeclared prefix: " + parts[0]);
+
+        if (raw.startsWith("<") && raw.endsWith(">")) {
+            String iri = raw.substring(1, raw.length() - 1);
+            iri = unescapeIRI(iri);
+            if (isAbsoluteIRI(iri)) {
+                return iri;
+            }
+            return resolveRelativeIRI(iri);
         }
-        return baseURI + raw;
+
+        if (raw.equals("a")) {
+            return RDF.type.getIRI().stringValue();
+        } else if (raw.contains(":")) {
+            String[] parts = raw.split(":", 2);
+            String prefix = parts[0];
+            String localName = parts[1];
+
+            localName = unescapeIRI(localName);
+
+            if (prefix.isEmpty()) {
+                String defaultNS = prefixMap.get("");
+                if (defaultNS != null) {
+                    return defaultNS + localName;
+                } else {
+                    return resolveRelativeIRI(localName);
+                }
+            }
+
+            String ns = prefixMap.get(prefix);
+            if (ns != null) {
+                return ns + localName;
+            }
+            throw new IllegalArgumentException("Undeclared prefix: " + prefix);
+        }
+
+        raw = unescapeIRI(raw);
+        return resolveRelativeIRI(raw);
+    }
+
+    private boolean isAbsoluteIRI(String iri) {
+        return iri.contains(":") && !iri.startsWith(":");
+    }
+
+    private String resolveRelativeIRI(String relativeIRI) {
+        try {
+
+            URI base = (baseURI != null && !baseURI.isEmpty())
+                    ? new URI(baseURI)
+                    : new URI("http://example.org/");
+
+
+            URI resolved = base.resolve(relativeIRI);
+
+            return resolved.toString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("URI syntax error during resolution: Base: " + baseURI + ", Relative: " + relativeIRI, e);
+        }
+    }
+
+
+    private String unescapeIRI(String rawIri) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < rawIri.length(); i++) {
+            char c = rawIri.charAt(i);
+            if (c == '\\') {
+                if (i + 1 < rawIri.length()) {
+                    char next = rawIri.charAt(i + 1);
+                    if (next == 'u' || next == 'U') {
+                        int len = (next == 'u') ? 4 : 8;
+                        if (i + len + 1 <= rawIri.length()) {
+                            try {
+                                String hex = rawIri.substring(i + 2, i + 2 + len);
+                                int codePoint = Integer.parseInt(hex, 16);
+
+                                if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+                                    throw new IllegalArgumentException("Surrogates not allowed in IRIREF: \\u" + hex);
+                                }
+
+                                sb.appendCodePoint(codePoint);
+                                i += len + 1;
+                            } catch (NumberFormatException e) {
+                                throw new IllegalArgumentException("Invalid hexadecimal value in IRI escape.", e);
+                            }
+                        } else {
+                            throw new IllegalArgumentException("Incomplete Unicode escape in IRI.");
+                        }
+                    } else {
+                        sb.append(next);
+                        i++;
+                    }
+                } else {
+                    sb.append(c);
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     private String unescapeString(String text) {
@@ -259,39 +422,70 @@ public class TriGListerner extends TriGBaseListener {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < content.length(); i++) {
             char c = content.charAt(i);
-            if (c == '\\' && i + 1 < content.length()) {
-                char next = content.charAt(i + 1);
-                switch (next) {
-                    case 't': sb.append('\t'); i++; break;
-                    case 'n': sb.append('\n'); i++; break;
-                    case 'r': sb.append('\r'); i++; break;
-                    case 'b': sb.append('\b'); i++; break;
-                    case 'f': sb.append('\f'); i++; break;
-                    case '\"': sb.append('\"'); i++; break;
-                    case '\'': sb.append('\''); i++; break;
-                    case '\\': sb.append('\\'); i++; break;
-                    case 'u':
-                    case 'U':
-                        int len = (next == 'u') ? 4 : 8;
-                        if (i + len + 1 <= content.length()) {
-                            try {
-                                String hex = content.substring(i + 2, i + 2 + len);
-                                int codePoint = Integer.parseInt(hex, 16);
-                                sb.appendCodePoint(codePoint);
-                                i += len + 1;
-                            } catch (NumberFormatException e) {
-                                sb.append(c).append(next);
-                                i++;
+            if (c == '\\') {
+                if (i + 1 < content.length()) {
+                    char next = content.charAt(i + 1);
+                    switch (next) {
+                        case 't':
+                            sb.append('\t');
+                            i++;
+                            break;
+                        case 'n':
+                            sb.append('\n');
+                            i++;
+                            break;
+                        case 'r':
+                            sb.append('\r');
+                            i++;
+                            break;
+                        case 'b':
+                            sb.append('\b');
+                            i++;
+                            break;
+                        case 'f':
+                            sb.append('\f');
+                            i++;
+                            break;
+                        case '\"':
+                            sb.append('\"');
+                            i++;
+                            break;
+                        case '\'':
+                            sb.append('\'');
+                            i++;
+                            break;
+                        case '\\':
+                            sb.append('\\');
+                            i++;
+                            break;
+                        case 'u':
+                        case 'U':
+                            int len = (next == 'u') ? 4 : 8;
+                            if (i + len + 1 <= content.length()) {
+                                try {
+                                    String hex = content.substring(i + 2, i + 2 + len);
+                                    int codePoint = Integer.parseInt(hex, 16);
+
+                                    if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+                                        throw new IllegalArgumentException("Invalid Unicode escape sequence: Surrogate code points are not allowed.");
+                                    }
+
+                                    sb.appendCodePoint(codePoint);
+                                    i += len + 1;
+                                } catch (NumberFormatException e) {
+                                    throw new IllegalArgumentException("Invalid Unicode escape sequence: Invalid hexadecimal value.", e);
+                                }
+                            } else {
+                                throw new IllegalArgumentException("Incomplete Unicode escape sequence.");
                             }
-                        } else {
+                            break;
+                        default:
                             sb.append(c).append(next);
                             i++;
-                        }
-                        break;
-                    default:
-                        sb.append(c).append(next);
-                        i++;
-                        break;
+                            break;
+                    }
+                } else {
+                    sb.append(c);
                 }
             } else {
                 sb.append(c);

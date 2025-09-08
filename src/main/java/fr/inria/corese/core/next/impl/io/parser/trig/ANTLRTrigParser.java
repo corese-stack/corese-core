@@ -9,9 +9,7 @@ import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.TriGLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TriGParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -21,6 +19,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An ANTLR4-based parser for Trig format.
@@ -28,6 +28,40 @@ import java.nio.charset.StandardCharsets;
  * then a listener to build the RDF model.
  */
 public class ANTLRTrigParser extends AbstractRDFParser {
+
+    /**
+     * Custom error listener to collect lexer and parser errors
+     */
+    private static class ErrorCollector extends BaseErrorListener {
+        private final List<String> errors = new ArrayList<>();
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                int line, int charPositionInLine, String msg, RecognitionException e) {
+            // Check if this is a string literal parsing error
+            if (msg != null && (msg.contains("token recognition error") || msg.contains("mismatched input"))) {
+                // Try to provide more context for string literal errors
+                if (offendingSymbol instanceof Token) {
+                    Token token = (Token) offendingSymbol;
+                    String tokenText = token.getText();
+                    if (msg.contains("token recognition error") && tokenText != null && tokenText.contains("\"")) {
+                        msg = "Invalid string literal - possibly unterminated or contains invalid escape sequence: " + msg;
+                    }
+                }
+            }
+
+            String error = "line " + line + ":" + charPositionInLine + " " + msg;
+            errors.add(error);
+        }
+
+        public boolean hasErrors() {
+            return !errors.isEmpty();
+        }
+
+        public String getErrorMessage() {
+            return String.join("; ", errors);
+        }
+    }
 
     /**
      * Constructor for the ANTLRTrigParser.
@@ -81,14 +115,34 @@ public class ANTLRTrigParser extends AbstractRDFParser {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
             TriGLexer triGLexer = new TriGLexer(charStream);
+
+            // Add error listener to catch lexer errors
+            ErrorCollector errorCollector = new ErrorCollector();
+            triGLexer.removeErrorListeners(); // Remove default console error listener
+            triGLexer.addErrorListener(errorCollector);
+
             CommonTokenStream tokens = new CommonTokenStream(triGLexer);
             TriGParser triGParser = new TriGParser(tokens);
+
+            // Add error listener to catch parser errors
+            triGParser.removeErrorListeners(); // Remove default console error listener
+            triGParser.addErrorListener(errorCollector);
+
             ParseTreeWalker walker = new ParseTreeWalker();
             ParseTree tree = triGParser.trigDoc();
+
+            // Check for lexer/parser errors before walking the tree
+            if (errorCollector.hasErrors()) {
+                throw new ParsingErrorException("Syntax error in TriG document: " + errorCollector.getErrorMessage());
+            }
+
             TriGListerner listerner = new TriGListerner(getModel(), getValueFactory(), this.getConfig());
             walker.walk((ParseTreeListener) listerner, tree);
         } catch (IOException e) {
             throw new ParsingErrorException("Failed to parse TriG RDF: " + e.getMessage(), e);
+        } catch (ParsingErrorException e) {
+            // Re-throw parsing exceptions as-is
+            throw e;
         } catch (Exception e) {
             throw new ParsingErrorException("Unexpected error during TriG parsing: " + e.getMessage(), e);
         }

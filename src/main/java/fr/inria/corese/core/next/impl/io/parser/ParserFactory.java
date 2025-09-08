@@ -49,7 +49,7 @@ public class ParserFactory extends AbstractRDFParserFactory {
         } else if (format == RDFFormat.RDFXML) {
             return new RDFXMLParser(model, factory, config);
         } else if (format == RDFFormat.TRIG) {
-            return new ANTLRTrigParser(model, factory, config);
+             return new ANTLRTrigParser(model, factory, config);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
     }

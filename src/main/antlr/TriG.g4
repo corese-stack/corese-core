@@ -169,9 +169,8 @@ BooleanLiteral
     ;
 
 IRIREF
-    : '<' (PN_CHARS | '.' | ':' | '#' | '@' | '%' | '&' | '$' | '!' | '\'' | '*' | '+' | '/' | '(' | ')' | '-' | ',' | '?' | '~' | UCHAR)* '>'
+    : '<' (PN_CHARS | '.' | ':' | '#' | '@' | '%' | '&' | '$' | '!' | '\'' | '*' | '+' | '/' | '(' | ')' | '-' | ',' | '?' | '~' | ';' | '=' | UCHAR)* '>'
     ;
-
 PNAME_NS
     : PN_PREFIX? ':'
     ;
@@ -207,19 +206,32 @@ EXPONENT
     ;
 
 STRING_LITERAL_QUOTE
-    : '"' ((~[\u0022\u005C\u0010\u0013]) | ECHAR | UCHAR)* '"'
+    : '"' ((~[\u0022\u005C\u000A\u000D]) | ECHAR | UCHAR)* '"'
     ;
 
 STRING_LITERAL_SINGLE_QUOTE
-    : '\'' ((~[\u0027\u005C\u0010\u0013]) | ECHAR | UCHAR)* '\''
+    : '\'' ((~[\u0027\u005C\u000A\u000D]) | ECHAR | UCHAR)* '\''
     ;
 
+// Fixed: More permissive handling of long string literals
 STRING_LITERAL_LONG_SINGLE_QUOTE
-    : '\'\'\'' (('\'' | '\'\'')? ( (~['\\] ) | ECHAR | UCHAR))* '\'\'\''
+    : '\'\'\'' (
+        ~'\''
+        | '\'' ~'\''
+        | '\'' '\'' ~'\''
+        | ECHAR
+        | UCHAR
+    )* '\'\'\''
     ;
 
 STRING_LITERAL_LONG_QUOTE
-    : '"""' (('"' | '""')? ( (~["'] ) | ECHAR | UCHAR))* '"""'
+    : '"""' (
+        ~'"'
+        | '"' ~'"'
+        | '"' '"' ~'"'
+        | ECHAR
+        | UCHAR
+    )* '"""'
     ;
 
 UCHAR
@@ -253,7 +265,7 @@ PN_CHARS_BASE
     | '\u3001' .. '\uD7FF'
     | '\uF900' .. '\uFDCF'
     | '\uFDF0' .. '\uFFFD'
-//    | '\u10000' .. '\uEFFFF'
+    | '\u{10000}'..'\u{EFFFF}'
     ;
 
 PN_CHARS_U
@@ -275,7 +287,7 @@ PN_PREFIX
     ;
 
 PN_LOCAL
-    :  	(PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
+    :   (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
     ;
 
 PLX
