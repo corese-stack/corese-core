@@ -116,7 +116,7 @@ public class DefaultSerializerFactory implements SerializerFactory {
                         specificConfig.getPermutationLimit(),
                         coreseValueFactory
                 );
-                return new CanonicalSerializer(model, specificConfig, coreseValueFactory, canonicalizer);
+                return new CanonicalSerializer(model, specificConfig, canonicalizer);
             } else {
                 logger.warn("Provided config for RDFC_1_0 is not CanonicalOption (was {}). Using default CanonicalOption.",
                         genericConfig != null ? genericConfig.getClass().getSimpleName() : "null");
@@ -126,7 +126,7 @@ public class DefaultSerializerFactory implements SerializerFactory {
                         defaultConfig.getPermutationLimit(),
                         coreseValueFactory
                 );
-                return new CanonicalSerializer(model, defaultConfig, coreseValueFactory, canonicalizer);
+                return new CanonicalSerializer(model, defaultConfig, canonicalizer);
             }
         });
 

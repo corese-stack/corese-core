@@ -13,6 +13,9 @@ import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializer
  */
 public class CanonicalOption extends AbstractSerializerOption {
 
+    /**
+     * Enumeration for the supported hashing algorithms.
+     */
     public enum HashAlgorithm {
         SHA_256,
         SHA_384
@@ -24,6 +27,8 @@ public class CanonicalOption extends AbstractSerializerOption {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
+     * It initializes a new instance of {@code CanonicalOption} with the values
+     * provided by the builder.
      *
      * @param builder The builder instance containing the desired configuration values.
      */
@@ -34,7 +39,11 @@ public class CanonicalOption extends AbstractSerializerOption {
         this.permutationLimit = builder.permutationLimit;
     }
 
-
+    /**
+     * Gets the hashing algorithm used for blank node canonicalization.
+     *
+     * @return The {@link HashAlgorithm} used.
+     */
     public HashAlgorithm getHashAlgorithm() {
         return hashAlgorithm;
     }
@@ -49,7 +58,13 @@ public class CanonicalOption extends AbstractSerializerOption {
         return depthFactor;
     }
 
-
+    /**
+     * Gets the permutation limit used in the canonicalization algorithm.
+     * This value is used to limit the number of permutations attempted during blank node canonicalization
+     * to prevent excessive computation time.
+     *
+     * @return The permutation limit.
+     */
     public int getPermutationLimit() {
         return permutationLimit;
     }
@@ -64,21 +79,40 @@ public class CanonicalOption extends AbstractSerializerOption {
         private int depthFactor = 5;
         private int permutationLimit = 50000;
 
+        /**
+         * Default constructor for the Builder.
+         * Initializes the builder with the default values for Canonical RDF serialization.
+         */
         public Builder() {
-            //Default constructor initializes
+            // Default constructor initializes
         }
 
+        /**
+         * Builds a new {@link CanonicalOption} instance with the configured values.
+         *
+         * @return A new instance of {@code CanonicalOption}.
+         */
         @Override
         public CanonicalOption build() {
             return new CanonicalOption(this);
         }
     }
 
-
+    /**
+     * Creates and returns a new {@code CanonicalOption} instance with the default configuration.
+     *
+     * @return A new {@code CanonicalOption} with default settings.
+     */
     public static CanonicalOption defaultConfig() {
         return new Builder().build();
     }
 
+    /**
+     * Creates and returns a new {@link Builder} instance, which can be used to customize
+     * the {@code CanonicalOption} before building.
+     *
+     * @return A new {@code Builder} instance.
+     */
     public static CanonicalOption.Builder builder() {
         return new CanonicalOption.Builder();
     }

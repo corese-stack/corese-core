@@ -24,7 +24,7 @@ import java.util.Objects;
  * This implementation now acts as a wrapper, preparing the model for a dedicated
  * RDFC-1.0 canonicalization component and then writing the resulting canonical statements.
  */
-public class CanonicalSerializer extends AbstractLineBasedSerializer implements RDFSerializer {
+public class CanonicalSerializer extends AbstractLineBasedSerializer {
 
     private final CanonicalOption config;
     private final Rdfc10Canonicalizer canonicalizer;
@@ -36,10 +36,9 @@ public class CanonicalSerializer extends AbstractLineBasedSerializer implements 
      *
      * @param model         The model to be serialized.
      * @param config        The configuration options for the canonicalization process.
-     * @param valueFactory  The factory for creating RDF values.
      * @param canonicalizer The canonicalizer component to use.
      */
-    public CanonicalSerializer(Model model, CanonicalOption config, ValueFactory valueFactory, Rdfc10Canonicalizer canonicalizer) {
+    public CanonicalSerializer(Model model, CanonicalOption config, Rdfc10Canonicalizer canonicalizer) {
         super(model, config);
         this.model = Objects.requireNonNull(model);
         this.config = Objects.requireNonNull(config);
@@ -59,6 +58,7 @@ public class CanonicalSerializer extends AbstractLineBasedSerializer implements 
      * @param writer the {@link Writer} to which the serialized model will be written.
      * @throws SerializationException if serialization fails due to an I/O error or invalid data.
      */
+    @Override
     public void write(Writer writer) {
         try (BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
             List<Statement> canonicalStatements = canonicalizer.canonicalize(model);

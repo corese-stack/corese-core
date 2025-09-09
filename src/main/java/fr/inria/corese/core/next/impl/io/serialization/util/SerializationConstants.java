@@ -107,7 +107,7 @@ public final class SerializationConstants {
 
     public static final String DEFAULT_GRAPH_IRI = "http://ns.inria.fr/corese/default-graph";
 
-    public static final String C14N = "_c14n";
+    public static final String C14N = "c14n";
 
     public static final String  CANONICAL_BNODE_PLACEHOLDER = "<>";
     public static final String  HEX_FORMAT = "%02x";

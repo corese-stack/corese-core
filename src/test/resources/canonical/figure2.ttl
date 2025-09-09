@@ -1,0 +1,9 @@
+@prefix ns1: <http://example.com/#> .
+
+ns1:p ns1:q _:b0 ;
+  ns1:r _:b1 .
+
+_:b1 ns1:t ns1:u .
+
+_:b0 ns1:s ns1:u .
+

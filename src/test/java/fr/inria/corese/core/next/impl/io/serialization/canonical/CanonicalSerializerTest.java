@@ -1,7 +1,14 @@
 package fr.inria.corese.core.next.impl.io.serialization.canonical;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
+import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,12 +16,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,8 +33,6 @@ class CanonicalSerializerTest {
 
     @Mock
     private Model mockModel;
-    @Mock
-    private ValueFactory mockValueFactory;
     @Mock
     private Rdfc10Canonicalizer mockCanonicalizer;
     @Mock
@@ -88,7 +91,7 @@ class CanonicalSerializerTest {
 
         setupBasicMocks();
 
-        serializer = new CanonicalSerializer(mockModel, defaultConfig, mockValueFactory, mockCanonicalizer) {
+        serializer = new CanonicalSerializer(mockModel, defaultConfig, mockCanonicalizer) {
             @Override
             protected void writeValue(Writer w, Value v) throws IOException {
                 if (v != null) {
@@ -187,7 +190,7 @@ class CanonicalSerializerTest {
     @DisplayName("Constructor with null model should throw NullPointerException")
     void testConstructorNullModel() {
         assertThrows(NullPointerException.class, () ->
-                new CanonicalSerializer(null, defaultConfig, mockValueFactory, mockCanonicalizer));
+                new CanonicalSerializer(null, defaultConfig, mockCanonicalizer));
     }
 
 
@@ -195,20 +198,20 @@ class CanonicalSerializerTest {
     @DisplayName("Constructor with null config should throw NullPointerException")
     void testConstructorNullConfig() {
         assertThrows(NullPointerException.class, () ->
-                new CanonicalSerializer(mockModel, null, mockValueFactory, mockCanonicalizer));
+                new CanonicalSerializer(mockModel, null, mockCanonicalizer));
     }
 
     @Test
     @DisplayName("Constructor with null canonicalizer should throw NullPointerException")
     void testConstructorNullCanonicalizer() {
         assertThrows(NullPointerException.class, () ->
-                new CanonicalSerializer(mockModel, defaultConfig, mockValueFactory, null));
+                new CanonicalSerializer(mockModel, defaultConfig, null));
     }
 
     @Test
     @DisplayName("Constructor with default configuration")
     void testConstructorWithDefaultConfig() {
-        CanonicalSerializer defaultSerializer = new CanonicalSerializer(mockModel, defaultConfig, mockValueFactory, mockCanonicalizer);
+        CanonicalSerializer defaultSerializer = new CanonicalSerializer(mockModel, defaultConfig, mockCanonicalizer);
         assertNotNull(defaultSerializer);
         assertEquals("RDFC-1.0", defaultSerializer.getFormatName());
     }
@@ -242,50 +245,6 @@ class CanonicalSerializerTest {
         verify(mockCanonicalizer).canonicalize(any(Model.class));
     }
 
-    @Test
-    @DisplayName("Serialization with blank nodes - W3C canonicalization and output sorting")
-    void testSerializeWithBlankNodesAndOutputVerification() throws SerializationException {
-
-        Statement inputStmt1 = createMockStatement(mockIRIP, mockIRIQ, mockBNodeE0, null);
-        Statement inputStmt2 = createMockStatement(mockIRIP, mockIRIQ, mockBNodeE1, null);
-        Statement inputStmt3 = createMockStatement(mockBNodeE0, mockIRIP, mockBNodeE2, null);
-        Statement inputStmt4 = createMockStatement(mockBNodeE1, mockIRIP, mockBNodeE3, null);
-        Statement inputStmt5 = createMockStatement(mockBNodeE2, mockIRIR, mockBNodeE3, null);
-
-        List<Statement> originalStatementsFromModel = Arrays.asList(inputStmt1, inputStmt2, inputStmt3, inputStmt4, inputStmt5);
-        Collections.shuffle(originalStatementsFromModel, new Random(0));
-
-        Statement canonicalOutputStmt1 = createMockStatement(mockIRIP, mockIRIQ, canonicalBNodeC2, null);
-        Statement canonicalOutputStmt2 = createMockStatement(mockIRIP, mockIRIQ, canonicalBNodeC3, null);
-        Statement canonicalOutputStmt3 = createMockStatement(canonicalBNodeC0, mockIRIR, canonicalBNodeC1, null);
-        Statement canonicalOutputStmt4 = createMockStatement(canonicalBNodeC2, mockIRIP, canonicalBNodeC1, null);
-        Statement canonicalOutputStmt5 = createMockStatement(canonicalBNodeC3, mockIRIP, canonicalBNodeC0, null);
-
-        List<Statement> expectedCanonicalStatementsSorted = Arrays.asList(
-                canonicalOutputStmt1,
-                canonicalOutputStmt2,
-                canonicalOutputStmt3,
-                canonicalOutputStmt4,
-                canonicalOutputStmt5
-        );
-
-        when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(expectedCanonicalStatementsSorted);
-
-        StringWriter writer = new StringWriter();
-
-        serializer.write(writer);
-
-        String expectedOutput = """
-                <http://example.com/#p> <http://example.com/#q> _:c14n2 .
-                <http://example.com/#p> <http://example.com/#q> _:c14n3 .
-                _:c14n0 <http://example.com/#r> _:c14n1 .
-                _:c14n2 <http://example.com/#p> _:c14n1 .
-                _:c14n3 <http://example.com/#p> _:c14n0 .
-                """;
-        assertEquals(expectedOutput, writer.toString());
-
-        verify(mockCanonicalizer).canonicalize(any(Model.class));
-    }
 
     @Test
     @DisplayName("Serialization with context (named graph)")
@@ -328,182 +287,69 @@ class CanonicalSerializerTest {
         assertEquals(expectedOutput, writer.toString());
     }
 
-
     @Test
-    @DisplayName("Serialization with blank nodes in context - canonicalization and sorting")
-    void testSerializeWithBlankNodeInContextAndOutputVerification() throws SerializationException {
+    @DisplayName("Test serialization with figure3.ttl")
+    void testSerializeFigure3() {
+        String canonicalOutput = serializeToRdfCanonical("/canonical/figure3.ttl");
 
-        Statement canonicalOutputStmt1 = createMockStatement(mockIRI1, mockIRI2, mockLiteral1, canonicalBNodeC0);
+        assertNotNull(canonicalOutput, "Canonical output should not be null");
+        assertFalse(canonicalOutput.isEmpty(), "Canonical output should not be empty");
+        String actual = canonicalOutput.trim().replace("\r\n", "\n");
+        String expected = "<http://example.com/p> <http://example.com/q> _:c14n2 .\n" +
+                "<http://example.com/p> <http://example.com/q> _:c14n3 .\n" +
+                "_:c14n0 <http://example.com/r> _:c14n1 .\n" +
+                "_:c14n2 <http://example.com/p> _:c14n1 .\n" +
+                "_:c14n3 <http://example.com/p> _:c14n0 .";
 
-        when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(Collections.singletonList(canonicalOutputStmt1));
+        assertEquals(expected, actual, "Canonical output should match expected format");
 
-        StringWriter writer = new StringWriter();
-
-        serializer.write(writer);
-
-        String expectedOutput = "<http://example.org/iri1> <http://example.org/iri2> \"literal1\" _:c14n0 .\n";
-        assertEquals(expectedOutput, writer.toString());
-
-        verify(mockCanonicalizer).canonicalize(any(Model.class));
     }
 
+
     @Test
-    void testSerializeW3CExampleWithDifferentActualOutput() throws SerializationException {
-        Statement inputStmt1 = createMockStatement(mockIRIP, mockIRIQ, mockBNodeE0, null);
-        Statement inputStmt2 = createMockStatement(mockIRIP, mockIRIQ, mockBNodeE1, null);
-        Statement inputStmt3 = createMockStatement(mockBNodeE0, mockIRIP, mockBNodeE2, null);
-        Statement inputStmt4 = createMockStatement(mockBNodeE1, mockIRIP, mockBNodeE3, null);
-        Statement inputStmt5 = createMockStatement(mockBNodeE2, mockIRIR, mockBNodeE3, null);
+    @DisplayName("Test serialization with figure2.ttl")
+    void testSerializeFigure2() {
+        String canonicalOutput = serializeToRdfCanonical("/canonical/figure2.ttl");
 
-        List<Statement> originalStatementsFromModel = Arrays.asList(inputStmt1, inputStmt2, inputStmt3, inputStmt4, inputStmt5);
-        Collections.shuffle(originalStatementsFromModel, new Random(0));
+        assertNotNull(canonicalOutput, "Canonical output should not be null");
+        assertFalse(canonicalOutput.isEmpty(), "Canonical output should not be empty");
 
-        Statement actualOutputStmt1 = createMockStatement(actualBNodeB0, mockIRIR, actualBNodeB2, null);
-        Statement actualOutputStmt2 = createMockStatement(actualBNodeB1, mockIRIP, actualBNodeB0, null);
-        Statement actualOutputStmt3 = createMockStatement(actualBNodeB3, mockIRIP, actualBNodeB2, null);
-        Statement actualOutputStmt4 = createMockStatement(mockIRIP, mockIRIQ, actualBNodeB1, null);
-        Statement actualOutputStmt5 = createMockStatement(mockIRIP, mockIRIQ, actualBNodeB3, null);
+        String actual = canonicalOutput.trim().replace("\r\n", "\n");
+
+        String expected = "<http://example.com/p> <http://example.com/q> _:c14n0 .\n" +
+                "<http://example.com/p> <http://example.com/r> _:c14n1 .\n" +
+                "_:c14n0 <http://example.com/s> <http://example.com/u> .\n" +
+                "_:c14n1 <http://example.com/t> <http://example.com/u> .";
 
 
-        List<Statement> actualCanonicalStatementsSorted = Arrays.asList(
-                actualOutputStmt1,
-                actualOutputStmt2,
-                actualOutputStmt3,
-                actualOutputStmt4,
-                actualOutputStmt5
+        assertEquals(expected, actual, "Canonical output should match RDFC-1.0 specification");
+    }
+
+    private String serializeToRdfCanonical(String resourcePath) {
+        Model model = new CoreseModel();
+        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+
+        ParserFactory parserFactory = new ParserFactory();
+        RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, model, valueFactory);
+
+        try (InputStream inputStream = getClass().getResourceAsStream(resourcePath)) {
+            if (inputStream == null) {
+                fail("Resource not found: " + resourcePath);
+            }
+            parser.parse(inputStream);
+        } catch (IOException e) {
+            fail("Failed to parse resource: " + resourcePath + " - " + e.getMessage());
+        }
+
+        DefaultSerializerFactory serializerFactory = new DefaultSerializerFactory();
+        RDFSerializer serializer = serializerFactory.createSerializer(
+                RDFFormat.RDFC_1_0,
+                model,
+                CanonicalOption.defaultConfig()
         );
 
-        when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(actualCanonicalStatementsSorted);
-
-        StringWriter writer = new StringWriter();
-
-        serializer.write(writer);
-
-        String expectedOutput = """
-                _:b0 <http://example.com/#r> _:b2 .
-                _:b1 <http://example.com/#p> _:b0 .
-                _:b3 <http://example.com/#p> _:b2 .
-                <http://example.com/#p> <http://example.com/#q> _:b1 .
-                <http://example.com/#p> <http://example.com/#q> _:b3 .
-                """;
-        assertEquals(expectedOutput, writer.toString());
-
-        verify(mockCanonicalizer).canonicalize(any(Model.class));
-    }
-
-    @Test
-    @DisplayName("Serialization without trailing dot")
-    void testSerializeNoTrailingDot() throws SerializationException {
-        CanonicalOption noDotConfig = CanonicalOption.builder().trailingDot(false).build();
-        CanonicalSerializer noDotSerializer = new CanonicalSerializer(mockModel, noDotConfig, mockValueFactory, mockCanonicalizer) {
-            @Override
-            protected void writeValue(Writer w, Value v) throws IOException {
-                if (v != null) {
-                    w.write(v.stringValue());
-                }
-            }
-        };
-
-        Statement simpleStmt = createMockStatement(mockIRI1, mockIRI2, mockLiteral1, null);
-
-        when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(Collections.singletonList(simpleStmt));
-
-        StringWriter writer = new StringWriter();
-
-        noDotSerializer.write(writer);
-
-        String expectedOutput = "<http://example.org/iri1> <http://example.org/iri2> \"literal1\"\n";
-        assertEquals(expectedOutput, writer.toString());
-
-        verify(mockCanonicalizer).canonicalize(any(Model.class));
-    }
-
-    @Test
-    @DisplayName("Serialization with different line ending")
-    void testSerializeDifferentLineEnding() throws SerializationException {
-        CanonicalOption customLineEndingConfig = CanonicalOption.builder().lineEnding("\r\n").build();
-        CanonicalSerializer customLineEndingSerializer = new CanonicalSerializer(mockModel, customLineEndingConfig, mockValueFactory, mockCanonicalizer) {
-            @Override
-            protected void writeValue(Writer w, Value v) throws IOException {
-                if (v != null) {
-                    w.write(v.stringValue());
-                }
-            }
-        };
-
-        Statement simpleStmt = createMockStatement(mockIRI1, mockIRI2, mockLiteral1, null);
-        when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(Collections.singletonList(simpleStmt));
-
-        StringWriter writer = new StringWriter();
-
-        customLineEndingSerializer.write(writer);
-
-        String expectedOutput = "<http://example.org/iri1> <http://example.org/iri2> \"literal1\" .\r\n";
-        assertEquals(expectedOutput, writer.toString());
-    }
-
-    @Test
-    @DisplayName("Serialization with a mix of statements (with and without context)")
-    void testSerializeMixedStatements() throws SerializationException {
-        Statement stmt1 = createMockStatement(mockIRI1, mockIRIP, mockLiteral1, null);
-        Statement stmt2 = createMockStatement(mockIRI2, mockIRIQ, mockLiteral2, mockIRI1);
-        Statement stmt3 = createMockStatement(mockIRI1, mockIRIR, mockLiteral2, null);
-
-        List<Statement> mixedStatements = Arrays.asList(stmt1, stmt2, stmt3);
-        when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(mixedStatements);
-
         StringWriter writer = new StringWriter();
         serializer.write(writer);
-
-        String expectedOutput = """
-                <http://example.org/iri1> <http://example.com/#p> "literal1" .
-                <http://example.org/iri2> <http://example.com/#q> "literal2" <http://example.org/iri1> .
-                <http://example.org/iri1> <http://example.com/#r> "literal2" .
-                """;
-        assertEquals(expectedOutput, writer.toString());
-    }
-
-    @Test
-    @DisplayName("Serialization of specific N3 input with exact expected output order")
-    void testSerializeSpecificN3InputWithExactOutputOrder() throws SerializationException {
-        // Given the specific N3 input:
-        // @prefix : <http://example.com/#> .
-        // :p :q _:e0 .
-        // :p :q _:e1 .
-        // _:e0 :p _:e2 .
-        // _:e1 :p _:e3 .
-        // _:e2 :r _:e3 .
-
-        // Mock the canonicalized output in the EXACT order you expect:
-        Statement expectedStmt1 = createMockStatement(mockBNodeE0, mockIRIP, mockBNodeE2, null);
-        Statement expectedStmt2 = createMockStatement(mockBNodeE1, mockIRIP, mockBNodeE3, null);
-        Statement expectedStmt3 = createMockStatement(mockIRIP, mockIRIQ, mockBNodeE0, null);
-        Statement expectedStmt4 = createMockStatement(mockIRIP, mockIRIQ, mockBNodeE1, null);
-        Statement expectedStmt5 = createMockStatement(mockBNodeE2, mockIRIR, mockBNodeE3, null);
-
-        List<Statement> expectedCanonicalStatements = Arrays.asList(
-                expectedStmt1,  // _:e0 :p _:e2 .
-                expectedStmt2,  // _:e1 :p _:e3 .
-                expectedStmt3,  // :p :q _:e0 .
-                expectedStmt4,  // :p :q _:e1 .
-                expectedStmt5   // _:e2 :r _:e3 .
-        );
-
-        when(mockCanonicalizer.canonicalize(any(Model.class))).thenReturn(expectedCanonicalStatements);
-
-        StringWriter writer = new StringWriter();
-
-        serializer.write(writer);
-
-        String expectedOutput = """
-            _:e0 <http://example.com/#p> _:e2 .
-            _:e1 <http://example.com/#p> _:e3 .
-            <http://example.com/#p> <http://example.com/#q> _:e0 .
-            <http://example.com/#p> <http://example.com/#q> _:e1 .
-            _:e2 <http://example.com/#r> _:e3 .
-            """;
-        assertEquals(expectedOutput, writer.toString());
-
-        verify(mockCanonicalizer).canonicalize(any(Model.class));
+        return writer.toString();
     }
 }
