@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  */
 public class Rdfc10Canonicalizer {
 
-    private final CanonicalOption.HashAlgorithm hashAlgorithm;
+    private final Rdfc10Options.HashAlgorithm hashAlgorithm;
     private final int maxCallsHashNDegreeQuads;
     private final StatementUtils statementUtils;
     private int callsHashNDegreeQuads = 0;
@@ -34,7 +34,7 @@ public class Rdfc10Canonicalizer {
      * @param valueFactory  The factory for creating RDF values, used by StatementUtils for
      * blank node replacement and serialization.
      */
-    public Rdfc10Canonicalizer(CanonicalOption.HashAlgorithm hashAlgorithm, int maxCalls, ValueFactory valueFactory) {
+    public Rdfc10Canonicalizer(Rdfc10Options.HashAlgorithm hashAlgorithm, int maxCalls, ValueFactory valueFactory) {
         this.hashAlgorithm = Objects.requireNonNull(hashAlgorithm, "Hash algorithm cannot be null");
         this.maxCallsHashNDegreeQuads = maxCalls;
         this.statementUtils = new StatementUtils(valueFactory);
@@ -390,7 +390,7 @@ public class Rdfc10Canonicalizer {
      */
     private String hash(String data) {
         try {
-            String algorithm = hashAlgorithm == CanonicalOption.HashAlgorithm.SHA_384 ?
+            String algorithm = hashAlgorithm == Rdfc10Options.HashAlgorithm.SHA_384 ?
                     SerializationConstants.SHA_384 : SerializationConstants.SHA_256;
             MessageDigest digest = MessageDigest.getInstance(algorithm);
             byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));

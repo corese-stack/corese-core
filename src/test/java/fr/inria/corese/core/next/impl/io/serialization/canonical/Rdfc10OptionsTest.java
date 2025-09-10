@@ -6,16 +6,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link CanonicalOption} class.
+ * Unit tests for the {@link Rdfc10Options} class.
  * This class verifies the default configuration and the builder functionality
  * for the Canonical RDF serialization options.
  */
-class CanonicalOptionTest {
+class Rdfc10OptionsTest {
 
     @Test
     @DisplayName("defaultConfig should return an instance with expected default values")
     void defaultConfig_shouldReturnExpectedValues() {
-        CanonicalOption config = CanonicalOption.defaultConfig();
+        Rdfc10Options config = Rdfc10Options.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
         assertTrue(config.isStrictMode(), "Default strictMode should be true for canonicalization");
@@ -28,7 +28,7 @@ class CanonicalOptionTest {
     @Test
     @DisplayName("builder should allow setting custom options")
     void builder_shouldAllowCustomOptions() {
-        CanonicalOption customConfig = CanonicalOption.builder()
+        Rdfc10Options customConfig = Rdfc10Options.builder()
                 .strictMode(false)
                 .validateURIs(false)
                 .escapeUnicode(false)
@@ -47,7 +47,7 @@ class CanonicalOptionTest {
     @Test
     @DisplayName("builder should use default values for un-set options")
     void builder_shouldUseDefaultValues_forUnsetOptions() {
-        CanonicalOption config = CanonicalOption.builder()
+        Rdfc10Options config = Rdfc10Options.builder()
                 .strictMode(false)
                 .build();
 

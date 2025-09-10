@@ -3,8 +3,6 @@ package fr.inria.corese.core.next.impl.io.serialization.canonical;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractLineBasedSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -24,9 +22,9 @@ import java.util.Objects;
  * This implementation now acts as a wrapper, preparing the model for a dedicated
  * RDFC-1.0 canonicalization component and then writing the resulting canonical statements.
  */
-public class CanonicalSerializer extends AbstractLineBasedSerializer {
+public class Rdfc10Serializer extends AbstractLineBasedSerializer {
 
-    private final CanonicalOption config;
+    private final Rdfc10Options config;
     private final Rdfc10Canonicalizer canonicalizer;
     private final Model model;
 
@@ -38,7 +36,7 @@ public class CanonicalSerializer extends AbstractLineBasedSerializer {
      * @param config        The configuration options for the canonicalization process.
      * @param canonicalizer The canonicalizer component to use.
      */
-    public CanonicalSerializer(Model model, CanonicalOption config, Rdfc10Canonicalizer canonicalizer) {
+    public Rdfc10Serializer(Model model, Rdfc10Options config, Rdfc10Canonicalizer canonicalizer) {
         super(model, config);
         this.model = Objects.requireNonNull(model);
         this.config = Objects.requireNonNull(config);
