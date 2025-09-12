@@ -174,7 +174,6 @@ public class RDFXMLParser extends AbstractRDFParser {
             IRI predicate = ctx.predicateStack.pop();
             Resource subject = ctx.subjectStack.peek();
             String datatypeUri = ctx.datatypeStack.isEmpty() ? null : ctx.datatypeStack.pop();
-            //emitLiteral(subject, predicate, text, datatypeUri);
             String lang = ctx.langStack.isEmpty() ? null : ctx.langStack.peek();
             emitter.emitLiteral(subject, predicate, text, datatypeUri, lang);
             return;
@@ -213,7 +212,8 @@ public class RDFXMLParser extends AbstractRDFParser {
     private void updateDatatype(Attributes attrs) {
         String datatype = attrs.getValue(RDF.type.getNamespace(), "datatype");
         if (datatype != null) {
-            ctx.datatypeStack.push(datatype);
+            String expanded = expandQNameFromQName(datatype);
+            ctx.datatypeStack.push(expanded);
         }
     }
 
