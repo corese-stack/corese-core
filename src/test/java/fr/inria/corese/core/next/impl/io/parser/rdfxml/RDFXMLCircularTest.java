@@ -265,7 +265,6 @@ class RDFXMLCircularTest {
     }
 
     @Test
-    @Disabled("Waiting for RDF/XML parser implementation from PR #176")
     @DisplayName("Round-trip test with simple model containing basic IRIs and literals")
     void testRoundTripWithSimpleModel() throws Exception {
         // Given: A simple model with basic triples
@@ -282,7 +281,6 @@ class RDFXMLCircularTest {
     }
 
     @Test
-    @Disabled("Waiting for RDF/XML parser implementation from PR #176")
     @DisplayName("Round-trip test with complex model containing diverse RDF value types")
     void testRoundTripWithComplexModel() throws Exception {
         // Given: A complex model with various RDF constructs
@@ -299,7 +297,6 @@ class RDFXMLCircularTest {
     }
 
     @Test
-    @Disabled("Waiting for RDF/XML parser implementation from PR #176")
     @DisplayName("Round-trip test with empty model")
     void testRoundTripWithEmptyModel() throws Exception {
         // Given: An empty model
@@ -315,15 +312,12 @@ class RDFXMLCircularTest {
     }
 
     @Test
-    @Disabled("Waiting for RDF/XML parser implementation from PR #176")
     @DisplayName("Round-trip test with model containing only typed literals")
     void testRoundTripWithTypedLiterals() throws Exception {
         // Given: A model with various typed literals
         Model originalModel = createTypedLiteralsTestModel();
-
         // When: Performing round-trip serialization and parsing
         Model deserializedModel = performRoundTrip(originalModel);
-
         // Then: All typed literals should be preserved correctly
         assertEquals(originalModel.size(), deserializedModel.size(),
                 "Model sizes should be equal after round-trip");
@@ -332,7 +326,6 @@ class RDFXMLCircularTest {
     }
 
     @Test
-    @Disabled("Waiting for RDF/XML parser implementation from PR #176")
     @DisplayName("Round-trip test with model containing only language-tagged literals")
     void testRoundTripWithLanguageTaggedLiterals() throws Exception {
         // Given: A model with language-tagged literals
@@ -349,7 +342,6 @@ class RDFXMLCircularTest {
     }
 
     @Test
-    @Disabled("Waiting for RDF/XML parser implementation from PR #176")
     @DisplayName("Round-trip test with model containing only blank nodes")
     void testRoundTripWithBlankNodes() throws Exception {
         // Given: A model with blank nodes as subjects and objects
@@ -367,7 +359,6 @@ class RDFXMLCircularTest {
     }
 
     @Test
-    @Disabled("Waiting for RDF/XML parser implementation from PR #176")
     @DisplayName("Round-trip test with model containing special characters and escape sequences")
     void testRoundTripWithSpecialCharacters() throws Exception {
         // Given: A model with special characters and escape sequences
