@@ -7,6 +7,8 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -21,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * and unescaping of IRIs and literals, and named graphs.
  */
 public class RDFXMLParserTest {
+    private static final Logger logger = LoggerFactory.getLogger(RDFXMLParserTest.class);
+
     /**
      * Helper method to parse the RDF/XML String
      * @param rdfXml
@@ -41,31 +45,40 @@ public class RDFXMLParserTest {
      * Helper method to print the model.
      * @param model
      */
-     private void printModel(Model model) {
+    /**
+     * Helper method to print the model.
+     * @param model
+     */
+    private void printModel(Model model) {
         model.stream().forEach(stmt -> {
             Value obj = stmt.getObject();
+            String subjectString = stmt.getSubject().stringValue();
+            String predicateString = stmt.getPredicate().stringValue();
+
             if (obj instanceof Literal literal) {
-                if (literal.getLanguage().isPresent()) {
-                    System.out.printf("(%s, %s, \"%s\"@%s)%n",
-                            stmt.getSubject().stringValue(),
-                            stmt.getPredicate().stringValue(),
-                            literal.getLabel(),
-                            literal.getLanguage().get());
+                String label = String.valueOf(literal.getLabel());
+                String languageTag = literal.getLanguage().orElse(null);
+
+                if (languageTag != null) {
+                    logger.debug("({}, {}, \"{}\"@{})",
+                            subjectString,
+                            predicateString,
+                            label,
+                            languageTag);
                 } else {
-                    System.out.printf("(%s, %s, \"%s\")%n",
-                            stmt.getSubject().stringValue(),
-                            stmt.getPredicate().stringValue(),
-                            literal.getLabel());
+                    logger.debug("({}, {}, \"{}\")",
+                            subjectString,
+                            predicateString,
+                            label);
                 }
             } else {
-                System.out.printf("(%s, %s, %s)%n",
-                        stmt.getSubject().stringValue(),
-                        stmt.getPredicate().stringValue(),
+                logger.debug("({}, {}, {})",
+                        subjectString,
+                        predicateString,
                         obj.stringValue());
             }
         });
     }
-
 
     /**
      * Test node elements with IRIs
