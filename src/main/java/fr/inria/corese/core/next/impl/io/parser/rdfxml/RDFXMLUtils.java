@@ -49,6 +49,21 @@ public class RDFXMLUtils {
     }
 
     /**
+     * Expands a QName string (e.g. "xsd:integer") into a full URI if known.
+     * Currently supports "xsd:" → XML Schema namespace.
+     *
+     * @param qname the QName string
+     * @return expanded full URI if a known prefix, otherwise returns qname unchanged
+     */
+    public static String expandQNameFromQName(String qname) {
+        if (qname == null) return null;
+        if (qname.startsWith("xsd:")) {
+            return "http://www.w3.org/2001/XMLSchema#" + qname.substring("xsd:".length());
+        }
+        return qname;
+    }
+
+    /**
      * Extracts a subject resource from RDF/XML attributes.
      * Supports rdf:about, rdf:nodeID, rdf:ID.
      *
