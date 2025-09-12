@@ -49,7 +49,7 @@ public class RDFXMLParserTest {
      * Helper method to print the model.
      * @param model
      */
-    private void printModel(Model model) {
+     private void printModel(Model model) {
         model.stream().forEach(stmt -> {
             Value obj = stmt.getObject();
             String subjectString = stmt.getSubject().stringValue();
