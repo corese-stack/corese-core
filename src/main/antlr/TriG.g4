@@ -180,7 +180,7 @@ PNAME_LN
     ;
 
 BLANK_NODE_LABEL
-    : '_:' (PN_CHARS_U | '0' .. '9') ((PN_CHARS | '.')* PN_CHARS)?
+    : '_:' (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
     ;
 
 LANGTAG
@@ -196,9 +196,11 @@ DECIMAL
     ;
 
 DOUBLE
-    : ('+' | '-' )? (('0' .. '9')+ '.' ('0' .. '9')* EXPONENT
-    | '.' ('0' .. '9')+ EXPONENT
-    | ('0' .. '9')+ EXPONENT)
+    : ('+' | '-')? (
+        ( ('0'..'9')+ '.' ('0'..'9')* EXPONENT )
+      | ( '.' ('0'..'9')+ EXPONENT )
+      | ( ('0'..'9')+ EXPONENT )
+      )
     ;
 
 EXPONENT
@@ -213,25 +215,24 @@ STRING_LITERAL_SINGLE_QUOTE
     : '\'' ((~[\u0027\u005C\u000A\u000D]) | ECHAR | UCHAR)* '\''
     ;
 
-// Fixed: More permissive handling of long string literals
 STRING_LITERAL_LONG_SINGLE_QUOTE
-    : '\'\'\'' (
-        ~'\''
-        | '\'' ~'\''
-        | '\'' '\'' ~'\''
-        | ECHAR
-        | UCHAR
-    )* '\'\'\''
+    : '\'\'\'' (LONG_STRING_CHAR_SINGLE | ECHAR | UCHAR)* '\'\'\''
     ;
 
 STRING_LITERAL_LONG_QUOTE
-    : '"""' (
-        ~'"'
-        | '"' ~'"'
-        | '"' '"' ~'"'
-        | ECHAR
-        | UCHAR
-    )* '"""'
+    : '"""' (LONG_STRING_CHAR_DOUBLE | ECHAR | UCHAR)* '"""'
+    ;
+
+fragment LONG_STRING_CHAR_DOUBLE
+    : ~[\\"]
+    | '"' ~["]
+    | '"' '"' ~["]
+    ;
+
+fragment LONG_STRING_CHAR_SINGLE
+    : ~[\\']
+    | '\'' ~[']
+    | '\'' '\'' ~[']
     ;
 
 UCHAR
@@ -248,7 +249,7 @@ WHITESPACE
     ;
 
 ANON
-    : '[' WHITESPACE* ']'
+    : '[' [\u0009\u000A\u000D\u0020]* ']'
     ;
 
 PN_CHARS_BASE
@@ -287,7 +288,7 @@ PN_PREFIX
     ;
 
 PN_LOCAL
-    :   (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
+    : (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
     ;
 
 PLX
