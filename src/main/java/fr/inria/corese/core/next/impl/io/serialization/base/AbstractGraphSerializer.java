@@ -322,18 +322,23 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             currentlyWritingBlankNodes.add(bNode);
 
             boolean handled = false;
-            if (option instanceof AbstractSerializerOption && getTFamilyOption().useCollections() && bNode.isBNode()) {
-                handled = writeRDFList(writer, bNode);
-            }
 
-            if (!handled && option instanceof AbstractSerializerOption && getTFamilyOption().getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS && bNode.isBNode()) { // getBlankNodeStyle is on AbstractTFamilyConfig
-                List<Statement> properties = model.stream()
-                        .filter(stmt -> stmt.getSubject().equals(bNode))
-                        .toList();
+            boolean isSubject = model.stream().anyMatch(stmt -> stmt.getSubject().equals(bNode));
 
-                if (!properties.isEmpty()) {
-                    writeInlineBlankNode(writer, properties);
-                    handled = true;
+            if (!isSubject && option instanceof AbstractSerializerOption) {
+                if (getTFamilyOption().useCollections() && bNode.isBNode()) {
+                    handled = writeRDFList(writer, bNode);
+                }
+
+                if (!handled && getTFamilyOption().getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS && bNode.isBNode()) {
+                    List<Statement> properties = model.stream()
+                            .filter(stmt -> stmt.getSubject().equals(bNode))
+                            .toList();
+
+                    if (!properties.isEmpty()) {
+                        writeInlineBlankNode(writer, properties);
+                        handled = true;
+                    }
                 }
             }
 
@@ -343,9 +348,11 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
             currentlyWritingBlankNodes.remove(bNode);
         } else {
-            throw new IllegalArgumentException("Unsupported value type for " + getFormatName() + " serialization: " + value.getClass().getName());
+            throw new IllegalArgumentException("Unsupported value type for " + getFormatName() +
+                    " serialization: " + value.getClass().getName());
         }
     }
+
 
     /**
      * Writes an {@link IRI} to the writer.
@@ -661,48 +668,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             if (stmt.getSubject().isBNode()) {
                 Resource bNodeSubject = stmt.getSubject();
                 if (tFamilyConfig.useCollections() && isRDFListHead(bNodeSubject)) {
-                    Resource current = bNodeSubject;
-                    Set<Resource> listNodes = new HashSet<>();
-                    Set<Resource> visitedInPrecomp = new HashSet<>();
-                    boolean isList = true;
-                    while (current != null && current.isBNode() && !visitedInPrecomp.contains(current)) {
-                        visitedInPrecomp.add(current);
-                        listNodes.add(current);
-                        final Resource finalCurrentForLambda = current;
-                        List<Statement> listProps = model.stream()
-                                .filter(s -> s.getSubject().equals(finalCurrentForLambda))
-                                .toList();
-
-                        if (listProps.size() != 2) {
-                            isList = false;
-                            break;
-                        }
-
-                        Optional<Value> first = listProps.stream()
-                                .filter(s -> s.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST))
-                                .map(Statement::getObject)
-                                .findFirst();
-
-                        Optional<Value> rest = listProps.stream()
-                                .filter(s -> s.getPredicate().stringValue().equals(SerializationConstants.RDF_REST))
-                                .map(Statement::getObject)
-                                .findFirst();
-
-                        if (!first.isPresent() || !rest.isPresent()) {
-                            isList = false;
-                            break;
-                        }
-
-                        if (rest.get().stringValue().equals(SerializationConstants.RDF_NIL)) {
-                            current = null;
-                        } else if (rest.get().isBNode()) {
-                            current = (Resource) rest.get();
-                        } else {
-                            isList = false;
-                            break;
-                        }
-                    }
-                    if (isList && current == null) {
+                    Set<Resource> listNodes = detectListNodes(bNodeSubject);
+                    if (!listNodes.isEmpty()) {
                         precomputed.addAll(listNodes);
                     }
                 }
@@ -716,13 +683,65 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                                     s.getPredicate().stringValue().equals(SerializationConstants.RDF_REST)
                     );
 
-                    if (!properties.isEmpty() && !isPartOfList) {
+                    boolean usedAsTopLevelSubject = model.stream()
+                            .anyMatch(s -> s.getSubject().equals(bNodeSubject));
+
+                    if (!properties.isEmpty() && !isPartOfList && !usedAsTopLevelSubject) {
                         precomputed.add(bNodeSubject);
                     }
                 }
             }
         }
         return precomputed;
+    }
+
+    /**
+     * Traverses an RDF list starting from the given head and collects all list nodes.
+     *
+     * @param head the blank node that may be the head of an RDF list
+     * @return the set of blank nodes that form the list, or an empty set if not a valid list
+     */
+    private Set<Resource> detectListNodes(Resource head) {
+        Set<Resource> listNodes = new HashSet<>();
+        Set<Resource> visited = new HashSet<>();
+        Resource current = head;
+
+        while (current != null && current.isBNode() && !visited.contains(current)) {
+            visited.add(current);
+            listNodes.add(current);
+
+            final Resource finalCurrent = current;
+            List<Statement> props = model.stream()
+                    .filter(s -> s.getSubject().equals(finalCurrent))
+                    .toList();
+
+            if (props.size() != 2) {
+                return Collections.emptySet();
+            }
+
+            Optional<Value> first = props.stream()
+                    .filter(s -> s.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST))
+                    .map(Statement::getObject)
+                    .findFirst();
+
+            Optional<Value> rest = props.stream()
+                    .filter(s -> s.getPredicate().stringValue().equals(SerializationConstants.RDF_REST))
+                    .map(Statement::getObject)
+                    .findFirst();
+
+            if (!first.isPresent() || !rest.isPresent()) {
+                return Collections.emptySet();
+            }
+
+            if (rest.get().stringValue().equals(SerializationConstants.RDF_NIL)) {
+                current = null;
+            } else if (rest.get().isBNode()) {
+                current = (Resource) rest.get();
+            } else {
+                return Collections.emptySet();
+            }
+        }
+        return current == null ? listNodes : Collections.emptySet();
     }
 
     /**

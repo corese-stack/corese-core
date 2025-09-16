@@ -117,11 +117,17 @@ public class TurtleListenerImpl extends TurtleBaseListener {
      * @return the stripped string
      */
     private String stripQuotes(String text) {
-        if (text == null || text.length() < 2)
+        if (text == null || text.length() < 2) {
             return text;
+        }
+        if (text.startsWith("\"\"\"") && text.endsWith("\"\"\"") && text.length() >= 6) {
+            return text.substring(3, text.length() - 3);
+        }
+        if (text.startsWith("'''") && text.endsWith("'''") && text.length() >= 6) {
+            return text.substring(3, text.length() - 3);
+        }
         if ((text.startsWith("\"") && text.endsWith("\"")) ||
-                (text.startsWith("'''") && text.endsWith("'''")) ||
-                (text.startsWith("\"\"\"") && text.endsWith("\"\"\""))) {
+                (text.startsWith("'") && text.endsWith("'"))) {
             return text.substring(1, text.length() - 1);
         }
         return text;
