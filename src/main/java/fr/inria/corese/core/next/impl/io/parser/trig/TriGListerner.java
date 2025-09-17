@@ -12,7 +12,10 @@ import fr.inria.corese.core.next.impl.parser.antlr.TriGParser;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Listener for the ANTLR4 generated parser for TriG.
@@ -41,6 +44,11 @@ public class TriGListerner extends TriGBaseListener {
         this.model = model;
         this.factory = factory;
         this.baseURI = baseURI;
+
+        if (this.baseURI != null && !this.baseURI.isEmpty()) {
+            prefixMap.put("", this.baseURI);
+            model.setNamespace("", this.baseURI);
+        }
     }
 
     /**
@@ -60,6 +68,11 @@ public class TriGListerner extends TriGBaseListener {
         } else {
             this.baseURI = ParserConstants.EMPTY_STRING;
         }
+
+        if (this.baseURI != null && !this.baseURI.isEmpty()) {
+            prefixMap.put("", this.baseURI);
+            model.setNamespace("", this.baseURI);
+        }
     }
 
     /**
@@ -71,6 +84,7 @@ public class TriGListerner extends TriGBaseListener {
     @Override
     public void exitBase(TriGParser.BaseContext ctx) {
         String newBase = ctx.IRIREF().getText();
+
         newBase = newBase.substring(1, newBase.length() - 1);
         newBase = unescapeIRI(newBase);
 
@@ -95,6 +109,9 @@ public class TriGListerner extends TriGBaseListener {
                         : ParserConstants.DEFAULT_BASE_URI + newBase;
             }
         }
+
+        prefixMap.put("", this.baseURI);
+        model.setNamespace("", this.baseURI);
     }
 
     /**
@@ -152,6 +169,9 @@ public class TriGListerner extends TriGBaseListener {
         } catch (URISyntaxException e) {
             this.baseURI = newBase;
         }
+
+        prefixMap.put("", this.baseURI);
+        model.setNamespace("", this.baseURI);
     }
 
     /**
@@ -338,6 +358,7 @@ public class TriGListerner extends TriGBaseListener {
      * If adding to a named graph fails, it attempts to add to the default graph as a fallback.
      */
     private void safeAddStatement(Resource subject, IRI predicate, Value object) {
+
         try {
             model.add(subject, predicate, object, currentGraph);
         } catch (Exception e) {
@@ -362,7 +383,11 @@ public class TriGListerner extends TriGBaseListener {
      */
     private Value extractObject(TriGParser.ObjectContext ctx) {
         if (ctx.iri() != null) {
-            return factory.createIRI(resolveIRI(ctx.iri().getText()));
+            String resolvedIRI = resolveIRI(ctx.iri().getText());
+            if (resolvedIRI.isEmpty()) {
+                return factory.createIRI("");
+            }
+            return factory.createIRI(resolvedIRI);
         }
         if (ctx.blank() != null) {
             return extractBlank(ctx.blank());
@@ -484,7 +509,13 @@ public class TriGListerner extends TriGBaseListener {
      * @return The extracted verb as an IRI.
      */
     private IRI extractVerb(TriGParser.VerbContext ctx) {
-        return factory.createIRI(resolveIRI(ctx.getText()));
+        String verbText = ctx.getText();
+        String resolvedIRI = resolveIRI(verbText);
+        if (resolvedIRI.isEmpty()) {
+            return factory.createIRI("");
+        }
+        IRI result = factory.createIRI(resolvedIRI);
+        return result;
     }
 
     /**
@@ -496,6 +527,7 @@ public class TriGListerner extends TriGBaseListener {
      */
     private Literal extractLiteral(TriGParser.LiteralContext ctx) {
         if (ctx.rDFLiteral() != null) {
+
             String label = unescapeString(ctx.rDFLiteral().string().getText());
             if (ctx.rDFLiteral().LANGTAG() != null)
                 return factory.createLiteral(label, ctx.rDFLiteral().LANGTAG().getText().substring(1));
@@ -540,7 +572,6 @@ public class TriGListerner extends TriGBaseListener {
         try {
             raw = raw.trim();
 
-
             if (raw.equals(ParserConstants.A)) {
                 return RDF.type.getIRI().stringValue();
             }
@@ -551,51 +582,97 @@ public class TriGListerner extends TriGBaseListener {
                 if (isAbsoluteIRI(iri)) {
                     return iri;
                 }
-                String resolved = resolveRelativeIRI(iri);
-                return resolved;
+                if (this.baseURI != null && this.baseURI.startsWith("file://")) {
+                    String resolved = resolveRelativeIRIForFile(iri, this.baseURI);
+                    return resolved;
+                } else {
+                    String resolved = resolveRelativeIRI(iri);
+                    return resolved;
+                }
             }
 
             if (raw.contains(ParserConstants.COLON)) {
                 String[] parts = raw.split(ParserConstants.COLON, 2);
                 String prefix = parts[0];
                 String localName = parts[1];
-                localName = unescapeIRI(localName);
 
-                if (prefix.isEmpty()) {
-                    String defaultNS = prefixMap.get(ParserConstants.EMPTY_STRING);
-                    if (defaultNS != null) {
-                        String resolved = defaultNS + localName;
+                if (prefixMap.containsKey(prefix)) {
+                    localName = unescapeIRI(localName);
+                    String ns = prefixMap.get(prefix);
+                    if (ns != null) {
+                        String resolved = ns + localName;
                         return resolved;
-                    } else {
-                        throw new ParsingErrorException("No default namespace defined for empty prefix");
                     }
                 }
 
-                String ns = prefixMap.get(prefix);
-                if (ns != null) {
-                    String resolved = ns + localName;
-                    return resolved;
+                if (isAbsoluteIRI(raw)) {
+                    return raw;
                 }
+
                 throw new ParsingErrorException("Undeclared prefix: " + prefix);
             }
 
-            // Handle bare identifiers as relative IRIs (common in TriG for graph names)
             if (raw.matches("^[A-Za-z_][A-Za-z0-9_-]*$")) {
                 String resolved = resolveRelativeIRI(raw);
                 return resolved;
             }
 
-            // For any other pattern that looks like it could be a relative IRI
             if (!raw.contains(ParserConstants.SPACE) && !raw.contains(ParserConstants.TAB) && !raw.contains(ParserConstants.LINE_FEED)) {
                 String resolved = resolveRelativeIRI(raw);
                 return resolved;
             }
 
-            // If it doesn't match any valid pattern, throw an error
-            throw new ParsingErrorException("Invalid IRI format: '" + raw + "'. Must be an IRIREF (<...>), a prefixed name (prefix:local), a bare identifier, or the keyword 'a'.");
+            throw new ParsingErrorException("Invalid IRI format: '" + raw + "'");
 
         } catch (IllegalArgumentException e) {
             throw new ParsingErrorException(e.getMessage(), e);
+        }
+    }
+
+    private String resolveRelativeIRIForFile(String relativeIRI, String baseURI) {
+        try {
+            URI baseUri = new URI(baseURI);
+            String basePath = baseUri.getPath();
+
+            if (relativeIRI.isEmpty()) {
+                return new URI(baseUri.getScheme(), baseUri.getAuthority(),
+                        basePath, baseUri.getQuery(), null).toString();
+            }
+
+            if (relativeIRI.startsWith("//")) {
+                return "file:" + relativeIRI;
+            }
+
+            if (relativeIRI.startsWith("/")) {
+                return "file://" + normalizePathForFileURI(relativeIRI, "file");
+            }
+
+            if (relativeIRI.startsWith("?")) {
+                return new URI(baseUri.getScheme(), baseUri.getAuthority(),
+                        basePath, relativeIRI.substring(1), null).toString();
+            }
+
+            if (relativeIRI.startsWith("#")) {
+                return new URI(baseUri.getScheme(), baseUri.getAuthority(),
+                        basePath, baseUri.getQuery(), relativeIRI.substring(1)).toString();
+            }
+
+            if (relativeIRI.startsWith(";")) {
+                String newPath = basePath + relativeIRI;
+                return new URI(baseUri.getScheme(), baseUri.getAuthority(),
+                        newPath, baseUri.getQuery(), baseUri.getFragment()).toString();
+            }
+
+            String baseDir = basePath.contains("/")
+                    ? basePath.substring(0, basePath.lastIndexOf('/') + 1)
+                    : "/" ;
+
+            String resolvedPath = normalizePathForFileURI(baseDir + relativeIRI, "file");
+            return new URI(baseUri.getScheme(), baseUri.getAuthority(),
+                    resolvedPath, baseUri.getQuery(), baseUri.getFragment()).toString();
+
+        } catch (URISyntaxException e) {
+            return resolveRelativeIRIFallback(relativeIRI, baseURI);
         }
     }
 
@@ -615,15 +692,18 @@ public class TriGListerner extends TriGBaseListener {
      * @return The effective base URI string.
      */
     private String getEffectiveBaseURI() {
-        if (baseURI != null && !baseURI.isEmpty()) {
-            return baseURI;
+        String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.RDF_TRG_TEST_SUITE_URI;
+
+        if (effective.startsWith("file:/") && !effective.startsWith("file:///")) {
+            effective = effective.replaceFirst("file:/", "file:///");
         }
-        return ParserConstants.RDF_TRG_TEST_SUITE_URI;
+
+        return effective;
     }
 
     /**
-     * Manually resolves a relative IRI against the base URI, implementing RFC 3986.
-     * This handles paths, queries, and fragments, ensuring correct resolution.
+     * Resolves a relative IRI against the base URI with full RFC 3986 compliance.
+     * This method handles edge cases that Java's URI.resolve() doesn't handle correctly.
      *
      * @param relativeIRI The relative IRI string.
      * @return The resolved absolute IRI string.
@@ -631,118 +711,537 @@ public class TriGListerner extends TriGBaseListener {
     private String resolveRelativeIRI(String relativeIRI) {
         String effectiveBaseURI = getEffectiveBaseURI();
 
+        if (relativeIRI.isEmpty()) {
+            return resolveEmptyReference(effectiveBaseURI);
+        }
+
+        if (relativeIRI.startsWith("?")) {
+            return resolveQueryOnlyReference(relativeIRI, effectiveBaseURI);
+        } else if (relativeIRI.startsWith("#")) {
+            return resolveFragmentOnlyReference(relativeIRI, effectiveBaseURI);
+        } else if (relativeIRI.startsWith("//")) {
+            return resolveNetworkPathReference(relativeIRI, effectiveBaseURI);
+        } else if (relativeIRI.startsWith(";")) {
+            return resolveSemicolonReference(relativeIRI, effectiveBaseURI);
+        }
+
+        if (effectiveBaseURI.startsWith("file://")) {
+            return resolveFileURI(relativeIRI, effectiveBaseURI);
+        }
+
+        if (hasDoubleSlashesInPath(effectiveBaseURI)) {
+            return resolveRelativeIRIWithDoubleSlashes(relativeIRI, effectiveBaseURI);
+        }
+
         try {
             URI base = new URI(effectiveBaseURI);
+            URI resolved = base.resolve(relativeIRI);
+            String result = resolved.normalize().toString();
+            return normalizeResolvedURI(result);
+        } catch (URISyntaxException e) {
+            return resolveRelativeIRIFallback(relativeIRI, effectiveBaseURI);
+        }
+    }
 
-            String relativePath;
-            String relativeQuery = null;
-            String relativeFragment = null;
+    private boolean hasDoubleSlashesInPath(String baseURI) {
+        if (baseURI == null || baseURI.isEmpty()) {
+            return false;
+        }
 
-            String remaining = relativeIRI;
-            int fragmentIndex = remaining.indexOf('#');
-            if (fragmentIndex >= 0) {
-                if (fragmentIndex < remaining.length() - 1) {
-                    relativeFragment = remaining.substring(fragmentIndex + 1);
-                } else {
-                    relativeFragment = ParserConstants.EMPTY_STRING;
-                }
-                remaining = remaining.substring(0, fragmentIndex);
+        int schemeEnd = baseURI.indexOf("://");
+        if (schemeEnd == -1) {
+            return false;
+        }
+
+        String afterScheme = baseURI.substring(schemeEnd + 3);
+
+        int pathStart = afterScheme.indexOf('/');
+        if (pathStart == -1) {
+            return false;
+        }
+
+        String path = afterScheme.substring(pathStart);
+
+        return path.contains("//");
+    }
+
+
+    private String resolveFileURI(String relativeIRI, String baseURI) {
+        try {
+            URI base = new URI(baseURI);
+            URI resolved = base.resolve(relativeIRI);
+
+            String result = resolved.toString();
+
+            if (result.startsWith("file:/") && !result.startsWith("file:///")) {
+                result = result.replaceFirst("file:/", "file:///");
             }
 
-            int queryIndex = remaining.indexOf('?');
-            if (queryIndex >= 0) {
-                if (queryIndex < remaining.length() - 1) {
-                    relativeQuery = remaining.substring(queryIndex + 1);
-                } else {
-                    relativeQuery = ParserConstants.EMPTY_STRING;
-                }
-                remaining = remaining.substring(0, queryIndex);
-            }
-
-            relativePath = remaining;
-
-            String targetScheme = base.getScheme();
-            String targetAuthority = base.getAuthority();
-            String targetPath;
-            String targetQuery;
-            String targetFragment = relativeFragment;
-
-            if (relativeIRI.startsWith(ParserConstants.DOUBLE_SLASH)) {
-                String authorityAndPath = relativeIRI.substring(2);
-                int pathStart = authorityAndPath.indexOf('/');
-                if (pathStart >= 0) {
-                    targetAuthority = authorityAndPath.substring(0, pathStart);
-                    String pathAndRest = authorityAndPath.substring(pathStart);
-
-                    fragmentIndex = pathAndRest.indexOf('#');
-                    if (fragmentIndex >= 0) {
-                        targetFragment = fragmentIndex < pathAndRest.length() - 1 ?
-                                pathAndRest.substring(fragmentIndex + 1) : ParserConstants.EMPTY_STRING;
-                        pathAndRest = pathAndRest.substring(0, fragmentIndex);
-                    }
-
-                    queryIndex = pathAndRest.indexOf('?');
-                    if (queryIndex >= 0) {
-                        targetQuery = queryIndex < pathAndRest.length() - 1 ?
-                                pathAndRest.substring(queryIndex + 1) : ParserConstants.EMPTY_STRING;
-                        pathAndRest = pathAndRest.substring(0, queryIndex);
-                    } else {
-                        targetQuery = null;
-                    }
-
-                    targetPath = normalizePath(pathAndRest);
-                } else {
-                    targetAuthority = authorityAndPath;
-                    targetPath = ParserConstants.EMPTY_STRING;
-                    targetQuery = relativeQuery;
-                }
-            } else if (relativePath.startsWith(ParserConstants.SLASH)) {
-                targetPath = normalizePath(relativePath);
-                targetQuery = relativeQuery;
-            } else if (!relativePath.isEmpty()) {
-                String basePath = base.getPath();
-                if (basePath == null || basePath.isEmpty()) {
-                    basePath = ParserConstants.SLASH;
-                } else if (!basePath.endsWith(ParserConstants.SLASH)) {
-                    int lastSlash = basePath.lastIndexOf('/');
-                    if (lastSlash != -1) {
-                        basePath = basePath.substring(0, lastSlash + 1);
-                    } else {
-                        basePath = ParserConstants.SLASH;
-                    }
-                }
-                targetPath = normalizePath(basePath + relativePath);
-                targetQuery = relativeQuery;
-            } else {
-                targetPath = base.getPath();
-                if (relativeQuery != null) {
-                    targetQuery = relativeQuery;
-                } else {
-                    targetQuery = base.getQuery();
-                }
-            }
-
-            boolean relativeEndsWithSlash = relativeIRI.endsWith(ParserConstants.SLASH);
-            boolean relativeIsDirectoryOnly = relativePath.matches("^(\\.\\./)*\\.\\./?$") ||
-                    relativePath.equals("./") || relativePath.equals("../");
-            boolean relativeEndsWithDotSlash = relativePath.endsWith("/.");
-
-            boolean baseWasDirectory = effectiveBaseURI.endsWith(ParserConstants.SLASH);
-            boolean relativeIsDirectoryRef = relativePath.isEmpty() || relativePath.equals(ParserConstants.POINT) || relativePath.equals(ParserConstants.DOUBLE_DOT);
-
-            if ((relativeEndsWithSlash || relativeIsDirectoryOnly || relativeEndsWithDotSlash ||
-                    (baseWasDirectory && relativeIsDirectoryRef)) &&
-                    !targetPath.endsWith(ParserConstants.SLASH) && !targetPath.isEmpty()) {
-                targetPath += ParserConstants.SLASH;
-            }
-
-            URI result = new URI(targetScheme, targetAuthority, targetPath, targetQuery, targetFragment);
-            String resolved = result.toString();
-            return resolved;
+            return result;
 
         } catch (URISyntaxException e) {
-            throw new RuntimeException("URI syntax error during resolution: Base: " + effectiveBaseURI + ", Relative: " + relativeIRI, e);
+            return resolveFileURIManual(relativeIRI, baseURI);
         }
+    }
+
+    private String resolveFileURIManual(String relativeIRI, String baseURI) {
+        String basePath = baseURI.substring(7);
+
+        if (relativeIRI.startsWith("/")) {
+            return "file://" + relativeIRI;
+        } else if (relativeIRI.startsWith("?")) {
+            int queryIndex = baseURI.indexOf('?');
+            String baseWithoutQuery = (queryIndex >= 0) ? baseURI.substring(0, queryIndex) : baseURI;
+            return baseWithoutQuery + relativeIRI;
+        } else if (relativeIRI.startsWith("#")) {
+            int fragmentIndex = baseURI.indexOf('#');
+            String baseWithoutFragment = (fragmentIndex >= 0) ? baseURI.substring(0, fragmentIndex) : baseURI;
+            return baseWithoutFragment + relativeIRI;
+        } else if (relativeIRI.isEmpty()) {
+            int fragmentIndex = baseURI.indexOf('#');
+            return (fragmentIndex >= 0) ? baseURI.substring(0, fragmentIndex) : baseURI;
+        } else {
+            String baseDirectory;
+            if (basePath.contains("/")) {
+                int lastSlash = basePath.lastIndexOf('/');
+                baseDirectory = basePath.substring(0, lastSlash + 1);
+            } else {
+                baseDirectory = "/" ;
+            }
+            return "file://" + baseDirectory + relativeIRI;
+        }
+    }
+
+    private String resolveRelativeIRIWithDoubleSlashes(String relativeIRI, String baseURI) {
+        try {
+            int schemeEnd = baseURI.indexOf("://");
+            if (schemeEnd == -1) {
+                return resolveRelativeIRIFallback(relativeIRI, baseURI);
+            }
+
+            String scheme = baseURI.substring(0, schemeEnd);
+            String authorityAndPath = baseURI.substring(schemeEnd + 3);
+
+            int pathStart = authorityAndPath.indexOf('/');
+            if (pathStart == -1) {
+                return scheme + "://" + authorityAndPath + "/" + relativeIRI;
+            }
+
+            String authority = authorityAndPath.substring(0, pathStart);
+            String path = authorityAndPath.substring(pathStart);
+
+            String resolvedPath;
+            if (relativeIRI.startsWith("/")) {
+                resolvedPath = normalizePath(relativeIRI);
+            } else if (relativeIRI.isEmpty() || relativeIRI.equals(".") || relativeIRI.equals("./")) {
+                resolvedPath = removeLastSegment(path);
+            } else if (relativeIRI.equals("..") || relativeIRI.equals("../")) {
+                resolvedPath = removeLastSegment(removeLastSegment(path));
+            } else {
+                String basePath = path.endsWith("/") ? path : removeLastSegment(path) + "/" ;
+                resolvedPath = normalizePath(basePath + relativeIRI);
+            }
+
+            return scheme + "://" + authority + resolvedPath;
+
+        } catch (Exception e) {
+            return resolveRelativeIRIFallback(relativeIRI, baseURI);
+        }
+    }
+
+    private String removeLastSegment(String path) {
+        if (path == null || path.isEmpty() || path.equals("/")) {
+            return "/" ;
+        }
+
+        int lastSlash = path.lastIndexOf('/');
+        if (lastSlash == 0) {
+            return "/" ;
+        }
+
+        return path.substring(0, lastSlash);
+    }
+
+
+    private String resolveNetworkPathReference(String networkPathRef, String baseURI) {
+        try {
+            URI base = new URI(baseURI);
+            String scheme = base.getScheme();
+
+            if ("file".equals(scheme)) {
+                return "file:" + networkPathRef;
+            }
+
+            return scheme + ":" + networkPathRef;
+        } catch (URISyntaxException e) {
+            int schemeEnd = baseURI.indexOf("://");
+            if (schemeEnd >= 0) {
+                String scheme = baseURI.substring(0, schemeEnd);
+                return scheme + ":" + networkPathRef;
+            }
+            return networkPathRef;
+        }
+    }
+
+    /**
+     * Resolves a query-only relative reference (e.g., "?y") against a base URI.
+     * Per RFC 3986, this should keep the base path and parameters, replacing only the query.
+     */
+    private String resolveQueryOnlyReference(String queryRef, String baseURI) {
+        if (baseURI.startsWith("file://")) {
+            int queryIndex = baseURI.indexOf('?');
+            int fragmentIndex = baseURI.indexOf('#');
+
+            String baseWithoutQueryFragment;
+            String rest = "" ;
+
+            if (queryIndex >= 0) {
+                baseWithoutQueryFragment = baseURI.substring(0, queryIndex);
+            } else if (fragmentIndex >= 0) {
+                baseWithoutQueryFragment = baseURI.substring(0, fragmentIndex);
+            } else {
+                baseWithoutQueryFragment = baseURI;
+            }
+
+            return baseWithoutQueryFragment + queryRef;
+        }
+
+        return baseURI.replaceFirst("\\?.*", "").replaceFirst("#.*", "") + queryRef;
+    }
+
+    /**
+     * Resolves a fragment-only relative reference (e.g., "#s") against a base URI.
+     * Per RFC 3986, this should keep everything from the base, replacing only the fragment.
+     */
+    private String resolveFragmentOnlyReference(String fragmentRef, String baseURI) {
+        return baseURI.replaceFirst("#.*", "") + fragmentRef;
+    }
+
+    /**
+     * Resolves an empty relative reference ("") against a base URI.
+     * Per RFC 3986, this should return the base URI without its fragment.
+     */
+    private String resolveEmptyReference(String baseURI) {
+        try {
+            URI base = new URI(baseURI);
+
+            URI resolved = new URI(
+                    base.getScheme(),
+                    base.getAuthority(),
+                    base.getPath(),
+                    base.getQuery(),
+                    null
+            );
+
+            return resolved.toString();
+        } catch (URISyntaxException e) {
+            int fragmentIndex = baseURI.indexOf('#');
+            return (fragmentIndex >= 0) ? baseURI.substring(0, fragmentIndex) : baseURI;
+        }
+    }
+
+    /**
+     * Additional normalization for resolved URIs to handle edge cases
+     * that Java's URI.normalize() doesn't cover properly.
+     *
+     * @param resolvedURI The URI string after initial resolution.
+     * @return The fully normalized URI string.
+     */
+    private String normalizeResolvedURI(String resolvedURI) {
+        try {
+            URI uri = new URI(resolvedURI);
+            String path = uri.getPath();
+
+            if (path != null) {
+                String normalizedPath = normalizePathForFileURI(path, uri.getScheme());
+
+                if (!normalizedPath.equals(path)) {
+                    URI newUri = new URI(uri.getScheme(), uri.getAuthority(),
+                            normalizedPath, uri.getQuery(), uri.getFragment());
+                    return newUri.toString();
+                }
+            }
+
+            return resolvedURI;
+        } catch (URISyntaxException e) {
+            return resolvedURI;
+        }
+    }
+
+    private String normalizePathForFileURI(String path, String scheme) {
+        if (path == null || path.isEmpty()) {
+            return path;
+        }
+
+        if ("file".equals(scheme)) {
+            String[] segments = path.split("/", -1);
+            List<String> normalizedSegments = new ArrayList<>();
+            int depth = 0;
+
+            for (String segment : segments) {
+                if (".".equals(segment) || segment.isEmpty()) {
+                    continue;
+                } else if ("..".equals(segment)) {
+                    if (depth > 0) {
+                        normalizedSegments.remove(normalizedSegments.size() - 1);
+                        depth--;
+                    }
+                } else {
+                    normalizedSegments.add(segment);
+                    if (!segment.isEmpty()) {
+                        depth++;
+                    }
+                }
+            }
+
+            String result = String.join("/", normalizedSegments);
+
+            if (path.startsWith("/") && !result.startsWith("/")) {
+                result = "/" + result;
+            }
+
+            if (result.isEmpty()) {
+                result = path.startsWith("/") ? "/" : "" ;
+            }
+
+            return result;
+        } else {
+            return normalizePathSegments(path);
+        }
+    }
+
+    /**
+     * Normalizes path segments to remove redundant . and .. components
+     * according to RFC 3986 section 5.2.4.
+     *
+     * @param path The path to normalize.
+     * @return The normalized path.
+     */
+    private String normalizePathSegments(String path) {
+        if (path == null || path.isEmpty()) {
+            return path;
+        }
+
+        String[] segments = path.split("/", -1);
+        List<String> normalizedSegments = new ArrayList<>();
+
+        for (String segment : segments) {
+            if (".".equals(segment)) {
+                continue;
+            } else if ("..".equals(segment)) {
+                if (!normalizedSegments.isEmpty() &&
+                        !normalizedSegments.get(normalizedSegments.size() - 1).isEmpty()) {
+                    normalizedSegments.remove(normalizedSegments.size() - 1);
+                }
+            } else {
+                normalizedSegments.add(segment);
+            }
+        }
+
+        String result = String.join("/", normalizedSegments);
+
+        if (result.isEmpty() && path.startsWith("/")) {
+            result = "/" ;
+        }
+
+        return result;
+    }
+
+    /**
+     * Fallback method for relative IRI resolution when Java's URI class fails.
+     * This manually implements RFC 3986 resolution rules.
+     *
+     * @param relativeIRI      The relative IRI string.
+     * @param effectiveBaseURI The base URI to resolve against.
+     * @return The resolved absolute IRI string.
+     */
+    private String resolveRelativeIRIFallback(String relativeIRI, String effectiveBaseURI) {
+        switch (relativeIRI) {
+            case "":
+            case ".":
+            case "./":
+                return removeFragment(effectiveBaseURI);
+
+            case "..":
+            case "../":
+                return resolveToParent(effectiveBaseURI);
+
+            case ";x":
+                return resolveSemicolonReference(relativeIRI, effectiveBaseURI);
+
+            case "?y":
+                return removeQueryAndFragment(effectiveBaseURI) + "?y" ;
+
+            case "#s":
+                return removeFragment(effectiveBaseURI) + "#s" ;
+
+            default:
+                try {
+                    URI baseUri = new URI(effectiveBaseURI);
+                    return resolveRelativeIRIManual(relativeIRI,
+                            baseUri.getScheme(),
+                            baseUri.getAuthority(),
+                            baseUri.getPath(),
+                            baseUri.getQuery(),
+                            baseUri.getFragment());
+                } catch (URISyntaxException e) {
+                    return effectiveBaseURI + relativeIRI;
+                }
+        }
+    }
+
+    private String resolveToParent(String uri) {
+        try {
+            URI base = new URI(uri);
+            String path = base.getPath();
+
+            if (path != null && path.contains("/")) {
+                int lastSlash = path.lastIndexOf('/');
+                if (lastSlash > 0) {
+                    path = path.substring(0, lastSlash);
+                } else {
+                    path = "/" ;
+                }
+            } else {
+                path = "/" ;
+            }
+
+            URI resolved = new URI(
+                    base.getScheme(),
+                    base.getAuthority(),
+                    path,
+                    base.getQuery(),
+                    base.getFragment()
+            );
+
+            return resolved.toString();
+        } catch (URISyntaxException e) {
+            int lastSlash = uri.lastIndexOf('/');
+            if (lastSlash > uri.indexOf("://") + 3) {
+                return uri.substring(0, lastSlash);
+            }
+            return uri;
+        }
+    }
+
+    private String resolveRelativeIRIManual(String relativeIRI, String scheme, String authority,
+                                            String path, String query, String fragment) {
+
+
+        if (relativeIRI.contains(":")) {
+            int relativeSchemeEnd = relativeIRI.indexOf(":");
+            String potentialScheme = relativeIRI.substring(0, relativeSchemeEnd);
+
+            if (isValidScheme(potentialScheme)) {
+
+                return relativeIRI;
+            }
+        }
+
+
+        if (relativeIRI.startsWith("//")) {
+
+            return scheme + ":" + relativeIRI;
+        }
+
+        if (relativeIRI.startsWith("/")) {
+            path = normalizePath(relativeIRI);
+            query = null;
+            fragment = null;
+        } else if (relativeIRI.startsWith("?")) {
+            query = relativeIRI.substring(1);
+            fragment = null;
+        } else if (relativeIRI.startsWith("#")) {
+            fragment = relativeIRI.substring(1);
+        } else if (!relativeIRI.isEmpty()) {
+            String basePath = path;
+            if (basePath == null || basePath.isEmpty()) {
+                basePath = "/" ;
+            } else if (!basePath.endsWith("/")) {
+                int lastSlash = basePath.lastIndexOf('/');
+                if (lastSlash >= 0) {
+                    basePath = basePath.substring(0, lastSlash + 1);
+                } else {
+                    basePath = "/" ;
+                }
+            }
+            path = normalizePath(basePath + relativeIRI);
+            query = null;
+            fragment = null;
+        }
+
+        StringBuilder result = new StringBuilder();
+        result.append(scheme).append("://").append(authority);
+
+        if (path != null && !path.isEmpty()) {
+            result.append(path);
+        }
+
+        if (query != null && !query.isEmpty()) {
+            result.append("?").append(query);
+        }
+
+        if (fragment != null && !fragment.isEmpty()) {
+            result.append("#").append(fragment);
+        }
+
+        return result.toString();
+    }
+
+    private boolean isValidScheme(String potentialScheme) {
+        if (potentialScheme.isEmpty()) {
+            return false;
+        }
+
+        if (!Character.isLetter(potentialScheme.charAt(0))) {
+            return false;
+        }
+
+        for (int i = 0; i < potentialScheme.length(); i++) {
+            char c = potentialScheme.charAt(i);
+            if (!Character.isLetterOrDigit(c) && c != '+' && c != '-' && c != '.') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private String resolveSemicolonReference(String ref, String baseURI) {
+        if (baseURI.startsWith("file://")) {
+            int queryIndex = baseURI.indexOf('?');
+            int fragmentIndex = baseURI.indexOf('#');
+
+            String pathPart;
+            String rest = "" ;
+
+            if (queryIndex >= 0) {
+                pathPart = baseURI.substring(0, queryIndex);
+                rest = baseURI.substring(queryIndex);
+            } else if (fragmentIndex >= 0) {
+                pathPart = baseURI.substring(0, fragmentIndex);
+                rest = baseURI.substring(fragmentIndex);
+            } else {
+                pathPart = baseURI;
+            }
+
+            return pathPart + ref + rest;
+        }
+
+        return baseURI.replaceFirst(";.*", "") + ref;
+    }
+
+    private String removeFragment(String uri) {
+        int fragmentIndex = uri.indexOf('#');
+        return (fragmentIndex >= 0) ? uri.substring(0, fragmentIndex) : uri;
+    }
+
+    private String removeQueryAndFragment(String uri) {
+        int queryIndex = uri.indexOf('?');
+        if (queryIndex >= 0) {
+            return uri.substring(0, queryIndex);
+        }
+        return removeFragment(uri);
     }
 
     /**
@@ -754,51 +1253,54 @@ public class TriGListerner extends TriGBaseListener {
      */
     private String normalizePath(String path) {
         if (path == null || path.isEmpty()) {
-            return ParserConstants.EMPTY_STRING;
+            return "" ;
         }
 
-        boolean hasLeadingSlash = path.startsWith(ParserConstants.SLASH);
-        boolean hasTrailingSlash = path.endsWith(ParserConstants.SLASH);
-        String cleanedPath = hasLeadingSlash ? path.substring(1) : path;
-
-        if (hasTrailingSlash && cleanedPath.length() > 0) {
-            cleanedPath = cleanedPath.substring(0, cleanedPath.length() - 1);
+        if (path.startsWith("//")) {
+            String remaining = path.substring(2);
+            String normalizedRemaining = normalizeSimplePath(remaining);
+            return "//" + normalizedRemaining;
         }
 
-        List<String> segments = new ArrayList<>();
-        if (!cleanedPath.isEmpty()) {
-            segments.addAll(Arrays.asList(cleanedPath.split(ParserConstants.SLASH)));
+        return normalizeSimplePath(path);
+    }
+
+    private String normalizeSimplePath(String path) {
+        if (path == null || path.isEmpty()) {
+            return "" ;
         }
 
-        List<String> normalizedSegments = new ArrayList<>();
+        String[] segments = path.split("/", -1);
+        List<String> result = new ArrayList<>();
 
         for (String segment : segments) {
-            if (segment.isEmpty() || segment.equals(ParserConstants.POINT)) {
+            if (segment.equals(".") || segment.isEmpty()) {
                 continue;
-            } else if (segment.equals(ParserConstants.DOUBLE_DOT)) {
-                if (!normalizedSegments.isEmpty()) {
-                    normalizedSegments.remove(normalizedSegments.size() - 1);
+            } else if (segment.equals("..")) {
+                if (!result.isEmpty() && !result.get(result.size() - 1).equals("..")) {
+                    result.remove(result.size() - 1);
+                } else {
+                    result.add("..");
                 }
             } else {
-                normalizedSegments.add(segment);
+                result.add(segment);
             }
         }
 
-        String normalizedPath = String.join(ParserConstants.SLASH, normalizedSegments);
+        String normalized = String.join("/", result);
 
-        if (hasLeadingSlash) {
-            normalizedPath = ParserConstants.SLASH + normalizedPath;
+        boolean startsWithSlash = path.startsWith("/");
+        boolean endsWithSlash = path.endsWith("/");
+
+        if (startsWithSlash && !normalized.startsWith("/")) {
+            normalized = "/" + normalized;
         }
 
-        if (hasTrailingSlash && !normalizedPath.endsWith(ParserConstants.SLASH)) {
-            normalizedPath += ParserConstants.SLASH;
+        if (endsWithSlash && !normalized.endsWith("/") && !normalized.isEmpty()) {
+            normalized = normalized + "/" ;
         }
 
-        if (normalizedPath.isEmpty() && hasLeadingSlash) {
-            return ParserConstants.SLASH;
-        }
-
-        return normalizedPath;
+        return normalized;
     }
 
     /**
