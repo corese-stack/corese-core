@@ -143,16 +143,20 @@ public class TurtleSerializer extends AbstractGraphSerializer {
                 case '"':
                     sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.QUOTE);
                     break;
-                case '\\':
-                    sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.BACK_SLASH);
-                    break;
                 default:
-                    if (option.escapeUnicode() && (c <= 0x1F || c == 0x7F || (c >= 0x80 && c <= 0xFFFF))) {
+                    if (Character.isISOControl(c) ||c == 0x7F) {
+                        sb.append(String.format("\\u%04X", (int) c));
+                }
+                    else if (option.escapeUnicode() && c >= 0x80 && c <= 0xFFFF) {
                         sb.append(String.format("\\u%04X", (int) c));
                     } else if (Character.isHighSurrogate(c)) {
                         int codePoint = value.codePointAt(i);
                         if (Character.isValidCodePoint(codePoint)) {
-                            sb.append(String.format("\\U%08X", codePoint));
+                            if (option.escapeUnicode()) {
+                                sb.append(String.format("\\U%08X", codePoint));
+                            } else {
+                                sb.append(Character.toChars(codePoint));
+                            }
                             i++;
                         } else {
                             sb.append(c);
@@ -178,6 +182,7 @@ public class TurtleSerializer extends AbstractGraphSerializer {
                 SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
                         SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
                         SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE);
+
     }
 
     /**
