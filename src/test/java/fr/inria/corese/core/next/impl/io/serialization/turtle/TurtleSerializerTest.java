@@ -577,4 +577,39 @@ class TurtleSerializerTest {
         assertEquals(expected, actual);
     }
 
+    /**
+     * Tests serialization of a literal containing escaped characters.
+     *
+     * @throws SerializationException if a serialization error occurs.
+     * @throws IOException            if an I/O error occurs during writing.
+     */
+    @Test
+    void testEscapedCharacterLiteralSerialization() throws SerializationException, IOException {
+        ValueFactory coreseFactory = new CoreseAdaptedValueFactory();
+        Statement statement = coreseFactory.createStatement(
+                coreseFactory.createIRI("http://example.org/book/1"),
+                coreseFactory.createIRI("http://example.org/properties/description"),
+                coreseFactory.createLiteral("\\\\ \\t \\b \\n \\r \\f")
+        );
+
+        Model coreseModel = new CoreseModel();
+        coreseModel.add(statement);
+
+        StringWriter writer = new StringWriter();
+        TurtleOption config = new TurtleOption.Builder()
+                .autoDeclarePrefixes(false)
+                .includeContext(false)
+                .prettyPrint(false)
+                .usePrefixes(false)
+                .build();
+        TurtleSerializer turtleSerializer = new TurtleSerializer(coreseModel, config);
+
+        turtleSerializer.write(writer);
+
+        String expected = "<http://example.org/book/1> <http://example.org/properties/description> \"\\\\ \\t \\b \\n \\r \\f\" .".trim();
+
+        String actual = writer.toString().trim();
+        assertEquals(expected, actual);
+    }
+
 }
