@@ -6,6 +6,8 @@ import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -500,6 +502,41 @@ class TurtleSerializerTest {
                   book:1 properties:description\s""" + "\"\"\"" + multilineText + "\"\"\"" + " .\n";
 
         String actual = writer.toString().replace("\r\n", "\n");
+        assertEquals(expected, actual);
+    }
+
+    /**
+     * Tests serialization of a literal containing escaped characters.
+     *
+     * @throws SerializationException if a serialization error occurs.
+     * @throws IOException            if an I/O error occurs during writing.
+     */
+    @Test
+    void testEscapedCharacterLiteralSerialization() throws SerializationException, IOException {
+        ValueFactory coreseFactory = new CoreseAdaptedValueFactory();
+        Statement statement = coreseFactory.createStatement(
+                coreseFactory.createIRI("http://example.org/book/1"),
+                coreseFactory.createIRI("http://example.org/properties/description"),
+                coreseFactory.createLiteral("\\\\ \\t \\b \\n \\r \\f")
+        );
+
+        Model coreseModel = new CoreseModel();
+        coreseModel.add(statement);
+
+        StringWriter writer = new StringWriter();
+        TurtleOption config = new TurtleOption.Builder()
+                .autoDeclarePrefixes(false)
+                .includeContext(false)
+                .prettyPrint(false)
+                .usePrefixes(false)
+                .build();
+        TurtleSerializer turtleSerializer = new TurtleSerializer(coreseModel, config);
+
+        turtleSerializer.write(writer);
+
+        String expected = "<http://example.org/book/1> <http://example.org/properties/description> \"\\\\ \\t \\b \\n \\r \\f\" .".trim();
+
+        String actual = writer.toString().trim();
         assertEquals(expected, actual);
     }
 

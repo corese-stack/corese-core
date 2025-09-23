@@ -216,6 +216,11 @@ class TurtleCircularTest {
         Literal literalUnicode = valueFactory.createLiteral("Hello 世界 🌍");
         model.add(subject, predicateNote, literalUnicode);
 
+        // Literal with character forbidden in URIs
+        Literal badURICharacters = valueFactory.createLiteral("<>-.!~*()?:;/=[]+@&$,%#~^ \\\\ \\t \\b \\n \\r \\f");
+        model.add(subject, predicateNote, badURICharacters);
+
+
         return model;
     }
 

@@ -143,9 +143,6 @@ public class TurtleSerializer extends AbstractGraphSerializer {
                 case '"':
                     sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.QUOTE);
                     break;
-                case '\\':
-                    sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.BACK_SLASH);
-                    break;
                 default:
                     if (Character.isISOControl(c) ||c == 0x7F) {
                         sb.append(String.format("\\u%04X", (int) c));
