@@ -76,14 +76,22 @@ public final class ParserConstants {
     public static final String BLANK_NODE_PREFIX = "_:";
 
     public static final String DEFAULT_BASE_URI = "http://example.org/";
-
+    public static final String FILE_PROTOCOL_SIMPLE = "file:/";
+    public static final String FILE_PROTOCOL_TRIPLE_SLASH = "file:///";
+    public static final String SCHEME_DELIMITER = "://";
+    public static final String FILE_PROTOCOL = "file://";
     public static final String RDF_TRG_TEST_SUITE_URI = "https://w3c.github.io/rdf-tests/rdf/rdf11/rdf-trig/";
+    public static final String PNAME_NS_PATTERN = "^[A-Za-z_][A-Za-z0-9_-]*$";
 
-
+    public static final String MINUS = "-";
     public static final String SPACE = " ";
     public static final String TAB = "\t";
     public static final String LINE_FEED = "\n";
     public static final String CARRIAGE_RETURN = "\r";
+
+    public static final String FRAGMENT = "#";
+    public static final String QUERY_MARK = "?";
+    public static final String PLUS = "+";
 
     // Prevent instantiation of this utility class.
     private ParserConstants() {

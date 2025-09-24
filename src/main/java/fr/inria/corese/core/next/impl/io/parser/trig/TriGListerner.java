@@ -46,8 +46,8 @@ public class TriGListerner extends TriGBaseListener {
         this.baseURI = baseURI;
 
         if (this.baseURI != null && !this.baseURI.isEmpty()) {
-            prefixMap.put("", this.baseURI);
-            model.setNamespace("", this.baseURI);
+            prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
+            model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
         }
     }
 
@@ -70,8 +70,8 @@ public class TriGListerner extends TriGBaseListener {
         }
 
         if (this.baseURI != null && !this.baseURI.isEmpty()) {
-            prefixMap.put("", this.baseURI);
-            model.setNamespace("", this.baseURI);
+            prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
+            model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
         }
     }
 
@@ -110,8 +110,8 @@ public class TriGListerner extends TriGBaseListener {
             }
         }
 
-        prefixMap.put("", this.baseURI);
-        model.setNamespace("", this.baseURI);
+        prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
+        model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
     }
 
     /**
@@ -170,8 +170,8 @@ public class TriGListerner extends TriGBaseListener {
             this.baseURI = newBase;
         }
 
-        prefixMap.put("", this.baseURI);
-        model.setNamespace("", this.baseURI);
+        prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
+        model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
     }
 
     /**
@@ -385,7 +385,7 @@ public class TriGListerner extends TriGBaseListener {
         if (ctx.iri() != null) {
             String resolvedIRI = resolveIRI(ctx.iri().getText());
             if (resolvedIRI.isEmpty()) {
-                return factory.createIRI("");
+                return factory.createIRI(ParserConstants.EMPTY_STRING);
             }
             return factory.createIRI(resolvedIRI);
         }
@@ -512,7 +512,7 @@ public class TriGListerner extends TriGBaseListener {
         String verbText = ctx.getText();
         String resolvedIRI = resolveIRI(verbText);
         if (resolvedIRI.isEmpty()) {
-            return factory.createIRI("");
+            return factory.createIRI(ParserConstants.EMPTY_STRING);
         }
         IRI result = factory.createIRI(resolvedIRI);
         return result;
@@ -540,7 +540,7 @@ public class TriGListerner extends TriGBaseListener {
         if (ctx.numericLiteral() != null) {
             String numericText = ctx.numericLiteral().getText();
 
-            boolean isNegative = numericText.startsWith("-");
+            boolean isNegative = numericText.startsWith(ParserConstants.MINUS);
             String absoluteValue = isNegative ? numericText.substring(1) : numericText;
 
             if (ctx.numericLiteral().DOUBLE() != null || absoluteValue.toLowerCase().contains(ParserConstants.E)) {
@@ -582,7 +582,7 @@ public class TriGListerner extends TriGBaseListener {
                 if (isAbsoluteIRI(iri)) {
                     return iri;
                 }
-                if (this.baseURI != null && this.baseURI.startsWith("file://")) {
+                if (this.baseURI != null && this.baseURI.startsWith(ParserConstants.FILE_PROTOCOL)) {
                     String resolved = resolveRelativeIRIForFile(iri, this.baseURI);
                     return resolved;
                 } else {
@@ -612,7 +612,7 @@ public class TriGListerner extends TriGBaseListener {
                 throw new ParsingErrorException("Undeclared prefix: " + prefix);
             }
 
-            if (raw.matches("^[A-Za-z_][A-Za-z0-9_-]*$")) {
+            if (raw.matches(ParserConstants.PNAME_NS_PATTERN)) {
                 String resolved = resolveRelativeIRI(raw);
                 return resolved;
             }
@@ -639,33 +639,33 @@ public class TriGListerner extends TriGBaseListener {
                         basePath, baseUri.getQuery(), null).toString();
             }
 
-            if (relativeIRI.startsWith("//")) {
+            if (relativeIRI.startsWith(ParserConstants.DOUBLE_SLASH)) {
                 return "file:" + relativeIRI;
             }
 
-            if (relativeIRI.startsWith("/")) {
-                return "file://" + normalizePathForFileURI(relativeIRI, "file");
+            if (relativeIRI.startsWith(ParserConstants.SLASH)) {
+                return ParserConstants.FILE_PROTOCOL + normalizePathForFileURI(relativeIRI, "file");
             }
 
-            if (relativeIRI.startsWith("?")) {
+            if (relativeIRI.startsWith(ParserConstants.QUERY_MARK)) {
                 return new URI(baseUri.getScheme(), baseUri.getAuthority(),
                         basePath, relativeIRI.substring(1), null).toString();
             }
 
-            if (relativeIRI.startsWith("#")) {
+            if (relativeIRI.startsWith(ParserConstants.FRAGMENT)) {
                 return new URI(baseUri.getScheme(), baseUri.getAuthority(),
                         basePath, baseUri.getQuery(), relativeIRI.substring(1)).toString();
             }
 
-            if (relativeIRI.startsWith(";")) {
+            if (relativeIRI.startsWith(ParserConstants.SEMICOLON)) {
                 String newPath = basePath + relativeIRI;
                 return new URI(baseUri.getScheme(), baseUri.getAuthority(),
                         newPath, baseUri.getQuery(), baseUri.getFragment()).toString();
             }
 
-            String baseDir = basePath.contains("/")
+            String baseDir = basePath.contains(ParserConstants.SLASH)
                     ? basePath.substring(0, basePath.lastIndexOf('/') + 1)
-                    : "/" ;
+                    : ParserConstants.SLASH ;
 
             String resolvedPath = normalizePathForFileURI(baseDir + relativeIRI, "file");
             return new URI(baseUri.getScheme(), baseUri.getAuthority(),
@@ -694,8 +694,8 @@ public class TriGListerner extends TriGBaseListener {
     private String getEffectiveBaseURI() {
         String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.RDF_TRG_TEST_SUITE_URI;
 
-        if (effective.startsWith("file:/") && !effective.startsWith("file:///")) {
-            effective = effective.replaceFirst("file:/", "file:///");
+        if (effective.startsWith(ParserConstants.FILE_PROTOCOL_SIMPLE) && !effective.startsWith(ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH)) {
+            effective = effective.replaceFirst(ParserConstants.FILE_PROTOCOL_SIMPLE, ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH);
         }
 
         return effective;
@@ -715,17 +715,17 @@ public class TriGListerner extends TriGBaseListener {
             return resolveEmptyReference(effectiveBaseURI);
         }
 
-        if (relativeIRI.startsWith("?")) {
+        if (relativeIRI.startsWith(ParserConstants.QUERY_MARK)) {
             return resolveQueryOnlyReference(relativeIRI, effectiveBaseURI);
-        } else if (relativeIRI.startsWith("#")) {
+        } else if (relativeIRI.startsWith(ParserConstants.FRAGMENT)) {
             return resolveFragmentOnlyReference(relativeIRI, effectiveBaseURI);
-        } else if (relativeIRI.startsWith("//")) {
+        } else if (relativeIRI.startsWith(ParserConstants.DOUBLE_SLASH)) {
             return resolveNetworkPathReference(relativeIRI, effectiveBaseURI);
-        } else if (relativeIRI.startsWith(";")) {
+        } else if (relativeIRI.startsWith(ParserConstants.SEMICOLON)) {
             return resolveSemicolonReference(relativeIRI, effectiveBaseURI);
         }
 
-        if (effectiveBaseURI.startsWith("file://")) {
+        if (effectiveBaseURI.startsWith(ParserConstants.FILE_PROTOCOL)) {
             return resolveFileURI(relativeIRI, effectiveBaseURI);
         }
 
@@ -748,7 +748,7 @@ public class TriGListerner extends TriGBaseListener {
             return false;
         }
 
-        int schemeEnd = baseURI.indexOf("://");
+        int schemeEnd = baseURI.indexOf(ParserConstants.SCHEME_DELIMITER);
         if (schemeEnd == -1) {
             return false;
         }
@@ -762,7 +762,7 @@ public class TriGListerner extends TriGBaseListener {
 
         String path = afterScheme.substring(pathStart);
 
-        return path.contains("//");
+        return path.contains(ParserConstants.DOUBLE_SLASH);
     }
 
 
@@ -773,8 +773,8 @@ public class TriGListerner extends TriGBaseListener {
 
             String result = resolved.toString();
 
-            if (result.startsWith("file:/") && !result.startsWith("file:///")) {
-                result = result.replaceFirst("file:/", "file:///");
+            if (result.startsWith(ParserConstants.FILE_PROTOCOL_SIMPLE) && !result.startsWith(ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH)) {
+                result = result.replaceFirst(ParserConstants.FILE_PROTOCOL_SIMPLE, ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH);
             }
 
             return result;
@@ -787,13 +787,13 @@ public class TriGListerner extends TriGBaseListener {
     private String resolveFileURIManual(String relativeIRI, String baseURI) {
         String basePath = baseURI.substring(7);
 
-        if (relativeIRI.startsWith("/")) {
-            return "file://" + relativeIRI;
-        } else if (relativeIRI.startsWith("?")) {
+        if (relativeIRI.startsWith(ParserConstants.SLASH)) {
+            return ParserConstants.FILE_PROTOCOL + relativeIRI;
+        } else if (relativeIRI.startsWith(ParserConstants.QUERY_MARK)) {
             int queryIndex = baseURI.indexOf('?');
             String baseWithoutQuery = (queryIndex >= 0) ? baseURI.substring(0, queryIndex) : baseURI;
             return baseWithoutQuery + relativeIRI;
-        } else if (relativeIRI.startsWith("#")) {
+        } else if (relativeIRI.startsWith(ParserConstants.FRAGMENT)) {
             int fragmentIndex = baseURI.indexOf('#');
             String baseWithoutFragment = (fragmentIndex >= 0) ? baseURI.substring(0, fragmentIndex) : baseURI;
             return baseWithoutFragment + relativeIRI;
@@ -802,19 +802,19 @@ public class TriGListerner extends TriGBaseListener {
             return (fragmentIndex >= 0) ? baseURI.substring(0, fragmentIndex) : baseURI;
         } else {
             String baseDirectory;
-            if (basePath.contains("/")) {
+            if (basePath.contains(ParserConstants.SLASH)) {
                 int lastSlash = basePath.lastIndexOf('/');
                 baseDirectory = basePath.substring(0, lastSlash + 1);
             } else {
-                baseDirectory = "/" ;
+                baseDirectory = ParserConstants.SLASH ;
             }
-            return "file://" + baseDirectory + relativeIRI;
+            return ParserConstants.FILE_PROTOCOL + baseDirectory + relativeIRI;
         }
     }
 
     private String resolveRelativeIRIWithDoubleSlashes(String relativeIRI, String baseURI) {
         try {
-            int schemeEnd = baseURI.indexOf("://");
+            int schemeEnd = baseURI.indexOf(ParserConstants.SCHEME_DELIMITER);
             if (schemeEnd == -1) {
                 return resolveRelativeIRIFallback(relativeIRI, baseURI);
             }
@@ -824,25 +824,25 @@ public class TriGListerner extends TriGBaseListener {
 
             int pathStart = authorityAndPath.indexOf('/');
             if (pathStart == -1) {
-                return scheme + "://" + authorityAndPath + "/" + relativeIRI;
+                return scheme + ParserConstants.SCHEME_DELIMITER + authorityAndPath + ParserConstants.SLASH + relativeIRI;
             }
 
             String authority = authorityAndPath.substring(0, pathStart);
             String path = authorityAndPath.substring(pathStart);
 
             String resolvedPath;
-            if (relativeIRI.startsWith("/")) {
+            if (relativeIRI.startsWith(ParserConstants.SLASH)) {
                 resolvedPath = normalizePath(relativeIRI);
-            } else if (relativeIRI.isEmpty() || relativeIRI.equals(".") || relativeIRI.equals("./")) {
+            } else if (relativeIRI.isEmpty() || relativeIRI.equals(ParserConstants.POINT) || relativeIRI.equals("./")) {
                 resolvedPath = removeLastSegment(path);
-            } else if (relativeIRI.equals("..") || relativeIRI.equals("../")) {
+            } else if (relativeIRI.equals(ParserConstants.DOUBLE_DOT) || relativeIRI.equals("../")) {
                 resolvedPath = removeLastSegment(removeLastSegment(path));
             } else {
-                String basePath = path.endsWith("/") ? path : removeLastSegment(path) + "/" ;
+                String basePath = path.endsWith(ParserConstants.SLASH) ? path : removeLastSegment(path) + ParserConstants.SLASH ;
                 resolvedPath = normalizePath(basePath + relativeIRI);
             }
 
-            return scheme + "://" + authority + resolvedPath;
+            return scheme + ParserConstants.SCHEME_DELIMITER + authority + resolvedPath;
 
         } catch (Exception e) {
             return resolveRelativeIRIFallback(relativeIRI, baseURI);
@@ -850,13 +850,13 @@ public class TriGListerner extends TriGBaseListener {
     }
 
     private String removeLastSegment(String path) {
-        if (path == null || path.isEmpty() || path.equals("/")) {
-            return "/" ;
+        if (path == null || path.isEmpty() || path.equals(ParserConstants.SLASH)) {
+            return ParserConstants.SLASH ;
         }
 
         int lastSlash = path.lastIndexOf('/');
         if (lastSlash == 0) {
-            return "/" ;
+            return ParserConstants.SLASH ;
         }
 
         return path.substring(0, lastSlash);
@@ -872,12 +872,12 @@ public class TriGListerner extends TriGBaseListener {
                 return "file:" + networkPathRef;
             }
 
-            return scheme + ":" + networkPathRef;
+            return scheme + ParserConstants.COLON + networkPathRef;
         } catch (URISyntaxException e) {
-            int schemeEnd = baseURI.indexOf("://");
+            int schemeEnd = baseURI.indexOf(ParserConstants.SCHEME_DELIMITER);
             if (schemeEnd >= 0) {
                 String scheme = baseURI.substring(0, schemeEnd);
-                return scheme + ":" + networkPathRef;
+                return scheme + ParserConstants.COLON + networkPathRef;
             }
             return networkPathRef;
         }
@@ -888,12 +888,12 @@ public class TriGListerner extends TriGBaseListener {
      * Per RFC 3986, this should keep the base path and parameters, replacing only the query.
      */
     private String resolveQueryOnlyReference(String queryRef, String baseURI) {
-        if (baseURI.startsWith("file://")) {
+        if (baseURI.startsWith(ParserConstants.FILE_PROTOCOL)) {
             int queryIndex = baseURI.indexOf('?');
             int fragmentIndex = baseURI.indexOf('#');
 
             String baseWithoutQueryFragment;
-            String rest = "" ;
+            String rest = ParserConstants.EMPTY_STRING ;
 
             if (queryIndex >= 0) {
                 baseWithoutQueryFragment = baseURI.substring(0, queryIndex);
@@ -906,7 +906,7 @@ public class TriGListerner extends TriGBaseListener {
             return baseWithoutQueryFragment + queryRef;
         }
 
-        return baseURI.replaceFirst("\\?.*", "").replaceFirst("#.*", "") + queryRef;
+        return baseURI.replaceFirst("\\?.*", ParserConstants.EMPTY_STRING).replaceFirst("#.*", ParserConstants.EMPTY_STRING) + queryRef;
     }
 
     /**
@@ -914,11 +914,11 @@ public class TriGListerner extends TriGBaseListener {
      * Per RFC 3986, this should keep everything from the base, replacing only the fragment.
      */
     private String resolveFragmentOnlyReference(String fragmentRef, String baseURI) {
-        return baseURI.replaceFirst("#.*", "") + fragmentRef;
+        return baseURI.replaceFirst("#.*", ParserConstants.EMPTY_STRING) + fragmentRef;
     }
 
     /**
-     * Resolves an empty relative reference ("") against a base URI.
+     * Resolves an empty relative reference (ParserConstants.EMPTY_STRING) against a base URI.
      * Per RFC 3986, this should return the base URI without its fragment.
      */
     private String resolveEmptyReference(String baseURI) {
@@ -974,14 +974,14 @@ public class TriGListerner extends TriGBaseListener {
         }
 
         if ("file".equals(scheme)) {
-            String[] segments = path.split("/", -1);
+            String[] segments = path.split(ParserConstants.SLASH, -1);
             List<String> normalizedSegments = new ArrayList<>();
             int depth = 0;
 
             for (String segment : segments) {
-                if (".".equals(segment) || segment.isEmpty()) {
+                if (ParserConstants.POINT.equals(segment) || segment.isEmpty()) {
                     continue;
-                } else if ("..".equals(segment)) {
+                } else if (ParserConstants.DOUBLE_DOT.equals(segment)) {
                     if (depth > 0) {
                         normalizedSegments.remove(normalizedSegments.size() - 1);
                         depth--;
@@ -994,14 +994,14 @@ public class TriGListerner extends TriGBaseListener {
                 }
             }
 
-            String result = String.join("/", normalizedSegments);
+            String result = String.join(ParserConstants.SLASH, normalizedSegments);
 
-            if (path.startsWith("/") && !result.startsWith("/")) {
-                result = "/" + result;
+            if (path.startsWith(ParserConstants.SLASH) && !result.startsWith(ParserConstants.SLASH)) {
+                result = ParserConstants.SLASH + result;
             }
 
             if (result.isEmpty()) {
-                result = path.startsWith("/") ? "/" : "" ;
+                result = path.startsWith(ParserConstants.SLASH) ? ParserConstants.SLASH : ParserConstants.EMPTY_STRING ;
             }
 
             return result;
@@ -1022,13 +1022,13 @@ public class TriGListerner extends TriGBaseListener {
             return path;
         }
 
-        String[] segments = path.split("/", -1);
+        String[] segments = path.split(ParserConstants.SLASH, -1);
         List<String> normalizedSegments = new ArrayList<>();
 
         for (String segment : segments) {
-            if (".".equals(segment)) {
+            if (ParserConstants.POINT.equals(segment)) {
                 continue;
-            } else if ("..".equals(segment)) {
+            } else if (ParserConstants.DOUBLE_DOT.equals(segment)) {
                 if (!normalizedSegments.isEmpty() &&
                         !normalizedSegments.get(normalizedSegments.size() - 1).isEmpty()) {
                     normalizedSegments.remove(normalizedSegments.size() - 1);
@@ -1038,10 +1038,10 @@ public class TriGListerner extends TriGBaseListener {
             }
         }
 
-        String result = String.join("/", normalizedSegments);
+        String result = String.join(ParserConstants.SLASH, normalizedSegments);
 
-        if (result.isEmpty() && path.startsWith("/")) {
-            result = "/" ;
+        if (result.isEmpty() && path.startsWith(ParserConstants.SLASH)) {
+            result = ParserConstants.SLASH ;
         }
 
         return result;
@@ -1057,12 +1057,12 @@ public class TriGListerner extends TriGBaseListener {
      */
     private String resolveRelativeIRIFallback(String relativeIRI, String effectiveBaseURI) {
         switch (relativeIRI) {
-            case "":
-            case ".":
+            case ParserConstants.EMPTY_STRING:
+            case ParserConstants.POINT:
             case "./":
                 return removeFragment(effectiveBaseURI);
 
-            case "..":
+            case ParserConstants.DOUBLE_DOT:
             case "../":
                 return resolveToParent(effectiveBaseURI);
 
@@ -1095,15 +1095,15 @@ public class TriGListerner extends TriGBaseListener {
             URI base = new URI(uri);
             String path = base.getPath();
 
-            if (path != null && path.contains("/")) {
+            if (path != null && path.contains(ParserConstants.SLASH)) {
                 int lastSlash = path.lastIndexOf('/');
                 if (lastSlash > 0) {
                     path = path.substring(0, lastSlash);
                 } else {
-                    path = "/" ;
+                    path = ParserConstants.SLASH ;
                 }
             } else {
-                path = "/" ;
+                path = ParserConstants.SLASH ;
             }
 
             URI resolved = new URI(
@@ -1117,7 +1117,7 @@ public class TriGListerner extends TriGBaseListener {
             return resolved.toString();
         } catch (URISyntaxException e) {
             int lastSlash = uri.lastIndexOf('/');
-            if (lastSlash > uri.indexOf("://") + 3) {
+            if (lastSlash > uri.indexOf(ParserConstants.SCHEME_DELIMITER) + 3) {
                 return uri.substring(0, lastSlash);
             }
             return uri;
@@ -1128,8 +1128,8 @@ public class TriGListerner extends TriGBaseListener {
                                             String path, String query, String fragment) {
 
 
-        if (relativeIRI.contains(":")) {
-            int relativeSchemeEnd = relativeIRI.indexOf(":");
+        if (relativeIRI.contains(ParserConstants.COLON)) {
+            int relativeSchemeEnd = relativeIRI.indexOf(ParserConstants.COLON);
             String potentialScheme = relativeIRI.substring(0, relativeSchemeEnd);
 
             if (isValidScheme(potentialScheme)) {
@@ -1139,30 +1139,30 @@ public class TriGListerner extends TriGBaseListener {
         }
 
 
-        if (relativeIRI.startsWith("//")) {
+        if (relativeIRI.startsWith(ParserConstants.DOUBLE_SLASH)) {
 
-            return scheme + ":" + relativeIRI;
+            return scheme + ParserConstants.COLON + relativeIRI;
         }
 
-        if (relativeIRI.startsWith("/")) {
+        if (relativeIRI.startsWith(ParserConstants.SLASH)) {
             path = normalizePath(relativeIRI);
             query = null;
             fragment = null;
-        } else if (relativeIRI.startsWith("?")) {
+        } else if (relativeIRI.startsWith(ParserConstants.QUERY_MARK)) {
             query = relativeIRI.substring(1);
             fragment = null;
-        } else if (relativeIRI.startsWith("#")) {
+        } else if (relativeIRI.startsWith(ParserConstants.FRAGMENT)) {
             fragment = relativeIRI.substring(1);
         } else if (!relativeIRI.isEmpty()) {
             String basePath = path;
             if (basePath == null || basePath.isEmpty()) {
-                basePath = "/" ;
-            } else if (!basePath.endsWith("/")) {
+                basePath = ParserConstants.SLASH ;
+            } else if (!basePath.endsWith(ParserConstants.SLASH)) {
                 int lastSlash = basePath.lastIndexOf('/');
                 if (lastSlash >= 0) {
                     basePath = basePath.substring(0, lastSlash + 1);
                 } else {
-                    basePath = "/" ;
+                    basePath = ParserConstants.SLASH ;
                 }
             }
             path = normalizePath(basePath + relativeIRI);
@@ -1171,18 +1171,18 @@ public class TriGListerner extends TriGBaseListener {
         }
 
         StringBuilder result = new StringBuilder();
-        result.append(scheme).append("://").append(authority);
+        result.append(scheme).append(ParserConstants.SCHEME_DELIMITER).append(authority);
 
         if (path != null && !path.isEmpty()) {
             result.append(path);
         }
 
         if (query != null && !query.isEmpty()) {
-            result.append("?").append(query);
+            result.append(ParserConstants.QUERY_MARK).append(query);
         }
 
         if (fragment != null && !fragment.isEmpty()) {
-            result.append("#").append(fragment);
+            result.append(ParserConstants.FRAGMENT).append(fragment);
         }
 
         return result.toString();
@@ -1208,12 +1208,12 @@ public class TriGListerner extends TriGBaseListener {
     }
 
     private String resolveSemicolonReference(String ref, String baseURI) {
-        if (baseURI.startsWith("file://")) {
+        if (baseURI.startsWith(ParserConstants.FILE_PROTOCOL)) {
             int queryIndex = baseURI.indexOf('?');
             int fragmentIndex = baseURI.indexOf('#');
 
             String pathPart;
-            String rest = "" ;
+            String rest = ParserConstants.EMPTY_STRING ;
 
             if (queryIndex >= 0) {
                 pathPart = baseURI.substring(0, queryIndex);
@@ -1228,7 +1228,7 @@ public class TriGListerner extends TriGBaseListener {
             return pathPart + ref + rest;
         }
 
-        return baseURI.replaceFirst(";.*", "") + ref;
+        return baseURI.replaceFirst(";.*", ParserConstants.EMPTY_STRING) + ref;
     }
 
     private String removeFragment(String uri) {
@@ -1253,13 +1253,13 @@ public class TriGListerner extends TriGBaseListener {
      */
     private String normalizePath(String path) {
         if (path == null || path.isEmpty()) {
-            return "" ;
+            return ParserConstants.EMPTY_STRING ;
         }
 
-        if (path.startsWith("//")) {
+        if (path.startsWith(ParserConstants.DOUBLE_SLASH)) {
             String remaining = path.substring(2);
             String normalizedRemaining = normalizeSimplePath(remaining);
-            return "//" + normalizedRemaining;
+            return ParserConstants.DOUBLE_SLASH + normalizedRemaining;
         }
 
         return normalizeSimplePath(path);
@@ -1267,37 +1267,37 @@ public class TriGListerner extends TriGBaseListener {
 
     private String normalizeSimplePath(String path) {
         if (path == null || path.isEmpty()) {
-            return "" ;
+            return ParserConstants.EMPTY_STRING ;
         }
 
-        String[] segments = path.split("/", -1);
+        String[] segments = path.split(ParserConstants.SLASH, -1);
         List<String> result = new ArrayList<>();
 
         for (String segment : segments) {
-            if (segment.equals(".") || segment.isEmpty()) {
+            if (segment.equals(ParserConstants.POINT) || segment.isEmpty()) {
                 continue;
-            } else if (segment.equals("..")) {
-                if (!result.isEmpty() && !result.get(result.size() - 1).equals("..")) {
+            } else if (segment.equals(ParserConstants.DOUBLE_DOT)) {
+                if (!result.isEmpty() && !result.get(result.size() - 1).equals(ParserConstants.DOUBLE_DOT)) {
                     result.remove(result.size() - 1);
                 } else {
-                    result.add("..");
+                    result.add(ParserConstants.DOUBLE_DOT);
                 }
             } else {
                 result.add(segment);
             }
         }
 
-        String normalized = String.join("/", result);
+        String normalized = String.join(ParserConstants.SLASH, result);
 
-        boolean startsWithSlash = path.startsWith("/");
-        boolean endsWithSlash = path.endsWith("/");
+        boolean startsWithSlash = path.startsWith(ParserConstants.SLASH);
+        boolean endsWithSlash = path.endsWith(ParserConstants.SLASH);
 
-        if (startsWithSlash && !normalized.startsWith("/")) {
-            normalized = "/" + normalized;
+        if (startsWithSlash && !normalized.startsWith(ParserConstants.SLASH)) {
+            normalized = ParserConstants.SLASH + normalized;
         }
 
-        if (endsWithSlash && !normalized.endsWith("/") && !normalized.isEmpty()) {
-            normalized = normalized + "/" ;
+        if (endsWithSlash && !normalized.endsWith(ParserConstants.SLASH) && !normalized.isEmpty()) {
+            normalized = normalized + ParserConstants.SLASH ;
         }
 
         return normalized;
