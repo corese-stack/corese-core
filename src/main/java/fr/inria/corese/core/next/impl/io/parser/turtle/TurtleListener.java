@@ -19,7 +19,7 @@ import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
 /**
  * Listener for the ANTLR4 generated parser for Turtle.
  */
-public class TurtleListenerImpl extends TurtleBaseListener {
+public class TurtleListener extends TurtleBaseListener {
 
     private final Model model;
     private String baseURI;
@@ -30,14 +30,14 @@ public class TurtleListenerImpl extends TurtleBaseListener {
     private IRI currentPredicate;
 
     /**
-     * Constructor for TurtleListenerImpl that initializes the model, value factory,
+     * Constructor for TurtleListener that initializes the model, value factory,
      * and configuration options.
      *
      * @param model   the model to be populated by the parser
      * @param factory the value factory used to create RDF values
      * @param options optional configuration options for the parser
      */
-    public TurtleListenerImpl(Model model, ValueFactory factory, IOOptions options) {
+    public TurtleListener(Model model, ValueFactory factory, IOOptions options) {
         this.model = model;
         this.baseURI = "";
         if (options != null && options instanceof RDFParserBaseIRIOptions) {
@@ -47,7 +47,7 @@ public class TurtleListenerImpl extends TurtleBaseListener {
     }
 
     /**
-     * Constructor for TurtleListenerImpl that initializes the model and value
+     * Constructor for TurtleListener that initializes the model and value
      * factory.
      *
      * @param ctx The parse tree context for the {@code prefixID} rule,

@@ -103,7 +103,7 @@ public class ANTLRTurtleParser extends AbstractRDFParser {
             TurtleParser parser = new TurtleParser(tokens);
             ParseTreeWalker walker = new ParseTreeWalker();
             ParseTree tree = parser.turtleDoc();
-            TurtleListenerImpl listener = new TurtleListenerImpl(getModel(), getValueFactory(), this.getConfig());
+            TurtleListener listener = new TurtleListener(getModel(), getValueFactory(), this.getConfig());
 
             walker.walk((ParseTreeListener) listener, tree);
 
