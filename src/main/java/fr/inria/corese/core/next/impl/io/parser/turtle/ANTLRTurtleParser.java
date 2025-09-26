@@ -1,28 +1,30 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Parser for Turtle RDF files.
- * 
+ *
  * @see fr.inria.corese.core.next.impl.io.parser.ParserFactory
  * @see <a href="https://www.w3.org/TR/turtle/">Turtle</a>
  */
@@ -56,59 +58,154 @@ public class ANTLRTurtleParser extends AbstractRDFParser {
         return RDFFormat.TURTLE;
     }
 
-    /**
-     * @param config we are not using any config in this parser implementation
-     */
     @Override
     public void setConfig(IOOptions config) {
-        // nothing to do
-    }
-
-    /**
-     * @return null, we are not using any config in this parser implementation
-     */
-    @Override
-    public IOOptions getConfig() {
-        return null;
     }
 
     @Override
-    public void parse(InputStream in) {
-        parse(new InputStreamReader(in), null);
+    public void parse(InputStream in) throws ParsingErrorException {
+        parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
     }
 
     @Override
-    public void parse(InputStream in, String baseURI) {
-        parse(new InputStreamReader(in), baseURI);
+    public void parse(InputStream in, String baseURI) throws ParsingErrorException {
+        parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
     }
 
     @Override
-    public void parse(Reader reader) {
+    public void parse(Reader reader) throws ParsingErrorException {
         parse(reader, null);
     }
 
     /**
-     * We are using ANTLR4 lexer and parser
-     * 
-     * @param reader  The Reader to read RDF data from.
-     * @param baseURI The base URI for resolving relative URIs in the RDF data.
+     * Parses Turtle data from a {@link Reader} using ANTLR4.
+     *
+     * @param reader  The {@link Reader} to read the RDF data.
+     * @param baseURI The base URI.
+     * @throws ParsingErrorException if a parsing or I/O error occurs.
      */
     @Override
-    public void parse(Reader reader, String baseURI) {
-
+    public void parse(Reader reader, String baseURI) throws ParsingErrorException {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
-            TurtleLexer lexer = new TurtleLexer(charStream);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            TurtleParser parser = new TurtleParser(tokens);
-            ParseTreeWalker walker = new ParseTreeWalker();
-            ParseTree tree = parser.turtleDoc();
-            TurtleListener listener = new TurtleListener(getModel(), getValueFactory(), this.getConfig());
+            TurtleLexer turtleLexer = new TurtleLexer(charStream);
 
+            TurtleErrorListener turtleErrorListener = new TurtleErrorListener();
+            turtleLexer.removeErrorListeners();
+            turtleLexer.addErrorListener(turtleErrorListener);
+
+            CommonTokenStream tokens = new CommonTokenStream(turtleLexer);
+            TurtleParser turtleParser = new TurtleParser(tokens);
+
+            turtleParser.removeErrorListeners();
+            turtleParser.addErrorListener(turtleErrorListener);
+
+            ParseTreeWalker walker = new ParseTreeWalker();
+            ParseTree tree;
+
+            try {
+                tree = turtleParser.turtleDoc();
+
+                if (turtleErrorListener.hasErrors()) {
+                    String errorMsg = turtleErrorListener.getErrorMessage();
+                    if (errorMsg == null || errorMsg.trim().isEmpty()) {
+                        errorMsg = "Unknown syntax error detected";
+                    }
+                    throw new ParsingErrorException("Syntax error in Turtle document: " + errorMsg);
+                }
+            } catch (RecognitionException e) {
+                throw new ParsingErrorException("Recognition error in Turtle document: " + e.getMessage());
+            }
+
+            IOOptions effectiveOptions = this.getConfig();
+            if (baseURI != null && !baseURI.isEmpty()) {
+                effectiveOptions = new BaseIRIOptions(baseURI);
+            }
+
+            TurtleListener listener = new TurtleListener(getModel(), getValueFactory(), effectiveOptions);
             walker.walk((ParseTreeListener) listener, tree);
 
+        } catch (ParsingErrorException e) {
+            throw e;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to parse Turtle RDF", e);
+            throw new ParsingErrorException("Failed to parse Turtle RDF: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new ParsingErrorException("Unexpected error during Turtle parsing: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Simple implementation of RDFParserBaseIRIOptions to pass base URI to listener.
+     */
+    private static class BaseIRIOptions implements RDFParserBaseIRIOptions {
+        private final String baseURI;
+
+        public BaseIRIOptions(String baseURI) {
+            this.baseURI = baseURI;
+        }
+
+        @Override
+        public String getBase() {
+            return baseURI;
+        }
+    }
+
+    /**
+     * A custom error listener to collect errors from the lexer and parser.
+     */
+    private static class TurtleErrorListener extends BaseErrorListener {
+        private final List<String> errors = new ArrayList<>();
+
+        /**
+         * Records syntax errors generated by ANTLR.
+         *
+         * @param recognizer         The recognizer that detected the error.
+         * @param offendingSymbol    The symbol that caused the error.
+         * @param line               The line number where the error occurred.
+         * @param charPositionInLine The character position on the line.
+         * @param msg                The error message.
+         * @param e                  The recognition exception.
+         */
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                int line, int charPositionInLine, String msg, RecognitionException e) {
+            if (msg == null || msg.trim().isEmpty()) {
+                msg = "Unknown syntax error";
+            }
+
+            if (msg.contains("token recognition error") || msg.contains("mismatched input")) {
+                if (offendingSymbol instanceof Token) {
+                    Token token = (Token) offendingSymbol;
+                    String tokenText = token.getText();
+                    if (msg.contains("token recognition error") && tokenText != null && tokenText.contains("\"")) {
+                        msg = "Invalid string literal - possibly unterminated or contains invalid escape sequence: " + msg;
+                    }
+                }
+            }
+
+            String error = "line " + line + ":" + charPositionInLine + " " + msg;
+            errors.add(error);
+        }
+
+        /**
+         * Checks if parsing errors have been found.
+         *
+         * @return `true` if the error list is not empty, otherwise `false`.
+         */
+        public boolean hasErrors() {
+            return !errors.isEmpty();
+        }
+
+        /**
+         * Returns a formatted error message containing all found errors.
+         *
+         * @return A {@link String} containing the error messages.
+         */
+        public String getErrorMessage() {
+            if (errors.isEmpty()) {
+                return "Unknown parsing error";
+            }
+            return String.join("; ", errors);
         }
     }
 }

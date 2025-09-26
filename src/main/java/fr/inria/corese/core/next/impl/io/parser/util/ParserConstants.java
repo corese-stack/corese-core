@@ -50,6 +50,7 @@ public final class ParserConstants {
 
     public static final String CLOSE_SQUARE_BRACKET = "]";
 
+    public static final String EMPTY_SQUARE_BRACKET = "[]";
     // --- IRI and Literal Delimiters ---
 
     public static final String IRI_START = "<";
