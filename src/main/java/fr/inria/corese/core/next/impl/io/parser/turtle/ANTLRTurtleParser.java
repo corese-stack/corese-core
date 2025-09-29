@@ -25,8 +25,6 @@ import java.util.List;
 /**
  * Parser for Turtle RDF files.
  *
- * @see fr.inria.corese.core.next.impl.io.parser.ParserFactory
- * @see <a href="https://www.w3.org/TR/turtle/">Turtle</a>
  */
 public class ANTLRTurtleParser extends AbstractRDFParser {
 

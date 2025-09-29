@@ -20,7 +20,7 @@ triplesOrGraph
 
 triples2
     : blankNodePropertyList predicateObjectList? '.'
-    | collection predicateObjectList '.'
+    | collection predicateObjectList? '.'
     ;
 
 wrappedGraph
@@ -28,7 +28,7 @@ wrappedGraph
     ;
 
 triplesBlock
-    : triples ('.' triplesBlock?)?
+    : triples ('.'? triplesBlock?)?
     ;
 
 labelOrSubject
@@ -149,7 +149,6 @@ WS
     : (('\u0020' | '\u0009' | '\u000A' | '\u000D' ) )+ -> skip
     ;
 
-// Terminals
 
 Graph_w options { caseInsensitive=true; }
     : 'GRAPH'
@@ -171,16 +170,18 @@ BooleanLiteral
 IRIREF
     : '<' (PN_CHARS | '.' | ':' | '#' | '@' | '%' | '&' | '$' | '!' | '\'' | '*' | '+' | '/' | '(' | ')' | '-' | ',' | '?' | '~' | ';' | '=' | UCHAR)* '>'
     ;
+
+BLANK_NODE_LABEL
+    : '_:' (PN_CHARS_U | [0-9] | PLX) ((PN_CHARS | '.' | PLX)* (PN_CHARS | PLX))?
+    ;
+
 PNAME_NS
-    : PN_PREFIX? ':'
+    : PN_PREFIX ':'
+    | ':'
     ;
 
 PNAME_LN
     : PNAME_NS PN_LOCAL
-    ;
-
-BLANK_NODE_LABEL
-    : '_:' (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
     ;
 
 LANGTAG
@@ -252,7 +253,7 @@ ANON
     : '[' [\u0009\u000A\u000D\u0020]* ']'
     ;
 
-PN_CHARS_BASE
+fragment PN_CHARS_BASE
     : 'A' .. 'Z'
     | 'a' .. 'z'
     | '\u00C0' .. '\u00D6'
@@ -269,12 +270,12 @@ PN_CHARS_BASE
     | '\u{10000}'..'\u{EFFFF}'
     ;
 
-PN_CHARS_U
+fragment PN_CHARS_U
     : PN_CHARS_BASE
     | '_'
     ;
 
-PN_CHARS
+fragment PN_CHARS
     : PN_CHARS_U
     | '-'
     | [0-9]
@@ -283,28 +284,28 @@ PN_CHARS
     | [\u203F-\u2040]
     ;
 
-PN_PREFIX
+fragment PN_PREFIX
     : PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
     ;
 
-PN_LOCAL
-    : (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
+fragment PN_LOCAL
+    : (PN_CHARS_U | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
     ;
 
-PLX
+fragment PLX
     : PERCENT
     | PN_LOCAL_ESC
     ;
 
-PERCENT
+fragment PERCENT
     : '%' HEX HEX
     ;
 
-HEX
+fragment HEX
     : [0-9a-fA-F]
     ;
 
-PN_LOCAL_ESC
+fragment PN_LOCAL_ESC
     : '\\' (
         '_'
         | '~'

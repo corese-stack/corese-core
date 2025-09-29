@@ -10,8 +10,6 @@ import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleBaseListener;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +54,6 @@ public class TurtleListener extends TurtleBaseListener {
             prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
             model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
         }
-
     }
 
     /**
@@ -64,7 +61,7 @@ public class TurtleListener extends TurtleBaseListener {
      * factory.
      *
      * @param ctx The parse tree context for the {@code prefixID} rule,
-     * which provides access to the parsed prefix name and IRI reference tokens.
+     *            which provides access to the parsed prefix name and IRI reference tokens.
      */
     @Override
     public void exitPrefixID(TurtleParser.PrefixIDContext ctx) {
@@ -78,7 +75,6 @@ public class TurtleListener extends TurtleBaseListener {
 
         prefixMap.put(prefix, resolvedIRI);
         model.setNamespace(prefix, resolvedIRI);
-
     }
 
     /**
@@ -98,7 +94,6 @@ public class TurtleListener extends TurtleBaseListener {
 
             prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
             model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
-
         }
     }
 
@@ -169,25 +164,13 @@ public class TurtleListener extends TurtleBaseListener {
         }
     }
 
-    @Override
-    public void enterVerb(TurtleParser.VerbContext ctx) {
-        // This is called for each verb, but we process them in processPredicateObjectList
-        // Keep this method empty to avoid interference
-    }
-
-    @Override
-    public void exitObject_(TurtleParser.Object_Context ctx) {
-        // This is called for each object, but we process them in processPredicateObjectList
-        // Keep this method empty to avoid interference
-    }
 
     /**
-     * Adds a statement to the model with robust error handling to catch
-     * potential issues during the addition process.
+     * Adds a subject-predicate-object triple to the model, with exception handling.
      *
-     * @param subject   The subject of the statement.
-     * @param predicate The predicate of the statement.
-     * @param object    The object of the statement.
+     * @param subject   The subject of the triple.
+     * @param predicate The predicate of the triple.
+     * @param object    The object of the triple.
      */
     private void safeAddStatement(Resource subject, IRI predicate, Value object) {
         try {
@@ -213,7 +196,6 @@ public class TurtleListener extends TurtleBaseListener {
             if (raw.startsWith(ParserConstants.IRI_START) && raw.endsWith(ParserConstants.IRI_END)) {
                 String iri = raw.substring(1, raw.length() - 1);
                 iri = unescapeIRI(iri);
-
                 return resolveIRIAgainstBase(iri);
             }
 
@@ -244,8 +226,7 @@ public class TurtleListener extends TurtleBaseListener {
                     localName = unescapeIRI(localName);
                     String ns = prefixMap.get(prefix);
                     if (ns != null) {
-                        String resolved = ns + localName;
-                        return resolved;
+                        return ns + localName;
                     }
                 }
 
@@ -300,7 +281,6 @@ public class TurtleListener extends TurtleBaseListener {
      * @return true if the string is an absolute IRI, false otherwise.
      */
     private boolean isAbsoluteIRI(String iri) {
-
         if (!iri.contains(ParserConstants.COLON)) {
             return false;
         }
@@ -338,65 +318,265 @@ public class TurtleListener extends TurtleBaseListener {
         }
 
         String effectiveBase = getEffectiveBaseURI();
+        return resolveReference(effectiveBase, iri);
+    }
 
-        try {
-            URI base = new URI(effectiveBase);
-            URI resolved = base.resolve(iri);
+    /**
+     * RFC 3986 Section 5.2.2 - Transform references.
+     * This method implements the reference resolution algorithm for an IRI.
+     *
+     * @param baseUri   The base URI.
+     * @param reference The reference IRI.
+     * @return The resolved target IRI.
+     */
+    private String resolveReference(String baseUri, String reference) {
+        // Parse the base URI components: [scheme, authority, path, query, fragment]
+        String[] base = parseURI(baseUri);
+        String[] ref = parseURI(reference);
+        String[] target = new String[5];
 
-            return resolved.toString();
-        } catch (URISyntaxException e) {
-
-            if (iri.isEmpty()) {
-                return effectiveBase;
-            }
-
-            if (iri.contains(ParserConstants.COLON) && !iri.startsWith(ParserConstants.SLASH) && !iri.startsWith(ParserConstants.QUERY_MARK) && !iri.startsWith(ParserConstants.FRAGMENT)) {
-
-                try {
-                    URI base = new URI(effectiveBase);
-                    String basePath = base.getPath();
-
-
-                    String resolvedPath;
-                    if (basePath.endsWith(ParserConstants.SLASH)) {
-                        resolvedPath = basePath + iri;
-                    } else {
-                        int lastSlash = basePath.lastIndexOf('/');
-                        if (lastSlash >= 0) {
-                            resolvedPath = basePath.substring(0, lastSlash + 1) + iri;
-                        } else {
-                            resolvedPath = ParserConstants.SLASH + iri;
-                        }
-                    }
-
-                    URI resolved = new URI(base.getScheme(), base.getAuthority(), resolvedPath, null, null);
-                    return resolved.toString();
-                } catch (URISyntaxException ex) {
-                    return effectiveBase + (effectiveBase.endsWith(ParserConstants.SLASH) ? ParserConstants.EMPTY_STRING : ParserConstants.SLASH) + iri;
-                }
-            }
-
-            if (iri.startsWith(ParserConstants.SLASH)) {
-                try {
-                    URI base = new URI(effectiveBase);
-                    return base.getScheme() + ParserConstants.SCHEME_DELIMITER + base.getAuthority() + iri;
-                } catch (URISyntaxException ex) {
-                    return effectiveBase + iri;
-                }
-            }
-
-            if (effectiveBase.endsWith(ParserConstants.SLASH)) {
-                return effectiveBase + iri;
+        // RFC 3986 Section 5.2.2 Algorithm
+        if (ref[0] != null) { // ref.scheme
+            target[0] = ref[0]; // scheme
+            target[1] = ref[1]; // authority
+            target[2] = removeDotSegments(ref[2]); // path
+            target[3] = ref[3]; // query
+        } else {
+            if (ref[1] != null) { // ref.authority
+                target[1] = ref[1]; // authority
+                target[2] = removeDotSegments(ref[2]); // path
+                target[3] = ref[3]; // query
             } else {
-                return effectiveBase + ParserConstants.SLASH + iri;
+                if (ref[2] == null || ref[2].isEmpty()) { // ref.path
+                    target[2] = base[2]; // path
+                    if (ref[3] != null) { // ref.query
+                        target[3] = ref[3]; // query
+                    } else {
+                        target[3] = base[3]; // base.query
+                    }
+                } else {
+                    if (ref[2].startsWith(ParserConstants.SLASH)) {
+                        target[2] = removeDotSegments(ref[2]);
+                    } else {
+                        target[2] = merge(base[2], ref[2]);
+                        target[2] = removeDotSegments(target[2]);
+                    }
+                    target[3] = ref[3]; // query
+                }
+                target[1] = base[1]; // authority
+            }
+            target[0] = base[0]; // scheme
+        }
+        target[4] = ref[4]; // fragment
+
+        return recomposeURI(target);
+    }
+
+    /**
+     * RFC 3986 Section 5.2.3 - Merge paths.
+     *
+     * @param basePath The base path.
+     * @param path     The path to merge.
+     * @return The merged path.
+     */
+    private String merge(String basePath, String path) {
+        if (basePath == null || basePath.isEmpty()) {
+            return ParserConstants.SLASH + path;
+        }
+
+        int lastSlash = basePath.lastIndexOf('/');
+        if (lastSlash >= 0) {
+            return basePath.substring(0, lastSlash + 1) + path;
+        } else {
+            return path;
+        }
+    }
+
+    /**
+     * RFC 3986 Section 5.2.4 - Remove dot segments ('.', '..').
+     *
+     * @param path The path to clean.
+     * @return The path without dot segments.
+     */
+    private String removeDotSegments(String path) {
+        if (path == null) {
+            return null;
+        }
+
+        StringBuilder input = new StringBuilder(path);
+        StringBuilder output = new StringBuilder();
+
+        while (input.length() > 0) {
+            String inputStr = input.toString();
+
+            // A: If the input buffer begins with "../" or "./",
+            if (inputStr.startsWith("../")) {
+                input.delete(0, 3);
+            } else if (inputStr.startsWith("./")) {
+                input.delete(0, 2);
+            }
+            // B: If the input buffer begins with "/./" or "/.",
+            else if (inputStr.startsWith("/./")) {
+                input.replace(0, 3, ParserConstants.SLASH);
+            } else if (inputStr.equals("/.")) {
+                input.replace(0, 2, ParserConstants.SLASH);
+            }
+            // C: If the input buffer begins with "/../" or "/..",
+            else if (inputStr.startsWith("/../")) {
+                input.replace(0, 4, ParserConstants.SLASH);
+                removeLastSegment(output);
+            } else if (inputStr.equals("/..")) {
+                input.replace(0, 3, ParserConstants.SLASH);
+                removeLastSegment(output);
+            }
+            // D: If the input buffer consists only of "." or "..",
+            else if (inputStr.equals(".") || inputStr.equals("..")) {
+                input.setLength(0);
+            }
+            // E: Move the first path segment from the input buffer to the end
+            else {
+                int nextSlash = inputStr.indexOf('/', 1);
+                if (nextSlash == -1) {
+                    output.append(inputStr);
+                    input.setLength(0);
+                } else {
+                    output.append(inputStr, 0, nextSlash);
+                    input.delete(0, nextSlash);
+                }
+            }
+        }
+
+        return output.toString();
+    }
+
+    /**
+     * Removes the last segment from the output buffer for dot segment removal.
+     *
+     * @param output The output StringBuilder.
+     */
+    private void removeLastSegment(StringBuilder output) {
+        if (output.length() > 0) {
+            int lastSlash = output.lastIndexOf(ParserConstants.SLASH);
+            if (lastSlash >= 0) {
+                output.setLength(lastSlash);
+            } else {
+                output.setLength(0);
             }
         }
     }
 
     /**
-     * Returns the effective base URI,
+     * Parses the URI components and returns them as an array: [scheme, authority, path, query, fragment].
      *
-     * @return The effective base URI string.
+     * @param uri The URI to parse.
+     * @return An array of strings containing the URI components.
+     */
+    private String[] parseURI(String uri) {
+        String[] components = new String[5];
+
+        if (uri == null || uri.isEmpty()) {
+            return components;
+        }
+
+        String remaining = uri;
+
+        int fragmentIndex = remaining.indexOf('#');
+        if (fragmentIndex >= 0) {
+            components[4] = remaining.substring(fragmentIndex + 1);
+            remaining = remaining.substring(0, fragmentIndex);
+        }
+
+        int queryIndex = remaining.indexOf('?');
+        if (queryIndex >= 0) {
+            components[3] = remaining.substring(queryIndex + 1);
+            remaining = remaining.substring(0, queryIndex);
+        }
+
+        int schemeIndex = remaining.indexOf(':');
+        if (schemeIndex > 0 && isValidScheme(remaining.substring(0, schemeIndex))) {
+            components[0] = remaining.substring(0, schemeIndex);
+            remaining = remaining.substring(schemeIndex + 1);
+        }
+
+        if (remaining.startsWith(ParserConstants.DOUBLE_SLASH)) {
+            int pathIndex = remaining.indexOf('/', 2);
+            if (pathIndex >= 0) {
+                components[1] = remaining.substring(2, pathIndex);
+                components[2] = remaining.substring(pathIndex);
+            } else {
+                components[1] = remaining.substring(2);
+                components[2] = ParserConstants.EMPTY_STRING;
+            }
+        } else {
+            components[2] = remaining;
+        }
+
+        return components;
+    }
+
+    /**
+     * Checks if a scheme is valid according to RFC 3986.
+     *
+     * @param scheme The scheme to check.
+     * @return true if the scheme is valid, false otherwise.
+     */
+    private boolean isValidScheme(String scheme) {
+        if (scheme == null || scheme.isEmpty()) {
+            return false;
+        }
+
+        char first = scheme.charAt(0);
+        if (!Character.isLetter(first)) {
+            return false;
+        }
+
+        for (int i = 1; i < scheme.length(); i++) {
+            char c = scheme.charAt(i);
+            if (!Character.isLetterOrDigit(c) && c != '+' && c != '-' && c != '.') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Recomposes a URI from the array of components: [scheme, authority, path, query, fragment].
+     *
+     * @param components The array of URI components.
+     * @return The recomposed URI.
+     */
+    private String recomposeURI(String[] components) {
+        StringBuilder result = new StringBuilder();
+
+        if (components[0] != null) { // scheme
+            result.append(components[0]).append(':');
+        }
+
+        if (components[1] != null) { // authority
+            result.append(ParserConstants.DOUBLE_SLASH).append(components[1]);
+        }
+
+        if (components[2] != null) { // path
+            result.append(components[2]);
+        }
+
+        if (components[3] != null) { // query
+            result.append('?').append(components[3]);
+        }
+
+        if (components[4] != null) { // fragment
+            result.append('#').append(components[4]);
+        }
+
+        return result.toString();
+    }
+
+
+    /**
+     * Gets the effective base URI, using a default value if not set.
+     *
+     * @return The effective base URI.
      */
     private String getEffectiveBaseURI() {
         String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.DEFAULT_BASE_URI;
@@ -409,12 +589,11 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Unescapes Unicode escape sequences
-     * from an IRI string, as per Turtle specification.
+     * Unescapes escape sequences in an IRI.
      *
-     * @param rawIri The raw IRI string containing escape sequences.
-     * @return The unescaped IRI string.
-     * @throws ParsingErrorException if the escape sequence is invalid.
+     * @param rawIri The raw IRI.
+     * @return The unescaped IRI.
+     * @throws ParsingErrorException if an escape sequence is invalid.
      */
     private String unescapeIRI(String rawIri) throws ParsingErrorException {
         StringBuilder sb = new StringBuilder();
@@ -457,17 +636,18 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Strips quotes from a string, handling single and triple quotes.
+     * Unescapes escape sequences in a string literal.
      *
-     * @param text the string to strip quotes from
-     * @return the stripped string
+     * @param text The string to unescape.
+     * @return The unescaped string.
+     * @throws ParsingErrorException if an escape sequence is invalid.
      */
     private String unescapeString(String text) throws ParsingErrorException {
         if (text == null || text.length() < 2) {
             return text;
         }
 
-        boolean isMultiline = text.startsWith("\"\"\"") || text.startsWith("'''");
+        boolean isMultiline = text.startsWith(ParserConstants.TRIPLE_QUOTE) || text.startsWith(ParserConstants.TRIPLE_APOSTROPHE);
         String content;
         if (isMultiline) {
             content = text.substring(3, text.length() - 3);
@@ -551,11 +731,12 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Extracts a literal from the given context, handling different types of
-     * literals.
+     * Extracts a literal from the parser context.
+     * Handles different literal types (strings, booleans, numeric).
      *
-     * @param ctx the context containing the literal
-     * @return the extracted Literal object
+     * @param ctx The literal context.
+     * @return The literal created by the factory.
+     * @throws ParsingErrorException if the literal is unsupported or invalid.
      */
     private Literal extractLiteral(TurtleParser.LiteralContext ctx) throws ParsingErrorException {
         try {
@@ -576,12 +757,10 @@ public class TurtleListener extends TurtleBaseListener {
 
             if (ctx.numericLiteral() != null) {
                 String numericText = ctx.numericLiteral().getText();
-                boolean isNegative = numericText.startsWith(ParserConstants.MINUS);
-                String absoluteValue = isNegative ? numericText.substring(1) : numericText;
 
-                if (ctx.numericLiteral().DOUBLE() != null || absoluteValue.toLowerCase().contains(ParserConstants.E)) {
+                if (ctx.numericLiteral().DOUBLE() != null) {
                     return factory.createLiteral(numericText, XSD.DOUBLE.getIRI());
-                } else if (ctx.numericLiteral().DECIMAL() != null || absoluteValue.contains(ParserConstants.DOT)) {
+                } else if (ctx.numericLiteral().DECIMAL() != null) {
                     return factory.createLiteral(numericText, XSD.DECIMAL.getIRI());
                 } else {
                     return factory.createLiteral(numericText, XSD.INTEGER.getIRI());
@@ -597,11 +776,11 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Extracts an RDF object from the given parse tree context.
-     * An object can be an IRI, a blank node, a literal, a blank node property list, or a collection.
+     * Extracts an object from the parser context.
+     * Handles different object types (IRI, blank node, literal, etc.).
      *
-     * @param ctx The context containing the object.
-     * @return The extracted {@link Value} object.
+     * @param ctx The object context.
+     * @return The value of the object.
      * @throws ParsingErrorException if the object type is unsupported.
      */
     private Value extractObject(TurtleParser.Object_Context ctx) throws ParsingErrorException {
@@ -611,9 +790,9 @@ public class TurtleListener extends TurtleBaseListener {
                 if (resolvedIRI.isEmpty()) {
                     throw new ParsingErrorException("Cannot resolve object IRI: " + ctx.iri().getText());
                 }
-                IRI iri = factory.createIRI(resolvedIRI);
-                return iri;
+                return factory.createIRI(resolvedIRI);
             }
+
             if (ctx.BlankNode() != null) {
                 String blankNodeText = ctx.BlankNode().getText();
                 if (blankNodeText.startsWith(ParserConstants.BLANK_NODE_PREFIX)) {
@@ -624,12 +803,15 @@ public class TurtleListener extends TurtleBaseListener {
                     throw new ParsingErrorException("Unsupported blank node format: " + blankNodeText);
                 }
             }
+
             if (ctx.literal() != null) {
                 return extractLiteral(ctx.literal());
             }
+
             if (ctx.blankNodePropertyList() != null) {
                 return processBlankNodePropertyList(ctx.blankNodePropertyList());
             }
+
             if (ctx.collection() != null) {
                 return processCollection(ctx.collection());
             }
@@ -643,11 +825,11 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Extracts an RDF subject from the given parse tree context.
-     * A subject can be an IRI, a blank node, or a collection.
+     * Extracts a subject from the parser context.
+     * Handles different subject types (IRI, blank node, collection).
      *
-     * @param ctx The context containing the subject.
-     * @return The extracted {@link Resource} object.
+     * @param ctx The subject context.
+     * @return The subject resource.
      * @throws ParsingErrorException if the subject type is unsupported.
      */
     private Resource extractSubject(TurtleParser.SubjectContext ctx) throws ParsingErrorException {
@@ -678,12 +860,13 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Processes a blank node property list, creating a new blank node and
-     * recursively processing its predicate-object list.
+     * Processes a blank node with a property list.
+     * Creates a new blank node, sets it as the subject,
+     * processes the predicate-object list, and then restores the previous subject and predicate.
      *
-     * @param ctx The parse tree context for the blank node property list.
-     * @return The blank node created to represent the list.
-     * @throws ParsingErrorException if processing fails.
+     * @param ctx The blank node property list context.
+     * @return The created blank node.
+     * @throws ParsingErrorException if an error occurs during processing.
      */
     private Resource processBlankNodePropertyList(TurtleParser.BlankNodePropertyListContext ctx) throws ParsingErrorException {
         try {
@@ -710,11 +893,12 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Processes a collection
+     * Processes a collection (RDF list) from the parser context.
+     * Converts the collection into a linked list of blank nodes and `rdf:first` and `rdf:rest` triples.
      *
-     * @param ctx The parse tree context for the collection.
-     * @return The blank node that is the head of the list.
-     * @throws ParsingErrorException if processing fails.
+     * @param ctx The collection context.
+     * @return The head blank node of the list.
+     * @throws ParsingErrorException if an error occurs during processing.
      */
     private Resource processCollection(TurtleParser.CollectionContext ctx) throws ParsingErrorException {
         try {
@@ -728,7 +912,8 @@ public class TurtleListener extends TurtleBaseListener {
             Resource current = head;
 
             for (int i = 0; i < objects.size(); i++) {
-                Value object = extractObject(objects.get(i));
+                TurtleParser.Object_Context objectCtx = objects.get(i);
+                Value object = extractObject(objectCtx);
 
                 safeAddStatement(current, factory.createIRI(RDF.first.getIRI().stringValue()), object);
 
@@ -751,15 +936,14 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Extracts the predicate from the given context, which is expected to be an
-     * IRI.
+     * Processes a list of predicates and objects for a given subject.
+     * Iterates through the predicate-object pairs and adds triples to the model.
      *
-     * @param ctx the context containing the predicate
-     * @return the extracted IRI object
+     * @param ctx The predicate-object list context.
+     * @throws ParsingErrorException if an error occurs during processing.
      */
     private void processPredicateObjectList(TurtleParser.PredicateObjectListContext ctx) throws ParsingErrorException {
         try {
-
             for (int i = 0; i < ctx.verb().size(); i++) {
                 TurtleParser.VerbContext verb = ctx.verb(i);
                 TurtleParser.ObjectListContext objectList = ctx.objectList(i);
@@ -781,10 +965,11 @@ public class TurtleListener extends TurtleBaseListener {
     }
 
     /**
-     * Extracts the verb from the given context, which can be a predicate or an IRI.
+     * Extracts a verb (predicate) from the parser context and resolves it to an IRI.
      *
-     * @param ctx the context containing the verb
-     * @return the extracted IRI object
+     * @param ctx The verb context.
+     * @return The IRI of the predicate.
+     * @throws ParsingErrorException if the verb cannot be resolved to a valid IRI.
      */
     private IRI extractVerb(TurtleParser.VerbContext ctx) throws ParsingErrorException {
         try {

@@ -589,7 +589,7 @@ class TurtleSerializerTest {
         Statement statement = coreseFactory.createStatement(
                 coreseFactory.createIRI("http://example.org/book/1"),
                 coreseFactory.createIRI("http://example.org/properties/description"),
-                coreseFactory.createLiteral("\\\\ \\t \\b \\n \\r \\f")
+                coreseFactory.createLiteral("\\ \t \b \n \r \f")
         );
 
         Model coreseModel = new CoreseModel();
@@ -606,7 +606,7 @@ class TurtleSerializerTest {
 
         turtleSerializer.write(writer);
 
-        String expected = "<http://example.org/book/1> <http://example.org/properties/description> \"\\\\ \\t \\b \\n \\r \\f\" .".trim();
+        String expected = "<http://example.org/book/1> <http://example.org/properties/description> \"\"\"\\ \t \b \n \r \f\"\"\" .";
 
         String actual = writer.toString().trim();
         assertEquals(expected, actual);

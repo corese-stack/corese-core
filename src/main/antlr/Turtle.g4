@@ -45,12 +45,10 @@ subject
     : iri
     | BlankNode
     | collection
-    | PNAME_NS
     ;
 
 predicate
     : iri
-    | PNAME_NS
     ;
 
 
@@ -60,7 +58,6 @@ object_
     | collection
     | blankNodePropertyList
     | literal
-    | PNAME_NS
     ;
 
 literal
@@ -148,6 +145,7 @@ IRIREF
     : '<' (~( '\u0000' | '\u0020' | '<' | '>' | '"' | '{' | '}' | '|' | '^' | '`' | '\\' ) | UCHAR)* '>'
     ;
 
+// Prefix alone
 PNAME_NS
     : PN_PREFIX? ':'
     ;
@@ -182,6 +180,7 @@ EXPONENT
     : ('e' | 'E') ('+' | '-' )? ('0' .. '9')+
     ;
 
+// "'''" (("'" | "''")? ([^'\] | ECHAR | UCHAR))* "'''"
 STRING_LITERAL_LONG_SINGLE_QUOTE
     : '\'\'\'' (
         ( ~['\\] | ECHAR | UCHAR )
@@ -190,6 +189,7 @@ STRING_LITERAL_LONG_SINGLE_QUOTE
       )* '\'\'\''
     ;
 
+// '"""' (('"' | '""')? ([^"\] | ECHAR | UCHAR))* '"""'
 STRING_LITERAL_LONG_QUOTE
     : '"""' (
         ( ~["\\] | ECHAR | UCHAR )
@@ -206,11 +206,13 @@ STRING_LITERAL_SINGLE_QUOTE
     : '\'' (~['\\\r\n] | ECHAR | UCHAR)* '\''
     ;
 
+// Hexadecimal unicode character
 UCHAR
     : '\\u' HEX HEX HEX HEX
     | '\\U' HEX HEX HEX HEX HEX HEX HEX HEX
     ;
 
+// Escaped character
 ECHAR
     : '\\' [tbnrf"'\\]
     ;
@@ -304,3 +306,4 @@ PN_LOCAL_ESC
 LC
     : '#' ~[\r\n]* -> channel(HIDDEN)
     ;
+

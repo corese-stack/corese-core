@@ -12,51 +12,50 @@ import fr.inria.corese.core.next.impl.parser.antlr.TriGParser;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Listener for the ANTLR4 generated parser for TriG.
- * This listener traverses the parse tree and builds the RDF model,
- * supporting named graphs. It includes unescaping logic for URIs and literals.
+ * TriG listener with proper IRI resolution, blank nodes and collections
+ * according to RFC3986 specification.
+ * This class translates TriG parsing events into RDF model operations.
  */
 public class TriGListerner extends TriGBaseListener {
     private final Model model;
     private String baseURI;
     private final Map<String, String> prefixMap = new HashMap<>();
     private final ValueFactory factory;
+    private boolean insideGraphBlock = false;
 
     private Resource currentSubject;
     private IRI currentPredicate;
     private Resource currentGraph;
 
     /**
-     * Constructor for the TriGListerner with a given base URI.
+     * Constructor for the TriG listener.
+     * Initializes the model, value factory, and base URI.
      *
-     * @param model   The RDF model to populate.
-     * @param factory The ValueFactory for creating RDF resources.
-     * @param options IOOptions for configuration (if any).
-     * @param baseURI The base URI to use for relative URI resolution.
+     * @param model   The RDF model where statements will be added.
+     * @param factory The factory for creating values (IRI, BNode, Literal).
+     * @param options I/O options (not directly used for logic but passed).
+     * @param baseURI The initial base URI for resolution.
      */
     public TriGListerner(Model model, ValueFactory factory, IOOptions options, String baseURI) {
         this.model = model;
         this.factory = factory;
         this.baseURI = baseURI;
 
-        if (this.baseURI != null && !this.baseURI.isEmpty()) {
-            prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
-            model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
-        }
+        initializeBasePrefix();
     }
 
     /**
-     * Constructor for the TriGListerner that extracts the base URI from options.
+     * Constructor for the TriG listener.
+     * Initializes the model, value factory, and attempts to retrieve the base URI from options.
      *
-     * @param model   The RDF model to populate.
-     * @param factory The ValueFactory for creating RDF resources.
-     * @param options IOOptions for configuration.
+     * @param model   The RDF model where statements will be added.
+     * @param factory The factory for creating values (IRI, BNode, Literal).
+     * @param options I/O options, potentially containing the base URI.
      */
     public TriGListerner(Model model, ValueFactory factory, IOOptions options) {
         this.model = model;
@@ -69,6 +68,14 @@ public class TriGListerner extends TriGBaseListener {
             this.baseURI = ParserConstants.EMPTY_STRING;
         }
 
+        initializeBasePrefix();
+    }
+
+    /**
+     * Initializes the base (empty) prefix with the current base URI.
+     * Updates both the internal prefix map and the model's namespace mapping.
+     */
+    private void initializeBasePrefix() {
         if (this.baseURI != null && !this.baseURI.isEmpty()) {
             prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
             model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
@@ -76,140 +83,64 @@ public class TriGListerner extends TriGBaseListener {
     }
 
     /**
-     * Called when a `BASE` directive is exited.
-     * Resolves the new base URI against the current one and updates it.
+     * Handles the exit of the `@base` rule.
+     * Extracts and unescapes the IRI, then updates the base URI.
      *
-     * @param ctx The parse tree context for the `BASE` directive.
+     * @param ctx The context for the `base` rule.
      */
     @Override
     public void exitBase(TriGParser.BaseContext ctx) {
-        String newBase = ctx.IRIREF().getText();
-
-        newBase = newBase.substring(1, newBase.length() - 1);
-        newBase = unescapeIRI(newBase);
-
-        try {
-            if (this.baseURI != null && !this.baseURI.isEmpty()) {
-                URI currentBase = new URI(this.baseURI);
-                URI resolved = currentBase.resolve(newBase);
-                this.baseURI = resolved.toString();
-            } else {
-                if (isAbsoluteIRI(newBase)) {
-                    this.baseURI = newBase;
-                } else {
-                    this.baseURI = ParserConstants.DEFAULT_BASE_URI + newBase;
-                }
-            }
-        } catch (URISyntaxException e) {
-            if (isAbsoluteIRI(newBase)) {
-                this.baseURI = newBase;
-            } else {
-                this.baseURI = (this.baseURI != null && !this.baseURI.isEmpty())
-                        ? this.baseURI + newBase
-                        : ParserConstants.DEFAULT_BASE_URI + newBase;
-            }
-        }
-
-        prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
-        model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
+        String newBase = extractAndUnescapeIRI(ctx.IRIREF().getText());
+        updateBaseURI(newBase);
     }
 
     /**
-     * Called when a `@prefix` directive is exited.
-     * Extracts the prefix and IRI, resolves the IRI, and adds the mapping to the
-     * prefix map and model.
+     * Handles the exit of the `@prefix` declaration rule.
+     * Extracts the prefix and the IRI, and registers the association.
      *
-     * @param ctx The parse tree context for the `@prefix` directive.
+     * @param ctx The context for the `prefixID` rule.
      */
     @Override
     public void exitPrefixID(TriGParser.PrefixIDContext ctx) {
         String prefix = ctx.PNAME_NS().getText();
-        String iri = ctx.IRIREF().getText();
+        // Remove trailing ':'
         prefix = prefix.substring(0, prefix.length() - 1);
-        iri = iri.substring(1, iri.length() - 1);
-        iri = unescapeIRI(iri);
-
-        String resolvedIRI;
-        try {
-            if (baseURI != null && !baseURI.isEmpty()) {
-                URI base = new URI(baseURI);
-                URI resolved = base.resolve(iri);
-                resolvedIRI = resolved.toString();
-            } else {
-                resolvedIRI = isAbsoluteIRI(iri) ? iri : ParserConstants.DEFAULT_BASE_URI + iri;
-            }
-        } catch (URISyntaxException e) {
-            resolvedIRI = isAbsoluteIRI(iri) ? iri :
-                    ((baseURI != null && !baseURI.isEmpty()) ? baseURI + iri : ParserConstants.DEFAULT_BASE_URI + iri);
-        }
-        prefixMap.put(prefix, resolvedIRI);
-        model.setNamespace(prefix, resolvedIRI);
+        String iri = extractAndUnescapeIRI(ctx.IRIREF().getText());
+        registerPrefix(prefix, iri);
     }
 
     /**
-     * Called when a `SPARQL BASE` directive is exited.
-     * Updates the base URI, similar to `exitBase`.
+     * Handles the exit of the SPARQL `BASE` rule.
+     * Extracts and unescapes the IRI, then updates the base URI.
      *
-     * @param ctx The parse tree context for the `SPARQL BASE` directive.
+     * @param ctx The context for the `sparqlBase` rule.
      */
     @Override
     public void exitSparqlBase(TriGParser.SparqlBaseContext ctx) {
-        String newBase = ctx.IRIREF().getText();
-        newBase = newBase.substring(1, newBase.length() - 1);
-        newBase = unescapeIRI(newBase);
-
-        try {
-            if (this.baseURI != null && !this.baseURI.isEmpty() && !isAbsoluteIRI(newBase)) {
-                URI currentBase = new URI(this.baseURI);
-                URI resolved = currentBase.resolve(newBase);
-                this.baseURI = resolved.toString();
-            } else {
-                this.baseURI = newBase;
-            }
-        } catch (URISyntaxException e) {
-            this.baseURI = newBase;
-        }
-
-        prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
-        model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
+        String newBase = extractAndUnescapeIRI(ctx.IRIREF().getText());
+        updateBaseURI(newBase);
     }
 
     /**
-     * Called when a `SPARQL PREFIX` directive is exited.
-     * Handles prefix mappings, similar to `exitPrefixID`.
+     * Handles the exit of the SPARQL `PREFIX` declaration rule.
+     * Extracts the prefix and the IRI, and registers the association.
      *
-     * @param ctx The parse tree context for the `SPARQL PREFIX` directive.
+     * @param ctx The context for the `sparqlPrefix` rule.
      */
     @Override
     public void exitSparqlPrefix(TriGParser.SparqlPrefixContext ctx) {
         String prefix = ctx.PNAME_NS().getText();
-        String iri = ctx.IRIREF().getText();
+        // Remove trailing ':'
         prefix = prefix.substring(0, prefix.length() - 1);
-        iri = iri.substring(1, iri.length() - 1);
-        iri = unescapeIRI(iri);
-
-        String resolvedIRI;
-        try {
-            if (baseURI != null && !baseURI.isEmpty()) {
-                URI base = new URI(baseURI);
-                URI resolved = base.resolve(iri);
-                resolvedIRI = resolved.toString();
-            } else {
-                resolvedIRI = isAbsoluteIRI(iri) ? iri : ParserConstants.DEFAULT_BASE_URI + iri;
-            }
-        } catch (URISyntaxException e) {
-            resolvedIRI = isAbsoluteIRI(iri) ? iri :
-                    ((baseURI != null && !baseURI.isEmpty()) ? baseURI + iri : ParserConstants.DEFAULT_BASE_URI + iri);
-        }
-        prefixMap.put(prefix, resolvedIRI);
-        model.setNamespace(prefix, resolvedIRI);
+        String iri = extractAndUnescapeIRI(ctx.IRIREF().getText());
+        registerPrefix(prefix, iri);
     }
 
     /**
-     * Called when a graph block is entered.
-     * Sets the `currentGraph` context for all triples within this block.
+     * Handles the entry into a graph block.
+     * If it's a named graph (`Graph_w`), sets {@code currentGraph} to the graph label or subject.
      *
-     * @param ctx The parse tree context for the graph block.
+     * @param ctx The context for the `block` rule.
      */
     @Override
     public void enterBlock(TriGParser.BlockContext ctx) {
@@ -221,10 +152,10 @@ public class TriGListerner extends TriGBaseListener {
     }
 
     /**
-     * Called when a graph block is exited.
-     * Resets the `currentGraph` to `null`.
+     * Handles the exit of a graph block.
+     * Resets {@code currentGraph} to null.
      *
-     * @param ctx The parse tree context for the graph block.
+     * @param ctx The context for the `block` rule.
      */
     @Override
     public void exitBlock(TriGParser.BlockContext ctx) {
@@ -232,162 +163,261 @@ public class TriGListerner extends TriGBaseListener {
     }
 
     /**
-     * Called when a `triplesOrGraph` statement is entered.
-     * Handles subjects that are defined before their predicate-object lists.
+     * Handles the entry into a wrapped graph (`{ ... }`).
+     * Sets the {@code insideGraphBlock} flag to true.
      *
-     * @param ctx The parse tree context for `triplesOrGraph`.
+     * @param ctx The context for the `wrappedGraph` rule.
+     */
+    @Override
+    public void enterWrappedGraph(TriGParser.WrappedGraphContext ctx) {
+        insideGraphBlock = true;
+    }
+
+    /**
+     * Handles the exit of a wrapped graph.
+     * Sets the {@code insideGraphBlock} flag to false.
+     *
+     * @param ctx The context for the `wrappedGraph` rule.
+     */
+    @Override
+    public void exitWrappedGraph(TriGParser.WrappedGraphContext ctx) {
+        insideGraphBlock = false;
+    }
+
+    /**
+     * Handles the entry of a `triplesOrGraph` construction.
+     * If a {@code labelOrSubject} is present, it either acts as the subject of the triples
+     * (if followed by a {@code predicateObjectList}) or the graph name (if followed by a {@code wrappedGraph}).
+     *
+     * @param ctx The context for the `triplesOrGraph` rule.
      */
     @Override
     public void enterTriplesOrGraph(TriGParser.TriplesOrGraphContext ctx) {
-        if (ctx.labelOrSubject() != null && ctx.predicateObjectList() != null) {
-            currentSubject = extractLabelOrSubject(ctx.labelOrSubject());
-            processPredicateObjectList(ctx.predicateObjectList());
-        } else if (ctx.labelOrSubject() != null && ctx.predicateObjectList() == null) {
-            Resource potentialGraph = extractLabelOrSubject(ctx.labelOrSubject());
-            currentGraph = potentialGraph;
+        if (ctx.labelOrSubject() != null) {
+            Resource resource = extractLabelOrSubject(ctx.labelOrSubject());
+            if (ctx.predicateObjectList() != null) {
+                // Triples with explicit subject
+                currentSubject = resource;
+                processPredicateObjectList(ctx.predicateObjectList());
+            } else if (ctx.wrappedGraph() != null) {
+                // Named graph definition
+                currentGraph = resource;
+            }
         }
     }
 
     /**
-     * Called when `triples` (subject-predicate-object) are entered.
-     * Sets the current subject for the triple and processes the object list.
+     * Handles the entry of a simple `triples` declaration (starting with a subject or a blank node property list).
+     * Sets the {@code currentSubject}, processes the {@code predicateObjectList}, and restores state.
      *
-     * @param ctx The parse tree context for `triples`.
+     * @param ctx The context for the `triples` rule.
      */
     @Override
     public void enterTriples(TriGParser.TriplesContext ctx) {
         Resource savedSubject = currentSubject;
+        try {
+            if (ctx.subject() != null) {
+                currentSubject = extractSubject(ctx.subject());
+            } else if (ctx.blankNodePropertyList() != null) {
+                currentSubject = processBlankNodePropertyList(ctx.blankNodePropertyList());
+            }
 
-        if (ctx.subject() != null) {
-            currentSubject = extractSubject(ctx.subject());
-        } else if (ctx.blankNodePropertyList() != null) {
-            currentSubject = processBlankNodePropertyList(ctx.blankNodePropertyList());
+            if (ctx.predicateObjectList() != null) {
+                processPredicateObjectList(ctx.predicateObjectList());
+            }
+        } finally {
+            currentSubject = savedSubject;
         }
-
-        if (ctx.predicateObjectList() != null) {
-            processPredicateObjectList(ctx.predicateObjectList());
-        }
-
-        currentSubject = savedSubject;
     }
 
     /**
-     * Called when `triples2` are entered, which handle blank node property lists
-     * or collections as the subject.
+     * Handles the entry of a `triples2` declaration (starting with BNode property list or Collection).
+     * Processes the list or collection to establish the subject, then handles the predicate-object list.
+     * Includes validation for standalone collections.
+     * {@code currentSubject} is restored in the `finally` block.
      *
-     * @param ctx The parse tree context for `triples2`.
+     * @param ctx The context for the `triples2` rule.
      */
     @Override
     public void enterTriples2(TriGParser.Triples2Context ctx) {
         Resource savedSubject = currentSubject;
 
-        if (ctx.blankNodePropertyList() != null) {
-            currentSubject = processBlankNodePropertyList(ctx.blankNodePropertyList());
-
-            if (ctx.predicateObjectList() != null) {
-                processPredicateObjectList(ctx.predicateObjectList());
-            }
-        } else if (ctx.collection() != null) {
-            currentSubject = processCollection(ctx.collection());
-
-            if (ctx.predicateObjectList() != null) {
-                processPredicateObjectList(ctx.predicateObjectList());
-            }
+        if (ctx.collection() != null && ctx.predicateObjectList() == null) {
+            validateStandaloneCollection(ctx);
         }
 
-        currentSubject = savedSubject;
+        try {
+            if (ctx.blankNodePropertyList() != null) {
+                currentSubject = processBlankNodePropertyList(ctx.blankNodePropertyList());
+            } else if (ctx.collection() != null) {
+                currentSubject = processCollection(ctx.collection());
+            }
+
+            if (ctx.predicateObjectList() != null) {
+                processPredicateObjectList(ctx.predicateObjectList());
+            }
+        } finally {
+            currentSubject = savedSubject;
+        }
     }
 
     /**
-     * Processes an RDF collection, converting it into a linked list of blank nodes
-     * using `rdf:first` and `rdf:rest`.
+     * Validates if a collection is used as a standalone statement (without a {@code predicateObjectList}
+     * following it) outside of a wrapped graph block.
+     * Throws a {@code ParsingErrorException} if the syntax is incorrect.
      *
-     * @param ctx The parse tree context for the collection.
-     * @return The head of the newly created blank node linked list.
+     * @param ctx The context for the `triples2` rule.
+     */
+    private void validateStandaloneCollection(TriGParser.Triples2Context ctx) {
+        if (ctx.predicateObjectList() == null && !insideGraphBlock) {
+            List<TriGParser.ObjectContext> objects = ctx.collection().object();
+            if (objects.isEmpty()) {
+                throw new ParsingErrorException("Free-standing list of zero-elements outside {} : bad syntax");
+            } else {
+                throw new ParsingErrorException("Free-standing list outside {} : bad syntax");
+            }
+        }
+    }
+
+    /**
+     * Processes a blank node property list (e.g., `[ predicateObjectList ]`).
+     * Creates a new blank node, sets it as the current subject, processes the nested
+     * predicate-object list, and restores the subject state.
+     *
+     * @param ctx The context for the `blankNodePropertyList` rule.
+     * @return The created blank node resource.
+     */
+    private Resource processBlankNodePropertyList(TriGParser.BlankNodePropertyListContext ctx) {
+        Resource bnode = factory.createBNode();
+        Resource savedSubject = currentSubject;
+        IRI savedPredicate = currentPredicate;
+
+        try {
+            currentSubject = bnode;
+            if (ctx.predicateObjectList() != null) {
+                processPredicateObjectList(ctx.predicateObjectList());
+            }
+        } finally {
+            currentSubject = savedSubject;
+            currentPredicate = savedPredicate;
+        }
+
+        return bnode;
+    }
+
+    /**
+     * Processes an RDF collection (list: `( object* )`).
+     * Constructs the RDF list structure using blank nodes, {@code rdf:first}, and {@code rdf:rest},
+     * terminated by {@code rdf:nil}.
+     *
+     * @param ctx The context for the `collection` rule.
+     * @return The head resource of the RDF list (a blank node or {@code rdf:nil} if empty).
      */
     private Resource processCollection(TriGParser.CollectionContext ctx) {
         List<TriGParser.ObjectContext> objects = ctx.object();
 
         if (objects.isEmpty()) {
+            // Empty list is rdf:nil
             return factory.createIRI(RDF.nil.getIRI().stringValue());
         }
 
         Resource head = factory.createBNode();
         Resource current = head;
+        Resource savedSubject = currentSubject;
+        IRI savedPredicate = currentPredicate;
 
-        for (int i = 0; i < objects.size(); i++) {
-            Value object = extractObject(objects.get(i));
+        try {
+            IRI firstPredicate = factory.createIRI(RDF.first.getIRI().stringValue());
+            IRI restPredicate = factory.createIRI(RDF.rest.getIRI().stringValue());
+            Value nilValue = factory.createIRI(RDF.nil.getIRI().stringValue());
 
-            safeAddStatement(current, factory.createIRI(RDF.first.getIRI().stringValue()), object);
+            for (int i = 0; i < objects.size(); i++) {
+                Value object = extractObject(objects.get(i));
+                safeAddStatement(current, firstPredicate, object);
 
-            if (i == objects.size() - 1) {
-                safeAddStatement(current, factory.createIRI(RDF.rest.getIRI().stringValue()),
-                        factory.createIRI(RDF.nil.getIRI().stringValue()));
-            } else {
-                Resource next = factory.createBNode();
-                safeAddStatement(current, factory.createIRI(RDF.rest.getIRI().stringValue()), next);
-                current = next;
+                if (i == objects.size() - 1) {
+                    // Last element, rest is rdf:nil
+                    safeAddStatement(current, restPredicate, nilValue);
+                } else {
+                    // Not the last element, create next blank node for rest
+                    Resource next = factory.createBNode();
+                    safeAddStatement(current, restPredicate, next);
+                    current = next;
+                }
             }
+        } finally {
+            currentSubject = savedSubject;
+            currentPredicate = savedPredicate;
         }
 
         return head;
     }
 
-
     /**
-     * Processes a list of predicates and objects, adding statements to the model.
+     * Processes a predicate-object list (i.e., `verb objectList ; verb objectList ...`).
+     * Iterates through each verb/object list pair, sets the current predicate,
+     * processes the object list, and adds statements to the model.
      *
-     * @param ctx The parse tree context for the predicate-object list.
+     * @param ctx The context for the `predicateObjectList` rule.
      */
     private void processPredicateObjectList(TriGParser.PredicateObjectListContext ctx) {
         for (int i = 0; i < ctx.verb().size(); i++) {
             TriGParser.VerbContext verb = ctx.verb(i);
             TriGParser.ObjectListContext objectList = ctx.objectList(i);
 
-            currentPredicate = extractVerb(verb);
+            IRI savedPredicate = currentPredicate;
+            try {
+                currentPredicate = extractVerb(verb);
 
-            for (TriGParser.ObjectContext objectCtx : objectList.object()) {
-                Value object = extractObject(objectCtx);
-                safeAddStatement(currentSubject, currentPredicate, object);
+                if (objectList != null) {
+                    for (TriGParser.ObjectContext objectCtx : objectList.object()) {
+                        Value object = extractObject(objectCtx);
+                        safeAddStatement(currentSubject, currentPredicate, object);
+                    }
+                }
+            } finally {
+                currentPredicate = savedPredicate;
             }
         }
     }
 
     /**
-     * Safely adds a statement to the model with proper error handling for graph contexts.
-     * If adding to a named graph fails, it attempts to add to the default graph as a fallback.
+     * Safely adds an RDF statement (triple or quad) to the model.
+     * Includes a fallback mechanism: if adding to the named graph fails and a graph is defined,
+     * it attempts to add the statement to the default graph (null graph name).
+     * Throws a {@code ParsingErrorException} on persistent failure.
+     *
+     * @param subject   The subject resource.
+     * @param predicate The predicate IRI.
+     * @param object    The object value.
      */
     private void safeAddStatement(Resource subject, IRI predicate, Value object) {
-
         try {
             model.add(subject, predicate, object, currentGraph);
         } catch (Exception e) {
             if (currentGraph != null) {
                 try {
+                    // Fallback to default graph if adding to named graph fails
                     model.add(subject, predicate, object, null);
                 } catch (Exception e2) {
-                    throw new ParsingErrorException("Failed to add statement to model: " + e.getMessage() +
-                            " (also failed on default graph: " + e2.getMessage() + ")", e);
+                    throw new ParsingErrorException("Failed to add statement: " + e.getMessage(), e);
                 }
             } else {
-                throw new ParsingErrorException("Failed to add statement to default graph: " + e.getMessage(), e);
+                throw new ParsingErrorException("Failed to add statement: " + e.getMessage(), e);
             }
         }
     }
 
     /**
-     * Extracts an object from the parse tree context, determining its type (IRI, blank, literal, etc.).
+     * Extracts and resolves the object value from its context.
+     * Can be an IRI, a blank node, a literal, or a blank node property list.
      *
-     * @param ctx The parse tree context for the object.
-     * @return The extracted RDF value.
+     * @param ctx The context for the `ObjectContext`.
+     * @return The RDF value (IRI, BNode, or Literal).
      */
     private Value extractObject(TriGParser.ObjectContext ctx) {
         if (ctx.iri() != null) {
-            String resolvedIRI = resolveIRI(ctx.iri().getText());
-            if (resolvedIRI.isEmpty()) {
-                return factory.createIRI(ParserConstants.EMPTY_STRING);
-            }
-            return factory.createIRI(resolvedIRI);
+            return factory.createIRI(resolveIRI(ctx.iri().getText()));
         }
         if (ctx.blank() != null) {
             return extractBlank(ctx.blank());
@@ -396,50 +426,53 @@ public class TriGListerner extends TriGBaseListener {
             return extractLiteral(ctx.literal());
         }
         if (ctx.blankNodePropertyList() != null) {
+            // Note: blankNodePropertyList inside object context becomes the object BNode itself
             return processBlankNodePropertyList(ctx.blankNodePropertyList());
         }
-        throw new RuntimeException("Unsupported object: " + ctx.getText());
+        throw new ParsingErrorException("Unsupported object: " + ctx.getText());
     }
 
     /**
-     * Processes a blank node property list, creating a new blank node and
-     * processing its properties.
+     * Extracts a blank node resource from its context.
+     * Can be a labeled blank node (`_:name`), an anonymous blank node (`[]`), or a collection (`(...)`).
      *
-     * @param ctx The parse tree context for the blank node property list.
-     * @return The newly created blank node.
+     * @param ctx The context for the `BlankContext`.
+     * @return The BNode or the {@code rdf:nil} IRI for an empty collection.
      */
-    private Resource processBlankNodePropertyList(TriGParser.BlankNodePropertyListContext ctx) {
-        Resource bnode = factory.createBNode();
-
-        Resource savedSubject = currentSubject;
-        IRI savedPredicate = currentPredicate;
-
-        currentSubject = bnode;
-
-        if (ctx.predicateObjectList() != null) {
-            processPredicateObjectList(ctx.predicateObjectList());
+    private Resource extractBlank(TriGParser.BlankContext ctx) {
+        TriGParser.BlankNodeContext node = ctx.blankNode();
+        if (node != null) {
+            if (node.BLANK_NODE_LABEL() != null) {
+                // Remove the leading '_:'
+                return factory.createBNode(node.BLANK_NODE_LABEL().getText().substring(2));
+            }
+            if (node.ANON() != null) {
+                return factory.createBNode();
+            }
         }
 
-        currentSubject = savedSubject;
-        currentPredicate = savedPredicate;
+        TriGParser.CollectionContext collection = ctx.collection();
+        if (collection != null) {
+            return processCollection(collection);
+        }
 
-        return bnode;
+        throw new ParsingErrorException("Unsupported blank node: " + ctx.getText());
     }
 
     /**
-     * Extracts a subject from the parse tree, which can be an IRI, a blank node,
-     * or a collection.
+     * Extracts and resolves the subject resource from its context.
+     * The subject can be an IRI or a blank node (including collections).
      *
-     * @param ctx The parse tree context for the subject.
-     * @return The extracted subject as an RDF resource.
+     * @param ctx The context for the `SubjectContext`.
+     * @return The RDF resource (IRI or BNode) to be used as the subject.
      */
     private Resource extractSubject(TriGParser.SubjectContext ctx) {
         if (ctx.iri() != null) {
             return factory.createIRI(resolveIRI(ctx.iri().getText()));
         }
         if (ctx.blank() != null) {
-            TriGParser.BlankNodeContext node = ctx.blank().blankNode();
-            if (node != null) {
+            if (ctx.blank().blankNode() != null) {
+                TriGParser.BlankNodeContext node = ctx.blank().blankNode();
                 if (node.BLANK_NODE_LABEL() != null) {
                     return factory.createBNode(node.BLANK_NODE_LABEL().getText().substring(2));
                 }
@@ -450,123 +483,129 @@ public class TriGListerner extends TriGBaseListener {
                 return processCollection(ctx.blank().collection());
             }
         }
-        throw new RuntimeException("Unsupported subject: " + ctx.getText());
+        throw new ParsingErrorException("Unsupported subject: " + ctx.getText());
     }
 
     /**
-     * Extracts a blank node, which can be a named blank node, an anonymous blank node,
-     * or a collection.
+     * Extracts and resolves a graph label or subject from its context.
+     * The label/subject can be an IRI or a blank node.
      *
-     * @param ctx The parse tree context for the blank node.
-     * @return The extracted blank node resource.
-     */
-    private Resource extractBlank(TriGParser.BlankContext ctx) {
-        TriGParser.BlankNodeContext node = ctx.blankNode();
-        if (node != null) {
-            if (node.BLANK_NODE_LABEL() != null)
-                return factory.createBNode(node.BLANK_NODE_LABEL().getText().substring(2));
-            if (node.ANON() != null)
-                return factory.createBNode();
-        }
-
-        TriGParser.CollectionContext collection = ctx.collection();
-        if (collection != null) {
-            return processCollection(collection);
-        }
-
-        throw new RuntimeException("Unsupported blank node structure: " + ctx.getText());
-    }
-
-    /**
-     * Extracts the label or subject for a named graph.
-     *
-     * @param ctx The parse tree context.
-     * @return The extracted graph name as a resource.
-     * @throws ParsingErrorException if the format is unsupported.
+     * @param ctx The context for the `LabelOrSubjectContext`.
+     * @return The RDF resource (IRI or BNode) for the graph label or subject.
      */
     private Resource extractLabelOrSubject(TriGParser.LabelOrSubjectContext ctx) {
         if (ctx.iri() != null) {
             String iriText = ctx.iri().getText();
-            String resolvedIRI = resolveIRI(iriText);
-            return factory.createIRI(resolvedIRI);
+            try {
+                return factory.createIRI(resolveIRI(iriText));
+            } catch (Exception e) {
+                throw new ParsingErrorException("Failed to resolve IRI: " + iriText, e);
+            }
         }
         if (ctx.blankNode() != null) {
             if (ctx.blankNode().BLANK_NODE_LABEL() != null) {
-                String blankNodeId = ctx.blankNode().BLANK_NODE_LABEL().getText().substring(2);
-                return factory.createBNode(blankNodeId);
+                return factory.createBNode(ctx.blankNode().BLANK_NODE_LABEL().getText().substring(2));
             }
             if (ctx.blankNode().ANON() != null) {
                 return factory.createBNode();
             }
         }
-        throw new ParsingErrorException("Unsupported label or subject for a named graph: " + ctx.getText());
+        throw new ParsingErrorException("Unsupported label or subject: " + ctx.getText());
     }
 
     /**
-     * Extracts the verb (predicate) for a statement.
+     * Extracts and resolves the verb (predicate) from its context.
+     * Handles the shortcut {@code a} for {@code rdf:type}.
      *
-     * @param ctx The parse tree context for the verb.
-     * @return The extracted verb as an IRI.
+     * @param ctx The context for the `VerbContext`.
+     * @return The resolved IRI for the predicate.
      */
     private IRI extractVerb(TriGParser.VerbContext ctx) {
         String verbText = ctx.getText();
-        String resolvedIRI = resolveIRI(verbText);
-        if (resolvedIRI.isEmpty()) {
-            return factory.createIRI(ParserConstants.EMPTY_STRING);
+        if (verbText.equals(ParserConstants.A)) {
+            return factory.createIRI(RDF.type.getIRI().stringValue());
         }
-        IRI result = factory.createIRI(resolvedIRI);
-        return result;
+        return factory.createIRI(resolveIRI(verbText));
     }
 
     /**
-     * Extracts a literal value from the parse tree.
-     * Handles string literals (with or without language tags/datatypes), booleans, and numerics.
+     * Extracts an RDF literal from its context.
+     * Handles simple, typed, and language-tagged literals, as well as boolean and numeric literals.
      *
-     * @param ctx The parse tree context for the literal.
-     * @return The extracted literal value.
+     * @param ctx The context for the `LiteralContext`.
+     * @return The RDF literal value.
      */
     private Literal extractLiteral(TriGParser.LiteralContext ctx) {
         if (ctx.rDFLiteral() != null) {
-
             String label = unescapeString(ctx.rDFLiteral().string().getText());
-            if (ctx.rDFLiteral().LANGTAG() != null)
+            if (ctx.rDFLiteral().LANGTAG() != null) {
                 return factory.createLiteral(label, ctx.rDFLiteral().LANGTAG().getText().substring(1));
-            if (ctx.rDFLiteral().iri() != null)
+            }
+            if (ctx.rDFLiteral().iri() != null) {
                 return factory.createLiteral(label, factory.createIRI(resolveIRI(ctx.rDFLiteral().iri().getText())));
+            }
             return factory.createLiteral(label);
         }
-        if (ctx.BooleanLiteral() != null)
+        if (ctx.BooleanLiteral() != null) {
             return factory.createLiteral(ctx.BooleanLiteral().getText(), XSD.BOOLEAN.getIRI());
+        }
         if (ctx.numericLiteral() != null) {
             String numericText = ctx.numericLiteral().getText();
-
-            boolean isNegative = numericText.startsWith(ParserConstants.MINUS);
-            String absoluteValue = isNegative ? numericText.substring(1) : numericText;
-
-            if (ctx.numericLiteral().DOUBLE() != null || absoluteValue.toLowerCase().contains(ParserConstants.E)) {
+            if (ctx.numericLiteral().DOUBLE() != null) {
                 return factory.createLiteral(numericText, XSD.DOUBLE.getIRI());
-            } else if (ctx.numericLiteral().DECIMAL() != null || absoluteValue.contains(ParserConstants.POINT)) {
+            } else if (ctx.numericLiteral().DECIMAL() != null) {
                 return factory.createLiteral(numericText, XSD.DECIMAL.getIRI());
-            } else if (ctx.numericLiteral().INTEGER() != null) {
-                return factory.createLiteral(numericText, XSD.INTEGER.getIRI());
             } else {
-                if (absoluteValue.contains(ParserConstants.POINT)) {
-                    return factory.createLiteral(numericText, XSD.DECIMAL.getIRI());
-                } else {
-                    return factory.createLiteral(numericText, XSD.INTEGER.getIRI());
-                }
+                return factory.createLiteral(numericText, XSD.INTEGER.getIRI());
             }
         }
-        throw new RuntimeException("Unsupported literal: " + ctx.getText());
+        throw new ParsingErrorException("Unsupported literal: " + ctx.getText());
     }
 
     /**
-     * Resolves a raw IRI string from the TriG document into an absolute IRI.
-     * Handles IRIREFs, prefixed names, the 'a' keyword, and bare identifiers.
+     * Extracts the text from an IRIREF (surrounded by `<` and `>`) and unescapes Unicode sequences.
      *
-     * @param raw The raw IRI string.
-     * @return The resolved absolute IRI string.
-     * @throws ParsingErrorException if the IRI format is invalid or the prefix is undeclared.
+     * @param text The raw text of the IRIREF.
+     * @return The unescaped IRI.
+     */
+    private String extractAndUnescapeIRI(String text) {
+        String iri = text.substring(1, text.length() - 1);
+        return unescapeIRI(iri);
+    }
+
+    /**
+     * Updates the base URI for relative IRI resolution.
+     * Resolves the new base against the old one, updates {@code baseURI}, and registers
+     * the empty prefix in the map and the model.
+     *
+     * @param newBase The new base IRI.
+     */
+    private void updateBaseURI(String newBase) {
+        this.baseURI = resolveIRIAgainstBase(newBase);
+        prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
+        model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
+    }
+
+    /**
+     * Registers a prefix with its corresponding namespace URI.
+     * The namespace IRI is resolved against the current base URI.
+     *
+     * @param prefix The prefix.
+     * @param iri    The namespace IRI.
+     */
+    private void registerPrefix(String prefix, String iri) {
+        String resolvedIRI = resolveIRIAgainstBase(iri);
+        prefixMap.put(prefix, resolvedIRI);
+        model.setNamespace(prefix, resolvedIRI);
+    }
+
+    /**
+     * Resolves a raw IRI (which can be relative, prefixed, or absolute) into an absolute IRI.
+     * Applies prefix resolution and relative resolution against {@code baseURI}.
+     *
+     * @param raw The raw IRI (including QNames, IRI references, or absolute IRIs).
+     * @return The resolved absolute IRI.
+     * @throws ParsingErrorException If an undeclared prefix is encountered.
      */
     private String resolveIRI(String raw) {
         try {
@@ -576,21 +615,19 @@ public class TriGListerner extends TriGBaseListener {
                 return RDF.type.getIRI().stringValue();
             }
 
+            if (raw.equals(ParserConstants.COLON)) {
+                String ns = prefixMap.get(ParserConstants.EMPTY_STRING);
+                return ns != null ? ns : getEffectiveBaseURI();
+            }
+
+            // Handle <iri_ref>
             if (raw.startsWith(ParserConstants.IRI_START) && raw.endsWith(ParserConstants.IRI_END)) {
                 String iri = raw.substring(1, raw.length() - 1);
                 iri = unescapeIRI(iri);
-                if (isAbsoluteIRI(iri)) {
-                    return iri;
-                }
-                if (this.baseURI != null && this.baseURI.startsWith(ParserConstants.FILE_PROTOCOL)) {
-                    String resolved = resolveRelativeIRIForFile(iri, this.baseURI);
-                    return resolved;
-                } else {
-                    String resolved = resolveRelativeIRI(iri);
-                    return resolved;
-                }
+                return iri.isEmpty() ? getEffectiveBaseURI() : resolveIRIAgainstBase(iri);
             }
 
+            // Handle prefixed name (QName)
             if (raw.contains(ParserConstants.COLON)) {
                 String[] parts = raw.split(ParserConstants.COLON, 2);
                 String prefix = parts[0];
@@ -600,8 +637,7 @@ public class TriGListerner extends TriGBaseListener {
                     localName = unescapeIRI(localName);
                     String ns = prefixMap.get(prefix);
                     if (ns != null) {
-                        String resolved = ns + localName;
-                        return resolved;
+                        return ns + localName;
                     }
                 }
 
@@ -612,736 +648,377 @@ public class TriGListerner extends TriGBaseListener {
                 throw new ParsingErrorException("Undeclared prefix: " + prefix);
             }
 
-            if (raw.matches(ParserConstants.PNAME_NS_PATTERN)) {
-                String resolved = resolveRelativeIRI(raw);
-                return resolved;
-            }
-
-            if (!raw.contains(ParserConstants.SPACE) && !raw.contains(ParserConstants.TAB) && !raw.contains(ParserConstants.LINE_FEED)) {
-                String resolved = resolveRelativeIRI(raw);
-                return resolved;
-            }
-
-            throw new ParsingErrorException("Invalid IRI format: '" + raw + "'");
+            return resolveIRIAgainstBase(raw);
 
         } catch (IllegalArgumentException e) {
             throw new ParsingErrorException(e.getMessage(), e);
         }
     }
 
-    private String resolveRelativeIRIForFile(String relativeIRI, String baseURI) {
+    /**
+     * Resolves an IRI against the effective base URI using RFC3986 rules.
+     *
+     * @param iri The relative or absolute IRI to resolve.
+     * @return The resolved absolute IRI.
+     */
+    private String resolveIRIAgainstBase(String iri) {
+        String effectiveBase = getEffectiveBaseURI();
+
+        // 1. If R is absolute, the result is R
+        if (isAbsoluteIRI(iri)) {
+            return iri;
+        }
+
+        // 2. If R is empty, the result is the base URI
+        if (iri.isEmpty()) {
+            return effectiveBase;
+        }
+
         try {
-            URI baseUri = new URI(baseURI);
+            URI baseUri = new URI(effectiveBase);
+            String baseScheme = baseUri.getScheme();
+            String baseAuthority = baseUri.getAuthority();
             String basePath = baseUri.getPath();
+            String baseQuery = baseUri.getQuery();
 
-            if (relativeIRI.isEmpty()) {
-                return new URI(baseUri.getScheme(), baseUri.getAuthority(),
-                        basePath, baseUri.getQuery(), null).toString();
-            }
+            String[] refParts = parseReference(iri);
+            String refScheme = refParts[0];
+            String refAuthority = refParts[1];
+            String refPath = refParts[2];
+            String refQuery = refParts[3];
+            String refFragment = refParts[4];
 
-            if (relativeIRI.startsWith(ParserConstants.DOUBLE_SLASH)) {
-                return "file:" + relativeIRI;
-            }
+            String targetScheme, targetAuthority, targetPath, targetQuery, targetFragment;
 
-            if (relativeIRI.startsWith(ParserConstants.SLASH)) {
-                return ParserConstants.FILE_PROTOCOL + normalizePathForFileURI(relativeIRI, "file");
-            }
-
-            if (relativeIRI.startsWith(ParserConstants.QUERY_MARK)) {
-                return new URI(baseUri.getScheme(), baseUri.getAuthority(),
-                        basePath, relativeIRI.substring(1), null).toString();
-            }
-
-            if (relativeIRI.startsWith(ParserConstants.FRAGMENT)) {
-                return new URI(baseUri.getScheme(), baseUri.getAuthority(),
-                        basePath, baseUri.getQuery(), relativeIRI.substring(1)).toString();
-            }
-
-            if (relativeIRI.startsWith(ParserConstants.SEMICOLON)) {
-                String newPath = basePath + relativeIRI;
-                return new URI(baseUri.getScheme(), baseUri.getAuthority(),
-                        newPath, baseUri.getQuery(), baseUri.getFragment()).toString();
-            }
-
-            String baseDir = basePath.contains(ParserConstants.SLASH)
-                    ? basePath.substring(0, basePath.lastIndexOf('/') + 1)
-                    : ParserConstants.SLASH ;
-
-            String resolvedPath = normalizePathForFileURI(baseDir + relativeIRI, "file");
-            return new URI(baseUri.getScheme(), baseUri.getAuthority(),
-                    resolvedPath, baseUri.getQuery(), baseUri.getFragment()).toString();
-
-        } catch (URISyntaxException e) {
-            return resolveRelativeIRIFallback(relativeIRI, baseURI);
-        }
-    }
-
-    /**
-     * Checks if a given IRI string is an absolute IRI.
-     *
-     * @param iri The IRI string to check.
-     * @return `true` if it's an absolute IRI, otherwise `false`.
-     */
-    private boolean isAbsoluteIRI(String iri) {
-        return iri.contains(ParserConstants.COLON) && !iri.startsWith(ParserConstants.COLON);
-    }
-
-    /**
-     * Gets the effective base URI, providing a default if none is set.
-     *
-     * @return The effective base URI string.
-     */
-    private String getEffectiveBaseURI() {
-        String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.RDF_TRG_TEST_SUITE_URI;
-
-        if (effective.startsWith(ParserConstants.FILE_PROTOCOL_SIMPLE) && !effective.startsWith(ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH)) {
-            effective = effective.replaceFirst(ParserConstants.FILE_PROTOCOL_SIMPLE, ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH);
-        }
-
-        return effective;
-    }
-
-    /**
-     * Resolves a relative IRI against the base URI with full RFC 3986 compliance.
-     * This method handles edge cases that Java's URI.resolve() doesn't handle correctly.
-     *
-     * @param relativeIRI The relative IRI string.
-     * @return The resolved absolute IRI string.
-     */
-    private String resolveRelativeIRI(String relativeIRI) {
-        String effectiveBaseURI = getEffectiveBaseURI();
-
-        if (relativeIRI.isEmpty()) {
-            return resolveEmptyReference(effectiveBaseURI);
-        }
-
-        if (relativeIRI.startsWith(ParserConstants.QUERY_MARK)) {
-            return resolveQueryOnlyReference(relativeIRI, effectiveBaseURI);
-        } else if (relativeIRI.startsWith(ParserConstants.FRAGMENT)) {
-            return resolveFragmentOnlyReference(relativeIRI, effectiveBaseURI);
-        } else if (relativeIRI.startsWith(ParserConstants.DOUBLE_SLASH)) {
-            return resolveNetworkPathReference(relativeIRI, effectiveBaseURI);
-        } else if (relativeIRI.startsWith(ParserConstants.SEMICOLON)) {
-            return resolveSemicolonReference(relativeIRI, effectiveBaseURI);
-        }
-
-        if (effectiveBaseURI.startsWith(ParserConstants.FILE_PROTOCOL)) {
-            return resolveFileURI(relativeIRI, effectiveBaseURI);
-        }
-
-        if (hasDoubleSlashesInPath(effectiveBaseURI)) {
-            return resolveRelativeIRIWithDoubleSlashes(relativeIRI, effectiveBaseURI);
-        }
-
-        try {
-            URI base = new URI(effectiveBaseURI);
-            URI resolved = base.resolve(relativeIRI);
-            String result = resolved.normalize().toString();
-            return normalizeResolvedURI(result);
-        } catch (URISyntaxException e) {
-            return resolveRelativeIRIFallback(relativeIRI, effectiveBaseURI);
-        }
-    }
-
-    private boolean hasDoubleSlashesInPath(String baseURI) {
-        if (baseURI == null || baseURI.isEmpty()) {
-            return false;
-        }
-
-        int schemeEnd = baseURI.indexOf(ParserConstants.SCHEME_DELIMITER);
-        if (schemeEnd == -1) {
-            return false;
-        }
-
-        String afterScheme = baseURI.substring(schemeEnd + 3);
-
-        int pathStart = afterScheme.indexOf('/');
-        if (pathStart == -1) {
-            return false;
-        }
-
-        String path = afterScheme.substring(pathStart);
-
-        return path.contains(ParserConstants.DOUBLE_SLASH);
-    }
-
-
-    private String resolveFileURI(String relativeIRI, String baseURI) {
-        try {
-            URI base = new URI(baseURI);
-            URI resolved = base.resolve(relativeIRI);
-
-            String result = resolved.toString();
-
-            if (result.startsWith(ParserConstants.FILE_PROTOCOL_SIMPLE) && !result.startsWith(ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH)) {
-                result = result.replaceFirst(ParserConstants.FILE_PROTOCOL_SIMPLE, ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH);
-            }
-
-            return result;
-
-        } catch (URISyntaxException e) {
-            return resolveFileURIManual(relativeIRI, baseURI);
-        }
-    }
-
-    private String resolveFileURIManual(String relativeIRI, String baseURI) {
-        String basePath = baseURI.substring(7);
-
-        if (relativeIRI.startsWith(ParserConstants.SLASH)) {
-            return ParserConstants.FILE_PROTOCOL + relativeIRI;
-        } else if (relativeIRI.startsWith(ParserConstants.QUERY_MARK)) {
-            int queryIndex = baseURI.indexOf('?');
-            String baseWithoutQuery = (queryIndex >= 0) ? baseURI.substring(0, queryIndex) : baseURI;
-            return baseWithoutQuery + relativeIRI;
-        } else if (relativeIRI.startsWith(ParserConstants.FRAGMENT)) {
-            int fragmentIndex = baseURI.indexOf('#');
-            String baseWithoutFragment = (fragmentIndex >= 0) ? baseURI.substring(0, fragmentIndex) : baseURI;
-            return baseWithoutFragment + relativeIRI;
-        } else if (relativeIRI.isEmpty()) {
-            int fragmentIndex = baseURI.indexOf('#');
-            return (fragmentIndex >= 0) ? baseURI.substring(0, fragmentIndex) : baseURI;
-        } else {
-            String baseDirectory;
-            if (basePath.contains(ParserConstants.SLASH)) {
-                int lastSlash = basePath.lastIndexOf('/');
-                baseDirectory = basePath.substring(0, lastSlash + 1);
+            if (refScheme != null) {
+                // 3. R has a scheme component
+                targetScheme = refScheme;
+                targetAuthority = refAuthority;
+                targetPath = removeDotSegments(refPath);
+                targetQuery = refQuery;
             } else {
-                baseDirectory = ParserConstants.SLASH ;
-            }
-            return ParserConstants.FILE_PROTOCOL + baseDirectory + relativeIRI;
-        }
-    }
-
-    private String resolveRelativeIRIWithDoubleSlashes(String relativeIRI, String baseURI) {
-        try {
-            int schemeEnd = baseURI.indexOf(ParserConstants.SCHEME_DELIMITER);
-            if (schemeEnd == -1) {
-                return resolveRelativeIRIFallback(relativeIRI, baseURI);
-            }
-
-            String scheme = baseURI.substring(0, schemeEnd);
-            String authorityAndPath = baseURI.substring(schemeEnd + 3);
-
-            int pathStart = authorityAndPath.indexOf('/');
-            if (pathStart == -1) {
-                return scheme + ParserConstants.SCHEME_DELIMITER + authorityAndPath + ParserConstants.SLASH + relativeIRI;
-            }
-
-            String authority = authorityAndPath.substring(0, pathStart);
-            String path = authorityAndPath.substring(pathStart);
-
-            String resolvedPath;
-            if (relativeIRI.startsWith(ParserConstants.SLASH)) {
-                resolvedPath = normalizePath(relativeIRI);
-            } else if (relativeIRI.isEmpty() || relativeIRI.equals(ParserConstants.POINT) || relativeIRI.equals("./")) {
-                resolvedPath = removeLastSegment(path);
-            } else if (relativeIRI.equals(ParserConstants.DOUBLE_DOT) || relativeIRI.equals("../")) {
-                resolvedPath = removeLastSegment(removeLastSegment(path));
-            } else {
-                String basePath = path.endsWith(ParserConstants.SLASH) ? path : removeLastSegment(path) + ParserConstants.SLASH ;
-                resolvedPath = normalizePath(basePath + relativeIRI);
-            }
-
-            return scheme + ParserConstants.SCHEME_DELIMITER + authority + resolvedPath;
-
-        } catch (Exception e) {
-            return resolveRelativeIRIFallback(relativeIRI, baseURI);
-        }
-    }
-
-    private String removeLastSegment(String path) {
-        if (path == null || path.isEmpty() || path.equals(ParserConstants.SLASH)) {
-            return ParserConstants.SLASH ;
-        }
-
-        int lastSlash = path.lastIndexOf('/');
-        if (lastSlash == 0) {
-            return ParserConstants.SLASH ;
-        }
-
-        return path.substring(0, lastSlash);
-    }
-
-
-    private String resolveNetworkPathReference(String networkPathRef, String baseURI) {
-        try {
-            URI base = new URI(baseURI);
-            String scheme = base.getScheme();
-
-            if ("file".equals(scheme)) {
-                return "file:" + networkPathRef;
-            }
-
-            return scheme + ParserConstants.COLON + networkPathRef;
-        } catch (URISyntaxException e) {
-            int schemeEnd = baseURI.indexOf(ParserConstants.SCHEME_DELIMITER);
-            if (schemeEnd >= 0) {
-                String scheme = baseURI.substring(0, schemeEnd);
-                return scheme + ParserConstants.COLON + networkPathRef;
-            }
-            return networkPathRef;
-        }
-    }
-
-    /**
-     * Resolves a query-only relative reference (e.g., "?y") against a base URI.
-     * Per RFC 3986, this should keep the base path and parameters, replacing only the query.
-     */
-    private String resolveQueryOnlyReference(String queryRef, String baseURI) {
-        if (baseURI.startsWith(ParserConstants.FILE_PROTOCOL)) {
-            int queryIndex = baseURI.indexOf('?');
-            int fragmentIndex = baseURI.indexOf('#');
-
-            String baseWithoutQueryFragment;
-            String rest = ParserConstants.EMPTY_STRING ;
-
-            if (queryIndex >= 0) {
-                baseWithoutQueryFragment = baseURI.substring(0, queryIndex);
-            } else if (fragmentIndex >= 0) {
-                baseWithoutQueryFragment = baseURI.substring(0, fragmentIndex);
-            } else {
-                baseWithoutQueryFragment = baseURI;
-            }
-
-            return baseWithoutQueryFragment + queryRef;
-        }
-
-        return baseURI.replaceFirst("\\?.*", ParserConstants.EMPTY_STRING).replaceFirst("#.*", ParserConstants.EMPTY_STRING) + queryRef;
-    }
-
-    /**
-     * Resolves a fragment-only relative reference (e.g., "#s") against a base URI.
-     * Per RFC 3986, this should keep everything from the base, replacing only the fragment.
-     */
-    private String resolveFragmentOnlyReference(String fragmentRef, String baseURI) {
-        return baseURI.replaceFirst("#.*", ParserConstants.EMPTY_STRING) + fragmentRef;
-    }
-
-    /**
-     * Resolves an empty relative reference (ParserConstants.EMPTY_STRING) against a base URI.
-     * Per RFC 3986, this should return the base URI without its fragment.
-     */
-    private String resolveEmptyReference(String baseURI) {
-        try {
-            URI base = new URI(baseURI);
-
-            URI resolved = new URI(
-                    base.getScheme(),
-                    base.getAuthority(),
-                    base.getPath(),
-                    base.getQuery(),
-                    null
-            );
-
-            return resolved.toString();
-        } catch (URISyntaxException e) {
-            int fragmentIndex = baseURI.indexOf('#');
-            return (fragmentIndex >= 0) ? baseURI.substring(0, fragmentIndex) : baseURI;
-        }
-    }
-
-    /**
-     * Additional normalization for resolved URIs to handle edge cases
-     * that Java's URI.normalize() doesn't cover properly.
-     *
-     * @param resolvedURI The URI string after initial resolution.
-     * @return The fully normalized URI string.
-     */
-    private String normalizeResolvedURI(String resolvedURI) {
-        try {
-            URI uri = new URI(resolvedURI);
-            String path = uri.getPath();
-
-            if (path != null) {
-                String normalizedPath = normalizePathForFileURI(path, uri.getScheme());
-
-                if (!normalizedPath.equals(path)) {
-                    URI newUri = new URI(uri.getScheme(), uri.getAuthority(),
-                            normalizedPath, uri.getQuery(), uri.getFragment());
-                    return newUri.toString();
-                }
-            }
-
-            return resolvedURI;
-        } catch (URISyntaxException e) {
-            return resolvedURI;
-        }
-    }
-
-    private String normalizePathForFileURI(String path, String scheme) {
-        if (path == null || path.isEmpty()) {
-            return path;
-        }
-
-        if ("file".equals(scheme)) {
-            String[] segments = path.split(ParserConstants.SLASH, -1);
-            List<String> normalizedSegments = new ArrayList<>();
-            int depth = 0;
-
-            for (String segment : segments) {
-                if (ParserConstants.POINT.equals(segment) || segment.isEmpty()) {
-                    continue;
-                } else if (ParserConstants.DOUBLE_DOT.equals(segment)) {
-                    if (depth > 0) {
-                        normalizedSegments.remove(normalizedSegments.size() - 1);
-                        depth--;
-                    }
+                // 4. R inherits the base scheme
+                if (refAuthority != null) {
+                    // 4.1 R is net-path
+                    targetScheme = baseScheme;
+                    targetAuthority = refAuthority;
+                    targetPath = removeDotSegments(refPath);
+                    targetQuery = refQuery;
                 } else {
-                    normalizedSegments.add(segment);
-                    if (!segment.isEmpty()) {
-                        depth++;
+                    // 4.2 R is abs-path or rel-path
+                    targetScheme = baseScheme;
+                    targetAuthority = baseAuthority;
+                    if (refPath.isEmpty()) {
+                        // 4.2.1 R is empty or only query/fragment
+                        targetPath = basePath;
+                        targetQuery = refQuery != null ? refQuery : baseQuery;
+                    } else {
+                        // 4.2.2 R is abs-path or rel-path
+                        if (refPath.startsWith(ParserConstants.SLASH)) {
+                            // 4.2.2.1 R is abs-path
+                            targetPath = removeDotSegments(refPath);
+                        } else {
+                            // 4.2.2.2 R is rel-path
+                            targetPath = removeDotSegments(mergePaths(basePath, refPath));
+                        }
+                        targetQuery = refQuery;
                     }
                 }
             }
+            targetFragment = refFragment;
 
-            String result = String.join(ParserConstants.SLASH, normalizedSegments);
+            return buildURI(targetScheme, targetAuthority, targetPath, targetQuery, targetFragment);
 
-            if (path.startsWith(ParserConstants.SLASH) && !result.startsWith(ParserConstants.SLASH)) {
-                result = ParserConstants.SLASH + result;
-            }
-
-            if (result.isEmpty()) {
-                result = path.startsWith(ParserConstants.SLASH) ? ParserConstants.SLASH : ParserConstants.EMPTY_STRING ;
-            }
-
-            return result;
-        } else {
-            return normalizePathSegments(path);
-        }
-    }
-
-    /**
-     * Normalizes path segments to remove redundant . and .. components
-     * according to RFC 3986 section 5.2.4.
-     *
-     * @param path The path to normalize.
-     * @return The normalized path.
-     */
-    private String normalizePathSegments(String path) {
-        if (path == null || path.isEmpty()) {
-            return path;
-        }
-
-        String[] segments = path.split(ParserConstants.SLASH, -1);
-        List<String> normalizedSegments = new ArrayList<>();
-
-        for (String segment : segments) {
-            if (ParserConstants.POINT.equals(segment)) {
-                continue;
-            } else if (ParserConstants.DOUBLE_DOT.equals(segment)) {
-                if (!normalizedSegments.isEmpty() &&
-                        !normalizedSegments.get(normalizedSegments.size() - 1).isEmpty()) {
-                    normalizedSegments.remove(normalizedSegments.size() - 1);
-                }
-            } else {
-                normalizedSegments.add(segment);
-            }
-        }
-
-        String result = String.join(ParserConstants.SLASH, normalizedSegments);
-
-        if (result.isEmpty() && path.startsWith(ParserConstants.SLASH)) {
-            result = ParserConstants.SLASH ;
-        }
-
-        return result;
-    }
-
-    /**
-     * Fallback method for relative IRI resolution when Java's URI class fails.
-     * This manually implements RFC 3986 resolution rules.
-     *
-     * @param relativeIRI      The relative IRI string.
-     * @param effectiveBaseURI The base URI to resolve against.
-     * @return The resolved absolute IRI string.
-     */
-    private String resolveRelativeIRIFallback(String relativeIRI, String effectiveBaseURI) {
-        switch (relativeIRI) {
-            case ParserConstants.EMPTY_STRING:
-            case ParserConstants.POINT:
-            case "./":
-                return removeFragment(effectiveBaseURI);
-
-            case ParserConstants.DOUBLE_DOT:
-            case "../":
-                return resolveToParent(effectiveBaseURI);
-
-            case ";x":
-                return resolveSemicolonReference(relativeIRI, effectiveBaseURI);
-
-            case "?y":
-                return removeQueryAndFragment(effectiveBaseURI) + "?y" ;
-
-            case "#s":
-                return removeFragment(effectiveBaseURI) + "#s" ;
-
-            default:
-                try {
-                    URI baseUri = new URI(effectiveBaseURI);
-                    return resolveRelativeIRIManual(relativeIRI,
-                            baseUri.getScheme(),
-                            baseUri.getAuthority(),
-                            baseUri.getPath(),
-                            baseUri.getQuery(),
-                            baseUri.getFragment());
-                } catch (URISyntaxException e) {
-                    return effectiveBaseURI + relativeIRI;
-                }
-        }
-    }
-
-    private String resolveToParent(String uri) {
-        try {
-            URI base = new URI(uri);
-            String path = base.getPath();
-
-            if (path != null && path.contains(ParserConstants.SLASH)) {
-                int lastSlash = path.lastIndexOf('/');
-                if (lastSlash > 0) {
-                    path = path.substring(0, lastSlash);
-                } else {
-                    path = ParserConstants.SLASH ;
-                }
-            } else {
-                path = ParserConstants.SLASH ;
-            }
-
-            URI resolved = new URI(
-                    base.getScheme(),
-                    base.getAuthority(),
-                    path,
-                    base.getQuery(),
-                    base.getFragment()
-            );
-
-            return resolved.toString();
         } catch (URISyntaxException e) {
-            int lastSlash = uri.lastIndexOf('/');
-            if (lastSlash > uri.indexOf(ParserConstants.SCHEME_DELIMITER) + 3) {
-                return uri.substring(0, lastSlash);
-            }
-            return uri;
+            return performSimpleFallback(effectiveBase, iri);
         }
     }
 
-    private String resolveRelativeIRIManual(String relativeIRI, String scheme, String authority,
-                                            String path, String query, String fragment) {
-
-
-        if (relativeIRI.contains(ParserConstants.COLON)) {
-            int relativeSchemeEnd = relativeIRI.indexOf(ParserConstants.COLON);
-            String potentialScheme = relativeIRI.substring(0, relativeSchemeEnd);
-
-            if (isValidScheme(potentialScheme)) {
-
-                return relativeIRI;
-            }
-        }
-
-
-        if (relativeIRI.startsWith(ParserConstants.DOUBLE_SLASH)) {
-
-            return scheme + ParserConstants.COLON + relativeIRI;
-        }
-
-        if (relativeIRI.startsWith(ParserConstants.SLASH)) {
-            path = normalizePath(relativeIRI);
-            query = null;
-            fragment = null;
-        } else if (relativeIRI.startsWith(ParserConstants.QUERY_MARK)) {
-            query = relativeIRI.substring(1);
-            fragment = null;
-        } else if (relativeIRI.startsWith(ParserConstants.FRAGMENT)) {
-            fragment = relativeIRI.substring(1);
-        } else if (!relativeIRI.isEmpty()) {
-            String basePath = path;
-            if (basePath == null || basePath.isEmpty()) {
-                basePath = ParserConstants.SLASH ;
-            } else if (!basePath.endsWith(ParserConstants.SLASH)) {
-                int lastSlash = basePath.lastIndexOf('/');
-                if (lastSlash >= 0) {
-                    basePath = basePath.substring(0, lastSlash + 1);
-                } else {
-                    basePath = ParserConstants.SLASH ;
-                }
-            }
-            path = normalizePath(basePath + relativeIRI);
-            query = null;
-            fragment = null;
-        }
-
+    /**
+     * Reconstructs a URI from its components (scheme, authority, path, query, fragment).
+     *
+     * @param scheme    The scheme (protocol).
+     * @param authority The authority (host, port, user info).
+     * @param path      The path.
+     * @param query     The query.
+     * @param fragment  The fragment.
+     * @return The normalized URI string.
+     */
+    private String buildURI(String scheme, String authority, String path, String query, String fragment) {
         StringBuilder result = new StringBuilder();
-        result.append(scheme).append(ParserConstants.SCHEME_DELIMITER).append(authority);
-
-        if (path != null && !path.isEmpty()) {
+        if (scheme != null) {
+            result.append(scheme).append(ParserConstants.COLON);
+        }
+        if (authority != null) {
+            result.append(ParserConstants.DOUBLE_SLASH).append(authority);
+        }
+        if (path != null) {
             result.append(path);
         }
-
-        if (query != null && !query.isEmpty()) {
+        if (query != null) {
             result.append(ParserConstants.QUERY_MARK).append(query);
         }
-
-        if (fragment != null && !fragment.isEmpty()) {
+        if (fragment != null) {
             result.append(ParserConstants.FRAGMENT).append(fragment);
         }
-
-        return result.toString();
+        return normalizeURI(result.toString());
     }
 
-    private boolean isValidScheme(String potentialScheme) {
-        if (potentialScheme.isEmpty()) {
-            return false;
+    /**
+     * Parses a URI/IRI reference into its five main components:
+     * Scheme, Authority, Path, Query, Fragment.
+     *
+     * @param ref The URI/IRI reference string.
+     * @return An array of 5 strings: [scheme, authority, path, query, fragment].
+     */
+    private String[] parseReference(String ref) {
+        String[] parts = new String[5];
+        String remaining = ref;
+
+        // 1. Fragment
+        int fragmentIndex = remaining.indexOf('#');
+        if (fragmentIndex >= 0) {
+            parts[4] = remaining.substring(fragmentIndex + 1);
+            remaining = remaining.substring(0, fragmentIndex);
         }
 
-        if (!Character.isLetter(potentialScheme.charAt(0))) {
-            return false;
+        // 2. Query
+        int queryIndex = remaining.indexOf('?');
+        if (queryIndex >= 0) {
+            parts[3] = remaining.substring(queryIndex + 1);
+            remaining = remaining.substring(0, queryIndex);
         }
 
-        for (int i = 0; i < potentialScheme.length(); i++) {
-            char c = potentialScheme.charAt(i);
+        // 3. Scheme (only if valid, must start with letter and colon follows)
+        int colonIndex = remaining.indexOf(':');
+        if (colonIndex > 0 && isValidScheme(remaining.substring(0, colonIndex))) {
+            parts[0] = remaining.substring(0, colonIndex);
+            remaining = remaining.substring(colonIndex + 1);
+        }
+
+        // 4. Authority (if starts with //)
+        if (remaining.startsWith(ParserConstants.DOUBLE_SLASH)) {
+            int authorityEnd = remaining.indexOf('/', 2);
+            if (authorityEnd < 0) {
+                authorityEnd = remaining.length();
+            }
+            parts[1] = remaining.substring(2, authorityEnd);
+            remaining = remaining.substring(authorityEnd);
+        }
+
+        // 5. Path
+        parts[2] = remaining;
+        return parts;
+    }
+
+    /**
+     * Merges the base path and the reference path for relative resolution.
+     *
+     * @param basePath The path of the base URI.
+     * @param refPath  The path of the reference IRI.
+     * @return The merged path string.
+     */
+    private String mergePaths(String basePath, String refPath) {
+        if (basePath == null || basePath.isEmpty()) {
+            return ParserConstants.SLASH + refPath;
+        }
+        int lastSlash = basePath.lastIndexOf('/');
+        return lastSlash >= 0 ? basePath.substring(0, lastSlash + 1) + refPath : refPath;
+    }
+
+    /**
+     * Removes dot segments (`.` and `..`) from the path according to the RFC3986 algorithm (section 5.2.4).
+     *
+     * @param path The URI path to be cleaned.
+     * @return The path without dot segments.
+     */
+    private String removeDotSegments(String path) {
+        if (path == null || path.isEmpty()) {
+            return ParserConstants.EMPTY_STRING;
+        }
+
+        String input = path;
+        StringBuilder output = new StringBuilder();
+
+        while (!input.isEmpty()) {
+            // 1. "." / ".." / "./" / "../"
+            if (input.startsWith("../")) {
+                input = input.substring(3);
+            } else if (input.startsWith("./")) {
+                input = input.substring(2);
+            }
+            // 2. "/./" / "/."
+            else if (input.startsWith("/./")) {
+                input = ParserConstants.SLASH + input.substring(3);
+            } else if (input.equals("/.")) {
+                input = ParserConstants.SLASH;
+            }
+            // 3. "/../" / "/.."
+            else if (input.startsWith("/../")) {
+                input = ParserConstants.SLASH + input.substring(4);
+                removeLastSegment(output);
+            } else if (input.equals("/..")) {
+                input = ParserConstants.SLASH;
+                removeLastSegment(output);
+            }
+            // 4. "." / ".."
+            else if (input.equals(ParserConstants.POINT) || input.equals(ParserConstants.DOUBLE_DOT)) {
+                input = ParserConstants.EMPTY_STRING;
+            }
+            // 5. Normal segment
+            else {
+                int nextSlash;
+                if (input.startsWith(ParserConstants.SLASH)) {
+                    nextSlash = input.indexOf(ParserConstants.SLASH, 1);
+                    if (nextSlash >= 0) {
+                        output.append(input.substring(0, nextSlash));
+                        input = input.substring(nextSlash);
+                    } else {
+                        output.append(input);
+                        input = ParserConstants.EMPTY_STRING;
+                    }
+                } else {
+                    nextSlash = input.indexOf(ParserConstants.SLASH);
+                    if (nextSlash >= 0) {
+                        output.append(input.substring(0, nextSlash));
+                        input = input.substring(nextSlash);
+                    } else {
+                        output.append(input);
+                        input = ParserConstants.EMPTY_STRING;
+                    }
+                }
+            }
+        }
+
+        return output.toString();
+    }
+
+    /**
+     * Removes the last segment (up to the last slash) of the path in the {@code output} StringBuilder.
+     * Used by {@code removeDotSegments} to handle {@code ..}.
+     *
+     * @param output The StringBuilder containing the path under construction.
+     */
+    private void removeLastSegment(StringBuilder output) {
+        String outputStr = output.toString();
+        int lastSlash = outputStr.lastIndexOf(ParserConstants.SLASH);
+        output.setLength(lastSlash >= 0 ? lastSlash : 0);
+    }
+
+    /**
+     * Provides a simple fallback method for relative IRI resolution.
+     * Used if RFC3986-based resolution fails (e.g., due to a {@code URISyntaxException}).
+     *
+     * @param base     The base URI.
+     * @param relative The relative IRI.
+     * @return The resolved IRI.
+     */
+    private String performSimpleFallback(String base, String relative) {
+        if (relative.isEmpty()) {
+            return base;
+        }
+        if (base.endsWith(ParserConstants.SLASH)) {
+            return base + relative;
+        }
+        int lastSlash = base.lastIndexOf('/');
+        return lastSlash >= 0 ? base.substring(0, lastSlash + 1) + relative : base + ParserConstants.SLASH + relative;
+    }
+
+    /**
+     * Normalizes the URI string, specifically handling the {@code file:} protocol.
+     * Ensures that {@code file:} is correctly represented by {@code file:///}.
+     *
+     * @param uri The URI string to normalize.
+     * @return The normalized URI.
+     */
+    private String normalizeURI(String uri) {
+        if (uri == null) {
+            return null;
+        }
+        // Specific normalization for 'file:' protocol to ensure 'file:///' format
+        if (uri.startsWith(ParserConstants.FILE_PROTOCOL_SIMPLE) && !uri.startsWith(ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH)) {
+            if (!uri.startsWith(ParserConstants.FILE_PROTOCOL)) {
+                uri = uri.replace(ParserConstants.FILE_PROTOCOL_SIMPLE, ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH);
+            }
+        }
+        return uri;
+    }
+
+    /**
+     * Checks if an IRI string is an absolute IRI (contains a valid scheme followed by a colon).
+     *
+     * @param iri The IRI string.
+     * @return {@code true} if the IRI is absolute, otherwise {@code false}.
+     */
+    private boolean isAbsoluteIRI(String iri) {
+        if (iri == null || iri.isEmpty()) {
+            return false;
+        }
+        int colonIndex = iri.indexOf(':');
+        if (colonIndex == -1 || colonIndex == 0) {
+            return false;
+        }
+        return isValidScheme(iri.substring(0, colonIndex));
+    }
+
+    /**
+     * Checks if an URI scheme string is syntactically valid according to RFC3986.
+     *
+     * @param scheme The scheme string to validate.
+     * @return {@code true} if the scheme is valid, otherwise {@code false}.
+     */
+    private boolean isValidScheme(String scheme) {
+        if (scheme == null || scheme.isEmpty() || !Character.isLetter(scheme.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < scheme.length(); i++) {
+            char c = scheme.charAt(i);
             if (!Character.isLetterOrDigit(c) && c != '+' && c != '-' && c != '.') {
                 return false;
             }
         }
-
         return true;
     }
 
-    private String resolveSemicolonReference(String ref, String baseURI) {
-        if (baseURI.startsWith(ParserConstants.FILE_PROTOCOL)) {
-            int queryIndex = baseURI.indexOf('?');
-            int fragmentIndex = baseURI.indexOf('#');
-
-            String pathPart;
-            String rest = ParserConstants.EMPTY_STRING ;
-
-            if (queryIndex >= 0) {
-                pathPart = baseURI.substring(0, queryIndex);
-                rest = baseURI.substring(queryIndex);
-            } else if (fragmentIndex >= 0) {
-                pathPart = baseURI.substring(0, fragmentIndex);
-                rest = baseURI.substring(fragmentIndex);
-            } else {
-                pathPart = baseURI;
-            }
-
-            return pathPart + ref + rest;
-        }
-
-        return baseURI.replaceFirst(";.*", ParserConstants.EMPTY_STRING) + ref;
-    }
-
-    private String removeFragment(String uri) {
-        int fragmentIndex = uri.indexOf('#');
-        return (fragmentIndex >= 0) ? uri.substring(0, fragmentIndex) : uri;
-    }
-
-    private String removeQueryAndFragment(String uri) {
-        int queryIndex = uri.indexOf('?');
-        if (queryIndex >= 0) {
-            return uri.substring(0, queryIndex);
-        }
-        return removeFragment(uri);
-    }
-
     /**
-     * Normalizes a URI path by processing `.` (current directory) and `..`
-     * (parent directory) segments, as per RFC 3986.
+     * Retrieves the effective base URI, using a default value if not set.
      *
-     * @param path The path string to normalize.
-     * @return The normalized path.
+     * @return The effective and normalized base URI.
      */
-    private String normalizePath(String path) {
-        if (path == null || path.isEmpty()) {
-            return ParserConstants.EMPTY_STRING ;
-        }
-
-        if (path.startsWith(ParserConstants.DOUBLE_SLASH)) {
-            String remaining = path.substring(2);
-            String normalizedRemaining = normalizeSimplePath(remaining);
-            return ParserConstants.DOUBLE_SLASH + normalizedRemaining;
-        }
-
-        return normalizeSimplePath(path);
-    }
-
-    private String normalizeSimplePath(String path) {
-        if (path == null || path.isEmpty()) {
-            return ParserConstants.EMPTY_STRING ;
-        }
-
-        String[] segments = path.split(ParserConstants.SLASH, -1);
-        List<String> result = new ArrayList<>();
-
-        for (String segment : segments) {
-            if (segment.equals(ParserConstants.POINT) || segment.isEmpty()) {
-                continue;
-            } else if (segment.equals(ParserConstants.DOUBLE_DOT)) {
-                if (!result.isEmpty() && !result.get(result.size() - 1).equals(ParserConstants.DOUBLE_DOT)) {
-                    result.remove(result.size() - 1);
-                } else {
-                    result.add(ParserConstants.DOUBLE_DOT);
-                }
-            } else {
-                result.add(segment);
-            }
-        }
-
-        String normalized = String.join(ParserConstants.SLASH, result);
-
-        boolean startsWithSlash = path.startsWith(ParserConstants.SLASH);
-        boolean endsWithSlash = path.endsWith(ParserConstants.SLASH);
-
-        if (startsWithSlash && !normalized.startsWith(ParserConstants.SLASH)) {
-            normalized = ParserConstants.SLASH + normalized;
-        }
-
-        if (endsWithSlash && !normalized.endsWith(ParserConstants.SLASH) && !normalized.isEmpty()) {
-            normalized = normalized + ParserConstants.SLASH ;
-        }
-
-        return normalized;
+    private String getEffectiveBaseURI() {
+        String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.DEFAULT_BASE_URI;
+        return normalizeURI(effective);
     }
 
     /**
-     * Unescapes Unicode escape sequences (`\ u` and `\U`) from an IRI string.
+     * Unescapes Unicode escape sequences within an IRI string.
      *
-     * @param rawIri The raw IRI string to unescape.
-     * @return The unescaped IRI string.
-     * @throws IllegalArgumentException if the escape sequence is invalid.
+     * @param rawIri The raw, potentially escaped IRI.
+     * @return The IRI with resolved Unicode escapes.
+     * @throws IllegalArgumentException If a Unicode sequence is incomplete or a surrogate is found.
      */
     private String unescapeIRI(String rawIri) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < rawIri.length(); i++) {
             char c = rawIri.charAt(i);
-            if (c == '\\') {
-                if (i + 1 < rawIri.length()) {
-                    char next = rawIri.charAt(i + 1);
-                    if (next == 'u' || next == 'U') {
-                        int len = (next == 'u') ? 4 : 8;
-                        if (i + len + 1 <= rawIri.length()) {
-                            try {
-                                String hex = rawIri.substring(i + 2, i + 2 + len);
-                                int codePoint = Integer.parseInt(hex, 16);
-
-                                if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
-                                    throw new IllegalArgumentException("Surrogates not allowed in IRIREF: \\u" + hex);
-                                }
-
-                                sb.appendCodePoint(codePoint);
-                                i += len + 1;
-                            } catch (NumberFormatException e) {
-                                throw new IllegalArgumentException("Invalid hexadecimal value in IRI escape.", e);
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Incomplete Unicode escape in IRI.");
+            if (c == '\\' && i + 1 < rawIri.length()) {
+                char next = rawIri.charAt(i + 1);
+                if (next == 'u' || next == 'U') {
+                    int len = (next == 'u') ? 4 : 8;
+                    if (i + len + 1 <= rawIri.length()) {
+                        String hex = rawIri.substring(i + 2, i + 2 + len);
+                        int codePoint = Integer.parseInt(hex, 16);
+                        if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+                            throw new IllegalArgumentException("Surrogates not allowed: \\u" + hex);
                         }
+                        sb.appendCodePoint(codePoint);
+                        i += len + 1;
                     } else {
-                        sb.append(next);
-                        i++;
+                        throw new IllegalArgumentException("Incomplete Unicode escape");
                     }
                 } else {
-                    sb.append(c);
+                    sb.append(next);
+                    i++;
                 }
             } else {
                 sb.append(c);
@@ -1351,93 +1028,78 @@ public class TriGListerner extends TriGBaseListener {
     }
 
     /**
-     * Unescapes escape sequences (e.g., `\t`, `\n`, `\"`) and Unicode
-     * escapes from a string literal.
+     * Unescapes common and Unicode escape sequences in RDF literal strings.
+     * Also handles the removal of surrounding single or triple quotes/apostrophes.
      *
-     * @param text The raw string literal to unescape.
-     * @return The unescaped string.
-     * @throws IllegalArgumentException if the escape sequence is invalid.
+     * @param text The raw literal text (including delimiters).
+     * @return The unescaped literal string value.
+     * @throws IllegalArgumentException If an invalid Unicode sequence is found.
      */
     private String unescapeString(String text) {
         if (text == null || text.length() < 2) {
             return text;
         }
 
-        boolean isMultiline = text.startsWith("\"\"\"") || text.startsWith("'''");
-        String content;
-        if (isMultiline) {
-            content = text.substring(3, text.length() - 3);
-        } else {
-            content = text.substring(1, text.length() - 1);
-        }
+        boolean isMultiline = text.startsWith(ParserConstants.TRIPLE_QUOTE) || text.startsWith(ParserConstants.TRIPLE_APOSTROPHE);
+        String content = isMultiline ? text.substring(3, text.length() - 3) : text.substring(1, text.length() - 1);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < content.length(); i++) {
             char c = content.charAt(i);
-            if (c == '\\') {
-                if (i + 1 < content.length()) {
-                    char next = content.charAt(i + 1);
-                    switch (next) {
-                        case 't':
-                            sb.append('\t');
-                            i++;
-                            break;
-                        case 'n':
-                            sb.append('\n');
-                            i++;
-                            break;
-                        case 'r':
-                            sb.append('\r');
-                            i++;
-                            break;
-                        case 'b':
-                            sb.append('\b');
-                            i++;
-                            break;
-                        case 'f':
-                            sb.append('\f');
-                            i++;
-                            break;
-                        case '\"':
-                            sb.append('\"');
-                            i++;
-                            break;
-                        case '\'':
-                            sb.append('\'');
-                            i++;
-                            break;
-                        case '\\':
-                            sb.append('\\');
-                            i++;
-                            break;
-                        case 'u':
-                        case 'U':
-                            int len = (next == 'u') ? 4 : 8;
-                            if (i + len + 1 <= content.length()) {
-                                try {
-                                    String hex = content.substring(i + 2, i + 2 + len);
-                                    int codePoint = Integer.parseInt(hex, 16);
-
-                                    if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
-                                        throw new IllegalArgumentException("Invalid Unicode escape sequence: Surrogate code points are not allowed.");
-                                    }
-
-                                    sb.appendCodePoint(codePoint);
-                                    i += len + 1;
-                                } catch (NumberFormatException e) {
-                                    throw new IllegalArgumentException("Invalid Unicode escape sequence: Invalid hexadecimal value.", e);
-                                }
-                            } else {
-                                throw new IllegalArgumentException("Incomplete Unicode escape sequence.");
+            if (c == '\\' && i + 1 < content.length()) {
+                char next = content.charAt(i + 1);
+                switch (next) {
+                    case 't':
+                        sb.append('\t');
+                        i++;
+                        break;
+                    case 'n':
+                        sb.append('\n');
+                        i++;
+                        break;
+                    case 'r':
+                        sb.append('\r');
+                        i++;
+                        break;
+                    case 'b':
+                        sb.append('\b');
+                        i++;
+                        break;
+                    case 'f':
+                        sb.append('\f');
+                        i++;
+                        break;
+                    case '"':
+                        sb.append('"');
+                        i++;
+                        break;
+                    case '\'':
+                        sb.append('\'');
+                        i++;
+                        break;
+                    case '\\':
+                        sb.append('\\');
+                        i++;
+                        break;
+                    case 'u':
+                    case 'U':
+                        int len = (next == 'u') ? 4 : 8;
+                        if (i + len + 1 <= content.length()) {
+                            String hex = content.substring(i + 2, i + 2 + len);
+                            int codePoint = Integer.parseInt(hex, 16);
+                            if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+                                throw new IllegalArgumentException("Invalid Unicode escape: Surrogate code points not allowed");
                             }
-                            break;
-                        default:
-                            sb.append(c).append(next);
-                            i++;
-                            break;
-                    }
-                } else {
-                    sb.append(c);
+                            sb.appendCodePoint(codePoint);
+                            i += len + 1;
+                        } else {
+                            throw new IllegalArgumentException("Incomplete Unicode escape sequence");
+                        }
+                        break;
+                    default:
+                        sb.append(c).append(next);
+                        i++;
+                        break;
                 }
             } else {
                 sb.append(c);
