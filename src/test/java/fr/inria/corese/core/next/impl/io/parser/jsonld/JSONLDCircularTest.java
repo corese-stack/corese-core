@@ -27,6 +27,8 @@ import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Circular tests for JSON-LD parser and serializer integration.
@@ -41,6 +43,8 @@ import fr.inria.corese.core.next.impl.temp.CoreseModel;
  */
 @DisplayName("JSON-LD Circular Integration Tests")
 class JSONLDCircularTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(JSONLDCircularTest.class);
 
     private ValueFactory valueFactory;
     private SerializerFactory serializerFactory;
@@ -69,7 +73,8 @@ class JSONLDCircularTest {
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new DefaultSerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = new TitaniumJSONLDProcessorOption.Builder().build();
+        defaultConfig = new TitaniumJSONLDProcessorOption.Builder()
+                .build();
     }
 
     /**
@@ -261,7 +266,7 @@ class JSONLDCircularTest {
     private Model performRoundTrip(Model originalModel) throws Exception {
         // Serialize to JSON-LD
         RDFSerializer serializer = serializerFactory.createSerializer(
-                RDFFormat.JSONLD, originalModel, (SerializationOption) defaultConfig);
+                RDFFormat.JSONLD, originalModel, defaultConfig);
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);
