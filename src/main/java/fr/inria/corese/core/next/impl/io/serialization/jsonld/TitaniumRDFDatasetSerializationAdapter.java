@@ -282,7 +282,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
                     ) {
                     return literal.getDatatype().stringValue();
                 } else if (literal.getLanguage().isPresent()) {
-                    return RDF.langString.getIRI().stringValue();
+                    return "rdf:langString"; // Titanium JSONLD expect the langstring datatype to be in this format ...
                 } else {
                     return XSD.xsdString.getIRI().stringValue();
                 }
