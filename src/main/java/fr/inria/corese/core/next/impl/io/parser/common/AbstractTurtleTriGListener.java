@@ -89,7 +89,7 @@ public abstract class AbstractTurtleTriGListener {
      * Resolves an IRI reference to absolute form.
      * Handles prefixed names (QNames), relative IRIs, and absolute IRIs.
      *
-     * @param raw raw IRI string (may be relative, prefixed, or absolute)
+     * @param raw raw IRI string
      * @return resolved absolute IRI
      * @throws ParsingErrorException if the IRI cannot be resolved
      */
@@ -142,7 +142,7 @@ public abstract class AbstractTurtleTriGListener {
     /**
      * Resolves a relative IRI reference against the base URI using RFC 3986 algorithm.
      *
-     * @param iri IRI reference to resolve (may be relative or absolute)
+     * @param iri IRI reference to resolve
      * @return resolved absolute IRI
      */
     public String resolveIRIAgainstBase(String iri) {

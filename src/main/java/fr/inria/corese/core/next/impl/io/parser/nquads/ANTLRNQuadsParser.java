@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.impl.parser.antlr.NQuadsLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.IOException;
@@ -52,7 +51,6 @@ public class ANTLRNQuadsParser extends AbstractRDFParser {
         return RDFFormat.NQUADS;
     }
 
-
     @Override
     public void parse(InputStream in) throws ParsingErrorException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
@@ -79,68 +77,78 @@ public class ANTLRNQuadsParser extends AbstractRDFParser {
     public void parse(Reader reader, String baseURI) throws ParsingErrorException {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
+
             NQuadsLexer lexer = new NQuadsLexer(charStream);
+            configureErrorHandling(lexer);
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
+            NQuadsParser parser = new NQuadsParser(tokens);
+            configureErrorHandling(parser);
 
-            lexer.removeErrorListeners();
-            lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+            ParseTree tree = parser.nquadsDoc();
 
-            NQuadsParser antlrParser = new NQuadsParser(tokens);
-            antlrParser.removeErrorListeners();
-            antlrParser.addErrorListener(ThrowingErrorListener.INSTANCE);
-
-            ParseTree tree = antlrParser.nquadsDoc();
             ParseTreeWalker walker = new ParseTreeWalker();
-
             NQuadsListener listener = new NQuadsListener(getModel(), getValueFactory(), getConfig());
-            walker.walk((ParseTreeListener) listener, tree);
+            walker.walk(listener, tree);
 
+        } catch (ParsingErrorException e) {
+            throw e;
         } catch (IOException e) {
-            throw new ParsingErrorException("Failed to parse N-Quads: " + e.getMessage(), e);
-        } catch (RuntimeException e) {
-            Throwable current = e;
-            while (current != null) {
-                if (current instanceof ParsingErrorException) {
-                    throw (ParsingErrorException) current;
-                }
-                current = current.getCause();
-            }
-            throw new ParsingErrorException("Unexpected error during N-Quads parsing: " + e.getMessage(), e);
+            throw new ParsingErrorException("Failed to read N-Quads input: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw unwrapException(e);
         }
     }
 
+    /**
+     * Configures error handling for lexer or parser.
+     * Replaces default error listeners with strict N-Quads error listener.
+     *
+     * @param recognizer Lexer or parser to configure
+     */
+    private void configureErrorHandling(Recognizer<?, ?> recognizer) {
+        recognizer.removeErrorListeners();
+        recognizer.addErrorListener(NQuadsErrorListener.INSTANCE);
+    }
+
+    /**
+     * Unwraps nested exceptions to find and re-throw ParsingErrorException.
+     *
+     * @param exception Exception to unwrap
+     * @return ParsingErrorException if found in cause chain
+     * @throws ParsingErrorException always, either original or wrapped
+     */
+    private ParsingErrorException unwrapException(Exception exception) {
+        Throwable current = exception;
+        while (current != null) {
+            if (current instanceof ParsingErrorException) {
+                return (ParsingErrorException) current;
+            }
+            current = current.getCause();
+        }
+        return new ParsingErrorException(
+                "Unexpected error during N-Quads parsing: " + exception.getMessage(),
+                exception);
+    }
 
     /**
      * Custom ANTLR ErrorListener that throws a ParsingErrorException on any syntax error.
      * This ensures that parsing failures are immediately reported as application-specific exceptions.
      */
-    private static class ThrowingErrorListener extends BaseErrorListener {
-        static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
+    private static class NQuadsErrorListener extends BaseErrorListener {
+
+        static final NQuadsErrorListener INSTANCE = new NQuadsErrorListener();
 
         @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                                int line, int charPositionInLine,
-                                String msg, RecognitionException e) {
-
-            if (offendingSymbol != null) {
-                String symbolText = offendingSymbol.toString();
-
-                if (msg != null && msg.contains("token recognition error") && symbolText.equals("':'")) {
-                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
-                }
-
-                if (msg != null && msg.contains("no viable alternative") && symbolText.contains("_:")) {
-                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
-                }
-
-                if (symbolText.contains("_:") && symbolText.contains(":") && !symbolText.equals("_:")) {
-                    throw new ParsingErrorException("Invalid blank node label: colon not allowed (line " + line + ")");
-                }
-            }
-
+        public void syntaxError(Recognizer<?, ?> recognizer,
+                                Object offendingSymbol,
+                                int line,
+                                int charPositionInLine,
+                                String msg,
+                                RecognitionException e) {
             throw new ParsingErrorException(
-                    String.format("line %d:%d %s", line, charPositionInLine, msg));
+                    String.format("Syntax error in N-Quads at line %d:%d - %s",
+                            line, charPositionInLine, msg));
         }
     }
 }
