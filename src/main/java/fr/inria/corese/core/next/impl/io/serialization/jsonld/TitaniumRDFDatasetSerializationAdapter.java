@@ -38,6 +38,8 @@ import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adapter class from Model to RdfDataset for usage in the JSON-LD serialization process using the titanium library.
@@ -45,6 +47,7 @@ import fr.inria.corese.core.next.impl.exception.SerializationException;
  */
 public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
+    private final static Logger logger = LoggerFactory.getLogger(TitaniumRDFDatasetSerializationAdapter.class);
     private Model model;
 
     /**
@@ -187,27 +190,15 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
      * @return the converted resource
      */
     private RdfResource toRdfResource(Resource resource) {
-        if (resource != null && (! (resource.isBNode() || resource.isIRI()))) {
-            throw new SerializationException("Unknown resource type " + resource, "JSON-LD");
-        } else if (resource == null) {
+        if (resource == null) {
             return null;
+        } else if (resource.isIRI()) {
+            return toRdfIRI((IRI) resource);
+        } else if (resource.isBNode()) {
+            return toRdfBlankNode((BNode) resource);
+        } else {
+            throw new SerializationException("Unknown resource type " + resource, "JSON-LD");
         }
-        return new RdfResource() {
-            @Override
-            public boolean isIRI() {
-                return resource.isIRI();
-            }
-
-            @Override
-            public boolean isBlankNode() {
-                return resource.isBNode();
-            }
-
-            @Override
-            public String getValue() {
-                return resource.stringValue();
-            }
-        };
     }
 
     /**
@@ -258,7 +249,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
             }
             @Override
             public String getValue() {
-                return bnode.stringValue();
+                return "_:" + bnode.stringValue();
             }
         };
     }
