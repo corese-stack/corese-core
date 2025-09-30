@@ -61,17 +61,18 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     @Override
     public RdfGraph getDefaultGraph() {
-        return new RdfGraph() {
+        RdfGraph resultGraph = new RdfGraph() {
             @Override
             public boolean contains(RdfTriple triple) {
-                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()));
+                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()), (Resource) null);
             }
 
             @Override
             public List<RdfTriple> toList() {
-                return model.stream().map(TitaniumRDFDatasetSerializationAdapter.this::toRdfTriple).toList();
+                return model.filter(null, null, null, (Resource) null).stream().map(TitaniumRDFDatasetSerializationAdapter.this::toRdfTriple).toList();
             }
         };
+        return resultGraph;
     }
 
     @Override
