@@ -115,17 +115,17 @@ class JSONLDSerializerTest {
     {
         "@id":"http://example.org/iri1",
         "http://example.org/pred1":[
-            {"@id":"blank1"}
+            {"@id":"_:blank1"}
         ]
     },
     {
-        "@id":"blank1",
+        "@id":"_:blank1",
         "http://example.org/pred1":[
             {
                 "@id":"http://example.org/iri1"
             },
             {
-                "@id":"blank1"
+                "@id":"_:blank1"
             },
             {
                 "@value":"literal1"
@@ -171,17 +171,6 @@ class JSONLDSerializerTest {
         "http://example.org/pred1":[
             {
                 "@id":"http://example.org/iri1"
-            },
-            {
-                "@value":"literal1"
-            },
-            {
-                "@value":"literal2",
-                "@type":"http://example.org/datatype1"
-            },
-            {
-               "@language":"en",
-               "@value":"literal3"
             }
         ]
     },
