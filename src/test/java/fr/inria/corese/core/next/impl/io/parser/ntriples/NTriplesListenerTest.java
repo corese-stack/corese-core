@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.ntriples;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -222,29 +223,29 @@ class NTriplesListenerTest {
 
 
     @Test
-    @DisplayName("unescapeLiteral should throw IllegalArgumentException for invalid \\uXXXX")
+    @DisplayName("unescapeLiteral should throw ParsingErrorException for invalid \\uXXXX")
     void testUnescapeLiteralInvalidUx() throws NoSuchMethodException {
         String input = "\"Invalid\\uXXXX\"";
         java.lang.reflect.Method method = NTriplesListener.class.getDeclaredMethod("unescapeLiteral", String.class);
         method.setAccessible(true);
 
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ParsingErrorException.class,
                 () -> listener.unescapeLiteral(input),
-                "Should throw unescapeLiteral should throw IllegalArgumentException for invalid \\uXXXX");
+                "Should throw unescapeLiteral should throw ParsingErrorException for invalid \\uXXXX");
     }
 
     @Test
-    @DisplayName("unescapeLiteral should throw IllegalArgumentException for invalid \\UXXXXXXXX")
+    @DisplayName("unescapeLiteral should throw ParsingErrorException for invalid \\UXXXXXXXX")
     void testUnescapeLiteralInvalid() throws NoSuchMethodException {
         String input = "\"Invalid\\U0000XXX\"";
         java.lang.reflect.Method method = NTriplesListener.class.getDeclaredMethod("unescapeLiteral", String.class);
         method.setAccessible(true);
 
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ParsingErrorException.class,
                 () -> listener.unescapeLiteral(input),
-                "Should throw unescapeLiteral should throw IllegalArgumentException for invalid \\UXXXXXXXX");
+                "Should throw unescapeLiteral should throw ParsingErrorException for invalid \\UXXXXXXXX");
     }
 
 
