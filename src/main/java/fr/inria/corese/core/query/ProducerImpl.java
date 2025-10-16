@@ -928,10 +928,7 @@ public class ProducerImpl
 
     @Override
     public Edge copy(Edge ent) {
-        if (EdgeManagerIndexer.test) {
-            return getGraph().getEdgeFactory().copy(ent);
-        }
-        return ent;
+        return getGraph().getEdgeFactory().copy(ent);
     }
 
     @Override
