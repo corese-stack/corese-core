@@ -1042,6 +1042,10 @@ public class Graph extends GraphObject implements
         return getSubjectIndex();
     }
 
+    public int getIndexSize() {
+        return getIndex().size();
+    }
+
     void startUpdate() {
     }
 
