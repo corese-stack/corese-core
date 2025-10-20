@@ -4,7 +4,6 @@ import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.Index;
 import fr.inria.corese.core.api.DataBroker;
-import fr.inria.corese.core.index.EdgeManagerIndexer;
 import fr.inria.corese.core.kgram.api.core.*;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Matcher;
@@ -902,7 +901,7 @@ public class ProducerImpl
             case ALL:
                 return this.getGraph().size();
             case PREDICATE:
-                return this.getGraph().getIndex().size();
+                return this.getGraph().getIndexSize();
             // to do for SUBJECT | OBJECT
             // for the moment, cannot get these values directIProducerQP
             case SUBJECT:
