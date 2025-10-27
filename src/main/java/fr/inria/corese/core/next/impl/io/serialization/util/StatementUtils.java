@@ -191,14 +191,6 @@ public class StatementUtils {
             return sb.toString();
         }
 
-        // If datatype is xsd:string or missing, don't add it (plain literal)
-        if (datatype == null ||
-                datatype.equals("http://www.w3.org/2001/XMLSchema#string") ||
-                datatype.equals("xsd:string")) {
-            // Don't add datatype for plain strings
-            return sb.toString();
-        }
-
         // For all other datatypes, include them explicitly
         sb.append(SerializationConstants.DATATYPE_SEPARATOR)
                 .append(SerializationConstants.LT)
