@@ -445,10 +445,9 @@ public abstract class AbstractTurtleTriGListener {
      * @return effective base URI
      */
     public String getEffectiveBaseURI() {
-        String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.DEFAULT_BASE_URI;
+        String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.getDefaultBaseURI();
         return normalizeURI(effective);
     }
-
     /**
      * Processes Unicode escape sequences in IRIs.
      *

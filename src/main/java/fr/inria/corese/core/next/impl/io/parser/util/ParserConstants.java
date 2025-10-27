@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.impl.io.parser.util;
 
+import fr.inria.corese.core.util.Property;
+
 /**
  * A utility class containing constants for characters and keywords
  * used in the TriG parser. Centralizing these values helps in
@@ -65,7 +67,6 @@ public final class ParserConstants {
      */
     public static final String BLANK_NODE_PREFIX = "_:";
 
-    public static final String DEFAULT_BASE_URI = "http://example.org/";
     public static final String FILE_PROTOCOL_SIMPLE = "file:/";
     public static final String FILE_PROTOCOL_TRIPLE_SLASH = "file:///";
     public static final String FILE_PROTOCOL = "file://";
@@ -85,5 +86,14 @@ public final class ParserConstants {
     // Prevent instantiation of this utility class.
     private ParserConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+    /**
+     * Returns the configured default base URI for IRI resolution.
+     * The value is configurable via {@code Property.Value.DEFAULT_BASE_URI}.
+     *
+     * @return the default base URI from configuration, or null if not set
+     */
+    public static String getDefaultBaseURI() {
+        return Property.getStringValue(Property.Value.DEFAULT_BASE_URI);
     }
 }

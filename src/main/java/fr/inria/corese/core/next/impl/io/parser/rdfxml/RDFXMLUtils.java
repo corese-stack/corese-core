@@ -5,10 +5,8 @@ import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import org.xml.sax.*;
-
 import java.util.List;
 import java.util.Optional;
-
 /**
  * Utility methods for processing RDF/XML constructs.
  * <p>
@@ -58,9 +56,10 @@ public class RDFXMLUtils {
     public static String expandQNameFromQName(String qname) {
         if (qname == null) return null;
         if (qname.startsWith("xsd:")) {
-            return "http://www.w3.org/2001/XMLSchema#" + qname.substring("xsd:".length());
+            return fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdString.getNamespace()
+                    + qname.substring("xsd:".length());
         }
-        return qname;
+               return qname;
     }
 
     /**
