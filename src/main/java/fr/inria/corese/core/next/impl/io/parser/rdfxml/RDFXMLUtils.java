@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 import org.xml.sax.*;
 import java.util.List;
 import java.util.Optional;
@@ -55,9 +56,10 @@ public class RDFXMLUtils {
      */
     public static String expandQNameFromQName(String qname) {
         if (qname == null) return null;
-        if (qname.startsWith("xsd:")) {
+        String xsdPrefix = fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdString.getPreferredPrefix() + ":";
+        if (qname.startsWith(xsdPrefix)) {
             return fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdString.getNamespace()
-                    + qname.substring("xsd:".length());
+                    + qname.substring(xsdPrefix.length());
         }
                return qname;
     }
@@ -76,7 +78,7 @@ public class RDFXMLUtils {
         if (about != null) return factory.createIRI(resolveAgainstBase(about, baseURI));
 
         String nodeID = attrs.getValue(RDF.type.getNamespace(), "nodeID");
-        if (nodeID != null) return factory.createBNode("_:" + nodeID);
+        if (nodeID != null) return factory.createBNode(ParserConstants.BLANK_NODE_PREFIX + nodeID);
 
         String id = attrs.getValue(RDF.type.getNamespace(), "ID");
         if (id != null) return factory.createIRI(resolveAgainstBase("#" + id, baseURI));
@@ -195,7 +197,7 @@ public class RDFXMLUtils {
      */
     public static boolean isContainer(String localName, String uri) {
         return RDF.type.getNamespace().equals(uri) &&
-                ("Seq".equals(localName) || "Bag".equals(localName) || "Alt".equals(localName));
+                (RDF.Seq.getIRI().getLocalName().equals(localName) || RDF.Bag.getIRI().getLocalName().equals(localName) || RDF.Alt.getIRI().getLocalName().equals(localName));
     }
 
     /**
