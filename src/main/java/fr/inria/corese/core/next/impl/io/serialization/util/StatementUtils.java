@@ -169,23 +169,75 @@ public class StatementUtils {
         StringBuilder sb = new StringBuilder();
 
         // Escape special characters in the literal label
-        String escapedLabel = literal.getLabel()
-                .replace(SerializationConstants.BACK_SLASH, "\\\\")
-                .replace(SerializationConstants.QUOTE, "\\\"");
-
+        String escapedLabel = escapeLiteralString(literal.getLabel());
         sb.append('"').append(escapedLabel).append('"');
 
-        // Handle datatype or language tag
+        String datatype = null;
+        String language = null;
+
+        // Get datatype
         if (literal.getDatatype() != null) {
-            String datatypeUri = literal.getDatatype().stringValue();
-            // Omit xsd:string datatype for brevity (implied by default)
-            if (!"http://www.w3.org/2001/XMLSchema#string".equals(datatypeUri)) {
-                sb.append(SerializationConstants.DATATYPE_SEPARATOR).append(serializeForComparison(literal.getDatatype()));
-            }
-        } else if (literal.getLanguage() != null) {
-            sb.append(SerializationConstants.AT).append(literal.getLanguage());
+            datatype = literal.getDatatype().stringValue();
         }
 
+        // Get language (getLanguage() returns Optional<String>)
+        if (literal.getLanguage().isPresent()) {
+            language = literal.getLanguage().get();
+        }
+
+        // If language tag exists, use it (language takes precedence over datatype)
+        if (language != null && !language.isEmpty()) {
+            sb.append(SerializationConstants.AT_SIGN).append(language);
+            return sb.toString();
+        }
+
+        // If datatype is xsd:string or missing, don't add it (plain literal)
+        if (datatype == null ||
+                datatype.equals("http://www.w3.org/2001/XMLSchema#string") ||
+                datatype.equals("xsd:string")) {
+            // Don't add datatype for plain strings
+            return sb.toString();
+        }
+
+        // For all other datatypes, include them explicitly
+        sb.append(SerializationConstants.DATATYPE_SEPARATOR)
+                .append(SerializationConstants.LT)
+                .append(datatype)
+                .append(SerializationConstants.GT);
+
+        return sb.toString();
+    }
+
+    /**
+     * Properly escape special characters in literal strings according to Turtle/N-Quads spec.
+     */
+    private static String escapeLiteralString(String label) {
+        if (label == null) return "";
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < label.length(); i++) {
+            char c = label.charAt(i);
+            switch (c) {
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    sb.append(c);
+                    break;
+            }
+        }
         return sb.toString();
     }
 
@@ -225,4 +277,69 @@ public class StatementUtils {
     }
 
 
+    /**
+     * Converts a statement to canonical N-Quad format for hashing in RDFC-1.0,
+     * replacing a specific blank node with a placeholder string.
+     * This is used specifically in the Hash First Degree Quads algorithm.
+     *
+     * @param quad The statement to convert
+     * @param blankNodeToReplace The blank node identifier to replace with placeholder
+     * @return A canonical N-Quad string with placeholder substitution
+     */
+    public String quadToCanonicalNQuad(Statement quad, String blankNodeToReplace) {
+        if (quad == null) {
+            return SerializationConstants.EMPTY_STRING;
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        // Subject
+        if (isBlankNode(quad.getSubject())) {
+            String bnodeId = getBlankNodeId(quad.getSubject());
+            if (bnodeId.equals(blankNodeToReplace)) {
+                sb.append(SerializationConstants.CANONICAL_BNODE_PLACEHOLDER);
+            } else {
+                // Use consistent prefix for all non-replaced blank nodes
+                sb.append(SerializationConstants.CANONICAL_BNODE_PREFIX).append(bnodeId);
+            }
+        } else {
+            sb.append(serializeForComparison(quad.getSubject()));
+        }
+        sb.append(SerializationConstants.SPACE);
+
+        // Predicate
+        sb.append(serializeForComparison(quad.getPredicate()))
+                .append(SerializationConstants.SPACE);
+
+        // Object
+        if (isBlankNode(quad.getObject())) {
+            String bnodeId = getBlankNodeId(quad.getObject());
+            if (bnodeId.equals(blankNodeToReplace)) {
+                sb.append(SerializationConstants.CANONICAL_BNODE_PLACEHOLDER);
+            } else {
+                sb.append(SerializationConstants.CANONICAL_BNODE_PREFIX).append(bnodeId);
+            }
+        } else {
+            sb.append(serializeForComparison(quad.getObject()));
+        }
+
+        // Context (graph)
+        if (quad.getContext() != null) {
+            sb.append(SerializationConstants.SPACE);
+            if (isBlankNode(quad.getContext())) {
+                String bnodeId = getBlankNodeId(quad.getContext());
+                if (bnodeId.equals(blankNodeToReplace)) {
+                    sb.append(SerializationConstants.CANONICAL_BNODE_PLACEHOLDER);
+                } else {
+                    sb.append(SerializationConstants.CANONICAL_BNODE_PREFIX).append(bnodeId);
+                }
+            } else {
+                sb.append(serializeForComparison(quad.getContext()));
+            }
+        }
+
+        sb.append(SerializationConstants.SPACE).append(SerializationConstants.POINT);
+
+        return sb.toString();
+    }
 }
