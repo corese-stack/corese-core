@@ -1225,6 +1225,7 @@ public class Property {
         // parser configuration
         STRICT_MODE,
 
+        DEFAULT_BASE_URI,
         // Elasticsearch parameters
         // TODO Change class to be able to define application-specific properties
         ELASTICSEARCH_API_KEY,

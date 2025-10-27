@@ -38,6 +38,9 @@ import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adapter class from Model to RdfDataset for usage in the JSON-LD serialization process using the titanium library.
@@ -45,6 +48,7 @@ import fr.inria.corese.core.next.impl.exception.SerializationException;
  */
 public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
+    private final static Logger logger = LoggerFactory.getLogger(TitaniumRDFDatasetSerializationAdapter.class);
     private Model model;
 
     /**
@@ -58,17 +62,18 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
 
     @Override
     public RdfGraph getDefaultGraph() {
-        return new RdfGraph() {
+        RdfGraph resultGraph = new RdfGraph() {
             @Override
             public boolean contains(RdfTriple triple) {
-                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()));
+                return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()), (Resource) null);
             }
 
             @Override
             public List<RdfTriple> toList() {
-                return model.stream().map(TitaniumRDFDatasetSerializationAdapter.this::toRdfTriple).toList();
+                return model.filter(null, null, null, (Resource) null).stream().map(TitaniumRDFDatasetSerializationAdapter.this::toRdfTriple).toList();
             }
         };
+        return resultGraph;
     }
 
     @Override
@@ -187,27 +192,15 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
      * @return the converted resource
      */
     private RdfResource toRdfResource(Resource resource) {
-        if (resource != null && (! (resource.isBNode() || resource.isIRI()))) {
-            throw new SerializationException("Unknown resource type " + resource, "JSON-LD");
-        } else if (resource == null) {
+        if (resource == null) {
             return null;
+        } else if (resource.isIRI()) {
+            return toRdfIRI((IRI) resource);
+        } else if (resource.isBNode()) {
+            return toRdfBlankNode((BNode) resource);
+        } else {
+            throw new SerializationException("Unknown resource type " + resource, "JSON-LD");
         }
-        return new RdfResource() {
-            @Override
-            public boolean isIRI() {
-                return resource.isIRI();
-            }
-
-            @Override
-            public boolean isBlankNode() {
-                return resource.isBNode();
-            }
-
-            @Override
-            public String getValue() {
-                return resource.stringValue();
-            }
-        };
     }
 
     /**
@@ -258,7 +251,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
             }
             @Override
             public String getValue() {
-                return bnode.stringValue();
+                return ParserConstants.BLANK_NODE_PREFIX + bnode.stringValue();
             }
         };
     }
@@ -290,7 +283,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
                     ) {
                     return literal.getDatatype().stringValue();
                 } else if (literal.getLanguage().isPresent()) {
-                    return RDF.langString.getIRI().stringValue();
+                    return "rdf:langString"; // Titanium JSONLD expect the langstring datatype to be in this format ...
                 } else {
                     return XSD.xsdString.getIRI().stringValue();
                 }

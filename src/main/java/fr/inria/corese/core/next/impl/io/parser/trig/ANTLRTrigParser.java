@@ -5,13 +5,10 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
-
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.TriGLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TriGParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -21,10 +18,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * An ANTLR4-based parser for Trig format.
- * This parser uses an ANTLR grammar to tokenize and parse Trig documents,
+ * A parser for the TriG format based on ANTLR4.
+ * It uses an ANTLR grammar to tokenize and parse TriG documents,
  * then a listener to build the RDF model.
  */
 public class ANTLRTrigParser extends AbstractRDFParser {
@@ -32,19 +31,23 @@ public class ANTLRTrigParser extends AbstractRDFParser {
     /**
      * Constructor for the ANTLRTrigParser.
      *
-     * @param model   The RDF model to populate.
-     * @param factory The ValueFactory for creating RDF resources.
+     * @param model   The RDF model to be populated.
+     * @param factory The value factory for creating RDF resources.
      */
-    public ANTLRTrigParser(Model model, ValueFactory factory) { super(model, factory); }
+    public ANTLRTrigParser(Model model, ValueFactory factory) {
+        super(model, factory);
+    }
 
     /**
      * Constructor for the ANTLRTrigParser with configuration options.
      *
-     * @param model   The RDF model to populate.
-     * @param factory The ValueFactory for creating RDF resources.
-     * @param config  The configuration options for parsing.
+     * @param model   The RDF model to be populated.
+     * @param factory The value factory for creating RDF resources.
+     * @param config  Configuration options for parsing.
      */
-    public ANTLRTrigParser(Model model, ValueFactory factory, IOOptions config) {super(model, factory, config);}
+    public ANTLRTrigParser(Model model, ValueFactory factory, IOOptions config) {
+        super(model, factory, config);
+    }
 
     @Override
     public RDFFormat getRDFFormat() {
@@ -52,7 +55,9 @@ public class ANTLRTrigParser extends AbstractRDFParser {
     }
 
     @Override
-    public void setConfig(IOOptions config) {}
+    public void setConfig(IOOptions config) {
+        // This method is required by the interface but is not used in this implementation.
+    }
 
     @Override
     public void parse(InputStream in) throws ParsingErrorException {
@@ -70,9 +75,9 @@ public class ANTLRTrigParser extends AbstractRDFParser {
     }
 
     /**
-     * Parses Trig data from a Reader using ANTLR4.
+     * Parses TriG data from a {@link Reader} using ANTLR4.
      *
-     * @param reader  The Reader to read RDF data from.
+     * @param reader  The {@link Reader} to read the RDF data.
      * @param baseURI The base URI.
      * @throws ParsingErrorException if a parsing or I/O error occurs.
      */
@@ -81,16 +86,87 @@ public class ANTLRTrigParser extends AbstractRDFParser {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
             TriGLexer triGLexer = new TriGLexer(charStream);
+
+            TrigErrorListener trigErrorListener = new TrigErrorListener();
+            triGLexer.removeErrorListeners();
+            triGLexer.addErrorListener(trigErrorListener);
+
             CommonTokenStream tokens = new CommonTokenStream(triGLexer);
             TriGParser triGParser = new TriGParser(tokens);
+
+
+            triGParser.removeErrorListeners();
+            triGParser.addErrorListener(trigErrorListener);
+
             ParseTreeWalker walker = new ParseTreeWalker();
             ParseTree tree = triGParser.trigDoc();
-            TriGListerner listerner = new TriGListerner(getModel(), getValueFactory(), this.getConfig());
+
+            if (trigErrorListener.hasErrors()) {
+                throw new ParsingErrorException("Syntax error in TriG document: " + trigErrorListener.getErrorMessage());
+            }
+
+            TriGListerner listerner = new TriGListerner(getModel(), getValueFactory(), this.getConfig(), baseURI);
             walker.walk((ParseTreeListener) listerner, tree);
+
+        } catch (ParsingErrorException e) {
+            throw e;
         } catch (IOException e) {
             throw new ParsingErrorException("Failed to parse TriG RDF: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new ParsingErrorException("Unexpected error during TriG parsing: " + e.getMessage(), e);
+        }
+    }
+
+
+    /**
+     * A custom error listener to collect errors from the lexer and parser.
+     */
+    private static class TrigErrorListener extends BaseErrorListener {
+        private final List<String> errors = new ArrayList<>();
+
+        /**
+         * Records syntax errors generated by ANTLR.
+         *
+         * @param recognizer         The recognizer that detected the error.
+         * @param offendingSymbol    The symbol that caused the error.
+         * @param line               The line number where the error occurred.
+         * @param charPositionInLine The character position on the line.
+         * @param msg                The error message.
+         * @param e                  The recognition exception.
+         */
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                                int line, int charPositionInLine, String msg, RecognitionException e) {
+            if (msg != null && (msg.contains("token recognition error") || msg.contains("mismatched input"))) {
+                if (offendingSymbol instanceof Token) {
+                    Token token = (Token) offendingSymbol;
+                    String tokenText = token.getText();
+                    if (msg.contains("token recognition error") && tokenText != null && tokenText.contains("\"")) {
+                        msg = "Invalid string literal - possibly unterminated or contains invalid escape sequence: " + msg;
+                    }
+                }
+            }
+
+            String error = "line " + line + ":" + charPositionInLine + " " + msg;
+            errors.add(error);
+        }
+
+        /**
+         * Checks if parsing errors have been found.
+         *
+         * @return `true` if the error list is not empty, otherwise `false`.
+         */
+        public boolean hasErrors() {
+            return !errors.isEmpty();
+        }
+
+        /**
+         * Returns a formatted error message containing all found errors.
+         *
+         * @return A {@link String} containing the error messages.
+         */
+        public String getErrorMessage() {
+            return String.join("; ", errors);
         }
     }
 }

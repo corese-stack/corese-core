@@ -20,7 +20,7 @@ triplesOrGraph
 
 triples2
     : blankNodePropertyList predicateObjectList? '.'
-    | collection predicateObjectList '.'
+    | collection predicateObjectList? '.'
     ;
 
 wrappedGraph
@@ -28,7 +28,7 @@ wrappedGraph
     ;
 
 triplesBlock
-    : triples ('.' triplesBlock?)?
+    : triples ('.'? triplesBlock?)?
     ;
 
 labelOrSubject
@@ -149,7 +149,6 @@ WS
     : (('\u0020' | '\u0009' | '\u000A' | '\u000D' ) )+ -> skip
     ;
 
-// Terminals
 
 Graph_w options { caseInsensitive=true; }
     : 'GRAPH'
@@ -169,19 +168,20 @@ BooleanLiteral
     ;
 
 IRIREF
-    : '<' (PN_CHARS | '.' | ':' | '#' | '@' | '%' | '&' | '$' | '!' | '\'' | '*' | '+' | '/' | '(' | ')' | '-' | ',' | '?' | '~' | UCHAR)* '>'
+    : '<' (PN_CHARS | '.' | ':' | '#' | '@' | '%' | '&' | '$' | '!' | '\'' | '*' | '+' | '/' | '(' | ')' | '-' | ',' | '?' | '~' | ';' | '=' | UCHAR)* '>'
+    ;
+
+BLANK_NODE_LABEL
+    : '_:' (PN_CHARS_U | [0-9] | PLX) ((PN_CHARS | '.' | PLX)* (PN_CHARS | PLX))?
     ;
 
 PNAME_NS
-    : PN_PREFIX? ':'
+    : PN_PREFIX ':'
+    | ':'
     ;
 
 PNAME_LN
     : PNAME_NS PN_LOCAL
-    ;
-
-BLANK_NODE_LABEL
-    : '_:' (PN_CHARS_U | '0' .. '9') ((PN_CHARS | '.')* PN_CHARS)?
     ;
 
 LANGTAG
@@ -197,9 +197,11 @@ DECIMAL
     ;
 
 DOUBLE
-    : ('+' | '-' )? (('0' .. '9')+ '.' ('0' .. '9')* EXPONENT
-    | '.' ('0' .. '9')+ EXPONENT
-    | ('0' .. '9')+ EXPONENT)
+    : ('+' | '-')? (
+        ( ('0'..'9')+ '.' ('0'..'9')* EXPONENT )
+      | ( '.' ('0'..'9')+ EXPONENT )
+      | ( ('0'..'9')+ EXPONENT )
+      )
     ;
 
 EXPONENT
@@ -207,19 +209,31 @@ EXPONENT
     ;
 
 STRING_LITERAL_QUOTE
-    : '"' ((~[\u0022\u005C\u0010\u0013]) | ECHAR | UCHAR)* '"'
+    : '"' ((~[\u0022\u005C\u000A\u000D]) | ECHAR | UCHAR)* '"'
     ;
 
 STRING_LITERAL_SINGLE_QUOTE
-    : '\'' ((~[\u0027\u005C\u0010\u0013]) | ECHAR | UCHAR)* '\''
+    : '\'' ((~[\u0027\u005C\u000A\u000D]) | ECHAR | UCHAR)* '\''
     ;
 
 STRING_LITERAL_LONG_SINGLE_QUOTE
-    : '\'\'\'' (('\'' | '\'\'')? ( (~['\\] ) | ECHAR | UCHAR))* '\'\'\''
+    : '\'\'\'' (LONG_STRING_CHAR_SINGLE | ECHAR | UCHAR)* '\'\'\''
     ;
 
 STRING_LITERAL_LONG_QUOTE
-    : '"""' (('"' | '""')? ( (~["'] ) | ECHAR | UCHAR))* '"""'
+    : '"""' (LONG_STRING_CHAR_DOUBLE | ECHAR | UCHAR)* '"""'
+    ;
+
+fragment LONG_STRING_CHAR_DOUBLE
+    : ~[\\"]
+    | '"' ~["]
+    | '"' '"' ~["]
+    ;
+
+fragment LONG_STRING_CHAR_SINGLE
+    : ~[\\']
+    | '\'' ~[']
+    | '\'' '\'' ~[']
     ;
 
 UCHAR
@@ -236,10 +250,10 @@ WHITESPACE
     ;
 
 ANON
-    : '[' WHITESPACE* ']'
+    : '[' [\u0009\u000A\u000D\u0020]* ']'
     ;
 
-PN_CHARS_BASE
+fragment PN_CHARS_BASE
     : 'A' .. 'Z'
     | 'a' .. 'z'
     | '\u00C0' .. '\u00D6'
@@ -253,15 +267,15 @@ PN_CHARS_BASE
     | '\u3001' .. '\uD7FF'
     | '\uF900' .. '\uFDCF'
     | '\uFDF0' .. '\uFFFD'
-//    | '\u10000' .. '\uEFFFF'
+    | '\u{10000}'..'\u{EFFFF}'
     ;
 
-PN_CHARS_U
+fragment PN_CHARS_U
     : PN_CHARS_BASE
     | '_'
     ;
 
-PN_CHARS
+fragment PN_CHARS
     : PN_CHARS_U
     | '-'
     | [0-9]
@@ -270,28 +284,28 @@ PN_CHARS
     | [\u203F-\u2040]
     ;
 
-PN_PREFIX
+fragment PN_PREFIX
     : PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
     ;
 
-PN_LOCAL
-    :  	(PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
+fragment PN_LOCAL
+    : (PN_CHARS_U | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
     ;
 
-PLX
+fragment PLX
     : PERCENT
     | PN_LOCAL_ESC
     ;
 
-PERCENT
+fragment PERCENT
     : '%' HEX HEX
     ;
 
-HEX
+fragment HEX
     : [0-9a-fA-F]
     ;
 
-PN_LOCAL_ESC
+fragment PN_LOCAL_ESC
     : '\\' (
         '_'
         | '~'

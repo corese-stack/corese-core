@@ -1,7 +1,7 @@
 grammar NQuads;
 
 nquadsDoc
-    : statement? (EOL* statement)* EOL*
+    : statement? (EOL* statement)* EOL* EOF
     ;
 
 statement
@@ -49,8 +49,7 @@ fragment IRI_CHAR
     ;
 
 STRING_LITERAL_QUOTE
-    : '"""' ( ~('"') | '"' ~('"') | '""' ~('"') | ECHAR | UCHAR )* '"""'
-    | '"' ( ~( [\u0022] | [\u005C] | [\u000A] | [\u000D] ) | ECHAR | UCHAR )* '"'
+    : '"' ( ~( [\u0022] | [\u005C] | [\u000A] | [\u000D] ) | ECHAR | UCHAR )* '"'
     ;
 
 BLANK_NODE_LABEL

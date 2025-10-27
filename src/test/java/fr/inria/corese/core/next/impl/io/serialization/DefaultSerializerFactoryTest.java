@@ -1,23 +1,29 @@
 package fr.inria.corese.core.next.impl.io.serialization;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
-import fr.inria.corese.core.next.impl.io.serialization.canonical.Rdfc10Serializer;
-import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
+import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.Rdfc10Serializer;
+import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
 
 /**
  * Unit tests for the {@link DefaultSerializerFactory} class.
@@ -30,7 +36,6 @@ class DefaultSerializerFactoryTest {
     private DefaultSerializerFactory factory;
     private Model mockModel;
     private SerializationOption mockConfig;
-
 
     @BeforeEach
     void setUp() {
@@ -47,7 +52,8 @@ class DefaultSerializerFactoryTest {
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof TurtleSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "TurtleSerializer constructor should be called once");
+            assertEquals(1, mockedConstruction.constructed().size(),
+                    "TurtleSerializer constructor should be called once");
         }
     }
 
@@ -59,7 +65,8 @@ class DefaultSerializerFactoryTest {
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof NTriplesSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "NTriplesSerializer constructor should be called once");
+            assertEquals(1, mockedConstruction.constructed().size(),
+                    "NTriplesSerializer constructor should be called once");
         }
     }
 
@@ -71,7 +78,8 @@ class DefaultSerializerFactoryTest {
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof NQuadsSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "NQuadsSerializer constructor should be called once");
+            assertEquals(1, mockedConstruction.constructed().size(),
+                    "NQuadsSerializer constructor should be called once");
         }
     }
 
@@ -83,7 +91,8 @@ class DefaultSerializerFactoryTest {
 
             assertNotNull(serializer);
             assertTrue(serializer instanceof TriGSerializer);
-            assertEquals(1, mockedConstruction.constructed().size(), "TriGSerializer constructor should be called once");
+            assertEquals(1, mockedConstruction.constructed().size(),
+                    "TriGSerializer constructor should be called once");
         }
     }
 
@@ -108,6 +117,19 @@ class DefaultSerializerFactoryTest {
             assertNotNull(serializer);
             assertTrue(serializer instanceof Rdfc10Serializer);
             assertEquals(1, mockedConstruction.constructed().size(), "CanonicalSerializer constructor should be called once");
+        }
+    }
+
+    @Test
+    @DisplayName("createSerializer should return JSONLDSerializer for JSONLD format")
+    void createSerializer_shouldReturnJSONLDSerializer_forJSONLDFormat() {
+        try (MockedConstruction<JSONLDSerializer> mockedConstruction = mockConstruction(JSONLDSerializer.class)) {
+            RDFSerializer serializer = factory.createSerializer(RDFFormat.JSONLD, mockModel, mockConfig);
+
+            assertNotNull(serializer);
+            assertTrue(serializer instanceof JSONLDSerializer);
+            assertEquals(1, mockedConstruction.constructed().size(),
+                    "JSONLDSerializer constructor should be called once");
         }
     }
 

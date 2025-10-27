@@ -2,25 +2,8 @@
  [The "BSD licence"]
  Copyright (c) 2014, Alejandro Medrano (@ Universidad Politecnica de Madrid, http://www.upm.es/)
  All rights reserved.
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
- 1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 */
 /* Derived from http://www.w3.org/TR/turtle/#sec-grammar-grammar */
-
-// $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
-// $antlr-format allowShortRulesOnASingleLine false, allowShortBlocksOnASingleLine true, alignSemicolons hanging, alignColons hanging
 
 grammar Turtle;
 
@@ -67,6 +50,7 @@ subject
 predicate
     : iri
     ;
+
 
 object_
     : iri
@@ -130,7 +114,8 @@ string
 
 iri
     : IRIREF
-    | PrefixedName
+    | PNAME_LN
+    | PNAME_NS
     ;
 
 BlankNode
@@ -152,14 +137,12 @@ Prefix_w options { caseInsensitive=true; }
     : 'PREFIX'
     ;
 
-// PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
-// Prefix without the final ':'
 PN_PREFIX
     : PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
     ;
 
 IRIREF
-    : '<' ((~( '\u0000' | '\u0020' | '<' | '>' | '"' | '{' | '}' | '|' | '^' | '`' |'\\' )) | UCHAR)*  '>'
+    : '<' (~( '\u0000' | '\u0020' | '<' | '>' | '"' | '{' | '}' | '|' | '^' | '`' | '\\' ) | UCHAR)* '>'
     ;
 
 // Prefix alone
@@ -167,12 +150,6 @@ PNAME_NS
     : PN_PREFIX? ':'
     ;
 
-PrefixedName
-    : PNAME_LN
-    | PNAME_NS
-    ;
-
-// Prefix + local name
 PNAME_LN
     : PNAME_NS PN_LOCAL
     ;
@@ -205,20 +182,28 @@ EXPONENT
 
 // "'''" (("'" | "''")? ([^'\] | ECHAR | UCHAR))* "'''"
 STRING_LITERAL_LONG_SINGLE_QUOTE
-    : '\'\'\'' ( ('\'' '\''? )? ( [^'\\] | ECHAR | UCHAR | '"' ) )*  '\'\'\''
+    : '\'\'\'' (
+        ( ~['\\] | ECHAR | UCHAR )
+        | '\'' ~['\\]
+        | '\'\'' ~['\\]
+      )* '\'\'\''
     ;
 
 // '"""' (('"' | '""')? ([^"\] | ECHAR | UCHAR))* '"""'
 STRING_LITERAL_LONG_QUOTE
-    : '"""' ( ('"' '"'? )? ( (~["\\]) | ECHAR | UCHAR )+ )* '"""'
+    : '"""' (
+        ( ~["\\] | ECHAR | UCHAR )
+        | '"' ~["\\]
+        | '""' ~["\\]
+      )* '"""'
     ;
 
 STRING_LITERAL_QUOTE
-    : '"'  (~ [\u0027\u005C\u000A\u000D] | ECHAR | UCHAR | '"')* '"'
+    : '"'  (~["\\\r\n] | ECHAR | UCHAR)* '"'
     ;
 
 STRING_LITERAL_SINGLE_QUOTE
-    : '\'' (~ [\u0027\u005C\u000A\u000D] | ECHAR | UCHAR | '\'')* '\''
+    : '\'' (~['\\\r\n] | ECHAR | UCHAR)* '\''
     ;
 
 // Hexadecimal unicode character
@@ -257,7 +242,7 @@ PN_CHARS_BASE
     | '\u3001' .. '\uD7FF'
     | '\uF900' .. '\uFDCF'
     | '\uFDF0' .. '\uFFFD'
-//    | '\u10000' .. '\uEFFFF'
+    | '\u{10000}'..'\u{EFFFF}'
     ;
 
 PN_CHARS_U

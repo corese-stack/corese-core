@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.api.Value;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
+import fr.inria.corese.core.next.impl.io.parser.common.AbstractNTriplesNQuadsListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesBaseListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
 
@@ -18,16 +19,15 @@ import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
  */
 public class NTriplesListener extends NTriplesBaseListener {
 
+    private final AbstractNTriplesNQuadsListener abstractNTriplesQuadsListener;
     private final Model model;
     private final ValueFactory factory;
-    @SuppressWarnings("unused")
-    private final IOOptions options;
 
     private Resource currentSubject;
     private IRI currentPredicate;
 
     /**
-     * Constructor for the NTriplesListener.
+     * Constructs an N-Triples listener.
      *
      * @param model   The RDF model to populate.
      * @param factory The ValueFactory for creating RDF resources.
@@ -36,7 +36,7 @@ public class NTriplesListener extends NTriplesBaseListener {
     public NTriplesListener(Model model, ValueFactory factory, IOOptions options) {
         this.model = model;
         this.factory = factory;
-        this.options = options;
+        this.abstractNTriplesQuadsListener = new AbstractNTriplesNQuadsListener(model, factory, options) {};
     }
 
     @Override
@@ -58,18 +58,15 @@ public class NTriplesListener extends NTriplesBaseListener {
      */
     protected Resource extractSubject(NTriplesParser.SubjectContext ctx) {
         if (ctx.IRIREF() != null) {
-            return factory.createIRI(unescapeUri(ctx.IRIREF().getText().substring(1, ctx.IRIREF().getText().length() - 1)));
+            String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
+            return factory.createIRI(iri);
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
-            String blankNodeLabel = ctx.BLANK_NODE_LABEL().getText().substring(2);
-            try {
-                validateBlankNodeLabel(blankNodeLabel);
-            } catch (ParsingErrorException e) {
-                throw new IllegalArgumentException("Invalid blank node label in subject: " + e.getMessage(), e);
-            }
-            return factory.createBNode(blankNodeLabel);
+            String label = abstractNTriplesQuadsListener.extractBlankNodeLabel(ctx.BLANK_NODE_LABEL().getText());
+            abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
+            return factory.createBNode(label);
         }
-        throw new IllegalArgumentException("Unsupported N-Triples subject: " + ctx.getText());
+        throw new ParsingErrorException("Unsupported N-Triples subject: " + ctx.getText());
     }
 
     /**
@@ -77,9 +74,10 @@ public class NTriplesListener extends NTriplesBaseListener {
      */
     protected IRI extractPredicate(NTriplesParser.PredicateContext ctx) {
         if (ctx.IRIREF() != null) {
-            return factory.createIRI(unescapeUri(ctx.IRIREF().getText().substring(1, ctx.IRIREF().getText().length() - 1)));
+            String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
+            return factory.createIRI(iri);
         }
-        throw new IllegalArgumentException("Unsupported N-Triples predicate: " + ctx.getText());
+        throw new ParsingErrorException("Unsupported N-Triples predicate: " + ctx.getText());
     }
 
     /**
@@ -87,216 +85,75 @@ public class NTriplesListener extends NTriplesBaseListener {
      */
     protected Value extractObject(NTriplesParser.ObjectContext ctx) {
         if (ctx.IRIREF() != null) {
-            return factory.createIRI(unescapeUri(ctx.IRIREF().getText().substring(1, ctx.IRIREF().getText().length() - 1)));
+            String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
+            return factory.createIRI(iri);
         }
         if (ctx.BLANK_NODE_LABEL() != null) {
-            String blankNodeLabel = ctx.BLANK_NODE_LABEL().getText().substring(2);
-            try {
-                validateBlankNodeLabel(blankNodeLabel);
-            } catch (ParsingErrorException e) {
-                throw new IllegalArgumentException("Invalid blank node label in object: " + e.getMessage(), e);
-            }
-            return factory.createBNode(blankNodeLabel);
+            String label = abstractNTriplesQuadsListener.extractBlankNodeLabel(ctx.BLANK_NODE_LABEL().getText());
+            abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
+            return factory.createBNode(label);
         }
         if (ctx.literal() != null) {
             return extractLiteral(ctx.literal());
         }
-        throw new IllegalArgumentException("Unsupported N-Triples object: " + ctx.getText());
+        throw new ParsingErrorException("Unsupported N-Triples object: " + ctx.getText());
     }
 
     /**
      * Extracts and unescapes a literal from the ANTLR context.
-     * This method handles string literals with or without datatype/language.
      */
     protected Literal extractLiteral(NTriplesParser.LiteralContext ctx) {
-        String label = ctx.STRING_LITERAL_QUOTE().getText();
-        label = unescapeLiteral(label);
+        String rawText = ctx.STRING_LITERAL_QUOTE().getText();
+        String label = abstractNTriplesQuadsListener.unescapeLiteral(rawText);
+
+        IRI datatype = null;
+        String langTag = null;
 
         if (ctx.IRIREF() != null) {
-            IRI datatype = factory.createIRI(unescapeUri(ctx.IRIREF().getText().substring(1, ctx.IRIREF().getText().length() - 1)));
-            return factory.createLiteral(label, datatype);
+            String iri = abstractNTriplesQuadsListener.unescapeUri(abstractNTriplesQuadsListener.stripAngles(ctx.IRIREF().getText()));
+            datatype = factory.createIRI(iri);
+        } else if (ctx.LANGTAG() != null) {
+            langTag = ctx.LANGTAG().getText().substring(1);
         }
-        if (ctx.LANGTAG() != null) {
-            String lang = ctx.LANGTAG().getText().substring(1);
-            return factory.createLiteral(label, lang);
-        }
-        return factory.createLiteral(label);
+
+        return abstractNTriplesQuadsListener.createLiteral(label, datatype, langTag);
     }
 
     /**
      * Validates a blank node label according to RDF N-Triples specification.
      * Blank node labels must not be empty and must not contain a colon.
-     * They *can* start with a digit.
      *
-     * @param label The blank node label (without the `_: `prefix).
-     * @throws ParsingErrorException if the label is invalid.
+     * @param label The blank node label (without the "_:" prefix)
+     * @throws ParsingErrorException if the label is invalid
+     * @deprecated Use helper.validateBlankNodeLabel instead
      */
+    @Deprecated
     protected void validateBlankNodeLabel(String label) throws ParsingErrorException {
-        if (label == null || label.isEmpty()) {
-            throw new ParsingErrorException("Blank node label cannot be empty.");
-        }
-
-        if (label.contains(":")) {
-            throw new ParsingErrorException("Blank node label cannot contain a colon (':')");
-        }
-
+        abstractNTriplesQuadsListener.validateBlankNodeLabel(label);
     }
 
     /**
      * Unescapes common N-Triples literal escape sequences.
-     * This method handles `\"`, `\\`, `\n`, `\t`, `\r`, `\b`, `\f`.
-     * It also handles `\ uXXXX` and `\UXXXXXXXX` for Unicode escapes.
-     * It also removes the surrounding quotes from the literal string.
      *
-     * @param literalText The raw literal string from ANTLR (including quotes and escapes).
-     * @return The unescaped literal string without surrounding quotes.
+     * @param literalText The raw literal string from ANTLR (including quotes)
+     * @return The unescaped literal string without surrounding quotes
+     * @deprecated Use helper.unescapeLiteral instead
      */
+    @Deprecated
     protected String unescapeLiteral(String literalText) {
-        String unquotedLiteral = literalText.substring(1, literalText.length() - 1);
-
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < unquotedLiteral.length(); i++) {
-            char c = unquotedLiteral.charAt(i);
-            if (c == '\\' && i + 1 < unquotedLiteral.length()) {
-                char nextChar = unquotedLiteral.charAt(i + 1);
-                switch (nextChar) {
-                    case '"':
-                        builder.append('"');
-                        i++;
-                        break;
-                    case '\\':
-                        builder.append('\\');
-                        i++;
-                        break;
-                    case 'n':
-                        builder.append('\n');
-                        i++;
-                        break;
-                    case 't':
-                        builder.append('\t');
-                        i++;
-                        break;
-                    case 'r':
-                        builder.append('\r');
-                        i++;
-                        break;
-                    case 'b':
-                        builder.append('\b');
-                        i++;
-                        break;
-                    case 'f':
-                        builder.append('\f');
-                        i++;
-                        break;
-                    case 'u':
-                        if (i + 5 < unquotedLiteral.length()) {
-                            String hex = unquotedLiteral.substring(i + 2, i + 6);
-                            try {
-                                int unicodeChar = Integer.parseInt(hex, 16);
-                                builder.append((char) unicodeChar);
-                                i += 5;
-                            } catch (NumberFormatException e) {
-                                throw new IllegalArgumentException("Invalid \\uXXXX escape sequence in literal: \\u" + hex);
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Incomplete \\uXXXX escape sequence in literal: " + unquotedLiteral.substring(i));
-                        }
-                        break;
-                    case 'U':
-                        if (i + 9 < unquotedLiteral.length()) {
-                            String hex = unquotedLiteral.substring(i + 2, i + 10);
-                            try {
-                                int unicodeChar = Integer.parseInt(hex, 16);
-                                if (Character.isSupplementaryCodePoint(unicodeChar)) {
-                                    builder.append(Character.highSurrogate(unicodeChar));
-                                    builder.append(Character.lowSurrogate(unicodeChar));
-                                } else {
-                                    builder.append((char) unicodeChar);
-                                }
-                                i += 9;
-                            } catch (NumberFormatException e) {
-                                throw new IllegalArgumentException("Invalid \\UXXXXXXXX escape sequence in literal: \\U" + hex);
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Incomplete \\UXXXXXXXX escape sequence in literal: " + unquotedLiteral.substring(i));
-                        }
-                        break;
-                    default:
-                        builder.append(c).append(nextChar);
-                        i++;
-                        break;
-                }
-            } else {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
+        return abstractNTriplesQuadsListener.unescapeLiteral(literalText);
     }
 
     /**
      * Unescapes common N-Triples URI escape sequences.
-     * This method handles `\>`, `\\`, `\ nXXXX`, `\UXXXXXXXX`.
      *
-     * @param uri The escaped URI string.
-     * @return The unescaped URI string.
+     * @param uri The escaped URI string
+     * @return The unescaped URI string
+     * @deprecated Use helper.unescapeUri instead
      */
+    @Deprecated
     protected String unescapeUri(String uri) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < uri.length(); i++) {
-            char c = uri.charAt(i);
-            if (c == '\\' && i + 1 < uri.length()) {
-                char nextChar = uri.charAt(i + 1);
-                switch (nextChar) {
-                    case '>':
-                        builder.append('>');
-                        i++;
-                        break;
-                    case '\\':
-                        builder.append('\\');
-                        i++;
-                        break;
-                    case 'u':
-                        if (i + 5 < uri.length()) {
-                            String hex = uri.substring(i + 2, i + 6);
-                            try {
-                                int unicodeChar = Integer.parseInt(hex, 16);
-                                builder.append((char) unicodeChar);
-                                i += 5;
-                            } catch (NumberFormatException e) {
-                                throw new IllegalArgumentException("Invalid \\uXXXX escape sequence in URI: \\u" + hex);
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Incomplete \\uXXXX escape sequence in URI: " + uri.substring(i));
-                        }
-                        break;
-                    case 'U':
-                        if (i + 9 < uri.length()) {
-                            String hex = uri.substring(i + 2, i + 10);
-                            try {
-                                int unicodeChar = Integer.parseInt(hex, 16);
-                                if (Character.isSupplementaryCodePoint(unicodeChar)) {
-                                    builder.append(Character.highSurrogate(unicodeChar));
-                                    builder.append(Character.lowSurrogate(unicodeChar));
-                                } else {
-                                    builder.append((char) unicodeChar);
-                                }
-                                i += 9;
-                            } catch (NumberFormatException e) {
-                                throw new IllegalArgumentException("Invalid \\UXXXXXXXX escape sequence in URI: \\U" + hex);
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Incomplete \\UXXXXXXXX escape sequence in URI: " + uri.substring(i));
-                        }
-                        break;
-                    default:
-                        builder.append(c).append(nextChar);
-                        i++;
-                        break;
-                }
-            } else {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
+        return abstractNTriplesQuadsListener.unescapeUri(uri);
     }
 }
+

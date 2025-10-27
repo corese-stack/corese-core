@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for the TurtleListenerImpl parser.
  */
-class TurtleListenerImplTest {
+class TurtleListenerTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(TurtleListenerImplTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(TurtleListenerTest.class);
 
     /**
      * Parses a Turtle string and returns the RDF model.
@@ -44,7 +44,7 @@ class TurtleListenerImplTest {
         ParseTree tree = parser.turtleDoc();
 
         Model model = new CoreseModel();
-        TurtleListenerImpl listener = new TurtleListenerImpl(model, factory, null);
+        TurtleListener listener = new TurtleListener(model, factory, null);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk((ParseTreeListener) listener, tree);
 

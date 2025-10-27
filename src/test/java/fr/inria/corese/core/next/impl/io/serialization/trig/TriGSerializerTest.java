@@ -475,7 +475,7 @@ class TriGSerializerTest {
                 
                 graph:g1 {
                   data:person1 data:name "Alice" .
-                } .
+                }
                 
                 """;
 
