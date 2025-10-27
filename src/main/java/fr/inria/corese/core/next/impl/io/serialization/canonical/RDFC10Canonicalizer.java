@@ -174,7 +174,8 @@ public class RDFC10Canonicalizer {
             Map<String, String> nDegreeHashes = new HashMap<>();
             for (String node : nodes) {
                 TemporaryIssuer tempIssuer = new TemporaryIssuer();
-                String nDegreeHash = hashNDegreeQuads(node, bnodeToQuads, canonicalIssuer, tempIssuer);
+                Set<String> visitedInPath = new HashSet<>();
+                String nDegreeHash = hashNDegreeQuads(node, bnodeToQuads, canonicalIssuer, tempIssuer, visitedInPath);
                 nDegreeHashes.put(node, nDegreeHash);
             }
 
@@ -206,7 +207,7 @@ public class RDFC10Canonicalizer {
         List<String> nquads = new ArrayList<>();
 
         for (Statement quad : quads) {
-            String nquad = quadToNQuad(quad, blankNode, SerializationConstants.CANONICAL_BNODE_PLACEHOLDER);
+            String nquad = StatementUtils.quadToNQuad(quad, blankNode, SerializationConstants.CANONICAL_BNODE_PLACEHOLDER);
             nquads.add(nquad);
         }
 
@@ -225,11 +226,13 @@ public class RDFC10Canonicalizer {
      * @param blankNodeToQuads The map of blank nodes to their associated statements.
      * @param canonicalIssuer  Map of already-assigned canonical identifiers.
      * @param issuer           Temporary identifier issuer for the current recursion path.
+     * @param visitedInPath    Set of nodes already visited in the current recursion path (cycle detection).
      * @return A hash representing the N-degree context of the blank node.
      * @throws SerializationException if the maximum recursion depth is exceeded.
      */
     private String hashNDegreeQuads(String identifier, Map<String, Set<Statement>> blankNodeToQuads,
-                                    Map<String, String> canonicalIssuer, TemporaryIssuer issuer) {
+                                    Map<String, String> canonicalIssuer, TemporaryIssuer issuer,
+                                    Set<String> visitedInPath) {
 
         if (++callsHashNDegreeQuads > maxCallsHashNDegreeQuads) {
             throw new SerializationException(
@@ -237,6 +240,16 @@ public class RDFC10Canonicalizer {
                     "Rdfc10Canonicalizer"
             );
         }
+
+        // This prevents infinite loops when dealing with circular blank node references
+        if (visitedInPath.contains(identifier)) {
+            // Return a hash based only on first-degree quads for this node
+            // This breaks the cycle while maintaining deterministic results
+            return hashFirstDegreeQuads(identifier, blankNodeToQuads);
+        }
+
+        // Mark this node as visited in the current recursion path
+        visitedInPath.add(identifier);
 
         // Collect all related blank nodes from all quads containing this node
         Set<String> relatedBlankNodes = new HashSet<>();
@@ -255,10 +268,14 @@ public class RDFC10Canonicalizer {
             } else if (issuer.hasIssued(relatedNode)) {
                 // Use temporary ID if already issued
                 relatedHash = issuer.issue(relatedNode);
+            } else if (visitedInPath.contains(relatedNode)) {
+                // we have a cycle. Use its first-degree hash instead of recursing.
+                relatedHash = hashFirstDegreeQuads(relatedNode, blankNodeToQuads);
             } else {
                 // Recursively calculate N-degree hash
                 TemporaryIssuer newIssuer = issuer.copy();
-                relatedHash = hashNDegreeQuads(relatedNode, blankNodeToQuads, canonicalIssuer, newIssuer);
+                Set<String> newVisitedInPath = new HashSet<>(visitedInPath);
+                relatedHash = hashNDegreeQuads(relatedNode, blankNodeToQuads, canonicalIssuer, newIssuer, newVisitedInPath);
             }
 
             relatedHashes.add(relatedHash);
@@ -275,53 +292,6 @@ public class RDFC10Canonicalizer {
         }
 
         return hash(hashInput.toString());
-    }
-
-    /**
-     * Converts a statement to canonical N-Quad format for hashing, replacing
-     * a specific blank node with a placeholder string.
-     *
-     * @param quad             The statement to convert.
-     * @param blankNodeToReplace The blank node identifier to replace.
-     * @param replacement      The placeholder string to use for replacement.
-     * @return A canonical N-Quad string with placeholder substitution.
-     */
-    private String quadToNQuad(Statement quad, String blankNodeToReplace, String replacement) {
-        StringBuilder sb = new StringBuilder();
-
-        // Handle subject
-        if (StatementUtils.isBlankNode(quad.getSubject())) {
-            String bnodeId = StatementUtils.getBlankNodeId(quad.getSubject());
-            sb.append(bnodeId.equals(blankNodeToReplace) ? replacement : SerializationConstants.CANONICAL_BNODE_PREFIX);
-        } else {
-            sb.append(StatementUtils.serializeForComparison(quad.getSubject()));
-        }
-        sb.append(SerializationConstants.SPACE);
-
-        // Predicate
-        sb.append(StatementUtils.serializeForComparison(quad.getPredicate())).append(SerializationConstants.SPACE);
-
-        // Handle object
-        if (StatementUtils.isBlankNode(quad.getObject())) {
-            String bnodeId = StatementUtils.getBlankNodeId(quad.getObject());
-            sb.append(bnodeId.equals(blankNodeToReplace) ? replacement : SerializationConstants.CANONICAL_BNODE_PREFIX);
-        } else {
-            sb.append(StatementUtils.serializeForComparison(quad.getObject()));
-        }
-
-        // Handle context
-        if (quad.getContext() != null) {
-            sb.append(SerializationConstants.SPACE);
-            if (StatementUtils.isBlankNode(quad.getContext())) {
-                String bnodeId = StatementUtils.getBlankNodeId(quad.getContext());
-                sb.append(bnodeId.equals(blankNodeToReplace) ? replacement : SerializationConstants.CANONICAL_BNODE_PREFIX);
-            } else {
-                sb.append(StatementUtils.serializeForComparison(quad.getContext()));
-            }
-        }
-
-        sb.append(SerializationConstants.SPACE).append(SerializationConstants.POINT);
-        return sb.toString();
     }
 
     /**

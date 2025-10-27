@@ -278,68 +278,49 @@ public class StatementUtils {
 
 
     /**
-     * Converts a statement to canonical N-Quad format for hashing in RDFC-1.0,
-     * replacing a specific blank node with a placeholder string.
-     * This is used specifically in the Hash First Degree Quads algorithm.
+     * Converts a statement to canonical N-Quad format for hashing, replacing
+     * a specific blank node with a placeholder string.
      *
-     * @param quad The statement to convert
-     * @param blankNodeToReplace The blank node identifier to replace with placeholder
-     * @return A canonical N-Quad string with placeholder substitution
+     * @param quad             The statement to convert.
+     * @param blankNodeToReplace The blank node identifier to replace.
+     * @param replacement      The placeholder string to use for replacement.
+     * @return A canonical N-Quad string with placeholder substitution.
      */
-    public String quadToCanonicalNQuad(Statement quad, String blankNodeToReplace) {
-        if (quad == null) {
-            return SerializationConstants.EMPTY_STRING;
-        }
-
+    public static String quadToNQuad(Statement quad, String blankNodeToReplace, String replacement) {
         StringBuilder sb = new StringBuilder();
 
-        // Subject
-        if (isBlankNode(quad.getSubject())) {
-            String bnodeId = getBlankNodeId(quad.getSubject());
-            if (bnodeId.equals(blankNodeToReplace)) {
-                sb.append(SerializationConstants.CANONICAL_BNODE_PLACEHOLDER);
-            } else {
-                // Use consistent prefix for all non-replaced blank nodes
-                sb.append(SerializationConstants.CANONICAL_BNODE_PREFIX).append(bnodeId);
-            }
+        // Handle subject
+        if (StatementUtils.isBlankNode(quad.getSubject())) {
+            String bnodeId = StatementUtils.getBlankNodeId(quad.getSubject());
+            sb.append(bnodeId.equals(blankNodeToReplace) ? replacement : SerializationConstants.CANONICAL_BNODE_PREFIX);
         } else {
-            sb.append(serializeForComparison(quad.getSubject()));
+            sb.append(StatementUtils.serializeForComparison(quad.getSubject()));
         }
         sb.append(SerializationConstants.SPACE);
 
         // Predicate
-        sb.append(serializeForComparison(quad.getPredicate()))
-                .append(SerializationConstants.SPACE);
+        sb.append(StatementUtils.serializeForComparison(quad.getPredicate())).append(SerializationConstants.SPACE);
 
-        // Object
-        if (isBlankNode(quad.getObject())) {
-            String bnodeId = getBlankNodeId(quad.getObject());
-            if (bnodeId.equals(blankNodeToReplace)) {
-                sb.append(SerializationConstants.CANONICAL_BNODE_PLACEHOLDER);
-            } else {
-                sb.append(SerializationConstants.CANONICAL_BNODE_PREFIX).append(bnodeId);
-            }
+        // Handle object
+        if (StatementUtils.isBlankNode(quad.getObject())) {
+            String bnodeId = StatementUtils.getBlankNodeId(quad.getObject());
+            sb.append(bnodeId.equals(blankNodeToReplace) ? replacement : SerializationConstants.CANONICAL_BNODE_PREFIX);
         } else {
-            sb.append(serializeForComparison(quad.getObject()));
+            sb.append(StatementUtils.serializeForComparison(quad.getObject()));
         }
 
-        // Context (graph)
+        // Handle context
         if (quad.getContext() != null) {
             sb.append(SerializationConstants.SPACE);
-            if (isBlankNode(quad.getContext())) {
-                String bnodeId = getBlankNodeId(quad.getContext());
-                if (bnodeId.equals(blankNodeToReplace)) {
-                    sb.append(SerializationConstants.CANONICAL_BNODE_PLACEHOLDER);
-                } else {
-                    sb.append(SerializationConstants.CANONICAL_BNODE_PREFIX).append(bnodeId);
-                }
+            if (StatementUtils.isBlankNode(quad.getContext())) {
+                String bnodeId = StatementUtils.getBlankNodeId(quad.getContext());
+                sb.append(bnodeId.equals(blankNodeToReplace) ? replacement : SerializationConstants.CANONICAL_BNODE_PREFIX);
             } else {
-                sb.append(serializeForComparison(quad.getContext()));
+                sb.append(StatementUtils.serializeForComparison(quad.getContext()));
             }
         }
 
         sb.append(SerializationConstants.SPACE).append(SerializationConstants.POINT);
-
         return sb.toString();
     }
 }
