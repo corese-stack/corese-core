@@ -38,6 +38,7 @@ import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,7 +251,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
             }
             @Override
             public String getValue() {
-                return "_:" + bnode.stringValue();
+                return ParserConstants.BLANK_NODE_PREFIX + bnode.stringValue();
             }
         };
     }
