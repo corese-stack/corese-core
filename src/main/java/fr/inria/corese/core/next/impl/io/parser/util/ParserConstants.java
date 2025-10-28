@@ -94,6 +94,10 @@ public final class ParserConstants {
      * @return the default base URI from configuration, or null if not set
      */
     public static String getDefaultBaseURI() {
-        return Property.getStringValue(Property.Value.DEFAULT_BASE_URI);
+        String configuredValue = Property.getStringValue(Property.Value.DEFAULT_BASE_URI);
+        if (configuredValue == null || configuredValue.isEmpty()) {
+            return "http://example.org/";
+        }
+        return configuredValue;
     }
 }
