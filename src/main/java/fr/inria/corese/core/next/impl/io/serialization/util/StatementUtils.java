@@ -191,11 +191,12 @@ public class StatementUtils {
             return sb.toString();
         }
 
-        // For all other datatypes, include them explicitly
-        sb.append(SerializationConstants.DATATYPE_SEPARATOR)
-                .append(SerializationConstants.LT)
-                .append(datatype)
-                .append(SerializationConstants.GT);
+        if (datatype != null && !datatype.equals(SerializationConstants.XSD_STRING)) {
+            sb.append(SerializationConstants.DATATYPE_SEPARATOR)
+                    .append(SerializationConstants.LT)
+                    .append(datatype)
+                    .append(SerializationConstants.GT);
+        }
 
         return sb.toString();
     }
