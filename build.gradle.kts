@@ -139,6 +139,9 @@ dependencies {
     implementation("com.typesafe.akka:akka-stream_2.13:2.6.20")                        // Akka Streams for reactive streams processing
     implementation("com.lightbend.akka:akka-stream-alpakka-xml_2.13:3.0.4")            // Alpakka XML for XML processing with Akka Streams
 
+    // HTML parsing for RDFa
+    implementation("org.jsoup:jsoup:1.21.2")
+
     // === Utilities ===
     implementation("org.apache.commons:commons-text:1.13.1")                           // Text manipulation utilities (Commons Text)
     implementation("org.json:json:20250517")                                           // JSON processing

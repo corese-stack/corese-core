@@ -23,7 +23,6 @@ public class RDFFormat extends FileFormat {
             true,
             false);
 
-
     public static final RDFFormat NTRIPLES = new RDFFormat(
             "N-Triples",
             List.of("nt"),
@@ -65,6 +64,13 @@ public class RDFFormat extends FileFormat {
             List.of("application/n-quads", "application/n-quads"),
             false,
             true);
+
+    public static final RDFFormat RDFa = new RDFFormat(
+            "RDFa",
+            List.of("html"),
+            List.of("text/html", "application/xhtml+xml"),
+            true,
+            false);
 
     /**
      * Constructs a new RDF format.
@@ -152,7 +158,7 @@ public class RDFFormat extends FileFormat {
      * @return An unmodifiable List of all RdfFormat constants.
      */
     public static List<RDFFormat> all() {
-        return List.of(TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML, TRIG);
+        return List.of(TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML, TRIG, RDFC_1_0, RDFa);
     }
 
     @Override
