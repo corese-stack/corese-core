@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
  * and unescaping of IRIs and literals, and named graphs.
  */
 @ExtendWith(MockitoExtension.class)
-class ANTLRNQuadsParserTest {
+class NQuadsParserTest {
 
     @Mock
     private Model mockModel;
@@ -30,7 +30,7 @@ class ANTLRNQuadsParserTest {
     @Mock
     private ValueFactory mockValueFactory;
 
-    private ANTLRNQuadsParser parser;
+    private NQuadsParser parser;
 
     @Mock
     private IRI mockSubjectIRI;
@@ -62,7 +62,7 @@ class ANTLRNQuadsParserTest {
 
     @BeforeEach
     void setUp() {
-        parser = new ANTLRNQuadsParser(mockModel, mockValueFactory);
+        parser = new NQuadsParser(mockModel, mockValueFactory);
 
         lenient().when(mockValueFactory.createIRI(anyString())).thenAnswer(invocation -> {
             String uri = invocation.getArgument(0);

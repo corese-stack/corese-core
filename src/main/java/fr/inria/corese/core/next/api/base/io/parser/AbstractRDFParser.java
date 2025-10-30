@@ -1,12 +1,16 @@
 package fr.inria.corese.core.next.api.base.io.parser;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
+import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 
 /**
@@ -38,13 +42,14 @@ public abstract class AbstractRDFParser implements RDFParser {
 
     /**
      * Constructor for AbstractRDFParser that initializes the model and value
-     * factory.
+     * factory. Ths created object will use an empty AbstractIOOptions object as configuration
      *
      * @param model   the model to be populated by the parser
      * @param factory the value factory used to create RDF values
      */
     protected AbstractRDFParser(Model model, ValueFactory factory) {
-        this(model, factory, null);
+        this(model, factory, new AbstractIOOptions() {
+        });
     }
 
     /**
@@ -58,6 +63,7 @@ public abstract class AbstractRDFParser implements RDFParser {
     protected AbstractRDFParser(Model model, ValueFactory factory, IOOptions config) {
         Objects.requireNonNull(model);
         Objects.requireNonNull(factory);
+        Objects.requireNonNull(config);
         this.model = model;
         this.valueFactory = factory;
         this.config = config;
@@ -65,12 +71,22 @@ public abstract class AbstractRDFParser implements RDFParser {
 
     @Override
     public void parse(InputStream in) {
-        parse(in, null);
+        if(getConfig() instanceof BaseIRIOptions) {
+            String baseIRI = ((BaseIRIOptions) getConfig()).getBaseIRI();
+            parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseIRI);
+        } else {
+            parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
+        }
     }
 
     @Override
     public void parse(Reader reader) {
-        parse(reader, null);
+        if(getConfig() instanceof BaseIRIOptions) {
+            String baseIRI = ((BaseIRIOptions) getConfig()).getBaseIRI();
+            parse(reader, baseIRI);
+        } else {
+            parse(reader, null);
+        }
     }
 
     /**

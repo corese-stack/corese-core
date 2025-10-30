@@ -43,24 +43,24 @@ public class TriGSerializer extends AbstractGraphSerializer {
 
     /**
      * Constructs a new {@code TriGSerializer} instance with the specified model and default configuration.
-     * The default configuration is returned by {@link TriGOption#defaultConfig()}.
+     * The default configuration is returned by {@link TriGSerializerOptions#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public TriGSerializer(Model model) {
-        this(model, TriGOption.defaultConfig());
+        this(model, TriGSerializerOptions.defaultConfig());
     }
 
     /**
      * Constructs a new {@code TriGSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link TriGOption} to use for serialization. Must not be null.
+     * @param config the {@link TriGSerializerOptions} to use for serialization. Must not be null.
      *               This config object should be an instance of {@code TriGConfig} or a subclass thereof.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public TriGSerializer(Model model, TriGOption config) {
+    public TriGSerializer(Model model, TriGSerializerOptions config) {
         super(model, config);
         Objects.requireNonNull(config, "TriGConfig cannot be null");
     }
@@ -82,12 +82,12 @@ public class TriGSerializer extends AbstractGraphSerializer {
      * @return The config cast to TriGConfig.
      * @throws IllegalStateException if the config is not an instance of TriGConfig.
      */
-    private TriGOption getTriGConfig() {
-        if (!(option instanceof TriGOption)) {
+    private TriGSerializerOptions getTriGConfig() {
+        if (!(option instanceof TriGSerializerOptions)) {
             throw new IllegalStateException("Current serializer configuration is not an instance of TriGConfig. " +
                     "TriGSerializer requires a TriGConfig instance.");
         }
-        return (TriGOption) option;
+        return (TriGSerializerOptions) option;
     }
 
     /**
@@ -99,7 +99,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
      */
     @Override
     protected void doWriteStatements(Writer writer) throws IOException {
-        TriGOption trigConfig = getTriGConfig();
+        TriGSerializerOptions trigConfig = getTriGConfig();
 
         if (trigConfig.includeContext()) {
             writeStatementsWithContext(writer);
@@ -119,7 +119,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeStatementsWithContext(Writer writer) throws IOException {
-        TriGOption trigConfig = getTriGConfig();
+        TriGSerializerOptions trigConfig = getTriGConfig();
 
         Map<Resource, List<Statement>> byContext = new HashMap<>();
         model.stream()

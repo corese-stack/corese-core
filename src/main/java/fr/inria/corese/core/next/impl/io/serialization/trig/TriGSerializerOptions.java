@@ -15,19 +15,19 @@ import java.util.Map;
  * <p>Use the {@link Builder} class to create instances of {@code TriGConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class TriGOption extends AbstractTFamilyOption {
+public class TriGSerializerOptions extends AbstractTFamilyOption {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
      *
      * @param builder The builder instance containing the desired configuration values.
      */
-    protected TriGOption(Builder builder) {
+    protected TriGSerializerOptions(Builder builder) {
         super(builder);
     }
 
     /**
-     * Public Builder for {@link TriGOption}.
+     * Public Builder for {@link TriGSerializerOptions}.
      * Provides a fluent API for constructing {@code TriGConfig} instances with default values
      * specific to the TriG format.
      */
@@ -50,13 +50,13 @@ public class TriGOption extends AbstractTFamilyOption {
          }
 
         /**
-         * Builds and returns a new {@link TriGOption} instance with the current builder settings.
+         * Builds and returns a new {@link TriGSerializerOptions} instance with the current builder settings.
          *
          * @return A new {@code TriGConfig} instance.
          */
         @Override
-        public TriGOption build() {
-            return new TriGOption(this);
+        public TriGSerializerOptions build() {
+            return new TriGSerializerOptions(this);
         }
     }
 
@@ -67,17 +67,17 @@ public class TriGOption extends AbstractTFamilyOption {
      *
      * @return A {@code TriGConfig} instance with default settings.
      */
-    public static TriGOption defaultConfig() {
+    public static TriGSerializerOptions defaultConfig() {
         return new Builder().build();
     }
 
     /**
-     * Returns a new builder instance for {@link TriGOption}.
+     * Returns a new builder instance for {@link TriGSerializerOptions}.
      * This allows for fluent construction of custom TriG configurations.
      *
      * @return A new {@code Builder} instance.
      */
-    public static TriGOption.Builder builder() {
-        return new TriGOption.Builder();
+    public static TriGSerializerOptions.Builder builder() {
+        return new TriGSerializerOptions.Builder();
     }
 }

@@ -23,7 +23,7 @@ import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsOption;
+import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializerOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 
@@ -44,7 +44,7 @@ class NQuadsCircularTest {
     private ValueFactory valueFactory;
     private SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
-    private NQuadsOption defaultConfig;
+    private NQuadsSerializerOptions defaultConfig;
 
     // Test data constants
     private static final String EXAMPLE_NS = "http://example.org/";
@@ -68,7 +68,7 @@ class NQuadsCircularTest {
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new DefaultSerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = NQuadsOption.defaultConfig();
+        defaultConfig = NQuadsSerializerOptions.defaultConfig();
     }
 
     /**

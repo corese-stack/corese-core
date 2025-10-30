@@ -20,9 +20,8 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
-import fr.inria.corese.core.next.impl.io.option.TitaniumJSONLDProcessorOption;
+import fr.inria.corese.core.next.impl.io.option.JSONLDProcessorOptions;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
@@ -49,7 +48,7 @@ class JSONLDCircularTest {
     private ValueFactory valueFactory;
     private SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
-    private TitaniumJSONLDProcessorOption defaultConfig;
+    private JSONLDProcessorOptions defaultConfig;
 
     // Test data constants
     private static final String EXAMPLE_NS = "http://example.org/";
@@ -73,7 +72,7 @@ class JSONLDCircularTest {
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new DefaultSerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = new TitaniumJSONLDProcessorOption.Builder()
+        defaultConfig = new JSONLDProcessorOptions.Builder()
                 .build();
     }
 

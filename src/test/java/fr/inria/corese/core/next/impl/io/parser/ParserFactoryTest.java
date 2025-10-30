@@ -3,12 +3,12 @@ package fr.inria.corese.core.next.impl.io.parser;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.api.io.parser.RDFParserOptions;
 import fr.inria.corese.core.next.impl.io.parser.jsonld.JSONLDParser;
-import fr.inria.corese.core.next.impl.io.parser.nquads.ANTLRNQuadsParser;
-import fr.inria.corese.core.next.impl.io.parser.ntriples.ANTLRNTriplesParser;
-import fr.inria.corese.core.next.impl.io.parser.turtle.ANTLRTurtleParser;
+import fr.inria.corese.core.next.impl.io.parser.nquads.NQuadsParser;
+import fr.inria.corese.core.next.impl.io.parser.ntriples.NTriplesParser;
+import fr.inria.corese.core.next.impl.io.parser.turtle.TurtleParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class ParserFactoryTest {
     private ValueFactory mockValueFactory;
 
     @Mock
-    private RDFParserOptions mockParserOptions;
+    private IOOptions mockParserOptions;
 
 
     @BeforeEach
@@ -57,7 +57,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithConfig_TURTLE() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, mockModel, mockValueFactory, mockParserOptions);
         assertNotNull(parser);
-        assertTrue(parser instanceof ANTLRTurtleParser);
+        assertTrue(parser instanceof TurtleParser);
     }
 
     @Test
@@ -65,7 +65,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithConfig_NTRIPLES() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.NTRIPLES, mockModel, mockValueFactory, mockParserOptions);
         assertNotNull(parser);
-        assertTrue(parser instanceof ANTLRNTriplesParser);
+        assertTrue(parser instanceof NTriplesParser);
     }
 
     @Test
@@ -73,7 +73,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithConfig_NQUADS() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.NQUADS, mockModel, mockValueFactory, mockParserOptions);
         assertNotNull(parser);
-        assertTrue(parser instanceof ANTLRNQuadsParser);
+        assertTrue(parser instanceof NQuadsParser);
     }
 
 
@@ -90,7 +90,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithoutConfig_TURTLE() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, mockModel, mockValueFactory);
         assertNotNull(parser);
-        assertTrue(parser instanceof ANTLRTurtleParser);
+        assertTrue(parser instanceof TurtleParser);
     }
 
     @Test
@@ -98,7 +98,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithoutConfig_NTRIPLES() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.NTRIPLES, mockModel, mockValueFactory);
         assertNotNull(parser);
-        assertTrue(parser instanceof ANTLRNTriplesParser);
+        assertTrue(parser instanceof NTriplesParser);
     }
 
     @Test
@@ -106,7 +106,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithoutConfig_NQUADS() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.NQUADS, mockModel, mockValueFactory);
         assertNotNull(parser);
-        assertTrue(parser instanceof ANTLRNQuadsParser);
+        assertTrue(parser instanceof NQuadsParser);
     }
 
 }

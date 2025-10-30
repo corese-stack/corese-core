@@ -27,13 +27,13 @@ import static org.mockito.Mockito.*;
 class TriGSerializerTest {
 
     private Model mockModel;
-    private TriGOption defaultConfig;
+    private TriGSerializerOptions defaultConfig;
     private TestStatementFactory factory;
 
     @BeforeEach
     void setUp() {
         mockModel = mock(Model.class);
-        defaultConfig = TriGOption.defaultConfig();
+        defaultConfig = TriGSerializerOptions.defaultConfig();
         factory = new TestStatementFactory();
     }
 
@@ -155,7 +155,7 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TriGOption customConfig = new TriGOption.Builder()
+        TriGSerializerOptions customConfig = new TriGSerializerOptions.Builder()
                 .strictMode(false)
                 .build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, customConfig);
@@ -205,7 +205,7 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TriGOption customConfig = new TriGOption.Builder()
+        TriGSerializerOptions customConfig = new TriGSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, customConfig);
@@ -255,7 +255,7 @@ class TriGSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TriGOption configWithBase = new TriGOption.Builder()
+        TriGSerializerOptions configWithBase = new TriGSerializerOptions.Builder()
                 .baseIRI("http://example.org/base/")
                 .build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, configWithBase);
@@ -338,7 +338,7 @@ class TriGSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TriGOption strictConfig = new TriGOption.Builder().strictMode(true).build();
+        TriGSerializerOptions strictConfig = new TriGSerializerOptions.Builder().strictMode(true).build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, strictConfig);
 
 
@@ -374,7 +374,7 @@ class TriGSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TriGOption strictConfig = new TriGOption.Builder().strictMode(true).validateURIs(true).build();
+        TriGSerializerOptions strictConfig = new TriGSerializerOptions.Builder().strictMode(true).validateURIs(true).build();
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, strictConfig);
 
 
@@ -411,7 +411,7 @@ class TriGSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TriGOption customConfig = new TriGOption.Builder()
+        TriGSerializerOptions customConfig = new TriGSerializerOptions.Builder()
                 .useMultilineLiterals(true)
                 .prettyPrint(true)
                 .build();

@@ -23,7 +23,7 @@ import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesOption;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 
@@ -41,7 +41,7 @@ class NTriplesCircularTest {
     private ValueFactory valueFactory;
     private SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
-    private NTriplesOption defaultConfig;
+    private NTriplesSerializerOptions defaultConfig;
 
     // Test data constants
     private static final String EXAMPLE_NS = "http://example.org/";
@@ -63,7 +63,7 @@ class NTriplesCircularTest {
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new DefaultSerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = NTriplesOption.defaultConfig();
+        defaultConfig = NTriplesSerializerOptions.defaultConfig();
     }
 
     /**

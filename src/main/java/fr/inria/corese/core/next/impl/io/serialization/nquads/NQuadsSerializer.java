@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.io.serialization.nquads;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractLineBasedSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
@@ -26,24 +27,24 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
 
     /**
      * Constructs a new {@code NQuadsSerializer} instance with the specified model and default N-Quads configuration.
-     * The default configuration is obtained from {@link NQuadsOption#defaultConfig()}.
+     * The default configuration is obtained from {@link NQuadsSerializerOptions#defaultConfig()}.
      *
      * @param model the {@link Model} to be serialized. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public NQuadsSerializer(Model model) {
-        this(model, NQuadsOption.defaultConfig());
+        this(model, NQuadsSerializerOptions.defaultConfig());
     }
 
     /**
      * Constructs a new {@code NQuadsSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link NQuadsOption} to use for serialization. Must not be null.
+     * @param config the {@link NQuadsSerializerOptions} to use for serialization. Must not be null.
      *               This config object should be an instance of {@code NQuadsConfig} or a subclass thereof.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NQuadsSerializer(Model model, NQuadsOption config) {
+    public NQuadsSerializer(Model model, NQuadsSerializerOptions config) {
         super(model, config);
         Objects.requireNonNull(config, "NQuadsConfig cannot be null");
     }
@@ -55,7 +56,7 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
      */
     @Override
     protected String getFormatName() {
-        return "N-Quads";
+        return RDFFormat.NQUADS.getName();
     }
 
     /**

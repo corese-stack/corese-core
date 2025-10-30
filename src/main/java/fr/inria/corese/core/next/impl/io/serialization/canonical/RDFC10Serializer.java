@@ -22,10 +22,10 @@ import java.util.Objects;
  * This implementation now acts as a wrapper, preparing the model for a dedicated
  * RDFC-1.0 canonicalization component and then writing the resulting canonical statements.
  */
-public class Rdfc10Serializer extends AbstractLineBasedSerializer {
+public class RDFC10Serializer extends AbstractLineBasedSerializer {
 
-    private final Rdfc10Options config;
-    private final Rdfc10Canonicalizer canonicalizer;
+    private final RDFC10Options config;
+    private final RDFC10Canonicalizer canonicalizer;
     private final Model model;
 
     /**
@@ -36,7 +36,7 @@ public class Rdfc10Serializer extends AbstractLineBasedSerializer {
      * @param config        The configuration options for the canonicalization process.
      * @param canonicalizer The canonicalizer component to use.
      */
-    public Rdfc10Serializer(Model model, Rdfc10Options config, Rdfc10Canonicalizer canonicalizer) {
+    public RDFC10Serializer(Model model, RDFC10Options config, RDFC10Canonicalizer canonicalizer) {
         super(model, config);
         this.model = Objects.requireNonNull(model);
         this.config = Objects.requireNonNull(config);

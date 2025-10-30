@@ -1,0 +1,38 @@
+package fr.inria.corese.core.next.impl.io.parser.turtle;
+
+import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
+
+public class TurtleParserOptions  extends AbstractIOOptions implements BaseIRIOptions {
+
+    private final TurtleParserOptions.Builder builder;
+    private final String baseIRI;
+
+    protected TurtleParserOptions(TurtleParserOptions.Builder builder) {
+        this.builder = builder;
+        this.baseIRI = this.builder.baseIRI;
+    }
+
+    @Override
+    public String getBaseIRI() {
+        return this.baseIRI;
+    }
+
+    public static class Builder extends AbstractIOOptions.Builder<TurtleParserOptions> {
+
+        protected String baseIRI = ParserConstants.getDefaultBaseURI();
+
+        @Override
+        public TurtleParserOptions build() {
+            return new TurtleParserOptions(this);
+        }
+
+        public TurtleParserOptions.Builder baseIRI(String baseIRI) {
+            this.baseIRI = baseIRI;
+            return this;
+        }
+
+    }
+
+}

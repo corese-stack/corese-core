@@ -12,7 +12,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link XmlOption} class.
+ * Unit tests for the {@link XMLSerializerOption} class.
  * These tests verify the default configuration settings and the functionality
  * of the builder pattern for customizing RDF/XML serialization options.
  */
@@ -21,7 +21,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("defaultConfig() should return a config with expected RDF/XML defaults")
     void defaultConfig_shouldReturnExpectedDefaults() {
-        XmlOption config = XmlOption.defaultConfig();
+        XMLSerializerOption config = XMLSerializerOption.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
 
@@ -54,7 +54,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding usePrefixes")
     void builder_shouldAllowOverridingUsePrefixes() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .usePrefixes(false)
                 .build();
         assertFalse(config.usePrefixes(), "usePrefixes should be overridden to false");
@@ -63,7 +63,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding autoDeclarePrefixes")
     void builder_shouldAllowOverridingAutoDeclarePrefixes() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .autoDeclarePrefixes(false)
                 .build();
         assertFalse(config.autoDeclarePrefixes(), "autoDeclarePrefixes should be overridden to false");
@@ -72,7 +72,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding prefixOrdering")
     void builder_shouldAllowOverridingPrefixOrdering() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .prefixOrdering(PrefixOrderingEnum.USAGE_ORDER)
                 .build();
         assertEquals(PrefixOrderingEnum.USAGE_ORDER, config.getPrefixOrdering(), "prefixOrdering should be overridden to USAGE_ORDER");
@@ -83,7 +83,7 @@ class XmlConfigTest {
     void builder_shouldAllowAddingCustomPrefixes() {
         String customPrefix = "my";
         String customNamespace = "http://my.example.org/";
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .addCustomPrefix(customPrefix, customNamespace)
                 .build();
 
@@ -96,7 +96,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding prettyPrint")
     void builder_shouldAllowOverridingPrettyPrint() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .prettyPrint(false)
                 .build();
         assertFalse(config.prettyPrint(), "prettyPrint should be overridden to false");
@@ -106,7 +106,7 @@ class XmlConfigTest {
     @DisplayName("Builder should allow overriding indent")
     void builder_shouldAllowOverridingIndent() {
         String customIndent = "\t";
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .indent(customIndent)
                 .build();
         assertEquals(customIndent, config.getIndent(), "indent should be overridden to custom value");
@@ -116,7 +116,7 @@ class XmlConfigTest {
     @DisplayName("Builder should allow overriding maxLineLength")
     void builder_shouldAllowOverridingMaxLineLength() {
         int customLength = 120;
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .maxLineLength(customLength)
                 .build();
         assertEquals(customLength, config.getMaxLineLength(), "maxLineLength should be overridden to custom value");
@@ -125,7 +125,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding sortSubjects")
     void builder_shouldAllowOverridingSortSubjects() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .sortSubjects(true)
                 .build();
         assertTrue(config.sortSubjects(), "sortSubjects should be overridden to true");
@@ -134,7 +134,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding sortPredicates")
     void builder_shouldAllowOverridingSortPredicates() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .sortPredicates(true)
                 .build();
         assertTrue(config.sortPredicates(), "sortPredicates should be overridden to true");
@@ -143,7 +143,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding useMultilineLiterals")
     void builder_shouldAllowOverridingUseMultilineLiterals() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .useMultilineLiterals(false)
                 .build();
         assertFalse(config.useMultilineLiterals(), "useMultilineLiterals should be overridden to false");
@@ -152,7 +152,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding strictMode")
     void builder_shouldAllowOverridingStrictMode() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .strictMode(false)
                 .build();
         assertFalse(config.isStrictMode(), "strictMode should be overridden to false");
@@ -161,7 +161,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding escapeUnicode")
     void builder_shouldAllowOverridingEscapeUnicode() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .escapeUnicode(true)
                 .build();
         assertTrue(config.escapeUnicode(), "escapeUnicode should be overridden to true");
@@ -170,7 +170,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
     void builder_shouldAllowOverridingLiteralDatatypePolicy() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .build();
         assertEquals(LiteralDatatypePolicyEnum.MINIMAL, config.getLiteralDatatypePolicy(), "literalDatatypePolicy should be overridden to MINIMAL");
@@ -180,7 +180,7 @@ class XmlConfigTest {
     @DisplayName("Builder should allow setting baseIRI")
     void builder_shouldAllowSettingBaseIRI() {
         String testBaseIRI = "http://example.org/base/";
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .baseIRI(testBaseIRI)
                 .build();
         assertEquals(testBaseIRI, config.getBaseIRI(), "baseIRI should be set correctly");
@@ -190,7 +190,7 @@ class XmlConfigTest {
     @DisplayName("Builder should allow overriding lineEnding")
     void builder_shouldAllowOverridingLineEnding() {
         String customLineEnding = "\r\n";
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .lineEnding(customLineEnding)
                 .build();
         assertEquals(customLineEnding, config.getLineEnding(), "lineEnding should be overridden to custom value");
@@ -199,7 +199,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
     void builder_shouldAllowOverridingValidateURIs() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .validateURIs(true)
                 .build();
         assertTrue(config.validateURIs(), "validateURIs should be overridden to true");
@@ -208,7 +208,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
     void builder_shouldAllowOverridingStableBlankNodeIds() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .stableBlankNodeIds(false)
                 .build();
         assertFalse(config.stableBlankNodeIds(), "stableBlankNodeIds should be overridden to false");
@@ -217,7 +217,7 @@ class XmlConfigTest {
     @Test
     @DisplayName("Builder should allow overriding includeContext")
     void builder_shouldAllowOverridingIncludeContext() {
-        XmlOption config = new XmlOption.Builder()
+        XMLSerializerOption config = new XMLSerializerOption.Builder()
                 .includeContext(true)
                 .build();
         assertTrue(config.includeContext(), "includeContext should be overridden to true");

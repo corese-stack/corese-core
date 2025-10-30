@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.rdfxml.context.RDFXMLContext;
@@ -54,7 +55,7 @@ public class RDFXMLParser extends AbstractRDFParser {
      * @param factory the RDF value factory for term creation
      */
     public RDFXMLParser(Model model, ValueFactory factory) {
-        this(model, factory, null);
+        this(model, factory, new RDFXMLParserOptions.Builder().build());
     }
 
     /**
@@ -76,17 +77,8 @@ public class RDFXMLParser extends AbstractRDFParser {
     }
 
     @Override
-    public void parse(InputStream in) throws ParsingErrorException {
-        parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
-    }
-
-    @Override
     public void parse(InputStream in, String baseURI) throws ParsingErrorException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
-    }
-
-    public void parse(Reader reader) throws ParsingErrorException {
-        parse(reader, null);
     }
 
     @Override

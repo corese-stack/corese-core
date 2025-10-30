@@ -8,8 +8,7 @@ import com.apicatalog.jsonld.JsonLdVersion;
 
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
-import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
-import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 
 /**
  * Wrapper around the JsonLdOptions class for the Titanium JSONLD parser and
@@ -18,8 +17,8 @@ import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
  * @see <a href=
  *      "https://javadoc.io/doc/com.apicatalog/titanium-json-ld/latest/com/apicatalog/jsonld/JsonLdOptions.html">JsonLdOptions</a>
  */
-public class TitaniumJSONLDProcessorOption extends AbstractIOOptions
-        implements RDFParserBaseIRIOptions, SerializationOption {
+public class JSONLDProcessorOptions extends AbstractIOOptions
+        implements BaseIRIOptions {
 
     private final Builder builder;
 
@@ -28,7 +27,7 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions
      * 
      * @param builder the builder containing the options for this processor
      */
-    protected TitaniumJSONLDProcessorOption(Builder builder) {
+    protected JSONLDProcessorOptions(Builder builder) {
         this.builder = builder;
     }
 
@@ -133,23 +132,23 @@ public class TitaniumJSONLDProcessorOption extends AbstractIOOptions
     }
 
     @Override
-    public String getBase() {
+    public String getBaseIRI() {
         return this.builder.options.getBase().toString();
     }
 
     /**
-     * Builder for creating instances of TitaniumJSONLDProcessorOption.
+     * Builder for creating instances of JSONLDProcessorOptions.
      * This nested static class provides a fluent API for configuring the
      * various options before building the final
-     * {@code TitaniumJSONLDProcessorOption} object.
+     * {@code JSONLDProcessorOptions} object.
      */
-    public static class Builder extends AbstractIOOptions.Builder<TitaniumJSONLDProcessorOption> {
+    public static class Builder extends AbstractIOOptions.Builder<JSONLDProcessorOptions> {
 
         private final JsonLdOptions options = new JsonLdOptions();
 
         @Override
-        public TitaniumJSONLDProcessorOption build() {
-            return new TitaniumJSONLDProcessorOption(this);
+        public JSONLDProcessorOptions build() {
+            return new JSONLDProcessorOptions(this);
         }
 
         /**

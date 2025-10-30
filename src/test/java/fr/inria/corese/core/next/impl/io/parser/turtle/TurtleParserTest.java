@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * and interact with the Model and ValueFactory, including error handling
  * and unescaping of IRIs and literals, and named graphs.
  */
-public class ANTLRTurtleParserTest {
+public class TurtleParserTest {
     private Model parseFromString(String turtleData, String baseURI) throws Exception {
         Model model = new CoreseModel();
         ValueFactory factory = new CoreseAdaptedValueFactory();
-        RDFParser parser = new ANTLRTurtleParser(model, factory);
+        RDFParser parser = new TurtleParser(model, factory);
         parser.parse(new StringReader(turtleData), baseURI);
         return model;
     }

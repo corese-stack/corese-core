@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.common.AbstractTurtleTriGListener;
@@ -31,9 +31,9 @@ public class TurtleListener extends TurtleBaseListener {
     public TurtleListener(Model model, ValueFactory factory, IOOptions options) {
         String baseURI = null;
 
-        if (options instanceof RDFParserBaseIRIOptions) {
-            RDFParserBaseIRIOptions baseIRIOptions = (RDFParserBaseIRIOptions) options;
-            baseURI = baseIRIOptions.getBase();
+        if (options instanceof BaseIRIOptions) {
+            BaseIRIOptions baseIRIOptions = (BaseIRIOptions) options;
+            baseURI = baseIRIOptions.getBaseIRI();
         }
 
         if (baseURI == null || baseURI.isEmpty()) {

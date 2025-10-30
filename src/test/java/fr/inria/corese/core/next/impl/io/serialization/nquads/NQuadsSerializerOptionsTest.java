@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.io.serialization.ntriples;
+package fr.inria.corese.core.next.impl.io.serialization.nquads;
 
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import org.junit.jupiter.api.DisplayName;
@@ -7,42 +7,42 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link NTriplesOption} class.
+ * Unit tests for the {@link NQuadsSerializerOptions} class.
  * These tests verify the default configuration settings and the functionality
- * of the builder pattern for customizing N-Triples serialization options.
+ * of the builder pattern for customizing N-Quads serialization options.
  */
-class NTriplesOptionTest {
+class NQuadsSerializerOptionsTest {
 
     @Test
-    @DisplayName("defaultConfig() should return a config with expected N-Triples defaults")
+    @DisplayName("defaultConfig() should return a config with expected N-Quads defaults")
     void defaultConfig_shouldReturnExpectedDefaults() {
-        NTriplesOption config = NTriplesOption.defaultConfig();
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
 
-        assertTrue(config.isStrictMode(), "Default strictMode should be true for N-Triples");
-        assertTrue(config.escapeUnicode(), "Default escapeUnicode should be true for N-Triples");
+        assertTrue(config.isStrictMode(), "Default strictMode should be true for N-Quads");
+        assertTrue(config.escapeUnicode(), "Default escapeUnicode should be true for N-Quads");
         assertEquals(LiteralDatatypePolicyEnum.ALWAYS_TYPED, config.getLiteralDatatypePolicy(), "Default literalDatatypePolicy should be ALWAYS_TYPED");
         assertNull(config.getBaseIRI(), "Default baseIRI should be null");
         assertFalse(config.stableBlankNodeIds(), "Default stableBlankNodeIds should be false");
 
-        assertFalse(config.includeContext(), "Default includeContext should be false for N-Triples");
+        assertTrue(config.includeContext(), "Default includeContext should be true for N-Quads");
     }
 
     @Test
     @DisplayName("Builder should allow overriding includeContext")
     void builder_shouldAllowOverridingIncludeContext() {
-        NTriplesOption config = NTriplesOption.builder()
-                .includeContext(true)
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
+                .includeContext(false)
                 .build();
 
-        assertTrue(config.includeContext(), "includeContext should be overridden to true");
+        assertFalse(config.includeContext(), "includeContext should be overridden to false");
     }
 
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
     void builder_shouldAllowOverridingLiteralDatatypePolicy() {
-        NTriplesOption config = NTriplesOption.builder()
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .build();
 
@@ -52,7 +52,7 @@ class NTriplesOptionTest {
     @Test
     @DisplayName("Builder should allow overriding escapeUnicode")
     void builder_shouldAllowOverridingEscapeUnicode() {
-        NTriplesOption config = NTriplesOption.builder()
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .escapeUnicode(false)
                 .build();
 
@@ -62,7 +62,7 @@ class NTriplesOptionTest {
     @Test
     @DisplayName("Builder should allow overriding strictMode")
     void builder_shouldAllowOverridingStrictMode() {
-        NTriplesOption config = NTriplesOption.builder()
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .strictMode(false)
                 .build();
 
@@ -73,7 +73,7 @@ class NTriplesOptionTest {
     @DisplayName("Builder should allow setting baseIRI")
     void builder_shouldAllowSettingBaseIRI() {
         String testBaseIRI = "http://example.org/base/";
-        NTriplesOption config = NTriplesOption.builder()
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .baseIRI(testBaseIRI)
                 .build();
 
@@ -84,7 +84,7 @@ class NTriplesOptionTest {
     @DisplayName("Builder should allow setting lineEnding")
     void builder_shouldAllowSettingLineEnding() {
         String customLineEnding = "\r\n";
-        NTriplesOption config = NTriplesOption.builder()
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .lineEnding(customLineEnding)
                 .build();
 
@@ -94,7 +94,7 @@ class NTriplesOptionTest {
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
     void builder_shouldAllowOverridingValidateURIs() {
-        NTriplesOption config = NTriplesOption.builder()
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .validateURIs(true)
                 .build();
 
@@ -104,7 +104,7 @@ class NTriplesOptionTest {
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
     void builder_shouldAllowOverridingStableBlankNodeIds() {
-        NTriplesOption config = NTriplesOption.builder()
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .stableBlankNodeIds(true)
                 .build();
 
@@ -114,12 +114,11 @@ class NTriplesOptionTest {
     @Test
     @DisplayName("Builder should handle null values for optional fields gracefully (e.g., baseIRI)")
     void builder_shouldHandleNullForOptionalFields() {
-        NTriplesOption config = NTriplesOption.builder()
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.builder()
                 .baseIRI(null)
                 .build();
 
         assertNull(config.getBaseIRI(), "baseIRI should be null when explicitly set to null");
     }
-
 
 }

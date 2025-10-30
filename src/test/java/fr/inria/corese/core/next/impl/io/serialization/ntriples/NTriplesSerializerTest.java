@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class NTriplesSerializerTest {
 
     private Model model;
-    private NTriplesOption config;
+    private NTriplesSerializerOptions config;
     private NTriplesSerializer nTriplesSerializer;
     private TestStatementFactory factory;
 
@@ -42,7 +42,7 @@ class NTriplesSerializerTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-        config = NTriplesOption.defaultConfig();
+        config = NTriplesSerializerOptions.defaultConfig();
         nTriplesSerializer = new NTriplesSerializer(model, config);
         factory = new TestStatementFactory();
 
@@ -270,7 +270,7 @@ class NTriplesSerializerTest {
 
         Writer writer = new StringWriter();
 
-        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesOption.defaultConfig());
+        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesSerializerOptions.defaultConfig());
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
@@ -294,7 +294,7 @@ class NTriplesSerializerTest {
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesOption.defaultConfig());
+        NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesSerializerOptions.defaultConfig());
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);

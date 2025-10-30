@@ -5,9 +5,9 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesLexer;
-import fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets;
  * This parser uses an ANTLR grammar to tokenize and parse N-Triples documents,
  * then a listener to build the RDF model.
  */
-public class ANTLRNTriplesParser extends AbstractRDFParser {
+public class NTriplesParser extends AbstractRDFParser {
 
     /**
      * Constructor for the ANTLRNTriplesParser.
@@ -39,8 +39,8 @@ public class ANTLRNTriplesParser extends AbstractRDFParser {
      * @param model   The RDF model to populate.
      * @param factory The value factory for creating RDF resources.
      */
-    public ANTLRNTriplesParser(Model model, ValueFactory factory) {
-        super(model, factory);
+    public NTriplesParser(Model model, ValueFactory factory) {
+        this(model, factory, new NTriplesParserOptions.Builder().build());
     }
 
     /**
@@ -50,7 +50,7 @@ public class ANTLRNTriplesParser extends AbstractRDFParser {
      * @param factory The value factory for creating RDF resources.
      * @param config  The configuration options for parsing.
      */
-    public ANTLRNTriplesParser(Model model, ValueFactory factory, IOOptions config) {
+    public NTriplesParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);
     }
 
@@ -59,20 +59,9 @@ public class ANTLRNTriplesParser extends AbstractRDFParser {
         return RDFFormat.NTRIPLES;
     }
 
-
-    @Override
-    public void parse(InputStream in) throws ParsingErrorException {
-        parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
-    }
-
     @Override
     public void parse(InputStream in, String baseURI) throws ParsingErrorException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
-    }
-
-    @Override
-    public void parse(Reader reader) throws ParsingErrorException {
-        parse(reader, null);
     }
 
     /**
@@ -101,7 +90,7 @@ public class ANTLRNTriplesParser extends AbstractRDFParser {
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-            NTriplesParser antlrParser = new NTriplesParser(tokens);
+            fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser antlrParser = new fr.inria.corese.core.next.impl.parser.antlr.NTriplesParser(tokens);
 
             antlrParser.removeErrorListener(ConsoleErrorListener.INSTANCE);
             antlrParser.setErrorHandler(new BailErrorStrategy());

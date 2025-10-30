@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.io.parser.trig;
+package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
@@ -6,11 +6,9 @@ import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.parser.antlr.TriGLexer;
-import fr.inria.corese.core.next.impl.parser.antlr.TriGParser;
+import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.IOException;
@@ -22,46 +20,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A parser for the TriG format based on ANTLR4.
- * It uses an ANTLR grammar to tokenize and parse TriG documents,
- * then a listener to build the RDF model.
+ * Parser for Turtle RDF files.
+ *
  */
-public class ANTLRTrigParser extends AbstractRDFParser {
+public class TurtleParser extends AbstractRDFParser {
 
     /**
-     * Constructor for the ANTLRTrigParser.
+     * Constructor for ANTLRTurtleParser that initializes the model and value
+     * factory.
      *
-     * @param model   The RDF model to be populated.
-     * @param factory The value factory for creating RDF resources.
+     * @param model   the model to be populated by the parser
+     * @param factory the value factory used to create RDF values
      */
-    public ANTLRTrigParser(Model model, ValueFactory factory) {
-        super(model, factory);
+    public TurtleParser(Model model, ValueFactory factory) {
+        this(model, factory, new TurtleParserOptions.Builder().build());
     }
 
     /**
-     * Constructor for the ANTLRTrigParser with configuration options.
+     * Constructor for ANTLRTurtleParser that initializes the model, value factory,
+     * and configuration options.
      *
-     * @param model   The RDF model to be populated.
-     * @param factory The value factory for creating RDF resources.
-     * @param config  Configuration options for parsing.
+     * @param model   the model to be populated by the parser
+     * @param factory the value factory used to create RDF values
+     * @param config  optional configuration options for the parser
      */
-    public ANTLRTrigParser(Model model, ValueFactory factory, IOOptions config) {
+    public TurtleParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);
     }
 
     @Override
     public RDFFormat getRDFFormat() {
-        return RDFFormat.TRIG;
-    }
-
-    @Override
-    public void setConfig(IOOptions config) {
-        // This method is required by the interface but is not used in this implementation.
-    }
-
-    @Override
-    public void parse(InputStream in) throws ParsingErrorException {
-        parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
+        return RDFFormat.TURTLE;
     }
 
     @Override
@@ -69,13 +58,8 @@ public class ANTLRTrigParser extends AbstractRDFParser {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
     }
 
-    @Override
-    public void parse(Reader reader) throws ParsingErrorException {
-        parse(reader, null);
-    }
-
     /**
-     * Parses TriG data from a {@link Reader} using ANTLR4.
+     * Parses Turtle data from a {@link Reader} using ANTLR4.
      *
      * @param reader  The {@link Reader} to read the RDF data.
      * @param baseURI The base URI.
@@ -85,43 +69,51 @@ public class ANTLRTrigParser extends AbstractRDFParser {
     public void parse(Reader reader, String baseURI) throws ParsingErrorException {
         try {
             CharStream charStream = CharStreams.fromReader(reader);
-            TriGLexer triGLexer = new TriGLexer(charStream);
+            TurtleLexer turtleLexer = new TurtleLexer(charStream);
 
-            TrigErrorListener trigErrorListener = new TrigErrorListener();
-            triGLexer.removeErrorListeners();
-            triGLexer.addErrorListener(trigErrorListener);
+            TurtleErrorListener turtleErrorListener = new TurtleErrorListener();
+            turtleLexer.removeErrorListeners();
+            turtleLexer.addErrorListener(turtleErrorListener);
 
-            CommonTokenStream tokens = new CommonTokenStream(triGLexer);
-            TriGParser triGParser = new TriGParser(tokens);
+            CommonTokenStream tokens = new CommonTokenStream(turtleLexer);
+            fr.inria.corese.core.next.impl.parser.antlr.TurtleParser turtleParser = new fr.inria.corese.core.next.impl.parser.antlr.TurtleParser(tokens);
 
-
-            triGParser.removeErrorListeners();
-            triGParser.addErrorListener(trigErrorListener);
+            turtleParser.removeErrorListeners();
+            turtleParser.addErrorListener(turtleErrorListener);
 
             ParseTreeWalker walker = new ParseTreeWalker();
-            ParseTree tree = triGParser.trigDoc();
+            ParseTree tree;
 
-            if (trigErrorListener.hasErrors()) {
-                throw new ParsingErrorException("Syntax error in TriG document: " + trigErrorListener.getErrorMessage());
+            try {
+                tree = turtleParser.turtleDoc();
+
+                if (turtleErrorListener.hasErrors()) {
+                    String errorMsg = turtleErrorListener.getErrorMessage();
+                    if (errorMsg == null || errorMsg.trim().isEmpty()) {
+                        errorMsg = "Unknown syntax error detected";
+                    }
+                    throw new ParsingErrorException("Syntax error in Turtle document: " + errorMsg);
+                }
+            } catch (RecognitionException e) {
+                throw new ParsingErrorException("Recognition error in Turtle document: " + e.getMessage());
             }
 
-            TriGListerner listerner = new TriGListerner(getModel(), getValueFactory(), this.getConfig(), baseURI);
-            walker.walk((ParseTreeListener) listerner, tree);
+            TurtleListener listener = new TurtleListener(getModel(), getValueFactory(), this.getConfig());
+            walker.walk(listener, tree);
 
         } catch (ParsingErrorException e) {
             throw e;
         } catch (IOException e) {
-            throw new ParsingErrorException("Failed to parse TriG RDF: " + e.getMessage(), e);
+            throw new ParsingErrorException("Failed to parse Turtle RDF: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new ParsingErrorException("Unexpected error during TriG parsing: " + e.getMessage(), e);
+            throw new ParsingErrorException("Unexpected error during Turtle parsing: " + e.getMessage(), e);
         }
     }
-
 
     /**
      * A custom error listener to collect errors from the lexer and parser.
      */
-    private static class TrigErrorListener extends BaseErrorListener {
+    private static class TurtleErrorListener extends BaseErrorListener {
         private final List<String> errors = new ArrayList<>();
 
         /**
@@ -137,7 +129,11 @@ public class ANTLRTrigParser extends AbstractRDFParser {
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                                 int line, int charPositionInLine, String msg, RecognitionException e) {
-            if (msg != null && (msg.contains("token recognition error") || msg.contains("mismatched input"))) {
+            if (msg == null || msg.trim().isEmpty()) {
+                msg = "Unknown syntax error";
+            }
+
+            if (msg.contains("token recognition error") || msg.contains("mismatched input")) {
                 if (offendingSymbol instanceof Token) {
                     Token token = (Token) offendingSymbol;
                     String tokenText = token.getText();
@@ -166,6 +162,9 @@ public class ANTLRTrigParser extends AbstractRDFParser {
          * @return A {@link String} containing the error messages.
          */
         public String getErrorMessage() {
+            if (errors.isEmpty()) {
+                return "Unknown parsing error";
+            }
             return String.join("; ", errors);
         }
     }

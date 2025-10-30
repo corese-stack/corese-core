@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class NQuadsSerializerTest {
 
     private Model model;
-    private NQuadsOption config;
+    private NQuadsSerializerOptions config;
     private NQuadsSerializer nQuadsSerializer;
     private TestStatementFactory factory;
 
@@ -41,7 +41,7 @@ class NQuadsSerializerTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-        config = NQuadsOption.defaultConfig();
+        config = NQuadsSerializerOptions.defaultConfig();
         nQuadsSerializer = new NQuadsSerializer(model, config);
         factory = new TestStatementFactory();
 
@@ -263,7 +263,7 @@ class NQuadsSerializerTest {
 
         Writer writer = new StringWriter();
 
-        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsOption.defaultConfig());
+        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsSerializerOptions.defaultConfig());
         serializer.write(writer);
 
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
@@ -286,7 +286,7 @@ class NQuadsSerializerTest {
         Model currentTestModel = mock(Model.class);
         when(currentTestModel.iterator()).thenReturn(new MockStatementIterator(stmt));
 
-        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsOption.defaultConfig());
+        NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsSerializerOptions.defaultConfig());
 
         StringWriter writer = new StringWriter();
         serializer.write(writer);
