@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
+import fr.inria.corese.core.next.impl.io.option.JSONLDProcessorOptions;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.api.BNode;
@@ -46,7 +47,7 @@ public class JSONLDParserTest {
 
     @Test
     void constructorConfigNoThrowsTest() {
-        assertDoesNotThrow(() -> new JSONLDParser(new CoreseModel(), valueFactory, null));
+        assertDoesNotThrow(() -> new JSONLDParser(new CoreseModel(), valueFactory, new JSONLDProcessorOptions.Builder().build()));
     }
 
     @Test

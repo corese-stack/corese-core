@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.JsonLdVersion;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 
 /**
  * Wrapper around the JsonLdOptions class for the Titanium JSONLD parser and
@@ -133,6 +134,9 @@ public class JSONLDProcessorOptions extends AbstractIOOptions
 
     @Override
     public String getBaseIRI() {
+        if(this.builder.options.getBase() == null) {
+            return ParserConstants.getDefaultBaseURI();
+        }
         return this.builder.options.getBase().toString();
     }
 
