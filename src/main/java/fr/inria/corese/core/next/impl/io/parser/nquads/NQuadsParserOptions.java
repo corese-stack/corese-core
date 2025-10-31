@@ -7,17 +7,15 @@ import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
  */
 public class NQuadsParserOptions extends AbstractIOOptions {
 
-    private final NQuadsParserOptions.Builder builder;
 
-    protected NQuadsParserOptions(NQuadsParserOptions.Builder builder) {
-        this.builder = builder;
+    protected NQuadsParserOptions() {
     }
 
     public static class Builder extends AbstractIOOptions.Builder<NQuadsParserOptions> {
 
         @Override
         public NQuadsParserOptions build() {
-            return new NQuadsParserOptions(this);
+            return new NQuadsParserOptions();
         }
     }
 }

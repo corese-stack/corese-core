@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.io.serialization.canonical;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractLineBasedSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -24,9 +25,7 @@ import java.util.Objects;
  */
 public class RDFC10Serializer extends AbstractLineBasedSerializer {
 
-    private final RDFC10Options config;
     private final RDFC10Canonicalizer canonicalizer;
-    private final Model model;
 
     /**
      * Constructs a new CanonicalSerializer.
@@ -38,14 +37,12 @@ public class RDFC10Serializer extends AbstractLineBasedSerializer {
      */
     public RDFC10Serializer(Model model, RDFC10Options config, RDFC10Canonicalizer canonicalizer) {
         super(model, config);
-        this.model = Objects.requireNonNull(model);
-        this.config = Objects.requireNonNull(config);
         this.canonicalizer = Objects.requireNonNull(canonicalizer);
     }
 
     @Override
     public String getFormatName() {
-        return "RDFC-1.0";
+        return RDFFormat.RDFC_1_0.getName();
     }
 
     /**

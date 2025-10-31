@@ -44,8 +44,7 @@ public class TriGListerner extends TriGBaseListener {
      */
     public TriGListerner(Model model, ValueFactory factory, IOOptions options) {
         String baseURI;
-        if (options instanceof BaseIRIOptions) {
-            BaseIRIOptions baseIRIOptions = (BaseIRIOptions) options;
+        if (options instanceof BaseIRIOptions baseIRIOptions) {
             baseURI = baseIRIOptions.getBaseIRI() != null ? baseIRIOptions.getBaseIRI() : ParserConstants.EMPTY_STRING;
         } else {
             baseURI = ParserConstants.EMPTY_STRING;

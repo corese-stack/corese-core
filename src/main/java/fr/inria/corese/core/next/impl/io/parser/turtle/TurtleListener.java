@@ -31,8 +31,7 @@ public class TurtleListener extends TurtleBaseListener {
     public TurtleListener(Model model, ValueFactory factory, IOOptions options) {
         String baseURI = null;
 
-        if (options instanceof BaseIRIOptions) {
-            BaseIRIOptions baseIRIOptions = (BaseIRIOptions) options;
+        if (options instanceof BaseIRIOptions baseIRIOptions) {
             baseURI = baseIRIOptions.getBaseIRI();
         }
 
