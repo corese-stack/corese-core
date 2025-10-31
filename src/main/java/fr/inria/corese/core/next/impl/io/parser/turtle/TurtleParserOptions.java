@@ -4,6 +4,9 @@ import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 
+/**
+ * Configuration class for the parsing of Turtle documents
+ */
 public class TurtleParserOptions  extends AbstractIOOptions implements BaseIRIOptions {
 
     private final TurtleParserOptions.Builder builder;
@@ -28,6 +31,11 @@ public class TurtleParserOptions  extends AbstractIOOptions implements BaseIRIOp
             return new TurtleParserOptions(this);
         }
 
+        /**
+         * Set the base IRI used for relative IRI processing
+         * @param baseIRI An IRI
+         * @return this
+         */
         public TurtleParserOptions.Builder baseIRI(String baseIRI) {
             this.baseIRI = baseIRI;
             return this;

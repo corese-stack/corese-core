@@ -26,7 +26,7 @@ import java.util.List;
 public class TurtleParser extends AbstractRDFParser {
 
     /**
-     * Constructor for ANTLRTurtleParser that initializes the model and value
+     * Constructor for TurtleParser that initializes the model and value
      * factory.
      *
      * @param model   the model to be populated by the parser
@@ -37,12 +37,12 @@ public class TurtleParser extends AbstractRDFParser {
     }
 
     /**
-     * Constructor for ANTLRTurtleParser that initializes the model, value factory,
+     * Constructor for TurtleParser that initializes the model, value factory,
      * and configuration options.
      *
      * @param model   the model to be populated by the parser
      * @param factory the value factory used to create RDF values
-     * @param config  optional configuration options for the parser
+     * @param config  configuration object for the parser
      */
     public TurtleParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);

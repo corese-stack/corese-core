@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 public class NQuadsParser extends AbstractRDFParser {
 
     /**
-     * Constructor for the ANTLRNQuadsParser.
+     * Constructor for the NQuadsParser. Will generate a
      *
      * @param model   The RDF model to populate.
      * @param factory The ValueFactory for creating RDF resources.
@@ -36,7 +36,7 @@ public class NQuadsParser extends AbstractRDFParser {
     }
 
     /**
-     * Constructor for the ANTLRNQuadsParser with configuration options.
+     * Constructor for the NQuadsParser with configuration options.
      *
      * @param model   The RDF model to populate.
      * @param factory The ValueFactory for creating RDF resources.

@@ -34,7 +34,7 @@ import java.nio.charset.StandardCharsets;
 public class NTriplesParser extends AbstractRDFParser {
 
     /**
-     * Constructor for the ANTLRNTriplesParser.
+     * Constructor for the NTriplesParser.
      *
      * @param model   The RDF model to populate.
      * @param factory The value factory for creating RDF resources.
@@ -44,7 +44,7 @@ public class NTriplesParser extends AbstractRDFParser {
     }
 
     /**
-     * Constructor for the ANTLRNTriplesParser with configuration options.
+     * Constructor for the NTriplesParser with configuration options.
      *
      * @param model   The RDF model to populate.
      * @param factory The value factory for creating RDF resources.

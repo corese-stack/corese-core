@@ -4,6 +4,9 @@ import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 
+/**
+ * Configuration class for the parsing of TriG documents
+ */
 public class TriGParserOptions  extends AbstractIOOptions implements BaseIRIOptions {
 
     private final TriGParserOptions.Builder builder;
@@ -28,6 +31,11 @@ public class TriGParserOptions  extends AbstractIOOptions implements BaseIRIOpti
             return new TriGParserOptions(this);
         }
 
+        /**
+         * Set the base IRI used for relative IRI processing
+         * @param baseIRI An IRI
+         * @return this
+         */
         public TriGParserOptions.Builder baseIRI(String baseIRI) {
             this.baseIRI = baseIRI;
             return this;
