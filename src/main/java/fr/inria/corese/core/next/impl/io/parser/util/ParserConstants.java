@@ -70,7 +70,6 @@ public final class ParserConstants {
     public static final String FILE_PROTOCOL_SIMPLE = "file:/";
     public static final String FILE_PROTOCOL_TRIPLE_SLASH = "file:///";
     public static final String FILE_PROTOCOL = "file://";
-    public static final String RDF_TRG_TEST_SUITE_URI = "https://w3c.github.io/rdf-tests/rdf/rdf11/rdf-trig/";
     public static final String PNAME_NS_PATTERN = "^[A-Za-z_][A-Za-z0-9_-]*$";
 
     public static final String MINUS = "-";

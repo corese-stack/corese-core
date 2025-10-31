@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.io.serialization.trig;
+package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
@@ -13,22 +13,21 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link TriGOption} class.
+ * Unit tests for the {@link TurtleSerializerOptions} class.
  * These tests verify the default configuration settings and the functionality
- * of the builder pattern for customizing TriG serialization options.
+ * of the builder pattern for customizing Turtle serialization options.
  */
-class TriGOptionTest {
+class TurtleSerializerOptionsTest {
 
     @Test
-    @DisplayName("defaultConfig() should return a config with expected TriG defaults")
+    @DisplayName("defaultConfig() should return a config with expected Turtle defaults")
     void defaultConfig_shouldReturnExpectedDefaults() {
-        TriGOption config = TriGOption.defaultConfig();
+        TurtleSerializerOptions config = TurtleSerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
 
-        assertTrue(config.includeContext(), "Default includeContext should be true for TriG");
-        assertEquals(BlankNodeStyleEnum.NAMED, config.getBlankNodeStyle(), "Default blankNodeStyle should be NAMED for TriG");
-        assertFalse(config.useCollections(), "Default useCollections should be false for TriG");
+        assertTrue(config.useCollections(), "Default useCollections should be true for Turtle");
+        assertEquals(BlankNodeStyleEnum.ANONYMOUS, config.getBlankNodeStyle(), "Default blankNodeStyle should be ANONYMOUS for Turtle");
 
         Map<String, String> expectedPrefixes = new HashMap<>();
         expectedPrefixes.put("rdf", SerializationConstants.RDF_NS);
@@ -37,6 +36,7 @@ class TriGOptionTest {
         expectedPrefixes.put("owl", SerializationConstants.OWL_NS);
         assertEquals(expectedPrefixes.size(), config.getCustomPrefixes().size(), "Default custom prefixes size mismatch");
         assertTrue(config.getCustomPrefixes().entrySet().containsAll(expectedPrefixes.entrySet()), "Default custom prefixes should contain common RDF prefixes");
+
 
         assertTrue(config.usePrefixes(), "Default usePrefixes should be true");
         assertTrue(config.autoDeclarePrefixes(), "Default autoDeclarePrefixes should be true");
@@ -48,40 +48,32 @@ class TriGOptionTest {
         assertEquals(SerializationConstants.DEFAULT_INDENTATION, config.getIndent(), "Default indent should be " + SerializationConstants.DEFAULT_INDENTATION);
         assertEquals(80, config.getMaxLineLength(), "Default maxLineLength should be 80");
         assertTrue(config.groupBySubject(), "Default groupBySubject should be true");
-        assertFalse(config.sortSubjects(), "Default sortSubjects should be false");
-        assertFalse(config.sortPredicates(), "Default sortPredicates should be false");
 
         assertTrue(config.isStrictMode(), "Default strictMode should be true");
         assertFalse(config.escapeUnicode(), "Default escapeUnicode should be false");
         assertEquals(LiteralDatatypePolicyEnum.MINIMAL, config.getLiteralDatatypePolicy(), "Default literalDatatypePolicy should be MINIMAL");
         assertNull(config.getBaseIRI(), "Default baseIRI should be null");
-    }
-
-    @Test
-    @DisplayName("Builder should allow overriding includeContext")
-    void builder_shouldAllowOverridingIncludeContext() {
-        TriGOption config = TriGOption.builder()
-                .includeContext(false)
-                .build();
-        assertFalse(config.includeContext(), "includeContext should be overridden to false");
-    }
-
-    @Test
-    @DisplayName("Builder should allow overriding blankNodeStyle")
-    void builder_shouldAllowOverridingBlankNodeStyle() {
-        TriGOption config = TriGOption.builder()
-                .blankNodeStyle(BlankNodeStyleEnum.ANONYMOUS)
-                .build();
-        assertEquals(BlankNodeStyleEnum.ANONYMOUS, config.getBlankNodeStyle(), "blankNodeStyle should be overridden to ANONYMOUS");
+        assertEquals(System.lineSeparator(), config.getLineEnding(), "Default lineEnding should be system's line separator");
+        assertFalse(config.validateURIs(), "Default validateURIs should be false");
+        assertFalse(config.stableBlankNodeIds(), "Default stableBlankNodeIds should be false");
     }
 
     @Test
     @DisplayName("Builder should allow overriding useCollections")
     void builder_shouldAllowOverridingUseCollections() {
-        TriGOption config = TriGOption.builder()
-                .useCollections(true)
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
+                .useCollections(false)
                 .build();
-        assertTrue(config.useCollections(), "useCollections should be overridden to true");
+        assertFalse(config.useCollections(), "useCollections should be overridden to false");
+    }
+
+    @Test
+    @DisplayName("Builder should allow overriding blankNodeStyle")
+    void builder_shouldAllowOverridingBlankNodeStyle() {
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
+                .blankNodeStyle(BlankNodeStyleEnum.NAMED)
+                .build();
+        assertEquals(BlankNodeStyleEnum.NAMED, config.getBlankNodeStyle(), "blankNodeStyle should be overridden to NAMED");
     }
 
     @Test
@@ -89,7 +81,7 @@ class TriGOptionTest {
     void builder_shouldAllowAddingCustomPrefixes() {
         String customPrefix = "my";
         String customNamespace = "http://my.example.org/";
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .addCustomPrefix(customPrefix, customNamespace)
                 .build();
 
@@ -102,7 +94,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding usePrefixes")
     void builder_shouldAllowOverridingUsePrefixes() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .usePrefixes(false)
                 .build();
         assertFalse(config.usePrefixes(), "usePrefixes should be overridden to false");
@@ -111,7 +103,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding autoDeclarePrefixes")
     void builder_shouldAllowOverridingAutoDeclarePrefixes() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .autoDeclarePrefixes(false)
                 .build();
         assertFalse(config.autoDeclarePrefixes(), "autoDeclarePrefixes should be overridden to false");
@@ -120,7 +112,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding prefixOrdering")
     void builder_shouldAllowOverridingPrefixOrdering() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .prefixOrdering(PrefixOrderingEnum.USAGE_ORDER)
                 .build();
         assertEquals(PrefixOrderingEnum.USAGE_ORDER, config.getPrefixOrdering(), "prefixOrdering should be overridden to USAGE_ORDER");
@@ -129,7 +121,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding useCompactTriples")
     void builder_shouldAllowOverridingUseCompactTriples() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .useCompactTriples(false)
                 .build();
         assertFalse(config.useCompactTriples(), "useCompactTriples should be overridden to false");
@@ -138,7 +130,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding useRdfTypeShortcut")
     void builder_shouldAllowOverridingUseRdfTypeShortcut() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .useRdfTypeShortcut(false)
                 .build();
         assertFalse(config.useRdfTypeShortcut(), "useRdfTypeShortcut should be overridden to false");
@@ -147,7 +139,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding useMultilineLiterals")
     void builder_shouldAllowOverridingUseMultilineLiterals() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .useMultilineLiterals(false)
                 .build();
         assertFalse(config.useMultilineLiterals(), "useMultilineLiterals should be overridden to false");
@@ -156,7 +148,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding prettyPrint")
     void builder_shouldAllowOverridingPrettyPrint() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .prettyPrint(false)
                 .build();
         assertFalse(config.prettyPrint(), "prettyPrint should be overridden to false");
@@ -166,7 +158,7 @@ class TriGOptionTest {
     @DisplayName("Builder should allow overriding indent")
     void builder_shouldAllowOverridingIndent() {
         String customIndent = "\t";
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .indent(customIndent)
                 .build();
         assertEquals(customIndent, config.getIndent(), "indent should be overridden to custom value");
@@ -176,7 +168,7 @@ class TriGOptionTest {
     @DisplayName("Builder should allow overriding maxLineLength")
     void builder_shouldAllowOverridingMaxLineLength() {
         int customLength = 120;
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .maxLineLength(customLength)
                 .build();
         assertEquals(customLength, config.getMaxLineLength(), "maxLineLength should be overridden to custom value");
@@ -185,7 +177,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding groupBySubject")
     void builder_shouldAllowOverridingGroupBySubject() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .groupBySubject(false)
                 .build();
         assertFalse(config.groupBySubject(), "groupBySubject should be overridden to false");
@@ -194,7 +186,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding sortSubjects")
     void builder_shouldAllowOverridingSortSubjects() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .sortSubjects(true)
                 .build();
         assertTrue(config.sortSubjects(), "sortSubjects should be overridden to true");
@@ -203,7 +195,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding sortPredicates")
     void builder_shouldAllowOverridingSortPredicates() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .sortPredicates(true)
                 .build();
         assertTrue(config.sortPredicates(), "sortPredicates should be overridden to true");
@@ -212,7 +204,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding strictMode")
     void builder_shouldAllowOverridingStrictMode() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .strictMode(false)
                 .build();
         assertFalse(config.isStrictMode(), "strictMode should be overridden to false");
@@ -222,7 +214,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding literalDatatypePolicy")
     void builder_shouldAllowOverridingLiteralDatatypePolicy() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .build();
         assertEquals(LiteralDatatypePolicyEnum.ALWAYS_TYPED, config.getLiteralDatatypePolicy(), "literalDatatypePolicy should be overridden to ALWAYS_TYPED");
@@ -232,7 +224,7 @@ class TriGOptionTest {
     @DisplayName("Builder should allow setting baseIRI")
     void builder_shouldAllowSettingBaseIRI() {
         String testBaseIRI = "http://example.org/base/";
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .baseIRI(testBaseIRI)
                 .build();
         assertEquals(testBaseIRI, config.getBaseIRI(), "baseIRI should be set correctly");
@@ -242,7 +234,7 @@ class TriGOptionTest {
     @DisplayName("Builder should allow overriding lineEnding")
     void builder_shouldAllowOverridingLineEnding() {
         String customLineEnding = "\r\n";
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .lineEnding(customLineEnding)
                 .build();
         assertEquals(customLineEnding, config.getLineEnding(), "lineEnding should be overridden to custom value");
@@ -251,7 +243,7 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding validateURIs")
     void builder_shouldAllowOverridingValidateURIs() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .validateURIs(true)
                 .build();
         assertTrue(config.validateURIs(), "validateURIs should be overridden to true");
@@ -260,12 +252,20 @@ class TriGOptionTest {
     @Test
     @DisplayName("Builder should allow overriding stableBlankNodeIds")
     void builder_shouldAllowOverridingStableBlankNodeIds() {
-        TriGOption config = TriGOption.builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .stableBlankNodeIds(true)
                 .build();
         assertTrue(config.stableBlankNodeIds(), "stableBlankNodeIds should be overridden to true");
     }
 
+    @Test
+    @DisplayName("Builder should allow overriding includeContext")
+    void builder_shouldAllowOverridingIncludeContext() {
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
+                .includeContext(true)
+                .build();
+        assertTrue(config.includeContext(), "includeContext should be overridden to true");
+    }
 
 
 }

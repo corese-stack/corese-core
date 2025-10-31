@@ -23,7 +23,7 @@ import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.trig.TriGOption;
+import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 
@@ -44,7 +44,7 @@ class TriGCircularTest {
     private ValueFactory valueFactory;
     private SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
-    private TriGOption defaultConfig;
+    private TriGSerializerOptions defaultConfig;
 
     // Test data constants
     private static final String EXAMPLE_NS = "http://example.org/";
@@ -68,7 +68,7 @@ class TriGCircularTest {
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new DefaultSerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = TriGOption.defaultConfig();
+        defaultConfig = TriGSerializerOptions.defaultConfig();
     }
 
     /**

@@ -7,7 +7,6 @@ import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsLexer;
-import fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -23,26 +22,26 @@ import java.nio.charset.StandardCharsets;
  * This parser uses an ANTLR grammar to tokenize and parse N-Quads documents,
  * then a listener to build the RDF model.
  */
-public class ANTLRNQuadsParser extends AbstractRDFParser {
+public class NQuadsParser extends AbstractRDFParser {
 
     /**
-     * Constructor for the ANTLRNQuadsParser.
+     * Constructor for the NQuadsParser. Will generate a
      *
      * @param model   The RDF model to populate.
      * @param factory The ValueFactory for creating RDF resources.
      */
-    public ANTLRNQuadsParser(Model model, ValueFactory factory) {
-        super(model, factory);
+    public NQuadsParser(Model model, ValueFactory factory) {
+        this(model, factory, new NQuadsParserOptions.Builder().build());
     }
 
     /**
-     * Constructor for the ANTLRNQuadsParser with configuration options.
+     * Constructor for the NQuadsParser with configuration options.
      *
      * @param model   The RDF model to populate.
      * @param factory The ValueFactory for creating RDF resources.
      * @param config  The configuration options for parsing.
      */
-    public ANTLRNQuadsParser(Model model, ValueFactory factory, IOOptions config) {
+    public NQuadsParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);
     }
 
@@ -52,18 +51,8 @@ public class ANTLRNQuadsParser extends AbstractRDFParser {
     }
 
     @Override
-    public void parse(InputStream in) throws ParsingErrorException {
-        parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
-    }
-
-    @Override
     public void parse(InputStream in, String baseURI) throws ParsingErrorException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
-    }
-
-    @Override
-    public void parse(Reader reader) throws ParsingErrorException {
-        parse(reader, null);
     }
 
     /**
@@ -82,7 +71,7 @@ public class ANTLRNQuadsParser extends AbstractRDFParser {
             configureErrorHandling(lexer);
 
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            NQuadsParser parser = new NQuadsParser(tokens);
+            fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser parser = new fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser(tokens);
             configureErrorHandling(parser);
 
             ParseTree tree = parser.nquadsDoc();

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 
+import fr.inria.corese.core.next.api.io.IOOptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,13 +16,11 @@ import org.mockito.MockedConstruction;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
 import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.canonical.Rdfc10Serializer;
-import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Serializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XMLSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
 
@@ -35,13 +34,13 @@ class DefaultSerializerFactoryTest {
 
     private DefaultSerializerFactory factory;
     private Model mockModel;
-    private SerializationOption mockConfig;
+    private IOOptions mockConfig;
 
     @BeforeEach
     void setUp() {
         factory = new DefaultSerializerFactory();
         mockModel = mock(Model.class);
-        mockConfig = mock(SerializationOption.class);
+        mockConfig = mock(IOOptions.class);
     }
 
     @Test
@@ -99,11 +98,11 @@ class DefaultSerializerFactoryTest {
     @Test
     @DisplayName("createSerializer should return XmlSerializer for RDFXML format")
     void createSerializer_shouldReturnXmlSerializer_forRdfXmlFormat() {
-        try (MockedConstruction<XmlSerializer> mockedConstruction = mockConstruction(XmlSerializer.class)) {
+        try (MockedConstruction<XMLSerializer> mockedConstruction = mockConstruction(XMLSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFXML, mockModel, mockConfig);
 
             assertNotNull(serializer);
-            assertTrue(serializer instanceof XmlSerializer);
+            assertTrue(serializer instanceof XMLSerializer);
             assertEquals(1, mockedConstruction.constructed().size(), "XmlSerializer constructor should be called once");
         }
     }
@@ -111,11 +110,11 @@ class DefaultSerializerFactoryTest {
     @Test
     @DisplayName("createSerializer should return CanonicalSerializer for CANONICAL_RDF format")
     void createSerializer_shouldReturnCanonicalSerializer_forCanonicalRdfFormat() {
-        try (MockedConstruction<Rdfc10Serializer> mockedConstruction = mockConstruction(Rdfc10Serializer.class)) {
+        try (MockedConstruction<RDFC10Serializer> mockedConstruction = mockConstruction(RDFC10Serializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFC_1_0, mockModel, mockConfig);
 
             assertNotNull(serializer);
-            assertTrue(serializer instanceof Rdfc10Serializer);
+            assertTrue(serializer instanceof RDFC10Serializer);
             assertEquals(1, mockedConstruction.constructed().size(), "CanonicalSerializer constructor should be called once");
         }
     }

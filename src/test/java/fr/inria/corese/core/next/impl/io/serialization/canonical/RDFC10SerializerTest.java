@@ -29,12 +29,12 @@ import static org.mockito.Mockito.*;
  * These tests verify that the serializer correctly delegates to an RDFC-1.0 canonicalization
  * component and formats the resulting canonical statements.
  */
-class Rdfc10SerializerTest {
+class RDFC10SerializerTest {
 
     @Mock
     private Model mockModel;
     @Mock
-    private Rdfc10Canonicalizer mockCanonicalizer;
+    private RDFC10Canonicalizer mockCanonicalizer;
     @Mock
     private BNode mockBNodeE0;
     @Mock
@@ -81,17 +81,17 @@ class Rdfc10SerializerTest {
     private Literal mockLiteral2;
 
 
-    private Rdfc10Serializer serializer;
-    private Rdfc10Options defaultConfig;
+    private RDFC10Serializer serializer;
+    private RDFC10Options defaultConfig;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        defaultConfig = Rdfc10Options.defaultConfig();
+        defaultConfig = RDFC10Options.defaultConfig();
 
         setupBasicMocks();
 
-        serializer = new Rdfc10Serializer(mockModel, defaultConfig, mockCanonicalizer) {
+        serializer = new RDFC10Serializer(mockModel, defaultConfig, mockCanonicalizer) {
             @Override
             protected void writeValue(Writer w, Value v) throws IOException {
                 if (v != null) {
@@ -190,7 +190,7 @@ class Rdfc10SerializerTest {
     @DisplayName("Constructor with null model should throw NullPointerException")
     void testConstructorNullModel() {
         assertThrows(NullPointerException.class, () ->
-                new Rdfc10Serializer(null, defaultConfig, mockCanonicalizer));
+                new RDFC10Serializer(null, defaultConfig, mockCanonicalizer));
     }
 
 
@@ -198,20 +198,20 @@ class Rdfc10SerializerTest {
     @DisplayName("Constructor with null config should throw NullPointerException")
     void testConstructorNullConfig() {
         assertThrows(NullPointerException.class, () ->
-                new Rdfc10Serializer(mockModel, null, mockCanonicalizer));
+                new RDFC10Serializer(mockModel, null, mockCanonicalizer));
     }
 
     @Test
     @DisplayName("Constructor with null canonicalizer should throw NullPointerException")
     void testConstructorNullCanonicalizer() {
         assertThrows(NullPointerException.class, () ->
-                new Rdfc10Serializer(mockModel, defaultConfig, null));
+                new RDFC10Serializer(mockModel, defaultConfig, null));
     }
 
     @Test
     @DisplayName("Constructor with default configuration")
     void testConstructorWithDefaultConfig() {
-        Rdfc10Serializer defaultSerializer = new Rdfc10Serializer(mockModel, defaultConfig, mockCanonicalizer);
+        RDFC10Serializer defaultSerializer = new RDFC10Serializer(mockModel, defaultConfig, mockCanonicalizer);
         assertNotNull(defaultSerializer);
         assertEquals("RDFC-1.0", defaultSerializer.getFormatName());
     }
@@ -345,7 +345,7 @@ class Rdfc10SerializerTest {
         RDFSerializer serializer = serializerFactory.createSerializer(
                 RDFFormat.RDFC_1_0,
                 model,
-                Rdfc10Options.defaultConfig()
+                RDFC10Options.defaultConfig()
         );
 
         StringWriter writer = new StringWriter();

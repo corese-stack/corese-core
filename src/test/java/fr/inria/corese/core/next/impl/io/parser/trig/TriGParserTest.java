@@ -21,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * and interact with the Model and ValueFactory, including error handling
  * and unescaping of IRIs and literals, and named graphs.
  */
-class ANTLRTrigParserTest {
+class TriGParserTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(ANTLRTrigParserTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(TriGParserTest.class);
 
     /**
      * helper method to parse trig data into corese model
@@ -37,7 +37,7 @@ class ANTLRTrigParserTest {
     private Model parseFromString(String trigData, String baseURI) throws Exception {
         Model model = new CoreseModel();
         ValueFactory factory = new CoreseAdaptedValueFactory();
-        RDFParser parser = new ANTLRTrigParser(model, factory);
+        RDFParser parser = new TriGParser(model, factory);
         parser.parse(new StringReader(trigData), baseURI);
         return model;
     }

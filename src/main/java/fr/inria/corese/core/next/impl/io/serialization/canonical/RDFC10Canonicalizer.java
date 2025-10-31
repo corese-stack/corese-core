@@ -18,9 +18,9 @@ import java.util.stream.Stream;
  * This class deterministically re-labels blank nodes and sorts all RDF statements
  * to produce a canonical representation of a dataset.
  */
-public class Rdfc10Canonicalizer {
+public class RDFC10Canonicalizer {
 
-    private final Rdfc10Options.HashAlgorithm hashAlgorithm;
+    private final RDFC10Options.HashAlgorithm hashAlgorithm;
     private final int maxCallsHashNDegreeQuads;
     private final StatementUtils statementUtils;
     private int callsHashNDegreeQuads = 0;
@@ -34,7 +34,7 @@ public class Rdfc10Canonicalizer {
      * @param valueFactory  The factory for creating RDF values, used by StatementUtils for
      * blank node replacement and serialization.
      */
-    public Rdfc10Canonicalizer(Rdfc10Options.HashAlgorithm hashAlgorithm, int maxCalls, ValueFactory valueFactory) {
+    public RDFC10Canonicalizer(RDFC10Options.HashAlgorithm hashAlgorithm, int maxCalls, ValueFactory valueFactory) {
         this.hashAlgorithm = Objects.requireNonNull(hashAlgorithm, "Hash algorithm cannot be null");
         this.maxCallsHashNDegreeQuads = maxCalls;
         this.statementUtils = new StatementUtils(valueFactory);
@@ -390,7 +390,7 @@ public class Rdfc10Canonicalizer {
      */
     private String hash(String data) {
         try {
-            String algorithm = hashAlgorithm == Rdfc10Options.HashAlgorithm.SHA_384 ?
+            String algorithm = hashAlgorithm == RDFC10Options.HashAlgorithm.SHA_384 ?
                     SerializationConstants.SHA_384 : SerializationConstants.SHA_256;
             MessageDigest digest = MessageDigest.getInstance(algorithm);
             byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));

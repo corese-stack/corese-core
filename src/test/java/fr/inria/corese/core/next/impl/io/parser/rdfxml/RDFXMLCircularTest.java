@@ -9,7 +9,6 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +23,7 @@ import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XmlOption;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XMLSerializerOption;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 
@@ -52,7 +51,7 @@ class RDFXMLCircularTest {
     private ValueFactory valueFactory;
     private SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
-    private XmlOption defaultConfig;
+    private XMLSerializerOption defaultConfig;
 
     // Test data constants
     private static final String EXAMPLE_NS = "http://example.org/";
@@ -74,7 +73,7 @@ class RDFXMLCircularTest {
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new DefaultSerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = XmlOption.defaultConfig();
+        defaultConfig = XMLSerializerOption.defaultConfig();
     }
 
     /**

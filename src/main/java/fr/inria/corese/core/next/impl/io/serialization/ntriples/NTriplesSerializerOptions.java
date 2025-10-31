@@ -10,19 +10,19 @@ import fr.inria.corese.core.next.impl.io.serialization.option.AbstractNFamilyOpt
  * <p>Use the {@link Builder} class to create instances of {@code NTriplesConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class NTriplesOption extends AbstractNFamilyOption {
+public class NTriplesSerializerOptions extends AbstractNFamilyOption {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
      *
      * @param builder The builder instance containing the desired configuration values.
      */
-    protected NTriplesOption(Builder builder) {
+    protected NTriplesSerializerOptions(Builder builder) {
         super(builder);
     }
 
     /**
-     * Public Builder for {@link NTriplesOption}.
+     * Public Builder for {@link NTriplesSerializerOptions}.
      * Provides a fluent API for constructing {@code NTriplesConfig} instances with default values
      * specific to the N-Triples format.
      */
@@ -36,13 +36,13 @@ public class NTriplesOption extends AbstractNFamilyOption {
         }
 
         /**
-         * Builds and returns a new {@link NTriplesOption} instance with the current builder settings.
+         * Builds and returns a new {@link NTriplesSerializerOptions} instance with the current builder settings.
          *
          * @return A new {@code NTriplesConfig} instance.
          */
         @Override
-        public NTriplesOption build() {
-            return new NTriplesOption(this);
+        public NTriplesSerializerOptions build() {
+            return new NTriplesSerializerOptions(this);
         }
     }
 
@@ -53,17 +53,17 @@ public class NTriplesOption extends AbstractNFamilyOption {
      *
      * @return A {@code NTriplesConfig} instance with default settings.
      */
-    public static NTriplesOption defaultConfig() {
+    public static NTriplesSerializerOptions defaultConfig() {
         return new Builder().build();
     }
 
     /**
-     * Returns a new builder instance for {@link NTriplesOption}.
+     * Returns a new builder instance for {@link NTriplesSerializerOptions}.
      * This allows for fluent construction of custom N-Triples configurations.
      *
      * @return A new {@code Builder} instance.
      */
-    public static NTriplesOption.Builder builder() {
-        return new NTriplesOption.Builder();
+    public static NTriplesSerializerOptions.Builder builder() {
+        return new NTriplesSerializerOptions.Builder();
     }
 }

@@ -10,19 +10,19 @@ import fr.inria.corese.core.next.impl.io.serialization.option.AbstractNFamilyOpt
  * <p>Use the {@link Builder} class to create instances of {@code NQuadsConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class NQuadsOption extends AbstractNFamilyOption {
+public class NQuadsSerializerOptions extends AbstractNFamilyOption {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
      *
      * @param builder The builder instance containing the desired configuration values.
      */
-    protected NQuadsOption(Builder builder) {
+    protected NQuadsSerializerOptions(Builder builder) {
         super(builder);
     }
 
     /**
-     * Public Builder for {@link NQuadsOption}.
+     * Public Builder for {@link NQuadsSerializerOptions}.
      * Provides a fluent API for constructing {@code NQuadsConfig} instances with default values
      * specific to the N-Quads format.
      */
@@ -35,13 +35,13 @@ public class NQuadsOption extends AbstractNFamilyOption {
         }
 
         /**
-         * Builds and returns a new {@link NQuadsOption} instance with the current builder settings.
+         * Builds and returns a new {@link NQuadsSerializerOptions} instance with the current builder settings.
          *
          * @return A new {@code NQuadsConfig} instance.
          */
         @Override
-        public NQuadsOption build() {
-            return new NQuadsOption(this);
+        public NQuadsSerializerOptions build() {
+            return new NQuadsSerializerOptions(this);
         }
     }
 
@@ -52,12 +52,12 @@ public class NQuadsOption extends AbstractNFamilyOption {
      *
      * @return A {@code NQuadsConfig} instance with default settings.
      */
-    public static NQuadsOption defaultConfig() {
+    public static NQuadsSerializerOptions defaultConfig() {
         return new Builder().build();
     }
 
     /**
-     * Returns a new builder instance for {@link NQuadsOption}.
+     * Returns a new builder instance for {@link NQuadsSerializerOptions}.
      * This allows for fluent construction of custom N-Quads configurations.
      *
      * @return A new {@code Builder} instance.

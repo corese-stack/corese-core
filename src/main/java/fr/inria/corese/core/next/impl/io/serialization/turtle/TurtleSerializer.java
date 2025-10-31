@@ -40,23 +40,23 @@ public class TurtleSerializer extends AbstractGraphSerializer {
 
     /**
      * Constructs a new {@code TurtleSerializer} instance with the specified model and default configuration.
-     * The default configuration is returned by {@link TurtleOption#defaultConfig()}.
+     * The default configuration is returned by {@link TurtleSerializerOptions#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public TurtleSerializer(Model model) {
-        this(model, TurtleOption.defaultConfig());
+        this(model, TurtleSerializerOptions.defaultConfig());
     }
 
     /**
      * Constructs a new {@code TurtleSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link TurtleOption} to use for serialization. Must not be null.
+     * @param config the {@link TurtleSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public TurtleSerializer(Model model, TurtleOption config) {
+    public TurtleSerializer(Model model, TurtleSerializerOptions config) {
         super(model, config);
         Objects.requireNonNull(config, "TurtleConfig cannot be null");
     }

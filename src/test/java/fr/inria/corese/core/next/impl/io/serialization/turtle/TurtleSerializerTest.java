@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
@@ -34,13 +33,13 @@ import static org.mockito.Mockito.*;
 class TurtleSerializerTest {
 
     private Model mockModel;
-    private TurtleOption defaultConfig;
+    private TurtleSerializerOptions defaultConfig;
     private TestStatementFactory factory;
 
     @BeforeEach
     void setUp() {
         mockModel = mock(Model.class);
-        defaultConfig = TurtleOption.defaultConfig();
+        defaultConfig = TurtleSerializerOptions.defaultConfig();
         factory = new TestStatementFactory();
     }
 
@@ -157,7 +156,7 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TurtleOption config = new TurtleOption.Builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .useRdfTypeShortcut(true)
                 .useCollections(true)
@@ -218,7 +217,7 @@ class TurtleSerializerTest {
         StringWriter writer = new StringWriter();
 
 
-        TurtleOption config = new TurtleOption.Builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
@@ -317,14 +316,14 @@ class TurtleSerializerTest {
         ValueFactory valueFactory;
         SerializerFactory serializerFactory;
         ParserFactory parserFactory;
-        TurtleOption defaultConfig;
+        TurtleSerializerOptions defaultConfig;
         String EXAMPLE_NS = "http://example.org/";
         String PREDICATE_KNOWS = EXAMPLE_NS + "knows";
 
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new DefaultSerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = TurtleOption.defaultConfig();
+        defaultConfig = TurtleSerializerOptions.defaultConfig();
 
         Model model = new CoreseModel();
 
@@ -396,7 +395,7 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        TurtleOption configWithBase = new TurtleOption.Builder()
+        TurtleSerializerOptions configWithBase = new TurtleSerializerOptions.Builder()
                 .baseIRI("http://example.org/base/")
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
@@ -480,7 +479,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TurtleOption strictConfig = new TurtleOption.Builder().strictMode(true).build();
+        TurtleSerializerOptions strictConfig = new TurtleSerializerOptions.Builder().strictMode(true).build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
@@ -516,7 +515,7 @@ class TurtleSerializerTest {
 
 
         StringWriter writer = new StringWriter();
-        TurtleOption strictConfig = new TurtleOption.Builder().strictMode(true).validateURIs(true).build();
+        TurtleSerializerOptions strictConfig = new TurtleSerializerOptions.Builder().strictMode(true).validateURIs(true).build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
@@ -552,7 +551,7 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleOption config = new TurtleOption.Builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .useMultilineLiterals(true)
                 .prettyPrint(true)
                 .autoDeclarePrefixes(true)
@@ -596,7 +595,7 @@ class TurtleSerializerTest {
         coreseModel.add(statement);
 
         StringWriter writer = new StringWriter();
-        TurtleOption config = new TurtleOption.Builder()
+        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .autoDeclarePrefixes(false)
                 .includeContext(false)
                 .prettyPrint(false)

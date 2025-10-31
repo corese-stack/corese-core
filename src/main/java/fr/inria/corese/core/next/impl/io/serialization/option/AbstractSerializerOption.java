@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.option;
 
-import fr.inria.corese.core.next.api.io.serialization.SerializationOption;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
 import java.util.Objects;
@@ -14,7 +15,7 @@ import java.util.Objects;
  * nested {@link AbstractBuilder}. Subclasses are expected to extend this
  * configuration and its builder to add format-specific options.</p>
  */
-public abstract class AbstractSerializerOption implements SerializationOption {
+public abstract class AbstractSerializerOption implements IOOptions , BaseIRIOptions {
 
     /**
      * The policy for how literal datatypes are printed.

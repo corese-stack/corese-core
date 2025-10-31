@@ -15,19 +15,19 @@ import java.util.Map;
  * <p>Use the {@link Builder} class to create instances of {@code TurtleConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class TurtleOption extends AbstractTFamilyOption {
+public class TurtleSerializerOptions extends AbstractTFamilyOption {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
      *
      * @param builder The builder instance containing the desired configuration values.
      */
-    protected TurtleOption(Builder builder) {
+    protected TurtleSerializerOptions(Builder builder) {
         super(builder);
     }
 
     /**
-     * Public Builder for {@link TurtleOption}.
+     * Public Builder for {@link TurtleSerializerOptions}.
      * Provides a fluent API for constructing {@code TurtleConfig} instances with default values
      * specific to the Turtle format.
      */
@@ -52,13 +52,13 @@ public class TurtleOption extends AbstractTFamilyOption {
         }
 
         /**
-         * Builds and returns a new {@link TurtleOption} instance with the current builder settings.
+         * Builds and returns a new {@link TurtleSerializerOptions} instance with the current builder settings.
          *
          * @return A new {@code TurtleConfig} instance.
          */
         @Override
-        public TurtleOption build() {
-            return new TurtleOption(this);
+        public TurtleSerializerOptions build() {
+            return new TurtleSerializerOptions(this);
         }
     }
 
@@ -69,18 +69,18 @@ public class TurtleOption extends AbstractTFamilyOption {
      *
      * @return A {@code TurtleConfig} instance with default settings.
      */
-    public static TurtleOption defaultConfig() {
+    public static TurtleSerializerOptions defaultConfig() {
         return new Builder().build();
     }
 
 
     /**
-     * Returns a new builder instance for {@link TurtleOption}.
+     * Returns a new builder instance for {@link TurtleSerializerOptions}.
      * This allows for fluent construction of custom Turtle configurations.
      *
      * @return A new {@code Builder} instance.
      */
-    public static TurtleOption.Builder builder() {
-        return new TurtleOption.Builder();
+    public static TurtleSerializerOptions.Builder builder() {
+        return new TurtleSerializerOptions.Builder();
     }
 }

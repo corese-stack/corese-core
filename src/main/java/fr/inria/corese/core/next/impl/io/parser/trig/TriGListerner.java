@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.trig;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.parser.RDFParserBaseIRIOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.common.AbstractTurtleTriGListener;
@@ -44,9 +44,8 @@ public class TriGListerner extends TriGBaseListener {
      */
     public TriGListerner(Model model, ValueFactory factory, IOOptions options) {
         String baseURI;
-        if (options instanceof RDFParserBaseIRIOptions) {
-            RDFParserBaseIRIOptions baseIRIOptions = (RDFParserBaseIRIOptions) options;
-            baseURI = baseIRIOptions.getBase() != null ? baseIRIOptions.getBase() : ParserConstants.EMPTY_STRING;
+        if (options instanceof BaseIRIOptions baseIRIOptions) {
+            baseURI = baseIRIOptions.getBaseIRI() != null ? baseIRIOptions.getBaseIRI() : ParserConstants.EMPTY_STRING;
         } else {
             baseURI = ParserConstants.EMPTY_STRING;
         }

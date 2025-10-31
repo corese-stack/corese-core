@@ -54,7 +54,7 @@ public class RDFXMLParser extends AbstractRDFParser {
      * @param factory the RDF value factory for term creation
      */
     public RDFXMLParser(Model model, ValueFactory factory) {
-        this(model, factory, null);
+        this(model, factory, new RDFXMLParserOptions.Builder().build());
     }
 
     /**
@@ -76,17 +76,8 @@ public class RDFXMLParser extends AbstractRDFParser {
     }
 
     @Override
-    public void parse(InputStream in) throws ParsingErrorException {
-        parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
-    }
-
-    @Override
     public void parse(InputStream in, String baseURI) throws ParsingErrorException {
         parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseURI);
-    }
-
-    public void parse(Reader reader) throws ParsingErrorException {
-        parse(reader, null);
     }
 
     @Override

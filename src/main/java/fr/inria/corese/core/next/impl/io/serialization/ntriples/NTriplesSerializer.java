@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
 
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,24 +27,24 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
 
     /**
      * Constructs a new {@code NTriplesSerializer} instance with the specified model and default configuration.
-     * The default configuration is obtained from {@link NTriplesOption#defaultConfig()}.
+     * The default configuration is obtained from {@link NTriplesSerializerOptions#defaultConfig()}.
      *
      * @param model the {@link Model} to be serialized. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public NTriplesSerializer(Model model) {
-        this(model, NTriplesOption.defaultConfig());
+        this(model, NTriplesSerializerOptions.defaultConfig());
     }
 
     /**
      * Constructs a new {@code NTriplesSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link NTriplesOption} to use for serialization. Must not be null.
+     * @param config the {@link NTriplesSerializerOptions} to use for serialization. Must not be null.
      *               This config object should be an instance of {@code NTriplesConfig} or a subclass thereof.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NTriplesSerializer(Model model, NTriplesOption config) {
+    public NTriplesSerializer(Model model, NTriplesSerializerOptions config) {
         super(model, config);
         Objects.requireNonNull(config, "NTriplesConfig cannot be null");
     }
@@ -55,7 +56,7 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
      */
     @Override
     protected String getFormatName() {
-        return "N-Triples";
+        return RDFFormat.NTRIPLES.getName();
     }
 
     /**
