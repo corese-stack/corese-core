@@ -14,8 +14,6 @@ import java.util.*;
  */
 public class RDFaEvaluationContextHandler {
 
-    private ValueFactory factory;
-
     /**
      * This will usually be the URL of the document being processed, but it could be some other URL, set by some other mechanism, such as the XHTML base element. The important thing is that it establishes a URL against which relative paths can be resolved.
      */
@@ -46,19 +44,57 @@ public class RDFaEvaluationContextHandler {
      */
     private String language = null;
 
-    private Statement incompleteStatementToStatement(RDFaIncompleteStatement incompleteStatement) {
-        Objects.requireNonNull(incompleteStatement.getSubject(), "Null subject, IncompleteStatement can only be converted if all its component are non-null.");
-        Objects.requireNonNull(incompleteStatement.getPredicate(), "Null predicate, IncompleteStatement can only be converted if all its component are non-null.");
-        Objects.requireNonNull(incompleteStatement.getObject(), "Null object, IncompleteStatement can only be converted if all its component are non-null.");
-
-        return factory.createStatement(incompleteStatement.getSubject(), incompleteStatement.getPredicate(), incompleteStatement.getObject());
+    public RDFaEvaluationContextHandler(IRI baseIri) {
+        this.baseIri = baseIri;
+        this.parentSubjectResource = baseIri;
     }
 
-    public boolean isRecursive() {
-        return recursive;
+    public RDFaEvaluationContextHandler(IRI baseIri, IRI parentSubjectResource) {
+        this.baseIri = baseIri;
+        this.parentSubjectResource = parentSubjectResource;
     }
 
-    public void setRecursive(boolean recursive) {
-        this.recursive = recursive;
+    public IRI getBaseIri() {
+        return baseIri;
+    }
+
+    public void setBaseIri(IRI baseIri) {
+        this.baseIri = baseIri;
+    }
+
+    public Resource getParentSubjectResource() {
+        return parentSubjectResource;
+    }
+
+    public void setParentSubjectResource(Resource parentSubjectResource) {
+        this.parentSubjectResource = parentSubjectResource;
+    }
+
+    public Resource getParentObjectResource() {
+        return parentObjectResource;
+    }
+
+    public void setParentObjectResource(Resource parentObjectResource) {
+        this.parentObjectResource = parentObjectResource;
+    }
+
+    public Map<String, IRI> getUriMappings() {
+        return uriMappings;
+    }
+
+    public void setUriMappings(Map<String, IRI> uriMappings) {
+        this.uriMappings = uriMappings;
+    }
+
+    /**
+     * @param prefix the prefix WITHOUT ":"
+     * @return the IRI associated to the prefix in this context
+     */
+    public IRI getUriMapping(String prefix) {
+        return this.uriMappings.get(prefix);
+    }
+
+    public void addUriMapping(String prefix, IRI prefixIri) {
+        this.uriMappings.put(prefix, prefixIri);
     }
 }
