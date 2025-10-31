@@ -24,15 +24,16 @@ public class RDFC10Canonicalizer {
     private final int maxCallsHashNDegreeQuads;
     private final StatementUtils statementUtils;
     private int callsHashNDegreeQuads = 0;
+    private Set<String> currentPathVisited = new HashSet<>();
 
     /**
      * Constructs a new Rdfc10Canonicalizer with specified configuration.
      *
      * @param hashAlgorithm The hashing algorithm to use for canonicalization (SHA-256 or SHA-384).
      * @param maxCalls      The maximum number of recursive calls to the Hash N-Degree Quads algorithm
-     * to prevent infinite loops on complex cyclic graphs.
+     *                      to prevent infinite loops on complex cyclic graphs.
      * @param valueFactory  The factory for creating RDF values, used by StatementUtils for
-     * blank node replacement and serialization.
+     *                      blank node replacement and serialization.
      */
     public RDFC10Canonicalizer(RDFC10SerializerOptions.HashAlgorithm hashAlgorithm, int maxCalls, ValueFactory valueFactory) {
         this.hashAlgorithm = Objects.requireNonNull(hashAlgorithm, "Hash algorithm cannot be null");
@@ -52,7 +53,7 @@ public class RDFC10Canonicalizer {
      * @param model The input model to canonicalize. Must not be null.
      * @return A list of canonicalized and sorted statements ready for serialization.
      * @throws SerializationException if canonicalization fails due to algorithmic constraints
-     * or invalid input data.
+     *                                or invalid input data.
      */
     public List<Statement> canonicalize(Model model) {
         Objects.requireNonNull(model, "Model cannot be null");
@@ -71,7 +72,7 @@ public class RDFC10Canonicalizer {
 
         // Reset the recursive call counter for each canonicalization operation
         callsHashNDegreeQuads = 0;
-
+        currentPathVisited.clear();
         // Step 1: Create a mapping of blank nodes to their associated statements
         Map<String, Set<Statement>> blankNodeToQuads = createBNodeToQuadsMap(stmtList);
 
@@ -98,7 +99,7 @@ public class RDFC10Canonicalizer {
      * @return A map linking blank node identifiers to their associated statements.
      */
     private Map<String, Set<Statement>> createBNodeToQuadsMap(List<Statement> statements) {
-        Map<String, Set<Statement>> blankNodeToQuads = new HashMap<>();
+        Map<String, Set<Statement>> blankNodeToQuads = new LinkedHashMap<>();
 
         for (Statement stmt : statements) {
             if (stmt == null) continue;
@@ -132,39 +133,44 @@ public class RDFC10Canonicalizer {
         Map<String, String> canonicalIssuer = new HashMap<>();
         int counter = 0;
 
+        List<String> bnodeOrder = new ArrayList<>(bnodeToQuads.keySet());
+
         // Step 1: Calculate first-degree hashes for all blank nodes
-        Map<String, String> firstDegreeHashes = new HashMap<>();
-        for (String bnode : bnodeToQuads.keySet()) {
+        Map<String, String> firstDegreeHashes = new LinkedHashMap<>();
+        for (String bnode : bnodeOrder) {
             String hash = hashFirstDegreeQuads(bnode, bnodeToQuads);
             firstDegreeHashes.put(bnode, hash);
         }
 
         // Step 2: Create hash groups
-        Map<String, List<String>> hashToNodes = new HashMap<>();
-        for (String node : bnodeToQuads.keySet()) {
+        Map<String, List<String>> hashToNodes = new LinkedHashMap<>();
+        for (String node : bnodeOrder) {
             String hash = firstDegreeHashes.get(node);
             hashToNodes.computeIfAbsent(hash, k -> new ArrayList<>()).add(node);
         }
 
         // Step 3: Separate into single-node and multi-node groups
-        List<String> singleNodeHashes = new ArrayList<>();
+        List<String> singleNodeBnodes = new ArrayList<>();
         List<String> multiNodeHashes = new ArrayList<>();
+
+        for (String bnode : bnodeOrder) {
+            String hash = firstDegreeHashes.get(bnode);
+            if (hashToNodes.get(hash).size() == 1) {
+                singleNodeBnodes.add(bnode);
+            }
+        }
+
         for (Map.Entry<String, List<String>> entry : hashToNodes.entrySet()) {
-            if (entry.getValue().size() == 1) {
-                singleNodeHashes.add(entry.getKey());
-            } else {
+            if (entry.getValue().size() > 1) {
                 multiNodeHashes.add(entry.getKey());
             }
         }
 
-        // Sort hashes within their groups
-        Collections.sort(singleNodeHashes);
         Collections.sort(multiNodeHashes);
 
-        // Step 4: Process single-node groups first
-        for (String hash : singleNodeHashes) {
-            String node = hashToNodes.get(hash).get(0);
-            canonicalIssuer.put(node, SerializationConstants.C14N + counter++);
+        // Step 4: Process single-node groups FIRST (dans l'ordre d'apparition!)
+        for (String bnode : singleNodeBnodes) {
+            canonicalIssuer.put(bnode, SerializationConstants.C14N + counter++);
         }
 
         // Step 5: Process multi-node groups using N-degree hashing
@@ -178,13 +184,14 @@ public class RDFC10Canonicalizer {
                 nDegreeHashes.put(node, nDegreeHash);
             }
 
-            nodes.sort((n1, n2) -> {
+            List<String> sortedNodes = new ArrayList<>(nodes);
+            sortedNodes.sort((n1, n2) -> {
                 int cmp = nDegreeHashes.get(n1).compareTo(nDegreeHashes.get(n2));
                 if (cmp != 0) return cmp;
-                return n1.compareTo(n2);
+                return Integer.compare(bnodeOrder.indexOf(n1), bnodeOrder.indexOf(n2));
             });
 
-            for (String node : nodes) {
+            for (String node : sortedNodes) {
                 canonicalIssuer.put(node, SerializationConstants.C14N + counter++);
             }
         }
@@ -238,52 +245,64 @@ public class RDFC10Canonicalizer {
             );
         }
 
-        // Collect all related blank nodes from all quads containing this node
-        Set<String> relatedBlankNodes = new HashSet<>();
-        for (Statement quad : blankNodeToQuads.get(identifier)) {
-            relatedBlankNodes.addAll(getRelatedBlankNodes(quad, identifier));
+        if (currentPathVisited.contains(identifier)) {
+            // Return a stable hash for cyclic references to break the infinite recursion
+            return hash("CYCLE:" + identifier + ":" + issuer.issue(identifier));
         }
 
-        // Calculate hashes for each related blank node
-        List<String> relatedHashes = new ArrayList<>();
-        for (String relatedNode : relatedBlankNodes) {
-            String relatedHash;
+        try {
+            currentPathVisited.add(identifier);
 
-            if (canonicalIssuer.containsKey(relatedNode)) {
-                // Use canonical ID if already assigned
-                relatedHash = canonicalIssuer.get(relatedNode);
-            } else if (issuer.hasIssued(relatedNode)) {
-                // Use temporary ID if already issued
-                relatedHash = issuer.issue(relatedNode);
-            } else {
-                // Recursively calculate N-degree hash
-                TemporaryIssuer newIssuer = issuer.copy();
-                relatedHash = hashNDegreeQuads(relatedNode, blankNodeToQuads, canonicalIssuer, newIssuer);
+            // Collect all related blank nodes from all quads containing this node
+            Set<String> relatedBlankNodes = new HashSet<>();
+            for (Statement quad : blankNodeToQuads.get(identifier)) {
+                relatedBlankNodes.addAll(getRelatedBlankNodes(quad, identifier));
             }
 
-            relatedHashes.add(relatedHash);
+            // Calculate hashes for each related blank node
+            List<String> relatedHashes = new ArrayList<>();
+            for (String relatedNode : relatedBlankNodes) {
+                String relatedHash;
+
+                if (canonicalIssuer.containsKey(relatedNode)) {
+                    // Use canonical ID if already assigned
+                    relatedHash = canonicalIssuer.get(relatedNode);
+                } else if (issuer.hasIssued(relatedNode)) {
+                    // Use temporary ID if already issued
+                    relatedHash = issuer.issue(relatedNode);
+                } else {
+                    // Recursively calculate N-degree hash
+                    TemporaryIssuer newIssuer = issuer.copy();
+                    relatedHash = hashNDegreeQuads(relatedNode, blankNodeToQuads, canonicalIssuer, newIssuer);
+                }
+
+                relatedHashes.add(relatedHash);
+            }
+
+            // Sort the related hashes
+            Collections.sort(relatedHashes);
+
+            // Build the final hash input
+            StringBuilder hashInput = new StringBuilder();
+            hashInput.append(hashFirstDegreeQuads(identifier, blankNodeToQuads));
+            for (String relatedHash : relatedHashes) {
+                hashInput.append(relatedHash);
+            }
+
+            return hash(hashInput.toString());
+
+        } finally {
+            currentPathVisited.remove(identifier);
         }
-
-        // Sort the related hashes
-        Collections.sort(relatedHashes);
-
-        // Build the final hash input
-        StringBuilder hashInput = new StringBuilder();
-        hashInput.append(hashFirstDegreeQuads(identifier, blankNodeToQuads));
-        for (String relatedHash : relatedHashes) {
-            hashInput.append(relatedHash);
-        }
-
-        return hash(hashInput.toString());
     }
 
     /**
      * Converts a statement to canonical N-Quad format for hashing, replacing
      * a specific blank node with a placeholder string.
      *
-     * @param quad             The statement to convert.
+     * @param quad               The statement to convert.
      * @param blankNodeToReplace The blank node identifier to replace.
-     * @param replacement      The placeholder string to use for replacement.
+     * @param replacement        The placeholder string to use for replacement.
      * @return A canonical N-Quad string with placeholder substitution.
      */
     private String quadToNQuad(Statement quad, String blankNodeToReplace, String replacement) {
@@ -376,9 +395,11 @@ public class RDFC10Canonicalizer {
                 .map(stmt -> statementUtils.replaceBlankNodes(stmt, canonicalMap))
                 .toList();
 
-        return replaced.stream()
+        List<Statement> sorted = replaced.stream()
                 .sorted(Comparator.comparing(StatementUtils::toNQuad))
                 .toList();
+
+        return sorted;
     }
 
     /**

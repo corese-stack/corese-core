@@ -92,17 +92,6 @@ public class StatementUtils {
      * @param value The Value to check.
      * @return true if the value is a blank node, false otherwise.
      */
-    public static boolean isBlankNode(Value value) {
-        return value != null && value.isBNode();
-    }
-
-    /**
-     * Extracts the identifier string from a blank node Value.
-     * For blank nodes, this returns the local identifier without the ":_" prefix.
-     *
-     * @param value The blank node Value from which to extract the identifier.
-     * @return The blank node identifier string, or null if the value is not a blank node.
-     */
     public static String getBlankNodeId(Value value) {
         if (value == null) return null;
         if (isBlankNode(value)) {
@@ -114,6 +103,32 @@ public class StatementUtils {
         }
         return null;
     }
+
+    /**
+     * Extracts the identifier string from a blank node Value.
+     * For blank nodes, this returns the local identifier without the ":_" prefix.
+     *
+     * @param value The blank node Value from which to extract the identifier.
+     * @return The blank node identifier string, or null if the value is not a blank node.
+     */
+    public static boolean isBlankNode(Value value) {
+        if (value == null) return false;
+
+        if (value.isBNode()) {
+            return true;
+        }
+
+        if (value instanceof Resource) {
+            String str = value.stringValue();
+            if (str.startsWith(SerializationConstants.BNODE_PREFIX)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 
     /**
      * Serializes a Value for lexicographic comparison according to RDFC-1.0 specifications.

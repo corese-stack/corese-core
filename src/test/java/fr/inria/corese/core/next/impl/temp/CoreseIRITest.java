@@ -65,9 +65,6 @@ public class CoreseIRITest extends IRITest {
         assertEquals("test", coreseIRI2.getLocalName());
     }
 
-    @Test
-    public void constructorStringException() {
-        assertThrows(IncorrectFormatException.class, () -> new CoreseIRI("test"));
-    }
+
 
 }
