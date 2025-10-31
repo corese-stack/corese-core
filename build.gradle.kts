@@ -109,9 +109,10 @@ repositories {
 
 dependencies {
     // === Logging ===
+    // As a library, corese-core should only depend on the SLF4J API.
+    // The actual logging implementation (Logback, Log4j2, etc.) should be chosen
+    // by the consuming application (e.g., corese-command).
     api("org.slf4j:slf4j-api:2.0.17")                                                  // Logging API only (SLF4J)
-    runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.0")                          // Log4j2 core for internal logging
-    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
 
     // === Core dependencies ===
     api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                                        // RDF/XML parser (Jena ARP)
