@@ -36,6 +36,7 @@ public abstract class ValueFactoryTest {
 
         assertNotNull(this.valueFactory.createIRI(correctIRI));
         assertThrows(IncorrectFormatException.class, () -> this.valueFactory.createIRI(incorrectIRI));
+        assertThrows(IncorrectFormatException.class, () -> this.valueFactory.createIRI(incorrectIRI));
     }
 
     @Test

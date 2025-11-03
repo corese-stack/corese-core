@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.common;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
@@ -58,12 +59,12 @@ public abstract class AbstractTurtleTriGListener {
      *
      * @param text raw IRI text including angle brackets
      * @return unescaped IRI string
+     * @throws ParsingErrorException if the IRI contains invalid characters after escape processing
      */
     public String extractAndUnescapeIRI(String text) {
         String iri = text.substring(1, text.length() - 1);
         iri = unescapeIRI(iri);
-        validateIRI(iri);
-        return iri;
+        return validateIRI(iri) ? iri : iri;
     }
 
     /**
@@ -87,7 +88,7 @@ public abstract class AbstractTurtleTriGListener {
      */
     public void registerPrefix(String prefix, String iri) {
         String resolvedIRI = resolveIRIAgainstBase(iri);
-        validateIRI(resolvedIRI);  
+        validateIRI(resolvedIRI);
         prefixMap.put(prefix, resolvedIRI);
         model.setNamespace(prefix, resolvedIRI);
 
@@ -655,24 +656,23 @@ public abstract class AbstractTurtleTriGListener {
      * Validates that an IRI contains only valid characters after escape sequence processing.
      *
      * @param iri the IRI string to validate (after escape sequences have been processed)
+     * @return true if the IRI is valid
      * @throws ParsingErrorException if the IRI contains forbidden characters
      */
-    private void validateIRI(String iri) throws ParsingErrorException {
+    private boolean validateIRI(String iri) throws ParsingErrorException {
         if (iri == null || iri.isEmpty()) {
-            return; // Empty IRIs are acceptable
+            return true;  // Empty IRIs are acceptable
         }
-
 
         // Check each character in the IRI
         for (int i = 0; i < iri.length(); i++) {
             char c = iri.charAt(i);
 
             // Check for forbidden characters
-            if (isInvalidIRICharacter(c)) {
+            if (IRIUtils.isInvalidIRICharacter(c)) {
                 String codePoint = String.format("U+%04X", (int) c);
-                String charDesc = getCharacterDescription(c);
-                String displayIRI = escapeForDisplay(iri);
-
+                String charDesc = IRIUtils.getCharacterDescription(c);
+                String displayIRI = IRIUtils.escapeForDisplay(iri);
 
                 throw new ParsingErrorException(
                         "Invalid character in IRI: " + codePoint + " (" + charDesc + ") " +
@@ -682,126 +682,7 @@ public abstract class AbstractTurtleTriGListener {
                 );
             }
         }
-
-    }
-
-    /**
-     * Checks if a character is invalid in an IRI according to RFC 3987.
-     *
-     * @param c the character to validate
-     * @return true if the character is forbidden in IRIs
-     */
-    private boolean isInvalidIRICharacter(char c) {
-        // Space (U+0020) - NOT ALLOWED
-        if (c == 0x20) {
-            return true;
-        }
-
-        // Control characters (U+0000-U+001F) - NOT ALLOWED
-        if (c >= 0x00 && c <= 0x1F) {
-            return true;
-        }
-
-        // DEL (U+007F) - NOT ALLOWED
-        if (c == 0x7F) {
-            return true;
-        }
-
-        // High control characters (U+0080-U+009F) - NOT ALLOWED
-        if (c >= 0x80 && c <= 0x9F) {
-            return true;
-        }
-
-        switch (c) {
-            case '<':  // U+003C - less than
-            case '>':  // U+003E - greater than
-            case '{':  // U+007B - left curly bracket
-            case '}':  // U+007D - right curly bracket
-            case '\\': // U+005C - backslash
-            case '^':  // U+005E - circumflex
-            case '`':  // U+0060 - grave accent
-            case '|':  // U+007C - pipe
-            case '"':  // U+0022 - quotation mark
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * Returns a human-readable description of a character for error messages.
-     *
-     * @param c the character to describe
-     * @return human-readable description
-     */
-    private String getCharacterDescription(char c) {
-        switch (c) {
-            case 0x00:
-                return "null character";
-            case 0x09:
-                return "tab";
-            case 0x0A:
-                return "line feed";
-            case 0x0D:
-                return "carriage return";
-            case 0x20:
-                return "space";
-            case 0x7F:
-                return "delete";
-            case '<':
-                return "less than";
-            case '>':
-                return "greater than";
-            case '{':
-                return "left curly bracket";
-            case '}':
-                return "right curly bracket";
-            case '\\':
-                return "backslash";
-            case '^':
-                return "circumflex";
-            case '`':
-                return "grave accent";
-            case '|':
-                return "pipe";
-            case '"':
-                return "quotation mark";
-            default:
-                if (c < 0x20) {
-                    return "control character";
-                } else if (c >= 0x80 && c <= 0x9F) {
-                    return "high control character";
-                } else {
-                    return String.format("character '%c'", c);
-                }
-        }
-    }
-
-    /**
-     * Escapes characters in a string for display in error messages.
-     *
-     * @param iri the IRI to escape for display
-     * @return escaped version suitable for error messages
-     */
-    private String escapeForDisplay(String iri) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < iri.length(); i++) {
-            char c = iri.charAt(i);
-            if (c < 0x20 || (c >= 0x7F && c <= 0x9F)) {
-                // Display control characters as Unicode escapes
-                sb.append(String.format("\\u%04X", (int) c));
-            } else if (c > 0x7E) {
-                // Display non-ASCII as Unicode escapes for clarity
-                sb.append(String.format("\\u%04X", (int) c));
-            } else if (c == '<' || c == '>' || c == '{' || c == '}' || c == '\\' || c == '^' || c == '`' || c == '|' || c == '"') {
-                // Display reserved characters with backslash escape
-                sb.append('\\').append(c);
-            } else {
-                // Display normal ASCII characters as-is
-                sb.append(c);
-            }
-        }
-        return sb.toString();
+        return true;
     }
 
     /**
