@@ -27,6 +27,8 @@ public abstract class AbstractTurtleTriGListener {
     public Resource currentSubject;
     public IRI currentPredicate;
 
+    private final java.util.Set<String> explicitlyDeclaredPrefixes = new java.util.HashSet<>();
+
     /**
      * Constructs a parser listener with the specified model, factory and base URI.
      *
@@ -59,7 +61,9 @@ public abstract class AbstractTurtleTriGListener {
      */
     public String extractAndUnescapeIRI(String text) {
         String iri = text.substring(1, text.length() - 1);
-        return unescapeIRI(iri);
+        iri = unescapeIRI(iri);
+        validateIRI(iri);
+        return iri;
     }
 
     /**
@@ -69,6 +73,8 @@ public abstract class AbstractTurtleTriGListener {
      */
     public void updateBaseURI(String newBase) {
         this.baseURI = resolveIRIAgainstBase(newBase);
+        validateIRI(this.baseURI);
+
         prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
         model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
     }
@@ -81,8 +87,11 @@ public abstract class AbstractTurtleTriGListener {
      */
     public void registerPrefix(String prefix, String iri) {
         String resolvedIRI = resolveIRIAgainstBase(iri);
+        validateIRI(resolvedIRI);  
         prefixMap.put(prefix, resolvedIRI);
         model.setNamespace(prefix, resolvedIRI);
+
+        explicitlyDeclaredPrefixes.add(prefix);
     }
 
     /**
@@ -109,6 +118,7 @@ public abstract class AbstractTurtleTriGListener {
             if (raw.startsWith(ParserConstants.IRI_START) && raw.endsWith(ParserConstants.IRI_END)) {
                 String iri = raw.substring(1, raw.length() - 1);
                 iri = unescapeIRI(iri);
+                validateIRI(iri);
                 return iri.isEmpty() ? getEffectiveBaseURI() : resolveIRIAgainstBase(iri);
             }
 
@@ -117,23 +127,33 @@ public abstract class AbstractTurtleTriGListener {
                 String prefix = parts[0];
                 String localName = parts[1];
 
+                if (prefix.isEmpty() && !explicitlyDeclaredPrefixes.contains("")) {
+                    throw new ParsingErrorException(
+                            "Syntax error: prefixed name ':' + '" + localName + "' used but ':' prefix was never declared. " +
+                                    "Use @prefix : <baseURI> to declare the empty prefix."
+                    );
+                }
+
                 if (prefixMap.containsKey(prefix)) {
                     localName = unescapeIRI(localName);
                     String ns = prefixMap.get(prefix);
                     if (ns != null) {
-                        return ns + localName;
+                        String result = ns + localName;
+                        validateIRI(result);
+                        return result;
                     }
-                }
-
-                if (isAbsoluteIRI(raw)) {
+                } else if (isAbsoluteIRI(raw)) {
                     return raw;
+                } else {
+                    throw new ParsingErrorException("Undeclared prefix: " + prefix);
                 }
-
-                throw new ParsingErrorException("Undeclared prefix: " + prefix);
             }
 
-            return resolveIRIAgainstBase(raw);
+            String result = resolveIRIAgainstBase(raw);
+            return result;
 
+        } catch (ParsingErrorException e) {
+            throw e;
         } catch (IllegalArgumentException e) {
             throw new ParsingErrorException(e.getMessage(), e);
         }
@@ -448,6 +468,7 @@ public abstract class AbstractTurtleTriGListener {
         String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.getDefaultBaseURI();
         return normalizeURI(effective);
     }
+
     /**
      * Processes Unicode escape sequences in IRIs.
      *
@@ -628,6 +649,159 @@ public abstract class AbstractTurtleTriGListener {
             default:
                 return factory.createLiteral(text, XSD.INTEGER.getIRI());
         }
+    }
+
+    /**
+     * Validates that an IRI contains only valid characters after escape sequence processing.
+     *
+     * @param iri the IRI string to validate (after escape sequences have been processed)
+     * @throws ParsingErrorException if the IRI contains forbidden characters
+     */
+    private void validateIRI(String iri) throws ParsingErrorException {
+        if (iri == null || iri.isEmpty()) {
+            return; // Empty IRIs are acceptable
+        }
+
+
+        // Check each character in the IRI
+        for (int i = 0; i < iri.length(); i++) {
+            char c = iri.charAt(i);
+
+            // Check for forbidden characters
+            if (isInvalidIRICharacter(c)) {
+                String codePoint = String.format("U+%04X", (int) c);
+                String charDesc = getCharacterDescription(c);
+                String displayIRI = escapeForDisplay(iri);
+
+
+                throw new ParsingErrorException(
+                        "Invalid character in IRI: " + codePoint + " (" + charDesc + ") " +
+                                "at position " + i + ". " +
+                                "IRI after escape processing: " + displayIRI + ". " +
+                                "IRIs cannot contain space, control characters, or reserved characters."
+                );
+            }
+        }
+
+    }
+
+    /**
+     * Checks if a character is invalid in an IRI according to RFC 3987.
+     *
+     * @param c the character to validate
+     * @return true if the character is forbidden in IRIs
+     */
+    private boolean isInvalidIRICharacter(char c) {
+        // Space (U+0020) - NOT ALLOWED
+        if (c == 0x20) {
+            return true;
+        }
+
+        // Control characters (U+0000-U+001F) - NOT ALLOWED
+        if (c >= 0x00 && c <= 0x1F) {
+            return true;
+        }
+
+        // DEL (U+007F) - NOT ALLOWED
+        if (c == 0x7F) {
+            return true;
+        }
+
+        // High control characters (U+0080-U+009F) - NOT ALLOWED
+        if (c >= 0x80 && c <= 0x9F) {
+            return true;
+        }
+
+        switch (c) {
+            case '<':  // U+003C - less than
+            case '>':  // U+003E - greater than
+            case '{':  // U+007B - left curly bracket
+            case '}':  // U+007D - right curly bracket
+            case '\\': // U+005C - backslash
+            case '^':  // U+005E - circumflex
+            case '`':  // U+0060 - grave accent
+            case '|':  // U+007C - pipe
+            case '"':  // U+0022 - quotation mark
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Returns a human-readable description of a character for error messages.
+     *
+     * @param c the character to describe
+     * @return human-readable description
+     */
+    private String getCharacterDescription(char c) {
+        switch (c) {
+            case 0x00:
+                return "null character";
+            case 0x09:
+                return "tab";
+            case 0x0A:
+                return "line feed";
+            case 0x0D:
+                return "carriage return";
+            case 0x20:
+                return "space";
+            case 0x7F:
+                return "delete";
+            case '<':
+                return "less than";
+            case '>':
+                return "greater than";
+            case '{':
+                return "left curly bracket";
+            case '}':
+                return "right curly bracket";
+            case '\\':
+                return "backslash";
+            case '^':
+                return "circumflex";
+            case '`':
+                return "grave accent";
+            case '|':
+                return "pipe";
+            case '"':
+                return "quotation mark";
+            default:
+                if (c < 0x20) {
+                    return "control character";
+                } else if (c >= 0x80 && c <= 0x9F) {
+                    return "high control character";
+                } else {
+                    return String.format("character '%c'", c);
+                }
+        }
+    }
+
+    /**
+     * Escapes characters in a string for display in error messages.
+     *
+     * @param iri the IRI to escape for display
+     * @return escaped version suitable for error messages
+     */
+    private String escapeForDisplay(String iri) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < iri.length(); i++) {
+            char c = iri.charAt(i);
+            if (c < 0x20 || (c >= 0x7F && c <= 0x9F)) {
+                // Display control characters as Unicode escapes
+                sb.append(String.format("\\u%04X", (int) c));
+            } else if (c > 0x7E) {
+                // Display non-ASCII as Unicode escapes for clarity
+                sb.append(String.format("\\u%04X", (int) c));
+            } else if (c == '<' || c == '>' || c == '{' || c == '}' || c == '\\' || c == '^' || c == '`' || c == '|' || c == '"') {
+                // Display reserved characters with backslash escape
+                sb.append('\\').append(c);
+            } else {
+                // Display normal ASCII characters as-is
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     /**
