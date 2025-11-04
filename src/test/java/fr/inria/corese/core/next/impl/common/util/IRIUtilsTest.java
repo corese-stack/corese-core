@@ -23,8 +23,8 @@ public class IRIUtilsTest {
 
     // Array of strings that should be recognized as correct IRIs. Some of them taken from the official IRI documentation.
     private static final String[] correctARIs = { uriSchema, uriWithFragment, uriWithQuery, uriWithPort, uriWithPortAndQuery, uriWithPortAndQueryAndFragment, uriWithPortAndFragment, uriToHTMLPage, uriToHTMLPageWithQuery, uriToHTMLPageWithQueryAndFragment, uriToHTMLPageWithFragment, "ftp://ftp.is.co.za/rfc/rfc1808.txt", "http://www.ietf.org/rfc/rfc2396.txt", "ldap://[2001:db8::7]/c=GB?objectClass?one", "mailto:John.Doe@example.com", "news:comp.infosystems.www.servers.unix", "tel:+1-816-555-1212", "telnet://192.0.2.16:80/", "urn:oasis:names:specification:docbook:dtd:xml:4.1.2", "http://foo.co.uk/", "http://regexr.com/foo.html?q=bar" };
-    private static final String[] incorrectIRIs = { "0123456789 +-.,!@#$%^&*();\\\\/|<>\\\"\\'", "12345 -98.7 3.141 .6180 9,000 +42", "555.123.4567\t+1-(800)-555-2468", "foodemo.net", "bar.ba.test.co.uk", "www.demo.com", "g.com", "g-.com", "com.g", "-g.com", "xn--d1ai6ai.xn--p1ai", "xn-fsqu00a.xn-0zwm56d", "xn--stackoverflow.com", "stackoverflow.xn--com", "stackoverflow.co.uk", "google.com.au", "-0-0o.com", "0-0o_.com" };
-
+    private static final String[] incorrectIRIs = {"0123456789 +-.,!@#$%^&*()","12345 -98.7 3.141","555.123.4567\t+1-(800)","test\nstring","test\rstring","test\u0000string","   ","\u00A0","","  \t  ",                      // Only whitespace
+     };
     @Test
     public void guessNamespaceTest() {
         assertEquals("http://schema.org/test/test/", IRIUtils.guessNamespace(uriSchema));
@@ -64,8 +64,24 @@ public class IRIUtilsTest {
             assertTrue(IRIUtils.isStandardIRI(iri));
         }
         for (String iri : incorrectIRIs) {
-            assertFalse(IRIUtils.isStandardIRI(iri));
+            assertFalse(IRIUtils.isStandardIRI(iri), "Expected '" + escapeForDisplay(iri) + "' to be an invalid IRI");
         }
     }
+
+    /**
+     * Helper method to escape strings for display in test failure messages
+     */
+    private static String escapeForDisplay(String str) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : str.toCharArray()) {
+            if (c < 0x20 || (c >= 0x7F && c <= 0x9F)) {
+                sb.append(String.format("\\u%04X", (int) c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
 
 }

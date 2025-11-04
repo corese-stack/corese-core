@@ -25,9 +25,6 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
      * @throws IncorrectFormatException if the IRI format is incorrect
      */
     protected AbstractIRI(String fullIRI) {
-        if (fullIRI == null) {
-            throw new IllegalArgumentException("fullIRI cannot be null");
-        }
         if (!IRIUtils.isStandardIRI(fullIRI)) {
             throw new IncorrectFormatException("IRI '" + fullIRI + "' must be a valid IRI");
         }

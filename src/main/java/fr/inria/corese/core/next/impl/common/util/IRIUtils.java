@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 /**
  * Utility class for IRI.
- *
+ * <p>
  * Intended to facilitate string manipulation related to IRI.
  */
 public class IRIUtils {
@@ -23,6 +23,7 @@ public class IRIUtils {
             "(?<anchor>(\\#))?" +
             "(?<fragment>([\\w\\-_]+))?)?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
+    private static final Pattern RELATIVE_IRI_PATTERN = Pattern.compile("^[^\\s\\p{Cc}]+$");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
 
@@ -35,6 +36,7 @@ public class IRIUtils {
 
     /**
      * Guesses the namespace of an IRI using a regex pattern.
+     *
      * @param iri The IRI string to be processed.
      * @return the guessed namespace of the IRI or an empty string if no match is found.
      */
@@ -45,18 +47,19 @@ public class IRIUtils {
         try {
             Matcher matcher = matchWithTimeout(IRI_PATTERN, iri);
             if (matcher == null || !matcher.matches()) {
-                return "";
+                return iri.endsWith("#") ? iri : (iri.contains("#") ? iri.substring(0, iri.lastIndexOf("#") + 1) : iri);
+
             } else if (matcher.matches()) {
                 if (matcher.group("protocol") != null && matcher.group("protocol").equals("_")) {
                     return "";
                 }
                 StringBuilder namespace = new StringBuilder();
                 namespace.append(matcher.group("protocol")).append(":");
-                if(matcher.group("dblSlashes") != null) {
+                if (matcher.group("dblSlashes") != null) {
                     namespace.append(matcher.group("dblSlashes"));
                 }
                 namespace.append(matcher.group("domain"));
-                if(matcher.group("path") != null) {
+                if (matcher.group("path") != null) {
                     namespace.append(matcher.group("path"));
                 }
                 if((matcher.group("fragment") != null || matcher.group("anchor") != null) && matcher.group("finalPath") != null) {
@@ -74,6 +77,7 @@ public class IRIUtils {
 
     /**
      * Guesses the local name of an IRI using a regex pattern.
+     *
      * @param iri The IRI string to be processed.
      * @return the guessed local name of the IRI or an empty string if no match is found.
      */
@@ -84,11 +88,11 @@ public class IRIUtils {
         try {
             Matcher matcher = matchWithTimeout(IRI_PATTERN, iri);
             if (matcher == null || !matcher.matches()) {
-                return "";
+                return iri;
             } else if (matcher.matches()) {
-                if(matcher.group("fragment") != null){ // If the IRI has a fragment
+                if (matcher.group("fragment") != null) { // If the IRI has a fragment
                     return matcher.group("fragment");
-                } else if(matcher.group("finalPath") != null ) { // If the IRI has no fragment but do not ends with a slash
+                } else if (matcher.group("finalPath") != null) { // If the IRI has no fragment but do not ends with a slash
                     return matcher.group("finalPath");
                 } else { // If the URI ends with a slash
                     return "";
@@ -103,6 +107,8 @@ public class IRIUtils {
 
     /**
      * Checks if the given string is a valid IRI using a regex pattern extracted from the W3C standards.
+     * Removes leading/trailing whitespace and non-breaking spaces before validation.
+     *
      * @param iriString The string to be checked.
      * @return true if the string is a valid IRI, false otherwise.
      */
@@ -111,7 +117,49 @@ public class IRIUtils {
             return false;
         }
 
+        // Remove leading whitespace and U+00A0 (non-breaking space)
+        int start = 0;
+        while (start < iriString.length()) {
+            char c = iriString.charAt(start);
+            if (Character.isWhitespace(c) || c == '\u00A0' || c == 160) {
+                start++;
+            } else {
+                break;
+            }
+        }
+
+        // Remove trailing whitespace and U+00A0 (non-breaking space)
+        int end = iriString.length();
+        while (end > start) {
+            char c = iriString.charAt(end - 1);
+            if (Character.isWhitespace(c) || c == '\u00A0' || c == 160) {
+                end--;
+            } else {
+                break;
+            }
+        }
+
+        iriString = iriString.substring(start, end);
+
+        if (iriString.isEmpty()) {
+            return false;
+        }
+
+        // Reject IRIs with internal whitespace
+        for (char c : iriString.toCharArray()) {
+            if (Character.isWhitespace(c) || c == '\u00A0' || c == 160) {
+                return false;
+            }
+        }
+
         try {
+            // If no scheme (no :), treat as relative IRI
+            if (!iriString.contains(":") || iriString.startsWith("#")) {
+                Matcher matcher = matchWithTimeout(RELATIVE_IRI_PATTERN, iriString);
+                return matcher != null && matcher.matches();
+            }
+
+            // If scheme present, validate as absolute IRI
             Matcher matcher = matchWithTimeout(STANDARD_IRI_PATTERN, iriString);
             if (matcher != null && matcher.matches()) {
                 return isValidURI(iriString);
@@ -121,6 +169,7 @@ public class IRIUtils {
             return false;
         }
     }
+
 
     /**
      * Executes regex matching with timeout protection.
