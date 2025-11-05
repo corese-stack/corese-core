@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import org.junit.jupiter.api.Test;
 
 public class IRIUtilsTest {
@@ -39,6 +40,7 @@ public class IRIUtilsTest {
         assertEquals("https://www.syuno-pit.biz/tezukayama-bandai-2.html#", IRIUtils.guessNamespace(uriToHTMLPageWithQueryAndFragment));
         assertEquals("https://www.syuno-pit.biz/tezukayama-bandai-2.html#", IRIUtils.guessNamespace(uriToHTMLPageWithFragment));
         assertEquals("", IRIUtils.guessNamespace(blankNode));
+        assertEquals("http://www.w3.org/2001/XMLSchema#", IRIUtils.guessNamespace("http://www.w3.org/2001/XMLSchema#"));
     }
 
     @Test

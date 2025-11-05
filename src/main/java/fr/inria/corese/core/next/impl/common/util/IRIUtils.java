@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.impl.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
@@ -14,7 +17,9 @@ import java.util.regex.Pattern;
  */
 public class IRIUtils {
 
-    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<namespace>(?<protocol>[\\w\\-]+):(?<dblSlashes>\\/\\/)?(?<domain>([\\w\\-_:@]+\\.)*[\\w\\-_:]*))((?<path>\\/([\\w\\-\\._\\:]+\\/)*)(?<finalPath>[\\w\\-\\._\\:]+)?(?<query>\\?[\\w\\-_\\:\\?\\=]+)?(\\#)?(?<fragment>([\\w\\-_]+))?)?$");
+    private static final Logger logger = LoggerFactory.getLogger(IRIUtils.class);
+
+    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<namespace>(?<protocol>[\\w\\-]+):(?<dblSlashes>\\/\\/)?(?<domain>([\\w\\-_:@]+\\.)*[\\w\\-_:]*))((?<path>\\/([\\w\\-\\._\\:]+\\/)*)(?<finalPath>[\\w\\-\\._\\:]+)?(?<query>\\?[\\w\\-_\\:\\?\\=]+)?(?<anchor>(\\#))?(?<fragment>([\\w\\-_]+))?)?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
@@ -40,6 +45,7 @@ public class IRIUtils {
             if (matcher == null || !matcher.matches()) {
                 return "";
             } else if (matcher.matches()) {
+                logger.debug("namespace {} protocol {} dblSlashes {} domain {} path {} finalPath {} query {} anchor {} fragment {}", matcher.group("namespace"), matcher.group("protocol"), matcher.group("dblSlashes"), matcher.group("domain"), matcher.group("path"), matcher.group("finalPath"), matcher.group("query"), matcher.group("anchor"), matcher.group("fragment"));
                 if (matcher.group("protocol") != null && matcher.group("protocol").equals("_")) {
                     return "";
                 }
@@ -52,9 +58,10 @@ public class IRIUtils {
                 if(matcher.group("path") != null) {
                     namespace.append(matcher.group("path"));
                 }
-                if(matcher.group("fragment") != null && matcher.group("finalPath") != null) {
+                if((matcher.group("fragment") != null || matcher.group("anchor") != null) && matcher.group("finalPath") != null) {
                     namespace.append(matcher.group("finalPath")).append("#");
                 }
+
                 return namespace.toString();
             } else {
                 throw new IllegalStateException("No namespace found for the given IRI: " + iri + ".");
