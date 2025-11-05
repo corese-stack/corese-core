@@ -105,29 +105,35 @@ public class RDFaParser extends AbstractRDFParser {
     private void processElement(Element element, RDFaEvaluationContext context, boolean recursive, boolean skipElement) {
         logger.debug("processElement({}, {}, ...)", element, context);
 
+        // 1. First, the local values are initialized
         Resource newSubject = null;
-        Value currentObject = null;
+        Resource currentObject = null;
+        Literal currentObjectLiteral = null;
         Map<String, IRI> currentMappings = context.uriMappings();
         Set<RDFaIncompleteStatement> incompleteStatementSet = new HashSet<>();
         String language = context.getLanguage();
 
+        // 2. Next the [current element] is parsed for [URI mapping]s and these are added to the [local list of URI mappings]. Note that a [URI mapping] will simply overwrite any current mapping in the list that has the same name;
         // Looking for namespace declarations
         // Namespace declaration are done using the XML namespace declaration mechanism, that can be seen as an attributes prefixed by "xmlns" and looks like this: "xmlns:prefix=namespace"
-        element.attributes().forEach(attribute -> {
-            logger.debug("Looking at attribute {}", attribute.getKey());
+        Iterator<Attribute> itAttribute = element.attributes().iterator();
+        while(itAttribute.hasNext()) {
+            Attribute attribute = itAttribute.next();
             if (attribute.getKey().startsWith(XMLNS_PREFIX)) {
                 String prefixName = attribute.localName();
                 String prefixNamespace = attribute.getValue();
-                logger.debug("Prefix found {} = {}", prefixName, prefixNamespace);
+                logger.debug("Mapping: {} = {}", prefixName, prefixNamespace);
                 context.addUriMapping(prefixName, getValueFactory().createIRI(prefixNamespace));
             }
-        });
+        }
 
+        // 3. The [current element] is also parsed for any language information, and if present, [current language] is set accordingly;
         if (element.attribute(LANG_ATTR) != null) {
             String langString = element.attr(LANG_ATTR);
             language = langString;
         }
 
+        // 4. If the [current element] contains no @rel or @rev attribute, then the next step is to establish a value for [new subject]. Any of the attributes that can carry a resource can set [new subject];
         if(element.attribute(REL_ATTR) == null && element.attribute(REV_ATTR) == null) {
             // [new subject] is set to the URI obtained from the first match from the following rules:
             if (element.attribute(ABOUT_ATTR) != null) { // by using the URI from @about, if present, obtained according to the section on CURIE and URI Processing;
@@ -207,22 +213,44 @@ public class RDFaParser extends AbstractRDFParser {
         if(currentObject != null)
             logger.debug("New object resolved to {}", currentObject.stringValue());
 
-        // If in any of the previous steps a [new subject] was set to a non-null value, it is now used to provide a subject for type values;
+        // 6. If in any of the previous steps a [new subject] was set to a non-null value, it is now used to provide a subject for type values;
         if(newSubject != null) {
             if(element.attribute(TYPEOF_ATTR) != null) { // One or more 'types' for the [new subject] can be set by using @typeof. If present, the attribute must contain one or more URIs, obtained according to the section on URI and CURIE Processing, each of which is used to generate a triple as follows:
                 Optional<Resource> typeIri = getResourceFromElementAttribute(element, TYPEOF_ATTR, context);
                 if (typeIri.isPresent()) {
-                    logger.debug("Typeof found: {}", typeIri.get());
-                    logger.debug("Type of resource resolved to {} {}", typeIri.get().stringValue(), context);
                     Statement stat = this.getValueFactory().createStatement(newSubject, RDF.type.getIRI(), typeIri.get());
-                    logger.debug("Statement added: {} {} {}", stat.getSubject().stringValue(), stat.getPredicate().stringValue(), stat.getObject().stringValue());
                     this.getModel().add(stat);
                 } else {
                     throw new ParsingErrorException("Typeof statement uses unknown type " + element.attr(TYPEOF_ATTR));
                 }
             }
         }
-        // If however [current object resource] was set to null, but there are predicates present, then they must be stored as [incomplete triple]s, pending the discovery of a subject that can be used as the object. Also, [current object resource] should be set to a newly created [bnode];
+
+        // 7. If in any of the previous steps a [current object resource] was set to a non-null value, it is now used to generate triples:
+        if (currentObject != null && (element.attribute(REL_ATTR) != null || element.attribute(REV_ATTR) != null)) {
+            if(element.attribute(REL_ATTR) != null) {
+                Optional<Resource> propertyOpt = getResourceFromElementAttribute(element, REL_ATTR, context);
+                if(propertyOpt.isPresent() && propertyOpt.get().isIRI()) {
+                    IRI property = (IRI) propertyOpt.get();
+                    RDFaIncompleteStatement statement = new RDFaIncompleteStatement(property);
+                    statement.setSubject(newSubject);
+                    statement.setObject(currentObject);
+                    incompleteStatementSet.add(statement);
+                }
+            }
+            if(element.attribute(REV_ATTR) != null) {
+                Optional<Resource> propertyOpt = getResourceFromElementAttribute(element, REL_ATTR, context);
+                if(propertyOpt.isPresent() && propertyOpt.get().isIRI() && currentObject.isResource()) {
+                    IRI property = (IRI) propertyOpt.get();
+                    RDFaIncompleteStatement statement = new RDFaIncompleteStatement(property);
+                    statement.setObject(newSubject);
+                    statement.setSubject((Resource) currentObject);
+                    incompleteStatementSet.add(statement);
+                }
+            }
+        }
+
+        // 8. If however [current object resource] was set to null, but there are predicates present, then they must be stored as [incomplete triple]s, pending the discovery of a subject that can be used as the object. Also, [current object resource] should be set to a newly created [bnode];
         if (currentObject == null && (element.attribute(REL_ATTR) != null || element.attribute(REV_ATTR) != null)) {
             currentObject = getValueFactory().createBNode();
             if(element.attribute(REL_ATTR) != null) {
@@ -230,40 +258,88 @@ public class RDFaParser extends AbstractRDFParser {
                 if(propertyOpt.isPresent() && propertyOpt.get().isIRI()) {
                     IRI property = (IRI) propertyOpt.get();
                     RDFaIncompleteStatement statement = new RDFaIncompleteStatement(property);
-                    statement.setSubject(newSubject);
                     incompleteStatementSet.add(statement);
                 }
             }
             if(element.attribute(REV_ATTR) != null) {
                 Optional<Resource> propertyOpt = getResourceFromElementAttribute(element, REL_ATTR, context);
-                if(propertyOpt.isPresent() && propertyOpt.get().isIRI()) {
+                if(propertyOpt.isPresent() && propertyOpt.get().isIRI() && currentObject.isResource()) {
                     IRI property = (IRI) propertyOpt.get();
                     RDFaIncompleteStatement statement = new RDFaIncompleteStatement(property);
-                    statement.setObject(newSubject);
+                    statement.setBackward();
                     incompleteStatementSet.add(statement);
                 }
             }
         }
 
-        if (element.attribute(TYPEOF_ATTR) != null) {
-            String typeIriString = element.attr(TYPEOF_ATTR);
-            logger.debug("Typeof found: {}", typeIriString);
-            if(context.parentSubjectResource().equals(context.baseIri())) { // Not current subjet was setup using about or src, so we are implicitly creating a blank node
-                context.parentSubjectResource(this.getValueFactory().createBNode());
-            }
-            Optional<Resource> typeIri = resolveStringResource(typeIriString, context);
-            if (typeIri.isPresent()) {
-                logger.debug("Type of resource resolved to {} {}", typeIri.get().stringValue(), context);
-                Statement stat = this.getValueFactory().createStatement(context.parentSubjectResource(), RDF.type.getIRI(), typeIri.get());
-                logger.debug("Statement added: {} {} {}", stat.getSubject().stringValue(), stat.getPredicate().stringValue(), stat.getObject().stringValue());
-                this.getModel().add(stat);
-            } else {
-                throw new ParsingErrorException("Typeof statement uses unknown type " + typeIriString);
+        // 9. The next step of the iteration is to establish any [current object literal];
+        if(element.attribute(PROPERTY_ATTR) != null) { // Predicates for the [current object literal] can be set by using @property. If present, one or more URIs are obtained according to the section on CURIE and URI Processing, and then the actual literal value is obtained as follows:
+            Optional<Resource> propertyOpt = getResourceFromElementAttribute(element, PROPERTY_ATTR, context);
+            if(propertyOpt.isPresent() && propertyOpt.get().isIRI()) {
+                IRI property = (IRI)propertyOpt.get();
+                logger.debug("Property found: {}", property.stringValue());
+
+                IRI datatype = null;
+                if(element.attribute(DATATYPE_ATTR) != null && ! element.attr(DATATYPE_ATTR).isEmpty()) {
+                    Optional<Resource> datatypeOpt = getResourceFromElementAttribute(element, DATATYPE_ATTR, context);
+                    if(datatypeOpt.isPresent() && datatypeOpt.get().isIRI() && ! datatypeOpt.get().equals(RDF.XMLLiteral.getIRI())) {
+                        datatype = (IRI) datatypeOpt.get();
+                    }
+                }
+                String value = element.text();
+                if(element.attribute(CONTENT_ATTR) != null) {
+                    value = element.attr(CONTENT_ATTR);
+                }
+                if(datatype != null) {
+                    logger.debug("Literal value: {}, datatype: {}", value, datatype.stringValue());
+                    currentObjectLiteral = this.getValueFactory().createLiteral(value, datatype);
+                    recursive = false;
+                } else if(language != null) {
+                    logger.debug("Literal value: {}, language: {}", value, language);
+                    currentObjectLiteral = this.getValueFactory().createLiteral(value, language);
+                } else {
+                    logger.debug("Literal value: {}", value);
+                    currentObjectLiteral = this.getValueFactory().createLiteral(value);
+                }
+
+                this.getModel().add(newSubject, property, currentObjectLiteral);
             }
         }
 
-        for (Element child : element.children()) {
-            processElement(child, context, recursive, skipElement);
+        // 10. If the [skip element] flag is 'false', and [new subject] was set to a non-null value, then any [incomplete triple]s within the current context should be completed:
+        Iterator<RDFaIncompleteStatement> itStat = context.getIncompleteStatementIterator();
+        while(itStat.hasNext()) {
+            RDFaIncompleteStatement statement = itStat.next();
+            if(statement.isForward()) {
+                this.getModel().add(context.parentSubjectResource(), statement.getPredicate(), newSubject);
+            } else if (statement.isBackward()){
+                this.getModel().add(newSubject, statement.getPredicate(), context.parentSubjectResource());
+            }
+        }
+
+        // 11. If the [recurse] flag is 'true', all elements that are children of the [current element] are processed using the rules described here, using a new [evaluation context],
+        if(recursive) {
+            if(skipElement) {
+                RDFaEvaluationContext newContext = new RDFaEvaluationContext(context);
+                newContext.setLanguage(language);
+                newContext.uriMappings(currentMappings);
+                context = newContext;
+            } else {
+                context = new RDFaEvaluationContext(context.baseIri());
+                if(newSubject != null) {
+                    context.parentObjectResource(newSubject);
+                }
+                if(currentObject != null) {
+                    context.parentObjectResource(currentObject);
+                }
+                context.uriMappings(currentMappings);
+                context.incompleteStatements(incompleteStatementSet);
+                context.setLanguage(language);
+            }
+
+            for (Element child : element.children()) {
+                processElement(child, context, recursive, skipElement);
+            }
         }
     }
 

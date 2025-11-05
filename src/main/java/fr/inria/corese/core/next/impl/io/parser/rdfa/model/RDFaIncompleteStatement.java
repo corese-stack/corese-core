@@ -12,13 +12,48 @@ public class RDFaIncompleteStatement {
     private Resource subject = null;
     private IRI predicate = null;
     private Value object = null;
+    private Direction direction = Direction.FORWARD;
 
-    public RDFaIncompleteStatement() {
+    public enum Direction {
+        FORWARD,
+        BACKWARD
+    }
+
+    private RDFaIncompleteStatement() {
 
     }
 
     public RDFaIncompleteStatement(IRI predicate) {
+        this.predicate = predicate;
+    }
 
+    public RDFaIncompleteStatement(IRI predicate, Direction direction) {
+        this.predicate = predicate;
+        this.direction = direction;
+    }
+
+    public boolean isForward() {
+        return this.direction == Direction.FORWARD;
+    }
+
+    public boolean isBackward() {
+        return this.direction == Direction.BACKWARD;
+    }
+
+    public Direction getDirection() {
+        return this.direction;
+    }
+
+    public void setForward() {
+        this.direction = Direction.FORWARD;
+    }
+
+    public void setBackward() {
+        this.direction = Direction.BACKWARD;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     public Resource getSubject() {
