@@ -7,12 +7,12 @@
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
 
     <owl:Ontology rdf:about="http://example.org/ontology">
-        <owl:imports rdf:resource="https://www.w3.org/2000/01/rdf-schema#" />
+        <owl:imports rdf:resource="https://ns.inria.fr/sparql-extension/" />
     </owl:Ontology>
 
     <owl:Class rdf:about="http://example.org/ontology#Person">
         <rdfs:label>Person</rdfs:label>
-        <rdfs:subClassOf rdf:resource="https://www.w3.org/2000/01/rdf-schema#Resource" />
+        <rdfs:subClassOf rdf:resource="https://ns.inria.fr/sparql-extension#Extension" />
     </owl:Class>
 
     <owl:Class rdf:about="http://example.org/ontology#Student">

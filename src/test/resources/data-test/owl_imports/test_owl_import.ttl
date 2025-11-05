@@ -1,10 +1,9 @@
 @prefix : <http://example.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <http://example.org/ontology> a owl:Ontology ;
-    owl:imports <https://www.w3.org/2000/01/rdf-schema#> .
+    owl:imports <https://ns.inria.fr/sparql-extension/> .
 
 :Person a owl:Class ;
     rdfs:label "Person" ;

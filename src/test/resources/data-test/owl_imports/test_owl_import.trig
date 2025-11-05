@@ -5,11 +5,11 @@
 
 <http://example.org/ontology> {
     <http://example.org/ontology> a owl:Ontology ;
-        owl:imports <https://www.w3.org/2000/01/rdf-schema#> .
+        owl:imports <https://ns.inria.fr/sparql-extension/> .
 
     :Person a owl:Class ;
         rdfs:label "Person" ;
-        rdfs:subClassOf rdfs:Resource .
+        rdfs:subClassOf <https://ns.inria.fr/sparql-extension#Extension> .
 
     :Student a owl:Class ;
         rdfs:label "Student" ;

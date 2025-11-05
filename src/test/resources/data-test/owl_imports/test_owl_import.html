@@ -8,12 +8,11 @@
 
 <body>
 <div about="http://example.org/ontology" typeof="owl:Ontology">
-    <link property="owl:imports" href="https://www.w3.org/2000/01/rdf-schema#" />
+    <link property="owl:imports" href="https://ns.inria.fr/sparql-extension/" />
 </div>
 
 <div about="http://example.org/ontology#Person" typeof="owl:Class">
-    <span property="rdfs:label">Person</span>
-    <link property="rdfs:subClassOf" href="https://www.w3.org/2000/01/rdf-schema#Resource" />
+    <link property="rdfs:subClassOf" href="https://ns.inria.fr/sparql-extension#Extension" />
 </div>
 
 <div about="http://example.org/ontology#Student" typeof="owl:Class">
