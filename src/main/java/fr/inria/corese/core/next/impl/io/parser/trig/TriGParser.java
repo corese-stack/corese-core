@@ -88,9 +88,11 @@ public class TriGParser extends AbstractRDFParser {
             if (trigErrorListener.hasErrors()) {
                 throw new ParsingErrorException("Syntax error in TriG document: " + trigErrorListener.getErrorMessage());
             }
-
-            TriGListerner listerner = new TriGListerner(getModel(), getValueFactory(), this.getConfig(), baseURI);
-            walker.walk((ParseTreeListener) listerner, tree);
+            IOOptions optionsWithBaseURI = new TriGParserOptions.Builder()
+                    .baseIRI(baseURI)
+                    .build();
+            TriGListerner listener = new TriGListerner(getModel(), getValueFactory(), optionsWithBaseURI);
+            walker.walk((ParseTreeListener) listener, tree);
 
         } catch (ParsingErrorException e) {
             throw e;

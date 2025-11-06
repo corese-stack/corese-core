@@ -97,8 +97,10 @@ public class TurtleParser extends AbstractRDFParser {
             } catch (RecognitionException e) {
                 throw new ParsingErrorException("Recognition error in Turtle document: " + e.getMessage());
             }
-
-            TurtleListener listener = new TurtleListener(getModel(), getValueFactory(), this.getConfig());
+            IOOptions optionsWithBaseURI = new TurtleParserOptions.Builder()
+                    .baseIRI(baseURI)
+                    .build();
+            TurtleListener listener = new TurtleListener(getModel(), getValueFactory(), optionsWithBaseURI);
             walker.walk(listener, tree);
 
         } catch (ParsingErrorException e) {
