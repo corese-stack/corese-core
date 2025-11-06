@@ -3,19 +3,27 @@ package fr.inria.corese.core.next.impl.io.parser.rdfa;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RDFaParserTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(RDFaParserTest.class);
 
     private static final ValueFactory factory = new CoreseAdaptedValueFactory();
 
@@ -95,6 +103,7 @@ public class RDFaParserTest {
                 """;
 
         Model testModel = new CoreseModel();
+        Model referenceModel = new CoreseModel();
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
 
@@ -115,11 +124,19 @@ public class RDFaParserTest {
         Statement aeBirthPlaceStatement = factory.createStatement(albertEinstein, birthPlace, germany);
         Statement germanyNameStatement = factory.createStatement(germany, conventionalLongName, gerLongName);
 
+        referenceModel.add(aeNameStatement);
+        referenceModel.add(aeDateOfBirthStatement);
+        referenceModel.add(aeBirthPlaceStatement);
+        referenceModel.add(germanyNameStatement);
+
+        DefaultSerializerFactory serializerFactory = new DefaultSerializerFactory();
+        RDFSerializer serializer = serializerFactory.createSerializer(RDFFormat.NTRIPLES, testModel, new NTriplesSerializerOptions.Builder().build());
+        StringWriter debugWriter = new StringWriter();
+        serializer.write(debugWriter);
+        logger.debug(debugWriter.toString());
+
         assertEquals(4, testModel.size());
-        assertTrue(testModel.contains(aeNameStatement));
-        assertTrue(testModel.contains(aeDateOfBirthStatement));
-        assertTrue(testModel.contains(aeBirthPlaceStatement));
-        assertTrue(testModel.contains(germanyNameStatement));
+        assertEquals(referenceModel, testModel);
 
     }
 }

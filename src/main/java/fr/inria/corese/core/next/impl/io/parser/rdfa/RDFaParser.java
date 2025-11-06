@@ -121,9 +121,9 @@ public class RDFaParser extends AbstractRDFParser {
             Attribute attribute = itAttribute.next();
             if (attribute.getKey().startsWith(XMLNS_PREFIX)) {
                 String prefixName = attribute.localName();
-                String prefixNamespace = attribute.getValue();
-                logger.debug("Mapping: {} = {}", prefixName, prefixNamespace);
-                context.addUriMapping(prefixName, getValueFactory().createIRI(prefixNamespace));
+                IRI prefixNamespace = getValueFactory().createIRI(attribute.getValue(), "");
+                logger.debug("Mapping: {} = {}", prefixName, prefixNamespace.stringValue());
+                context.addUriMapping(prefixName, prefixNamespace);
             }
         }
 
@@ -211,7 +211,7 @@ public class RDFaParser extends AbstractRDFParser {
         if (newSubject != null)
             logger.debug("New subject resolved to {}", newSubject.stringValue());
         if(currentObject != null)
-            logger.debug("New object resolved to {}", currentObject.stringValue());
+            logger.debug("Current object resolved to {}", currentObject.stringValue());
 
         // 6. If in any of the previous steps a [new subject] was set to a non-null value, it is now used to provide a subject for type values;
         if(newSubject != null) {
@@ -232,20 +232,14 @@ public class RDFaParser extends AbstractRDFParser {
                 Optional<Resource> propertyOpt = getResourceFromElementAttribute(element, REL_ATTR, context);
                 if(propertyOpt.isPresent() && propertyOpt.get().isIRI()) {
                     IRI property = (IRI) propertyOpt.get();
-                    RDFaIncompleteStatement statement = new RDFaIncompleteStatement(property);
-                    statement.setSubject(newSubject);
-                    statement.setObject(currentObject);
-                    incompleteStatementSet.add(statement);
+                    this.getModel().add(newSubject, property, currentObject);
                 }
             }
             if(element.attribute(REV_ATTR) != null) {
                 Optional<Resource> propertyOpt = getResourceFromElementAttribute(element, REL_ATTR, context);
                 if(propertyOpt.isPresent() && propertyOpt.get().isIRI() && currentObject.isResource()) {
                     IRI property = (IRI) propertyOpt.get();
-                    RDFaIncompleteStatement statement = new RDFaIncompleteStatement(property);
-                    statement.setObject(newSubject);
-                    statement.setSubject((Resource) currentObject);
-                    incompleteStatementSet.add(statement);
+                    this.getModel().add(currentObject, property, newSubject);
                 }
             }
         }
@@ -302,6 +296,7 @@ public class RDFaParser extends AbstractRDFParser {
                     currentObjectLiteral = this.getValueFactory().createLiteral(value);
                 }
 
+                logger.debug("Adding {} {} {} {}", newSubject.stringValue(), property.stringValue(), currentObjectLiteral.getLabel(), currentObjectLiteral.getDatatype().stringValue());
                 this.getModel().add(newSubject, property, currentObjectLiteral);
             }
         }
@@ -358,14 +353,6 @@ public class RDFaParser extends AbstractRDFParser {
     public void parse(Reader reader, String baseURI) {
     }
 
-    private Statement incompleteStatementToStatement(RDFaIncompleteStatement incompleteStatement) {
-        Objects.requireNonNull(incompleteStatement.getSubject(), "Null subject, IncompleteStatement can only be converted if all its component are non-null.");
-        Objects.requireNonNull(incompleteStatement.getPredicate(), "Null predicate, IncompleteStatement can only be converted if all its component are non-null.");
-        Objects.requireNonNull(incompleteStatement.getObject(), "Null object, IncompleteStatement can only be converted if all its component are non-null.");
-
-        return this.getValueFactory().createStatement(incompleteStatement.getSubject(), incompleteStatement.getPredicate(), incompleteStatement.getObject());
-    }
-
     /**
      * Resolves the string representation of a resource found in attributes of an element, be it an IRI, <ahref="https://www.w3.org/TR/rdfa-syntax/#s_curieprocessing">CURIE</a> or relative URI
      *
@@ -374,7 +361,6 @@ public class RDFaParser extends AbstractRDFParser {
      * @return the full IRI if it is a relative IRI, full IRI or CURIE, nothing otherwise
      */
     private Optional<Resource> resolveStringResource(String stringResource, RDFaEvaluationContext context) {
-        logger.debug("Resolution of resource {}, {}", stringResource, context);
         String resultString = stringResource;
         if (resultString.startsWith("[") && resultString.endsWith("]")) {
             resultString = resultString.replaceFirst("\\[", "");
@@ -386,7 +372,6 @@ public class RDFaParser extends AbstractRDFParser {
             int colonIndex = resultString.indexOf(":");
             String prefixString = resultString.substring(0, colonIndex);
             String localNameString = resultString.substring(colonIndex + 1);
-            logger.debug("CURIE with prefix: {} and local name: {}", prefixString, localNameString);
             // Basic resolution following https://www.w3.org/TR/rdfa-syntax/#s_convertingcurietouri
             if (context.hasUriMapping(prefixString)) {
                 IRI namespaceIRI = context.uriMapping(prefixString);
@@ -398,13 +383,11 @@ public class RDFaParser extends AbstractRDFParser {
                 throw new ParsingErrorException("CURIE " + stringResource + " uses unknown prefix");
             }
         } else if (IRIUtils.isStandardIRI(resultString)) {  // Full IRI
-            logger.debug("Standard IRI: {}", resultString);
             return Optional.of(this.getValueFactory().createIRI(resultString));
 
         } else if (resultString.startsWith("_:")) {  // Blank Node
             int colonIndex = resultString.indexOf(":");
             String localNameString = resultString.substring(colonIndex + 1);
-            logger.debug("Blank Node: _:{}", localNameString);
             return Optional.of(this.getValueFactory().createBNode(localNameString));
         }
         return Optional.empty();

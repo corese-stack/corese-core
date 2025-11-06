@@ -45,7 +45,6 @@ public class IRIUtils {
             if (matcher == null || !matcher.matches()) {
                 return "";
             } else if (matcher.matches()) {
-                logger.debug("namespace {} protocol {} dblSlashes {} domain {} path {} finalPath {} query {} anchor {} fragment {}", matcher.group("namespace"), matcher.group("protocol"), matcher.group("dblSlashes"), matcher.group("domain"), matcher.group("path"), matcher.group("finalPath"), matcher.group("query"), matcher.group("anchor"), matcher.group("fragment"));
                 if (matcher.group("protocol") != null && matcher.group("protocol").equals("_")) {
                     return "";
                 }
