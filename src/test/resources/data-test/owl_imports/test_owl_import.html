@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html
-    prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns# owl: http://www.w3.org/2002/07/owl# rdfs: http://www.w3.org/2000/01/rdf-schema# foaf: http://xmlns.com/foaf/0.1/">
+    prefix="rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns# owl: http://www.w3.org/2002/07/owl# rdfs: http://www.w3.org/2000/01/rdf-schema#">
 
 <head>
     <title>RDFa Example</title>
@@ -8,12 +8,11 @@
 
 <body>
     <div about="http://example.org/ontology" typeof="owl:Ontology">
-        <link property="owl:imports" href="http://xmlns.com/foaf/0.1/" />
+        <link property="owl:imports" href="https://ns.inria.fr/sparql-extension/" />
     </div>
 
     <div about="http://example.org/ontology#Person" typeof="owl:Class">
-        <span property="rdfs:label">Person</span>
-        <link property="rdfs:subClassOf" href="http://xmlns.com/foaf/0.1/Person" />
+        <link property="rdfs:subClassOf" href="https://ns.inria.fr/sparql-extension#Extension" />
     </div>
 
     <div about="http://example.org/ontology#Student" typeof="owl:Class">
