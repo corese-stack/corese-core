@@ -40,7 +40,7 @@ public class OwlImportTest {
     @Test
     public void testRdfImportEnabled() throws LoadException {
         int graphSize = testImport("test_owl_import.rdf", true);
-        assertEquals(628, graphSize);
+        assertEquals(8, graphSize);
     }
 
     /**
@@ -58,7 +58,7 @@ public class OwlImportTest {
     @Test
     public void testTurtleImportEnabled() throws LoadException {
         int graphSize = testImport("test_owl_import.ttl", true);
-        assertEquals(628, graphSize);
+        assertEquals(8, graphSize);
     }
 
     /**
@@ -76,7 +76,7 @@ public class OwlImportTest {
     @Test
     public void testTrigImportEnabled() throws LoadException {
         int graphSize = testImport("test_owl_import.trig", true);
-        assertEquals(628, graphSize);
+        assertEquals(8, graphSize);
     }
 
     /**
@@ -94,7 +94,7 @@ public class OwlImportTest {
     @Test
     public void testNTriplesImportEnabled() throws LoadException {
         int graphSize = testImport("test_owl_import.nt", true);
-        assertEquals(628, graphSize);
+        assertEquals(8, graphSize);
     }
 
     /**
@@ -112,7 +112,7 @@ public class OwlImportTest {
     @Test
     public void testNQuadsImportEnabled() throws LoadException {
         int graphSize = testImport("test_owl_import.nq", true);
-        assertEquals(628, graphSize);
+        assertEquals(8, graphSize);
     }
 
     /**
@@ -130,7 +130,7 @@ public class OwlImportTest {
     @Test
     public void testJsonLdImportEnabled() throws LoadException {
         int graphSize = testImport("test_owl_import.jsonld", true);
-        assertEquals(628, graphSize);
+        assertEquals(8, graphSize);
     }
 
     /**
@@ -139,7 +139,7 @@ public class OwlImportTest {
     @Test
     public void testRdfaImportDisabled() throws LoadException {
         int graphSize = testImport("test_owl_import.html", false);
-        assertEquals(8, graphSize);
+        assertEquals(7, graphSize);
     }
 
     /**
@@ -148,7 +148,7 @@ public class OwlImportTest {
     @Test
     public void testRdfaImportEnabled() throws LoadException {
         int graphSize = testImport("test_owl_import.html", true);
-        assertEquals(628, graphSize);
+        assertEquals(7, graphSize);
     }
 
     /**

@@ -20,7 +20,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-core"
-    const val version = "4.6.4"
+    const val version = "4.6.5"
 
     // Project description
     const val desc = "Corese is a Semantic Web Factory (triple store and SPARQL endpoint) implementing RDF, RDFS, SPARQL 1.1 Query and Update, Shacl. STTL. LDScript."
@@ -54,9 +54,10 @@ repositories {
 // Define dependencies
 dependencies {
     // === Logging ===
+    // As a library, corese-core should only depend on the SLF4J API.
+    // The actual logging implementation (Logback, Log4j2, etc.) should be chosen
+    // by the consuming application (e.g., corese-command).
     api("org.slf4j:slf4j-api:2.0.17")                                                  // Logging API only (SLF4J)
-    runtimeOnly("org.apache.logging.log4j:log4j-core:2.25.0")                          // Log4j2 core for internal logging
-    runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
 
     // === Core dependencies ===
     api("fr.com.hp.hpl.jena.rdf.arp:arp:2.2.b")                             // RDF/XML parser (Jena ARP)
@@ -75,6 +76,7 @@ dependencies {
 
     // === Test dependencies ===
     testImplementation("junit:junit:4.13.2")                                           // Unit testing framework
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.20")                           // Logging implementation for tests and development
 }
 
 /////////////////////////
@@ -188,10 +190,10 @@ tasks.jacocoTestReport {
 // Set the test task to be followed by Jacoco report generation.
 // This ensures that test coverage reports are always generated after tests.
 tasks.test {
-    // testLogging {
-    //     events("passed", "skipped", "failed") // Affiche les résultats des tests
-    //     showStandardStreams = true           // Affiche les sorties console des tests
-    // }
+    testLogging {
+        events("passed", "skipped", "failed") // Affiche les résultats des tests
+        showStandardStreams = true           // Affiche les sorties console des tests (y compris les logs)
+    }
     finalizedBy(tasks.jacocoTestReport)
 }
 

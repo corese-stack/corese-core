@@ -1,7 +1,16 @@
 <!-- markdownlint-disable MD024 -->
 # Corese Changelog
 
-## Version 4.6.4 –
+## Version 4.6.5 – 2025-11-07
+
+### Changed
+
+- Removed Log4j2 runtime dependencies (`log4j-core` and `log4j-slf4j2-impl`) from the library.
+  - As a library, corese-core now only depends on the SLF4J API, allowing consuming applications to choose their preferred logging implementation.
+  - Added Logback as a test-only dependency for development and testing purposes.
+  - Removed Log4j2 configuration file (`log4j2.xml`) from the source code.
+
+## Version 4.6.4 – 2025-07-29
 
 ### Changed
 
