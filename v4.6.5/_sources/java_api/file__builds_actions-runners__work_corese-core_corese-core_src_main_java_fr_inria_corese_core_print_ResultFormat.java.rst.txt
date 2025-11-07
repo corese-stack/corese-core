@@ -1,0 +1,47 @@
+
+.. _file__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print_ResultFormat.java:
+
+File ResultFormat.java
+======================
+
+|exhale_lsh| :ref:`Parent directory <dir__builds_actions-runners__work_corese-core_corese-core_src_main_java_fr_inria_corese_core_print>` (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/print``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+Definition (``/builds/actions-runners/_work/corese-core/corese-core/src/main/java/fr/inria/corese/core/print/ResultFormat.java``)
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+Includes
+--------
+
+
+- ``static``
+
+
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_fr__inria__corese__core__print`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_classfr_1_1inria_1_1corese_1_1core_1_1print_1_1ResultFormat`
+
