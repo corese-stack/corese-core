@@ -31,11 +31,12 @@ Direct Download
 ---------------
 
 .. raw:: html
+
    <div style="margin: 10px 5px;">
       <a href="https://github.com/corese-stack/corese-core/releases">
-      <img src="./_static/logo/badge_github.svg" alt="GitHub Release" width="186">
+         <img src="./_static/logo/badge_github.svg" alt="GitHub Release" width="186">
       </a>
       <a href="https://central.sonatype.com/artifact/fr.inria.corese/corese-core">
-      <img src="./_static/logo/badge_maven.svg" alt="Maven Central" width="186">
+         <img src="./_static/logo/badge_maven.svg" alt="Maven Central" width="186">
       </a>
    </div>
