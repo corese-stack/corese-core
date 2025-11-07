@@ -15,7 +15,7 @@ Add the following dependency to your ``pom.xml`` file:
    <dependency>
        <groupId>fr.inria.corese</groupId>
        <artifactId>corese-core</artifactId>
-       <version>4.6.4</version>
+       <version>4.6.5</version>
    </dependency>
 
 Gradle
@@ -25,7 +25,7 @@ Add this line to the ``dependencies`` section of your ``build.gradle`` file:
 
 .. code-block:: groovy
 
-   implementation 'fr.inria.corese:corese-core:4.6.4'
+   implementation 'fr.inria.corese:corese-core:4.6.5'
 
 Direct Download
 ---------------
