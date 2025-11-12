@@ -2,15 +2,14 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 <http://example.org/ontology> {
     <http://example.org/ontology> a owl:Ontology ;
-        owl:imports <http://xmlns.com/foaf/0.1/> .
+        owl:imports <https://ns.inria.fr/sparql-extension/> .
 
     :Person a owl:Class ;
         rdfs:label "Person" ;
-        rdfs:subClassOf foaf:Person .
+        rdfs:subClassOf <https://ns.inria.fr/sparql-extension#Extension> .
 
     :Student a owl:Class ;
         rdfs:label "Student" ;
