@@ -351,6 +351,8 @@ public class RDFaParser extends AbstractRDFParser {
 
     @Override
     public void parse(Reader reader, String baseURI) {
+        InputStream inputStream = new ReaderInputStream(reader, StandardCharsets.UTF_8);
+        parse(inputStream , baseURI);
     }
 
     /**
@@ -389,6 +391,9 @@ public class RDFaParser extends AbstractRDFParser {
             int colonIndex = resultString.indexOf(":");
             String localNameString = resultString.substring(colonIndex + 1);
             return Optional.of(this.getValueFactory().createBNode(localNameString));
+        } else if (IRIUtils.isStandardIRI(context.baseIri().stringValue() + resultString)) {
+            String concatenatedRelativeUri = context.baseIri().stringValue() + resultString;
+            return Optional.of(getValueFactory().createIRI(concatenatedRelativeUri));
         }
         return Optional.empty();
     }
