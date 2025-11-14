@@ -107,6 +107,8 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
     public boolean equals(Object obj) {
         if (obj instanceof CoreseDuration) {
             return this.coreseObject.equals(((CoreseDuration) obj).coreseObject);
+        } else if (obj instanceof AbstractDuration) {
+            return super.equals(obj);
         }
         return false;
     }

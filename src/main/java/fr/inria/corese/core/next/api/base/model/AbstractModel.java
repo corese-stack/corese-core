@@ -345,6 +345,11 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
+        public boolean equals(Object o) {
+            return o instanceof Model && this.size() == ((Model) o).size() && ((Model) o).containsAll(this);
+        }
+
+        @Override
         public boolean addAll(Collection<? extends V> collection) {
             boolean modified = false;
 

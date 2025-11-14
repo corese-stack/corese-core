@@ -86,4 +86,9 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
         hash = 31 * hash + (this.localName == null ? 0 : this.localName.hashCode());
         return hash;
     }
+
+    @Override
+    public String toString() {
+        return this.stringValue();
+    }
 }
