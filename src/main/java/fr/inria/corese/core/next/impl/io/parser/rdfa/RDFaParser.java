@@ -4,25 +4,28 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.rdfa.model.RDFaIncompleteStatement;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * RDFa parser. This parser will load the RDF data stored as RDFa in an HTML page. Its inner implementation is based on the jsoup library. It loads the html page as DOM and process it following the <a href="https://www.w3.org/TR/rdfa-syntax/#sec_5.5.">recommended algorithm in the RDFa recommendation.</a>
+ */
 public class RDFaParser extends AbstractRDFParser {
-
-    private static final Logger logger = LoggerFactory.getLogger(RDFaParser.class);
 
     private static final String REL_ATTR = "rel";
     private static final String REV_ATTR = "rev";
@@ -49,6 +52,16 @@ public class RDFaParser extends AbstractRDFParser {
     @Override
     public RDFFormat getRDFFormat() {
         return RDFFormat.RDFa;
+    }
+
+    @Override
+    public void parse(InputStream in) {
+        if(getConfig() instanceof BaseIRIOptions baseIRIOptions) {
+            String baseIRI = baseIRIOptions.getBaseIRI();
+            parse(new InputStreamReader(in, StandardCharsets.UTF_8), baseIRI);
+        } else {
+            parse(new InputStreamReader(in, StandardCharsets.UTF_8), null);
+        }
     }
 
     @Override
@@ -90,7 +103,7 @@ public class RDFaParser extends AbstractRDFParser {
         }
 
         for (Element element : document.children()) {
-            processElement(element, new RDFaEvaluationContext(baseIri), baseIri);
+            processElement(element, new RDFaEvaluationContext(baseIri));
         }
     }
 
@@ -103,7 +116,6 @@ public class RDFaParser extends AbstractRDFParser {
      * @see <a href="https://www.w3.org/TR/rdfa-syntax/#s_rdfaindetail">RDFa processing in details<a/>
      */
     private void processElement(Element element, RDFaEvaluationContext context, boolean recursive, boolean skipElement) {
-        logger.debug("processElement({}, {}, ...)", element, context);
 
         // 1. First, the local values are initialized
         Resource newSubject = null;
@@ -122,7 +134,6 @@ public class RDFaParser extends AbstractRDFParser {
             if (attribute.getKey().startsWith(XMLNS_PREFIX)) {
                 String prefixName = attribute.localName();
                 IRI prefixNamespace = getValueFactory().createIRI(attribute.getValue(), "");
-                logger.debug("Mapping: {} = {}", prefixName, prefixNamespace.stringValue());
                 context.addUriMapping(prefixName, prefixNamespace);
             }
         }
@@ -140,25 +151,21 @@ public class RDFaParser extends AbstractRDFParser {
                 Optional<Resource> newSubjectResource = getResourceFromElementAttribute(element, ABOUT_ATTR, context);
                 if (newSubjectResource.isPresent()) {
                     newSubject = newSubjectResource.get();
-                    logger.debug("@about found: {}", newSubjectResource.get().stringValue());
                 }
             } else if (element.attribute(SRC_ATTR) != null) { // otherwise, by using the URI from @src, if present, obtained according to the section on CURIE and URI Processing.
                 Optional<Resource> newSubjectResource = getResourceFromElementAttribute(element, SRC_ATTR, context);
                 if (newSubjectResource.isPresent()) {
                     newSubject = newSubjectResource.get();
-                    logger.debug("@src found: {}", newSubjectResource.get().stringValue());
                 }
             } else if (element.attribute(RESOURCE_ATTR) != null) { // otherwise, by using the URI from @resource, if present, obtained according to the section on CURIE and URI Processing;
                 Optional<Resource> newSubjectResource = getResourceFromElementAttribute(element, RESOURCE_ATTR, context);
                 if (newSubjectResource.isPresent()) {
                     newSubject = newSubjectResource.get();
-                    logger.debug("@resource found: {}", newSubjectResource.get().stringValue());
                 }
             } else if (element.attribute(HREF_ATTR) != null) { // otherwise, by using the URI from @href, if present, obtained according to the section on CURIE and URI Processing.
                 Optional<Resource> newSubjectResource = getResourceFromElementAttribute(element, HREF_ATTR, context);
                 if (newSubjectResource.isPresent()) {
                     newSubject = newSubjectResource.get();
-                    logger.debug("href found: {}", newSubjectResource.get());
                 }
             } else if (element.nameIs("body") || element.nameIs("head")) { // if the element is the head or body element then act as if there is an empty @about present, and process it according to the rule for @about, above;
                 newSubject = context.baseIri();
@@ -176,13 +183,11 @@ public class RDFaParser extends AbstractRDFParser {
                 Optional<Resource> newSubjectResource = getResourceFromElementAttribute(element, ABOUT_ATTR, context);
                 if (newSubjectResource.isPresent()) {
                     newSubject = newSubjectResource.get();
-                    logger.debug("@about found: {}", newSubjectResource.get());
                 }
             } else if (element.attribute(SRC_ATTR) != null) { // otherwise, by using the URI from @src, if present, obtained according to the section on CURIE and URI Processing.
                 Optional<Resource> newSubjectResource = getResourceFromElementAttribute(element, SRC_ATTR, context);
                 if (newSubjectResource.isPresent()) {
                     newSubject = newSubjectResource.get();
-                    logger.debug("@src found: {}", newSubjectResource.get());
                 }
             } else if (element.nameIs("body") || element.nameIs("head")) { // if the element is the head or body element then act as if there is an empty @about present, and process it according to the rule for @about, above;
                 newSubject = context.baseIri();
@@ -197,21 +202,14 @@ public class RDFaParser extends AbstractRDFParser {
                 Optional<Resource> newObjectResource =  getResourceFromElementAttribute(element, RESOURCE_ATTR, context);
                 if (newObjectResource.isPresent()) {
                     currentObject = newObjectResource.get();
-                    logger.debug("@resource found: {}", newObjectResource.get().stringValue());
                 }
             } else if (element.attribute(HREF_ATTR) != null) { // otherwise, by using the URI from @href, if present, obtained according to the section on CURIE and URI Processing.
                 Optional<Resource> newObjectResource =  getResourceFromElementAttribute(element, RESOURCE_ATTR, context);
                 if (newObjectResource.isPresent()) {
                     currentObject = newObjectResource.get();
-                    logger.debug("href found: {}", newObjectResource.get().stringValue());
                 }
             }
         }
-
-        if (newSubject != null)
-            logger.debug("New subject resolved to {}", newSubject.stringValue());
-        if(currentObject != null)
-            logger.debug("Current object resolved to {}", currentObject.stringValue());
 
         // 6. If in any of the previous steps a [new subject] was set to a non-null value, it is now used to provide a subject for type values;
         if(newSubject != null) {
@@ -271,7 +269,6 @@ public class RDFaParser extends AbstractRDFParser {
             Optional<Resource> propertyOpt = getResourceFromElementAttribute(element, PROPERTY_ATTR, context);
             if(propertyOpt.isPresent() && propertyOpt.get().isIRI()) {
                 IRI property = (IRI)propertyOpt.get();
-                logger.debug("Property found: {}", property.stringValue());
 
                 IRI datatype = null;
                 if(element.attribute(DATATYPE_ATTR) != null && ! element.attr(DATATYPE_ATTR).isEmpty()) {
@@ -285,18 +282,14 @@ public class RDFaParser extends AbstractRDFParser {
                     value = element.attr(CONTENT_ATTR);
                 }
                 if(datatype != null) {
-                    logger.debug("Literal value: {}, datatype: {}", value, datatype.stringValue());
                     currentObjectLiteral = this.getValueFactory().createLiteral(value, datatype);
                     recursive = false;
                 } else if(language != null) {
-                    logger.debug("Literal value: {}, language: {}", value, language);
                     currentObjectLiteral = this.getValueFactory().createLiteral(value, language);
                 } else {
-                    logger.debug("Literal value: {}", value);
                     currentObjectLiteral = this.getValueFactory().createLiteral(value);
                 }
 
-                logger.debug("Adding {} {} {} {}", newSubject.stringValue(), property.stringValue(), currentObjectLiteral.getLabel(), currentObjectLiteral.getDatatype().stringValue());
                 this.getModel().add(newSubject, property, currentObjectLiteral);
             }
         }
@@ -341,11 +334,10 @@ public class RDFaParser extends AbstractRDFParser {
     /**
      * Surcharge function that initialize the flags and subject and objet to their initial values for processing
      *
-     * @param element
-     * @param context
-     * @param newSubject
+     * @param element HTML element
+     * @param context current evaluation context
      */
-    private void processElement(Element element, RDFaEvaluationContext context, Resource newSubject) {
+    private void processElement(Element element, RDFaEvaluationContext context) {
         processElement(element, context, true, false);
     }
 
@@ -413,7 +405,6 @@ public class RDFaParser extends AbstractRDFParser {
         if (element.attribute(attributeName) != null) { // otherwise, by using the URI from @resource, if present, obtained according to the section on CURIE and URI Processing;
             String newSubjectString = element.attr(attributeName);
             return resolveStringResource(newSubjectString, context);
-
         }
         return Optional.empty();
     }

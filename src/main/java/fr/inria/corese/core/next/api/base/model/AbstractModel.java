@@ -334,7 +334,8 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
             Iterator<?> iterator = collection.iterator();
             try {
                 while (iterator.hasNext()) {
-                    if (!contains(iterator.next())) {
+                    Object currentObject = iterator.next();
+                    if (! (currentObject instanceof Statement) && ! this.contains(currentObject)) {
                         return false;
                     }
                 }

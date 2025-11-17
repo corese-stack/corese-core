@@ -3,32 +3,25 @@ package fr.inria.corese.core.next.impl.io.parser.rdfa;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
+import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RDFaParserTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(RDFaParserTest.class);
-
     private static final ValueFactory factory = new CoreseAdaptedValueFactory();
 
     @Test
-    public void basicDocTest() {
+    public void basicBaseTest() {
         String testDataString = """
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
@@ -44,17 +37,31 @@ public class RDFaParserTest {
 </html>""";
 
         Model testModel = new CoreseModel();
-
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
-
-        parser.parse(new ByteArrayInputStream(testDataString.getBytes()));
+        Model referenceModel = new CoreseModel();
 
         IRI subject = factory.createIRI("http://www.w3.org/2006/07/SWD/RDFa/testsuite/xhtml1-testcases/photo1.jpg");
         IRI predicate = factory.createIRI("http://purl.org/dc/elements/1.1/creator");
         Literal object = factory.createLiteral("Mark Birbeck");
 
+        referenceModel.add(subject, predicate, object);
+
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+
+        parser.parse(new ByteArrayInputStream(testDataString.getBytes()));
+
+        assertEquals(RDFFormat.RDFa, parser.getRDFFormat());
+        assertEquals(referenceModel.size(), testModel.size());
+        Iterator<Statement> itStatementRef = referenceModel.iterator();
+        Iterator<Statement> itStatementTest = testModel.iterator();
+        while(itStatementRef.hasNext() && itStatementTest.hasNext()) {
+            Statement statementRef = itStatementRef.next();
+            Statement statementTest = itStatementTest.next();
+            assertEquals(statementRef.getSubject(), statementTest.getSubject());
+            assertEquals(statementRef.getPredicate(), statementTest.getPredicate());
+            assertEquals(statementRef.getObject(), statementTest.getObject());
+            assertEquals(statementRef.getContext(), statementTest.getContext());
+        }
         assertTrue(testModel.contains(subject, predicate, object));
-        assertEquals(1, testModel.size());
     }
 
     @Test
@@ -84,7 +91,42 @@ public class RDFaParserTest {
     }
 
     @Test
-    public void basicChainTest() {
+    public void basicIRItoIRITest() {
+        String testDataString = """
+                <html>
+                  <head>
+                  <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
+                  </head>
+                  <body>
+                <div about="http://dbpedia.org/resource/Albert_Einstein">
+                  <div rel="dbp:birthPlace" resource="http://dbpedia.org/resource/Germany" />
+                </div>
+                  </body>
+                </html>
+                """;
+
+        Model testModel = new CoreseModel();
+        Model referenceModel = new CoreseModel();
+
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+
+        parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
+
+        IRI albertEinstein = factory.createIRI("http://dbpedia.org/resource/Albert_Einstein");
+        IRI birthPlace = factory.createIRI("http://dbpedia.org/property/birthPlace");
+        IRI germany = factory.createIRI("http://dbpedia.org/resource/Germany");
+
+        Statement aeBirthPlaceStatement = factory.createStatement(albertEinstein, birthPlace, germany);
+
+        referenceModel.add(aeBirthPlaceStatement);
+
+        assertEquals(1, testModel.size());
+        assertEquals(referenceModel, testModel);
+        assertTrue(referenceModel.containsAll(testModel));
+    }
+
+    @Test
+    public void basicIRItoStringTest() {
         String testDataString = """
                 <html>
                   <head>
@@ -93,7 +135,86 @@ public class RDFaParserTest {
                   <body>
                 <div about="http://dbpedia.org/resource/Albert_Einstein">
                   <span property="foaf:name">Albert Einstein</span>
+                </div>
+                  </body>
+                </html>
+                """;
+
+        Model testModel = new CoreseModel();
+        Model referenceModel = new CoreseModel();
+
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+
+        parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
+
+        IRI albertEinstein = factory.createIRI("http://dbpedia.org/resource/Albert_Einstein");
+        IRI foafName = factory.createIRI("http://xmlns.com/foaf/0.1/name");
+        Literal aeName = factory.createLiteral("Albert Einstein");
+
+        Statement aeNameStatement = factory.createStatement(albertEinstein, foafName, aeName);
+
+        referenceModel.add(aeNameStatement);
+
+        assertEquals(1, testModel.size());
+        assertEquals(referenceModel, testModel);
+        assertTrue(referenceModel.containsAll(testModel));
+
+    }
+
+    @Test
+    public void basicIRItoTypedLiteralTest() {
+        String testDataString = """
+                <html>
+                  <head>
+                  <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
+                  </head>
+                  <body>
+                <div about="http://dbpedia.org/resource/Albert_Einstein">
                   <span property="dbp:dateOfBirth" datatype="xsd:date">1879-03-14</span>
+                </div>
+                  </body>
+                </html>
+                """;
+
+        Model testModel = new CoreseModel();
+        Model referenceModel = new CoreseModel();
+
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+
+        parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
+
+        IRI albertEinstein = factory.createIRI("http://dbpedia.org/resource/Albert_Einstein");
+        IRI dateOfBirth = factory.createIRI("http://dbpedia.org/property/dateOfBirth");
+        Literal aeDateOfBirth = factory.createLiteral("1879-03-14", XSD.xsdDate.getIRI());
+
+        Statement aeDateOfBirthStatement = factory.createStatement(albertEinstein, dateOfBirth, aeDateOfBirth);
+
+        referenceModel.add(aeDateOfBirthStatement);
+
+        assertEquals(1, testModel.size());
+        assertEquals(referenceModel.size(), testModel.size());
+        Iterator<Statement> itStatementRef = referenceModel.iterator();
+        Iterator<Statement> itStatementTest = testModel.iterator();
+        while(itStatementRef.hasNext() && itStatementTest.hasNext()) {
+            Statement statementRef = itStatementRef.next();
+            Statement statementTest = itStatementTest.next();
+            assertEquals(statementRef.getSubject(), statementTest.getSubject());
+            assertEquals(statementRef.getPredicate(), statementTest.getPredicate());
+            assertEquals(statementRef.getObject(), statementTest.getObject());
+            assertEquals(statementRef.getContext(), statementTest.getContext());
+        }
+        assertTrue(referenceModel.containsAll(testModel));
+    }
+
+    @Test
+    public void basicChainTest() {
+        String testDataString = """
+                <html>
+                  <head>
+                  <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
+                  </head>
+                  <body>
+                <div about="http://dbpedia.org/resource/Albert_Einstein">
                   <div rel="dbp:birthPlace" resource="http://dbpedia.org/resource/Germany" />
                   <span about="http://dbpedia.org/resource/Germany"
                     property="dbp:conventionalLongName">Federal Republic of Germany</span>
@@ -110,33 +231,20 @@ public class RDFaParserTest {
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
         IRI albertEinstein = factory.createIRI("http://dbpedia.org/resource/Albert_Einstein");
-        IRI dateOfBirth = factory.createIRI("http://dbpedia.org/property/dateOfBirth");
-        IRI foafName = factory.createIRI("http://xmlns.com/foaf/0.1/name");
         IRI birthPlace = factory.createIRI("http://dbpedia.org/property/birthPlace");
         IRI germany = factory.createIRI("http://dbpedia.org/resource/Germany");
         IRI conventionalLongName = factory.createIRI("http://dbpedia.org/property/conventionalLongName");
-        Literal aeName = factory.createLiteral("Albert Einstein");
-        Literal aeDateOfBirth = factory.createLiteral("1879-03-14", XSD.xsdDate.getIRI());
         Literal gerLongName = factory.createLiteral("Federal Republic of Germany");
 
-        Statement aeNameStatement = factory.createStatement(albertEinstein, foafName, aeName);
-        Statement aeDateOfBirthStatement = factory.createStatement(albertEinstein, dateOfBirth, aeDateOfBirth);
         Statement aeBirthPlaceStatement = factory.createStatement(albertEinstein, birthPlace, germany);
         Statement germanyNameStatement = factory.createStatement(germany, conventionalLongName, gerLongName);
 
-        referenceModel.add(aeNameStatement);
-        referenceModel.add(aeDateOfBirthStatement);
         referenceModel.add(aeBirthPlaceStatement);
         referenceModel.add(germanyNameStatement);
 
-        DefaultSerializerFactory serializerFactory = new DefaultSerializerFactory();
-        RDFSerializer serializer = serializerFactory.createSerializer(RDFFormat.NTRIPLES, testModel, new NTriplesSerializerOptions.Builder().build());
-        StringWriter debugWriter = new StringWriter();
-        serializer.write(debugWriter);
-        logger.debug(debugWriter.toString());
-
-        assertEquals(4, testModel.size());
+        assertEquals(2, testModel.size());
         assertEquals(referenceModel, testModel);
+        assertTrue(referenceModel.containsAll(testModel));
 
     }
 }
