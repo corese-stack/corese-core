@@ -67,7 +67,7 @@ public class RDFFormat extends FileFormat {
 
     public static final RDFFormat RDFa = new RDFFormat(
             "RDFa",
-            List.of("html"),
+            List.of("html", "xhtml"),
             List.of("text/html", "application/xhtml+xml"),
             true,
             false);
