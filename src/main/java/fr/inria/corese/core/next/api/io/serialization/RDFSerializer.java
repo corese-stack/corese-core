@@ -11,7 +11,6 @@ import fr.inria.corese.core.next.impl.exception.SerializationException;
  * This interface defines a contract for classes that are responsible
  * for providing appropriate RDF serializers based on the desired
  * {@link RDFFormat}, a {@link Model} to be serialized, and
- * {@link SerializationOption}.
  * Implementations of this factory can manage the instantiation
  * and configuration of various RDF serializers, promoting
  * loose coupling and extensibility in the serialization process.

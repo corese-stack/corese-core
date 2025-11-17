@@ -2391,7 +2391,7 @@ public class ASTQuery
         return var;
     }
 
-    /**
+    /*   /**
      * use case: select sql() as (?x, ?y)
      *
      * @param var1
