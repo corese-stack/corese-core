@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.temp.literal;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractNumber;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 
@@ -12,7 +13,7 @@ import java.math.BigInteger;
 /**
  * Super class for all the numeric based literal in the XSD datatype hierarchy.
  */
-public abstract class AbstractCoreseNumber extends AbstractLiteral implements CoreseDatatypeAdapter {
+public abstract class AbstractCoreseNumber extends AbstractNumber implements CoreseDatatypeAdapter {
 
     protected final CoreseNumber coreseObject;
 
@@ -77,8 +78,8 @@ public abstract class AbstractCoreseNumber extends AbstractLiteral implements Co
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AbstractCoreseNumber)) return false;
-        AbstractCoreseNumber that = (AbstractCoreseNumber) o;
+        if (!(o instanceof AbstractNumber)) return false;
+        if (!(o instanceof AbstractCoreseNumber that)) return super.equals(o);
         return this.coreseObject.equals(that.coreseObject);
     }
 
