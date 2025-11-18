@@ -3,13 +3,10 @@ package fr.inria.corese.core.query;
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.EventManager;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.api.DataBroker;
-import fr.inria.corese.core.api.DataBrokerConstruct;
 import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.api.Log;
 import fr.inria.corese.core.compiler.eval.Interpreter;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
-import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
 import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import fr.inria.corese.core.compiler.parser.Transformer;
 import fr.inria.corese.core.kgram.api.core.Node;
@@ -26,7 +23,6 @@ import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.load.Service;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.print.LogManager;
-import fr.inria.corese.core.print.TripleFormat;
 import fr.inria.corese.core.producer.DataBrokerConstructExtern;
 import fr.inria.corese.core.query.update.GraphManager;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -39,13 +35,10 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.transform.TemplateVisitor;
 import fr.inria.corese.core.util.Extension;
 import fr.inria.corese.core.util.Property;
 import jakarta.ws.rs.client.ResponseProcessingException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +93,9 @@ public class QueryProcess extends QuerySolver {
     boolean isMatch = false;
     private QueryProcessUpdate queryProcessUpdate;
     private ProducerImpl localProducer;
-    private DataBrokerConstruct dataBrokerUpdate;
+    /* --- dead code removal ---
+      private DataBrokerConstruct dataBrokerUpdate; */
+
     // true: execute start/end transaction before query
     // false: case where we execute a subquery (e.g. xt:sparql)
     // or a query within rule engine
@@ -281,11 +276,13 @@ public class QueryProcess extends QuerySolver {
         return ProducerImpl.create(g);
     }
 
+/* --- dead code removal ---
     public static QueryProcess create(Graph g, Graph g2) {
         QueryProcess qp = QueryProcess.create(g);
         qp.add(g2);
         return qp;
     }
+ --- dead code removal --- */
 
     /**
      * Create an Eval initialized with a query q that contains function
@@ -316,9 +313,11 @@ public class QueryProcess extends QuerySolver {
         return eval;
     }
 
+/* --- dead code removal ---
     static boolean isOverwrite() {
         return isReentrant();
     }
+ --- dead code removal --- */
 
     public static void setOverwrite(boolean b) {
         setReentrant(b);
@@ -347,9 +346,11 @@ public class QueryProcess extends QuerySolver {
         solverVisitorName = aSolverVisitorName;
     }
 
+/* --- dead code removal ---
     public static String getServerVisitorName() {
         return serverVisitorName;
     }
+ --- dead code removal --- */
 
     public static void setServerVisitorName(String name) {
         serverVisitorName = name;
@@ -409,6 +410,7 @@ public class QueryProcess extends QuerySolver {
         return null;
     }
 
+/* --- dead code removal ---
     public Loader getLoader() {
         return load;
     }
@@ -416,6 +418,7 @@ public class QueryProcess extends QuerySolver {
     public void setLoader(Loader ld) {
         load = ld;
     }
+ --- dead code removal --- */
 
     public boolean isMatch() {
         return isMatch;
@@ -466,15 +469,19 @@ public class QueryProcess extends QuerySolver {
      *
      ***************************************************************
      */
+/* --- dead code removal ---
     public Mappings update(String squery) throws EngineException {
         return doQuery(squery, null, null);
     }
+ --- dead code removal --- */
 
     @Override
     public Mappings query(String squery) throws EngineException {
         return doQuery(squery, null, null);
     }
 
+
+/* --- dead code removal ---
     // rdf is a turtle document
     // parse it as sparql query graph pattern (where bnode are variable)
     public Mappings queryTurtle(String rdf) throws EngineException {
@@ -499,6 +506,7 @@ public class QueryProcess extends QuerySolver {
     public Mappings query(Graph g) throws EngineException {
         return queryTrig(g);
     }
+ --- dead code removal --- */
 
     /**
      * defaut and named specify a Dataset if the query has no from/using (resp.
@@ -515,6 +523,7 @@ public class QueryProcess extends QuerySolver {
         return query(squery, null, ds);
     }
 
+/* --- dead code removal ---
     public Mappings query(String squery, Context c) throws EngineException {
         return query(squery, null, Dataset.create(c));
     }
@@ -522,6 +531,7 @@ public class QueryProcess extends QuerySolver {
     public Mappings query(String squery, AccessRight access) throws EngineException {
         return query(squery, new Context(access));
     }
+ --- dead code removal --- */
 
     @Override
     public Mappings query(String squery, Mapping map) throws EngineException {
@@ -532,6 +542,7 @@ public class QueryProcess extends QuerySolver {
         return query(squery, Mapping.create(b), null);
     }
 
+/* --- dead code removal ---
     public Mappings query(String squery, Context c, Binding b) throws EngineException {
         return query(squery, Mapping.create(b), Dataset.create(c));
     }
@@ -539,6 +550,7 @@ public class QueryProcess extends QuerySolver {
     public Mappings query(String squery, ProcessVisitor vis) throws EngineException {
         return query(squery, null, Dataset.create(vis));
     }
+ --- dead code removal --- */
 
     Mappings doQuery(String squery, Mapping map, Dataset ds) throws EngineException {
         Query q = compile(squery, ds);
@@ -558,10 +570,12 @@ public class QueryProcess extends QuerySolver {
         return q;
     }
 
+/* --- dead code removal ---
     public Mappings modifier(String str, Mappings map) throws SparqlException {
         Query q = compile(str, new Context().setAST(map.getAST()));
         return modifier(q, map);
     }
+ --- dead code removal --- */
 
     @Override
     public Query compile(String squery) throws EngineException {
@@ -642,9 +656,11 @@ public class QueryProcess extends QuerySolver {
         return sparqlQueryUpdate(squery, ds, RDFS_ENTAILMENT);
     }
 
+/* --- dead code removal ---
     public Mappings sparql(String squery, Dataset ds, int entail) throws EngineException {
         return sparqlQueryUpdate(squery, ds, entail);
     }
+ --- dead code removal --- */
 
     public Mappings query(ASTQuery ast) throws EngineException {
         if (ast.isUpdate()) {
@@ -686,6 +702,7 @@ public class QueryProcess extends QuerySolver {
      *
      *****************************************
      */
+/* --- dead code removal ---
     public Mappings sparqlQuery(String squery) throws EngineException {
         Query q = compile(squery);
         if (q.isUpdate()) {
@@ -693,6 +710,7 @@ public class QueryProcess extends QuerySolver {
         }
         return query(q);
     }
+ --- dead code removal --- */
 
     public Mappings sparqlQuery(String squery, Mapping map, Dataset ds) throws EngineException {
         Query q = compile(squery, ds);
@@ -706,6 +724,7 @@ public class QueryProcess extends QuerySolver {
         return query(null, q, map, ds);
     }
 
+/* --- dead code removal ---
     public Mappings sparqlUpdate(String squery) throws EngineException {
         Query q = compile(squery);
         if (!q.isUpdate()) {
@@ -717,6 +736,7 @@ public class QueryProcess extends QuerySolver {
     public Mappings sparqlQueryUpdate(String squery) throws EngineException {
         return query(squery);
     }
+ --- dead code removal --- */
 
     /*
      * *************************************************************************
@@ -875,6 +895,7 @@ public class QueryProcess extends QuerySolver {
         }
     }
 
+/* --- dead code removal ---
     // translate log header into Mappings
     // use case: gui display log header as query results
     public Mappings log2Mappings(ContextLog log) throws EngineException {
@@ -908,6 +929,7 @@ public class QueryProcess extends QuerySolver {
 
         return map;
     }
+ --- dead code removal --- */
 
     Mappings synQuery(Node gNode, Query query, Mapping m) throws EngineException {
         Mappings map = null;
@@ -1153,9 +1175,10 @@ public class QueryProcess extends QuerySolver {
      ************************************************************************
      */
 
+/* --- dead code removal ---
     /**
      * skolemize the blank nodes of the result Mappings
-     */
+     *_/
     public Mappings skolem(Mappings map) {
         Graph g = getGraph();
         if (map.getGraph() != null) {
@@ -1174,6 +1197,7 @@ public class QueryProcess extends QuerySolver {
         }
         return map;
     }
+ --- dead code removal --- */
 
     public void logStart(Query query) {
         if (getGraph() != null) {
@@ -1187,12 +1211,14 @@ public class QueryProcess extends QuerySolver {
         }
     }
 
+/* --- dead code removal ---
     public void close() {
         if (dbProducer != null) {
             dbProducer.close();
             dbProducer = null;
         }
     }
+ --- dead code removal --- */
 
     /**
      * Logger xt:method(us:start, us:Event, event, obj)
@@ -1235,9 +1261,11 @@ public class QueryProcess extends QuerySolver {
         return funcall(name, null, b, param);
     }
 
+/* --- dead code removal ---
     public IDatatype funcall(String name, Context c, IDatatype... param) throws EngineException {
         return funcall(name, c, null, param);
     }
+ --- dead code removal --- */
 
     public IDatatype funcall(String name, Context c, Binding b, IDatatype... param) throws EngineException {
         Function function = getLinkedFunction(name, param);
@@ -1283,19 +1311,21 @@ public class QueryProcess extends QuerySolver {
         getCurrentEval().getVisitor().setActive(false);
     }
 
+/* --- dead code removal ---
     /**
      * call @public @prepare function us:prepare() {} before lock graph
      * to complete initialization before query processing
      * to be called explicitely by user
      * use case: GUI QueryExec call prepare()
      * use case: xt:entailment()
-     */
+     *_/
     public void prepare() {
         try {
             new QuerySolverVisitor(getCreateEval()).prepare();
         } catch (EngineException ex) {
         }
     }
+ --- dead code removal --- */
 
     // Default Visitor to execute @event functions
     public ProcessVisitor getDefaultVisitor() {
@@ -1315,9 +1345,11 @@ public class QueryProcess extends QuerySolver {
         return getCurrentEval().getVisitor();
     }
 
+/* --- dead code removal ---
     public TemplateVisitor getTemplateVisitor() {
         return (TemplateVisitor) getCreateBinding().getTransformerVisitor();
     }
+ --- dead code removal --- */
 
     @Override
     public ProcessVisitor createProcessVisitor(Eval eval) {
@@ -1389,10 +1421,12 @@ public class QueryProcess extends QuerySolver {
     /**
      * 1- Linked Function 2- owl:imports
      */
+/* --- dead code removal ---
     @Override
     public Query parseQuery(String path) throws EngineException {
         return parseQuery(path, Level.USER_DEFAULT);
     }
+ --- dead code removal --- */
 
     @Override
     public Query parseQuery(String path, Level level) throws EngineException {
@@ -1426,9 +1460,11 @@ public class QueryProcess extends QuerySolver {
         getTransformer().getLinkedFunction(label);
     }
 
+/* --- dead code removal ---
     void getLinkedFunctionBasic(String label) throws EngineException {
         getTransformer().getLinkedFunctionBasic(label);
     }
+ --- dead code removal --- */
 
     public Graph defineFederation(String path) throws IOException, EngineException, LoadException {
         Graph g = Graph.create();
@@ -1458,9 +1494,11 @@ public class QueryProcess extends QuerySolver {
         FederateVisitor.defineFederation(name, list);
     }
 
+/* --- dead code removal ---
     public void defineFederation(String name, String... list) {
         FederateVisitor.defineFederation(name, Arrays.asList(list));
     }
+ --- dead code removal --- */
 
     Transformer getTransformer() {
         if (transformer == null) {
@@ -1472,10 +1510,12 @@ public class QueryProcess extends QuerySolver {
 
     //***********************************************************************
 
+/* --- dead code removal ---
     public Graph getExceptionGraph(Mappings map) throws LoadException {
         LogManager te = getLogManager(map);
         return te.parse();
     }
+ --- dead code removal --- */
 
     /**
      * Manager for local and remote endpoint log
@@ -1493,6 +1533,7 @@ public class QueryProcess extends QuerySolver {
         return new LogManager(getLog(map));
     }
 
+/* --- dead code removal ---
     public JSONObject getMessage(Mappings map) {
         String text = getStringMessage(map);
         if (text == null) {
@@ -1500,7 +1541,7 @@ public class QueryProcess extends QuerySolver {
         }
         return new JSONObject(text);
     }
-
+ 
     public String getStringMessage(Mappings map) {
         String url = map.getLastLink(URLParam.MES);
         if (url == null) {
@@ -1508,6 +1549,7 @@ public class QueryProcess extends QuerySolver {
         }
         return new Service().getString(url);
     }
+ --- dead code removal --- */
 
     public QueryProcessUpdate getQueryProcessUpdate() {
         return queryProcessUpdate;
@@ -1534,6 +1576,7 @@ public class QueryProcess extends QuerySolver {
         return getDataManager() != null;
     }
 
+/* --- dead code removal ---
     public DataBroker getDataBroker() {
         return getLocalProducer().getDataBroker();
     }
@@ -1545,6 +1588,7 @@ public class QueryProcess extends QuerySolver {
     public void setDataBrokerUpdate(DataBrokerConstruct dataBrokerUpdate) {
         this.dataBrokerUpdate = dataBrokerUpdate;
     }
+ --- dead code removal --- */
 
     public boolean isProcessTransaction() {
         return processTransaction;
