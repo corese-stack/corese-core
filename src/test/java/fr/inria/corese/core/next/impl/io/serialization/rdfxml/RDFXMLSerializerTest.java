@@ -23,11 +23,11 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for the XmlSerializer class.
  */
-class XMLSerializerTest {
+class RDFXMLSerializerTest {
 
     @Mock
     private Model mockModel;
-    XMLSerializerOption mockConfig;
+    RDFXMLSerializerOption mockConfig;
     private TestStatementFactory factory;
 
     private StringWriter writer;
@@ -38,7 +38,7 @@ class XMLSerializerTest {
         writer = new StringWriter();
         factory = new TestStatementFactory();
 
-        mockConfig = XMLSerializerOption.defaultConfig();
+        mockConfig = RDFXMLSerializerOption.defaultConfig();
     }
 
 
@@ -53,7 +53,7 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .autoDeclarePrefixes(true)
                 .usePrefixes(true)
                 .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
@@ -61,7 +61,7 @@ class XMLSerializerTest {
                 .build();
 
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
 
@@ -88,13 +88,13 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .stableBlankNodeIds(true)
                 .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -121,13 +121,13 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .stableBlankNodeIds(true)
                 .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
 
@@ -154,13 +154,13 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -185,14 +185,14 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .addCustomPrefix("ex", "http://example.org/vocabulary/")
                 .addCustomPrefix("xsd", "http://www.w3.org/2001/XMLSchema#")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -217,12 +217,12 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -254,14 +254,14 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .addCustomPrefix("exorg", "http://ex.org/")
                 .addCustomPrefix("excom", "http://ex.com/")
                 .prefixOrdering(PrefixOrderingEnum.USAGE_ORDER)
                 .sortSubjects(false)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String actual = writer.toString();
@@ -296,13 +296,13 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .sortSubjects(true)
                 .addCustomPrefix("ex", "http://ex.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -332,11 +332,11 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -362,14 +362,14 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .addCustomPrefix("ex", "http://example.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -396,13 +396,13 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .autoDeclarePrefixes(false)
                 .usePrefixes(true)
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -428,13 +428,13 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .usePrefixes(false)
                 .autoDeclarePrefixes(true)
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
@@ -466,14 +466,14 @@ class XMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .stableBlankNodeIds(false)
                 .sortSubjects(true)
                 .addCustomPrefix("ex", "http://example.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
 
@@ -497,11 +497,11 @@ class XMLSerializerTest {
     void shouldHandleEmptyModel() throws SerializationException {
         when(mockModel.stream()).thenReturn(Stream.empty());
 
-        XMLSerializerOption testConfig = new XMLSerializerOption.Builder()
+        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-        XMLSerializer serializer = new XMLSerializer(mockModel, testConfig);
+        RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """

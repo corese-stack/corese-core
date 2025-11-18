@@ -20,7 +20,7 @@ import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Serializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XMLSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
 
@@ -98,11 +98,11 @@ class SerializerFactoryTest {
     @Test
     @DisplayName("createSerializer should return XmlSerializer for RDFXML format")
     void createSerializer_shouldReturnXmlSerializer_forRdfXmlFormat() {
-        try (MockedConstruction<XMLSerializer> mockedConstruction = mockConstruction(XMLSerializer.class)) {
+        try (MockedConstruction<RDFXMLSerializer> mockedConstruction = mockConstruction(RDFXMLSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFXML, mockModel, mockConfig);
 
             assertNotNull(serializer);
-            assertTrue(serializer instanceof XMLSerializer);
+            assertTrue(serializer instanceof RDFXMLSerializer);
             assertEquals(1, mockedConstruction.constructed().size(), "XmlSerializer constructor should be called once");
         }
     }

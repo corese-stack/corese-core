@@ -18,7 +18,7 @@ import java.util.Objects;
  * <p>Use the {@link Builder} class to create instances of {@code XmlConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class XMLSerializerOption extends AbstractSerializerOption {
+public class RDFXMLSerializerOption extends AbstractSerializerOption {
 
     /**
      * Whether prefix declarations (e.g., `xmlns:prefix="uri"`) should be used for compact IRIs.
@@ -78,7 +78,7 @@ public class XMLSerializerOption extends AbstractSerializerOption {
      *
      * @param builder The builder instance containing the desired configuration values.
      */
-    protected XMLSerializerOption(Builder builder) {
+    protected RDFXMLSerializerOption(Builder builder) {
         super(builder);
 
         this.usePrefixes = builder.usePrefixes;
@@ -186,7 +186,7 @@ public class XMLSerializerOption extends AbstractSerializerOption {
 
 
     /**
-     * Public Builder for {@link XMLSerializerOption}.
+     * Public Builder for {@link RDFXMLSerializerOption}.
      * Provides a fluent API for constructing {@code XmlConfig} instances with default values
      * specific to the RDF/XML format.
      */
@@ -350,13 +350,13 @@ public class XMLSerializerOption extends AbstractSerializerOption {
         }
 
         /**
-         * Builds and returns a new {@link XMLSerializerOption} instance with the current builder settings.
+         * Builds and returns a new {@link RDFXMLSerializerOption} instance with the current builder settings.
          *
          * @return A new {@code XmlConfig} instance.
          */
         @Override
-        public XMLSerializerOption build() {
-            return new XMLSerializerOption(this);
+        public RDFXMLSerializerOption build() {
+            return new RDFXMLSerializerOption(this);
         }
     }
 
@@ -367,7 +367,7 @@ public class XMLSerializerOption extends AbstractSerializerOption {
      *
      * @return A {@code XmlConfig} instance with default settings.
      */
-    public static XMLSerializerOption defaultConfig() {
+    public static RDFXMLSerializerOption defaultConfig() {
         return new Builder().build();
     }
 }

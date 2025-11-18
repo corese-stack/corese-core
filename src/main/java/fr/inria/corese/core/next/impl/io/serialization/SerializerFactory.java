@@ -12,8 +12,8 @@ import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializerOp
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XMLSerializerOption;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XMLSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOption;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializerOptions;
@@ -107,12 +107,12 @@ public class SerializerFactory implements fr.inria.corese.core.next.api.io.seria
         });
 
         tempRegistry.put(RDFFormat.RDFXML, (model, genericConfig) -> {
-            if (genericConfig instanceof XMLSerializerOption specificConfig) {
-                return new XMLSerializer(model, specificConfig);
+            if (genericConfig instanceof RDFXMLSerializerOption specificConfig) {
+                return new RDFXMLSerializer(model, specificConfig);
             } else {
                 logger.warn("Provided config for RDFXML is not RDFXmlConfig (was {}). Using default RDFXmlConfig.",
                         genericConfig.getClass().getSimpleName());
-                return new XMLSerializer(model, XMLSerializerOption.defaultConfig());
+                return new RDFXMLSerializer(model, RDFXMLSerializerOption.defaultConfig());
             }
         });
 

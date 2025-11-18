@@ -22,7 +22,7 @@ import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XMLSerializerOption;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOption;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 
@@ -50,7 +50,7 @@ class RDFXMLCircularTest {
     private ValueFactory valueFactory;
     private fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
-    private XMLSerializerOption defaultConfig;
+    private RDFXMLSerializerOption defaultConfig;
 
     // Test data constants
     private static final String EXAMPLE_NS = "http://example.org/";
@@ -72,7 +72,7 @@ class RDFXMLCircularTest {
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new SerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = XMLSerializerOption.defaultConfig();
+        defaultConfig = RDFXMLSerializerOption.defaultConfig();
     }
 
     /**

@@ -46,12 +46,12 @@ import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstan
  * <p>Advanced features such as handling XML schemata, specific RDF/XML graph structures (e.g., rdf:Bag, rdf:Seq, rdf:Alt),
  * and full blank node syntax optimization are simplified in this version.</p>
  */
-public class XMLSerializer implements RDFSerializer {
+public class RDFXMLSerializer implements RDFSerializer {
 
-    private static final Logger logger = LoggerFactory.getLogger(XMLSerializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RDFXMLSerializer.class);
 
     private final Model model;
-    private final XMLSerializerOption config;
+    private final RDFXMLSerializerOption config;
     private final Map<String, String> iriToPrefixMapping;
     private final Map<String, String> prefixToIriMapping;
     private final Map<Resource, String> blankNodeIds;
@@ -60,23 +60,23 @@ public class XMLSerializer implements RDFSerializer {
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and default configuration.
-     * The default configuration is obtained from {@link XMLSerializerOption#defaultConfig()}.
+     * The default configuration is obtained from {@link RDFXMLSerializerOption#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
-    public XMLSerializer(Model model) {
-        this(model, XMLSerializerOption.defaultConfig());
+    public RDFXMLSerializer(Model model) {
+        this(model, RDFXMLSerializerOption.defaultConfig());
     }
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link XMLSerializerOption} to use for serialization. Must not be null.
+     * @param config the {@link RDFXMLSerializerOption} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public XMLSerializer(Model model, XMLSerializerOption config) {
+    public RDFXMLSerializer(Model model, RDFXMLSerializerOption config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
         this.iriToPrefixMapping = new HashMap<>();
