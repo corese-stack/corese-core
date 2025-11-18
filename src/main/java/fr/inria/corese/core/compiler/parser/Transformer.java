@@ -10,7 +10,6 @@ import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.core.*;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import fr.inria.corese.core.sparql.triple.cst.RDFS;
@@ -21,7 +20,6 @@ import fr.inria.corese.core.sparql.triple.parser.visitor.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +111,7 @@ public class Transformer implements ExpType {
         functionCompiler = new FunctionCompiler(this);
     }
 
+/* --- dead code removal ---
     Transformer(CompilerFactory f) {
         this();
         fac = f;
@@ -122,6 +121,7 @@ public class Transformer implements ExpType {
     public static Transformer create(CompilerFactory f) {
         return new Transformer(f);
     }
+ --- dead code removal --- */
 
     public static Transformer create() {
         return new Transformer();
@@ -388,6 +388,7 @@ public class Transformer implements ExpType {
         }
     }
 
+/* --- dead code removal ---
     @Deprecated
     void toJava(ASTQuery ast) throws EngineException {
         if (ast.hasMetadata(Metadata.Type.COMPILE)) {
@@ -401,6 +402,7 @@ public class Transformer implements ExpType {
             }
         }
     }
+ --- dead code removal --- */
 
     void visit(ASTQuery ast) {
         visitor(ast);
@@ -582,9 +584,11 @@ public class Transformer implements ExpType {
     }
 
 
+/* --- dead code removal ---
     public void imports(Query q, String path) throws EngineException {
         getFunctionCompiler().imports(q, q.getAST(), path);
     }
+ --- dead code removal --- */
 
     public boolean getLinkedFunction(String label) throws EngineException {
         return getFunctionCompiler().getLinkedFunction(label);
@@ -851,6 +855,7 @@ public class Transformer implements ExpType {
         return exp;
     }
 
+/* --- dead code removal ---
     Query create(Exp exp) {
         Query q = Query.create(exp);
         if (sort != null) {
@@ -858,6 +863,7 @@ public class Transformer implements ExpType {
         }
         return q;
     }
+ --- dead code removal --- */
 
     Exp compileValues(Values val, boolean opt, int level) {
         Exp exp = compileValues(val);
@@ -968,9 +974,11 @@ public class Transformer implements ExpType {
         return Mapping.safeCreate(lNode, nodes);
     }
 
+/* --- dead code removal ---
     Exp construct(ASTQuery ast) throws EngineException {
         return compile(ast, ast.getInsert());
     }
+ --- dead code removal --- */
 
     Exp delete(ASTQuery ast) throws EngineException {
         return compile(ast, ast.getDelete());
@@ -984,9 +992,11 @@ public class Transformer implements ExpType {
         this.ast = ast;
     }
 
+/* --- dead code removal ---
     public Compiler getCompiler() {
         return compiler;
     }
+ --- dead code removal --- */
 
     void complete(Query qCurrent, ASTQuery ast) throws EngineException {
         qCurrent.collect();
@@ -1199,9 +1209,11 @@ public class Transformer implements ExpType {
         return node;
     }
 
+/* --- dead code removal ---
     ASTQuery getAST(Query q) {
         return q.getAST();
     }
+ --- dead code removal --- */
 
     Node getProperAndSubSelectNode(Query q, String name) {
         Node node;
@@ -1834,6 +1846,7 @@ public class Transformer implements ExpType {
         return functionCompiler;
     }
 
+/* --- dead code removal ---
     public void setFunctionCompiler(FunctionCompiler functionCompiler) {
         this.functionCompiler = functionCompiler;
     }
@@ -1846,6 +1859,7 @@ public class Transformer implements ExpType {
     public void setNumber(int number) {
         this.number = number;
     }
+ --- dead code removal --- */
 
     int incrNumber() {
         return number++;
@@ -1899,9 +1913,11 @@ public class Transformer implements ExpType {
         this.visit = visit;
     }
 
+/* --- dead code removal ---
     public boolean isSPARQLCompliant() {
         return isSPARQLCompliant;
     }
+ --- dead code removal --- */
 
     public void setSPARQLCompliant(boolean b) {
         isSPARQLCompliant = b;
