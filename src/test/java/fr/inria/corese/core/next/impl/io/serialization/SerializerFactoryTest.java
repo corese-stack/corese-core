@@ -25,20 +25,20 @@ import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
 
 /**
- * Unit tests for the {@link DefaultSerializerFactory} class.
+ * Unit tests for the {@link SerializerFactory} class.
  * This class verifies that the factory correctly creates instances of
  * various {@link RDFSerializer} implementations based on the provided
  * {@link RDFFormat} and handles null inputs gracefully.
  */
-class DefaultSerializerFactoryTest {
+class SerializerFactoryTest {
 
-    private DefaultSerializerFactory factory;
+    private SerializerFactory factory;
     private Model mockModel;
     private IOOptions mockConfig;
 
     @BeforeEach
     void setUp() {
-        factory = new DefaultSerializerFactory();
+        factory = new SerializerFactory();
         mockModel = mock(Model.class);
         mockConfig = mock(IOOptions.class);
     }

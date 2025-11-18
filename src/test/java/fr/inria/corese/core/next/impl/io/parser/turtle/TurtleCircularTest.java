@@ -20,9 +20,8 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
@@ -39,7 +38,7 @@ import fr.inria.corese.core.next.impl.temp.CoreseModel;
 class TurtleCircularTest {
 
     private ValueFactory valueFactory;
-    private SerializerFactory serializerFactory;
+    private fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
     private TurtleSerializerOptions defaultConfig;
 
@@ -61,7 +60,7 @@ class TurtleCircularTest {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new DefaultSerializerFactory();
+        serializerFactory = new SerializerFactory();
         parserFactory = new ParserFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();
     }

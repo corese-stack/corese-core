@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Canonicalizer;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Options;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Serializer;
@@ -32,7 +31,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 
 /**
- * Default implementation of {@link SerializerFactory}.
+ * Default implementation of {@link fr.inria.corese.core.next.api.io.serialization.SerializerFactory}.
  * This factory is responsible for creating instances of {@link RDFSerializer}
  * based on the requested {@link RDFFormat}. It uses a registry pattern
  * to map each format to its corresponding serializer constructor,
@@ -45,9 +44,9 @@ import java.util.function.BiFunction;
  * to default configurations if an incompatible type is provided.
  * </p>
  */
-public class DefaultSerializerFactory implements SerializerFactory {
+public class SerializerFactory implements fr.inria.corese.core.next.api.io.serialization.SerializerFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultSerializerFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(SerializerFactory.class);
 
     private final Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> registry;
     private final ValueFactory coreseValueFactory;
@@ -61,7 +60,7 @@ public class DefaultSerializerFactory implements SerializerFactory {
      * possible,
      * it falls back to the format's default configuration.
      */
-    public DefaultSerializerFactory() {
+    public SerializerFactory() {
         this.coreseValueFactory = new CoreseAdaptedValueFactory();
 
         Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> tempRegistry = new HashMap<>();

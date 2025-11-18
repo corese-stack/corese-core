@@ -1,10 +1,9 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -314,14 +313,14 @@ class TurtleSerializerTest {
         Logger logger = LoggerFactory.getLogger(TurtleSerializerTest.class);
 
         ValueFactory valueFactory;
-        SerializerFactory serializerFactory;
+        fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
         ParserFactory parserFactory;
         TurtleSerializerOptions defaultConfig;
         String EXAMPLE_NS = "http://example.org/";
         String PREDICATE_KNOWS = EXAMPLE_NS + "knows";
 
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new DefaultSerializerFactory();
+        serializerFactory = new SerializerFactory();
         parserFactory = new ParserFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();
 

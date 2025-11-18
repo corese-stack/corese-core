@@ -20,10 +20,9 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.option.JSONLDProcessorOptions;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.slf4j.Logger;
@@ -46,7 +45,7 @@ class JSONLDCircularTest {
     private static final Logger logger = LoggerFactory.getLogger(JSONLDCircularTest.class);
 
     private ValueFactory valueFactory;
-    private SerializerFactory serializerFactory;
+    private fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
     private JSONLDProcessorOptions defaultConfig;
 
@@ -70,7 +69,7 @@ class JSONLDCircularTest {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new DefaultSerializerFactory();
+        serializerFactory = new SerializerFactory();
         parserFactory = new ParserFactory();
         defaultConfig = new JSONLDProcessorOptions.Builder()
                 .build();
