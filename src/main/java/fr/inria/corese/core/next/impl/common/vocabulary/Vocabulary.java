@@ -21,4 +21,12 @@ public interface Vocabulary {
      * @return the preferred prefix of this vocabulary
      */
     String getPreferredPrefix();
+
+    static String getVocabularyNamespace() {
+        throw new RuntimeException("Unimplemented function");
+    }
+
+    static String getVocabularyPreferredPrefix() {
+        throw new RuntimeException("Unimplemented function");
+    }
 }

@@ -51,8 +51,6 @@ public enum OWL implements Vocabulary {
 
     private final IRI iri;
 
-     public static final String NS = "http://www.w3.org/2002/07/owl#";
-
     OWL(String localName) {
         this.iri = new BasicIRI(getNamespace(), localName);
     }
@@ -64,11 +62,19 @@ public enum OWL implements Vocabulary {
 
     @Override
     public String getNamespace() {
-        return NS; // Referencing the directly defined static NS
+        return getVocabularyNamespace(); // Referencing the directly defined static NS
     }
 
     @Override
     public String getPreferredPrefix() {
+        return getVocabularyPreferredPrefix();
+    }
+
+    public static String getVocabularyNamespace() {
+        return "http://www.w3.org/2002/07/owl#";
+    }
+
+    public static String getVocabularyPreferredPrefix() {
         return "owl";
     }
 }
