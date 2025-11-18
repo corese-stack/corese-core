@@ -24,7 +24,7 @@ import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.io.option.JSONLDProcessorOptions;
+import fr.inria.corese.core.next.impl.io.option.JSONLDOptions;
 
 /**
  * Parser for JSON-LD RDF files. This parser is based on the Titanium JSON-LD library.
@@ -43,7 +43,7 @@ public class JSONLDParser extends AbstractRDFParser {
      * @param factory the value factory used to create RDF values
      */
     public JSONLDParser(Model model, ValueFactory factory) {
-        this(model, factory, new JSONLDProcessorOptions.Builder().build());
+        this(model, factory, new JSONLDOptions.Builder().build());
     }
 
     /**
@@ -96,8 +96,8 @@ public class JSONLDParser extends AbstractRDFParser {
     private void parseJSONLDDocument(Document document, String baseURI) {
         try {
             JsonLdOptions options = new JsonLdOptions();
-            if(this.getConfig() instanceof JSONLDProcessorOptions) {
-                options = ((JSONLDProcessorOptions) this.getConfig()).getJsonLdOptions();
+            if(this.getConfig() instanceof JSONLDOptions) {
+                options = ((JSONLDOptions) this.getConfig()).getJsonLdOptions();
             }
             if(baseURI != null && !baseURI.isEmpty()) {
                 options.setBase(URI.create(baseURI));

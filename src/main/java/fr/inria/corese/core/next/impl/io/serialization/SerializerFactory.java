@@ -5,8 +5,9 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.impl.io.option.JSONLDOptions;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Canonicalizer;
-import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Options;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Serializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
@@ -19,7 +20,6 @@ import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
-import fr.inria.corese.core.next.impl.io.option.JSONLDProcessorOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,18 +117,18 @@ public class SerializerFactory implements fr.inria.corese.core.next.api.io.seria
         });
 
         tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> {
-            if (genericConfig instanceof JSONLDProcessorOptions specificConfig) {
+            if (genericConfig instanceof JSONLDOptions specificConfig) {
                 return new JSONLDSerializer(model, specificConfig);
             } else {
                 logger.warn(
                         "Provided config for JSONLD is not TitaniumJSONLDProcessorOption (was {}). Using default TitaniumJSONLDProcessorOption.",
                         genericConfig.getClass().getSimpleName());
-                return new JSONLDSerializer(model, new JSONLDProcessorOptions.Builder().build());
+                return new JSONLDSerializer(model, new JSONLDOptions.Builder().build());
             }
         });
 
         tempRegistry.put(RDFFormat.RDFC_1_0, (model, genericConfig) -> {
-            if (genericConfig instanceof RDFC10Options specificConfig) {
+            if (genericConfig instanceof RDFC10SerializerOptions specificConfig) {
                 RDFC10Canonicalizer canonicalizer = new RDFC10Canonicalizer(
                         specificConfig.getHashAlgorithm(),
                         specificConfig.getPermutationLimit(),
@@ -138,7 +138,7 @@ public class SerializerFactory implements fr.inria.corese.core.next.api.io.seria
             } else {
                 logger.warn("Provided config for RDFC_1_0 is not CanonicalOption (was {}). Using default CanonicalOption.",
                         genericConfig != null ? genericConfig.getClass().getSimpleName() : "null");
-                RDFC10Options defaultConfig = RDFC10Options.defaultConfig();
+                RDFC10SerializerOptions defaultConfig = RDFC10SerializerOptions.defaultConfig();
                 RDFC10Canonicalizer canonicalizer = new RDFC10Canonicalizer(
                         defaultConfig.getHashAlgorithm(),
                         defaultConfig.getPermutationLimit(),
@@ -150,13 +150,13 @@ public class SerializerFactory implements fr.inria.corese.core.next.api.io.seria
 
 
         tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> {
-            if (genericConfig instanceof JSONLDProcessorOptions specificConfig) {
+            if (genericConfig instanceof JSONLDOptions specificConfig) {
                 return new JSONLDSerializer(model, specificConfig);
             } else {
                 logger.warn(
                         "Provided config for JSONLD is not TitaniumJSONLDProcessorOption (was {}). Using default TitaniumJSONLDProcessorOption.",
                         genericConfig.getClass().getSimpleName());
-                return new JSONLDSerializer(model, new JSONLDProcessorOptions.Builder().build());
+                return new JSONLDSerializer(model, new JSONLDOptions.Builder().build());
             }
         });
 

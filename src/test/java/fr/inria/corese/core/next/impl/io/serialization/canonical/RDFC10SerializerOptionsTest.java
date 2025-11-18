@@ -6,16 +6,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link RDFC10Options} class.
+ * Unit tests for the {@link RDFC10SerializerOptions} class.
  * This class verifies the default configuration and the builder functionality
  * for the Canonical RDF serialization options.
  */
-class RDFC10OptionsTest {
+class RDFC10SerializerOptionsTest {
 
     @Test
     @DisplayName("defaultConfig should return an instance with expected default values")
     void defaultConfig_shouldReturnExpectedValues() {
-        RDFC10Options config = RDFC10Options.defaultConfig();
+        RDFC10SerializerOptions config = RDFC10SerializerOptions.defaultConfig();
 
         assertNotNull(config, "Default config should not be null");
         assertTrue(config.isStrictMode(), "Default strictMode should be true for canonicalization");
@@ -28,7 +28,7 @@ class RDFC10OptionsTest {
     @Test
     @DisplayName("builder should allow setting custom options")
     void builder_shouldAllowCustomOptions() {
-        RDFC10Options customConfig = RDFC10Options.builder()
+        RDFC10SerializerOptions customConfig = RDFC10SerializerOptions.builder()
                 .strictMode(false)
                 .validateURIs(false)
                 .escapeUnicode(false)
@@ -47,7 +47,7 @@ class RDFC10OptionsTest {
     @Test
     @DisplayName("builder should use default values for un-set options")
     void builder_shouldUseDefaultValues_forUnsetOptions() {
-        RDFC10Options config = RDFC10Options.builder()
+        RDFC10SerializerOptions config = RDFC10SerializerOptions.builder()
                 .strictMode(false)
                 .build();
 

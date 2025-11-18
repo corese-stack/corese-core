@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.impl.io.serialization.jsonld;
 import com.apicatalog.jsonld.json.JsonLdComparison;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.impl.io.option.JSONLDProcessorOptions;
+import fr.inria.corese.core.next.impl.io.option.JSONLDOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import jakarta.json.Json;
@@ -50,7 +50,7 @@ class JSONLDSerializerTest {
         // IRI IRI LangLiteral
         this.model.add(iriNode, iriPred, langLiteral);
 
-        RDFSerializer serializer = new JSONLDSerializer(this.model, (new JSONLDProcessorOptions.Builder()).ordered(true).build());
+        RDFSerializer serializer = new JSONLDSerializer(this.model, (new JSONLDOptions.Builder()).ordered(true).build());
 
         StringWriter writer = new StringWriter();
 
