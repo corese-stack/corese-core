@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,8 +170,8 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeNamespaceAttributes(Writer writer) throws IOException {
-        if (!iriToPrefixMapping.containsKey(SerializationConstants.RDF_NS)) {
-            addPrefixMapping(SerializationConstants.RDF_NS, "rdf");
+        if (!iriToPrefixMapping.containsKey(RDF.getVocabularyNamespace())) {
+            addPrefixMapping(RDF.getVocabularyNamespace(), RDF.getVocabularyPreferredPrefix());
         }
 
         List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
@@ -437,7 +438,7 @@ public class RDFXMLSerializer implements RDFSerializer {
         }
 
         return config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED ||
-                (!datatype.stringValue().equals(SerializationConstants.XSD_STRING) &&
+                (!datatype.equals(XSD.xsdString.getIRI()) &&
                         config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL);
     }
 
@@ -474,11 +475,11 @@ public class RDFXMLSerializer implements RDFSerializer {
      */
     private String getSuggestedPrefix(String namespace) {
 
-        if (namespace.equals(SerializationConstants.RDF_NS)) return "rdf";
-        if (namespace.equals(SerializationConstants.RDFS_NS)) return "rdfs";
-        if (namespace.equals(SerializationConstants.XSD_NS)) return "xsd";
-        if (namespace.equals(SerializationConstants.OWL_NS)) return "owl";
-        if (namespace.equals(SerializationConstants.FOAF_NS)) return "foaf";
+        if (namespace.equals(RDF.getVocabularyNamespace())) return RDF.getVocabularyPreferredPrefix();
+        if (namespace.equals(RDFS.getVocabularyNamespace())) return RDFS.getVocabularyPreferredPrefix();
+        if (namespace.equals(XSD.getVocabularyNamespace())) return XSD.getVocabularyPreferredPrefix();
+        if (namespace.equals(OWL.getVocabularyNamespace())) return OWL.getVocabularyPreferredPrefix();
+        if (namespace.equals(FOAF.getVocabularyNamespace())) return FOAF.getVocabularyPreferredPrefix();
 
 
         String base = namespace;

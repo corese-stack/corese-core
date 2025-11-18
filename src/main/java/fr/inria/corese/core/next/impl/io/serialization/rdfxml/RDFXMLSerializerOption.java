@@ -1,5 +1,9 @@
 package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
+import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOption;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
@@ -213,10 +217,10 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
             stableBlankNodeIds(true); // Good for reproducible RDF/XML outputs
             escapeUnicode(false); // Usually direct UTF-8 for RDF/XML, not unicode escapes
 
-            addCustomPrefix("rdf", SerializationConstants.RDF_NS);
-            addCustomPrefix("rdfs", SerializationConstants.RDFS_NS);
-            addCustomPrefix("xsd", SerializationConstants.XSD_NS);
-            addCustomPrefix("owl", SerializationConstants.OWL_NS);
+            addCustomPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
+            addCustomPrefix(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
+            addCustomPrefix(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
+            addCustomPrefix(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
         }
 
 

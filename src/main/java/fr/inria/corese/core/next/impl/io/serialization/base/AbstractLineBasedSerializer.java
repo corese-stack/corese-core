@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +177,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
         IRI datatype = literal.getDatatype();
         if (!literal.getLanguage().isPresent() && datatype != null &&
                 (config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED ||
-                        (config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL && !datatype.stringValue().equals(SerializationConstants.XSD_STRING)))) {
+                        (config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL && !datatype.equals(XSD.STRING.getIRI())))) {
             writer.write(SerializationConstants.DATATYPE_SEPARATOR);
             writeIRI(writer, datatype);
         }

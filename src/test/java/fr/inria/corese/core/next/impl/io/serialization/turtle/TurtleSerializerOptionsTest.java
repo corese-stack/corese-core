@@ -1,5 +1,9 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
+import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
@@ -30,10 +34,10 @@ class TurtleSerializerOptionsTest {
         assertEquals(BlankNodeStyleEnum.ANONYMOUS, config.getBlankNodeStyle(), "Default blankNodeStyle should be ANONYMOUS for Turtle");
 
         Map<String, String> expectedPrefixes = new HashMap<>();
-        expectedPrefixes.put("rdf", SerializationConstants.RDF_NS);
-        expectedPrefixes.put("rdfs", SerializationConstants.RDFS_NS);
-        expectedPrefixes.put("xsd", SerializationConstants.XSD_NS);
-        expectedPrefixes.put("owl", SerializationConstants.OWL_NS);
+        expectedPrefixes.put(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
+        expectedPrefixes.put(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
+        expectedPrefixes.put(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
+        expectedPrefixes.put(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
         assertEquals(expectedPrefixes.size(), config.getCustomPrefixes().size(), "Default custom prefixes size mismatch");
         assertTrue(config.getCustomPrefixes().entrySet().containsAll(expectedPrefixes.entrySet()), "Default custom prefixes should contain common RDF prefixes");
 

@@ -2,10 +2,10 @@ package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -149,7 +149,7 @@ class RDFXMLSerializerTest {
         Statement stmt = factory.createStatement(
                 factory.createIRI("http://example.org/person"),
                 factory.createIRI("http://xmlns.com/foaf/0.1/name"),
-                factory.createLiteral("John Doe", factory.createIRI(SerializationConstants.XSD_STRING), null)
+                factory.createLiteral("John Doe", XSD.xsdString.getIRI(), null)
         );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
@@ -180,7 +180,7 @@ class RDFXMLSerializerTest {
         Statement stmt = factory.createStatement(
                 factory.createIRI("http://example.org/data"),
                 factory.createIRI("http://example.org/vocabulary/value"),
-                factory.createLiteral("123", factory.createIRI(SerializationConstants.XSD_INTEGER), null)
+                factory.createLiteral("123", fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdInteger.getIRI(), null)
         );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));

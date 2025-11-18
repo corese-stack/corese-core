@@ -1,5 +1,9 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
+import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -42,10 +46,10 @@ public class TurtleSerializerOptions extends AbstractTFamilyOption {
             blankNodeStyle(BlankNodeStyleEnum.ANONYMOUS);
 
             Map<String, String> commonTurtlePrefixes = new HashMap<>();
-            commonTurtlePrefixes.put("rdf", SerializationConstants.RDF_NS);
-            commonTurtlePrefixes.put("rdfs", SerializationConstants.RDFS_NS);
-            commonTurtlePrefixes.put("xsd", SerializationConstants.XSD_NS);
-            commonTurtlePrefixes.put("owl", SerializationConstants.OWL_NS);
+            commonTurtlePrefixes.put(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
+            commonTurtlePrefixes.put(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
+            commonTurtlePrefixes.put(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
+            commonTurtlePrefixes.put(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
             addCustomPrefixes(commonTurtlePrefixes);
 
 

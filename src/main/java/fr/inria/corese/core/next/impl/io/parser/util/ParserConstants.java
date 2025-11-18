@@ -86,6 +86,7 @@ public final class ParserConstants {
     private ParserConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
+
     /**
      * Returns the configured default base URI for IRI resolution.
      * The value is configurable via {@code Property.Value.DEFAULT_BASE_URI}.

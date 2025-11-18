@@ -1,10 +1,5 @@
 package fr.inria.corese.core.next.impl.io.serialization.util;
 
-import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
-
 
 /**
  * Provides common constants used throughout the RDF serialization process.
@@ -17,31 +12,6 @@ public final class SerializationConstants {
     private SerializationConstants() {
         // Private constructor to prevent instantiation
     }
-
-    // --- Standard RDF/RDFS/XSD/OWL URIs ---
-    public static final String RDF_NS = RDF.HTML.getNamespace();
-    public static final String RDF_TYPE = RDF.type.getIRI().stringValue();
-    public static final String RDF_FIRST = RDF.first.getIRI().stringValue();
-    public static final String RDF_REST = RDF.rest.getIRI().stringValue();
-    public static final String RDF_NIL = RDF.nil.getIRI().stringValue();
-
-
-    public static final String RDFS_NS = RDFS.Resource.getNamespace();
-
-    public static final String XSD_NS = XSD.xsdString.getNamespace();
-
-    public static final String OWL_NS = OWL.NS;
-
-    public static final String XSD_STRING = XSD_NS + "string";
-    public static final String XSD_INTEGER = XSD_NS + "integer";
-    public static final String XSD_DECIMAL = XSD_NS + "decimal";
-    public static final String XSD_DOUBLE = XSD_NS + "double";
-    public static final String XSD_BOOLEAN = XSD_NS + "boolean";
-    public static final String XSD_DATETIME = XSD_NS + "dateTime";
-
-    // Nouveau namespace FOAF
-    public static final String FOAF_NS = "http://xmlns.com/foaf/0.1/";
-
 
     // --- Common Delimiters and Special Characters in Serialization ---
     public static final String SPACE = " ";
@@ -114,7 +84,7 @@ public final class SerializationConstants {
     public static final String  CANONICAL_BNODE_PREFIX = "_:b";
 
 
-    // Algorithmes de hachage
+    // Hash algorithm
     public static final String SHA_256 = "SHA-256";
     public static final String SHA_384 = "SHA-384";
 
