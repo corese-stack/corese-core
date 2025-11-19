@@ -2,6 +2,9 @@ package fr.inria.corese.core.next.impl.io.common;
 
 import fr.inria.corese.core.util.Property;
 
+/**
+ * Shared constants between serializers and parsers
+ */
 public class IOConstants {
 
     protected IOConstants() {
