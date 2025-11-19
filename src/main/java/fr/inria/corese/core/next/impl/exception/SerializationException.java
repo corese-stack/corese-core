@@ -14,6 +14,8 @@ public class SerializationException extends CoreseException {
     private final int lineNumber;
     private final int columnNumber;
 
+    public static final String DEFAULT_FORMAT = "unknown";
+
     public SerializationException(String message, String formatName) {
         this(message, formatName, -1, -1, null);
     }
@@ -27,7 +29,7 @@ public class SerializationException extends CoreseException {
      *                   the {@link #getMessage()} method).
      * @param formatName the name of the RDF format being processed when the error
      *                   occurred.
-     *                   Use "unknown" if the format is not applicable or cannot be
+     *                   Use DEFAULT_FORMAT if the format is not applicable or cannot be
      *                   determined.
      * @param cause      the cause (which is saved for later retrieval by the
      *                   {@link #getCause()} method).
@@ -71,7 +73,7 @@ public class SerializationException extends CoreseException {
      */
     private static String buildMessage(String base, String format, int line, int col) {
         StringBuilder sb = new StringBuilder(base);
-        if (!"unknown".equals(format)) {
+        if (!DEFAULT_FORMAT.equals(format)) {
             sb.append(" [Format: ").append(format).append("]");
         }
         if (line > 0) {

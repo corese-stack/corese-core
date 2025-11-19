@@ -49,14 +49,9 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
         Objects.requireNonNull(config, "NQuadsConfig cannot be null");
     }
 
-    /**
-     * Returns the format name for error messages and logging.
-     *
-     * @return "N-Quads"
-     */
     @Override
-    protected String getFormatName() {
-        return RDFFormat.NQUADS.getName();
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.NQUADS;
     }
 
     /**

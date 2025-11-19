@@ -5,6 +5,7 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.api.FromRdfApi;
 import com.apicatalog.jsonld.document.RdfDocument;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
@@ -56,5 +57,10 @@ public class JSONLDSerializer implements RDFSerializer {
         } catch (JsonLdError | IOException e) {
             throw new SerializationException("Error during serialization", "JSONLD", e);
         }
+    }
+
+    @Override
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.JSONLD;
     }
 }

@@ -78,11 +78,6 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
     }
 
     /**
-     * Returns the name of the format for error messages.
-     */
-    protected abstract String getFormatName();
-
-    /**
      * Handles writing the context part of a statement.
      * This is where N-Triples and N-Quads differ.
      *
@@ -133,7 +128,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      * @param writer the {@link Writer} to which the value will be written.
      * @param value  the {@link Value} to write.
      * @throws IOException              if an I/O error occurs.
-     * @throws IllegalArgumentException if the provided value is null or an unsupported type.
+     * @throws SerializationException if the provided value is null or an unsupported type.
      */
     protected void writeValue(Writer writer, Value value) throws IOException {
         validateValue(value);
@@ -146,10 +141,10 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
             } else if (value.isBNode()) {
                 writeBlankNode(writer, (Resource) value);
             } else {
-                throw new IllegalArgumentException("Unsupported resource type for " + getFormatName() + " serialization: " + value.getClass().getName());
+                throw new SerializationException("Unsupported resource type for serialization: " + value.getClass().getName(), this.getFormatName());
             }
         } else {
-            throw new IllegalArgumentException("Unsupported value type for " + getFormatName() + " serialization: " + value.getClass().getName());
+            throw new SerializationException("Unsupported value type for serialization: " + value.getClass().getName(), this.getFormatName());
         }
     }
 
@@ -170,7 +165,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
             try {
                 writer.write(SerializationConstants.AT + lang);
             } catch (IOException e) {
-                throw new UncheckedIOException("Error writing language tag to stream", e);
+                throw new SerializationException("Error writing language tag to stream", this.getFormatName(), e);
             }
         });
 
@@ -191,7 +186,6 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      * @param writer the {@link Writer} to which the IRI will be written.
      * @param iri    the {@link IRI} to write.
      * @throws IOException              if an I/O error occurs.
-     * @throws IllegalArgumentException if the IRI is invalid (e.g., contains spaces) and strict mode/URI validation is enabled.
      */
     protected void writeIRI(Writer writer, IRI iri) throws IOException {
         if (config.isStrictMode() && config.validateURIs()) {
@@ -231,7 +225,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
                 iri.contains(SerializationConstants.LT) ||
                 iri.contains(SerializationConstants.GT)) {
 
-            throw new IllegalArgumentException("Invalid IRI for " + getFormatName() + " (contains illegal characters inside '<>'): " + iri);
+            throw new SerializationException("Invalid IRI (contains illegal characters inside '<>'): " + iri, this.getFormatName());
         }
 
         return config.escapeUnicode() ? escapeUnicodeString(iri) : iri;
@@ -326,7 +320,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
     protected void validateValue(Value value) {
         if (value == null) {
             logger.warn("Encountered a null value where a non-null value was expected for " + getFormatName() + " serialization. This will result in an IllegalArgumentException if strict mode is enabled.");
-            throw new IllegalArgumentException("Value cannot be null in " + getFormatName() + " format when strictMode is enabled.");
+            throw new SerializationException("Value cannot be null in " + getFormatName() + " format when strictMode is enabled.", this.getFormatName());
         }
 
         if (value.isLiteral()) {
@@ -342,7 +336,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      * Only called if strictMode is enabled.
      *
      * @param literal The {@link Literal} to validate.
-     * @throws IllegalArgumentException if the literal is invalid (e.g., language tag with wrong datatype,
+     * @throws SerializationException if the literal is invalid (e.g., language tag with wrong datatype,
      * or rdf:langString literal missing a language tag).
      */
     protected void validateLiteral(Literal literal) {
@@ -350,13 +344,13 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
 
         if (literal.getLanguage().isPresent()) {
             if (datatype == null || !datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
-                throw new IllegalArgumentException(
-                        "Literal with language tag must use rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"));
+                throw new SerializationException(
+                        "Literal with language tag must use rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"), this.getFormatName());
             }
         } else {
             if (datatype != null && datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
-                throw new IllegalArgumentException(
-                        "rdf:langString literal must have a language tag.");
+                throw new SerializationException(
+                        "rdf:langString literal must have a language tag.", this.getFormatName());
             }
         }
     }
@@ -368,7 +362,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      * Only called if strictMode and validateURIs are enabled.
      *
      * @param iri The {@link IRI} to validate.
-     * @throws IllegalArgumentException if the IRI contains invalid characters.
+     * @throws SerializationException if the IRI contains invalid characters.
      */
     protected void validateIRI(IRI iri) {
         String iriString = iri.stringValue();
@@ -376,7 +370,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
                 iriString.contains(SerializationConstants.QUOTE) ||
                 iriString.contains(SerializationConstants.LT) ||
                 iriString.contains(SerializationConstants.GT)) {
-            throw new IllegalArgumentException("IRI contains illegal characters (space, quote, angle brackets) for " + getFormatName() + " unescaped form: " + iriString);
+            throw new SerializationException("IRI contains illegal characters (space, quote, angle brackets) unescaped form: " + iriString, this.getFormatName());
         }
     }
 }

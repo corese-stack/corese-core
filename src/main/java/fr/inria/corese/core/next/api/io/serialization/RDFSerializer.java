@@ -29,4 +29,18 @@ public interface RDFSerializer {
      *                                process
      */
     void write(final Writer writer) throws SerializationException;
+
+    /**
+     * Returns the format name for error messages and logging.
+     *
+     * @return the format name (e.g., "TriG", "Turtle").
+     */
+    default String getFormatName() {
+        return getRDFFormat().getName();
+    };
+
+    /**
+     * Gets the RDF format that this serializer generates.
+     */
+    RDFFormat getRDFFormat();
 }

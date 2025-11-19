@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,12 +90,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * This should be called before accessing any methods specific to AbstractTFamilyConfig.
      *
      * @return The config cast to AbstractTFamilyConfig.
-     * @throws IllegalStateException if the config is not an instance of AbstractTFamilyConfig.
+     * @throws SerializationException if the config is not an instance of AbstractTFamilyConfig.
      */
     private AbstractTFamilyOption getTFamilyOption() {
         if (!(option instanceof AbstractTFamilyOption)) {
-            throw new IllegalStateException("Current serializer configuration is not an instance of AbstractTFamilyOption. " +
-                    "Features like prefixes, compact syntax, and pretty-printing are only available for T-Family formats.");
+            throw new SerializationException("Current serializer configuration is not an instance of AbstractTFamilyOption. " +
+                    "Features like prefixes, compact syntax, and pretty-printing are only available for T-Family formats.", this.getFormatName());
         }
         return (AbstractTFamilyOption) option;
     }
@@ -133,13 +134,6 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             throw new SerializationException("Invalid data for format " + getFormatName() + ": " + e.getMessage(), getFormatName(), e);
         }
     }
-
-    /**
-     * Returns the format name for error messages and logging.
-     *
-     * @return the format name (e.g., "TriG", "Turtle").
-     */
-    protected abstract String getFormatName();
 
     /**
      * Abstract method for the main statement writing,
@@ -348,8 +342,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
             currentlyWritingBlankNodes.remove(bNode);
         } else {
-            throw new IllegalArgumentException("Unsupported value type for " + getFormatName() +
-                    " serialization: " + value.getClass().getName());
+            throw new SerializationException("Unsupported value type serialization: " + value.getClass().getName(), this.getFormatName());
         }
     }
 
@@ -407,7 +400,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             try {
                 writer.write(SerializationConstants.AT + lang);
             } catch (IOException e) {
-                throw new UncheckedIOException("Error writing language tag to stream", e);
+                throw new SerializationException("Error writing language tag to stream", this.getFormatName(), e);
             }
         });
 
@@ -923,12 +916,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Called only if strictMode is enabled.
      *
      * @param value The {@link Value} to validate.
-     * @throws IllegalArgumentException if the value is null or invalid according to strict rules.
+     * @throws SerializationException if the value is null or invalid according to strict rules.
      */
     protected void validateValue(Value value) {
         if (value == null) {
             logger.warn("Null value encountered where a non-null value was expected for {} serialization. This will lead to an IllegalArgumentException if strict mode is enabled.", getFormatName());
-            throw new IllegalArgumentException("Value cannot be null in {} format when strictMode is enabled." + getFormatName());
+            throw new SerializationException("Value cannot be null in {} format when strictMode is enabled.", getFormatName());
         }
 
         if (option.isStrictMode() && value.isLiteral()) {
@@ -942,7 +935,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Called only if strictMode is enabled.
      *
      * @param literal The {@link Literal} to validate.
-     * @throws IllegalArgumentException if the literal is invalid (e.g., language tag with wrong datatype,
+     * @throws SerializationException if the literal is invalid (e.g., language tag with wrong datatype,
      *                                  or rdf:langString literal without language tag).
      */
     protected void validateLiteral(Literal literal) {
@@ -950,13 +943,13 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
         if (literal.getLanguage().isPresent()) {
             if (datatype == null || !datatype.equals(RDF.langString.getIRI())) {
-                throw new IllegalArgumentException(
-                        "A literal with a language tag must use the rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"));
+                throw new SerializationException(
+                        "A literal with a language tag must use the rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"), this.getFormatName());
             }
         } else {
             if (datatype != null && datatype.equals(RDF.langString.getIRI())) {
-                throw new IllegalArgumentException(
-                        "An rdf:langString literal must have a language tag.");
+                throw new SerializationException(
+                        "An rdf:langString literal must have a language tag.", this.getFormatName());
             }
         }
     }
@@ -968,7 +961,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Called only if strictMode and validateURIs are enabled.
      *
      * @param iri The {@link IRI} to validate.
-     * @throws IllegalArgumentException if the IRI contains invalid characters.
+     * @throws SerializationException if the IRI contains invalid characters.
      */
     protected void validateIRI(IRI iri) {
         String iriString = iri.stringValue();
@@ -977,7 +970,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 iriString.contains(SerializationConstants.QUOTE) ||
                 iriString.contains(SerializationConstants.LT) ||
                 iriString.contains(SerializationConstants.GT)) {
-            throw new IllegalArgumentException("IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form of " + getFormatName() + ": " + iriString);
+            throw new SerializationException("IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form : " + iriString, this.getFormatName());
         }
     }
 }

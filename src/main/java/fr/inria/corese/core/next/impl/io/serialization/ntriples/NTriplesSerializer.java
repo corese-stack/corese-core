@@ -49,14 +49,9 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
         Objects.requireNonNull(config, "NTriplesConfig cannot be null");
     }
 
-    /**
-     * Returns the format name for error messages and logging.
-     *
-     * @return "N-Triples"
-     */
     @Override
-    protected String getFormatName() {
-        return RDFFormat.NTRIPLES.getName();
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.NTRIPLES;
     }
 
     /**

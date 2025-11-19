@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +117,11 @@ public class RDFXMLSerializer implements RDFSerializer {
         } catch (IllegalArgumentException e) {
             throw new SerializationException("Invalid data for RDF/XML format: " + e.getMessage(), "RDF/XML", e);
         }
+    }
+
+    @Override
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.RDFXML;
     }
 
     /**

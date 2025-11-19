@@ -148,7 +148,7 @@ public class JSONLDParser extends AbstractRDFParser {
                 } else if(IRIUtils.isStandardIRI(object)) {
                     objValue = getValueFactory().createIRI(object);
                 } else {
-                    throw new RdfConsumerException("Invalid object: " + object);
+                    throw new ParsingErrorException("Invalid object: " + object);
                 }
 
                 // Graph
