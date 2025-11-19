@@ -489,7 +489,7 @@ class TurtleSerializerTest {
 
         assertEquals("Turtle", thrown.getFormatName());
 
-        assertEquals("Invalid data for format Turtle: An rdf:langString literal must have a language tag. [Format: Turtle]", thrown.getMessage());
+        assertEquals("An rdf:langString literal must have a language tag. [Format: Turtle]", thrown.getMessage());
     }
 
     /**
@@ -525,7 +525,7 @@ class TurtleSerializerTest {
 
         assertEquals("Turtle", thrown.getFormatName());
 
-        assertEquals("Invalid data for format Turtle: IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form of Turtle: http://example.org/invalid iri [Format: Turtle]", thrown.getMessage());
+        assertEquals("IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form : http://example.org/invalid iri [Format: Turtle]", thrown.getMessage());
     }
 
     /**
