@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.util;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 
 import java.util.Map;
 
@@ -120,7 +121,7 @@ public class StatementUtils {
 
         if (value instanceof Resource) {
             String str = value.stringValue();
-            if (str.startsWith(SerializationConstants.BNODE_PREFIX)) {
+            if (str.startsWith(SerializationConstants.BLANK_NODE_PREFIX)) {
                 return true;
             }
         }
@@ -202,11 +203,11 @@ public class StatementUtils {
 
         // If language tag exists, use it (language takes precedence over datatype)
         if (language != null && !language.isEmpty()) {
-            sb.append(SerializationConstants.AT_SIGN).append(language);
+            sb.append(SerializationConstants.AT).append(language);
             return sb.toString();
         }
 
-        if (datatype != null && !datatype.equals(SerializationConstants.XSD_STRING)) {
+        if (datatype != null && !datatype.equals(XSD.xsdString.getIRI().stringValue())) {
             sb.append(SerializationConstants.DATATYPE_SEPARATOR)
                     .append(SerializationConstants.LT)
                     .append(datatype)
