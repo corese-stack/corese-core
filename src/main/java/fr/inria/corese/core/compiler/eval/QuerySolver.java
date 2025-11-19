@@ -109,12 +109,6 @@ public class QuerySolver implements SPARQLEngine {
         QUERY_PLAN = n;
     }
 
-/* --- dead code removal ---
-    public static void defaultNamespaces(String ns) {
-        NAMESPACES = ns;
-    }
- --- dead code removal --- */
-
     public static void definePrefix(String pref, String ns) {
         if (NAMESPACES == null) {
             NAMESPACES = "";
@@ -163,12 +157,6 @@ public class QuerySolver implements SPARQLEngine {
         return getCreateBinding().getCreateLog();
     }
 
-/* --- dead code removal ---
-    public ContextLog getCreateLog() {
-        return getCreateBinding().getCreateLog();
-    }
- --- dead code removal --- */
-
     public void setVisitor(QueryVisitor v) {
         addVisitor(v);
     }
@@ -180,12 +168,6 @@ public class QuerySolver implements SPARQLEngine {
         visit.add(v);
     }
 
-/* --- dead code removal ---
-    public boolean hasVisitor() {
-        return visit != null && !visit.isEmpty();
-    }
- --- dead code removal --- */
-
     public List<QueryVisitor> getVisitorList() {
         return visit;
     }
@@ -194,21 +176,9 @@ public class QuerySolver implements SPARQLEngine {
         provider = p;
     }
 
-/* --- dead code removal ---
-    public Provider getProvider() {
-        return provider;
-    }
- --- dead code removal --- */
-
     public void setDefaultBase(String str) {
         setBase(str);
     }
-
-/* --- dead code removal ---
-    public String getBase() {
-        return defaultBase;
-    }
- --- dead code removal --- */
 
     public void setBase(String str) {
         defaultBase = str;
@@ -394,18 +364,6 @@ public class QuerySolver implements SPARQLEngine {
         return getCurrentEval().getEnvironment();
     }
 
-/* --- dead code removal ---
-    public Context getContext() {
-        return getCreateBinding().getCreateContext();
-    }
-
-    public void finish() {
-        if (current != null) {
-            current.finish();
-        }
-    }
- --- dead code removal --- */
-
     public Mappings modifier(Query q, Mappings map) throws SparqlException {
         if (getCurrentEval() == null) {
             logger.info("Undefined Eval");
@@ -494,13 +452,6 @@ public class QuerySolver implements SPARQLEngine {
         return kgram;
     }
 
-/* --- dead code removal ---
-    @Deprecated
-    public IDatatype eval(String q) {
-        return DatatypeMap.TRUE;
-    }
- --- dead code removal --- */
-
     void init(Query q) {
         // use case: OWL RL kg:sparql(query) in a rule
         // query is evaluated as a Rule
@@ -538,12 +489,6 @@ public class QuerySolver implements SPARQLEngine {
         return evaluator;
     }
 
-/* --- dead code removal ---
-    public Interpreter getInterpreter() {
-        return evaluator;
-    }
- --- dead code removal --- */
-
     public ASTQuery getAST(Query q) {
         return q.getAST();
     }
@@ -568,13 +513,6 @@ public class QuerySolver implements SPARQLEngine {
         return compile(squery, null);
     }
 
-/* --- dead code removal ---
-    // rule: construct where
-    public Query compileRule(String squery) throws EngineException {
-        return compileRule(squery, null);
-    }
- --- dead code removal --- */
-
     void setParameter(Transformer transformer) {
         transformer.setGenerateMain(isGenerateMain());
         transformer.setNamespaces(NAMESPACES);
@@ -597,17 +535,6 @@ public class QuerySolver implements SPARQLEngine {
         transformer.setSPARQLCompliant(isSPARQLCompliant);
         return transformer.transform(squery);
     }
-
-/* --- dead code removal ---
-    public ASTQuery parse(String q) throws EngineException {
-        return parse(q, (Dataset) null);
-    }
-
-    public ASTQuery parse(String q, Dataset ds) throws EngineException {
-        Transformer transformer = createTransformer(ds);
-        return transformer.parse(q);
-    }
- --- dead code removal --- */
 
     Transformer createTransformer(Dataset ds) {
         Transformer transformer = transformer();
@@ -664,30 +591,6 @@ public class QuerySolver implements SPARQLEngine {
         }
     }
 
-/* --- dead code removal ---
-    public void addPragma(String subject, String property, String value) {
-        Triple t = Triple.create(Constant.create(subject), Constant.create(property), Constant.create(value));
-        getPragma().add(t);
-    }
-
-    public void addPragma(String subject, String property, int value) {
-        Triple t = Triple.create(Constant.create(subject), Constant.create(property), Constant.create(value));
-        getPragma().add(t);
-    }
-
-    public void addPragma(String subject, String property, boolean value) {
-        Triple t = Triple.create(Constant.create(subject), Constant.create(property), Constant.create(value));
-        getPragma().add(t);
-    }
-
-    public void addPragma(Atom subject, Atom property, Atom value) {
-        if (getPragma() == null) {
-            setPragma(BasicGraphPattern.create());
-        }
-        getPragma().add(Triple.create(subject, property, value));
-    }
- --- dead code removal --- */
-
     public void setListGroup(boolean b) {
         isListGroup = b;
     }
@@ -696,43 +599,13 @@ public class QuerySolver implements SPARQLEngine {
         isListPath = b;
     }
 
-/* --- dead code removal ---
-    public void setCountPath(boolean b) {
-        isCountPath = b;
-    }
- --- dead code removal --- */
-
     public void setPathLoop(boolean b) {
         isCheckLoop = !b;
     }
 
-/* --- dead code removal ---
-    boolean isSPARQLCompliant() {
-        return isSPARQLCompliant;
-    }
- --- dead code removal --- */
-
     public void setSPARQLCompliant(boolean isSPARQLCompliant) {
         this.isSPARQLCompliant = isSPARQLCompliant;
     }
-
-/* --- dead code removal ---
-    public boolean isDebug() {
-        return isDebug;
-    }
-
-    public void setDebug(boolean b) {
-        isDebug = b;
-    }
-
-    public void setOptimize(boolean b) {
-        isOptimize = b;
-    }
-
-    public void setSlice(int n) {
-        slice = n;
-    }
- --- dead code removal --- */
 
     public BasicGraphPattern getPragma() {
         return pragma;
@@ -742,45 +615,12 @@ public class QuerySolver implements SPARQLEngine {
         this.pragma = pragma;
     }
 
-/* --- dead code removal ---
-    public boolean isDetail() {
-        return isDetail;
-    }
-
-    public void setDetail(boolean isDetail) {
-        this.isDetail = isDetail;
-    }
- --- dead code removal --- */
-
     /**
      * @return the isSkolem
      */
     public boolean isSkolem() {
         return isSkolem;
     }
-
-/* --- dead code removal ---
-    /**
-     * @param isSkolem the isSkolem to set
-     *_/
-    public void setSkolem(boolean isSkolem) {
-        this.isSkolem = isSkolem;
-    }
- 
-    /**
-     * @return the isMatchBlank
-     *_/
-    public boolean isMatchBlank() {
-        return isMatchBlank;
-    }
-
-    /**
-     * @param isMatchBlank the isMatchBlank to set
-     *_/
-    public void setMatchBlank(boolean isMatchBlank) {
-        this.isMatchBlank = isMatchBlank;
-    }
- --- dead code removal --- */
 
     /**
      * @return the planner
@@ -789,58 +629,12 @@ public class QuerySolver implements SPARQLEngine {
         return planner;
     }
 
-/* --- dead code removal ---
-    /**
-     * @param planner the planner to set
-     *_/
-    public void setPlanProfile(int planner) {
-        this.planner = planner;
-    }
-
-    /**
-     * @return the isPathType
-     *_/
-    public boolean isPathType() {
-        return isPathType;
-    }
-
-    /**
-     * @param isPathType the isPathType to set
-     *_/
-    public void setPathType(boolean isPathType) {
-        this.isPathType = isPathType;
-    }
-
-    /**
-     * @return the isStorePath
-     *_/
-    public boolean isStorePath() {
-        return isStorePath;
-    }
-
-    /**
-     * @param isStorePath the isStorePath to set
-     *_/
-    public void setStorePath(boolean isStorePath) {
-        this.isStorePath = isStorePath;
-    }
- --- dead code removal --- */
-
     /**
      * @return the isCachePath
      */
     public boolean isCachePath() {
         return isCachePath;
     }
-
-/* --- dead code removal ---
-    /**
-     * @param isCachePath the isCachePath to set
-     *_/
-    public void setCachePath(boolean isCachePath) {
-        this.isCachePath = isCachePath;
-    }
- --- dead code removal --- */
 
     // true = skip Lock ;  false = with Lock
     @Override
@@ -858,21 +652,9 @@ public class QuerySolver implements SPARQLEngine {
         return isUseBind;
     }
 
-/* --- dead code removal ---
-    public void setUseBind(boolean isUseBind) {
-        this.isUseBind = isUseBind;
-    }
- --- dead code removal --- */
-
     public boolean isGenerateMain() {
         return isGenerateMain;
     }
-
-/* --- dead code removal ---
-    public void setGenerateMain(boolean isGenerateMain) {
-        this.isGenerateMain = isGenerateMain;
-    }
- --- dead code removal --- */
 
     public Query parseQuery(String path) throws EngineException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -898,16 +680,6 @@ public class QuerySolver implements SPARQLEngine {
         this.metadata = metadata;
     }
 
-/* --- dead code removal ---
-    public void set(Metadata metadata) {
-        this.metadata = metadata;
-    }
-
-    public boolean isRule() {
-        return isRule;
-    }
- --- dead code removal --- */
-
     public void setRule(boolean rule) {
         this.isRule = rule;
     }
@@ -916,26 +688,9 @@ public class QuerySolver implements SPARQLEngine {
         return algebra;
     }
 
-/* --- dead code removal ---
-    /**
-     * BGP must be set to true
-     *
-     * @param algebra the algebra to set
-     *_/
-    public void setAlgebra(boolean algebra) {
-        this.algebra = algebra;
-    }
- --- dead code removal --- */
-
     public boolean isBGP() {
         return isBGP;
     }
-
-/* --- dead code removal ---
-    public void setBGP(boolean BGP) {
-        this.isBGP = BGP;
-    }
- --- dead code removal --- */
 
     @Override
     public void getLinkedFunction(String uri) throws EngineException {
