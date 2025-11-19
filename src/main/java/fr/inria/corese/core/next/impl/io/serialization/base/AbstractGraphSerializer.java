@@ -315,7 +315,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             Resource bNode = (Resource) value;
 
             if (currentlyWritingBlankNodes.contains(bNode)) {
-                writer.write(SerializationConstants.BNODE_PREFIX + bNode.stringValue());
+                writer.write(SerializationConstants.BLANK_NODE_PREFIX + bNode.stringValue());
                 return;
             }
 
@@ -343,7 +343,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
 
             if (!handled) {
-                writer.write(SerializationConstants.BNODE_PREFIX + bNode.stringValue());
+                writer.write(SerializationConstants.BLANK_NODE_PREFIX + bNode.stringValue());
             }
 
             currentlyWritingBlankNodes.remove(bNode);
@@ -405,7 +405,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
         literal.getLanguage().ifPresent(lang -> {
             try {
-                writer.write(SerializationConstants.AT_SIGN + lang);
+                writer.write(SerializationConstants.AT + lang);
             } catch (IOException e) {
                 throw new UncheckedIOException("Error writing language tag to stream", e);
             }

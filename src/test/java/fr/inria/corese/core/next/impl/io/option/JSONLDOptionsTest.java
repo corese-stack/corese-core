@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.option;
 
 import com.apicatalog.jsonld.JsonLdVersion;
+import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class JSONLDOptionsTest {
 
-    private JSONLDOptions optionAllTrue = new JSONLDOptions.Builder().base("http://example.org/AllTrue")
+    private fr.inria.corese.core.next.impl.io.common.JSONLDOptions optionAllTrue = new fr.inria.corese.core.next.impl.io.common.JSONLDOptions.Builder().base("http://example.org/AllTrue")
             .extractAllScripts(true)
             .compactToRelative(true)
             .compactArrays(true)
@@ -22,7 +23,7 @@ class JSONLDOptionsTest {
             .useNativeTypes(true)
             .build();
 
-    private JSONLDOptions optionAllFalse = new JSONLDOptions.Builder().base("http://example.org/AllFalse")
+    private fr.inria.corese.core.next.impl.io.common.JSONLDOptions optionAllFalse = new fr.inria.corese.core.next.impl.io.common.JSONLDOptions.Builder().base("http://example.org/AllFalse")
             .extractAllScripts(false)
             .compactArrays(false)
             .compactToRelative(false)
@@ -57,15 +58,15 @@ class JSONLDOptionsTest {
 
     @Test
     void getProcessingMode() {
-        JSONLDOptions option10 = new JSONLDOptions.Builder().processingMode(JsonLdVersion.V1_0).build();
-        JSONLDOptions option11 = new JSONLDOptions.Builder().processingMode(JsonLdVersion.V1_1).build();
+        fr.inria.corese.core.next.impl.io.common.JSONLDOptions option10 = new fr.inria.corese.core.next.impl.io.common.JSONLDOptions.Builder().processingMode(JsonLdVersion.V1_0).build();
+        fr.inria.corese.core.next.impl.io.common.JSONLDOptions option11 = new fr.inria.corese.core.next.impl.io.common.JSONLDOptions.Builder().processingMode(JsonLdVersion.V1_1).build();
         assertEquals(JsonLdVersion.V1_0, option10.getProcessingMode());
         assertEquals(JsonLdVersion.V1_1, option11.getProcessingMode());
     }
 
     @Test
     void getTimeout() {
-        JSONLDOptions option10seconds = new JSONLDOptions.Builder().timeout(Duration.of(10, ChronoUnit.SECONDS)).build();
+        fr.inria.corese.core.next.impl.io.common.JSONLDOptions option10seconds = new JSONLDOptions.Builder().timeout(Duration.of(10, ChronoUnit.SECONDS)).build();
         assertNull(optionAllTrue.getTimeout());
         assertEquals(Duration.of(10, ChronoUnit.SECONDS), option10seconds.getTimeout());
     }

@@ -1,44 +1,28 @@
 package fr.inria.corese.core.next.impl.io.serialization.util;
 
 
+import fr.inria.corese.core.next.impl.io.common.IOConstants;
+
 /**
  * Provides common constants used throughout the RDF serialization process.
  * This includes URIs for common RDF, RDFS, XSD, and OWL vocabularies,
  * as well as various special characters and strings used in serialization formats
  * like Turtle, N-Triples, and N-Quads.
  */
-public final class SerializationConstants {
+public final class SerializationConstants extends IOConstants {
 
     private SerializationConstants() {
+        super();
         // Private constructor to prevent instantiation
     }
 
     // --- Common Delimiters and Special Characters in Serialization ---
-    public static final String SPACE = " ";
-    public static final String TAB = "\t";
-    public static final String LINE_FEED = "\n";
-    public static final String CARRIAGE_RETURN = "\r";
     public static final String NEWLINE = LINE_FEED;
-
-    public static final String POINT = ".";
-    public static final String SEMICOLON = ";";
-    public static final String COMMA = ",";
-    public static final String AT_SIGN = "@";
     public static final String CARET = "^";
-    public static final String LT = "<"; // Less than
-    public static final String GT = ">"; // Greater than
-    public static final String QUOTE = "\"";
-    public static final String COLON = ":";
     public static final String BACK_SLASH = "\\";
-
-    // Nouveaux délimiteurs
-    public static final String HASH = "#";
-    public static final String SLASH = "/";
 
 
     // Turtle-specific
-    public static final String RDF_TYPE_SHORTCUT = "a";
-    public static final String BNODE_PREFIX = "_:";
     public static final String DATATYPE_SEPARATOR = "^^";
     public static final String BLANK_NODE_START = "[";
     public static final String BLANK_NODE_END = "]";
@@ -74,8 +58,6 @@ public final class SerializationConstants {
     public static final String GT_ENTITY = "&gt;";
     public static final String QUOT_ENTITY = "&quot;";
     public static final String APOS_ENTITY = "&apos;";
-
-    public static final String DEFAULT_GRAPH_IRI = "http://ns.inria.fr/corese/default-graph";
 
     public static final String C14N = "c14n";
 

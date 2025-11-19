@@ -107,7 +107,7 @@ public class StatementUtils {
         if (value == null) return null;
         if (isBlankNode(value)) {
             String str = value.stringValue();
-            if (str.startsWith(SerializationConstants.BNODE_PREFIX)) {
+            if (str.startsWith(SerializationConstants.BLANK_NODE_PREFIX)) {
                 return str.substring(2);
             }
             return str;
@@ -155,7 +155,7 @@ public class StatementUtils {
      * @return The serialized blank node string.
      */
     private static String serializeBNode(BNode bnode) {
-        return SerializationConstants.BNODE_PREFIX + bnode.getID();
+        return SerializationConstants.BLANK_NODE_PREFIX + bnode.getID();
     }
 
     /**
@@ -183,7 +183,7 @@ public class StatementUtils {
                 sb.append(SerializationConstants.DATATYPE_SEPARATOR).append(serializeForComparison(literal.getDatatype()));
             }
         } else if (literal.getLanguage() != null) {
-            sb.append(SerializationConstants.AT_SIGN).append(literal.getLanguage());
+            sb.append(SerializationConstants.AT).append(literal.getLanguage());
         }
 
         return sb.toString();

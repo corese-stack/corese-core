@@ -9,7 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
-import fr.inria.corese.core.next.impl.io.option.JSONLDOptions;
+import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.api.BNode;

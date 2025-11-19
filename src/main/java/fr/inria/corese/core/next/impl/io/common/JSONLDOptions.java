@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.io.option;
+package fr.inria.corese.core.next.impl.io.common;
 
 import java.net.URI;
 import java.time.Duration;

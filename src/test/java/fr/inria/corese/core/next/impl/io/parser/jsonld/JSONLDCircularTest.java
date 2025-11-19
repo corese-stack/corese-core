@@ -8,7 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
-import fr.inria.corese.core.next.impl.io.option.JSONLDOptions;
+import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

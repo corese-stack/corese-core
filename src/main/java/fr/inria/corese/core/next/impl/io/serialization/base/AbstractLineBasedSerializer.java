@@ -168,7 +168,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
 
         literal.getLanguage().ifPresent(lang -> {
             try {
-                writer.write(SerializationConstants.AT_SIGN + lang);
+                writer.write(SerializationConstants.AT + lang);
             } catch (IOException e) {
                 throw new UncheckedIOException("Error writing language tag to stream", e);
             }
@@ -211,7 +211,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeBlankNode(Writer writer, Resource blankNode) throws IOException {
-        writer.write(SerializationConstants.BNODE_PREFIX);
+        writer.write(SerializationConstants.BLANK_NODE_PREFIX);
         writer.write(blankNode.stringValue());
     }
 

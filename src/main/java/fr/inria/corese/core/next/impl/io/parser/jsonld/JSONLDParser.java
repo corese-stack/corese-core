@@ -24,7 +24,7 @@ import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.impl.io.option.JSONLDOptions;
+import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
 
 /**
  * Parser for JSON-LD RDF files. This parser is based on the Titanium JSON-LD library.
