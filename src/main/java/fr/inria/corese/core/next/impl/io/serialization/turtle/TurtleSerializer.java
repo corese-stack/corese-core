@@ -61,7 +61,11 @@ public class TurtleSerializer extends AbstractGraphSerializer {
         super(model, config);
         Objects.requireNonNull(config, "TurtleConfig cannot be null");
     }
-
+    /**
+     * Retrieves the RDF format supported by this serializer, which is Turtle
+     *
+     * @return {@link RDFFormat#TURTLE}.
+     */
     @Override
     public RDFFormat getRDFFormat() {
         return RDFFormat.TURTLE;

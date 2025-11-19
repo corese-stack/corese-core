@@ -48,7 +48,11 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
         super(model, config);
         Objects.requireNonNull(config, "NTriplesConfig cannot be null");
     }
-
+    /**
+     * Retrieves the RDF format supported by this serializer, which is N-TRIPLES.
+     *
+     * @return {@link RDFFormat#NTRIPLES}.
+     */
     @Override
     public RDFFormat getRDFFormat() {
         return RDFFormat.NTRIPLES;

@@ -52,7 +52,7 @@ public class SerializerFactory implements fr.inria.corese.core.next.api.io.seria
     private final ValueFactory coreseValueFactory;
 
     /**
-     * Constructs a {@code DefaultSerializerFactory} and populates its registry
+     * Constructs a {@code SerializerFactory} and populates its registry
      * with constructors for all known {@link RDFFormat} implementations.
      * Each constructor attempts to cast the generic {@link IOOptions} to
      * the

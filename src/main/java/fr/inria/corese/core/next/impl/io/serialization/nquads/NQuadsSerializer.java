@@ -49,6 +49,11 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
         Objects.requireNonNull(config, "NQuadsConfig cannot be null");
     }
 
+    /**
+     * Retrieves the RDF format supported by this serializer, which is N-Quads.
+     *
+     * @return {@link RDFFormat#NQUADS}.
+     */
     @Override
     public RDFFormat getRDFFormat() {
         return RDFFormat.NQUADS;

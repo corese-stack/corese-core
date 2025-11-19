@@ -141,10 +141,10 @@ public class JSONLDOptions extends AbstractIOOptions
     }
 
     /**
-     * Builder for creating instances of JSONLDProcessorOptions.
+     * Builder for creating instances of JSONLDOptions.
      * This nested static class provides a fluent API for configuring the
      * various options before building the final
-     * {@code JSONLDProcessorOptions} object.
+     * {@code JSONLDOptions} object.
      */
     public static class Builder extends AbstractIOOptions.Builder<JSONLDOptions> {
 

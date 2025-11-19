@@ -283,7 +283,11 @@ public class TriGSerializer extends AbstractGraphSerializer {
                         SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
                         SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE);
     }
-
+    /**
+     * Retrieves the RDF format supported by this serializer, which is Trig.
+     *
+     * @return {@link RDFFormat#TRIG}.
+     */
     @Override
     public RDFFormat getRDFFormat() {
         return RDFFormat.TRIG;
