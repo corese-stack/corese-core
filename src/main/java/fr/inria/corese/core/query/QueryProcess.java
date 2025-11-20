@@ -3,13 +3,10 @@ package fr.inria.corese.core.query;
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.EventManager;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.api.DataBroker;
-import fr.inria.corese.core.api.DataBrokerConstruct;
 import fr.inria.corese.core.api.Loader;
 import fr.inria.corese.core.api.Log;
 import fr.inria.corese.core.compiler.eval.Interpreter;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
-import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
 import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import fr.inria.corese.core.compiler.parser.Transformer;
 import fr.inria.corese.core.kgram.api.core.Node;
@@ -26,7 +23,6 @@ import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.load.Service;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.print.LogManager;
-import fr.inria.corese.core.print.TripleFormat;
 import fr.inria.corese.core.producer.DataBrokerConstructExtern;
 import fr.inria.corese.core.query.update.GraphManager;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -39,13 +35,10 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.transform.TemplateVisitor;
 import fr.inria.corese.core.util.Extension;
 import fr.inria.corese.core.util.Property;
 import jakarta.ws.rs.client.ResponseProcessingException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +93,7 @@ public class QueryProcess extends QuerySolver {
     boolean isMatch = false;
     private QueryProcessUpdate queryProcessUpdate;
     private ProducerImpl localProducer;
-    private DataBrokerConstruct dataBrokerUpdate;
+
     // true: execute start/end transaction before query
     // false: case where we execute a subquery (e.g. xt:sparql)
     // or a query within rule engine
@@ -281,12 +274,6 @@ public class QueryProcess extends QuerySolver {
         return ProducerImpl.create(g);
     }
 
-    public static QueryProcess create(Graph g, Graph g2) {
-        QueryProcess qp = QueryProcess.create(g);
-        qp.add(g2);
-        return qp;
-    }
-
     /**
      * Create an Eval initialized with a query q that contains function
      * definitions This Eval can be used to call these functions:
@@ -316,10 +303,6 @@ public class QueryProcess extends QuerySolver {
         return eval;
     }
 
-    static boolean isOverwrite() {
-        return isReentrant();
-    }
-
     public static void setOverwrite(boolean b) {
         setReentrant(b);
     }
@@ -345,10 +328,6 @@ public class QueryProcess extends QuerySolver {
 
     public static void setVisitorName(String aSolverVisitorName) {
         solverVisitorName = aSolverVisitorName;
-    }
-
-    public static String getServerVisitorName() {
-        return serverVisitorName;
     }
 
     public static void setServerVisitorName(String name) {
@@ -409,14 +388,6 @@ public class QueryProcess extends QuerySolver {
         return null;
     }
 
-    public Loader getLoader() {
-        return load;
-    }
-
-    public void setLoader(Loader ld) {
-        load = ld;
-    }
-
     public boolean isMatch() {
         return isMatch;
     }
@@ -466,38 +437,10 @@ public class QueryProcess extends QuerySolver {
      *
      ***************************************************************
      */
-    public Mappings update(String squery) throws EngineException {
-        return doQuery(squery, null, null);
-    }
 
     @Override
     public Mappings query(String squery) throws EngineException {
         return doQuery(squery, null, null);
-    }
-
-    // rdf is a turtle document
-    // parse it as sparql query graph pattern (where bnode are variable)
-    public Mappings queryTurtle(String rdf) throws EngineException {
-        return doQuery(rdf, null, Dataset.create().setLoad(true));
-    }
-
-    // translate graph g as turtle ast query graph pattern
-    public Mappings queryTurtle(Graph g) throws EngineException {
-        String rdf = TripleFormat.create(g).setGraphQuery(true).toString();
-        return doQuery(rdf, null, Dataset.create().setLoad(true));
-    }
-
-    // translate graph g as trig ast query graph pattern
-    public Mappings queryTrig(Graph g) throws EngineException {
-        // trig where default graph kg:default is printed
-        // in turtle without embedding graph kg:default { }
-        String rdf = TripleFormat.create(g, true).setGraphQuery(true).toString();
-        return doQuery(rdf, null, Dataset.create().setLoad(true));
-    }
-
-    // translate graph g as trig ast query graph pattern
-    public Mappings query(Graph g) throws EngineException {
-        return queryTrig(g);
     }
 
     /**
@@ -515,14 +458,6 @@ public class QueryProcess extends QuerySolver {
         return query(squery, null, ds);
     }
 
-    public Mappings query(String squery, Context c) throws EngineException {
-        return query(squery, null, Dataset.create(c));
-    }
-
-    public Mappings query(String squery, AccessRight access) throws EngineException {
-        return query(squery, new Context(access));
-    }
-
     @Override
     public Mappings query(String squery, Mapping map) throws EngineException {
         return query(squery, map, null);
@@ -530,14 +465,6 @@ public class QueryProcess extends QuerySolver {
 
     public Mappings query(String squery, Binding b) throws EngineException {
         return query(squery, Mapping.create(b), null);
-    }
-
-    public Mappings query(String squery, Context c, Binding b) throws EngineException {
-        return query(squery, Mapping.create(b), Dataset.create(c));
-    }
-
-    public Mappings query(String squery, ProcessVisitor vis) throws EngineException {
-        return query(squery, null, Dataset.create(vis));
     }
 
     Mappings doQuery(String squery, Mapping map, Dataset ds) throws EngineException {
@@ -556,11 +483,6 @@ public class QueryProcess extends QuerySolver {
             getLog().share(q.getAST().getLog());
         }
         return q;
-    }
-
-    public Mappings modifier(String str, Mappings map) throws SparqlException {
-        Query q = compile(str, new Context().setAST(map.getAST()));
-        return modifier(q, map);
     }
 
     @Override
@@ -642,10 +564,6 @@ public class QueryProcess extends QuerySolver {
         return sparqlQueryUpdate(squery, ds, RDFS_ENTAILMENT);
     }
 
-    public Mappings sparql(String squery, Dataset ds, int entail) throws EngineException {
-        return sparqlQueryUpdate(squery, ds, entail);
-    }
-
     public Mappings query(ASTQuery ast) throws EngineException {
         if (ast.isUpdate()) {
             return update(ast);
@@ -686,13 +604,6 @@ public class QueryProcess extends QuerySolver {
      *
      *****************************************
      */
-    public Mappings sparqlQuery(String squery) throws EngineException {
-        Query q = compile(squery);
-        if (q.isUpdate()) {
-            throw new EngineException("Unauthorized Update in SPARQL Query:\n" + squery);
-        }
-        return query(q);
-    }
 
     public Mappings sparqlQuery(String squery, Mapping map, Dataset ds) throws EngineException {
         Query q = compile(squery, ds);
@@ -704,18 +615,6 @@ public class QueryProcess extends QuerySolver {
             throw new EngineException("Unauthorized Update in SPARQL Query:\n" + q.getAST().toString());
         }
         return query(null, q, map, ds);
-    }
-
-    public Mappings sparqlUpdate(String squery) throws EngineException {
-        Query q = compile(squery);
-        if (!q.isUpdate()) {
-            throw new EngineException("Unauthorized Query in SPARQL Update:\n" + squery);
-        }
-        return query(q);
-    }
-
-    public Mappings sparqlQueryUpdate(String squery) throws EngineException {
-        return query(squery);
     }
 
     /*
@@ -873,40 +772,6 @@ public class QueryProcess extends QuerySolver {
         } catch (IOException ex) {
             logger.error(ex.getMessage());
         }
-    }
-
-    // translate log header into Mappings
-    // use case: gui display log header as query results
-    public Mappings log2Mappings(ContextLog log) throws EngineException {
-        return log2Mappings(log, false);
-    }
-
-    public Mappings log2Mappings(ContextLog log, boolean blog) throws EngineException {
-        String str = "select * where {?s ?p ?o}";
-        Query q = compile(str);
-        Mappings map = Mappings.create(q);
-        map.init(q);
-        Collection<String> nameList = log.getLabelList();
-
-        for (String url : log.getSubjectMap().getKeys()) {
-            if (blog) {
-                nameList = log.getPropertyMap(url).keySet();
-            }
-            for (String name : nameList) {
-                IDatatype value = log.getLabel(url, name);
-
-                if (value != null) {
-                    ArrayList<Node> valueList = new ArrayList<>();
-                    valueList.add(DatatypeMap.newResource(url));
-                    valueList.add(DatatypeMap.newResource(name));
-                    valueList.add(value);
-                    Mapping m = Mapping.create(q.getSelect(), valueList);
-                    map.add(m);
-                }
-            }
-        }
-
-        return map;
     }
 
     Mappings synQuery(Node gNode, Query query, Mapping m) throws EngineException {
@@ -1153,28 +1018,6 @@ public class QueryProcess extends QuerySolver {
      ************************************************************************
      */
 
-    /**
-     * skolemize the blank nodes of the result Mappings
-     */
-    public Mappings skolem(Mappings map) {
-        Graph g = getGraph();
-        if (map.getGraph() != null) {
-            // result of construct where
-            g = (Graph) map.getGraph();
-        }
-        for (Mapping m : map) {
-            Node[] nodes = m.getNodes();
-            int i = 0;
-            for (Node n : nodes) {
-                if (n.isBlank()) {
-                    nodes[i] = g.skolem(n);
-                }
-                i++;
-            }
-        }
-        return map;
-    }
-
     public void logStart(Query query) {
         if (getGraph() != null) {
             getGraph().logStart(query);
@@ -1184,13 +1027,6 @@ public class QueryProcess extends QuerySolver {
     public void logFinish(Query query, Mappings m) {
         if (getGraph() != null) {
             getGraph().logFinish(query, m);
-        }
-    }
-
-    public void close() {
-        if (dbProducer != null) {
-            dbProducer.close();
-            dbProducer = null;
         }
     }
 
@@ -1233,10 +1069,6 @@ public class QueryProcess extends QuerySolver {
 
     public IDatatype funcall(String name, Binding b, IDatatype... param) throws EngineException {
         return funcall(name, null, b, param);
-    }
-
-    public IDatatype funcall(String name, Context c, IDatatype... param) throws EngineException {
-        return funcall(name, c, null, param);
     }
 
     public IDatatype funcall(String name, Context c, Binding b, IDatatype... param) throws EngineException {
@@ -1283,20 +1115,6 @@ public class QueryProcess extends QuerySolver {
         getCurrentEval().getVisitor().setActive(false);
     }
 
-    /**
-     * call @public @prepare function us:prepare() {} before lock graph
-     * to complete initialization before query processing
-     * to be called explicitely by user
-     * use case: GUI QueryExec call prepare()
-     * use case: xt:entailment()
-     */
-    public void prepare() {
-        try {
-            new QuerySolverVisitor(getCreateEval()).prepare();
-        } catch (EngineException ex) {
-        }
-    }
-
     // Default Visitor to execute @event functions
     public ProcessVisitor getDefaultVisitor() {
         try {
@@ -1313,10 +1131,6 @@ public class QueryProcess extends QuerySolver {
             return getDefaultVisitor();
         }
         return getCurrentEval().getVisitor();
-    }
-
-    public TemplateVisitor getTemplateVisitor() {
-        return (TemplateVisitor) getCreateBinding().getTransformerVisitor();
     }
 
     @Override
@@ -1386,14 +1200,6 @@ public class QueryProcess extends QuerySolver {
         return t.parse(str);
     }
 
-    /**
-     * 1- Linked Function 2- owl:imports
-     */
-    @Override
-    public Query parseQuery(String path) throws EngineException {
-        return parseQuery(path, Level.USER_DEFAULT);
-    }
-
     @Override
     public Query parseQuery(String path, Level level) throws EngineException {
         String str = QueryLoad.create().basicParse(path);
@@ -1426,10 +1232,6 @@ public class QueryProcess extends QuerySolver {
         getTransformer().getLinkedFunction(label);
     }
 
-    void getLinkedFunctionBasic(String label) throws EngineException {
-        getTransformer().getLinkedFunctionBasic(label);
-    }
-
     public Graph defineFederation(String path) throws IOException, EngineException, LoadException {
         Graph g = Graph.create();
         Load ld = Load.create(g);
@@ -1458,10 +1260,6 @@ public class QueryProcess extends QuerySolver {
         FederateVisitor.defineFederation(name, list);
     }
 
-    public void defineFederation(String name, String... list) {
-        FederateVisitor.defineFederation(name, Arrays.asList(list));
-    }
-
     Transformer getTransformer() {
         if (transformer == null) {
             transformer = Transformer.create();
@@ -1472,10 +1270,6 @@ public class QueryProcess extends QuerySolver {
 
     //***********************************************************************
 
-    public Graph getExceptionGraph(Mappings map) throws LoadException {
-        LogManager te = getLogManager(map);
-        return te.parse();
-    }
 
     /**
      * Manager for local and remote endpoint log
@@ -1491,22 +1285,6 @@ public class QueryProcess extends QuerySolver {
      */
     public LogManager getLogManager(Mappings map) {
         return new LogManager(getLog(map));
-    }
-
-    public JSONObject getMessage(Mappings map) {
-        String text = getStringMessage(map);
-        if (text == null) {
-            return null;
-        }
-        return new JSONObject(text);
-    }
-
-    public String getStringMessage(Mappings map) {
-        String url = map.getLastLink(URLParam.MES);
-        if (url == null) {
-            return null;
-        }
-        return new Service().getString(url);
     }
 
     public QueryProcessUpdate getQueryProcessUpdate() {
@@ -1532,18 +1310,6 @@ public class QueryProcess extends QuerySolver {
 
     public boolean hasDataManager() {
         return getDataManager() != null;
-    }
-
-    public DataBroker getDataBroker() {
-        return getLocalProducer().getDataBroker();
-    }
-
-    public DataBrokerConstruct getDataBrokerUpdate() {
-        return dataBrokerUpdate;
-    }
-
-    public void setDataBrokerUpdate(DataBrokerConstruct dataBrokerUpdate) {
-        this.dataBrokerUpdate = dataBrokerUpdate;
     }
 
     public boolean isProcessTransaction() {
