@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -95,7 +96,7 @@ class TriGSerializerTest {
 
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/person1"),
-                factory.createIRI(SerializationConstants.RDF_TYPE),
+                fr.inria.corese.core.next.impl.common.vocabulary.RDF.type.getIRI(),
                 factory.createIRI("http://xmlns.com/foaf/0.1/Person"),
                 null
         );
@@ -189,7 +190,7 @@ class TriGSerializerTest {
      */
     @Test
     void testLiteralWithExplicitXsdStringType() throws SerializationException, IOException {
-        IRI mockDatatype = factory.createIRI(SerializationConstants.XSD_STRING);
+        IRI mockDatatype = XSD.STRING.getIRI();
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/data/book2"),
                 factory.createIRI("http://purl.org/dc/elements/1.1/creator"),
@@ -348,7 +349,7 @@ class TriGSerializerTest {
 
         assertEquals("TriG", thrown.getFormatName());
 
-        assertEquals("Invalid data for format TriG: An rdf:langString literal must have a language tag. [Format: TriG]", thrown.getMessage());
+        assertEquals("An rdf:langString literal must have a language tag. [Format: TriG]", thrown.getMessage());
     }
 
     /**
@@ -384,7 +385,7 @@ class TriGSerializerTest {
 
         assertEquals("TriG", thrown.getFormatName());
 
-        assertEquals("Invalid data for format TriG: IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form of TriG: http://example.org/invalid iri [Format: TriG]", thrown.getMessage());
+        assertEquals("IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form : http://example.org/invalid iri [Format: TriG]", thrown.getMessage());
     }
 
     /**

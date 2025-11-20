@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.impl.io.serialization.jsonld;
 
-import static fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants.DEFAULT_GRAPH_IRI;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Duration;
@@ -38,6 +36,7 @@ import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +108,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
             @Override
             public boolean contains(RdfTriple triple) {
                 Resource graphResource = null;
-                if (graphName != null && !graphName.getValue().equals(DEFAULT_GRAPH_IRI)) {
+                if (graphName != null && !graphName.getValue().equals(IOConstants.getDefaultBaseURI())) {
                     graphResource = toResource(graphName);
                 }
                 return model.contains(toResource(triple.getSubject()), toIRI(triple.getPredicate()), toValue(triple.getObject()), graphResource);
@@ -119,7 +118,7 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
             public List<RdfTriple> toList() {
                 List<RdfTriple> result = new ArrayList<>();
                 Resource graphResource = null;
-                if (graphName != null && !graphName.getValue().equals(DEFAULT_GRAPH_IRI)) {
+                if (graphName != null && !graphName.getValue().equals(IOConstants.getDefaultBaseURI())) {
                     graphResource = toResource(graphName);
                 }
                 model.getStatements(null, null, null, graphResource).forEach(statement -> result.add(toRdfNQuad(statement)));

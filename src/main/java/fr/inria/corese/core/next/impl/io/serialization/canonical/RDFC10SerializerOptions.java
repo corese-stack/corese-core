@@ -11,7 +11,7 @@ import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializer
  * Use the {@link Builder} class to create instances of {@code CanonicalOption}.
  * A predefined default configuration is available via {@link #defaultConfig()}.
  */
-public class RDFC10Options extends AbstractSerializerOption {
+public class RDFC10SerializerOptions extends AbstractSerializerOption {
 
     /**
      * Enumeration for the supported hashing algorithms.
@@ -32,7 +32,7 @@ public class RDFC10Options extends AbstractSerializerOption {
      *
      * @param builder The builder instance containing the desired configuration values.
      */
-    protected RDFC10Options(Builder builder) {
+    protected RDFC10SerializerOptions(Builder builder) {
         super(builder);
         this.hashAlgorithm = builder.hashAlgorithm;
         this.depthFactor = builder.depthFactor;
@@ -70,7 +70,7 @@ public class RDFC10Options extends AbstractSerializerOption {
     }
 
     /**
-     * Public Builder for {@link RDFC10Options}.
+     * Public Builder for {@link RDFC10SerializerOptions}.
      * Provides a fluent API for constructing {@code CanonicalOption} instances with default values
      * specific to the Canonical RDF format.
      */
@@ -88,13 +88,13 @@ public class RDFC10Options extends AbstractSerializerOption {
         }
 
         /**
-         * Builds a new {@link RDFC10Options} instance with the configured values.
+         * Builds a new {@link RDFC10SerializerOptions} instance with the configured values.
          *
          * @return A new instance of {@code CanonicalOption}.
          */
         @Override
-        public RDFC10Options build() {
-            return new RDFC10Options(this);
+        public RDFC10SerializerOptions build() {
+            return new RDFC10SerializerOptions(this);
         }
     }
 
@@ -103,7 +103,7 @@ public class RDFC10Options extends AbstractSerializerOption {
      *
      * @return A new {@code CanonicalOption} with default settings.
      */
-    public static RDFC10Options defaultConfig() {
+    public static RDFC10SerializerOptions defaultConfig() {
         return new Builder().build();
     }
 
@@ -113,7 +113,7 @@ public class RDFC10Options extends AbstractSerializerOption {
      *
      * @return A new {@code Builder} instance.
      */
-    public static RDFC10Options.Builder builder() {
-        return new RDFC10Options.Builder();
+    public static RDFC10SerializerOptions.Builder builder() {
+        return new RDFC10SerializerOptions.Builder();
     }
 }

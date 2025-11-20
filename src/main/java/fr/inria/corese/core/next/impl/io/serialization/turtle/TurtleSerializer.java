@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
 
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,15 +61,14 @@ public class TurtleSerializer extends AbstractGraphSerializer {
         super(model, config);
         Objects.requireNonNull(config, "TurtleConfig cannot be null");
     }
-
     /**
-     * Returns the format name for error messages and logging.
+     * Retrieves the RDF format supported by this serializer, which is Turtle
      *
-     * @return "Turtle"
+     * @return {@link RDFFormat#TURTLE}.
      */
     @Override
-    protected String getFormatName() {
-        return "Turtle";
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.TURTLE;
     }
 
     /**

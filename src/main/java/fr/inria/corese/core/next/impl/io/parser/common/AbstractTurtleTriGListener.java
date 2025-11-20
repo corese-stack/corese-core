@@ -97,7 +97,7 @@ public abstract class AbstractTurtleTriGListener {
         try {
             raw = raw.trim();
 
-            if (raw.equals(ParserConstants.A)) {
+            if (raw.equals(ParserConstants.RDF_TYPE_SHORTCUT)) {
                 return RDF.type.getIRI().stringValue();
             }
 
@@ -234,7 +234,7 @@ public abstract class AbstractTurtleTriGListener {
             result.append(ParserConstants.QUERY_MARK).append(query);
         }
         if (fragment != null) {
-            result.append(ParserConstants.FRAGMENT).append(fragment);
+            result.append(ParserConstants.HASH).append(fragment);
         }
         return normalizeURI(result.toString());
     }

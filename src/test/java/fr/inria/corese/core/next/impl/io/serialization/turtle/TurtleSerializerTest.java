@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
+import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -98,7 +98,7 @@ class TurtleSerializerTest {
 
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/person1"),
-                factory.createIRI(SerializationConstants.RDF_TYPE),
+                fr.inria.corese.core.next.impl.common.vocabulary.RDF.type.getIRI(),
                 factory.createIRI("http://xmlns.com/foaf/0.1/Person"),
                 null
         );
@@ -200,7 +200,7 @@ class TurtleSerializerTest {
     @DisplayName("Should serialize literal with xsd:string datatype (minimal policy)")
     void testLiteralWithExplicitXsdStringType() throws SerializationException, IOException {
 
-        IRI mockDatatype = factory.createIRI(SerializationConstants.XSD_STRING);
+        IRI mockDatatype = XSD.STRING.getIRI();
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/data/book2"),
                 factory.createIRI("http://purl.org/dc/elements/1.1/creator"),
@@ -314,14 +314,14 @@ class TurtleSerializerTest {
         Logger logger = LoggerFactory.getLogger(TurtleSerializerTest.class);
 
         ValueFactory valueFactory;
-        SerializerFactory serializerFactory;
+        fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
         ParserFactory parserFactory;
         TurtleSerializerOptions defaultConfig;
         String EXAMPLE_NS = "http://example.org/";
         String PREDICATE_KNOWS = EXAMPLE_NS + "knows";
 
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new DefaultSerializerFactory();
+        serializerFactory = new SerializerFactory();
         parserFactory = new ParserFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();
 
@@ -489,7 +489,7 @@ class TurtleSerializerTest {
 
         assertEquals("Turtle", thrown.getFormatName());
 
-        assertEquals("Invalid data for format Turtle: An rdf:langString literal must have a language tag. [Format: Turtle]", thrown.getMessage());
+        assertEquals("An rdf:langString literal must have a language tag. [Format: Turtle]", thrown.getMessage());
     }
 
     /**
@@ -525,7 +525,7 @@ class TurtleSerializerTest {
 
         assertEquals("Turtle", thrown.getFormatName());
 
-        assertEquals("Invalid data for format Turtle: IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form of Turtle: http://example.org/invalid iri [Format: Turtle]", thrown.getMessage());
+        assertEquals("IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form : http://example.org/invalid iri [Format: Turtle]", thrown.getMessage());
     }
 
     /**

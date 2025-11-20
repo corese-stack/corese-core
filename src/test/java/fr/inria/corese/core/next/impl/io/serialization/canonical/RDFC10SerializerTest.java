@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,12 +82,12 @@ class RDFC10SerializerTest {
 
 
     private RDFC10Serializer serializer;
-    private RDFC10Options defaultConfig;
+    private RDFC10SerializerOptions defaultConfig;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        defaultConfig = RDFC10Options.defaultConfig();
+        defaultConfig = RDFC10SerializerOptions.defaultConfig();
 
         setupBasicMocks();
 
@@ -341,11 +341,11 @@ class RDFC10SerializerTest {
             fail("Failed to parse resource: " + resourcePath + " - " + e.getMessage());
         }
 
-        DefaultSerializerFactory serializerFactory = new DefaultSerializerFactory();
+        SerializerFactory serializerFactory = new SerializerFactory();
         RDFSerializer serializer = serializerFactory.createSerializer(
                 RDFFormat.RDFC_1_0,
                 model,
-                RDFC10Options.defaultConfig()
+                RDFC10SerializerOptions.defaultConfig()
         );
 
         StringWriter writer = new StringWriter();

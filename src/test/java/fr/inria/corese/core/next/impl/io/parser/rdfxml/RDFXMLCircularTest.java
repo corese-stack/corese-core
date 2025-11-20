@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,8 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.api.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.DefaultSerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.XMLSerializerOption;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOption;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 
@@ -49,9 +48,9 @@ import fr.inria.corese.core.next.impl.temp.CoreseModel;
 class RDFXMLCircularTest {
 
     private ValueFactory valueFactory;
-    private SerializerFactory serializerFactory;
+    private fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
-    private XMLSerializerOption defaultConfig;
+    private RDFXMLSerializerOption defaultConfig;
 
     // Test data constants
     private static final String EXAMPLE_NS = "http://example.org/";
@@ -71,9 +70,9 @@ class RDFXMLCircularTest {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new DefaultSerializerFactory();
+        serializerFactory = new SerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = XMLSerializerOption.defaultConfig();
+        defaultConfig = RDFXMLSerializerOption.defaultConfig();
     }
 
     /**

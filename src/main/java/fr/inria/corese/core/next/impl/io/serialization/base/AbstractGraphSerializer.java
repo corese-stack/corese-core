@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import fr.inria.corese.core.next.impl.common.vocabulary.*;
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +32,6 @@ import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.Value;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOption;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
@@ -89,12 +90,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * This should be called before accessing any methods specific to AbstractTFamilyConfig.
      *
      * @return The config cast to AbstractTFamilyConfig.
-     * @throws IllegalStateException if the config is not an instance of AbstractTFamilyConfig.
+     * @throws SerializationException if the config is not an instance of AbstractTFamilyConfig.
      */
     private AbstractTFamilyOption getTFamilyOption() {
         if (!(option instanceof AbstractTFamilyOption)) {
-            throw new IllegalStateException("Current serializer configuration is not an instance of AbstractTFamilyOption. " +
-                    "Features like prefixes, compact syntax, and pretty-printing are only available for T-Family formats.");
+            throw new SerializationException("Current serializer configuration is not an instance of AbstractTFamilyOption. " +
+                    "Features like prefixes, compact syntax, and pretty-printing are only available for T-Family formats.", this.getFormatName());
         }
         return (AbstractTFamilyOption) option;
     }
@@ -133,13 +134,6 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             throw new SerializationException("Invalid data for format " + getFormatName() + ": " + e.getMessage(), getFormatName(), e);
         }
     }
-
-    /**
-     * Returns the format name for error messages and logging.
-     *
-     * @return the format name (e.g., "TriG", "Turtle").
-     */
-    protected abstract String getFormatName();
 
     /**
      * Abstract method for the main statement writing,
@@ -287,7 +281,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      */
     protected void writePredicate(Writer writer, Value predicate) throws IOException {
         AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-        if (tFamilyConfig.useRdfTypeShortcut() && predicate.stringValue().equals(SerializationConstants.RDF_TYPE)) {
+        if (tFamilyConfig.useRdfTypeShortcut() && predicate.equals(RDF.type.getIRI())) {
             writer.write(SerializationConstants.RDF_TYPE_SHORTCUT);
         } else {
             writeValue(writer, predicate);
@@ -315,7 +309,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             Resource bNode = (Resource) value;
 
             if (currentlyWritingBlankNodes.contains(bNode)) {
-                writer.write(SerializationConstants.BNODE_PREFIX + bNode.stringValue());
+                writer.write(SerializationConstants.BLANK_NODE_PREFIX + bNode.stringValue());
                 return;
             }
 
@@ -343,13 +337,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
 
             if (!handled) {
-                writer.write(SerializationConstants.BNODE_PREFIX + bNode.stringValue());
+                writer.write(SerializationConstants.BLANK_NODE_PREFIX + bNode.stringValue());
             }
 
             currentlyWritingBlankNodes.remove(bNode);
         } else {
-            throw new IllegalArgumentException("Unsupported value type for " + getFormatName() +
-                    " serialization: " + value.getClass().getName());
+            throw new SerializationException("Unsupported value type serialization: " + value.getClass().getName(), this.getFormatName());
         }
     }
 
@@ -405,9 +398,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
         literal.getLanguage().ifPresent(lang -> {
             try {
-                writer.write(SerializationConstants.AT_SIGN + lang);
+                writer.write(SerializationConstants.AT + lang);
             } catch (IOException e) {
-                throw new UncheckedIOException("Error writing language tag to stream", e);
+                throw new SerializationException("Error writing language tag to stream", this.getFormatName(), e);
             }
         });
 
@@ -446,7 +439,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         }
 
         return option.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED ||
-                (!datatype.stringValue().equals(SerializationConstants.XSD_STRING) &&
+                (!datatype.equals(XSD.xsdString.getIRI()) &&
                         option.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL);
     }
 
@@ -468,8 +461,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
         boolean firstProperty = true;
         for (Statement stmt : properties) {
-            if (stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST) ||
-                    stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_REST)) {
+            if (stmt.getPredicate().equals(RDF.first.getIRI()) ||
+                    stmt.getPredicate().equals(RDF.rest.getIRI())) {
                 continue;
             }
 
@@ -598,12 +591,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
 
             Optional<Value> first = statements.stream()
-                    .filter(stmt -> stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST))
+                    .filter(stmt -> stmt.getPredicate().equals(RDF.first.getIRI()))
                     .map(Statement::getObject)
                     .findFirst();
 
             Optional<Value> rest = statements.stream()
-                    .filter(stmt -> stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_REST))
+                    .filter(stmt -> stmt.getPredicate().equals(RDF.rest.getIRI()))
                     .map(Statement::getObject)
                     .findFirst();
 
@@ -614,7 +607,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
             items.add(first.get());
 
-            if (rest.get().stringValue().equals(SerializationConstants.RDF_NIL)) {
+            if (rest.get().equals(RDF.nil.getIRI())) {
                 current = null;
             } else if (rest.get().isBNode()) {
                 current = (Resource) rest.get();
@@ -679,8 +672,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                             .toList();
 
                     boolean isPartOfList = properties.stream().anyMatch(s ->
-                            s.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST) ||
-                                    s.getPredicate().stringValue().equals(SerializationConstants.RDF_REST)
+                            s.getPredicate().equals(RDF.first.getIRI()) ||
+                                    s.getPredicate().equals(RDF.rest.getIRI())
                     );
 
                     boolean usedAsTopLevelSubject = model.stream()
@@ -720,12 +713,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
 
             Optional<Value> first = props.stream()
-                    .filter(s -> s.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST))
+                    .filter(s -> s.getPredicate().equals(RDF.first.getIRI()))
                     .map(Statement::getObject)
                     .findFirst();
 
             Optional<Value> rest = props.stream()
-                    .filter(s -> s.getPredicate().stringValue().equals(SerializationConstants.RDF_REST))
+                    .filter(s -> s.getPredicate().equals(RDF.rest.getIRI()))
                     .map(Statement::getObject)
                     .findFirst();
 
@@ -733,7 +726,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 return Collections.emptySet();
             }
 
-            if (rest.get().stringValue().equals(SerializationConstants.RDF_NIL)) {
+            if (rest.get().equals(RDF.nil.getIRI())) {
                 current = null;
             } else if (rest.get().isBNode()) {
                 current = (Resource) rest.get();
@@ -753,14 +746,14 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
     protected boolean isRDFListHead(Resource bNode) {
         boolean hasFirstAndRest = model.stream()
                 .filter(stmt -> stmt.getSubject().equals(bNode))
-                .anyMatch(stmt -> stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_FIRST))
+                .anyMatch(stmt -> stmt.getPredicate().equals(RDF.first.getIRI()))
                 &&
                 model.stream()
                         .filter(stmt -> stmt.getSubject().equals(bNode))
-                        .anyMatch(stmt -> stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_REST));
+                        .anyMatch(stmt -> stmt.getPredicate().equals(RDF.rest.getIRI()));
 
         boolean isObjectOfRest = model.stream()
-                .filter(stmt -> stmt.getPredicate().stringValue().equals(SerializationConstants.RDF_REST))
+                .filter(stmt -> stmt.getPredicate().equals(RDF.rest.getIRI()))
                 .anyMatch(stmt -> stmt.getObject().equals(bNode));
 
         return hasFirstAndRest && !isObjectOfRest;
@@ -854,11 +847,11 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return A suggested prefix, or null if suggestion is not possible.
      */
     protected String getSuggestedPrefix(String namespace) {
-        if (namespace.equals(SerializationConstants.RDF_NS)) return "rdf";
-        if (namespace.equals(SerializationConstants.RDFS_NS)) return "rdfs";
-        if (namespace.equals(SerializationConstants.XSD_NS)) return "xsd";
-        if (namespace.equals(SerializationConstants.OWL_NS)) return "owl";
-        if (namespace.equals(SerializationConstants.FOAF_NS)) return "foaf";
+        if (namespace.equals(RDF.getVocabularyNamespace())) return RDF.getVocabularyPreferredPrefix();
+        if (namespace.equals(RDFS.getVocabularyNamespace())) return RDFS.getVocabularyPreferredPrefix();
+        if (namespace.equals(XSD.getVocabularyNamespace())) return XSD.getVocabularyPreferredPrefix();
+        if (namespace.equals(OWL.getVocabularyNamespace())) return OWL.getVocabularyPreferredPrefix();
+        if (namespace.equals(FOAF.getVocabularyNamespace())) return FOAF.getVocabularyPreferredPrefix();
 
         String base = namespace;
         if (base.endsWith(SerializationConstants.HASH) || base.endsWith(SerializationConstants.SLASH)) {
@@ -923,12 +916,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Called only if strictMode is enabled.
      *
      * @param value The {@link Value} to validate.
-     * @throws IllegalArgumentException if the value is null or invalid according to strict rules.
+     * @throws SerializationException if the value is null or invalid according to strict rules.
      */
     protected void validateValue(Value value) {
         if (value == null) {
             logger.warn("Null value encountered where a non-null value was expected for {} serialization. This will lead to an IllegalArgumentException if strict mode is enabled.", getFormatName());
-            throw new IllegalArgumentException("Value cannot be null in {} format when strictMode is enabled." + getFormatName());
+            throw new SerializationException("Value cannot be null in {} format when strictMode is enabled.", getFormatName());
         }
 
         if (option.isStrictMode() && value.isLiteral()) {
@@ -942,21 +935,21 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Called only if strictMode is enabled.
      *
      * @param literal The {@link Literal} to validate.
-     * @throws IllegalArgumentException if the literal is invalid (e.g., language tag with wrong datatype,
+     * @throws SerializationException if the literal is invalid (e.g., language tag with wrong datatype,
      *                                  or rdf:langString literal without language tag).
      */
     protected void validateLiteral(Literal literal) {
         IRI datatype = literal.getDatatype();
 
         if (literal.getLanguage().isPresent()) {
-            if (datatype == null || !datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
-                throw new IllegalArgumentException(
-                        "A literal with a language tag must use the rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"));
+            if (datatype == null || !datatype.equals(RDF.langString.getIRI())) {
+                throw new SerializationException(
+                        "A literal with a language tag must use the rdf:langString datatype. Found: " + (datatype != null ? datatype.stringValue() : "null"), this.getFormatName());
             }
         } else {
-            if (datatype != null && datatype.stringValue().equals(RDF.LANGSTRING.getIRI().stringValue())) {
-                throw new IllegalArgumentException(
-                        "An rdf:langString literal must have a language tag.");
+            if (datatype != null && datatype.equals(RDF.langString.getIRI())) {
+                throw new SerializationException(
+                        "An rdf:langString literal must have a language tag.", this.getFormatName());
             }
         }
     }
@@ -968,7 +961,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Called only if strictMode and validateURIs are enabled.
      *
      * @param iri The {@link IRI} to validate.
-     * @throws IllegalArgumentException if the IRI contains invalid characters.
+     * @throws SerializationException if the IRI contains invalid characters.
      */
     protected void validateIRI(IRI iri) {
         String iriString = iri.stringValue();
@@ -977,7 +970,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 iriString.contains(SerializationConstants.QUOTE) ||
                 iriString.contains(SerializationConstants.LT) ||
                 iriString.contains(SerializationConstants.GT)) {
-            throw new IllegalArgumentException("IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form of " + getFormatName() + ": " + iriString);
+            throw new SerializationException("IRI contains illegal characters (space, quotes, angle brackets) for the unescaped form : " + iriString, this.getFormatName());
         }
     }
 }

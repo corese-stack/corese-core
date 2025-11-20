@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.io.option;
+package fr.inria.corese.core.next.impl.io.common;
 
 import java.net.URI;
 import java.time.Duration;
@@ -18,7 +18,7 @@ import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
  * @see <a href=
  *      "https://javadoc.io/doc/com.apicatalog/titanium-json-ld/latest/com/apicatalog/jsonld/JsonLdOptions.html">JsonLdOptions</a>
  */
-public class JSONLDProcessorOptions extends AbstractIOOptions
+public class JSONLDOptions extends AbstractIOOptions
         implements BaseIRIOptions {
 
     private final Builder builder;
@@ -28,7 +28,7 @@ public class JSONLDProcessorOptions extends AbstractIOOptions
      * 
      * @param builder the builder containing the options for this processor
      */
-    protected JSONLDProcessorOptions(Builder builder) {
+    protected JSONLDOptions(Builder builder) {
         this.builder = builder;
     }
 
@@ -141,18 +141,18 @@ public class JSONLDProcessorOptions extends AbstractIOOptions
     }
 
     /**
-     * Builder for creating instances of JSONLDProcessorOptions.
+     * Builder for creating instances of JSONLDOptions.
      * This nested static class provides a fluent API for configuring the
      * various options before building the final
-     * {@code JSONLDProcessorOptions} object.
+     * {@code JSONLDOptions} object.
      */
-    public static class Builder extends AbstractIOOptions.Builder<JSONLDProcessorOptions> {
+    public static class Builder extends AbstractIOOptions.Builder<JSONLDOptions> {
 
         private final JsonLdOptions options = new JsonLdOptions();
 
         @Override
-        public JSONLDProcessorOptions build() {
-            return new JSONLDProcessorOptions(this);
+        public JSONLDOptions build() {
+            return new JSONLDOptions(this);
         }
 
         /**

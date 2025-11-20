@@ -165,7 +165,7 @@ class NQuadsSerializerTest {
 
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
-        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
+        assertEquals("Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
@@ -180,7 +180,7 @@ class NQuadsSerializerTest {
 
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
-        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
+        assertEquals("Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test
@@ -194,7 +194,7 @@ class NQuadsSerializerTest {
 
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nQuadsSerializer.write(writer));
-        assertEquals("Invalid N-Quads data: Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
+        assertEquals("Value cannot be null in N-Quads format when strictMode is enabled. [Format: N-Quads]", thrown.getMessage());
     }
 
     @Test

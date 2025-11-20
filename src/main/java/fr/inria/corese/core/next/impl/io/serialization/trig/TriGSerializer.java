@@ -14,6 +14,7 @@ import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractGraphSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
@@ -63,16 +64,6 @@ public class TriGSerializer extends AbstractGraphSerializer {
     public TriGSerializer(Model model, TriGSerializerOptions config) {
         super(model, config);
         Objects.requireNonNull(config, "TriGConfig cannot be null");
-    }
-
-    /**
-     * Returns the format name for error messages and logging.
-     *
-     * @return "TriG"
-     */
-    @Override
-    protected String getFormatName() {
-        return "TriG";
     }
 
     /**
@@ -291,5 +282,14 @@ public class TriGSerializer extends AbstractGraphSerializer {
                 SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
                         SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE +
                         SerializationConstants.BACK_SLASH + SerializationConstants.QUOTE);
+    }
+    /**
+     * Retrieves the RDF format supported by this serializer, which is Trig.
+     *
+     * @return {@link RDFFormat#TRIG}.
+     */
+    @Override
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.TRIG;
     }
 }

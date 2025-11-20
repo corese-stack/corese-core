@@ -50,13 +50,13 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
     }
 
     /**
-     * Returns the format name for error messages and logging.
+     * Retrieves the RDF format supported by this serializer, which is N-Quads.
      *
-     * @return "N-Quads"
+     * @return {@link RDFFormat#NQUADS}.
      */
     @Override
-    protected String getFormatName() {
-        return RDFFormat.NQUADS.getName();
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.NQUADS;
     }
 
     /**

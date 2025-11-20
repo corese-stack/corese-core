@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,12 +48,12 @@ import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstan
  * <p>Advanced features such as handling XML schemata, specific RDF/XML graph structures (e.g., rdf:Bag, rdf:Seq, rdf:Alt),
  * and full blank node syntax optimization are simplified in this version.</p>
  */
-public class XMLSerializer implements RDFSerializer {
+public class RDFXMLSerializer implements RDFSerializer {
 
-    private static final Logger logger = LoggerFactory.getLogger(XMLSerializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RDFXMLSerializer.class);
 
     private final Model model;
-    private final XMLSerializerOption config;
+    private final RDFXMLSerializerOption config;
     private final Map<String, String> iriToPrefixMapping;
     private final Map<String, String> prefixToIriMapping;
     private final Map<Resource, String> blankNodeIds;
@@ -60,23 +62,23 @@ public class XMLSerializer implements RDFSerializer {
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and default configuration.
-     * The default configuration is obtained from {@link XMLSerializerOption#defaultConfig()}.
+     * The default configuration is obtained from {@link RDFXMLSerializerOption#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
-    public XMLSerializer(Model model) {
-        this(model, XMLSerializerOption.defaultConfig());
+    public RDFXMLSerializer(Model model) {
+        this(model, RDFXMLSerializerOption.defaultConfig());
     }
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link XMLSerializerOption} to use for serialization. Must not be null.
+     * @param config the {@link RDFXMLSerializerOption} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public XMLSerializer(Model model, XMLSerializerOption config) {
+    public RDFXMLSerializer(Model model, RDFXMLSerializerOption config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
         this.iriToPrefixMapping = new HashMap<>();
@@ -115,6 +117,11 @@ public class XMLSerializer implements RDFSerializer {
         } catch (IllegalArgumentException e) {
             throw new SerializationException("Invalid data for RDF/XML format: " + e.getMessage(), "RDF/XML", e);
         }
+    }
+
+    @Override
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.RDFXML;
     }
 
     /**
@@ -169,8 +176,8 @@ public class XMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeNamespaceAttributes(Writer writer) throws IOException {
-        if (!iriToPrefixMapping.containsKey(SerializationConstants.RDF_NS)) {
-            addPrefixMapping(SerializationConstants.RDF_NS, "rdf");
+        if (!iriToPrefixMapping.containsKey(RDF.getVocabularyNamespace())) {
+            addPrefixMapping(RDF.getVocabularyNamespace(), RDF.getVocabularyPreferredPrefix());
         }
 
         List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
@@ -437,7 +444,7 @@ public class XMLSerializer implements RDFSerializer {
         }
 
         return config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED ||
-                (!datatype.stringValue().equals(SerializationConstants.XSD_STRING) &&
+                (!datatype.equals(XSD.xsdString.getIRI()) &&
                         config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL);
     }
 
@@ -474,11 +481,11 @@ public class XMLSerializer implements RDFSerializer {
      */
     private String getSuggestedPrefix(String namespace) {
 
-        if (namespace.equals(SerializationConstants.RDF_NS)) return "rdf";
-        if (namespace.equals(SerializationConstants.RDFS_NS)) return "rdfs";
-        if (namespace.equals(SerializationConstants.XSD_NS)) return "xsd";
-        if (namespace.equals(SerializationConstants.OWL_NS)) return "owl";
-        if (namespace.equals(SerializationConstants.FOAF_NS)) return "foaf";
+        if (namespace.equals(RDF.getVocabularyNamespace())) return RDF.getVocabularyPreferredPrefix();
+        if (namespace.equals(RDFS.getVocabularyNamespace())) return RDFS.getVocabularyPreferredPrefix();
+        if (namespace.equals(XSD.getVocabularyNamespace())) return XSD.getVocabularyPreferredPrefix();
+        if (namespace.equals(OWL.getVocabularyNamespace())) return OWL.getVocabularyPreferredPrefix();
+        if (namespace.equals(FOAF.getVocabularyNamespace())) return FOAF.getVocabularyPreferredPrefix();
 
 
         String base = namespace;

@@ -73,7 +73,7 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (! (o instanceof IRI))
             return false;
         AbstractIRI that = (AbstractIRI) o;
         return this.stringValue().equals(that.stringValue());

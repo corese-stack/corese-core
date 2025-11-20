@@ -87,7 +87,7 @@ public enum RDFS implements Vocabulary {
 
     @Override
     public String getNamespace() {
-        return "http://www.w3.org/2000/01/rdf-schema#";
+        return getVocabularyNamespace();
     }
 
     @Override
@@ -97,6 +97,14 @@ public enum RDFS implements Vocabulary {
 
     @Override
     public String getPreferredPrefix() {
+        return getVocabularyPreferredPrefix();
+    }
+
+    public static String getVocabularyNamespace() {
+        return "http://www.w3.org/2000/01/rdf-schema#";
+    }
+
+    public static String getVocabularyPreferredPrefix() {
         return "rdfs";
     }
 }

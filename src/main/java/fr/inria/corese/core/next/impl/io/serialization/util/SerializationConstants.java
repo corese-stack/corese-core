@@ -1,10 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.util;
 
-import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 
+import fr.inria.corese.core.next.impl.io.common.IOConstants;
 
 /**
  * Provides common constants used throughout the RDF serialization process.
@@ -12,63 +9,20 @@ import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
  * as well as various special characters and strings used in serialization formats
  * like Turtle, N-Triples, and N-Quads.
  */
-public final class SerializationConstants {
+public final class SerializationConstants extends IOConstants {
 
     private SerializationConstants() {
+        super();
         // Private constructor to prevent instantiation
     }
 
-    // --- Standard RDF/RDFS/XSD/OWL URIs ---
-    public static final String RDF_NS = RDF.HTML.getNamespace();
-    public static final String RDF_TYPE = RDF.type.getIRI().stringValue();
-    public static final String RDF_FIRST = RDF.first.getIRI().stringValue();
-    public static final String RDF_REST = RDF.rest.getIRI().stringValue();
-    public static final String RDF_NIL = RDF.nil.getIRI().stringValue();
-
-
-    public static final String RDFS_NS = RDFS.Resource.getNamespace();
-
-    public static final String XSD_NS = XSD.xsdString.getNamespace();
-
-    public static final String OWL_NS = OWL.NS;
-
-    public static final String XSD_STRING = XSD_NS + "string";
-    public static final String XSD_INTEGER = XSD_NS + "integer";
-    public static final String XSD_DECIMAL = XSD_NS + "decimal";
-    public static final String XSD_DOUBLE = XSD_NS + "double";
-    public static final String XSD_BOOLEAN = XSD_NS + "boolean";
-    public static final String XSD_DATETIME = XSD_NS + "dateTime";
-
-    // Nouveau namespace FOAF
-    public static final String FOAF_NS = "http://xmlns.com/foaf/0.1/";
-
-
     // --- Common Delimiters and Special Characters in Serialization ---
-    public static final String SPACE = " ";
-    public static final String TAB = "\t";
-    public static final String LINE_FEED = "\n";
-    public static final String CARRIAGE_RETURN = "\r";
     public static final String NEWLINE = LINE_FEED;
-
-    public static final String POINT = ".";
-    public static final String SEMICOLON = ";";
-    public static final String COMMA = ",";
-    public static final String AT_SIGN = "@";
     public static final String CARET = "^";
-    public static final String LT = "<"; // Less than
-    public static final String GT = ">"; // Greater than
-    public static final String QUOTE = "\"";
-    public static final String COLON = ":";
     public static final String BACK_SLASH = "\\";
-
-    // Nouveaux délimiteurs
-    public static final String HASH = "#";
-    public static final String SLASH = "/";
 
 
     // Turtle-specific
-    public static final String RDF_TYPE_SHORTCUT = "a";
-    public static final String BNODE_PREFIX = "_:";
     public static final String DATATYPE_SEPARATOR = "^^";
     public static final String BLANK_NODE_START = "[";
     public static final String BLANK_NODE_END = "]";
@@ -105,8 +59,6 @@ public final class SerializationConstants {
     public static final String QUOT_ENTITY = "&quot;";
     public static final String APOS_ENTITY = "&apos;";
 
-    public static final String DEFAULT_GRAPH_IRI = "http://ns.inria.fr/corese/default-graph";
-
     public static final String C14N = "c14n";
 
     public static final String  CANONICAL_BNODE_PLACEHOLDER = "<>";
@@ -114,7 +66,7 @@ public final class SerializationConstants {
     public static final String  CANONICAL_BNODE_PREFIX = "_:b";
 
 
-    // Algorithmes de hachage
+    // Hash algorithm
     public static final String SHA_256 = "SHA-256";
     public static final String SHA_384 = "SHA-384";
 

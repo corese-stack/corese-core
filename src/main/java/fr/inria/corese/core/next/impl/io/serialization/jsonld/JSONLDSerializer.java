@@ -5,10 +5,11 @@ import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.api.FromRdfApi;
 import com.apicatalog.jsonld.document.RdfDocument;
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.option.JSONLDProcessorOptions;
+import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -38,7 +39,7 @@ public class JSONLDSerializer implements RDFSerializer {
      * @param model
      */
     public JSONLDSerializer(Model model) {
-        this(model, new JSONLDProcessorOptions.Builder().build());
+        this(model, new JSONLDOptions.Builder().build());
     }
 
     @Override
@@ -47,7 +48,7 @@ public class JSONLDSerializer implements RDFSerializer {
 
         try {
             FromRdfApi fromRdfApi = JsonLd.fromRdf(RdfDocument.of(adapter));
-            if(this.config instanceof JSONLDProcessorOptions options) {
+            if(this.config instanceof JSONLDOptions options) {
                 fromRdfApi.options(options.getJsonLdOptions());
             }
 
@@ -56,5 +57,10 @@ public class JSONLDSerializer implements RDFSerializer {
         } catch (JsonLdError | IOException e) {
             throw new SerializationException("Error during serialization", "JSONLD", e);
         }
+    }
+
+    @Override
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.JSONLD;
     }
 }

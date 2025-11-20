@@ -169,7 +169,7 @@ class NTriplesSerializerTest {
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
 
-        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
+        assertEquals("Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
     @Test
@@ -184,7 +184,7 @@ class NTriplesSerializerTest {
 
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
-        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
+        assertEquals("Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
     @Test
@@ -198,7 +198,7 @@ class NTriplesSerializerTest {
 
         StringWriter writer = new StringWriter();
         SerializationException thrown = assertThrows(SerializationException.class, () -> nTriplesSerializer.write(writer));
-        assertEquals("Invalid N-Triples data: Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
+        assertEquals("Value cannot be null in N-Triples format when strictMode is enabled. [Format: N-Triples]", thrown.getMessage());
     }
 
 

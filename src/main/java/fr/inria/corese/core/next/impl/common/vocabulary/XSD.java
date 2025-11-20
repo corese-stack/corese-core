@@ -208,11 +208,19 @@ public enum XSD implements Vocabulary {
 
     @Override
     public String getNamespace() {
-        return "http://www.w3.org/2001/XMLSchema#";
+        return getVocabularyNamespace();
     }
 
     @Override
     public String getPreferredPrefix() {
+        return getVocabularyPreferredPrefix();
+    }
+
+    public static String getVocabularyNamespace() {
+        return "http://www.w3.org/2001/XMLSchema#";
+    }
+
+    public static String getVocabularyPreferredPrefix() {
         return "xsd";
     }
 

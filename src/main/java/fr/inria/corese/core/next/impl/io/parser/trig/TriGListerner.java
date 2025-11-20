@@ -444,7 +444,7 @@ public class TriGListerner extends TriGBaseListener {
      */
     private IRI extractVerb(TriGParser.VerbContext ctx) {
         String verbText = ctx.getText();
-        if (verbText.equals(ParserConstants.A)) {
+        if (verbText.equals(ParserConstants.RDF_TYPE_SHORTCUT)) {
             return delegate.createIRI(RDF.type.getIRI().stringValue());
         }
         return delegate.createIRI(delegate.resolveIRI(verbText));

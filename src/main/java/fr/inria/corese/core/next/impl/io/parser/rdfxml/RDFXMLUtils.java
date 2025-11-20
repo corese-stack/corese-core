@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 import org.xml.sax.*;
 import java.util.List;
@@ -104,7 +105,7 @@ public class RDFXMLUtils {
         try {
             return new java.net.URI(baseURI).resolve(iri).toString();
         } catch (Exception e) {
-            throw new IncorrectFormatException("Failed to resolve IRI: " + iri + " against base: " + baseURI, e);
+            throw new ParsingErrorException("Failed to resolve IRI: " + iri + " against base: " + baseURI, e);
         }
     }
 

@@ -52,11 +52,19 @@ public enum RDF implements Vocabulary {
 
     @Override
     public String getNamespace() {
-        return "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+        return getVocabularyNamespace();
     }
 
     @Override
     public String getPreferredPrefix() {
+        return getVocabularyPreferredPrefix();
+    }
+
+    public static String getVocabularyNamespace() {
+        return "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    }
+
+    public static String getVocabularyPreferredPrefix() {
         return "rdf";
     }
 }

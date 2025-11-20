@@ -1,5 +1,9 @@
 package fr.inria.corese.core.next.impl.io.serialization.trig;
 
+import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -41,10 +45,10 @@ public class TriGSerializerOptions extends AbstractTFamilyOption {
             useCollections(false);
 
             Map<String, String> commonTriGPrefixes = new HashMap<>();
-            commonTriGPrefixes.put("rdf", SerializationConstants.RDF_NS);
-            commonTriGPrefixes.put("rdfs", SerializationConstants.RDFS_NS);
-            commonTriGPrefixes.put("xsd", SerializationConstants.XSD_NS);
-            commonTriGPrefixes.put("owl", SerializationConstants.OWL_NS);
+            commonTriGPrefixes.put(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
+            commonTriGPrefixes.put(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
+            commonTriGPrefixes.put(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
+            commonTriGPrefixes.put(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
             addCustomPrefixes(commonTriGPrefixes);
 
          }

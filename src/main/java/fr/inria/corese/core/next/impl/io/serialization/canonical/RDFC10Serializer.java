@@ -35,14 +35,14 @@ public class RDFC10Serializer extends AbstractLineBasedSerializer {
      * @param config        The configuration options for the canonicalization process.
      * @param canonicalizer The canonicalizer component to use.
      */
-    public RDFC10Serializer(Model model, RDFC10Options config, RDFC10Canonicalizer canonicalizer) {
+    public RDFC10Serializer(Model model, RDFC10SerializerOptions config, RDFC10Canonicalizer canonicalizer) {
         super(model, config);
         this.canonicalizer = Objects.requireNonNull(canonicalizer);
     }
 
     @Override
-    public String getFormatName() {
-        return RDFFormat.RDFC_1_0.getName();
+    public RDFFormat getRDFFormat() {
+        return RDFFormat.RDFC_1_0;
     }
 
     /**
