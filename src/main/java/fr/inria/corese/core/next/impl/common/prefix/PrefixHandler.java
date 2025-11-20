@@ -1,14 +1,17 @@
 package fr.inria.corese.core.next.impl.common.prefix;
 
+import fr.inria.corese.core.next.api.IPrefixHandler;
+import fr.inria.corese.core.next.api.Namespace;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Unified prefix handler for managing namespace prefix mappings across all RDF formats.
  */
-public class PrefixHandler {
+public class PrefixHandler implements IPrefixHandler, Cloneable {
 
     /**
      * Map of prefix to namespace URI.
@@ -20,16 +23,21 @@ public class PrefixHandler {
      */
     private final ConcurrentHashMap<String, String> namespaceToPrefix;
 
+    /**
+     * The default namespace
+     */
+    private String defaultNamespace;
 
     /**
      * Creates a new PrefixHandler.
      *
      * @param includeStandardVocabularies if true, initializes with standard W3C vocabularies
-     *                                    (rdf, rdfs, xsd, owl)
+     *                                    (rdf, rdfs, xsd, owl, foaf)
      */
     public PrefixHandler(boolean includeStandardVocabularies) {
         this.prefixToNamespace = new ConcurrentHashMap<>();
         this.namespaceToPrefix = new ConcurrentHashMap<>();
+        this.defaultNamespace = null;
 
         if (includeStandardVocabularies) {
             initializeStandardVocabularies();
@@ -60,21 +68,25 @@ public class PrefixHandler {
 
     /**
      * Sets or updates a prefix mapping.
+     * Validates that the prefix matches XML NCName rules.
      *
      * @param prefix    the prefix
      * @param namespace the namespace URI
-     * @throws IllegalArgumentException if prefix or namespace is null
+     * @throws IllegalArgumentException if prefix is invalid or namespace is null
      */
+    @Override
     public void setPrefix(String prefix, String namespace) {
-        if (prefix == null) {
-            throw new IllegalArgumentException("Prefix cannot be null");
+        if (!isValidPrefix(prefix)) {
+            throw new IllegalArgumentException(
+                    "Invalid prefix format: '" + prefix +
+                            "' (must be empty or match [a-zA-Z_][-a-zA-Z0-9_]*)");
         }
         if (namespace == null) {
             throw new IllegalArgumentException("Namespace cannot be null");
         }
 
         String oldNamespace = prefixToNamespace.get(prefix);
-        if (oldNamespace != null) {
+        if (oldNamespace != null && !oldNamespace.equals(namespace)) {
             namespaceToPrefix.remove(oldNamespace);
         }
 
@@ -83,11 +95,26 @@ public class PrefixHandler {
     }
 
     /**
+     * Sets a namespace using a Namespace object.
+     *
+     * @param namespace the Namespace object to register
+     * @throws IllegalArgumentException if namespace is null
+     */
+    @Override
+    public void setNamespace(Namespace namespace) {
+        if (namespace == null) {
+            throw new IllegalArgumentException("Namespace cannot be null");
+        }
+        setPrefix(namespace.getPrefix(), namespace.getName());
+    }
+
+    /**
      * Gets the namespace URI for a given prefix.
      *
      * @param prefix the prefix to look up
      * @return the namespace URI, or null if the prefix is not registered
      */
+    @Override
     public String getNamespace(String prefix) {
         return prefixToNamespace.get(prefix);
     }
@@ -98,6 +125,7 @@ public class PrefixHandler {
      * @param namespace the namespace URI to look up
      * @return the prefix, or null if the namespace is not registered
      */
+    @Override
     public String getPrefix(String namespace) {
         return namespaceToPrefix.get(namespace);
     }
@@ -108,10 +136,30 @@ public class PrefixHandler {
      * @param prefix the prefix to check
      * @return true if the prefix is registered, false otherwise
      */
+    @Override
     public boolean hasPrefix(String prefix) {
         return prefixToNamespace.containsKey(prefix);
     }
 
+    /**
+     * Gets the default namespace
+     *
+     * @return the default namespace URI, or null if not set
+     */
+    @Override
+    public String getDefaultNamespace() {
+        return defaultNamespace;
+    }
+
+    /**
+     * Sets the default namespace.
+     *
+     * @param namespace the default namespace IRI, or null to unset
+     */
+    @Override
+    public void setDefaultNamespace(String namespace) {
+        this.defaultNamespace = namespace;
+    }
 
     /**
      * Removes a prefix mapping.
@@ -119,6 +167,7 @@ public class PrefixHandler {
      * @param prefix the prefix to remove
      * @return true if the prefix was removed, false if it didn't exist
      */
+    @Override
     public boolean removePrefix(String prefix) {
         String namespace = prefixToNamespace.remove(prefix);
         if (namespace != null) {
@@ -131,9 +180,11 @@ public class PrefixHandler {
     /**
      * Removes all prefix mappings.
      */
+    @Override
     public void clear() {
         prefixToNamespace.clear();
         namespaceToPrefix.clear();
+        defaultNamespace = null;
     }
 
     /**
@@ -141,6 +192,7 @@ public class PrefixHandler {
      *
      * @return an immutable set of all prefixes
      */
+    @Override
     public Set<String> getPrefixes() {
         return Set.copyOf(prefixToNamespace.keySet());
     }
@@ -150,6 +202,7 @@ public class PrefixHandler {
      *
      * @return an immutable set of all namespace URIs
      */
+    @Override
     public Set<String> getNamespaces() {
         return Set.copyOf(namespaceToPrefix.keySet());
     }
@@ -159,8 +212,22 @@ public class PrefixHandler {
      *
      * @return an unmodifiable map where keys are prefixes and values are namespace URIs
      */
+    @Override
     public Map<String, String> getPrefixMap() {
         return Collections.unmodifiableMap(new HashMap<>(prefixToNamespace));
+    }
+
+    /**
+     * Returns all namespace objects as an immutable set.
+     * Each Namespace object contains both prefix and IRI.
+     *
+     * @return a set of Namespace objects
+     */
+    @Override
+    public Set<Namespace> getNamespaceObjects() {
+        return namespaceToPrefix.entrySet().stream()
+                .map(e -> new SimpleNamespace(e.getValue(), e.getKey()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -168,6 +235,7 @@ public class PrefixHandler {
      *
      * @return the number of mappings
      */
+    @Override
     public int size() {
         return prefixToNamespace.size();
     }
@@ -177,6 +245,7 @@ public class PrefixHandler {
      *
      * @return true if no mappings exist, false otherwise
      */
+    @Override
     public boolean isEmpty() {
         return prefixToNamespace.isEmpty();
     }
@@ -188,14 +257,19 @@ public class PrefixHandler {
      * @return the full IRI, or null if the prefix is not registered
      * @throws IllegalArgumentException if prefixedName is null or doesn't contain ":"
      */
+    @Override
     public String expandPrefix(String prefixedName) {
         if (prefixedName == null) {
             throw new IllegalArgumentException("Prefixed name cannot be null");
         }
 
         int colonIndex = prefixedName.indexOf(':');
+
         if (colonIndex == -1) {
-            throw new IllegalArgumentException("Invalid prefixed name (no colon): " + prefixedName);
+            if (defaultNamespace != null) {
+                return defaultNamespace + prefixedName;
+            }
+            return null;
         }
 
         String prefix = prefixedName.substring(0, colonIndex);
@@ -216,6 +290,7 @@ public class PrefixHandler {
      * @return the prefixed name if a matching namespace is found, otherwise the original IRI
      * @throws IllegalArgumentException if iri is null
      */
+    @Override
     public String compressIRI(String iri) {
         if (iri == null) {
             throw new IllegalArgumentException("IRI cannot be null");
@@ -240,20 +315,74 @@ public class PrefixHandler {
     }
 
     /**
-     * Copies all prefix mappings from another PrefixHandler.
-     * Existing mappings are preserved unless overridden.
+     * Checks if a prefix is valid according to XML NCName rules.
+     * Empty string "" is considered valid (for Turtle default prefix)
      *
-     * @param other the PrefixHandler to copy from
+     * @param prefix the prefix to validate
+     * @return true if the prefix is valid, false otherwise
+     */
+    @Override
+    public boolean isValidPrefix(String prefix) {
+        if (prefix == null) {
+            return false;
+        }
+        if (prefix.isEmpty()) {
+            return true;
+        }
+        return prefix.matches("[a-zA-Z_][-a-zA-Z0-9_]*");
+    }
+
+    /**
+     * Copies all prefix mappings from another handler.
+     * Existing mappings in this handler are overwritten if prefixes match.
+     *
+     * @param other the handler to copy from
      * @throws IllegalArgumentException if other is null
      */
-    public void copyFrom(PrefixHandler other) {
+    @Override
+    public void copyFrom(IPrefixHandler other) {
         if (other == null) {
-            throw new IllegalArgumentException("Source PrefixHandler cannot be null");
+            throw new IllegalArgumentException("Source handler cannot be null");
         }
 
         for (String prefix : other.getPrefixes()) {
             String namespace = other.getNamespace(prefix);
-            setPrefix(prefix, namespace);
+            this.setPrefix(prefix, namespace);
+        }
+
+        String otherDefault = other.getDefaultNamespace();
+        if (otherDefault != null) {
+            this.setDefaultNamespace(otherDefault);
+        }
+    }
+
+    /**
+     * Creates a deep copy of this handler.
+     * The returned handler is independent and can be modified without
+     * affecting the original.
+     *
+     * @return a new PrefixHandler instance with same mappings
+     */
+    @Override
+    public PrefixHandler clone() {
+        try {
+            // Create new instance without standard vocabularies
+            PrefixHandler cloned = new PrefixHandler(false);
+
+            // Copy all mappings
+            for (String prefix : this.prefixToNamespace.keySet()) {
+                String namespace = this.prefixToNamespace.get(prefix);
+                cloned.setPrefix(prefix, namespace);
+            }
+
+            // Copy default namespace
+            if (this.defaultNamespace != null) {
+                cloned.setDefaultNamespace(this.defaultNamespace);
+            }
+
+            return cloned;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to clone PrefixHandler", e);
         }
     }
 
@@ -265,10 +394,69 @@ public class PrefixHandler {
             if (!first) {
                 sb.append(", ");
             }
-            sb.append(prefix).append("->").append(prefixToNamespace.get(prefix));
+            sb.append("\"").append(prefix).append("\"\"").append(prefixToNamespace.get(prefix)).append("\"");
             first = false;
+        }
+        if (defaultNamespace != null) {
+            sb.append(", default\"").append(defaultNamespace).append("\"");
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    /**
+     * Simple immutable implementation of Namespace interface.
+     * Used internally to create Namespace objects from prefix-URI pairs.
+     */
+    public static final class SimpleNamespace implements Namespace {
+        private static final long serialVersionUID = 1L;
+
+        private final String prefix;
+        private final String name;
+
+        public SimpleNamespace(String prefix, String name) {
+            this.prefix = Objects.requireNonNull(prefix, "Prefix cannot be null");
+            this.name = Objects.requireNonNull(name, "Name cannot be null");
+        }
+
+        @Override
+        public String getPrefix() {
+            return prefix;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public int compareTo(Namespace o) {
+            Objects.requireNonNull(o);
+            int cmp = this.name.compareTo(o.getName());
+            if (cmp != 0) {
+                return cmp;
+            }
+            return this.prefix.compareTo(o.getPrefix());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Namespace)) return false;
+            Namespace that = (Namespace) o;
+            // Both prefix and name must be equal
+            return this.prefix.equals(that.getPrefix()) &&
+                    this.name.equals(that.getName());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(prefix, name);
+        }
+
+        @Override
+        public String toString() {
+            return prefix + ":" + name;
+        }
     }
 }

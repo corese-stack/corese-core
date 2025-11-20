@@ -1,15 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
-import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
-import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Configuration for Turtle serialization format.
