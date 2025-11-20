@@ -11,7 +11,6 @@ import fr.inria.corese.core.kgram.event.EventListener;
 import fr.inria.corese.core.kgram.event.EventManager;
 import fr.inria.corese.core.kgram.event.ResultListener;
 import fr.inria.corese.core.kgram.tool.MetaProducer;
-import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
@@ -110,10 +109,6 @@ public class QuerySolver implements SPARQLEngine {
         QUERY_PLAN = n;
     }
 
-    public static void defaultNamespaces(String ns) {
-        NAMESPACES = ns;
-    }
-
     public static void definePrefix(String pref, String ns) {
         if (NAMESPACES == null) {
             NAMESPACES = "";
@@ -162,10 +157,6 @@ public class QuerySolver implements SPARQLEngine {
         return getCreateBinding().getCreateLog();
     }
 
-    public ContextLog getCreateLog() {
-        return getCreateBinding().getCreateLog();
-    }
-
     public void setVisitor(QueryVisitor v) {
         addVisitor(v);
     }
@@ -177,10 +168,6 @@ public class QuerySolver implements SPARQLEngine {
         visit.add(v);
     }
 
-    public boolean hasVisitor() {
-        return visit != null && !visit.isEmpty();
-    }
-
     public List<QueryVisitor> getVisitorList() {
         return visit;
     }
@@ -189,16 +176,8 @@ public class QuerySolver implements SPARQLEngine {
         provider = p;
     }
 
-    public Provider getProvider() {
-        return provider;
-    }
-
     public void setDefaultBase(String str) {
         setBase(str);
-    }
-
-    public String getBase() {
-        return defaultBase;
     }
 
     public void setBase(String str) {
@@ -385,16 +364,6 @@ public class QuerySolver implements SPARQLEngine {
         return getCurrentEval().getEnvironment();
     }
 
-    public Context getContext() {
-        return getCreateBinding().getCreateContext();
-    }
-
-    public void finish() {
-        if (current != null) {
-            current.finish();
-        }
-    }
-
     public Mappings modifier(Query q, Mappings map) throws SparqlException {
         if (getCurrentEval() == null) {
             logger.info("Undefined Eval");
@@ -483,11 +452,6 @@ public class QuerySolver implements SPARQLEngine {
         return kgram;
     }
 
-    @Deprecated
-    public IDatatype eval(String q) {
-        return DatatypeMap.TRUE;
-    }
-
     void init(Query q) {
         // use case: OWL RL kg:sparql(query) in a rule
         // query is evaluated as a Rule
@@ -525,10 +489,6 @@ public class QuerySolver implements SPARQLEngine {
         return evaluator;
     }
 
-    public Interpreter getInterpreter() {
-        return evaluator;
-    }
-
     public ASTQuery getAST(Query q) {
         return q.getAST();
     }
@@ -553,11 +513,6 @@ public class QuerySolver implements SPARQLEngine {
         return compile(squery, null);
     }
 
-    // rule: construct where
-    public Query compileRule(String squery) throws EngineException {
-        return compileRule(squery, null);
-    }
-
     void setParameter(Transformer transformer) {
         transformer.setGenerateMain(isGenerateMain());
         transformer.setNamespaces(NAMESPACES);
@@ -579,15 +534,6 @@ public class QuerySolver implements SPARQLEngine {
         Transformer transformer = createTransformer(ds);
         transformer.setSPARQLCompliant(isSPARQLCompliant);
         return transformer.transform(squery);
-    }
-
-    public ASTQuery parse(String q) throws EngineException {
-        return parse(q, (Dataset) null);
-    }
-
-    public ASTQuery parse(String q, Dataset ds) throws EngineException {
-        Transformer transformer = createTransformer(ds);
-        return transformer.parse(q);
     }
 
     Transformer createTransformer(Dataset ds) {
@@ -645,28 +591,6 @@ public class QuerySolver implements SPARQLEngine {
         }
     }
 
-    public void addPragma(String subject, String property, String value) {
-        Triple t = Triple.create(Constant.create(subject), Constant.create(property), Constant.create(value));
-        getPragma().add(t);
-    }
-
-    public void addPragma(String subject, String property, int value) {
-        Triple t = Triple.create(Constant.create(subject), Constant.create(property), Constant.create(value));
-        getPragma().add(t);
-    }
-
-    public void addPragma(String subject, String property, boolean value) {
-        Triple t = Triple.create(Constant.create(subject), Constant.create(property), Constant.create(value));
-        getPragma().add(t);
-    }
-
-    public void addPragma(Atom subject, Atom property, Atom value) {
-        if (getPragma() == null) {
-            setPragma(BasicGraphPattern.create());
-        }
-        getPragma().add(Triple.create(subject, property, value));
-    }
-
     public void setListGroup(boolean b) {
         isListGroup = b;
     }
@@ -675,36 +599,12 @@ public class QuerySolver implements SPARQLEngine {
         isListPath = b;
     }
 
-    public void setCountPath(boolean b) {
-        isCountPath = b;
-    }
-
     public void setPathLoop(boolean b) {
         isCheckLoop = !b;
     }
 
-    boolean isSPARQLCompliant() {
-        return isSPARQLCompliant;
-    }
-
     public void setSPARQLCompliant(boolean isSPARQLCompliant) {
         this.isSPARQLCompliant = isSPARQLCompliant;
-    }
-
-    public boolean isDebug() {
-        return isDebug;
-    }
-
-    public void setDebug(boolean b) {
-        isDebug = b;
-    }
-
-    public void setOptimize(boolean b) {
-        isOptimize = b;
-    }
-
-    public void setSlice(int n) {
-        slice = n;
     }
 
     public BasicGraphPattern getPragma() {
@@ -715,40 +615,11 @@ public class QuerySolver implements SPARQLEngine {
         this.pragma = pragma;
     }
 
-    public boolean isDetail() {
-        return isDetail;
-    }
-
-    public void setDetail(boolean isDetail) {
-        this.isDetail = isDetail;
-    }
-
     /**
      * @return the isSkolem
      */
     public boolean isSkolem() {
         return isSkolem;
-    }
-
-    /**
-     * @param isSkolem the isSkolem to set
-     */
-    public void setSkolem(boolean isSkolem) {
-        this.isSkolem = isSkolem;
-    }
-
-    /**
-     * @return the isMatchBlank
-     */
-    public boolean isMatchBlank() {
-        return isMatchBlank;
-    }
-
-    /**
-     * @param isMatchBlank the isMatchBlank to set
-     */
-    public void setMatchBlank(boolean isMatchBlank) {
-        this.isMatchBlank = isMatchBlank;
     }
 
     /**
@@ -759,52 +630,10 @@ public class QuerySolver implements SPARQLEngine {
     }
 
     /**
-     * @param planner the planner to set
-     */
-    public void setPlanProfile(int planner) {
-        this.planner = planner;
-    }
-
-    /**
-     * @return the isPathType
-     */
-    public boolean isPathType() {
-        return isPathType;
-    }
-
-    /**
-     * @param isPathType the isPathType to set
-     */
-    public void setPathType(boolean isPathType) {
-        this.isPathType = isPathType;
-    }
-
-    /**
-     * @return the isStorePath
-     */
-    public boolean isStorePath() {
-        return isStorePath;
-    }
-
-    /**
-     * @param isStorePath the isStorePath to set
-     */
-    public void setStorePath(boolean isStorePath) {
-        this.isStorePath = isStorePath;
-    }
-
-    /**
      * @return the isCachePath
      */
     public boolean isCachePath() {
         return isCachePath;
-    }
-
-    /**
-     * @param isCachePath the isCachePath to set
-     */
-    public void setCachePath(boolean isCachePath) {
-        this.isCachePath = isCachePath;
     }
 
     // true = skip Lock ;  false = with Lock
@@ -823,16 +652,8 @@ public class QuerySolver implements SPARQLEngine {
         return isUseBind;
     }
 
-    public void setUseBind(boolean isUseBind) {
-        this.isUseBind = isUseBind;
-    }
-
     public boolean isGenerateMain() {
         return isGenerateMain;
-    }
-
-    public void setGenerateMain(boolean isGenerateMain) {
-        this.isGenerateMain = isGenerateMain;
     }
 
     public Query parseQuery(String path) throws EngineException {
@@ -859,14 +680,6 @@ public class QuerySolver implements SPARQLEngine {
         this.metadata = metadata;
     }
 
-    public void set(Metadata metadata) {
-        this.metadata = metadata;
-    }
-
-    public boolean isRule() {
-        return isRule;
-    }
-
     public void setRule(boolean rule) {
         this.isRule = rule;
     }
@@ -875,21 +688,8 @@ public class QuerySolver implements SPARQLEngine {
         return algebra;
     }
 
-    /**
-     * BGP must be set to true
-     *
-     * @param algebra the algebra to set
-     */
-    public void setAlgebra(boolean algebra) {
-        this.algebra = algebra;
-    }
-
     public boolean isBGP() {
         return isBGP;
-    }
-
-    public void setBGP(boolean BGP) {
-        this.isBGP = BGP;
     }
 
     @Override
