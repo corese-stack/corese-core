@@ -45,14 +45,6 @@ public class TurtleSerializerOptions extends AbstractTFamilyOption {
             useCollections(true);
             blankNodeStyle(BlankNodeStyleEnum.ANONYMOUS);
 
-            Map<String, String> commonTurtlePrefixes = new HashMap<>();
-            commonTurtlePrefixes.put(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
-            commonTurtlePrefixes.put(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
-            commonTurtlePrefixes.put(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
-            commonTurtlePrefixes.put(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
-            addCustomPrefixes(commonTurtlePrefixes);
-
-
         }
 
         /**

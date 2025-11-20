@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.common;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
@@ -9,8 +10,6 @@ import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Base class for RDF parsers (Turtle, TriG) providing common functionality.
@@ -22,7 +21,8 @@ public abstract class AbstractTurtleTriGListener {
 
     public final Model model;
     public final ValueFactory factory;
-    public final Map<String, String> prefixMap = new HashMap<>();
+    public final PrefixHandler prefixHandler;
+
     public String baseURI;
 
     public Resource currentSubject;
@@ -41,6 +41,8 @@ public abstract class AbstractTurtleTriGListener {
         this.model = model;
         this.factory = factory;
         this.baseURI = baseURI;
+        this.prefixHandler = new PrefixHandler(true);
+
         initializeBasePrefix();
     }
 
@@ -49,7 +51,7 @@ public abstract class AbstractTurtleTriGListener {
      */
     public void initializeBasePrefix() {
         if (this.baseURI != null && !this.baseURI.isEmpty()) {
-            prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
+            prefixHandler.setPrefix(ParserConstants.EMPTY_STRING, this.baseURI);
             model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
         }
     }
@@ -74,8 +76,7 @@ public abstract class AbstractTurtleTriGListener {
     public void updateBaseURI(String newBase) {
         this.baseURI = resolveIRIAgainstBase(newBase);
         validateIRI(this.baseURI);
-
-        prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
+        prefixHandler.setPrefix(ParserConstants.EMPTY_STRING, this.baseURI);
         model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
     }
 
@@ -88,7 +89,7 @@ public abstract class AbstractTurtleTriGListener {
     public void registerPrefix(String prefix, String iri) {
         String resolvedIRI = resolveIRIAgainstBase(iri);
         validateIRI(resolvedIRI);
-        prefixMap.put(prefix, resolvedIRI);
+        prefixHandler.setPrefix(prefix, resolvedIRI);
         model.setNamespace(prefix, resolvedIRI);
 
         explicitlyDeclaredPrefixes.add(prefix);
@@ -111,7 +112,7 @@ public abstract class AbstractTurtleTriGListener {
             }
 
             if (raw.equals(ParserConstants.COLON)) {
-                String ns = prefixMap.get(ParserConstants.EMPTY_STRING);
+                String ns = prefixHandler.getNamespace(ParserConstants.EMPTY_STRING);
                 return ns != null ? ns : getEffectiveBaseURI();
             }
 
@@ -127,16 +128,9 @@ public abstract class AbstractTurtleTriGListener {
                 String prefix = parts[0];
                 String localName = parts[1];
 
-                if (prefix.isEmpty() && !explicitlyDeclaredPrefixes.contains("")) {
-                    throw new ParsingErrorException(
-                            "Syntax error: prefixed name ':' + '" + localName + "' used but ':' prefix was never declared. " +
-                                    "Use @prefix : <baseURI> to declare the empty prefix."
-                    );
-                }
-
-                if (prefixMap.containsKey(prefix)) {
+                if (prefixHandler.hasPrefix(prefix)) {
                     localName = unescapeIRI(localName);
-                    String ns = prefixMap.get(prefix);
+                    String ns = prefixHandler.getNamespace(prefix);
                     if (ns != null) {
                         String result = ns + localName;
                         validateIRI(result);
@@ -693,5 +687,15 @@ public abstract class AbstractTurtleTriGListener {
          * XSD double type
          */
         DOUBLE
+    }
+
+    /**
+     * Returns the prefix handler for this listener.
+     * Allows external access to discovered prefixes.
+     *
+     * @return the PrefixHandler instance
+     */
+    public PrefixHandler getPrefixHandler() {
+        return prefixHandler;
     }
 }

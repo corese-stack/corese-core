@@ -1,9 +1,8 @@
 package fr.inria.corese.core.next.impl.io.serialization.option;
 
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,7 +36,8 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      * A map of custom URI prefixes to be used for serialization, in addition to or instead of
      * auto-declared prefixes. Useful for enforcing specific prefix names or when {@code autoDeclarePrefixes} is false.
      */
-    protected final Map<String, String> customPrefixes; // Used for CUSTOM ordering or if autoDeclarePrefixes=false
+    protected final PrefixHandler prefixHandler;
+
     /**
      * Whether compact triple syntax (e.g., using ';' for subject/predicate reuse and ',' for object lists)
      * should be used. This significantly reduces file size and improves readability for formats like Turtle.
@@ -111,7 +111,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
         this.usePrefixes = builder.usePrefixes;
         this.autoDeclarePrefixes = builder.autoDeclarePrefixes;
         this.prefixOrdering = Objects.requireNonNull(builder.prefixOrdering, "Prefix ordering cannot be null");
-        this.customPrefixes = Collections.unmodifiableMap(new HashMap<>(Objects.requireNonNull(builder.customPrefixes, "Custom prefixes map cannot be null")));
+        this.prefixHandler = Objects.requireNonNull(builder.prefixHandler, "PrefixHandler cannot be null");
         this.useCompactTriples = builder.useCompactTriples;
         this.useRdfTypeShortcut = builder.useRdfTypeShortcut;
         this.useCollections = builder.useCollections;
@@ -129,7 +129,6 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
             throw new IllegalArgumentException("Cannot enable both escapeUnicode and useMultilineLiterals in Turtle TriG configs.");
         }
     }
-
 
     /**
      * Checks if prefix declarations should be used for compact IRIs.
@@ -161,10 +160,10 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
     /**
      * Returns an unmodifiable map of custom URI prefixes.
      *
-     * @return A map where keys are prefix names and values are namespace URIs.
+     * @return The {@link PrefixHandler} managing all prefix mappings.
      */
-    public Map<String, String> getCustomPrefixes() {
-        return customPrefixes;
+    public PrefixHandler getPrefixHandler() {
+        return prefixHandler;
     }
 
     /**
@@ -186,7 +185,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
     }
 
     /**
-     * Checks if Turtle collection syntax `( item1 item2 )` should be used for `rdf:List` structures.
+     * Checks if Turtle collection syntax should be used for `rdf:List` structures.
      *
      * @return {@code true} if collection syntax is enabled, {@code false} otherwise.
      */
@@ -204,7 +203,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
     }
 
     /**
-     * Checks if multi-line literal syntax (triple quotes) should be used.
+     * Checks if multi-line literal syntax should be used.
      *
      * @return {@code true} if multi-line literals are enabled, {@code false} otherwise.
      */
@@ -267,52 +266,19 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
     }
 
     /**
-     * Determines if triple quotes should be used for a given literal value.
-     * This is typically true if multi-line literals are enabled and the value contains newline characters.
-     *
-     * @param literalValue The string value of the literal.
-     * @return {@code true} if triple quotes should be used, {@code false} otherwise.
-     */
-    public boolean shouldUseTripleQuotes(String literalValue) {
-        return useMultilineLiterals && (literalValue.contains(SerializationConstants.LINE_FEED) || literalValue.contains(SerializationConstants.CARRIAGE_RETURN));
-    }
-
-    /**
-     * Checks if output optimization features (compact triples, subject grouping, pretty-printing) are enabled.
-     *
-     * @return {@code true} if any optimization feature is enabled, {@code false} otherwise.
-     */
-    public boolean shouldOptimizeOutput() {
-        return useCompactTriples || groupBySubject || prettyPrint;
-    }
-
-    /**
-     * Checks if inline blank node syntax (`[]`) should be used.
-     * This is typically true if anonymous blank node style is chosen and compact triples are enabled.
-     *
-     * @return {@code true} if inline blank nodes should be used, {@code false} otherwise.
-     */
-    public boolean shouldUseInlineBlankNodes() {
-        return blankNodeStyle == BlankNodeStyleEnum.ANONYMOUS && useCompactTriples;
-    }
-
-    /**
      * An abstract base builder for {@link AbstractTFamilyOption}.
      * This builder provides methods for setting Turtle Trig serialization configuration options.
-     * It extends {@link AbstractSerializerOption.AbstractBuilder} and uses a recursive type
      * parameter (`S`) to allow concrete subclass builders to return their own specific type,
      * enabling fluent API chaining.
      *
      * @param <S> The type of the concrete builder extending this abstract builder.
      */
-    public abstract static class AbstractTFamilyBuilder<S extends AbstractTFamilyBuilder<S>>
-            extends AbstractSerializerOption.AbstractBuilder<S> {
+    public abstract static class AbstractTFamilyBuilder<S extends AbstractTFamilyBuilder<S>> extends AbstractBuilder<S> {
 
         protected boolean usePrefixes = true;
         protected boolean autoDeclarePrefixes = true;
         protected PrefixOrderingEnum prefixOrdering = PrefixOrderingEnum.ALPHABETICAL;
-        protected final Map<String, String> customPrefixes = new HashMap<>();
-
+        protected PrefixHandler prefixHandler = new PrefixHandler(true);
         protected boolean useCompactTriples = true;
         protected boolean useRdfTypeShortcut = true;
         // Default to false for complexity, specific formats can override
@@ -332,7 +298,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
         /**
          * Sets whether prefix declarations should be used for compact IRIs.
          *
-         * @param usePrefixes {@code true} to use prefixes, {@code false} otherwise.
+         * @param usePrefixes {@code true} to enable prefixes, {@code false} otherwise.
          * @return The builder instance for fluent chaining.
          */
         public S usePrefixes(boolean usePrefixes) {
@@ -364,30 +330,42 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
         }
 
         /**
-         * Adds a custom prefix mapping to be used for serialization.
+         * Sets the PrefixHandler to use for managing prefix mappings.
+         *
+         * @param prefixHandler The {@link PrefixHandler} to use. Must not be null.
+         * @return The builder instance for fluent chaining.
+         * @throws NullPointerException if prefixHandler is null.
+         */
+        public S prefixHandler(PrefixHandler prefixHandler) {
+            this.prefixHandler = Objects.requireNonNull(prefixHandler, "PrefixHandler cannot be null");
+            return self();
+        }
+
+        /**
+         * Adds a custom prefix mapping to the PrefixHandler.
          *
          * @param prefix    The prefix name (e.g., "ex"). Must not be null.
          * @param namespace The namespace URI (e.g., "http://example.org/"). Must not be null.
          * @return The builder instance for fluent chaining.
          * @throws NullPointerException if prefix or namespace is null.
          */
-        public S addCustomPrefix(String prefix, String namespace) {
+        public S addPrefix(String prefix, String namespace) {
             Objects.requireNonNull(prefix, "Prefix name cannot be null");
             Objects.requireNonNull(namespace, "Namespace URI cannot be null");
-            this.customPrefixes.put(prefix, namespace);
+            this.prefixHandler.setPrefix(prefix, namespace);
             return self();
         }
 
         /**
-         * Adds multiple custom prefix mappings from a map.
+         * Adds multiple custom prefix mappings from a map to the PrefixHandler.
          *
          * @param prefixes A map of prefix names to namespace URIs. Must not be null.
          * @return The builder instance for fluent chaining.
          * @throws NullPointerException if the provided map is null.
          */
-        public S addCustomPrefixes(Map<String, String> prefixes) {
+        public S addPrefixes(Map<String, String> prefixes) {
             Objects.requireNonNull(prefixes, "Prefixes map cannot be null");
-            this.customPrefixes.putAll(prefixes);
+            prefixes.forEach(this.prefixHandler::setPrefix);
             return self();
         }
 
@@ -518,7 +496,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
          * Builds and returns a new {@link AbstractTFamilyOption} instance with the current builder settings.
          * This method must be implemented by concrete builder subclasses to return their specific configuration type.
          *
-         * @return A new {@code AbstractTFamilyConfig} instance or a subclass instance.
+         * @return A new {@code AbstractTFamilyOption} instance or a subclass instance.
          */
         public abstract AbstractTFamilyOption build();
     }

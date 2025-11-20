@@ -1,16 +1,11 @@
 package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
-import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOption;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,7 +14,7 @@ import java.util.Objects;
  * This class extends {@link AbstractSerializerOption} directly as RDF/XML has
  * distinct serialization characteristics not shared by the Turtle or N-Family formats.
  *
- * <p>Use the {@link Builder} class to create instances of {@code XmlConfig}.
+ * <p>Use the {@link Builder} class to create instances of {@code RDFXMLSerializerOption}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
 public class RDFXMLSerializerOption extends AbstractSerializerOption {
@@ -40,11 +35,10 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      */
     protected final PrefixOrderingEnum prefixOrdering;
     /**
-     * A map of custom URI prefixes to be used for serialization, in addition to or instead of
-     * auto-declared prefixes. Useful for enforcing specific prefix names or when {@code autoDeclarePrefixes} is false.
-     * Keys are prefixes, values are namespace URIs.
+     * The prefix handler for managing namespace prefix mappings.
+     * Provides unified prefix management across all RDF formats.
      */
-    protected final Map<String, String> customPrefixes;
+    protected final PrefixHandler prefixHandler;
     /**
      * Whether human-readable formatting with indentation and newlines (pretty-printing) is enabled.
      * This makes the output easier for humans to read and debug, but increases file size slightly.
@@ -88,7 +82,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
         this.usePrefixes = builder.usePrefixes;
         this.autoDeclarePrefixes = builder.autoDeclarePrefixes;
         this.prefixOrdering = Objects.requireNonNull(builder.prefixOrdering, "Prefix ordering cannot be null");
-        this.customPrefixes = Collections.unmodifiableMap(new HashMap<>(Objects.requireNonNull(builder.customPrefixes, "Custom prefixes map cannot be null")));
+        this.prefixHandler = Objects.requireNonNull(builder.prefixHandler, "PrefixHandler cannot be null");
         this.prettyPrint = builder.prettyPrint;
         this.indent = Objects.requireNonNull(builder.indent, "Indentation string cannot be null");
         this.maxLineLength = builder.maxLineLength;
@@ -126,12 +120,23 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
     }
 
     /**
-     * Returns an unmodifiable map of custom URI prefixes.
+     * Returns the prefix handler for managing namespace prefix mappings.
+     *
+     * @return The {@link PrefixHandler} instance.
+     */
+    public PrefixHandler getPrefixHandler() {
+        return prefixHandler;
+    }
+
+    /**
+     * Returns an unmodifiable map of custom URI prefixes for backward compatibility.
      *
      * @return A map where keys are prefix names and values are namespace URIs.
+     * @deprecated Use {@link #getPrefixHandler()} instead for full prefix management capabilities.
      */
+    @Deprecated
     public Map<String, String> getCustomPrefixes() {
-        return customPrefixes;
+        return prefixHandler.getPrefixMap();
     }
 
     /**
@@ -188,17 +193,16 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
         return useMultilineLiterals;
     }
 
-
     /**
      * Public Builder for {@link RDFXMLSerializerOption}.
-     * Provides a fluent API for constructing {@code XmlConfig} instances with default values
+     * Provides a fluent API for constructing {@code RDFXMLSerializerOption} instances with default values
      * specific to the RDF/XML format.
      */
     public static class Builder extends AbstractSerializerOption.AbstractBuilder<Builder> {
         protected boolean usePrefixes = true;
         protected boolean autoDeclarePrefixes = true;
         protected PrefixOrderingEnum prefixOrdering = PrefixOrderingEnum.ALPHABETICAL;
-        protected final Map<String, String> customPrefixes = new HashMap<>();
+        protected PrefixHandler prefixHandler = new PrefixHandler(true);
         protected boolean prettyPrint = true;
         protected String indent = SerializationConstants.DEFAULT_INDENTATION;
         protected int maxLineLength = 0;
@@ -216,13 +220,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
             trailingDot(false); // No trailing dot in RDF/XML
             stableBlankNodeIds(true); // Good for reproducible RDF/XML outputs
             escapeUnicode(false); // Usually direct UTF-8 for RDF/XML, not unicode escapes
-
-            addCustomPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
-            addCustomPrefix(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
-            addCustomPrefix(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
-            addCustomPrefix(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
         }
-
 
         /**
          * Sets whether prefix declarations should be used for compact IRIs.
@@ -259,17 +257,29 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
         }
 
         /**
-         * Adds a custom prefix mapping to be used for serialization.
+         * Sets the PrefixHandler to use for managing prefix mappings.
+         *
+         * @param prefixHandler The {@link PrefixHandler} to use. Must not be null.
+         * @return The builder instance for fluent chaining.
+         * @throws NullPointerException if prefixHandler is null.
+         */
+        public Builder prefixHandler(PrefixHandler prefixHandler) {
+            this.prefixHandler = Objects.requireNonNull(prefixHandler, "PrefixHandler cannot be null");
+            return self();
+        }
+
+        /**
+         * Adds a custom prefix mapping to the PrefixHandler.
          *
          * @param prefix    The prefix name (e.g., "ex"). Must not be null.
          * @param namespace The namespace URI Must not be null.
          * @return The builder instance for fluent chaining.
          * @throws NullPointerException if prefix or namespace is null.
          */
-        public Builder addCustomPrefix(String prefix, String namespace) {
+        public Builder addPrefix(String prefix, String namespace) {
             Objects.requireNonNull(prefix, "Prefix name cannot be null");
             Objects.requireNonNull(namespace, "Namespace URI cannot be null");
-            this.customPrefixes.put(prefix, namespace);
+            this.prefixHandler.setPrefix(prefix, namespace);
             return self();
         }
 
@@ -280,9 +290,9 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
          * @return The builder instance for fluent chaining.
          * @throws NullPointerException if the provided map is null.
          */
-        public Builder addCustomPrefixes(Map<String, String> prefixes) {
+        public Builder addPrefixes(Map<String, String> prefixes) {
             Objects.requireNonNull(prefixes, "Prefixes map cannot be null");
-            this.customPrefixes.putAll(prefixes);
+            prefixes.forEach(this.prefixHandler::setPrefix);
             return self();
         }
 
@@ -356,7 +366,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
         /**
          * Builds and returns a new {@link RDFXMLSerializerOption} instance with the current builder settings.
          *
-         * @return A new {@code XmlConfig} instance.
+         * @return A new {@code RDFXMLSerializerOption} instance.
          */
         @Override
         public RDFXMLSerializerOption build() {
@@ -369,7 +379,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      * This provides a convenient way to get a standard RDF/XML configuration without
      * manually building it.
      *
-     * @return A {@code XmlConfig} instance with default settings.
+     * @return A {@code RDFXMLSerializerOption} instance with default settings.
      */
     public static RDFXMLSerializerOption defaultConfig() {
         return new Builder().build();

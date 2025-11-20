@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
@@ -33,13 +34,18 @@ class XmlConfigTest {
         assertTrue(config.autoDeclarePrefixes(), "Default autoDeclarePrefixes should be true for XML");
         assertEquals(PrefixOrderingEnum.ALPHABETICAL, config.getPrefixOrdering(), "Default prefixOrdering should be ALPHABETICAL for XML");
 
-        Map<String, String> expectedPrefixes = new HashMap<>();
-        expectedPrefixes.put(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
-        expectedPrefixes.put(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
-        expectedPrefixes.put(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
-        expectedPrefixes.put(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
-        assertEquals(expectedPrefixes.size(), config.getCustomPrefixes().size(), "Default custom prefixes size mismatch");
-        assertTrue(config.getCustomPrefixes().entrySet().containsAll(expectedPrefixes.entrySet()), "Default custom prefixes should contain common RDF prefixes");
+        // Vérifier les préfixes standards via PrefixHandler
+        PrefixHandler prefixHandler = config.getPrefixHandler();
+        assertNotNull(prefixHandler, "PrefixHandler should not be null");
+        assertTrue(prefixHandler.hasPrefix(RDF.getVocabularyPreferredPrefix()), "Should contain rdf prefix");
+        assertTrue(prefixHandler.hasPrefix(RDFS.getVocabularyPreferredPrefix()), "Should contain rdfs prefix");
+        assertTrue(prefixHandler.hasPrefix(XSD.getVocabularyPreferredPrefix()), "Should contain xsd prefix");
+        assertTrue(prefixHandler.hasPrefix(OWL.getVocabularyPreferredPrefix()), "Should contain owl prefix");
+
+        assertEquals(RDF.getVocabularyNamespace(), prefixHandler.getNamespace(RDF.getVocabularyPreferredPrefix()));
+        assertEquals(RDFS.getVocabularyNamespace(), prefixHandler.getNamespace(RDFS.getVocabularyPreferredPrefix()));
+        assertEquals(XSD.getVocabularyNamespace(), prefixHandler.getNamespace(XSD.getVocabularyPreferredPrefix()));
+        assertEquals(OWL.getVocabularyNamespace(), prefixHandler.getNamespace(OWL.getVocabularyPreferredPrefix()));
 
         assertTrue(config.prettyPrint(), "Default prettyPrint should be true for XML");
         assertEquals(SerializationConstants.DEFAULT_INDENTATION, config.getIndent(), "Default indent should be " + SerializationConstants.DEFAULT_INDENTATION);
@@ -83,18 +89,58 @@ class XmlConfigTest {
     }
 
     @Test
-    @DisplayName("Builder should allow adding custom prefixes")
+    @DisplayName("Builder should allow adding custom prefixes via PrefixHandler")
     void builder_shouldAllowAddingCustomPrefixes() {
         String customPrefix = "my";
         String customNamespace = "http://my.example.org/";
+
         RDFXMLSerializerOption config = new RDFXMLSerializerOption.Builder()
-                .addCustomPrefix(customPrefix, customNamespace)
+                .addPrefix(customPrefix, customNamespace)
                 .build();
 
-        assertTrue(config.getCustomPrefixes().containsKey(customPrefix), "Custom prefix should be added");
-        assertEquals(customNamespace, config.getCustomPrefixes().get(customPrefix), "Custom prefix namespace should be correct");
-        assertTrue(config.getCustomPrefixes().containsKey("rdf"));
-        assertTrue(config.getCustomPrefixes().containsKey("xsd"));
+        PrefixHandler prefixHandler = config.getPrefixHandler();
+        assertTrue(prefixHandler.hasPrefix(customPrefix), "Custom prefix should be added");
+        assertEquals(customNamespace, prefixHandler.getNamespace(customPrefix), "Custom prefix namespace should be correct");
+
+        // Vérifier que les préfixes standards sont toujours présents
+        assertTrue(prefixHandler.hasPrefix("rdf"));
+        assertTrue(prefixHandler.hasPrefix("xsd"));
+    }
+
+    @Test
+    @DisplayName("Builder should allow setting custom PrefixHandler")
+    void builder_shouldAllowSettingCustomPrefixHandler() {
+        PrefixHandler customHandler = new PrefixHandler(false); // sans vocabulaires standards
+        customHandler.setPrefix("ex", "http://example.org/");
+        customHandler.setPrefix("custom", "http://custom.org/");
+
+        RDFXMLSerializerOption config = new RDFXMLSerializerOption.Builder()
+                .prefixHandler(customHandler)
+                .build();
+
+        PrefixHandler resultHandler = config.getPrefixHandler();
+        assertEquals(customHandler, resultHandler, "PrefixHandler should be the custom one");
+        assertTrue(resultHandler.hasPrefix("ex"));
+        assertTrue(resultHandler.hasPrefix("custom"));
+        assertFalse(resultHandler.hasPrefix("rdf")); // Pas de vocabulaires standards
+    }
+
+    @Test
+    @DisplayName("Builder should allow adding multiple prefixes at once")
+    void builder_shouldAllowAddingMultiplePrefixes() {
+        Map<String, String> customPrefixes = new HashMap<>();
+        customPrefixes.put("ex", "http://example.org/");
+        customPrefixes.put("custom", "http://custom.org/");
+
+        RDFXMLSerializerOption config = new RDFXMLSerializerOption.Builder()
+                .addPrefixes(customPrefixes)
+                .build();
+
+        PrefixHandler prefixHandler = config.getPrefixHandler();
+        assertTrue(prefixHandler.hasPrefix("ex"));
+        assertTrue(prefixHandler.hasPrefix("custom"));
+        assertEquals("http://example.org/", prefixHandler.getNamespace("ex"));
+        assertEquals("http://custom.org/", prefixHandler.getNamespace("custom"));
     }
 
     @Test
@@ -227,5 +273,20 @@ class XmlConfigTest {
         assertTrue(config.includeContext(), "includeContext should be overridden to true");
     }
 
+    @Test
+    @DisplayName("Builder should maintain default prefixes when adding custom ones")
+    void builder_shouldMaintainDefaultPrefixesWhenAddingCustomOnes() {
+        RDFXMLSerializerOption config = new RDFXMLSerializerOption.Builder()
+                .addPrefix("ex", "http://example.org/")
+                .build();
 
+        PrefixHandler prefixHandler = config.getPrefixHandler();
+        // Vérifier que les préfixes standards sont toujours là
+        assertTrue(prefixHandler.hasPrefix("rdf"));
+        assertTrue(prefixHandler.hasPrefix("xsd"));
+        assertTrue(prefixHandler.hasPrefix("rdfs"));
+        assertTrue(prefixHandler.hasPrefix("owl"));
+        // Et le nouveau préfixe custom
+        assertTrue(prefixHandler.hasPrefix("ex"));
+    }
 }

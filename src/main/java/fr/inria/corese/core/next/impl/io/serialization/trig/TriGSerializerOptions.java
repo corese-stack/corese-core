@@ -44,12 +44,6 @@ public class TriGSerializerOptions extends AbstractTFamilyOption {
             blankNodeStyle(BlankNodeStyleEnum.NAMED);
             useCollections(false);
 
-            Map<String, String> commonTriGPrefixes = new HashMap<>();
-            commonTriGPrefixes.put(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
-            commonTriGPrefixes.put(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
-            commonTriGPrefixes.put(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
-            commonTriGPrefixes.put(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
-            addCustomPrefixes(commonTriGPrefixes);
 
          }
 

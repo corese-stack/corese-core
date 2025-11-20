@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import org.slf4j.Logger;
@@ -105,8 +106,14 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      */
     private void initializePrefixes() {
         if (option instanceof AbstractTFamilyOption && getTFamilyOption().usePrefixes()) {
-            for (Map.Entry<String, String> entry : getTFamilyOption().getCustomPrefixes().entrySet()) {
-                addPrefixMapping(entry.getValue(), entry.getKey());
+            AbstractTFamilyOption tFamilyOption = getTFamilyOption();
+            PrefixHandler prefixHandler = tFamilyOption.getPrefixHandler();
+
+            for (String prefix : prefixHandler.getPrefixes()) {
+                String namespace = prefixHandler.getNamespace(prefix);
+                if (namespace != null) {
+                    addPrefixMapping(namespace, prefix);
+                }
             }
         }
     }
@@ -385,10 +392,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         String value = literal.stringValue();
 
         boolean useTripleQuotes = false;
-        if (option instanceof AbstractSerializerOption) {
-            useTripleQuotes = getTFamilyOption().shouldUseTripleQuotes(value);
+        if (option instanceof AbstractTFamilyOption) {
+            useTripleQuotes = getTFamilyOption().useMultilineLiterals() &&
+                    (value.contains(SerializationConstants.LINE_FEED) || value.contains(SerializationConstants.CARRIAGE_RETURN) || value.contains("\"\"\""));
         }
-
 
         if (useTripleQuotes) {
             writer.write(String.format("\"\"\"%s\"\"\"", escapeMultilineLiteralString(value)));
