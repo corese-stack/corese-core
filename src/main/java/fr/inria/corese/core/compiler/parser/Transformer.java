@@ -10,7 +10,6 @@ import fr.inria.corese.core.kgram.core.Exp;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.core.*;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import fr.inria.corese.core.sparql.triple.cst.RDFS;
@@ -21,7 +20,6 @@ import fr.inria.corese.core.sparql.triple.parser.visitor.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,16 +109,6 @@ public class Transformer implements ExpType {
         compiler = fac.newInstance();
         subQueryList = new ArrayList<>();
         functionCompiler = new FunctionCompiler(this);
-    }
-
-    Transformer(CompilerFactory f) {
-        this();
-        fac = f;
-        compiler = fac.newInstance();
-    }
-
-    public static Transformer create(CompilerFactory f) {
-        return new Transformer(f);
     }
 
     public static Transformer create() {
@@ -388,20 +376,6 @@ public class Transformer implements ExpType {
         }
     }
 
-    @Deprecated
-    void toJava(ASTQuery ast) throws EngineException {
-        if (ast.hasMetadata(Metadata.Type.COMPILE)) {
-            String name = ast.getMetadata().getValue(Metadata.Type.COMPILE);
-            JavaCompiler jc = new JavaCompiler(name);
-            try {
-                jc.compile(ast);
-                jc.write();
-            } catch (IOException ex) {
-                logger.error(ex.getMessage());
-            }
-        }
-    }
-
     void visit(ASTQuery ast) {
         visitor(ast);
         if (getVisitorList() != null) {
@@ -579,11 +553,6 @@ public class Transformer implements ExpType {
             return;
         }
         getFunctionCompiler().undefinedFunction(q, ast, ast.getLevel());
-    }
-
-
-    public void imports(Query q, String path) throws EngineException {
-        getFunctionCompiler().imports(q, q.getAST(), path);
     }
 
     public boolean getLinkedFunction(String label) throws EngineException {
@@ -851,14 +820,6 @@ public class Transformer implements ExpType {
         return exp;
     }
 
-    Query create(Exp exp) {
-        Query q = Query.create(exp);
-        if (sort != null) {
-            q.set(sort);
-        }
-        return q;
-    }
-
     Exp compileValues(Values val, boolean opt, int level) {
         Exp exp = compileValues(val);
         if (exp == null) {
@@ -968,10 +929,6 @@ public class Transformer implements ExpType {
         return Mapping.safeCreate(lNode, nodes);
     }
 
-    Exp construct(ASTQuery ast) throws EngineException {
-        return compile(ast, ast.getInsert());
-    }
-
     Exp delete(ASTQuery ast) throws EngineException {
         return compile(ast, ast.getDelete());
     }
@@ -982,10 +939,6 @@ public class Transformer implements ExpType {
 
     public void setAST(ASTQuery ast) {
         this.ast = ast;
-    }
-
-    public Compiler getCompiler() {
-        return compiler;
     }
 
     void complete(Query qCurrent, ASTQuery ast) throws EngineException {
@@ -1197,10 +1150,6 @@ public class Transformer implements ExpType {
             node = compiler.createNode(variable);
         }
         return node;
-    }
-
-    ASTQuery getAST(Query q) {
-        return q.getAST();
     }
 
     Node getProperAndSubSelectNode(Query q, String name) {
@@ -1834,19 +1783,6 @@ public class Transformer implements ExpType {
         return functionCompiler;
     }
 
-    public void setFunctionCompiler(FunctionCompiler functionCompiler) {
-        this.functionCompiler = functionCompiler;
-    }
-
-
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
     int incrNumber() {
         return number++;
     }
@@ -1897,10 +1833,6 @@ public class Transformer implements ExpType {
 
     public void setVisitorList(List<QueryVisitor> visit) {
         this.visit = visit;
-    }
-
-    public boolean isSPARQLCompliant() {
-        return isSPARQLCompliant;
     }
 
     public void setSPARQLCompliant(boolean b) {
