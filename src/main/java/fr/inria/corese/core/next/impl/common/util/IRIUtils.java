@@ -41,14 +41,19 @@ public class IRIUtils {
      * @return the guessed namespace of the IRI or an empty string if no match is found.
      */
     public static String guessNamespace(String iri) {
-        if (!isValidInput(iri)) {
+        if (isInvalidInput(iri)) {
             return "";
         }
         try {
             Matcher matcher = matchWithTimeout(IRI_PATTERN, iri);
             if (matcher == null || !matcher.matches()) {
-                return iri.endsWith("#") ? iri : (iri.contains("#") ? iri.substring(0, iri.lastIndexOf("#") + 1) : iri);
-
+                if (iri.endsWith("#")) {
+                    return iri;
+                } else if (iri.contains("#")) {
+                    return iri.substring(0, iri.lastIndexOf("#") + 1);
+                } else {
+                    return iri;
+                }
             } else if (matcher.matches()) {
                 if (matcher.group("protocol") != null && matcher.group("protocol").equals("_")) {
                     return "";
@@ -82,7 +87,7 @@ public class IRIUtils {
      * @return the guessed local name of the IRI or an empty string if no match is found.
      */
     public static String guessLocalName(String iri) {
-        if (!isValidInput(iri)) {
+        if (isInvalidInput(iri)) {
             return "";
         }
         try {
@@ -113,7 +118,7 @@ public class IRIUtils {
      * @return true if the string is a valid IRI, false otherwise.
      */
     public static boolean isStandardIRI(String iriString) {
-        if (!isValidInput(iriString)) {
+        if (isInvalidInput(iriString)) {
             return false;
         }
 
@@ -121,7 +126,7 @@ public class IRIUtils {
         int start = 0;
         while (start < iriString.length()) {
             char c = iriString.charAt(start);
-            if (Character.isWhitespace(c) || c == '\u00A0' || c == 160) {
+            if (Character.isWhitespace(c) || c == 160) {
                 start++;
             } else {
                 break;
@@ -132,7 +137,7 @@ public class IRIUtils {
         int end = iriString.length();
         while (end > start) {
             char c = iriString.charAt(end - 1);
-            if (Character.isWhitespace(c) || c == '\u00A0' || c == 160) {
+            if (Character.isWhitespace(c) || c == 160) {
                 end--;
             } else {
                 break;
@@ -147,7 +152,7 @@ public class IRIUtils {
 
         // Reject IRIs with internal whitespace
         for (char c : iriString.toCharArray()) {
-            if (Character.isWhitespace(c) || c == '\u00A0' || c == 160) {
+            if (Character.isWhitespace(c) || c == 160) {
                 return false;
             }
         }
@@ -203,11 +208,11 @@ public class IRIUtils {
     /**
      * Validates input string for basic security checks.
      */
-    private static boolean isValidInput(String input) {
-        return input != null &&
-                !input.isEmpty() &&
-                input.length() <= MAX_IRI_LENGTH &&
-                !containsSuspiciousPatterns(input);
+    private static boolean isInvalidInput(String input) {
+        return input == null ||
+                input.isEmpty() ||
+                input.length() > MAX_IRI_LENGTH ||
+                containsSuspiciousPatterns(input);
     }
 
     /**
@@ -250,12 +255,6 @@ public class IRIUtils {
      * @return true if the character is forbidden in IRIs
      */
     public static boolean isInvalidIRICharacter(char c) {
-        // Space (U+0020) - NOT ALLOWED
-        if (c == 0x20) {
-            return true;
-        }
-
-        // Control characters (U+0000-U+001F) - NOT ALLOWED
         if (c >= 0x00 && c <= 0x1F) {
             return true;
         }
@@ -270,20 +269,10 @@ public class IRIUtils {
             return true;
         }
 
-        switch (c) {
-            case '<':  // U+003C - less than
-            case '>':  // U+003E - greater than
-            case '{':  // U+007B - left curly bracket
-            case '}':  // U+007D - right curly bracket
-            case '\\': // U+005C - backslash
-            case '^':  // U+005E - circumflex
-            case '`':  // U+0060 - grave accent
-            case '|':  // U+007C - pipe
-            case '"':  // U+0022 - quotation mark
-                return true;
-            default:
-                return false;
-        }
+        return switch (c) {
+            case '<', '>', '{', '}', '\\', '^', '`', '|', '"' -> true;
+            default -> false;
+        };
     }
 
     /**

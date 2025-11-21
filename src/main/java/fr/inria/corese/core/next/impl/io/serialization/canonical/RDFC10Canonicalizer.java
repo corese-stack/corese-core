@@ -395,11 +395,9 @@ public class RDFC10Canonicalizer {
                 .map(stmt -> statementUtils.replaceBlankNodes(stmt, canonicalMap))
                 .toList();
 
-        List<Statement> sorted = replaced.stream()
+        return replaced.stream()
                 .sorted(Comparator.comparing(StatementUtils::toNQuad))
                 .toList();
-
-        return sorted;
     }
 
     /**

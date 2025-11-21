@@ -63,8 +63,7 @@ public abstract class AbstractTurtleTriGListener {
      */
     public String extractAndUnescapeIRI(String text) {
         String iri = text.substring(1, text.length() - 1);
-        iri = unescapeIRI(iri);
-        return validateIRI(iri) ? iri : iri;
+        return unescapeIRI(iri);
     }
 
     /**
@@ -150,12 +149,9 @@ public abstract class AbstractTurtleTriGListener {
                 }
             }
 
-            String result = resolveIRIAgainstBase(raw);
-            return result;
+            return resolveIRIAgainstBase(raw);
 
         } catch (ParsingErrorException e) {
-            throw e;
-        } catch (IllegalArgumentException e) {
             throw new ParsingErrorException(e.getMessage(), e);
         }
     }
@@ -641,15 +637,11 @@ public abstract class AbstractTurtleTriGListener {
      * @return numeric literal with corresponding XSD datatype
      */
     public Literal createNumericLiteral(String text, NumericType type) {
-        switch (type) {
-            case DOUBLE:
-                return factory.createLiteral(text, XSD.DOUBLE.getIRI());
-            case DECIMAL:
-                return factory.createLiteral(text, XSD.DECIMAL.getIRI());
-            case INTEGER:
-            default:
-                return factory.createLiteral(text, XSD.INTEGER.getIRI());
-        }
+        return switch (type) {
+            case DOUBLE -> factory.createLiteral(text, XSD.DOUBLE.getIRI());
+            case DECIMAL -> factory.createLiteral(text, XSD.DECIMAL.getIRI());
+            default -> factory.createLiteral(text, XSD.INTEGER.getIRI());
+        };
     }
 
     /**
