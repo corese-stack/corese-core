@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.api.IPrefixHandler;
 import fr.inria.corese.core.next.api.Namespace;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 
+import java.io.Serial;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -16,12 +17,12 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
     /**
      * Map of prefix to namespace URI.
      */
-    private final ConcurrentHashMap<String, String> prefixToNamespace;
+    private ConcurrentHashMap<String, String> prefixToNamespace;
 
     /**
      * Map of namespace URI to prefix (for reverse lookup).
      */
-    private final ConcurrentHashMap<String, String> namespaceToPrefix;
+    private ConcurrentHashMap<String, String> namespaceToPrefix;
 
     /**
      * The default namespace
@@ -345,10 +346,7 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
             throw new IllegalArgumentException("Source handler cannot be null");
         }
 
-        for (String prefix : other.getPrefixes()) {
-            String namespace = other.getNamespace(prefix);
-            this.setPrefix(prefix, namespace);
-        }
+        new HashMap<>(other.getPrefixMap()).forEach(this::setPrefix);
 
         String otherDefault = other.getDefaultNamespace();
         if (otherDefault != null) {
@@ -366,23 +364,12 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
     @Override
     public PrefixHandler clone() {
         try {
-            // Create new instance without standard vocabularies
-            PrefixHandler cloned = new PrefixHandler(false);
-
-            // Copy all mappings
-            for (String prefix : this.prefixToNamespace.keySet()) {
-                String namespace = this.prefixToNamespace.get(prefix);
-                cloned.setPrefix(prefix, namespace);
-            }
-
-            // Copy default namespace
-            if (this.defaultNamespace != null) {
-                cloned.setDefaultNamespace(this.defaultNamespace);
-            }
-
+            PrefixHandler cloned = (PrefixHandler) super.clone();
+            cloned.prefixToNamespace = new ConcurrentHashMap<>(this.prefixToNamespace);
+            cloned.namespaceToPrefix = new ConcurrentHashMap<>(this.namespaceToPrefix);
             return cloned;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to clone PrefixHandler", e);
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(e);
         }
     }
 
@@ -394,11 +381,11 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
             if (!first) {
                 sb.append(", ");
             }
-            sb.append("\"").append(prefix).append("\"\"").append(prefixToNamespace.get(prefix)).append("\"");
+            sb.append('"').append(prefix).append("\": \"").append(prefixToNamespace.get(prefix)).append('"');
             first = false;
         }
         if (defaultNamespace != null) {
-            sb.append(", default\"").append(defaultNamespace).append("\"");
+            sb.append(", default: \"").append(defaultNamespace).append('"');
         }
         sb.append("}");
         return sb.toString();
@@ -408,15 +395,17 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
      * Simple immutable implementation of Namespace interface.
      * Used internally to create Namespace objects from prefix-URI pairs.
      */
-    public static final class SimpleNamespace implements Namespace {
+    public record SimpleNamespace(String prefix, String name) implements Namespace {
+
+        @Serial
         private static final long serialVersionUID = 1L;
 
-        private final String prefix;
-        private final String name;
-
-        public SimpleNamespace(String prefix, String name) {
-            this.prefix = Objects.requireNonNull(prefix, "Prefix cannot be null");
-            this.name = Objects.requireNonNull(name, "Name cannot be null");
+        /**
+         * Compact constructor for validation
+         */
+        public SimpleNamespace {
+            Objects.requireNonNull(prefix, "Prefix cannot be null");
+            Objects.requireNonNull(name, "Name cannot be null");
         }
 
         @Override
@@ -428,7 +417,7 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         public String getName() {
             return name;
         }
-
+        @SuppressWarnings("NullableProblems")
         @Override
         public int compareTo(Namespace o) {
             Objects.requireNonNull(o);
@@ -438,22 +427,8 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
             }
             return this.prefix.compareTo(o.getPrefix());
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Namespace)) return false;
-            Namespace that = (Namespace) o;
-            // Both prefix and name must be equal
-            return this.prefix.equals(that.getPrefix()) &&
-                    this.name.equals(that.getName());
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(prefix, name);
-        }
-
+        
+        @SuppressWarnings("NullableProblems")
         @Override
         public String toString() {
             return prefix + ":" + name;
