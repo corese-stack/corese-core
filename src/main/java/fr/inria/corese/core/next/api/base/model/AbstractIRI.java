@@ -4,12 +4,15 @@ import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 
+import java.io.Serial;
+
 /**
  * Base class for IRI implementations. Includes base functionality for IRI
  * handling.
  */
 public abstract class AbstractIRI implements IRI, Comparable<IRI> {
 
+    @Serial
     private static final long serialVersionUID = -1005683238501772511L;
 
     private final String namespace;
@@ -42,11 +45,6 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
         }
         this.namespace = namespace;
         this.localName = localName;
-    }
-
-    @Override
-    public boolean isIRI() {
-        return true;
     }
 
     @Override
@@ -85,5 +83,10 @@ public abstract class AbstractIRI implements IRI, Comparable<IRI> {
         hash = 31 * hash + (this.namespace == null ? 0 : this.namespace.hashCode());
         hash = 31 * hash + (this.localName == null ? 0 : this.localName.hashCode());
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        return this.stringValue();
     }
 }

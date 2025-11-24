@@ -1,10 +1,5 @@
 package fr.inria.corese.core.next.impl.temp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +13,8 @@ import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
 import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
 
@@ -134,5 +131,17 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         IRI foaf = valueFactory.createIRI("http://xmlns.com/foaf/0.1/");
         assertNotNull(foaf);
         assertEquals("http://xmlns.com/foaf/0.1/", foaf.stringValue());
+    }
+
+    @Test
+    public void testDateCreation() {
+        IRI xsdDate = valueFactory.createIRI("http://www.w3.org/2001/XMLSchema#date");
+        String literalStringValue = "2025-11-20";
+        Literal date = valueFactory.createLiteral(literalStringValue, xsdDate);
+
+        assertNotNull(date);
+        assertEquals(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdDate.getIRI().stringValue(), date.getDatatype().stringValue());
+        assertEquals(literalStringValue, date.getLabel());
+        assertInstanceOf(fr.inria.corese.core.sparql.datatype.CoreseDate.class, ((CoreseNodeAdapter) date).getCoreseNode());
     }
 }

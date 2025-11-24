@@ -139,6 +139,9 @@ dependencies {
     implementation("com.typesafe.akka:akka-stream_2.13:2.6.20")                        // Akka Streams for reactive streams processing
     implementation("com.lightbend.akka:akka-stream-alpakka-xml_2.13:3.0.4")            // Alpakka XML for XML processing with Akka Streams
 
+    // HTML parsing for RDFa
+    implementation("org.jsoup:jsoup:1.21.2")
+
     // === Utilities ===
     implementation("org.apache.commons:commons-text:1.13.1")                           // Text manipulation utilities (Commons Text)
     implementation("org.json:json:20250517")                                           // JSON processing
@@ -150,6 +153,9 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.2")               // JUnit platform launcher (runtime)
     testImplementation("org.mockito:mockito-core:5.18.0")                              // Mockito core for mocking in tests
     testImplementation("org.mockito:mockito-junit-jupiter:5.18.0")                     // Mockito integration with JUnit Jupiter
+    testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.25.0")                          // Log4j2 core for internal logging
+    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.25.0")                   // SLF4J binding for Log4j2 (runtime)
+
 }
 
 /////////////////////////

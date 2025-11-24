@@ -334,7 +334,8 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
             Iterator<?> iterator = collection.iterator();
             try {
                 while (iterator.hasNext()) {
-                    if (!contains(iterator.next())) {
+                    Object currentObject = iterator.next();
+                    if (! (currentObject instanceof Statement) && ! this.contains(currentObject)) {
                         return false;
                     }
                 }
@@ -608,6 +609,20 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         } else if (collection instanceof ValueSet) {
             ((ValueSet<?>) collection).closeIterator(iterator);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Model model && this.size() == model.size() && model.containsAll(this);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 13;
+        for (Statement stat : this) {
+            hash = 31 * hash + stat.hashCode();
+        }
+        return hash;
     }
 
 }

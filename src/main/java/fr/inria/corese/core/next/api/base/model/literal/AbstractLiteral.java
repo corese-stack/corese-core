@@ -165,4 +165,35 @@ public abstract class AbstractLiteral implements Literal {
     public XMLGregorianCalendar calendarValue() {
         throw new IncorrectOperationException("Cannot convert to XML calendar");
     }
+
+    /**
+     * Check if two temporal literals are equal.
+     * @param obj the object to compare with
+     * @return true if compareTo returns 0, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+        if(!(obj instanceof Literal)) {
+            return false;
+        }
+
+        return ((Literal) obj).getLabel().equals(this.getLabel()) && ((Literal) obj).getDatatype().equals(this.datatype);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + (this.getLabel() == null ? 0 : this.getLabel().hashCode());
+        hash = 31 * hash + (this.getDatatype() == null ? 0 : this.getDatatype().hashCode());
+        hash = 31 * hash + (this.getLanguage().isEmpty() ? 0 : this.getLanguage().get().hashCode());
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        return this.stringValue();
+    }
 }

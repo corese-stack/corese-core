@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.temp.literal;
 
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractLiteral;
+import fr.inria.corese.core.next.api.base.model.literal.AbstractNumber;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.impl.exception.IncorrectDatatypeException;
@@ -153,5 +154,10 @@ public class CoreseInteger extends AbstractCoreseNumber {
     @Override
     public BigDecimal decimalValue() {
         return BigDecimal.valueOf(this.coreseObject.longValue());
+    }
+
+    @Override
+    public int compareTo(AbstractNumber abstractNumber) {
+        return Math.toIntExact(this.longValue() - abstractNumber.longValue());
     }
 }

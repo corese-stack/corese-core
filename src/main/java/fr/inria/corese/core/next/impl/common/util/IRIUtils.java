@@ -14,7 +14,14 @@ import java.util.regex.Pattern;
  */
 public class IRIUtils {
 
-    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<namespace>(?<protocol>[\\w\\-]+):(?<dblSlashes>\\/\\/)?(?<domain>([\\w\\-_:@]+\\.)*[\\w\\-_:]*))((?<path>\\/([\\w\\-\\._\\:]+\\/)*)(?<finalPath>[\\w\\-\\._\\:]+)?(?<query>\\?[\\w\\-_\\:\\?\\=]+)?(\\#)?(?<fragment>([\\w\\-_]+))?)?$");
+    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<namespace>" +
+            "(?<protocol>[\\w\\-]+):(?<dblSlashes>\\/\\/)?" +
+            "(?<domain>([\\w\\-_:@]+\\.)*[\\w\\-_:]*))" +
+            "((?<path>\\/([\\w\\-\\._\\:]+\\/)*)" +
+            "(?<finalPath>[\\w\\-\\._\\:]+)?" +
+            "(?<query>\\?[\\w\\-_\\:\\?\\=]+)?" +
+            "(?<anchor>(\\#))?" +
+            "(?<fragment>([\\w\\-_]+))?)?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
@@ -52,9 +59,10 @@ public class IRIUtils {
                 if(matcher.group("path") != null) {
                     namespace.append(matcher.group("path"));
                 }
-                if(matcher.group("fragment") != null && matcher.group("finalPath") != null) {
+                if((matcher.group("fragment") != null || matcher.group("anchor") != null) && matcher.group("finalPath") != null) {
                     namespace.append(matcher.group("finalPath")).append("#");
                 }
+
                 return namespace.toString();
             } else {
                 throw new IllegalStateException("No namespace found for the given IRI: " + iri + ".");

@@ -39,6 +39,7 @@ public class IRIUtilsTest {
         assertEquals("https://www.syuno-pit.biz/tezukayama-bandai-2.html#", IRIUtils.guessNamespace(uriToHTMLPageWithQueryAndFragment));
         assertEquals("https://www.syuno-pit.biz/tezukayama-bandai-2.html#", IRIUtils.guessNamespace(uriToHTMLPageWithFragment));
         assertEquals("", IRIUtils.guessNamespace(blankNode));
+        assertEquals("http://www.w3.org/2001/XMLSchema#", IRIUtils.guessNamespace("http://www.w3.org/2001/XMLSchema#"));
     }
 
     @Test

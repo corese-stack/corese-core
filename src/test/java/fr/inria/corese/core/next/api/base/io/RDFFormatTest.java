@@ -298,7 +298,7 @@ class RDFFormatTest {
         List<RDFFormat> allFormats = RDFFormat.all();
 
         assertNotNull(allFormats, "List of all formats should not be null");
-        assertEquals(6, allFormats.size(), "List should contain 5 predefined formats"); // TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML, TRIG
+        assertEquals(8, allFormats.size(), "List should contain 5 predefined formats"); // TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML, TRIG
 
         assertTrue(allFormats.contains(RDFFormat.TURTLE));
         assertTrue(allFormats.contains(RDFFormat.NTRIPLES));
@@ -306,6 +306,8 @@ class RDFFormatTest {
         assertTrue(allFormats.contains(RDFFormat.JSONLD));
         assertTrue(allFormats.contains(RDFFormat.RDFXML));
         assertTrue(allFormats.contains(RDFFormat.TRIG));
+        assertTrue(allFormats.contains(RDFFormat.RDFa));
+        assertTrue(allFormats.contains(RDFFormat.RDFC_1_0));
 
         assertThrows(UnsupportedOperationException.class, () -> allFormats.add(RDFFormat.TURTLE),
                 "The list returned by all() should be unmodifiable");

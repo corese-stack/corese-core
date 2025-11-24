@@ -148,7 +148,6 @@ public class CoreseModel extends AbstractModel {
 
     @Override
     public boolean contains(Resource subject, IRI predicate, Value object, Resource... contexts) {
-
         Node subjectNode = converter.toCoreseNode(subject);
         Node predicateNode = converter.toCoreseNode(predicate);
         Node objectNode = converter.toCoreseNode(object);
