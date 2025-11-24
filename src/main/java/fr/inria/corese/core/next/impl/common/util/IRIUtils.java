@@ -112,59 +112,15 @@ public class IRIUtils {
 
     /**
      * Checks if the given string is a valid IRI using a regex pattern extracted from the W3C standards.
-     * Removes leading/trailing whitespace and non-breaking spaces before validation.
-     *
      * @param iriString The string to be checked.
      * @return true if the string is a valid IRI, false otherwise.
      */
     public static boolean isStandardIRI(String iriString) {
-        if (isInvalidInput(iriString)) {
+        if (!isValidInput(iriString)) {
             return false;
-        }
-
-        // Remove leading whitespace and U+00A0 (non-breaking space)
-        int start = 0;
-        while (start < iriString.length()) {
-            char c = iriString.charAt(start);
-            if (Character.isWhitespace(c) || c == 160) {
-                start++;
-            } else {
-                break;
-            }
-        }
-
-        // Remove trailing whitespace and U+00A0 (non-breaking space)
-        int end = iriString.length();
-        while (end > start) {
-            char c = iriString.charAt(end - 1);
-            if (Character.isWhitespace(c) || c == 160) {
-                end--;
-            } else {
-                break;
-            }
-        }
-
-        iriString = iriString.substring(start, end);
-
-        if (iriString.isEmpty()) {
-            return false;
-        }
-
-        // Reject IRIs with internal whitespace
-        for (char c : iriString.toCharArray()) {
-            if (Character.isWhitespace(c) || c == 160) {
-                return false;
-            }
         }
 
         try {
-            // If no scheme (no :), treat as relative IRI
-            if (!iriString.contains(":") || iriString.startsWith("#")) {
-                Matcher matcher = matchWithTimeout(RELATIVE_IRI_PATTERN, iriString);
-                return matcher != null && matcher.matches();
-            }
-
-            // If scheme present, validate as absolute IRI
             Matcher matcher = matchWithTimeout(STANDARD_IRI_PATTERN, iriString);
             if (matcher != null && matcher.matches()) {
                 return isValidURI(iriString);
@@ -175,6 +131,16 @@ public class IRIUtils {
         }
     }
 
+
+    /**
+     * Validates input string for basic security checks.
+     */
+    private static boolean isValidInput(String input) {
+        return input != null &&
+                !input.isEmpty() &&
+                input.length() <= MAX_IRI_LENGTH &&
+                !containsSuspiciousPatterns(input);
+    }
 
     /**
      * Executes regex matching with timeout protection.
