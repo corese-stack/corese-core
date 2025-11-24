@@ -14,7 +14,14 @@ import java.util.regex.Pattern;
  */
 public class IRIUtils {
 
-    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<namespace>(?<protocol>[\\w\\-]+):(?<dblSlashes>\\/\\/)?(?<domain>([\\w\\-_:@]+\\.)*[\\w\\-_:]*))((?<path>\\/([\\w\\-\\._\\:]+\\/)*)(?<finalPath>[\\w\\-\\._\\:]+)?(?<query>\\?[\\w\\-_\\:\\?\\=]+)?(?<anchor>(\\#))?(?<fragment>([\\w\\-_]+))?)?$");
+    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<namespace>" +
+            "(?<protocol>[\\w\\-]+):(?<dblSlashes>\\/\\/)?" +
+            "(?<domain>([\\w\\-_:@]+\\.)*[\\w\\-_:]*))" +
+            "((?<path>\\/([\\w\\-\\._\\:]+\\/)*)" +
+            "(?<finalPath>[\\w\\-\\._\\:]+)?" +
+            "(?<query>\\?[\\w\\-_\\:\\?\\=]+)?" +
+            "(?<anchor>(\\#))?" +
+            "(?<fragment>([\\w\\-_]+))?)?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
