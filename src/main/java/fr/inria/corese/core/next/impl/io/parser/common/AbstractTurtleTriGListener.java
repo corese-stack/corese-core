@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.common;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
@@ -26,6 +27,8 @@ public abstract class AbstractTurtleTriGListener {
 
     public Resource currentSubject;
     public IRI currentPredicate;
+
+    private final java.util.Set<String> explicitlyDeclaredPrefixes = new java.util.HashSet<>();
 
     /**
      * Constructs a parser listener with the specified model, factory and base URI.
@@ -56,6 +59,7 @@ public abstract class AbstractTurtleTriGListener {
      *
      * @param text raw IRI text including angle brackets
      * @return unescaped IRI string
+     * @throws ParsingErrorException if the IRI contains invalid characters after escape processing
      */
     public String extractAndUnescapeIRI(String text) {
         String iri = text.substring(1, text.length() - 1);
@@ -69,6 +73,8 @@ public abstract class AbstractTurtleTriGListener {
      */
     public void updateBaseURI(String newBase) {
         this.baseURI = resolveIRIAgainstBase(newBase);
+        validateIRI(this.baseURI);
+
         prefixMap.put(ParserConstants.EMPTY_STRING, this.baseURI);
         model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
     }
@@ -81,8 +87,11 @@ public abstract class AbstractTurtleTriGListener {
      */
     public void registerPrefix(String prefix, String iri) {
         String resolvedIRI = resolveIRIAgainstBase(iri);
+        validateIRI(resolvedIRI);
         prefixMap.put(prefix, resolvedIRI);
         model.setNamespace(prefix, resolvedIRI);
+
+        explicitlyDeclaredPrefixes.add(prefix);
     }
 
     /**
@@ -109,6 +118,7 @@ public abstract class AbstractTurtleTriGListener {
             if (raw.startsWith(ParserConstants.IRI_START) && raw.endsWith(ParserConstants.IRI_END)) {
                 String iri = raw.substring(1, raw.length() - 1);
                 iri = unescapeIRI(iri);
+                validateIRI(iri);
                 return iri.isEmpty() ? getEffectiveBaseURI() : resolveIRIAgainstBase(iri);
             }
 
@@ -117,24 +127,31 @@ public abstract class AbstractTurtleTriGListener {
                 String prefix = parts[0];
                 String localName = parts[1];
 
+                if (prefix.isEmpty() && !explicitlyDeclaredPrefixes.contains("")) {
+                    throw new ParsingErrorException(
+                            "Syntax error: prefixed name ':' + '" + localName + "' used but ':' prefix was never declared. " +
+                                    "Use @prefix : <baseURI> to declare the empty prefix."
+                    );
+                }
+
                 if (prefixMap.containsKey(prefix)) {
                     localName = unescapeIRI(localName);
                     String ns = prefixMap.get(prefix);
                     if (ns != null) {
-                        return ns + localName;
+                        String result = ns + localName;
+                        validateIRI(result);
+                        return result;
                     }
-                }
-
-                if (isAbsoluteIRI(raw)) {
+                } else if (isAbsoluteIRI(raw)) {
                     return raw;
+                } else {
+                    throw new ParsingErrorException("Undeclared prefix: " + prefix);
                 }
-
-                throw new ParsingErrorException("Undeclared prefix: " + prefix);
             }
 
             return resolveIRIAgainstBase(raw);
 
-        } catch (IllegalArgumentException e) {
+        } catch (ParsingErrorException e) {
             throw new ParsingErrorException(e.getMessage(), e);
         }
     }
@@ -448,6 +465,7 @@ public abstract class AbstractTurtleTriGListener {
         String effective = (baseURI != null && !baseURI.isEmpty()) ? baseURI : ParserConstants.getDefaultBaseURI();
         return normalizeURI(effective);
     }
+
     /**
      * Processes Unicode escape sequences in IRIs.
      *
@@ -619,15 +637,44 @@ public abstract class AbstractTurtleTriGListener {
      * @return numeric literal with corresponding XSD datatype
      */
     public Literal createNumericLiteral(String text, NumericType type) {
-        switch (type) {
-            case DOUBLE:
-                return factory.createLiteral(text, XSD.DOUBLE.getIRI());
-            case DECIMAL:
-                return factory.createLiteral(text, XSD.DECIMAL.getIRI());
-            case INTEGER:
-            default:
-                return factory.createLiteral(text, XSD.INTEGER.getIRI());
+        return switch (type) {
+            case DOUBLE -> factory.createLiteral(text, XSD.DOUBLE.getIRI());
+            case DECIMAL -> factory.createLiteral(text, XSD.DECIMAL.getIRI());
+            default -> factory.createLiteral(text, XSD.INTEGER.getIRI());
+        };
+    }
+
+    /**
+     * Validates that an IRI contains only valid characters after escape sequence processing.
+     *
+     * @param iri the IRI string to validate (after escape sequences have been processed)
+     * @return true if the IRI is valid
+     * @throws ParsingErrorException if the IRI contains forbidden characters
+     */
+    private boolean validateIRI(String iri) throws ParsingErrorException {
+        if (iri == null || iri.isEmpty()) {
+            return true;  // Empty IRIs are acceptable
         }
+
+        // Check each character in the IRI
+        for (int i = 0; i < iri.length(); i++) {
+            char c = iri.charAt(i);
+
+            // Check for forbidden characters
+            if (IRIUtils.isInvalidIRICharacter(c)) {
+                String codePoint = String.format("U+%04X", (int) c);
+                String charDesc = IRIUtils.getCharacterDescription(c);
+                String displayIRI = IRIUtils.escapeForDisplay(iri);
+
+                throw new ParsingErrorException(
+                        "Invalid character in IRI: " + codePoint + " (" + charDesc + ") " +
+                                "at position " + i + ". " +
+                                "IRI after escape processing: " + displayIRI + ". " +
+                                "IRIs cannot contain space, control characters, or reserved characters."
+                );
+            }
+        }
+        return true;
     }
 
     /**

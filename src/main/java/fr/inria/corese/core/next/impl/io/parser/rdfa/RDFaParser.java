@@ -16,6 +16,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,6 +29,8 @@ import java.util.*;
  * RDFa parser. This parser will load the RDF data stored as RDFa in an HTML page. Its inner implementation is based on the jsoup library. It loads the html page as DOM and process it following the <a href="https://www.w3.org/TR/rdfa-syntax/#sec_5.5.">recommended algorithm in the RDFa recommendation.</a>
  */
 public class RDFaParser extends AbstractRDFParser {
+
+    private static final String BASE_TAG = "base";
 
     private static final String REL_ATTR = "rel";
     private static final String REV_ATTR = "rev";
@@ -89,10 +93,10 @@ public class RDFaParser extends AbstractRDFParser {
         if (baseIri.stringValue().equals(IOConstants.getDefaultBaseURI())) {
             // Looking for the <base> node in the document
             IRI baseIriFromXml = baseIri;
-            Iterator<Element> baseElementIterator = document.stream().filter(element -> element.nameIs("base")).iterator();
+            Iterator<Element> baseElementIterator = document.stream().filter(element -> element.nameIs(BASE_TAG)).iterator();
             while (baseElementIterator.hasNext()) {
                 Element baseElement = baseElementIterator.next();
-                Attribute baseElementHrefAttribute = baseElement.attribute("href");
+                Attribute baseElementHrefAttribute = baseElement.attribute(HREF_ATTR);
                 if (baseElementHrefAttribute != null) {
                     String baseIriString = baseElementHrefAttribute.getValue();
                     baseIriFromXml = getValueFactory().createIRI(baseIriString);
@@ -288,7 +292,6 @@ public class RDFaParser extends AbstractRDFParser {
                 } else {
                     currentObjectLiteral = this.getValueFactory().createLiteral(value);
                 }
-
                 this.getModel().add(newSubject, property, currentObjectLiteral);
             }
         }

@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.util;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 
 import java.util.Map;
 
@@ -92,17 +93,6 @@ public class StatementUtils {
      * @param value The Value to check.
      * @return true if the value is a blank node, false otherwise.
      */
-    public static boolean isBlankNode(Value value) {
-        return value != null && value.isBNode();
-    }
-
-    /**
-     * Extracts the identifier string from a blank node Value.
-     * For blank nodes, this returns the local identifier without the ":_" prefix.
-     *
-     * @param value The blank node Value from which to extract the identifier.
-     * @return The blank node identifier string, or null if the value is not a blank node.
-     */
     public static String getBlankNodeId(Value value) {
         if (value == null) return null;
         if (isBlankNode(value)) {
@@ -114,6 +104,32 @@ public class StatementUtils {
         }
         return null;
     }
+
+    /**
+     * Extracts the identifier string from a blank node Value.
+     * For blank nodes, this returns the local identifier without the ":_" prefix.
+     *
+     * @param value The blank node Value from which to extract the identifier.
+     * @return The blank node identifier string, or null if the value is not a blank node.
+     */
+    public static boolean isBlankNode(Value value) {
+        if (value == null) return false;
+
+        if (value.isBNode()) {
+            return true;
+        }
+
+        if (value instanceof Resource) {
+            String str = value.stringValue();
+            if (str.startsWith(SerializationConstants.BLANK_NODE_PREFIX)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 
     /**
      * Serializes a Value for lexicographic comparison according to RDFC-1.0 specifications.
@@ -169,23 +185,68 @@ public class StatementUtils {
         StringBuilder sb = new StringBuilder();
 
         // Escape special characters in the literal label
-        String escapedLabel = literal.getLabel()
-                .replace(SerializationConstants.BACK_SLASH, "\\\\")
-                .replace(SerializationConstants.QUOTE, "\\\"");
-
+        String escapedLabel = escapeLiteralString(literal.getLabel());
         sb.append('"').append(escapedLabel).append('"');
 
-        // Handle datatype or language tag
+        String datatype = null;
+        String language = null;
+
+        // Get datatype
         if (literal.getDatatype() != null) {
-            String datatypeUri = literal.getDatatype().stringValue();
-            // Omit xsd:string datatype for brevity (implied by default)
-            if (!"http://www.w3.org/2001/XMLSchema#string".equals(datatypeUri)) {
-                sb.append(SerializationConstants.DATATYPE_SEPARATOR).append(serializeForComparison(literal.getDatatype()));
-            }
-        } else if (literal.getLanguage() != null) {
-            sb.append(SerializationConstants.AT).append(literal.getLanguage());
+            datatype = literal.getDatatype().stringValue();
         }
 
+        // Get language (getLanguage() returns Optional<String>)
+        if (literal.getLanguage().isPresent()) {
+            language = literal.getLanguage().get();
+        }
+
+        // If language tag exists, use it (language takes precedence over datatype)
+        if (language != null && !language.isEmpty()) {
+            sb.append(SerializationConstants.AT).append(language);
+            return sb.toString();
+        }
+
+        if (datatype != null && !datatype.equals(XSD.xsdString.getIRI().stringValue())) {
+            sb.append(SerializationConstants.DATATYPE_SEPARATOR)
+                    .append(SerializationConstants.LT)
+                    .append(datatype)
+                    .append(SerializationConstants.GT);
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Properly escape special characters in literal strings according to Turtle/N-Quads spec.
+     */
+    private static String escapeLiteralString(String label) {
+        if (label == null) return "";
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < label.length(); i++) {
+            char c = label.charAt(i);
+            switch (c) {
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    sb.append(c);
+                    break;
+            }
+        }
         return sb.toString();
     }
 
@@ -223,6 +284,5 @@ public class StatementUtils {
 
         return sb.toString();
     }
-
 
 }

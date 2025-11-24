@@ -67,7 +67,15 @@ public class CoreseIRITest extends IRITest {
 
     @Test
     public void constructorStringException() {
-        assertThrows(IncorrectFormatException.class, () -> new CoreseIRI("test"));
+
+        assertThrows(IncorrectFormatException.class, () -> new CoreseIRI("   "));
+
+        assertThrows(IncorrectFormatException.class, () -> new CoreseIRI("\u00A0"));
+
+        assertThrows(IncorrectFormatException.class, () -> new CoreseIRI(""));
+
+        assertThrows(IncorrectFormatException.class, () -> new CoreseIRI("test string"));
+
     }
 
 }

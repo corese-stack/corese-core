@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 /**
  * Utility class for IRI.
- *
+ * <p>
  * Intended to facilitate string manipulation related to IRI.
  */
 public class IRIUtils {
@@ -23,6 +23,7 @@ public class IRIUtils {
             "(?<anchor>(\\#))?" +
             "(?<fragment>([\\w\\-_]+))?)?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
+    private static final Pattern RELATIVE_IRI_PATTERN = Pattern.compile("^[^\\s\\p{Cc}]+$");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
 
@@ -35,28 +36,35 @@ public class IRIUtils {
 
     /**
      * Guesses the namespace of an IRI using a regex pattern.
+     *
      * @param iri The IRI string to be processed.
      * @return the guessed namespace of the IRI or an empty string if no match is found.
      */
     public static String guessNamespace(String iri) {
-        if (!isValidInput(iri)) {
+        if (isInvalidInput(iri)) {
             return "";
         }
         try {
             Matcher matcher = matchWithTimeout(IRI_PATTERN, iri);
             if (matcher == null || !matcher.matches()) {
-                return "";
+                if (iri.endsWith("#")) {
+                    return iri;
+                } else if (iri.contains("#")) {
+                    return iri.substring(0, iri.lastIndexOf("#") + 1);
+                } else {
+                    return iri;
+                }
             } else if (matcher.matches()) {
                 if (matcher.group("protocol") != null && matcher.group("protocol").equals("_")) {
                     return "";
                 }
                 StringBuilder namespace = new StringBuilder();
                 namespace.append(matcher.group("protocol")).append(":");
-                if(matcher.group("dblSlashes") != null) {
+                if (matcher.group("dblSlashes") != null) {
                     namespace.append(matcher.group("dblSlashes"));
                 }
                 namespace.append(matcher.group("domain"));
-                if(matcher.group("path") != null) {
+                if (matcher.group("path") != null) {
                     namespace.append(matcher.group("path"));
                 }
                 if((matcher.group("fragment") != null || matcher.group("anchor") != null) && matcher.group("finalPath") != null) {
@@ -74,21 +82,22 @@ public class IRIUtils {
 
     /**
      * Guesses the local name of an IRI using a regex pattern.
+     *
      * @param iri The IRI string to be processed.
      * @return the guessed local name of the IRI or an empty string if no match is found.
      */
     public static String guessLocalName(String iri) {
-        if (!isValidInput(iri)) {
+        if (isInvalidInput(iri)) {
             return "";
         }
         try {
             Matcher matcher = matchWithTimeout(IRI_PATTERN, iri);
             if (matcher == null || !matcher.matches()) {
-                return "";
+                return iri;
             } else if (matcher.matches()) {
-                if(matcher.group("fragment") != null){ // If the IRI has a fragment
+                if (matcher.group("fragment") != null) { // If the IRI has a fragment
                     return matcher.group("fragment");
-                } else if(matcher.group("finalPath") != null ) { // If the IRI has no fragment but do not ends with a slash
+                } else if (matcher.group("finalPath") != null) { // If the IRI has no fragment but do not ends with a slash
                     return matcher.group("finalPath");
                 } else { // If the URI ends with a slash
                     return "";
@@ -120,6 +129,17 @@ public class IRIUtils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+
+    /**
+     * Validates input string for basic security checks.
+     */
+    private static boolean isValidInput(String input) {
+        return input != null &&
+                !input.isEmpty() &&
+                input.length() <= MAX_IRI_LENGTH &&
+                !containsSuspiciousPatterns(input);
     }
 
     /**
@@ -154,11 +174,11 @@ public class IRIUtils {
     /**
      * Validates input string for basic security checks.
      */
-    private static boolean isValidInput(String input) {
-        return input != null &&
-                !input.isEmpty() &&
-                input.length() <= MAX_IRI_LENGTH &&
-                !containsSuspiciousPatterns(input);
+    private static boolean isInvalidInput(String input) {
+        return input == null ||
+                input.isEmpty() ||
+                input.length() > MAX_IRI_LENGTH ||
+                containsSuspiciousPatterns(input);
     }
 
     /**
@@ -192,5 +212,108 @@ public class IRIUtils {
         } catch (URISyntaxException e) {
             return false;
         }
+    }
+
+    /**
+     * Checks if a character is invalid in an IRI according to RFC
+     *
+     * @param c the character to validate
+     * @return true if the character is forbidden in IRIs
+     */
+    public static boolean isInvalidIRICharacter(char c) {
+        if (c >= 0x00 && c <= 0x1F) {
+            return true;
+        }
+
+        // DEL (U+007F) - NOT ALLOWED
+        if (c == 0x7F) {
+            return true;
+        }
+
+        // High control characters (U+0080-U+009F) - NOT ALLOWED
+        if (c >= 0x80 && c <= 0x9F) {
+            return true;
+        }
+
+        return switch (c) {
+            case '<', '>', '{', '}', '\\', '^', '`', '|', '"' -> true;
+            default -> false;
+        };
+    }
+
+    /**
+     * Returns a human-readable description of a character for error messages.
+     *
+     * @param c the character to describe
+     * @return human-readable description
+     */
+    public static String getCharacterDescription(char c) {
+        switch (c) {
+            case 0x00:
+                return "null character";
+            case 0x09:
+                return "tab";
+            case 0x0A:
+                return "line feed";
+            case 0x0D:
+                return "carriage return";
+            case 0x20:
+                return "space";
+            case 0x7F:
+                return "delete";
+            case '<':
+                return "less than";
+            case '>':
+                return "greater than";
+            case '{':
+                return "left curly bracket";
+            case '}':
+                return "right curly bracket";
+            case '\\':
+                return "backslash";
+            case '^':
+                return "circumflex";
+            case '`':
+                return "grave accent";
+            case '|':
+                return "pipe";
+            case '"':
+                return "quotation mark";
+            default:
+                if (c < 0x20) {
+                    return "control character";
+                } else if (c >= 0x80 && c <= 0x9F) {
+                    return "high control character";
+                } else {
+                    return String.format("character '%c'", c);
+                }
+        }
+    }
+
+    /**
+     * Escapes characters in a string for display in error messages.
+     *
+     * @param iri the IRI to escape for display
+     * @return escaped version suitable for error messages
+     */
+    public static String escapeForDisplay(String iri) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < iri.length(); i++) {
+            char c = iri.charAt(i);
+            if (c < 0x20 || (c >= 0x7F && c <= 0x9F)) {
+                // Display control characters as Unicode escapes
+                sb.append(String.format("\\u%04X", (int) c));
+            } else if (c > 0x7E) {
+                // Display non-ASCII as Unicode escapes for clarity
+                sb.append(String.format("\\u%04X", (int) c));
+            } else if (c == '<' || c == '>' || c == '{' || c == '}' || c == '\\' || c == '^' || c == '`' || c == '|' || c == '"') {
+                // Display reserved characters with backslash escape
+                sb.append('\\').append(c);
+            } else {
+                // Display normal ASCII characters as-is
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 }
