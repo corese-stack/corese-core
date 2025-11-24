@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.rdfa;
 
 import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 
 /**
@@ -24,7 +25,7 @@ public class RDFaParserOptions extends AbstractIOOptions implements BaseIRIOptio
 
     public static class Builder extends AbstractIOOptions.Builder<RDFaParserOptions> {
 
-        protected String baseIRI = ParserConstants.getDefaultBaseURI();
+        protected String baseIRI = IOConstants.getDefaultBaseURI();
 
         @Override
         public RDFaParserOptions build() {

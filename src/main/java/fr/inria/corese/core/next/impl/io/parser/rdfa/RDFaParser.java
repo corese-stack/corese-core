@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
+import fr.inria.corese.core.next.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.io.parser.rdfa.model.RDFaIncompleteStatement;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -85,7 +86,7 @@ public class RDFaParser extends AbstractRDFParser {
      */
     private void processDocument(Document document, IRI baseIri) {
         // If the base Iri in argument is not the default baseIri, then we take it, else we use the one in the document
-        if (baseIri.stringValue().equals(ParserConstants.getDefaultBaseURI())) {
+        if (baseIri.stringValue().equals(IOConstants.getDefaultBaseURI())) {
             // Looking for the <base> node in the document
             IRI baseIriFromXml = baseIri;
             Iterator<Element> baseElementIterator = document.stream().filter(element -> element.nameIs("base")).iterator();
@@ -97,7 +98,6 @@ public class RDFaParser extends AbstractRDFParser {
                     baseIriFromXml = getValueFactory().createIRI(baseIriString);
                 }
             }
-            ;
 
             baseIri = this.getValueFactory().createIRI(baseIriFromXml.stringValue());
         }
@@ -108,7 +108,6 @@ public class RDFaParser extends AbstractRDFParser {
     }
 
     /**
-     *
      * @param element     Current element
      * @param context     Active context
      * @param recursive   Processing generally continues recursively through the entire tree of elements available. However, if an author indicates that some branch of the tree should be treated as an XML literal, no further processing should take place on that branch, and setting this flag to false would have that effect.

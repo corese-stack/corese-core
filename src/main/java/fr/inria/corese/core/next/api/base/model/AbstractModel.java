@@ -346,11 +346,6 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         }
 
         @Override
-        public boolean equals(Object o) {
-            return o instanceof Model && this.size() == ((Model) o).size() && ((Model) o).containsAll(this);
-        }
-
-        @Override
         public boolean addAll(Collection<? extends V> collection) {
             boolean modified = false;
 
@@ -614,6 +609,20 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
         } else if (collection instanceof ValueSet) {
             ((ValueSet<?>) collection).closeIterator(iterator);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Model model && this.size() == model.size() && model.containsAll(this);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 13;
+        for (Statement stat : this) {
+            hash = 31 * hash + stat.hashCode();
+        }
+        return hash;
     }
 
 }

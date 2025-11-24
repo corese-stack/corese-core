@@ -5,29 +5,33 @@ import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Value;
 
 /**
- * This class represents triples in the process of creation during the chaining of element in an RDFa document.
+ * This utility class represents triples in the process of creation during the chaining of element in an RDFa document.
+ * This class in not intended to be used anywhere outside the RDFa parser
+ * @see <a href="https://www.w3.org/TR/rdfa-core/#s_Completing_Incomplete_Triples">Incomplete triples</a>
  */
 public class RDFaIncompleteStatement {
-
-    private Resource subject = null;
-    private IRI predicate = null;
-    private Value object = null;
-    private Direction direction = Direction.FORWARD;
 
     public enum Direction {
         FORWARD,
         BACKWARD
     }
 
-    private RDFaIncompleteStatement() {
+    private Resource subject = null;
+    private IRI predicate = null;
+    private Value object = null;
+    private Direction direction = null;
 
+    private RDFaIncompleteStatement() {
+        this.direction = Direction.FORWARD;
     }
 
     public RDFaIncompleteStatement(IRI predicate) {
+        this();
         this.predicate = predicate;
     }
 
     public RDFaIncompleteStatement(IRI predicate, Direction direction) {
+        this();
         this.predicate = predicate;
         this.direction = direction;
     }
@@ -119,11 +123,20 @@ public class RDFaIncompleteStatement {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if(! (o instanceof RDFaIncompleteStatement oStat)) {
+            return false;
+        }
+        return oStat.getSubject() == this.getSubject() && oStat.getPredicate() == this.getPredicate() && oStat.getObject() == this.getObject() && oStat.getDirection() == this.getDirection();
+    }
+
+    @Override
     public int hashCode() {
         int hash = 7;
         hash = 31 * hash + (getSubject() == null ? 0 : getSubject().hashCode());
         hash = 31 * hash + (getPredicate() == null ? 0 : getPredicate().hashCode());
         hash = 31 * hash + (getObject() == null ? 0 : getObject().hashCode());
+        hash = 31 * hash + (getDirection() == null ? 0 : getDirection().hashCode());
         return hash;
     }
 }

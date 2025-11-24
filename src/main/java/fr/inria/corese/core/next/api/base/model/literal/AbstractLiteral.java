@@ -184,6 +184,15 @@ public abstract class AbstractLiteral implements Literal {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + (this.getLabel() == null ? 0 : this.getLabel().hashCode());
+        hash = 31 * hash + (this.getDatatype() == null ? 0 : this.getDatatype().hashCode());
+        hash = 31 * hash + (this.getLanguage().isEmpty() ? 0 : this.getLanguage().get().hashCode());
+        return hash;
+    }
+
+    @Override
     public String toString() {
         return this.stringValue();
     }

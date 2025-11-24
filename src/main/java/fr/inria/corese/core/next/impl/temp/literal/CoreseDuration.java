@@ -105,11 +105,16 @@ public class CoreseDuration extends AbstractDuration implements CoreseDatatypeAd
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof CoreseDuration) {
-            return this.coreseObject.equals(((CoreseDuration) obj).coreseObject);
+        if (obj instanceof CoreseDuration coreseDuration) {
+            return this.coreseObject.equals(coreseDuration.coreseObject);
         } else if (obj instanceof AbstractDuration) {
             return super.equals(obj);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.coreseObject.hashCode();
     }
 }

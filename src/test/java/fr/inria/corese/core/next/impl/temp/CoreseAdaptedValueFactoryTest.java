@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.impl.temp;
 
 import java.time.Duration;
 
-import fr.inria.corese.core.next.impl.temp.literal.CoreseDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
