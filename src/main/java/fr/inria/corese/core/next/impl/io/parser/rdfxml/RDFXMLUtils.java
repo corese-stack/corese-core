@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
+import fr.inria.corese.core.next.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 import org.xml.sax.*;
 import java.util.List;
@@ -62,27 +63,120 @@ public class RDFXMLUtils {
             return fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdString.getNamespace()
                     + qname.substring(xsdPrefix.length());
         }
-               return qname;
+        return qname;
+    }
+
+    /**
+     * Validates if a string is a valid XML Name according to XML 1.0 specification.
+     * An XML Name must start with a letter, underscore, or colon, and can contain
+     * letters, digits, hyphens, underscores, colons, and periods.
+     * Special RDF/XML rule: Names cannot start with "_:" (reserved for blank nodes).
+     *
+     * @param name the string to validate
+     * @param isRdfIdAttribute true if validating rdf:ID or rdf:bagID (disallows "_:" prefix)
+     * @return true if the string is a valid XML Name
+     */
+    public static boolean isValidXMLName(String name, boolean isRdfIdAttribute) {
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
+
+        // RDF/XML specific: rdf:ID and rdf:bagID cannot start with "_:"
+        // RDF/XML specific: rdf:nodeID cannot start with "_:" or contain ":"
+        if (name.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
+            return false;
+        }
+
+        // For rdf:nodeID, colons are not allowed (NCName restriction)
+        if (!isRdfIdAttribute && name.contains(IOConstants.COLON)) {
+            return false;
+        }
+
+        char first = name.charAt(0);
+        // XML Name must start with: Letter | '_' | ':'
+        // For simplicity, we check: not a digit, not a hyphen, not a period
+        if (Character.isDigit(first) || first == '-' || first == '.') {
+            return false;
+        }
+
+        // Additional validation: check all characters are valid
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            // Valid chars: letters, digits, '.', '-', '_', ':'
+            if (!Character.isLetterOrDigit(c) && c != '.' && c != '-' && c != '_' && c != ':') {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
      * Extracts a subject resource from RDF/XML attributes.
-     * Supports rdf:about, rdf:nodeID, rdf:ID.
+     * Supports rdf:about, rdf:nodeID, rdf:ID, and rdf:bagID.
      *
      * @param attrs    the XML attributes
      * @param factory  the value factory
      * @param baseURI  the base URI for resolving relative IRIs
      * @return a Resource representing the subject
+     * @throws ParsingErrorException if rdf:ID, rdf:nodeID, or rdf:bagID value is not a valid XML Name,
+     *                               if conflicting attributes are present, or if obsolete attributes are used
      */
     public static Resource extractSubject(Attributes attrs, ValueFactory factory, String baseURI) {
+        // Check for obsolete attributes (removed in RDF 1.1)
+        String aboutEach = attrs.getValue(RDF.type.getNamespace(), "aboutEach");
+        String aboutEachPrefix = attrs.getValue(RDF.type.getNamespace(), "aboutEachPrefix");
+
+        if (aboutEach != null) {
+            throw new ParsingErrorException("rdf:aboutEach is not supported. " +
+                    "This attribute was removed from RDF specifications.");
+        }
+        if (aboutEachPrefix != null) {
+            throw new ParsingErrorException("rdf:aboutEachPrefix is not supported. " +
+                    "This attribute was removed from RDF specifications.");
+        }
+
         String about = attrs.getValue(RDF.type.getNamespace(), "about");
-        if (about != null) return factory.createIRI(resolveAgainstBase(about, baseURI));
-
         String nodeID = attrs.getValue(RDF.type.getNamespace(), "nodeID");
-        if (nodeID != null) return factory.createBNode(ParserConstants.BLANK_NODE_PREFIX + nodeID);
-
         String id = attrs.getValue(RDF.type.getNamespace(), "ID");
-        if (id != null) return factory.createIRI(resolveAgainstBase("#" + id, baseURI));
+        String bagID = attrs.getValue(RDF.type.getNamespace(), "bagID");
+
+        // Check for conflicting attributes
+        int count = (about != null ? 1 : 0) + (nodeID != null ? 1 : 0) + (id != null ? 1 : 0) + (bagID != null ? 1 : 0);
+        if (count > 1) {
+            throw new ParsingErrorException("Cannot have multiple subject-identifying attributes. " +
+                    "Only one of rdf:about, rdf:nodeID, rdf:ID, or rdf:bagID is allowed per element.");
+        }
+
+        if (about != null) {
+            return factory.createIRI(resolveAgainstBase(about, baseURI));
+        }
+
+        if (nodeID != null) {
+            if (!isValidXMLName(nodeID, false)) {
+                throw new ParsingErrorException("rdf:nodeID value '" + nodeID + "' is not a valid XML Name. " +
+                        "XML Names must start with a letter, underscore, or colon, not a digit or hyphen.");
+            }
+            return factory.createBNode(ParserConstants.BLANK_NODE_PREFIX + nodeID);
+        }
+
+        if (id != null) {
+            if (!isValidXMLName(id, true)) {
+                throw new ParsingErrorException("rdf:ID value '" + id + "' is not a valid XML Name. " +
+                        "XML Names must start with a letter, underscore, or colon, not a digit or hyphen. " +
+                        "Additionally, rdf:ID cannot start with '_:'.");
+            }
+            return factory.createIRI(resolveAgainstBase("#" + id, baseURI));
+        }
+
+        if (bagID != null) {
+            if (!isValidXMLName(bagID, true)) {
+                throw new ParsingErrorException("rdf:bagID value '" + bagID + "' is not a valid XML Name. " +
+                        "XML Names must start with a letter, underscore, or colon, not a digit or hyphen. " +
+                        "Additionally, rdf:bagID cannot start with '_:'.");
+            }
+            return factory.createIRI(resolveAgainstBase("#" + bagID, baseURI));
+        }
 
         // Default to blank node
         return factory.createBNode();
@@ -154,28 +248,13 @@ public class RDFXMLUtils {
      * @return true if the attribute is considered syntax-related
      */
     public static boolean isSyntaxAttribute(String uri, String localName, String qName) {
-        if (uri != null && RDF.type.getNamespace().equals(uri)) {
+        if (RDF.type.getNamespace().equals(uri)) {
             return switch (localName) {
                 case "about", "ID", "nodeID", "resource", "parseType", "datatype" -> true;
                 default -> false;
             };
         }
         return qName.startsWith("xml:");
-    }
-
-    /**
-     * Resolves an XSD datatype from a URI.
-     *
-     * @param uri the datatype URI
-     * @return an Optional containing the XSD constant if matched
-     */
-    public static Optional<XSD> fromURI(String uri) {
-        for (XSD xsd : XSD.values()) {
-            if (xsd.getIRI().stringValue().equals(uri)) {
-                return Optional.of(xsd);
-            }
-        }
-        return Optional.empty();
     }
 
     /**
@@ -186,7 +265,7 @@ public class RDFXMLUtils {
      * @return true if the element is rdf:RDF
      */
     public static boolean isRdfRDF(String uri, String localName) {
-        return RDF.type.equals(uri) && "RDF".equals(localName);
+        return RDF.type.getNamespace().equals(uri) && "RDF".equals(localName);
     }
 
     /**
