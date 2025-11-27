@@ -23,7 +23,6 @@ public class IRIUtils {
             "(?<anchor>(\\#))?" +
             "(?<fragment>([\\w\\-_]+))?)?$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
-    private static final Pattern RELATIVE_IRI_PATTERN = Pattern.compile("^[^\\s\\p{Cc}]+$");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
 
@@ -119,7 +118,9 @@ public class IRIUtils {
         if (!isValidInput(iriString)) {
             return false;
         }
-
+        if (isShortIRI(iriString)) {
+            return true;
+        }
         try {
             Matcher matcher = matchWithTimeout(STANDARD_IRI_PATTERN, iriString);
             if (matcher != null && matcher.matches()) {
@@ -131,6 +132,18 @@ public class IRIUtils {
         }
     }
 
+    /**
+     * Checks if this is a short IRI that should be accepted in lenient mode.
+     */
+    private static boolean isShortIRI(String iri) {
+        return iri != null &&
+
+                iri.length() <= 10 &&
+                !iri.contains(":") &&
+                !iri.contains("/") &&
+                !iri.contains(" ") &&
+                iri.matches("[a-zA-Z0-9]+");
+    }
 
     /**
      * Validates input string for basic security checks.
