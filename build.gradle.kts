@@ -16,6 +16,7 @@ plugins {
     id("org.sonarqube") version "6.1.0.5360"                    // SonarQube integration
     id("com.intershop.gradle.javacc") version "5.0.1"           // JavaCC plugin for parsing JavaCC files
     id("antlr")                                                 // Antlr plugin for generating parsers from grammar files
+    `eclipse`                                                   // Eclipse plugin for IDE integration
 }
 
 // SonarQube configuration
