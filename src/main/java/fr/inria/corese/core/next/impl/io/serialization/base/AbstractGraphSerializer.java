@@ -1,44 +1,22 @@
 package fr.inria.corese.core.next.impl.io.serialization.base;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-
+import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
-import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.serialization.option.*;
+import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.api.Value;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOption;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
-import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
-import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for RDF serializers based on TriG and Turtle syntax.
@@ -105,8 +83,14 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      */
     private void initializePrefixes() {
         if (option instanceof AbstractTFamilyOption && getTFamilyOption().usePrefixes()) {
-            for (Map.Entry<String, String> entry : getTFamilyOption().getCustomPrefixes().entrySet()) {
-                addPrefixMapping(entry.getValue(), entry.getKey());
+            AbstractTFamilyOption tFamilyOption = getTFamilyOption();
+            PrefixHandler prefixHandler = tFamilyOption.getPrefixHandler();
+
+            for (String prefix : prefixHandler.getPrefixes()) {
+                String namespace = prefixHandler.getNamespace(prefix);
+                if (namespace != null) {
+                    addPrefixMapping(namespace, prefix);
+                }
             }
         }
     }
@@ -385,10 +369,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         String value = literal.stringValue();
 
         boolean useTripleQuotes = false;
-        if (option instanceof AbstractSerializerOption) {
-            useTripleQuotes = getTFamilyOption().shouldUseTripleQuotes(value);
+        if (option instanceof AbstractTFamilyOption) {
+            useTripleQuotes = getTFamilyOption().useMultilineLiterals() &&
+                    (value.contains(SerializationConstants.LINE_FEED) || value.contains(SerializationConstants.CARRIAGE_RETURN) || value.contains("\"\"\""));
         }
-
 
         if (useTripleQuotes) {
             writer.write(String.format("\"\"\"%s\"\"\"", escapeMultilineLiteralString(value)));

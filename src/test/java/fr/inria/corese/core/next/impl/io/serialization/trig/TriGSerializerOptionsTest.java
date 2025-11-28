@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.impl.io.serialization.trig;
 
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
@@ -34,13 +35,18 @@ class TriGSerializerOptionsTest {
         assertEquals(BlankNodeStyleEnum.NAMED, config.getBlankNodeStyle(), "Default blankNodeStyle should be NAMED for TriG");
         assertFalse(config.useCollections(), "Default useCollections should be false for TriG");
 
-        Map<String, String> expectedPrefixes = new HashMap<>();
-        expectedPrefixes.put(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
-        expectedPrefixes.put(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
-        expectedPrefixes.put(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
-        expectedPrefixes.put(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
-        assertEquals(expectedPrefixes.size(), config.getCustomPrefixes().size(), "Default custom prefixes size mismatch");
-        assertTrue(config.getCustomPrefixes().entrySet().containsAll(expectedPrefixes.entrySet()), "Default custom prefixes should contain common RDF prefixes");
+        PrefixHandler prefixHandler = config.getPrefixHandler();
+        assertNotNull(prefixHandler, "PrefixHandler should not be null");
+
+        assertTrue(prefixHandler.hasPrefix(RDF.getVocabularyPreferredPrefix()), "Should contain rdf prefix");
+        assertTrue(prefixHandler.hasPrefix(RDFS.getVocabularyPreferredPrefix()), "Should contain rdfs prefix");
+        assertTrue(prefixHandler.hasPrefix(XSD.getVocabularyPreferredPrefix()), "Should contain xsd prefix");
+        assertTrue(prefixHandler.hasPrefix(OWL.getVocabularyPreferredPrefix()), "Should contain owl prefix");
+
+        assertEquals(RDF.getVocabularyNamespace(), prefixHandler.getNamespace(RDF.getVocabularyPreferredPrefix()));
+        assertEquals(RDFS.getVocabularyNamespace(), prefixHandler.getNamespace(RDFS.getVocabularyPreferredPrefix()));
+        assertEquals(XSD.getVocabularyNamespace(), prefixHandler.getNamespace(XSD.getVocabularyPreferredPrefix()));
+        assertEquals(OWL.getVocabularyNamespace(), prefixHandler.getNamespace(OWL.getVocabularyPreferredPrefix()));
 
         assertTrue(config.usePrefixes(), "Default usePrefixes should be true");
         assertTrue(config.autoDeclarePrefixes(), "Default autoDeclarePrefixes should be true");
@@ -88,20 +94,6 @@ class TriGSerializerOptionsTest {
         assertTrue(config.useCollections(), "useCollections should be overridden to true");
     }
 
-    @Test
-    @DisplayName("Builder should allow adding custom prefixes")
-    void builder_shouldAllowAddingCustomPrefixes() {
-        String customPrefix = "my";
-        String customNamespace = "http://my.example.org/";
-        TriGSerializerOptions config = TriGSerializerOptions.builder()
-                .addCustomPrefix(customPrefix, customNamespace)
-                .build();
-
-        assertTrue(config.getCustomPrefixes().containsKey(customPrefix), "Custom prefix should be added");
-        assertEquals(customNamespace, config.getCustomPrefixes().get(customPrefix), "Custom prefix namespace should be correct");
-        assertTrue(config.getCustomPrefixes().containsKey("rdf"));
-        assertTrue(config.getCustomPrefixes().containsKey("xsd"));
-    }
 
     @Test
     @DisplayName("Builder should allow overriding usePrefixes")

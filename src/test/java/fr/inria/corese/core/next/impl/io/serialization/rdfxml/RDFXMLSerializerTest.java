@@ -3,10 +3,10 @@ package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ class RDFXMLSerializerTest {
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .autoDeclarePrefixes(true)
                 .usePrefixes(true)
-                .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
+                .addPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -90,7 +90,7 @@ class RDFXMLSerializerTest {
 
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .stableBlankNodeIds(true)
-                .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
+                .addPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -123,7 +123,7 @@ class RDFXMLSerializerTest {
 
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .stableBlankNodeIds(true)
-                .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
+                .addPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -156,7 +156,7 @@ class RDFXMLSerializerTest {
 
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
-                .addCustomPrefix("foaf", "http://xmlns.com/foaf/0.1/")
+                .addPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -187,8 +187,8 @@ class RDFXMLSerializerTest {
 
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
-                .addCustomPrefix("ex", "http://example.org/vocabulary/")
-                .addCustomPrefix("xsd", "http://www.w3.org/2001/XMLSchema#")
+                .addPrefix("ex", "http://example.org/vocabulary/")
+                .addPrefix("xsd", "http://www.w3.org/2001/XMLSchema#")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -218,7 +218,7 @@ class RDFXMLSerializerTest {
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
-                .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
+                .addPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -255,8 +255,8 @@ class RDFXMLSerializerTest {
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
-                .addCustomPrefix("exorg", "http://ex.org/")
-                .addCustomPrefix("excom", "http://ex.com/")
+                .addPrefix("exorg", "http://ex.org/")
+                .addPrefix("excom", "http://ex.com/")
                 .prefixOrdering(PrefixOrderingEnum.USAGE_ORDER)
                 .sortSubjects(false)
                 .build();
@@ -298,7 +298,7 @@ class RDFXMLSerializerTest {
 
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .sortSubjects(true)
-                .addCustomPrefix("ex", "http://ex.org/")
+                .addPrefix("ex", "http://ex.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -364,7 +364,7 @@ class RDFXMLSerializerTest {
 
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
-                .addCustomPrefix("ex", "http://example.org/")
+                .addPrefix("ex", "http://example.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -469,7 +469,7 @@ class RDFXMLSerializerTest {
         RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
                 .stableBlankNodeIds(false)
                 .sortSubjects(true)
-                .addCustomPrefix("ex", "http://example.org/")
+                .addPrefix("ex", "http://example.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 

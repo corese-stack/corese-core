@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.io.serialization.turtle;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
@@ -216,12 +217,15 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
+        PrefixHandler prefixHandler = new PrefixHandler(true);
+        prefixHandler.setPrefix("data", "http://example.org/data/");
+        prefixHandler.setPrefix("dc", "http://purl.org/dc/elements/1.1/");
 
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
-                .addCustomPrefix("dc", "http://purl.org/dc/elements/1.1/")
+                .prefixHandler(prefixHandler)
                 .build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 

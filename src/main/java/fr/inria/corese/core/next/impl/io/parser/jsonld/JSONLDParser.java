@@ -1,9 +1,5 @@
 package fr.inria.corese.core.next.impl.io.parser.jsonld;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URI;
-
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.JsonLdOptions;
 import com.apicatalog.jsonld.document.Document;
@@ -11,20 +7,19 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.processor.ToRdfProcessor;
 import com.apicatalog.rdf.api.RdfConsumerException;
 import com.apicatalog.rdf.api.RdfQuadConsumer;
-
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.api.Value;
-import fr.inria.corese.core.next.api.ValueFactory;
+import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
+
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URI;
 
 /**
  * Parser for JSON-LD RDF files. This parser is based on the Titanium JSON-LD library.
@@ -35,6 +30,11 @@ import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
 public class JSONLDParser extends AbstractRDFParser {
 
     private static final String JSONLD_JAVA_DEFAULT_GRAPH = "@default";
+
+    /**
+     * Prefix handler for managing namespace prefixes.
+     */
+    private final PrefixHandler prefixHandler;
 
     /**
      * Constructor for JSONLDParser that initializes the model and value factory.
@@ -55,11 +55,21 @@ public class JSONLDParser extends AbstractRDFParser {
      */
     public JSONLDParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);
+        this.prefixHandler = new PrefixHandler(true);
     }
 
     @Override
     public RDFFormat getRDFFormat() {
         return RDFFormat.JSONLD;
+    }
+
+    /**
+     * Returns the prefix handler containing namespace prefixes discovered during parsing.
+     *
+     * @return the PrefixHandler instance
+     */
+    public PrefixHandler getPrefixHandler() {
+        return prefixHandler;
     }
 
     /**

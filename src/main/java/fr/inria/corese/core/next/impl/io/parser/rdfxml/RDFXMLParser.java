@@ -1,9 +1,13 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.rdfxml.context.RDFXMLContext;
@@ -48,6 +52,11 @@ public class RDFXMLParser extends AbstractRDFParser {
     private final RDFXMLStatementEmitter emitter;
 
     /**
+     * Prefix handler for managing namespace prefixes discovered during XML parsing.
+     */
+    private final PrefixHandler prefixHandler;
+
+    /**
      * Creates a new parser with a target RDF model and factory.
      *
      * @param model   the RDF model to populate
@@ -68,11 +77,21 @@ public class RDFXMLParser extends AbstractRDFParser {
         super(model, factory, config);
         this.ctx = new RDFXMLContext(getModel(), getValueFactory());
         this.emitter = new RDFXMLStatementEmitter(model, factory);
+        this.prefixHandler = new PrefixHandler(true);
     }
 
     @Override
     public RDFFormat getRDFFormat() {
         return format;
+    }
+
+    /**
+     * Returns the prefix handler containing namespace prefixes discovered during parsing.
+     *
+     * @return the PrefixHandler instance
+     */
+    public PrefixHandler getPrefixHandler() {
+        return prefixHandler;
     }
 
     @Override
