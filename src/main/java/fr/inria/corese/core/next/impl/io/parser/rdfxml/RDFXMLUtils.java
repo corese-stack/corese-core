@@ -62,33 +62,31 @@ public class RDFXMLUtils {
      * Special RDF/XML rule: Names cannot start with "_:" (reserved for blank nodes).
      *
      * @param name the string to validate
-     * @return true if the string is a valid XML Name
+     * @param isRdfIdAttribute true if validating rdf:ID or rdf:bagID (stricter rules)
+     * @return true if the string is INVALID, false if valid
      */
-    public static boolean isInvalidXMLName(String name) {
+    public static boolean isInvalidXMLName(String name, boolean isRdfIdAttribute) {
         if (name == null || name.isEmpty()) {
-            return false;
+            return true;
         }
 
-        // RDF/XML specific: rdf:ID and rdf:bagID cannot start with "_:"
-        // RDF/XML specific: rdf:nodeID cannot start with "_:" or contain ":"
-        if (name.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
-            return false;
+        if (isRdfIdAttribute && name.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
+            return true;
         }
 
         if (name.contains(IOConstants.COLON)) {
-            return false;
+            return true;
         }
 
         char first = name.charAt(0);
-        // XML Name must start with: Letter | '_' | ':'
-        // For simplicity, we check: not a digit, not a hyphen, not a period
+
         if (Character.isDigit(first) || first == '-' || first == '.') {
-            return false;
+            return true;
         }
 
         // First char must be letter or underscore (NCName)
         if (!Character.isLetter(first) && first != '_') {
-            return false;
+            return true;
         }
 
         // Validate all characters (NCName rules - no colon anywhere)
@@ -96,11 +94,11 @@ public class RDFXMLUtils {
             char c = name.charAt(i);
             // Valid chars for NCName: letters, digits, '.', '-', '_' (NO colon)
             if (!Character.isLetterOrDigit(c) && c != '.' && c != '-' && c != '_') {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -146,7 +144,7 @@ public class RDFXMLUtils {
         }
 
         if (nodeID != null) {
-            if (isInvalidXMLName(nodeID)) {
+            if (isInvalidXMLName(nodeID, false)) {
                 throw new ParsingErrorException("rdf:nodeID value '" + nodeID + "' is not a valid NCName. " +
                         "NCNames cannot contain colons and must start with a letter or underscore.");
             }
@@ -154,7 +152,7 @@ public class RDFXMLUtils {
         }
 
         if (id != null) {
-            if (isInvalidXMLName(id)) {
+            if (isInvalidXMLName(id, true)) {
                 throw new ParsingErrorException("rdf:ID value '" + id + "' is not a valid NCName. " +
                         "NCNames cannot contain colons and must start with a letter or underscore. " +
                         "Additionally, rdf:ID cannot start with '_:'.");
@@ -168,7 +166,7 @@ public class RDFXMLUtils {
         }
 
         if (bagID != null) {
-            if (isInvalidXMLName(bagID)) {
+            if (isInvalidXMLName(bagID, true)) {
                 throw new ParsingErrorException("rdf:bagID value '" + bagID + "' is not a valid NCName. " +
                         "NCNames cannot contain colons and must start with a letter or underscore. " +
                         "Additionally, rdf:bagID cannot start with '_:'.");

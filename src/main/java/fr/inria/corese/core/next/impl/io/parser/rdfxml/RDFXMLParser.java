@@ -497,7 +497,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             }
 
             // CRITICAL FIX: Validate nodeID format (must be valid NCName).
-            if (RDFXMLUtils.isInvalidXMLName(nodeID)) {
+            if (RDFXMLUtils.isInvalidXMLName(nodeID, false)) {
                 throw new ParsingErrorException(
                         "rdf:nodeID value '" + nodeID + "' is not a valid NCName. " +
                                 "NCNames cannot contain colons and must start with a letter or underscore.");

@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for the RDFXMLUtils utility class.
- *
  * This test suite validates the correct behavior of various utility methods
  * related to RDF/XML parsing, including QName expansion, datatype resolution,
  * subject extraction, IRI resolution, container detection, syntax attribute recognition,
@@ -52,7 +51,7 @@ public class RDFXMLUtilsTest {
     public void testExtractSubjectWithAbout() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "about", "", "CDATA", "http://example.org/subject");
-        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, null);
+        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, null,null);
         assertEquals("http://example.org/subject", subject.stringValue());
     }
 
@@ -64,7 +63,7 @@ public class RDFXMLUtilsTest {
     public void testExtractSubjectWithNodeID() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "nodeID", "", "CDATA", "b123");
-        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, null);
+        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, null, null);
         assertTrue(subject.stringValue().contains("_:b123"));
     }
 
@@ -75,7 +74,7 @@ public class RDFXMLUtilsTest {
     public void testExtractSubjectWithID() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "ID", "", "CDATA", "id123");
-        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, "http://example.org/");
+        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, "http://example.org/", null);
         assertEquals("http://example.org/id123", subject.stringValue());
     }
 

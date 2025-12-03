@@ -1,48 +1,30 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOption;
+import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
-import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import fr.inria.corese.core.next.api.BNode;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
-import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOption;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Circular tests for RDF/XML parser and serializer integration.
  * These tests verify that data can be correctly serialized to RDF/XML format
  * and then parsed back to an equivalent model (round-trip testing).
- * 
  * The circular testing approach ensures that the parser and serializer
  * are compatible and preserve data integrity across format transformations.
- * 
- * RDF/XML supports namespaces, so additional tests are included for prefix
- * handling.
- * 
- * NOTE: These tests are currently disabled because they cannot work yet.
- * We need to wait for the RDF/XML parser implementation from PR #176:
- * https://github.com/corese-stack/corese-core/pull/176
- * 
- * Once the parser is implemented, these tests can be enabled to verify
- * the round-trip functionality between the parser and serializer.
  */
 @DisplayName("RDF/XML Circular Integration Tests")
 class RDFXMLCircularTest {
@@ -190,7 +172,7 @@ class RDFXMLCircularTest {
 
     /**
      * Creates a model with blank nodes for testing.
-     * 
+     *
      * @return A model with blank nodes as subject and object
      */
     private Model createBlankNodesTestModel() {
@@ -246,8 +228,8 @@ class RDFXMLCircularTest {
 
         // Verify serialization produced content (only check for non-empty models)
         assertNotNull(serializedContent, "Serialized content should not be null");
-        if (originalModel.size() > 0) {
-            assertTrue(serializedContent.length() > 0, "Serialized content should not be empty for non-empty models");
+        if (!originalModel.isEmpty()) {
+            assertFalse(serializedContent.isEmpty(), "Serialized content should not be empty for non-empty models");
         }
 
         // Parse back from RDF/XML
