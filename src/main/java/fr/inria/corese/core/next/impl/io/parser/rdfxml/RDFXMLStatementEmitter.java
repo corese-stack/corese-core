@@ -3,6 +3,9 @@ package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 
 import java.util.Optional;
@@ -14,6 +17,8 @@ import static fr.inria.corese.core.next.impl.io.parser.rdfxml.RDFXMLUtils.*;
  * and ValueFactory.
  */
 public class RDFXMLStatementEmitter {
+
+    private static final Logger logger = LoggerFactory.getLogger(RDFXMLStatementEmitter.class);
 
     private final Model model;
     private final ValueFactory factory;
@@ -39,19 +44,36 @@ public class RDFXMLStatementEmitter {
      * @param lang         the language tag (optional, may be null)
      */
     public void emitLiteral(Resource subject, IRI predicate, String text, String datatypeUri, String lang) {
+        if (subject == null) {
+            throw new ParsingErrorException(
+                    "Cannot emit literal statement: subject is null. " +
+                            "This may indicate malformed RDF/XML structure.");
+        }
+
+        if (predicate == null) {
+            throw new ParsingErrorException(
+                    "Cannot emit literal statement: predicate is null.");
+        }
+
         Value literal;
         if (datatypeUri != null && !datatypeUri.isEmpty()) {
             Optional<XSD> known = RDFXMLUtils.resolveDatatype(datatypeUri);
             IRI dtype = known.map(XSD::getIRI).orElseGet(() -> {
-                System.err.printf("[Warning] Unknown datatype: %s%n", datatypeUri);
+                logger.error("[Warning] Unknown datatype: %s%n {} ", datatypeUri);
                 return factory.createIRI(datatypeUri);
             });
-            literal = factory.createLiteral(text, dtype);
-        } else if (lang != null && !lang.equals("__NO_LANG__")) {
+
+            try {
+                literal = factory.createLiteral(text, dtype);
+            } catch (IllegalArgumentException e) {
+                literal = factory.createLiteral(text);
+            }
+        } else if (lang != null && !lang.equals("__NO_LANG__") && !lang.isEmpty()) {
             literal = factory.createLiteral(text, lang);
         } else {
             literal = factory.createLiteral(text);
         }
+
         model.add(factory.createStatement(subject, predicate, literal));
     }
 
@@ -80,6 +102,12 @@ public class RDFXMLStatementEmitter {
             String value = attrs.getValue(i);
 
             if (isSyntaxAttribute(attrURI, attrLocal, attrQName)) continue;
+
+            // VALIDATION: rdf:li cannot be used as property attribute
+            if (RDF.type.getNamespace().equals(attrURI) && "li".equals(attrLocal)) {
+                throw new ParsingErrorException("rdf:li cannot be used as property attribute. " +
+                        "It can only be used as property element inside rdf:Bag, rdf:Seq, or rdf:Alt containers.");
+            }
 
             IRI pred = factory.createIRI(expandQName(attrURI, attrLocal, attrQName));
             model.add(factory.createStatement(subject, pred, factory.createLiteral(value)));

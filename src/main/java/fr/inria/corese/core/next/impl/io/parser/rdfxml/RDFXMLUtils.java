@@ -1,15 +1,20 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Resource;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 /**
  * Utility methods for processing RDF/XML constructs.
  * <p>
@@ -49,22 +54,6 @@ public class RDFXMLUtils {
         return Optional.empty();
     }
 
-    /**
-     * Expands a QName string (e.g. "xsd:integer") into a full URI if known.
-     * Currently supports "xsd:" → XML Schema namespace.
-     *
-     * @param qname the QName string
-     * @return expanded full URI if a known prefix, otherwise returns qname unchanged
-     */
-    public static String expandQNameFromQName(String qname) {
-        if (qname == null) return null;
-        String xsdPrefix = fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdString.getPreferredPrefix() + ":";
-        if (qname.startsWith(xsdPrefix)) {
-            return fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdString.getNamespace()
-                    + qname.substring(xsdPrefix.length());
-        }
-        return qname;
-    }
 
     /**
      * Validates if a string is a valid XML Name according to XML 1.0 specification.
@@ -73,10 +62,9 @@ public class RDFXMLUtils {
      * Special RDF/XML rule: Names cannot start with "_:" (reserved for blank nodes).
      *
      * @param name the string to validate
-     * @param isRdfIdAttribute true if validating rdf:ID or rdf:bagID (disallows "_:" prefix)
      * @return true if the string is a valid XML Name
      */
-    public static boolean isValidXMLName(String name, boolean isRdfIdAttribute) {
+    public static boolean isInvalidXMLName(String name) {
         if (name == null || name.isEmpty()) {
             return false;
         }
@@ -87,8 +75,7 @@ public class RDFXMLUtils {
             return false;
         }
 
-        // For rdf:nodeID, colons are not allowed (NCName restriction)
-        if (!isRdfIdAttribute && name.contains(IOConstants.COLON)) {
+        if (name.contains(IOConstants.COLON)) {
             return false;
         }
 
@@ -99,11 +86,16 @@ public class RDFXMLUtils {
             return false;
         }
 
-        // Additional validation: check all characters are valid
-        for (int i = 0; i < name.length(); i++) {
+        // First char must be letter or underscore (NCName)
+        if (!Character.isLetter(first) && first != '_') {
+            return false;
+        }
+
+        // Validate all characters (NCName rules - no colon anywhere)
+        for (int i = 1; i < name.length(); i++) {
             char c = name.charAt(i);
-            // Valid chars: letters, digits, '.', '-', '_', ':'
-            if (!Character.isLetterOrDigit(c) && c != '.' && c != '-' && c != '_' && c != ':') {
+            // Valid chars for NCName: letters, digits, '.', '-', '_' (NO colon)
+            if (!Character.isLetterOrDigit(c) && c != '.' && c != '-' && c != '_') {
                 return false;
             }
         }
@@ -118,11 +110,12 @@ public class RDFXMLUtils {
      * @param attrs    the XML attributes
      * @param factory  the value factory
      * @param baseURI  the base URI for resolving relative IRIs
+     * @param usedIDs  set to track used rdf:ID values (can be null if not tracking)
      * @return a Resource representing the subject
      * @throws ParsingErrorException if rdf:ID, rdf:nodeID, or rdf:bagID value is not a valid XML Name,
      *                               if conflicting attributes are present, or if obsolete attributes are used
      */
-    public static Resource extractSubject(Attributes attrs, ValueFactory factory, String baseURI) {
+    public static Resource extractSubject(Attributes attrs, ValueFactory factory, String baseURI, Set<String> usedIDs) {
         // Check for obsolete attributes (removed in RDF 1.1)
         String aboutEach = attrs.getValue(RDF.type.getNamespace(), "aboutEach");
         String aboutEachPrefix = attrs.getValue(RDF.type.getNamespace(), "aboutEachPrefix");
@@ -153,26 +146,31 @@ public class RDFXMLUtils {
         }
 
         if (nodeID != null) {
-            if (!isValidXMLName(nodeID, false)) {
-                throw new ParsingErrorException("rdf:nodeID value '" + nodeID + "' is not a valid XML Name. " +
-                        "XML Names must start with a letter, underscore, or colon, not a digit or hyphen.");
+            if (isInvalidXMLName(nodeID)) {
+                throw new ParsingErrorException("rdf:nodeID value '" + nodeID + "' is not a valid NCName. " +
+                        "NCNames cannot contain colons and must start with a letter or underscore.");
             }
             return factory.createBNode(ParserConstants.BLANK_NODE_PREFIX + nodeID);
         }
 
         if (id != null) {
-            if (!isValidXMLName(id, true)) {
-                throw new ParsingErrorException("rdf:ID value '" + id + "' is not a valid XML Name. " +
-                        "XML Names must start with a letter, underscore, or colon, not a digit or hyphen. " +
+            if (isInvalidXMLName(id)) {
+                throw new ParsingErrorException("rdf:ID value '" + id + "' is not a valid NCName. " +
+                        "NCNames cannot contain colons and must start with a letter or underscore. " +
                         "Additionally, rdf:ID cannot start with '_:'.");
             }
-            return factory.createIRI(resolveAgainstBase("#" + id, baseURI));
+            String fullId = resolveAgainstBase("#" + id, baseURI);
+            if (usedIDs != null && !usedIDs.add(fullId)) {
+                throw new ParsingErrorException("rdf:ID value '" + id + "' has already been used in this document. " +
+                        "Each rdf:ID must be unique within a document.");
+            }
+            return factory.createIRI(fullId);
         }
 
         if (bagID != null) {
-            if (!isValidXMLName(bagID, true)) {
-                throw new ParsingErrorException("rdf:bagID value '" + bagID + "' is not a valid XML Name. " +
-                        "XML Names must start with a letter, underscore, or colon, not a digit or hyphen. " +
+            if (isInvalidXMLName(bagID)) {
+                throw new ParsingErrorException("rdf:bagID value '" + bagID + "' is not a valid NCName. " +
+                        "NCNames cannot contain colons and must start with a letter or underscore. " +
                         "Additionally, rdf:bagID cannot start with '_:'.");
             }
             return factory.createIRI(resolveAgainstBase("#" + bagID, baseURI));
@@ -214,18 +212,6 @@ public class RDFXMLUtils {
         return RDF.type.getNamespace().equals(uri) && "Description".equals(localName);
     }
 
-
-    /**
-     * Checks if the attributes define a subject node (via about, nodeID, or ID).
-     *
-     * @param attrs the attributes to check
-     * @return true if any node-identifying attribute is present
-     */
-    public static boolean isNodeElement(Attributes attrs) {
-        return attrs.getValue(RDF.type.getNamespace(), "about") != null ||
-                attrs.getValue(RDF.type.getNamespace(), "nodeID") != null ||
-                attrs.getValue(RDF.type.getNamespace(), "ID") != null;
-    }
 
 
     /**
@@ -269,6 +255,74 @@ public class RDFXMLUtils {
     }
 
     /**
+     * Validates that an element name from the RDF namespace is allowed as a node element.
+     * FIXES FOR error-001, error-011, error-012:
+     * - Rejects rdf:RDF as node element (nested rdf:RDF is forbidden)
+     * - Rejects all forbidden RDF names
+     *
+     * @param uri       the namespace URI
+     * @param localName the local name of the element
+     * @throws ParsingErrorException if the element name is a forbidden RDF name
+     */
+    public static void validateNodeElementName(String uri, String localName) {
+        if (!RDF.type.getNamespace().equals(uri)) {
+            return;
+        }
+
+        switch (localName) {
+            case "RDF":
+                throw new ParsingErrorException("rdf:RDF cannot be used as a node element. " +
+                        "Nested rdf:RDF elements are not allowed.");
+            case "ID":
+            case "about":
+            case "bagID":
+            case "parseType":
+            case "resource":
+            case "nodeID":
+            case "datatype":
+            case "aboutEach":
+            case "aboutEachPrefix":
+                throw new ParsingErrorException("'" + localName + "' is not allowed as a node element name from the RDF namespace. " +
+                        "RDF namespace names like rdf:ID, rdf:about, rdf:bagID, etc. cannot be used as typed node elements.");
+            case "li":
+                throw new ParsingErrorException("rdf:li cannot be used as a node element. " +
+                        "It can only be used as a property element within containers.");
+        }
+
+    }
+
+    /**
+     * Validates that a property element name from the RDF namespace is allowed.
+     * According to RDF/XML specification, certain RDF namespace names cannot be used as property elements.
+     *
+     * @param uri       the namespace URI
+     * @param localName the local name of the element
+     * @throws ParsingErrorException if the property name is a forbidden RDF name
+     */
+    public static void validatePropertyElementName(String uri, String localName) {
+        if (!RDF.type.getNamespace().equals(uri)) {
+            return;
+        }
+
+        // According to RDF/XML spec section 5.1
+        switch (localName) {
+            case "RDF":
+            case "ID":
+            case "about":
+            case "bagID":
+            case "parseType":
+            case "resource":
+            case "nodeID":
+            case "datatype":
+            case "Description":
+            case "aboutEach":
+            case "aboutEachPrefix":
+                throw new ParsingErrorException("'" + localName + "' is not allowed as a property element name from the RDF namespace. " +
+                        "Only rdf:type, rdf:_n (container membership), and rdf:li are valid RDF property names.");
+        }
+    }
+
+    /**
      * Determines if an element is a recognized RDF container: Bag, Seq, or Alt.
      *
      * @param localName the local name
@@ -308,5 +362,49 @@ public class RDFXMLUtils {
             current = next;
         }
         return head;
+    }
+
+
+    /**
+     * Validates parseType attribute values.
+     * Only "Resource", "Literal", and "Collection" are valid values.
+     *
+     * @param parseType the parseType value to validate
+     * @throws ParsingErrorException if the parseType value is invalid
+     */
+    public static void validateParseType(String parseType) {
+        if (parseType == null) {
+            return;
+        }
+
+        switch (parseType) {
+            case "Resource":
+            case "Literal":
+            case "Collection":
+                return; // Valid
+            default:
+                throw new ParsingErrorException(
+                        "Invalid rdf:parseType value: '" + parseType + "'. " +
+                                "Only 'Resource', 'Literal', and 'Collection' are allowed.");
+        }
+    }
+
+    /**
+     * Checks if an element is an RDF node element type (Description, Bag, Seq, Alt).
+     * Used for determining when to pop the subject stack.
+     *
+     * @param uri       the namespace URI
+     * @param localName the local name
+     * @return true if this is an RDF node element type
+     */
+    public static boolean isRdfNodeElementType(String uri, String localName) {
+        if (!RDF.type.getNamespace().equals(uri)) {
+            return false;
+        }
+
+        return "Description".equals(localName) ||
+                "Bag".equals(localName) ||
+                "Seq".equals(localName) ||
+                "Alt".equals(localName);
     }
 }
