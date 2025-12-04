@@ -116,7 +116,7 @@ public class RDFXMLUtilsTest {
         Resource head = RDFXMLUtils.createRdfCollection(List.of(r1, r2), model, factory);
 
         assertNotNull(head);
-        assertTrue(model.size() > 0);
+        assertFalse(model.isEmpty());
         assertTrue(model.contains(null, RDF.first.getIRI(), r1));
         assertTrue(model.contains(null, RDF.rest.getIRI(), RDF.nil.getIRI()));
     }
