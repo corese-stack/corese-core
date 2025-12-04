@@ -16,7 +16,7 @@ import java.util.Iterator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RDFaParserTest {
+public class RDFa10ParserTest {
 
     private static final ValueFactory factory = new CoreseAdaptedValueFactory();
 
@@ -45,11 +45,11 @@ public class RDFaParserTest {
 
         referenceModel.add(subject, predicate, object);
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa_1_0, testModel, factory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()));
 
-        assertEquals(RDFFormat.RDFa, parser.getRDFFormat());
+        assertEquals(RDFFormat.RDFa_1_0, parser.getRDFFormat());
         assertEquals(referenceModel.size(), testModel.size());
         Iterator<Statement> itStatementRef = referenceModel.iterator();
         Iterator<Statement> itStatementTest = testModel.iterator();
@@ -79,7 +79,7 @@ public class RDFaParserTest {
 
         Model testModel = new CoreseModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa_1_0, testModel, factory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -108,7 +108,7 @@ public class RDFaParserTest {
         Model testModel = new CoreseModel();
         Model referenceModel = new CoreseModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa_1_0, testModel, factory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -143,7 +143,7 @@ public class RDFaParserTest {
         Model testModel = new CoreseModel();
         Model referenceModel = new CoreseModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa_1_0, testModel, factory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -179,7 +179,7 @@ public class RDFaParserTest {
         Model testModel = new CoreseModel();
         Model referenceModel = new CoreseModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa_1_0, testModel, factory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 
@@ -226,7 +226,7 @@ public class RDFaParserTest {
         Model testModel = new CoreseModel();
         Model referenceModel = new CoreseModel();
 
-        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa, testModel, factory);
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFa_1_0, testModel, factory);
 
         parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
 

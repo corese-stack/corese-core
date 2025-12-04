@@ -13,7 +13,8 @@ public class RDFaIncompleteStatement {
 
     public enum Direction {
         FORWARD,
-        BACKWARD
+        BACKWARD,
+        NONE
     }
 
     private Resource subject = null;

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Represents a namespace with a prefix and the start of an IRI as its name.
  */
-public interface Namespace extends Serializable, Comparable<Namespace> {
+public interface Namespace extends Serializable {
 
     /**
      * @return The prefix of the namespace.
