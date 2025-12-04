@@ -85,7 +85,16 @@ public class RDFXMLStatementEmitter {
      * @param expandedQName  the fully expanded IRI for the type
      */
     public void emitType(Resource subject, String expandedQName) {
-        model.add(factory.createStatement(subject, RDF.type.getIRI(), factory.createIRI(expandedQName)));
+        if (subject == null) {
+            throw new ParsingErrorException(
+                    "Cannot emit type statement: subject is null.");
+        }
+
+        model.add(factory.createStatement(
+                subject,
+                RDF.type.getIRI(),
+                factory.createIRI(expandedQName)
+        ));
     }
 
     /**
@@ -95,6 +104,21 @@ public class RDFXMLStatementEmitter {
      * @param attrs   the XML attributes associated with the element
      */
     public void emitPropertyAttributes(Resource subject, Attributes attrs) {
+        emitPropertyAttribute(subject, attrs);
+    }
+
+    /**
+     * Emits RDF statements for non-syntax XML attributes as predicate-object pairs.
+     *
+     * @param subject the subject resource
+     * @param attrs   the XML attributes associated with the element
+     */
+    public void emitPropertyAttribute(Resource subject, Attributes attrs) {
+        if (subject == null) {
+            throw new ParsingErrorException(
+                    "Cannot emit property attributes: subject is null.");
+        }
+
         for (int i = 0; i < attrs.getLength(); i++) {
             String attrURI = attrs.getURI(i);
             String attrLocal = attrs.getLocalName(i);
@@ -103,10 +127,22 @@ public class RDFXMLStatementEmitter {
 
             if (isSyntaxAttribute(attrURI, attrLocal, attrQName)) continue;
 
-            // VALIDATION: rdf:li cannot be used as property attribute
-            if (RDF.type.getNamespace().equals(attrURI) && "li".equals(attrLocal)) {
-                throw new ParsingErrorException("rdf:li cannot be used as property attribute. " +
-                        "It can only be used as property element inside rdf:Bag, rdf:Seq, or rdf:Alt containers.");
+            if (attrURI == null || attrURI.isEmpty()) {
+                continue;
+            }
+
+            // VALIDATION: rdf:li and rdf:_n CANNOT be used as property attributes
+            if (RDF.type.getNamespace().equals(attrURI)) {
+                if ("li".equals(attrLocal)) {
+                    throw new ParsingErrorException(
+                            "rdf:li cannot be used as property attribute. " +
+                                    "It can only be used as property element inside containers.");
+                }
+                if (attrLocal.matches("^_\\d+$")) {
+                    throw new ParsingErrorException(
+                            "rdf:" + attrLocal + " cannot be used as property attribute. " +
+                                    "Container membership properties can only be used as property elements.");
+                }
             }
 
             IRI pred = factory.createIRI(expandQName(attrURI, attrLocal, attrQName));
