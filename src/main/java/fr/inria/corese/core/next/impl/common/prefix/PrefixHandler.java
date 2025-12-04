@@ -444,8 +444,8 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         public String getName() {
             return name;
         }
+
         @SuppressWarnings("NullableProblems")
-        @Override
         public int compareTo(Namespace o) {
             Objects.requireNonNull(o);
             int cmp = this.name.compareTo(o.getName());

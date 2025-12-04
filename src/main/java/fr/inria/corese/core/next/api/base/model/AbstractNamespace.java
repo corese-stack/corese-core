@@ -20,22 +20,6 @@ public abstract class AbstractNamespace implements Namespace {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Comparator that orders namespaces by prefix, then by URI.
-     * Null values are ordered first.
-     */
-    private static final Comparator<Namespace> ORDERING = Comparator.nullsFirst(
-            Comparator.comparing(Namespace::getPrefix)
-                    .thenComparing(Namespace::getName));
-
-    /**
-     * Compares this namespace to another based on prefix and name.
-     */
-    @Override
-    public int compareTo(Namespace other) {
-        return ORDERING.compare(this, other);
-    }
-
-    /**
      * Checks equality based on prefix and name.
      */
     @Override

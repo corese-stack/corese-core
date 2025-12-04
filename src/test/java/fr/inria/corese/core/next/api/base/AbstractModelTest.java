@@ -692,16 +692,5 @@ class AbstractModelTest {
         public String getName() {
             return name;
         }
-
-        @Override
-        public int compareTo(Namespace other) {
-
-            int prefixComparison = this.getPrefix().compareTo(other.getPrefix());
-            if (prefixComparison != 0) {
-                return prefixComparison;
-            }
-
-            return this.getName().compareTo(other.getName());
-        }
     }
 }
