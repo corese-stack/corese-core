@@ -306,7 +306,7 @@ class RDFFormatTest {
         assertTrue(allFormats.contains(RDFFormat.JSONLD));
         assertTrue(allFormats.contains(RDFFormat.RDFXML));
         assertTrue(allFormats.contains(RDFFormat.TRIG));
-        assertTrue(allFormats.contains(RDFFormat.RDFa_1_0));
+        assertTrue(allFormats.contains(RDFFormat.RDFA));
         assertTrue(allFormats.contains(RDFFormat.RDFC_1_0));
 
         assertThrows(UnsupportedOperationException.class, () -> allFormats.add(RDFFormat.TURTLE),

@@ -65,17 +65,10 @@ public class RDFFormat extends FileFormat {
             false,
             true);
 
-    public static final RDFFormat RDFa_1_0 = new RDFFormat(
-            "RDFa 1.0",
-            List.of("html"),
-            List.of("text/html"),
-            true,
-            false);
-
-    public static final RDFFormat RDFa_1_1 = new RDFFormat(
+    public static final RDFFormat RDFA = new RDFFormat(
             "RDFa 1.1",
-            List.of("xhtml", "svg", "xml"),
-            List.of("application/xhtml+xml", "image/svg+xml", "application/xml", "text/xml"),
+            List.of("xhtml", "svg", "html"),
+            List.of("application/xhtml+xml", "image/svg+xml", "application/xml", "text/xml", "text/html"),
             true,
             false);
 
@@ -165,7 +158,7 @@ public class RDFFormat extends FileFormat {
      * @return An unmodifiable List of all RdfFormat constants.
      */
     public static List<RDFFormat> all() {
-        return List.of(TURTLE, NTRIPLES, NQUADS, JSONLD, RDFXML, TRIG, RDFC_1_0, RDFa_1_0, RDFa_1_1);
+        return List.of(JSONLD, NQUADS, NTRIPLES, RDFA, RDFC_1_0, RDFXML, TRIG, TURTLE);
     }
 
     @Override

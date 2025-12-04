@@ -104,7 +104,7 @@ public enum RDFaInitialPrefixes implements Namespace {
     private final String prefix;
     private final String name;
 
-    RDFaInitialPrefixes(String name, String prefix) {
+    RDFaInitialPrefixes(String prefix, String name) {
         this.name = name;
         this.prefix = prefix;
     }
