@@ -7,7 +7,6 @@ import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.base.io.parser.AbstractRDFParser;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.parser.rdfxml.context.RDFXMLContext;
@@ -60,22 +59,11 @@ public class RDFXMLParser extends AbstractRDFParser {
 
     /*** Tracks the counter (rdf:_1, rdf:_2, ...) for each active RDF container (Bag, Seq, Alt).*/
     private final Map<Resource, Integer> containerCounters = new HashMap<>();
-
-    /**
-     * Prefix handler for managing namespace prefixes discovered during XML parsing.
-     */
-    private final PrefixHandler prefixHandler;
-
-    /**
-     * Tracks the nesting depth of &lt;rdf:RDF&gt; elements, which must not exceed 1.
-     */
     private int rdfDepth = 0;
 
-    /**
-     * Constructs an RDFXMLParser with default options.
-     * @param model The model to which triples will be added.
-     * @param factory The factory used to create RDF values.
-     */
+    private String lastElementQName = null;
+    private String lastElementRdfId = null;
+
     public RDFXMLParser(Model model, ValueFactory factory) {
         this(model, factory, new RDFXMLParserOptions.Builder().build());
     }
@@ -90,7 +78,6 @@ public class RDFXMLParser extends AbstractRDFParser {
         super(model, factory, config);
         this.ctx = new RDFXMLContext(getModel(), getValueFactory());
         this.emitter = new RDFXMLStatementEmitter(model, factory);
-        this.prefixHandler = new PrefixHandler(true);
     }
 
     @Override
@@ -98,14 +85,6 @@ public class RDFXMLParser extends AbstractRDFParser {
         return format;
     }
 
-    /**
-     * Returns the prefix handler containing namespace prefixes discovered during parsing.
-     *
-     * @return the PrefixHandler instance
-     */
-    public PrefixHandler getPrefixHandler() {
-        return prefixHandler;
-    }
 
     @Override
     public void parse(InputStream in, String baseURI) throws ParsingErrorException {
@@ -118,10 +97,12 @@ public class RDFXMLParser extends AbstractRDFParser {
         ctx.baseURI = baseURI;
         usedIDs.clear();
         containerCounters.clear();
-        rdfDepth = 0;
+        rdfDepth = 0;  // Reset depth counter for each document
+
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
+
             SAXParser saxParser = factory.newSAXParser();
             InputSource inputSource = new InputSource(reader);
             // Parse the input using the custom handler
@@ -183,11 +164,20 @@ public class RDFXMLParser extends AbstractRDFParser {
     private void handleStartElement(String uri, String localName, String qName, Attributes attrs)
             throws ParsingErrorException {
 
-        // Check for the top-level <rdf:RDF> element.
+        if (qName.equals(lastElementQName)) {
+            String rdfId = attrs.getValue(RDF.type.getNamespace(), "ID");
+            if (rdfId != null && rdfId.equals(lastElementRdfId)) {
+                return;
+            }
+            lastElementRdfId = rdfId;
+        } else {
+            lastElementQName = qName;
+            lastElementRdfId = attrs.getValue(RDF.type.getNamespace(), "ID");
+        }
+
+        // Check for the top-level <rdf:RDF> element
         if (RDFXMLUtils.isRdfRDF(uri, localName)) {
             rdfDepth++;
-
-            // Nested rdf:RDF is forbidden by the specification.
             if (rdfDepth > 1) {
                 throw new ParsingErrorException(
                         "rdf:RDF cannot be used as a node element. Nested rdf:RDF elements are not allowed.");
@@ -211,7 +201,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         if (processCollectionStart(localName, uri, qName, attrs)) return;
         if (processCollectionItem(localName, uri, attrs)) return;
         if (processNodeElement(localName, uri, qName, attrs)) return;
-        processPropertyElement(localName, uri, qName, attrs); // Fallthrough: Must be a Property Element
+        processPropertyElement(localName, uri, qName, attrs);
     }
 
     /**
@@ -312,7 +302,7 @@ public class RDFXMLParser extends AbstractRDFParser {
         // Extracts the resource URI or blank node ID for the collection item.
         Resource item = extractSubject(attrs, ctx.factory, ctx.baseURI, usedIDs);
         ctx.collectionBuilder.add(item);
-        // The subject of the collection item is pushed onto the stack by processNodeElement (which follows this check).
+        ctx.suppressSubject = true;
 
         return true;
     }
@@ -480,7 +470,7 @@ public class RDFXMLParser extends AbstractRDFParser {
             // Emit the S-P-O triple where O is the resource URI.
             emitter.emitResourceTriple(ctx.subjectStack.peek(), predicate, resource, ctx.baseURI);
 
-            // Emit property attributes (if any) as properties of the parent subject (allowed by spec 7.2.16).
+            // Emit property attributes as properties of the parent subject
             if (hasRealPropertyAttributes(attrs)) {
                 emitter.emitPropertyAttributes(ctx.subjectStack.peek(), attrs);
             }
@@ -618,6 +608,14 @@ public class RDFXMLParser extends AbstractRDFParser {
 
             ctx.inCollection = false;
             ctx.collectionBuilder.clear();
+            return;
+        }
+
+        if (ctx.inCollection && RDFXMLUtils.isDescription(localName, uri)) {
+            if (!ctx.subjectStack.isEmpty()) {
+                ctx.subjectStack.pop();
+            }
+            return;
         }
 
         if (RDFXMLUtils.isDescription(localName, uri) || RDFXMLUtils.isRdfNodeElementType(uri, localName)) {
