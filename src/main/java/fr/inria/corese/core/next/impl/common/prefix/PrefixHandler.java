@@ -80,7 +80,7 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         if (!isValidPrefix(prefix)) {
             throw new IllegalArgumentException(
                     "Invalid prefix format: '" + prefix +
-                            "' (must be empty or match [a-zA-Z_][-a-zA-Z0-9_]*)");
+                            "' (must be empty or valid according to Turtle/TriG specification)");
         }
         if (namespace == null) {
             throw new IllegalArgumentException("Namespace cannot be null");
@@ -316,7 +316,7 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
     }
 
     /**
-     * Checks if a prefix is valid according to XML NCName rules.
+     * Checks if a prefix is valid according
      * Empty string "" is considered valid (for Turtle default prefix)
      *
      * @param prefix the prefix to validate
@@ -330,7 +330,7 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         if (prefix.isEmpty()) {
             return true;
         }
-        return prefix.matches("[a-zA-Z_][-a-zA-Z0-9_]*");
+        return !prefix.contains(":");
     }
 
     /**
