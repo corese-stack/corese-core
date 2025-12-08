@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.option;
 
+import fr.inria.corese.core.next.api.io.serialization.PrettyPrintOptions;
+import fr.inria.corese.core.next.api.io.serialization.UsesPrefixOptions;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
@@ -8,14 +10,14 @@ import java.util.Objects;
 
 /**
  * An abstract base class for serialization configurations of Turtle Trig RDF formats (e.g., Turtle, TriG).
- * This class extends {@link AbstractSerializerOption} and introduces parameters specific to
+ * This class extends {@link AbstractSerializerOptions} and introduces parameters specific to
  * formats that utilize syntax sugar, pretty-printing, and collection syntax.
  *
  * <p>It enforces the use of the Builder pattern for construction through its
  * nested {@link AbstractTFamilyBuilder}. Subclasses are expected to extend this
  * configuration and its builder to add format-specific options.</p>
  */
-public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
+public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions implements UsesPrefixOptions, PrettyPrintOptions {
 
     /**
      * Whether prefix declarations (e.g., `@prefix`, `PREFIX`) should be used for compact IRIs.
@@ -105,7 +107,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      * @throws NullPointerException     if any required field from the builder is null.
      * @throws IllegalArgumentException if incompatible options (e.g., escapeUnicode and useMultilineLiterals) are enabled.
      */
-    protected AbstractTFamilyOption(AbstractTFamilyBuilder<?> builder) {
+    protected AbstractTFamilyOptions(AbstractTFamilyBuilder<?> builder) {
         super(builder);
 
         this.usePrefixes = builder.usePrefixes;
@@ -135,6 +137,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return {@code true} if prefixes are used, {@code false} otherwise.
      */
+    @Override
     public boolean usePrefixes() {
         return usePrefixes;
     }
@@ -144,6 +147,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return {@code true} if auto-declaration is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean autoDeclarePrefixes() {
         return autoDeclarePrefixes;
     }
@@ -153,6 +157,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return The {@link PrefixOrderingEnum} for prefix ordering.
      */
+    @Override
     public PrefixOrderingEnum getPrefixOrdering() {
         return prefixOrdering;
     }
@@ -162,6 +167,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return The {@link PrefixHandler} managing all prefix mappings.
      */
+    @Override
     public PrefixHandler getPrefixHandler() {
         return prefixHandler;
     }
@@ -216,6 +222,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return {@code true} if pretty-printing is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean prettyPrint() {
         return prettyPrint;
     }
@@ -225,6 +232,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return The indentation string.
      */
+    @Override
     public String getIndent() {
         return indent;
     }
@@ -234,6 +242,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return The maximum line length.
      */
+    @Override
     public int getMaxLineLength() {
         return maxLineLength;
     }
@@ -252,6 +261,7 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return {@code true} if subject sorting is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean sortSubjects() {
         return sortSubjects;
     }
@@ -261,12 +271,13 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
      *
      * @return {@code true} if predicate sorting is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean sortPredicates() {
         return sortPredicates;
     }
 
     /**
-     * An abstract base builder for {@link AbstractTFamilyOption}.
+     * An abstract base builder for {@link AbstractTFamilyOptions}.
      * This builder provides methods for setting Turtle Trig serialization configuration options.
      * parameter (`S`) to allow concrete subclass builders to return their own specific type,
      * enabling fluent API chaining.
@@ -493,11 +504,11 @@ public abstract class AbstractTFamilyOption extends AbstractSerializerOption {
         }
 
         /**
-         * Builds and returns a new {@link AbstractTFamilyOption} instance with the current builder settings.
+         * Builds and returns a new {@link AbstractTFamilyOptions} instance with the current builder settings.
          * This method must be implemented by concrete builder subclasses to return their specific configuration type.
          *
-         * @return A new {@code AbstractTFamilyOption} instance or a subclass instance.
+         * @return A new {@code AbstractTFamilyOptions} instance or a subclass instance.
          */
-        public abstract AbstractTFamilyOption build();
+        public abstract AbstractTFamilyOptions build();
     }
 }

@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.serialization.option;
 
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
 import java.util.Objects;
@@ -15,7 +16,7 @@ import java.util.Objects;
  * nested {@link AbstractBuilder}. Subclasses are expected to extend this
  * configuration and its builder to add format-specific options.</p>
  */
-public abstract class AbstractSerializerOption implements IOOptions , BaseIRIOptions {
+public abstract class AbstractSerializerOptions implements IOOptions, BaseIRIOptions, LineEndingOptions {
 
     /**
      * The policy for how literal datatypes are printed.
@@ -72,7 +73,7 @@ public abstract class AbstractSerializerOption implements IOOptions , BaseIRIOpt
      * @param builder The builder instance containing the desired configuration values.
      * @throws NullPointerException if any required field from the builder is null.
      */
-    protected AbstractSerializerOption(AbstractBuilder<?> builder) {
+    protected AbstractSerializerOptions(AbstractBuilder<?> builder) {
         this.literalDatatypePolicy = Objects.requireNonNull(builder.literalDatatypePolicy, "Literal datatype policy cannot be null");
         this.escapeUnicode = builder.escapeUnicode;
         this.trailingDot = builder.trailingDot;
@@ -119,6 +120,7 @@ public abstract class AbstractSerializerOption implements IOOptions , BaseIRIOpt
      *
      * @return The base IRI string, or {@code null} if no base IRI is specified.
      */
+    @Override
     public String getBaseIRI() {
         return baseIRI;
     }
@@ -137,6 +139,7 @@ public abstract class AbstractSerializerOption implements IOOptions , BaseIRIOpt
      *
      * @return The line ending string (e.g., `"\n"` for Unix, `"\r\n"` for Windows).
      */
+    @Override
     public String getLineEnding() {
         return lineEnding;
     }
@@ -169,7 +172,7 @@ public abstract class AbstractSerializerOption implements IOOptions , BaseIRIOpt
     }
 
     /**
-     * An abstract base builder for {@link AbstractSerializerOption}.
+     * An abstract base builder for {@link AbstractSerializerOptions}.
      * This builder provides methods for setting common serialization configuration options.
      * It uses a recursive type parameter (`S`) to allow concrete subclass builders
      * to return their own specific type, enabling fluent API chaining.
@@ -290,12 +293,12 @@ public abstract class AbstractSerializerOption implements IOOptions , BaseIRIOpt
         }
 
         /**
-         * Builds and returns a new {@link AbstractSerializerOption} instance with the current builder settings.
+         * Builds and returns a new {@link AbstractSerializerOptions} instance with the current builder settings.
          * This method must be implemented by concrete builder subclasses to return their specific configuration type.
          *
          * @return A new {@code AbstractSerializerConfig} instance or a subclass instance.
          */
-        public abstract AbstractSerializerOption build();
+        public abstract AbstractSerializerOptions build();
 
         /**
          * Helper method to return the concrete builder instance for fluent API chaining.

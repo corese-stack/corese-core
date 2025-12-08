@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.io.serialization.option;
 
 /**
  * An abstract base class for serialization configurations of N-Family RDF formats (e.g., N-Triples, N-Quads).
- * This class extends {@link AbstractSerializerOption} and provides a common foundation
+ * This class extends {@link AbstractSerializerOptions} and provides a common foundation
  * for formats that typically have simpler, line-based structures and specific default behaviors
  * regarding literal datatypes and character escaping.
  *
@@ -10,7 +10,7 @@ package fr.inria.corese.core.next.impl.io.serialization.option;
  * nested {@link AbstractNFamilyBuilder}. Subclasses are expected to extend this
  * configuration and its builder to add format-specific options.</p>
  */
-public abstract class AbstractNFamilyOption extends AbstractSerializerOption {
+public abstract class AbstractNFamilyOptions extends AbstractSerializerOptions {
 
     /**
      * Protected constructor to be used by concrete builder implementations.
@@ -19,14 +19,14 @@ public abstract class AbstractNFamilyOption extends AbstractSerializerOption {
      *
      * @param builder The builder instance containing the desired configuration values.
      */
-    protected AbstractNFamilyOption(AbstractNFamilyBuilder<?> builder) {
+    protected AbstractNFamilyOptions(AbstractNFamilyBuilder<?> builder) {
         super(builder);
     }
 
     /**
-     * An abstract base builder for {@link AbstractNFamilyOption}.
+     * An abstract base builder for {@link AbstractNFamilyOptions}.
      * This builder provides methods for setting N-Family serialization configuration options.
-     * It extends {@link AbstractSerializerOption.AbstractBuilder} and uses a recursive type
+     * It extends {@link AbstractSerializerOptions.AbstractBuilder} and uses a recursive type
      * parameter (`S`) to allow concrete subclass builders to return their own specific type,
      * enabling fluent API chaining.
      *
@@ -36,7 +36,7 @@ public abstract class AbstractNFamilyOption extends AbstractSerializerOption {
      * @param <S> The type of the concrete builder extending this abstract builder.
      */
     public abstract static class AbstractNFamilyBuilder<S extends AbstractNFamilyBuilder<S>>
-            extends AbstractSerializerOption.AbstractBuilder<S> {
+            extends AbstractSerializerOptions.AbstractBuilder<S> {
 
         /**
          * Default constructor for the builder.
@@ -52,11 +52,11 @@ public abstract class AbstractNFamilyOption extends AbstractSerializerOption {
         }
 
         /**
-         * Builds and returns a new {@link AbstractNFamilyOption} instance with the current builder settings.
+         * Builds and returns a new {@link AbstractNFamilyOptions} instance with the current builder settings.
          * This method must be implemented by concrete builder subclasses to return their specific configuration type.
          *
          * @return A new {@code AbstractNFamilyConfig} instance or a subclass instance.
          */
-        public abstract AbstractNFamilyOption build();
+        public abstract AbstractNFamilyOptions build();
     }
 }

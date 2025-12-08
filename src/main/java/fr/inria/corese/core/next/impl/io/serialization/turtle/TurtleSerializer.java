@@ -5,13 +5,17 @@ import java.io.Writer;
 import java.util.Objects;
 
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractGraphSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
 /**
@@ -47,7 +51,7 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      * @throws NullPointerException if the provided model is null.
      */
     public TurtleSerializer(Model model) {
-        this(model, TurtleSerializerOptions.defaultConfig());
+        super(model, TurtleSerializerOptions.defaultConfig());
     }
 
     /**
@@ -57,9 +61,21 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      * @param config the {@link TurtleSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public TurtleSerializer(Model model, TurtleSerializerOptions config) {
-        super(model, config);
+    public TurtleSerializer(Model model, IOOptions config) {
+        this(model);
         Objects.requireNonNull(config, "TurtleConfig cannot be null");
+        if(config instanceof AbstractSerializerOptions turtleSerializerOptions) {
+            this.option = turtleSerializerOptions;
+        } else {
+            TurtleSerializerOptions.Builder optionBuilder = new TurtleSerializerOptions.Builder();
+            if(config instanceof BaseIRIOptions baseIRIOptions) {
+                optionBuilder.baseIRI(baseIRIOptions.getBaseIRI());
+            }
+            if(config instanceof LineEndingOptions lineEndingOptions) {
+                optionBuilder.lineEnding(lineEndingOptions.getLineEnding());
+            }
+            this.option = optionBuilder.build();
+        }
     }
     /**
      * Retrieves the RDF format supported by this serializer, which is Turtle
@@ -81,7 +97,7 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      */
     @Override
     protected void doWriteStatements(Writer writer) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = (AbstractTFamilyOption) option;
+        AbstractTFamilyOptions tFamilyConfig = (AbstractTFamilyOptions) option;
 
         if (tFamilyConfig.useCompactTriples() && tFamilyConfig.groupBySubject()) {
             writeOptimizedStatements(writer);

@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.impl.io.serialization.base;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.io.serialization.PrettyPrintOptions;
+import fr.inria.corese.core.next.api.io.serialization.UsesPrefixOptions;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
@@ -28,8 +30,8 @@ import java.util.stream.Collectors;
  *
  * <p>Note: Many features related to compact syntax, pretty-printing, and advanced
  * prefix management are specific to Turtle Trig formats and require the
- * provided {@link AbstractSerializerOption} to be an instance of
- * {@link AbstractSerializerOption} at runtime. An {@link IllegalStateException}
+ * provided {@link AbstractSerializerOptions} to be an instance of
+ * {@link AbstractSerializerOptions} at runtime. An {@link IllegalStateException}
  * will be thrown if an incompatible configuration is used for such features.</p>
  */
 public abstract class AbstractGraphSerializer implements RDFSerializer {
@@ -40,7 +42,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractGraphSerializer.class);
 
     protected final Model model;
-    protected final AbstractSerializerOption option;
+    protected AbstractSerializerOptions option;
     protected final Map<String, String> iriToPrefixMapping;
     protected final Map<String, String> prefixToIriMapping;
     protected final Set<Resource> consumedBlankNodes;
@@ -50,10 +52,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Constructs a new abstract TriG/Turtle serializer instance.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param option the {@link AbstractSerializerOption} to use for serialization. Must not be null.
+     * @param option the {@link AbstractSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    protected AbstractGraphSerializer(Model model, AbstractSerializerOption option) {
+    protected AbstractGraphSerializer(Model model, AbstractSerializerOptions option) {
         this.model = Objects.requireNonNull(model, "The model cannot be null");
         this.option = Objects.requireNonNull(option, "The configuration cannot be null");
         this.iriToPrefixMapping = new HashMap<>();
@@ -64,27 +66,11 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
     }
 
     /**
-     * Helper method to safely cast the generic config to AbstractTFamilyConfig.
-     * This should be called before accessing any methods specific to AbstractTFamilyConfig.
-     *
-     * @return The config cast to AbstractTFamilyConfig.
-     * @throws SerializationException if the config is not an instance of AbstractTFamilyConfig.
-     */
-    private AbstractTFamilyOption getTFamilyOption() {
-        if (!(option instanceof AbstractTFamilyOption)) {
-            throw new SerializationException("Current serializer configuration is not an instance of AbstractTFamilyOption. " +
-                    "Features like prefixes, compact syntax, and pretty-printing are only available for T-Family formats.", this.getFormatName());
-        }
-        return (AbstractTFamilyOption) option;
-    }
-
-    /**
      * Initializes prefix mappings by adding custom prefixes from the configuration.
      */
     private void initializePrefixes() {
-        if (option instanceof AbstractTFamilyOption && getTFamilyOption().usePrefixes()) {
-            AbstractTFamilyOption tFamilyOption = getTFamilyOption();
-            PrefixHandler prefixHandler = tFamilyOption.getPrefixHandler();
+        if (option instanceof UsesPrefixOptions prefixOptions && prefixOptions.usePrefixes()) {
+            PrefixHandler prefixHandler = prefixOptions.getPrefixHandler();
 
             for (String prefix : prefixHandler.getPrefixes()) {
                 String namespace = prefixHandler.getNamespace(prefix);
@@ -142,9 +128,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                     option.getLineEnding()));
         }
 
-        if (option instanceof AbstractSerializerOption
-                && getTFamilyOption().usePrefixes()
-                && getTFamilyOption().autoDeclarePrefixes()) {
+        if (option instanceof UsesPrefixOptions prefixOptions
+                && prefixOptions.usePrefixes()
+                && prefixOptions.autoDeclarePrefixes()) {
             collectUsedNamespaces();
         }
 
@@ -191,23 +177,23 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writePrefixDeclarations(Writer writer) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
+        if(this.option instanceof UsesPrefixOptions prefixOptions) {
+            List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
 
-        List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
+            if (prefixOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
+                Collections.sort(prefixes);
+            }
 
-        if (tFamilyConfig.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
-            Collections.sort(prefixes);
-        }
+            for (String prefix : prefixes) {
+                writer.write(String.format("@prefix %s: <%s> .%s",
+                        prefix,
+                        prefixToIriMapping.get(prefix),
+                        option.getLineEnding()));
+            }
 
-        for (String prefix : prefixes) {
-            writer.write(String.format("@prefix %s: <%s> .%s",
-                    prefix,
-                    prefixToIriMapping.get(prefix),
-                    option.getLineEnding()));
-        }
-
-        if (!prefixes.isEmpty() || option.getBaseIRI() != null) {
-            writer.write(option.getLineEnding());
+            if (!prefixes.isEmpty() || option.getBaseIRI() != null) {
+                writer.write(option.getLineEnding());
+            }
         }
     }
 
@@ -236,9 +222,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeStatement(Writer writer, Statement stmt) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
-        String indent = tFamilyConfig.prettyPrint() ? tFamilyConfig.getIndent() : SerializationConstants.EMPTY_STRING;
+        String indent = this.option instanceof PrettyPrintOptions prettyOptions && prettyOptions.prettyPrint() ? prettyOptions.getIndent() : SerializationConstants.EMPTY_STRING;
         writer.write(indent);
 
         // Subject
@@ -264,8 +248,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writePredicate(Writer writer, Value predicate) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-        if (tFamilyConfig.useRdfTypeShortcut() && predicate.equals(RDF.type.getIRI())) {
+        if (this.option instanceof AbstractTFamilyOptions tFamilyOptions && tFamilyOptions.useRdfTypeShortcut() && predicate.equals(RDF.type.getIRI())) {
             writer.write(SerializationConstants.RDF_TYPE_SHORTCUT);
         } else {
             writeValue(writer, predicate);
@@ -303,12 +286,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
             boolean isSubject = model.stream().anyMatch(stmt -> stmt.getSubject().equals(bNode));
 
-            if (!isSubject && option instanceof AbstractSerializerOption) {
-                if (getTFamilyOption().useCollections() && bNode.isBNode()) {
+            if (!isSubject && option instanceof AbstractTFamilyOptions abstractTFOptions) {
+                if (abstractTFOptions.useCollections() && bNode.isBNode()) {
                     handled = writeRDFList(writer, bNode);
                 }
 
-                if (!handled && getTFamilyOption().getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS && bNode.isBNode()) {
+                if (!handled && abstractTFOptions.getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS && bNode.isBNode()) {
                     List<Statement> properties = model.stream()
                             .filter(stmt -> stmt.getSubject().equals(bNode))
                             .toList();
@@ -345,7 +328,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         }
 
         String prefixed = null;
-        if (option instanceof AbstractSerializerOption && getTFamilyOption().usePrefixes()) {
+        if (option instanceof UsesPrefixOptions prefixOptions && prefixOptions.usePrefixes()) {
             prefixed = getPrefixedName(iri.stringValue());
         }
 
@@ -369,8 +352,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         String value = literal.stringValue();
 
         boolean useTripleQuotes = false;
-        if (option instanceof AbstractTFamilyOption) {
-            useTripleQuotes = getTFamilyOption().useMultilineLiterals() &&
+        if (option instanceof AbstractTFamilyOptions tFamilyOptions) {
+            useTripleQuotes = tFamilyOptions.useMultilineLiterals() &&
                     (value.contains(SerializationConstants.LINE_FEED) || value.contains(SerializationConstants.CARRIAGE_RETURN) || value.contains("\"\"\""));
         }
 
@@ -436,10 +419,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeInlineBlankNode(Writer writer, List<Statement> properties) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
-        String currentIndent = tFamilyConfig.prettyPrint() ? tFamilyConfig.getIndent() : SerializationConstants.EMPTY_STRING;
-        String propIndent = tFamilyConfig.prettyPrint() ? currentIndent + tFamilyConfig.getIndent() : "";
+        String currentIndent = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() ? prettyPrintOptions.getIndent() : SerializationConstants.EMPTY_STRING;
+        String propIndent = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() ? currentIndent + prettyPrintOptions.getIndent() : "";
 
         writer.write(SerializationConstants.BLANK_NODE_START);
 
@@ -455,7 +436,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
             firstProperty = false;
 
-            if (tFamilyConfig.prettyPrint()) {
+            if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint()) {
                 writer.write(option.getLineEnding() + propIndent);
             } else {
                 writer.write(SerializationConstants.SPACE);
@@ -466,7 +447,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             writeValue(writer, stmt.getObject());
         }
 
-        if (tFamilyConfig.prettyPrint() && !properties.isEmpty() && !firstProperty) {
+        if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() && !properties.isEmpty() && !firstProperty) {
             writer.write(option.getLineEnding() + currentIndent);
         }
 
@@ -482,9 +463,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeOptimizedStatements(Writer writer) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
-        Map<Resource, List<Statement>> bySubject = tFamilyConfig.sortSubjects() ?
+        Map<Resource, List<Statement>> bySubject = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortSubjects() ?
                 new TreeMap<>(Comparator.comparing(Resource::stringValue)) :
                 new HashMap<>();
 
@@ -493,12 +472,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 .forEach(stmt -> bySubject.computeIfAbsent(stmt.getSubject(), k -> new ArrayList<>()).add(stmt));
 
         for (Map.Entry<Resource, List<Statement>> subjectEntry : bySubject.entrySet()) {
-            String indent = tFamilyConfig.prettyPrint() ? tFamilyConfig.getIndent() : SerializationConstants.EMPTY_STRING;
+            String indent = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() ? prettyPrintOptions.getIndent() : SerializationConstants.EMPTY_STRING;
             writer.write(indent);
             writeValue(writer, subjectEntry.getKey());
             writer.write(SerializationConstants.SPACE);
 
-            Map<IRI, List<Statement>> byPredicate = tFamilyConfig.sortPredicates() ?
+            Map<IRI, List<Statement>> byPredicate = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortPredicates() ?
                     new TreeMap<>(Comparator.comparing(IRI::stringValue)) :
                     new HashMap<>();
 
@@ -508,8 +487,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             for (Map.Entry<IRI, List<Statement>> predicateEntry : byPredicate.entrySet()) {
                 if (!firstPredicate) {
                     writer.write(SerializationConstants.SEMICOLON);
-                    if (tFamilyConfig.prettyPrint()) {
-                        writer.write(option.getLineEnding() + indent + tFamilyConfig.getIndent());
+                    if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint()) {
+                        writer.write(option.getLineEnding() + indent + prettyPrintOptions.getIndent());
                     } else {
                         writer.write(SerializationConstants.SPACE);
                     }
@@ -523,8 +502,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 for (Statement stmt : predicateEntry.getValue()) {
                     if (!firstObject) {
                         writer.write(SerializationConstants.COMMA);
-                        if (tFamilyConfig.prettyPrint()) {
-                            writer.write(option.getLineEnding() + indent + tFamilyConfig.getIndent() + tFamilyConfig.getIndent());
+                        if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint()) {
+                            writer.write(option.getLineEnding() + indent + prettyPrintOptions.getIndent() + prettyPrintOptions.getIndent());
                         } else {
                             writer.write(SerializationConstants.SPACE);
                         }
@@ -638,19 +617,17 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return A {@link Set} of {@link Resource} representing the blank nodes that will be serialized inline.
      */
     protected Set<Resource> precomputeInlineBlankNodesAndLists() {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
         Set<Resource> precomputed = new HashSet<>();
         for (Statement stmt : model) {
             if (stmt.getSubject().isBNode()) {
                 Resource bNodeSubject = stmt.getSubject();
-                if (tFamilyConfig.useCollections() && isRDFListHead(bNodeSubject)) {
+                if (this.option instanceof AbstractTFamilyOptions tFamilyOptions && tFamilyOptions.useCollections() && isRDFListHead(bNodeSubject)) {
                     Set<Resource> listNodes = detectListNodes(bNodeSubject);
                     if (!listNodes.isEmpty()) {
                         precomputed.addAll(listNodes);
                     }
                 }
-                if (tFamilyConfig.getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS) {
+                if (this.option instanceof AbstractTFamilyOptions tFamilyOptions && tFamilyOptions.getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS) {
                     List<Statement> properties = model.stream()
                             .filter(s -> s.getSubject().equals(bNodeSubject))
                             .toList();
