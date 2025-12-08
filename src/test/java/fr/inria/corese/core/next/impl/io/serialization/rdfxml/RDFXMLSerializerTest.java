@@ -28,7 +28,7 @@ class RDFXMLSerializerTest {
 
     @Mock
     private Model mockModel;
-    RDFXMLSerializerOption mockConfig;
+    RDFXMLSerializerOptions mockConfig;
     private TestStatementFactory factory;
     private StringWriter writer;
     private AutoCloseable closeable;
@@ -58,7 +58,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .autoDeclarePrefixes(true)
                 .usePrefixes(true)
                 .addPrefix("foaf", "http://xmlns.com/foaf/0.1/")
@@ -93,7 +93,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .stableBlankNodeIds(true)
                 .addPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -126,7 +126,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .stableBlankNodeIds(true)
                 .addPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -159,7 +159,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .addPrefix("foaf", "http://xmlns.com/foaf/0.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -190,7 +190,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.MINIMAL)
                 .addPrefix("ex", "http://example.org/vocabulary/")
                 .addPrefix("xsd", "http://www.w3.org/2001/XMLSchema#")
@@ -222,7 +222,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .addPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
@@ -259,7 +259,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .addPrefix("exorg", "http://ex.org/")
                 .addPrefix("excom", "http://ex.com/")
                 .prefixOrdering(PrefixOrderingEnum.USAGE_ORDER)
@@ -301,7 +301,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .sortSubjects(true)
                 .addPrefix("ex", "http://ex.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -337,7 +337,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
@@ -367,7 +367,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .addPrefix("ex", "http://example.org/")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -401,7 +401,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .autoDeclarePrefixes(false)
                 .usePrefixes(true)
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -433,7 +433,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .usePrefixes(false)
                 .autoDeclarePrefixes(true)
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
@@ -471,7 +471,7 @@ class RDFXMLSerializerTest {
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt1, stmt2));
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .stableBlankNodeIds(false)
                 .sortSubjects(true)
                 .addPrefix("ex", "http://example.org/")
@@ -502,7 +502,7 @@ class RDFXMLSerializerTest {
     void shouldHandleEmptyModel() throws SerializationException {
         when(mockModel.stream()).thenReturn(Stream.empty());
 
-        RDFXMLSerializerOption testConfig = new RDFXMLSerializerOption.Builder()
+        RDFXMLSerializerOptions testConfig = new RDFXMLSerializerOptions.Builder()
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 

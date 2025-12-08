@@ -38,7 +38,7 @@ class RDFXMLCircularTest {
     private ValueFactory valueFactory;
     private fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
-    private RDFXMLSerializerOption defaultConfig;
+    private RDFXMLSerializerOptions defaultConfig;
 
     // Test data constants
     private static final String EXAMPLE_NS = "http://example.org/";
@@ -60,7 +60,7 @@ class RDFXMLCircularTest {
         valueFactory = new CoreseAdaptedValueFactory();
         serializerFactory = new SerializerFactory();
         parserFactory = new ParserFactory();
-        defaultConfig = RDFXMLSerializerOption.defaultConfig();
+        defaultConfig = RDFXMLSerializerOptions.defaultConfig();
     }
 
     /**

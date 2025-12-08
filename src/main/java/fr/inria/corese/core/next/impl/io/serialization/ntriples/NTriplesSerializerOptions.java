@@ -1,16 +1,16 @@
 package fr.inria.corese.core.next.impl.io.serialization.ntriples;
 
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractNFamilyOption;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractNFamilyOptions;
 
 /**
  * Configuration for N-Triples serialization format.
- * This class extends {@link AbstractNFamilyOption} and provides specific defaults
+ * This class extends {@link AbstractNFamilyOptions} and provides specific defaults
  * and options tailored for N-Triples, which is a simple, line-oriented format.
  *
  * <p>Use the {@link Builder} class to create instances of {@code NTriplesConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class NTriplesSerializerOptions extends AbstractNFamilyOption {
+public class NTriplesSerializerOptions extends AbstractNFamilyOptions {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
@@ -26,7 +26,7 @@ public class NTriplesSerializerOptions extends AbstractNFamilyOption {
      * Provides a fluent API for constructing {@code NTriplesConfig} instances with default values
      * specific to the N-Triples format.
      */
-    public static class Builder extends AbstractNFamilyOption.AbstractNFamilyBuilder<Builder> {
+    public static class Builder extends AbstractNFamilyOptions.AbstractNFamilyBuilder<Builder> {
         /**
          * Default constructor initializes all options with their default values for N-Triples.
          */
