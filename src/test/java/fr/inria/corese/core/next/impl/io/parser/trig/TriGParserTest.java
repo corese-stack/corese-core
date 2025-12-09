@@ -31,10 +31,9 @@ class TriGParserTest {
      * @param trigData a string of rdf data in trig format
      * @param baseURI the base uri
      * @return Corese rdf model
-     * @throws Exception
      */
 
-    private Model parseFromString(String trigData, String baseURI) throws Exception {
+    private Model parseFromString(String trigData, String baseURI) {
         Model model = new CoreseModel();
         ValueFactory factory = new CoreseAdaptedValueFactory();
         RDFParser parser = new TriGParser(model, factory);
@@ -47,7 +46,7 @@ class TriGParserTest {
      * @param model
      */
     private void printModel(Model model) {
-        model.stream().forEach(stmt -> {
+        model.forEach(stmt -> {
             Value obj = stmt.getObject();
             String subjectString = stmt.getSubject().stringValue();
             String predicateString = stmt.getPredicate().stringValue();
@@ -78,7 +77,7 @@ class TriGParserTest {
     }
 
     @Test
-    void testNamedGraphParsing() throws Exception {
+    void testNamedGraphParsing()  {
         String trig = """
                 @prefix ex: <http://example.org/> .
                 ex:Graph1 {
@@ -95,7 +94,7 @@ class TriGParserTest {
     }
 
     @Test
-    void testDocumentThatContainsOneGraphExample1() throws Exception {
+    void testDocumentThatContainsOneGraphExample1()  {
         String trig = """
                 # This document encodes one graph.
                 @prefix ex: <http://www.example.org/vocabulary#> .
@@ -120,7 +119,7 @@ class TriGParserTest {
     }
 
     @Test
-    void testDocumentThatContainsTwoGraphExample() throws Exception {
+    void testDocumentThatContainsTwoGraphExample()  {
         String trig = """
                 # This document contains a same data as the
                 # previous example.
@@ -160,7 +159,7 @@ class TriGParserTest {
     }
 
     @Test
-    void testNestedBlankNodesWithSharedIdentifiers() throws Exception {
+    void testNestedBlankNodesWithSharedIdentifiers()  {
         String trig = """
                 @prefix ex: <http://example.org/> .
                 

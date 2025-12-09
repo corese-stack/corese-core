@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class JSONLDOptionsTest {
 
-    private fr.inria.corese.core.next.impl.io.common.JSONLDOptions optionAllTrue = new fr.inria.corese.core.next.impl.io.common.JSONLDOptions.Builder().base("http://example.org/AllTrue")
+    private final fr.inria.corese.core.next.impl.io.common.JSONLDOptions optionAllTrue = new fr.inria.corese.core.next.impl.io.common.JSONLDOptions.Builder().base("http://example.org/AllTrue")
             .extractAllScripts(true)
             .compactToRelative(true)
             .compactArrays(true)
@@ -23,7 +23,7 @@ class JSONLDOptionsTest {
             .useNativeTypes(true)
             .build();
 
-    private fr.inria.corese.core.next.impl.io.common.JSONLDOptions optionAllFalse = new fr.inria.corese.core.next.impl.io.common.JSONLDOptions.Builder().base("http://example.org/AllFalse")
+    private final fr.inria.corese.core.next.impl.io.common.JSONLDOptions optionAllFalse = new fr.inria.corese.core.next.impl.io.common.JSONLDOptions.Builder().base("http://example.org/AllFalse")
             .extractAllScripts(false)
             .compactArrays(false)
             .compactToRelative(false)

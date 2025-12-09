@@ -62,9 +62,7 @@ class PrefixHandlerTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException if prefix is null")
     void testSetPrefixNullPrefix() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            handler.setPrefix(null, "http://example.org/");
-        });
+        assertThrows(IllegalArgumentException.class, () -> handler.setPrefix(null, "http://example.org/"));
     }
 
     /**
@@ -73,9 +71,7 @@ class PrefixHandlerTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException if namespace is null")
     void testSetPrefixNullNamespace() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            handler.setPrefix("ex", null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> handler.setPrefix("ex", null));
     }
 
 
@@ -220,9 +216,7 @@ class PrefixHandlerTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException if expansion input is null")
     void testExpandPrefixNullInput() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            handler.expandPrefix(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> handler.expandPrefix(null));
     }
 
     /**
@@ -243,9 +237,7 @@ class PrefixHandlerTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException if compression input is null")
     void testCompressIRINullInput() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            handler.compressIRI(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> handler.compressIRI(null));
     }
 
     /**
@@ -312,9 +304,7 @@ class PrefixHandlerTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException if copy source is null")
     void testCopyFromNull() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            handler.copyFrom(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> handler.copyFrom(null));
     }
 
     /**

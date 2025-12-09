@@ -66,17 +66,15 @@ class NQuadsParserTest {
 
         lenient().when(mockValueFactory.createIRI(anyString())).thenAnswer(invocation -> {
             String uri = invocation.getArgument(0);
-            if (uri.equals("http://example.org/subject")) return mockSubjectIRI;
-            if (uri.equals("http://example.org/predicate")) return mockPredicateIRI;
-            if (uri.equals("http://example.org/object")) return mockObjectIRI;
-            if (uri.equals("http://example.org/graph")) return mockGraphIRI;
-            if (uri.equals("http://www.w3.org/2001/XMLSchema#integer")) return mockDatatypeIRI;
-            if (uri.equals("http://example.org/escaped>uri")) return mockEscapedIRI;
-            if (uri.equals("http://example.org/s ubject")) return mock(IRI.class);
-            if (uri.equals("http://example.org/path/€")) return mock(IRI.class);
-            if (uri.equals("http://example.org/path>with\\<escaped\\_chars\\")) return mock(IRI.class);
-            if (uri.equals("http://example.org/graphName")) return mock(IRI.class);
-            return mock(IRI.class);
+            return switch (uri) {
+                case "http://example.org/subject" -> mockSubjectIRI;
+                case "http://example.org/predicate" -> mockPredicateIRI;
+                case "http://example.org/object" -> mockObjectIRI;
+                case "http://example.org/graph" -> mockGraphIRI;
+                case "http://www.w3.org/2001/XMLSchema#integer" -> mockDatatypeIRI;
+                case "http://example.org/escaped>uri" -> mockEscapedIRI;
+                default -> mock(IRI.class);
+            };
         });
 
         lenient().when(mockValueFactory.createBNode(anyString())).thenAnswer(invocation -> {

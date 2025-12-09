@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.api.Literal;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.impl.common.BasicIRI;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +20,8 @@ import java.time.Period;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public abstract class ValueFactoryTest {
 
@@ -33,10 +33,8 @@ public abstract class ValueFactoryTest {
     @Test
     public void testCreateIRI() {
         String correctIRI = "http://example.org";
-        String incorrectIRI = "test";
 
         assertNotNull(this.valueFactory.createIRI(correctIRI));
-//        assertThrows(IncorrectFormatException.class, () -> this.valueFactory.createIRI(incorrectIRI));
     }
 
     @Test
@@ -48,7 +46,7 @@ public abstract class ValueFactoryTest {
         assertNotNull(nodesCorese123);
         assertNotNull(nodesCoreseRandom);
         assertNotNull(nodesCoreseRandom.getID());
-        assertEquals(nodesCorese123.getID(), "corese123");
+        assertEquals("corese123", nodesCorese123.getID());
     }
 
     @Test

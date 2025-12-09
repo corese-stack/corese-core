@@ -5,8 +5,6 @@ import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
@@ -17,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,10 +46,9 @@ class TurtleSerializerTest {
      * and that standard prefixes are declared and used.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testBasicTurtleSerialization() throws SerializationException, IOException {
+    void testBasicTurtleSerialization() throws SerializationException {
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/person1"),
                 factory.createIRI("http://example.org/ns/hasName"),
@@ -91,10 +87,9 @@ class TurtleSerializerTest {
      * Verifies that `rdf:type` is serialized as `a` when the option is enabled.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testRdfTypeShortcut() throws SerializationException, IOException {
+    void testRdfTypeShortcut() throws SerializationException {
 
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/person1"),
@@ -136,10 +131,9 @@ class TurtleSerializerTest {
      * Verifies that the language tag is appended correctly.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testLiteralWithLanguageTag() throws SerializationException, IOException {
+    void testLiteralWithLanguageTag() throws SerializationException {
 
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/data/book1"),
@@ -194,11 +188,10 @@ class TurtleSerializerTest {
      * Verifies that the datatype is printed when `ALWAYS_TYPED` policy is used.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
     @DisplayName("Should serialize literal with xsd:string datatype (minimal policy)")
-    void testLiteralWithExplicitXsdStringType() throws SerializationException, IOException {
+    void testLiteralWithExplicitXsdStringType() throws SerializationException {
 
         IRI mockDatatype = XSD.STRING.getIRI();
         Statement mockStatement = factory.createStatement(
@@ -252,10 +245,9 @@ class TurtleSerializerTest {
      * Verifies that the blank node is serialized inline with its properties.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testBlankNodeSerialization() throws SerializationException, IOException {
+    void testBlankNodeSerialization() throws SerializationException {
 
         Statement mainStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/mainSubject"),
@@ -295,8 +287,6 @@ class TurtleSerializerTest {
                   _:b1 ns:hasValue "Value of BNode" .
                 """;
 
-        String actual = writer.toString().replace("\r\n", "\n");
-
         String expected1 = """
   _:b1 ns:hasValue "Value of BNode" .
   ns:mainSubject ns:refersTo _:b1 .
@@ -317,15 +307,11 @@ class TurtleSerializerTest {
         Logger logger = LoggerFactory.getLogger(TurtleSerializerTest.class);
 
         ValueFactory valueFactory;
-        fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
-        ParserFactory parserFactory;
         TurtleSerializerOptions defaultConfig;
         String EXAMPLE_NS = "http://example.org/";
         String PREDICATE_KNOWS = EXAMPLE_NS + "knows";
 
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new SerializerFactory();
-        parserFactory = new ParserFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();
 
         Model model = new CoreseModel();
@@ -337,34 +323,34 @@ class TurtleSerializerTest {
         model.add(blankSubject, predicate, blankObject);
 
 
-            model.stream().forEach(stmt -> {
-                Value obj = stmt.getObject();
-                String subjectString = stmt.getSubject().stringValue();
-                String predicateString = stmt.getPredicate().stringValue();
+        for (Statement stmt : model) {
+            Value obj = stmt.getObject();
+            String subjectString = stmt.getSubject().stringValue();
+            String predicateString = stmt.getPredicate().stringValue();
 
-                if (obj instanceof Literal literal) {
-                    String label = String.valueOf(literal.getLabel());
-                    String languageTag = literal.getLanguage().orElse(null);
+            if (obj instanceof Literal literal) {
+                String label = String.valueOf(literal.getLabel());
+                String languageTag = literal.getLanguage().orElse(null);
 
-                    if (languageTag != null) {
-                        logger.debug("({}, {}, \"{}\"@{})",
-                                subjectString,
-                                predicateString,
-                                label,
-                                languageTag);
-                    } else {
-                        logger.debug("({}, {}, \"{}\")",
-                                subjectString,
-                                predicateString,
-                                label);
-                    }
-                } else {
-                    logger.debug("({}, {}, {})",
+                if (languageTag != null) {
+                    logger.debug("({}, {}, \"{}\"@{})",
                             subjectString,
                             predicateString,
-                            obj.stringValue());
+                            label,
+                            languageTag);
+                } else {
+                    logger.debug("({}, {}, \"{}\")",
+                            subjectString,
+                            predicateString,
+                            label);
                 }
-            });
+            } else {
+                logger.debug("({}, {}, {})",
+                        subjectString,
+                        predicateString,
+                        obj.stringValue());
+            }
+        }
 
         StringWriter writer = new StringWriter();
         TurtleSerializer turtleSerializer = new TurtleSerializer(model, defaultConfig);
@@ -379,10 +365,9 @@ class TurtleSerializerTest {
      * Verifies that the `@base` directive is included in the output.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testBaseIRI() throws SerializationException, IOException {
+    void testBaseIRI() throws SerializationException {
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/base/resource1"),
                 factory.createIRI("http://example.org/base/prop"),
@@ -427,13 +412,12 @@ class TurtleSerializerTest {
      * Verifies that only prefix declarations (if auto-declared) are written, with no statements.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testEmptyModel() throws SerializationException, IOException {
+    void testEmptyModel() throws SerializationException {
 
         Model emptyModel = mock(Model.class);
-        when(emptyModel.iterator()).thenAnswer(invocation -> Collections.emptyList().iterator());
+        when(emptyModel.iterator()).thenAnswer(invocation -> Collections.emptyIterator());
         when(emptyModel.stream())
                 .thenReturn(Stream.empty())
                 .thenReturn(Stream.empty());
@@ -486,9 +470,7 @@ class TurtleSerializerTest {
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
-        SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            turtleSerializer.write(writer);
-        });
+        SerializationException thrown = assertThrows(SerializationException.class, () -> turtleSerializer.write(writer));
 
         assertEquals("Turtle", thrown.getFormatName());
 
@@ -522,9 +504,7 @@ class TurtleSerializerTest {
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, strictConfig);
 
 
-        SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            turtleSerializer.write(writer);
-        });
+        SerializationException thrown = assertThrows(SerializationException.class, () -> turtleSerializer.write(writer));
 
         assertEquals("Turtle", thrown.getFormatName());
 
@@ -536,10 +516,9 @@ class TurtleSerializerTest {
      * Verifies that the literal is wrapped in triple quotes `"""` when `useMultilineLiterals` is true.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testMultilineLiteralSerialization() throws SerializationException, IOException {
+    void testMultilineLiteralSerialization() throws SerializationException {
         String multilineText = "This is the first line.\nThis is the second line.";
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/book/1"),
@@ -583,10 +562,9 @@ class TurtleSerializerTest {
      * Tests serialization of a literal containing escaped characters.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testEscapedCharacterLiteralSerialization() throws SerializationException, IOException {
+    void testEscapedCharacterLiteralSerialization() throws SerializationException {
         ValueFactory coreseFactory = new CoreseAdaptedValueFactory();
         Statement statement = coreseFactory.createStatement(
                 coreseFactory.createIRI("http://example.org/book/1"),

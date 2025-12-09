@@ -1,6 +1,19 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.api.*;
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import fr.inria.corese.core.next.api.BNode;
+import fr.inria.corese.core.next.api.IRI;
+import fr.inria.corese.core.next.api.Literal;
+import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
@@ -19,12 +32,20 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * Circular tests for RDF/XML parser and serializer integration.
  * These tests verify that data can be correctly serialized to RDF/XML format
  * and then parsed back to an equivalent model (round-trip testing).
  * The circular testing approach ensures that the parser and serializer
  * are compatible and preserve data integrity across format transformations.
+ * RDF/XML supports namespaces, so additional tests are included for prefix
+ * handling.
+ * NOTE: These tests are currently disabled because they cannot work yet.
+ * We need to wait for the RDF/XML parser implementation from PR #176:
+ * Once the parser is implemented, these tests can be enabled to verify
+ * the round-trip functionality between the parser and serializer.
  */
 @DisplayName("RDF/XML Circular Integration Tests")
 class RDFXMLCircularTest {
@@ -228,7 +249,8 @@ class RDFXMLCircularTest {
         // Verify serialization produced content (only check for non-empty models)
         assertNotNull(serializedContent, "Serialized content should not be null");
         if (!originalModel.isEmpty()) {
-            assertFalse(serializedContent.isEmpty(), "Serialized content should not be empty for non-empty models");
+            assertFalse(serializedContent.isEmpty(),
+                    "Serialized content should not be empty for non-empty models");
         }
 
         // Parse back from RDF/XML
@@ -384,7 +406,7 @@ class RDFXMLCircularTest {
 
     @Test
     @DisplayName("Round-trip test with simple model containing basic IRIs and literals")
-    void testRoundTripWithSimpleModel() {
+    void testRoundTripWithSimpleModel()  {
         // Given: A simple model with basic triples
         Model originalModel = createSimpleTestModel();
 
@@ -396,7 +418,7 @@ class RDFXMLCircularTest {
 
     @Test
     @DisplayName("Round-trip test with complex model containing diverse RDF value types")
-    void testRoundTripWithComplexModel() {
+    void testRoundTripWithComplexModel()  {
         // Given: A complex model with various RDF constructs
         Model originalModel = createComplexTestModel();
 
@@ -410,7 +432,7 @@ class RDFXMLCircularTest {
 
     @Test
     @DisplayName("Round-trip test with empty model")
-    void testRoundTripWithEmptyModel() {
+    void testRoundTripWithEmptyModel()  {
         // Given: An empty model
         Model originalModel = new CoreseModel();
 
@@ -424,7 +446,7 @@ class RDFXMLCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only typed literals")
-    void testRoundTripWithTypedLiterals() {
+    void testRoundTripWithTypedLiterals()  {
         // Given: A model with various typed literals
         Model originalModel = createTypedLiteralsTestModel();
         // When: Performing round-trip serialization and parsing
@@ -435,7 +457,7 @@ class RDFXMLCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only language-tagged literals")
-    void testRoundTripWithLanguageTaggedLiterals() {
+    void testRoundTripWithLanguageTaggedLiterals()  {
         // Given: A model with language-tagged literals
         Model originalModel = createLanguageTaggedLiteralsTestModel();
 
@@ -447,7 +469,7 @@ class RDFXMLCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only blank nodes")
-    void testRoundTripWithBlankNodes() {
+    void testRoundTripWithBlankNodes()  {
         // Given: A model with blank nodes as subjects and objects
         Model originalModel = createBlankNodesTestModel();
 
@@ -466,7 +488,7 @@ class RDFXMLCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing special characters and escape sequences")
-    void testRoundTripWithSpecialCharacters() {
+    void testRoundTripWithSpecialCharacters()  {
         // Given: A model with special characters and escape sequences
         Model originalModel = createSpecialCharactersTestModel();
 
