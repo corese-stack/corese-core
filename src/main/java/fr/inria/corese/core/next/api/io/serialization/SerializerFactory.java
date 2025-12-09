@@ -18,7 +18,7 @@ public interface SerializerFactory {
 
     /**
      * Creates a new RDF serializer for the specified format and model.
-     * 
+     *
      * @param format The {@link RDFFormat} to use for serialization.
      * @param model  The {@link Model} to be serialized.
      * @param config The {@link IOOptions} configuration to use for
@@ -27,4 +27,15 @@ public interface SerializerFactory {
      *         model.
      */
     RDFSerializer createSerializer(RDFFormat format, Model model, IOOptions config);
+
+    /**
+     * Creates a new RDF serializer for the specified format and model
+     * using the default configuration for that format.
+     *
+     * @param format The {@link RDFFormat} to use for serialization.
+     * @param model  The {@link Model} to be serialized.
+     * @return A new instance of an RDF serializer for the specified format and
+     *         model with default configuration.
+     */
+    RDFSerializer createSerializer(RDFFormat format, Model model);
 }
