@@ -27,5 +27,4 @@ public interface Triple extends Resource {
 
 	@Override
 	int hashCode();
-
 }
