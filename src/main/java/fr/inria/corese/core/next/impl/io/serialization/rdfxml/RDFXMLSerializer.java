@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.serialization.*;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,6 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.Value;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
@@ -53,7 +54,7 @@ public class RDFXMLSerializer implements RDFSerializer {
     private static final Logger logger = LoggerFactory.getLogger(RDFXMLSerializer.class);
 
     private final Model model;
-    private final RDFXMLSerializerOption config;
+    private final IOOptions config;
     private final Map<String, String> iriToPrefixMapping;
     private final Map<String, String> prefixToIriMapping;
     private final Map<Resource, String> blankNodeIds;
@@ -62,23 +63,23 @@ public class RDFXMLSerializer implements RDFSerializer {
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and default configuration.
-     * The default configuration is obtained from {@link RDFXMLSerializerOption#defaultConfig()}.
+     * The default configuration is obtained from {@link RDFXMLSerializerOptions#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public RDFXMLSerializer(Model model) {
-        this(model, RDFXMLSerializerOption.defaultConfig());
+        this(model, RDFXMLSerializerOptions.defaultConfig());
     }
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link RDFXMLSerializerOption} to use for serialization. Must not be null.
+     * @param config the {@link RDFXMLSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public RDFXMLSerializer(Model model, RDFXMLSerializerOption config) {
+    public RDFXMLSerializer(Model model, IOOptions config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
         this.iriToPrefixMapping = new HashMap<>();
@@ -92,8 +93,8 @@ public class RDFXMLSerializer implements RDFSerializer {
      * The custom prefixes map in XmlConfig is expected to be {prefix: namespaceURI}.
      */
     private void initializePrefixes() {
-        if (config.usePrefixes()) {
-            for (Map.Entry<String, String> entry : config.getCustomPrefixes().entrySet()) {
+        if (this.config instanceof UsesPrefixOptions usesPrefixOptions && usesPrefixOptions.usePrefixes()) {
+            for (Map.Entry<String, String> entry : usesPrefixOptions.getPrefixHandler().getPrefixMap().entrySet()) {
                 addPrefixMapping(entry.getValue(), entry.getKey());
             }
         }
@@ -132,7 +133,9 @@ public class RDFXMLSerializer implements RDFSerializer {
      */
     private void writeXmlDeclaration(Writer writer) throws IOException {
         writer.write(SerializationConstants.XML_DECLARATION_START);
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
     }
 
     /**
@@ -143,30 +146,39 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeRdfRootElement(Writer writer) throws IOException {
-        if (config.usePrefixes() && config.autoDeclarePrefixes()) {
+        if (this.config instanceof UsesPrefixOptions usesPrefixOptions &&  usesPrefixOptions.usePrefixes() && usesPrefixOptions.autoDeclarePrefixes()) {
             collectUsedNamespaces();
         }
 
         writer.write(SerializationConstants.RDF_ROOT_START);
         writeNamespaceAttributes(writer);
         writer.write(">");
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
 
         Map<Resource, List<Statement>> statementsBySubject = cachedStatements.stream()
                 .collect(Collectors.groupingBy(Statement::getSubject));
 
 
         List<Resource> sortedSubjects = new ArrayList<>(statementsBySubject.keySet());
-        if (config.sortSubjects()) {
+        if (this.config instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortSubjects()) {
             Collections.sort(sortedSubjects, Comparator.comparing(Value::stringValue));
         }
 
+        String zeroIndent = "";
         for (Resource subject : sortedSubjects) {
-            writeDescriptionElement(writer, subject, statementsBySubject.get(subject), config.getIndent());
+            if(this.config instanceof PrettyPrintOptions prettyPrintOptions) {
+                writeDescriptionElement(writer, subject, statementsBySubject.get(subject), prettyPrintOptions.getIndent());
+            } else {
+                writeDescriptionElement(writer, subject, statementsBySubject.get(subject), zeroIndent);
+            }
         }
 
         writer.write(SerializationConstants.RDF_ROOT_END);
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
     }
 
     /**
@@ -181,7 +193,7 @@ public class RDFXMLSerializer implements RDFSerializer {
         }
 
         List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
-        if (config.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
+        if (this.config instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
             Collections.sort(prefixes);
         }
 
@@ -319,7 +331,10 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeDescriptionElement(Writer writer, Resource subject, List<Statement> statements, String currentIndent) throws IOException {
-        String nextIndent = currentIndent + config.getIndent();
+        String nextIndent = currentIndent;
+        if(this.config instanceof PrettyPrintOptions prettyPrintOptions) {
+            nextIndent = currentIndent + prettyPrintOptions.getIndent();
+        }
 
         writer.write(currentIndent);
         if (subject.isIRI()) {
@@ -327,13 +342,15 @@ public class RDFXMLSerializer implements RDFSerializer {
         } else if (subject.isBNode()) {
             writer.write(String.format("%s %s=\"%s\">", SerializationConstants.RDF_DESCRIPTION_START, SerializationConstants.RDF_NODEID_ATTRIBUTE, getBlankNodeId(subject)));
         }
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
 
         Map<IRI, List<Statement>> statementsByPredicate = statements.stream()
                 .collect(Collectors.groupingBy(Statement::getPredicate));
 
         List<IRI> sortedPredicates = new ArrayList<>(statementsByPredicate.keySet());
-        if (config.sortPredicates()) {
+        if (this.config instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortPredicates()) {
             Collections.sort(sortedPredicates, Comparator.comparing(Value::stringValue));
         }
 
@@ -345,7 +362,9 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         writer.write(currentIndent);
         writer.write(SerializationConstants.RDF_DESCRIPTION_END);
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
     }
 
     /**
@@ -374,10 +393,14 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         if (object.isIRI()) {
             writer.write(String.format(" %s=\"%s\"/>", SerializationConstants.RDF_RESOURCE_ATTRIBUTE, escapeXmlAttribute(object.stringValue())));
-            writer.write(config.getLineEnding());
+            if(this.config instanceof LineEndingOptions lineEndingOptions) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
         } else if (object.isBNode()) {
             writer.write(String.format(" %s=\"%s\"/>", SerializationConstants.RDF_NODEID_ATTRIBUTE, getBlankNodeId((Resource) object)));
-            writer.write(config.getLineEnding());
+            if(this.config instanceof LineEndingOptions lineEndingOptions) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
         } else if (object.isLiteral()) {
             Literal literal = (Literal) object;
 
@@ -397,15 +420,12 @@ public class RDFXMLSerializer implements RDFSerializer {
                 writer.write(">");
             }
 
-            if (config.useMultilineLiterals() && (literal.stringValue().contains(SerializationConstants.LINE_FEED) || literal.stringValue().contains(SerializationConstants.CARRIAGE_RETURN))) {
-
-                writer.write(escapeXmlContent(literal.stringValue()));
-            } else {
-                writer.write(escapeXmlContent(literal.stringValue()));
-            }
+            writer.write(escapeXmlContent(literal.stringValue()));
 
             writer.write(String.format("</%s>", elementName));
-            writer.write(config.getLineEnding());
+            if(this.config instanceof LineEndingOptions lineEndingOptions) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
         } else {
             throw new IllegalArgumentException("Unsupported value type for RDF/XML serialization: " + object.getClass().getName());
         }
@@ -419,7 +439,7 @@ public class RDFXMLSerializer implements RDFSerializer {
      */
     private String getBlankNodeId(Resource bNode) {
         return blankNodeIds.computeIfAbsent(bNode, k -> {
-            if (config.stableBlankNodeIds()) {
+            if (this.config instanceof BlankNodeIdGenerationOptions bnGenOptions && bnGenOptions.stableBlankNodeIds()) {
                 return "b" + (blankNodeCounter++);
             } else {
                 return bNode.stringValue().substring(2);
@@ -443,9 +463,10 @@ public class RDFXMLSerializer implements RDFSerializer {
             return false;
         }
 
-        return config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED ||
-                (!datatype.equals(XSD.xsdString.getIRI()) &&
-                        config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL);
+        return config instanceof DatatypePolicyOptions datatypePolicyOptions
+                && (datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED
+                    || (!datatype.equals(XSD.xsdString.getIRI())
+                        && datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL));
     }
 
 

@@ -22,11 +22,11 @@ public interface UsesPrefixOptions {
      *
      * @return The {@link PrefixOrderingEnum} for prefix ordering.
      */
-    public PrefixOrderingEnum getPrefixOrdering();
+    PrefixOrderingEnum getPrefixOrdering();
     /**
      * Returns an unmodifiable map of custom URI prefixes.
      *
      * @return The {@link PrefixHandler} managing all prefix mappings.
      */
-    public PrefixHandler getPrefixHandler();
+    PrefixHandler getPrefixHandler();
 }

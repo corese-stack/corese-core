@@ -130,17 +130,6 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
     }
 
     /**
-     * Returns an unmodifiable map of custom URI prefixes for backward compatibility.
-     *
-     * @return A map where keys are prefix names and values are namespace URIs.
-     * @deprecated Use {@link #getPrefixHandler()} instead for full prefix management capabilities.
-     */
-    @Deprecated
-    public Map<String, String> getCustomPrefixes() {
-        return prefixHandler.getPrefixMap();
-    }
-
-    /**
      * Checks if human-readable formatting (pretty-printing) is enabled.
      *
      * @return {@code true} if pretty-printing is enabled, {@code false} otherwise.

@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.api.io.serialization;
 
+import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
+
 public interface PrettyPrintOptions {
 
     /**
@@ -36,4 +38,11 @@ public interface PrettyPrintOptions {
      * @return {@code true} if predicate sorting is enabled, {@code false} otherwise.
      */
     boolean sortPredicates();
+
+    /**
+     * Returns the policy for ordering prefix declarations.
+     *
+     * @return The {@link PrefixOrderingEnum} for prefix ordering.
+     */
+    PrefixOrderingEnum getPrefixOrdering();
 }
