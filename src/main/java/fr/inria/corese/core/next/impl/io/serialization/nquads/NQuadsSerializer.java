@@ -4,7 +4,13 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.api.io.serialization.BlankNodeIdGenerationOptions;
+import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractLineBasedSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializerOptions;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractNFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +39,7 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
      * @throws NullPointerException if the provided model is null.
      */
     public NQuadsSerializer(Model model) {
-        this(model, NQuadsSerializerOptions.defaultConfig());
+        super(model, NQuadsSerializerOptions.defaultConfig());
     }
 
     /**
@@ -44,9 +50,24 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
      *               This config object should be an instance of {@code NQuadsConfig} or a subclass thereof.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NQuadsSerializer(Model model, NQuadsSerializerOptions config) {
-        super(model, config);
+    public NQuadsSerializer(Model model, IOOptions config) {
+        this(model);
         Objects.requireNonNull(config, "NQuadsConfig cannot be null");
+        if(config instanceof AbstractNFamilyOptions nFamilyOptions) {
+            this.config = nFamilyOptions;
+        } else {
+            NTriplesSerializerOptions.Builder optionBuilder = new NTriplesSerializerOptions.Builder();
+            if(config instanceof BaseIRIOptions baseIRIOptions) {
+                optionBuilder.baseIRI(baseIRIOptions.getBaseIRI());
+            }
+            if(config instanceof LineEndingOptions lineEndingOptions) {
+                optionBuilder.lineEnding(lineEndingOptions.getLineEnding());
+            }
+            if(config instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
+                optionBuilder.stableBlankNodeIds(blankNodeIdGenerationOptions.stableBlankNodeIds());
+            }
+            this.config = optionBuilder.build();
+        }
     }
 
     /**

@@ -37,7 +37,7 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
     private static final Logger logger = LoggerFactory.getLogger(AbstractLineBasedSerializer.class);
 
     protected final Model model;
-    protected final AbstractSerializerOptions config;
+    protected AbstractSerializerOptions config;
 
     /**
      * Constructs a new line-based serializer.
