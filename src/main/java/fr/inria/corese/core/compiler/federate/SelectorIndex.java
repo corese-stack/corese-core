@@ -2,7 +2,7 @@ package fr.inria.corese.core.compiler.federate;
 
 import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.federate.util.ResourceReader;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import org.slf4j.Logger;

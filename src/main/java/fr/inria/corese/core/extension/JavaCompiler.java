@@ -1,7 +1,7 @@
 package fr.inria.corese.core.extension;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 

@@ -13,9 +13,9 @@ import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.MappingsGraph;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
@@ -24,6 +24,7 @@ import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.URLParam;
 
 /**
  * Select Result format according to query form and @display annotation.,

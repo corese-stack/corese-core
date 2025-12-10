@@ -1,10 +1,10 @@
 package fr.inria.corese.core;
 
 
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.api.core.TripleStore;
-import fr.inria.corese.core.next.kgram.path.Path;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.Objects;

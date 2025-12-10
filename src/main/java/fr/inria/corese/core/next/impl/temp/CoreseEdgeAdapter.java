@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.impl.temp;
 
-import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 
 /**
  * Interface that defines a wrapper for classes that represent Corese edges.

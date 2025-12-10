@@ -6,16 +6,16 @@ package fr.inria.corese.core.util;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.next.kgram.api.core.ExpType;
-import fr.inria.corese.core.next.kgram.core.Eval;
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.api.GraphListener;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
 
 import org.slf4j.LoggerFactory;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**

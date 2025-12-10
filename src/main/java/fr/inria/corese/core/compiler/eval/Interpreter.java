@@ -1,13 +1,13 @@
 package fr.inria.corese.core.compiler.eval;
 
-import fr.inria.corese.core.next.kgram.api.core.Expr;
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
-import fr.inria.corese.core.next.kgram.api.query.Evaluator;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
-import fr.inria.corese.core.next.kgram.core.Eval;
-import fr.inria.corese.core.next.kgram.core.Query;
-import fr.inria.corese.core.next.kgram.event.ResultListener;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Evaluator;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.event.ResultListener;
 import fr.inria.corese.core.sparql.api.*;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;

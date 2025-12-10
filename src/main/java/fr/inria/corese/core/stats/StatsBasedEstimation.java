@@ -1,16 +1,17 @@
 package fr.inria.corese.core.stats;
 
-import fr.inria.corese.core.next.kgram.api.core.ExpType;
-import fr.inria.corese.core.next.kgram.sorter.impl.qpv1.QPGNodeCostModel;
-import fr.inria.corese.core.next.kgram.sorter.core.QPGraph;
-import fr.inria.corese.core.next.kgram.sorter.core.QPGNode;
-import fr.inria.corese.core.next.kgram.sorter.core.IEstimate;
-import fr.inria.corese.core.next.kgram.api.core.Filter;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import static fr.inria.corese.core.next.kgram.api.core.Node.OBJECT;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
-import fr.inria.corese.core.next.kgram.core.Exp;
-import fr.inria.corese.core.next.kgram.sorter.impl.qpv1.BasicPatternGenerator;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.sorter.impl.qpv1.QPGNodeCostModel;
+import fr.inria.corese.core.kgram.sorter.core.QPGraph;
+import fr.inria.corese.core.kgram.sorter.core.QPGNode;
+import fr.inria.corese.core.kgram.sorter.core.IEstimate;
+import fr.inria.corese.core.kgram.api.core.Filter;
+import fr.inria.corese.core.kgram.api.core.Node;
+import static fr.inria.corese.core.kgram.api.core.Node.OBJECT;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.sorter.core.QPGEdge;
+import fr.inria.corese.core.kgram.sorter.impl.qpv1.BasicPatternGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

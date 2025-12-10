@@ -1,7 +1,7 @@
 package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.core.next.kgram.api.core.ExpType;
-import fr.inria.corese.core.next.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.PointerType;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import static fr.inria.corese.core.next.kgram.api.core.PointerType.NSMANAGER;
+import static fr.inria.corese.core.kgram.api.core.PointerType.NSMANAGER;
 
 /**
  * <p>

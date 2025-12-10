@@ -1,6 +1,6 @@
 package fr.inria.corese.core.compiler.api;
 
-import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Mappings;
 
 public interface QueryVisitor extends fr.inria.corese.core.sparql.api.QueryVisitor {
 

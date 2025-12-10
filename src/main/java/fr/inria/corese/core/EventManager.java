@@ -2,7 +2,7 @@ package fr.inria.corese.core;
 
 import fr.inria.corese.core.api.Engine;
 import fr.inria.corese.core.compiler.parser.Transformer;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 import fr.inria.corese.core.util.Property;

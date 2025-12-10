@@ -2,8 +2,8 @@ package fr.inria.corese.core;
 
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
 import fr.inria.corese.core.index.NodeManager;
-import fr.inria.corese.core.next.kgram.api.core.DatatypeValue;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.DatatypeValue;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;

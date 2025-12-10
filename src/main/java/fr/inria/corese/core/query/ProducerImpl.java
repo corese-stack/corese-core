@@ -4,14 +4,14 @@ import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.Index;
 import fr.inria.corese.core.api.DataBroker;
-import fr.inria.corese.core.next.kgram.api.core.*;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
-import fr.inria.corese.core.next.kgram.api.query.Matcher;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
-import fr.inria.corese.core.next.kgram.core.*;
-import fr.inria.corese.core.next.kgram.sorter.core.IProducerQP;
-import fr.inria.corese.core.next.kgram.sorter.core.QPGNode;
-import fr.inria.corese.core.next.kgram.tool.MetaIterator;
+import fr.inria.corese.core.kgram.api.core.*;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.*;
+import fr.inria.corese.core.kgram.sorter.core.IProducerQP;
+import fr.inria.corese.core.kgram.sorter.core.QPGNode;
+import fr.inria.corese.core.kgram.tool.MetaIterator;
 import fr.inria.corese.core.producer.DataBrokerExtern;
 import fr.inria.corese.core.producer.DataBrokerLocal;
 import fr.inria.corese.core.producer.DataProducer;
@@ -27,8 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static fr.inria.corese.core.next.kgram.sorter.core.Const.*;
-
+import static fr.inria.corese.core.kgram.sorter.core.Const.*;
 
 /**
  * Producer Implement getEdges() for KGRAM interpreter rely on

@@ -7,7 +7,7 @@ package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.api.Loader;
-import fr.inria.corese.core.next.kgram.api.query.Graphable;
+import fr.inria.corese.core.kgram.api.query.Graphable;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import org.slf4j.Logger;

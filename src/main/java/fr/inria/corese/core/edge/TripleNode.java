@@ -2,8 +2,8 @@ package fr.inria.corese.core.edge;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.NodeImpl;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
