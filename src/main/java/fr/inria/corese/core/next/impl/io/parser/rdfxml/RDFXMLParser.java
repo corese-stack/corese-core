@@ -518,8 +518,8 @@ public class RDFXMLParser extends AbstractRDFParser {
 
                 if ("Resource".equals(parseType)) {
                     // Creates a new blank node, emits S-P-BNode triple, and makes BNode the new subject.
-                    Resource bnode = emitBnodePredicateObject(predicate);
-                    ctx.subjectStack.push(bnode);
+                    Resource bNode = emitBNodePredicateObject(predicate);
+                    ctx.subjectStack.push(bNode);
                     return;
                 }
             }
@@ -527,8 +527,8 @@ public class RDFXMLParser extends AbstractRDFParser {
             // --- Case 4: Property Element with attributes only (Abbreviated form for anonymous Blank Node) ---
             if (hasNonSyntaxAttributes(attrs)) {
                 // Creates a new blank node (O), emits S-P-BNode triple, and adds attributes as properties of BNode.
-                Resource bnode = emitBnodePredicateObject(predicate);
-                emitter.emitPropertyAttributes(bnode, attrs);
+                Resource bNode = emitBNodePredicateObject(predicate);
+                emitter.emitPropertyAttributes(bNode, attrs);
                 // Triple is complete, so pop the predicate.
                 ctx.predicateStack.pop();
             }
@@ -567,15 +567,15 @@ public class RDFXMLParser extends AbstractRDFParser {
             return false;
         }
 
-        private Resource emitBnodePredicateObject(IRI predicate) throws ParsingErrorException {
+        private Resource emitBNodePredicateObject(IRI predicate) throws ParsingErrorException {
             // Creates a new anonymous blank node and emits a triple from the current subject using the given predicate.
             if (ctx.subjectStack.isEmpty()) {
                 throw new ParsingErrorException("Cannot create blank node object: no subject available");
             }
             Resource parent = ctx.subjectStack.peek();
-            Resource bnode = ctx.factory.createBNode();
-            emitter.emitTriple(parent, predicate, bnode);
-            return bnode;
+            Resource bNode = ctx.factory.createBNode();
+            emitter.emitTriple(parent, predicate, bNode);
+            return bNode;
         }
 
         /**
