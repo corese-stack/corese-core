@@ -1,13 +1,13 @@
 package fr.inria.corese.core.rule;
 
-import fr.inria.corese.core.next.kgram.api.core.*;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
-import fr.inria.corese.core.next.kgram.core.Distinct;
-import fr.inria.corese.core.next.kgram.core.Exp;
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Query;
-import fr.inria.corese.core.next.kgram.event.ResultListener;
-import fr.inria.corese.core.next.kgram.path.Path;
+import fr.inria.corese.core.kgram.api.core.*;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.core.Distinct;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.event.ResultListener;
+import fr.inria.corese.core.kgram.path.Path;
 import fr.inria.corese.core.api.GraphListener;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.RDFS;

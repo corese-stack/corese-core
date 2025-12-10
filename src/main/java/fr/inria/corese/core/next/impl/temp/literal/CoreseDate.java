@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractTemporalPointLiteral;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;

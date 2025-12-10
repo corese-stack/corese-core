@@ -1,17 +1,17 @@
 package fr.inria.corese.core.sparql.triple.function.extension;
 
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.EXTCONT;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.EXTEQUAL;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.XPATH;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.XT_COMPARE;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.XT_DISTANCE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.EXTCONT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.EXTEQUAL;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XPATH;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_COMPARE;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_DISTANCE;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.function.term.TermEval;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.datatype.function.StringHelper;
 import fr.inria.corese.core.sparql.datatype.function.VariableResolverImpl;

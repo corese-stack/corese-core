@@ -2,11 +2,11 @@ package fr.inria.corese.core.producer;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.Graph;
 import java.util.ArrayList;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 
 /**

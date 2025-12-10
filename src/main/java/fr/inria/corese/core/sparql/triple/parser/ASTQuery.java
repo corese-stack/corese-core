@@ -20,9 +20,9 @@ import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
 import fr.inria.corese.core.sparql.triple.cst.RDFS;
 import fr.inria.corese.core.sparql.triple.printer.SPIN;
 import fr.inria.corese.core.sparql.triple.update.ASTUpdate;
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.kgram.api.query.ASTQ;
-import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.query.ASTQ;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.QueryVisitor;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.api.Walker;
@@ -243,7 +243,7 @@ public class ASTQuery
     // triple without path, triple with path
     private final List<Triple> tripleList;
     private List<Triple> pathList;
-    private fr.inria.corese.core.next.kgram.core.Query updateQuery;
+    private fr.inria.corese.core.kgram.core.Query updateQuery;
 /* --- dead code removal ---
     private AccessRight accessRight; */
     private ASTSelector astSelector;
@@ -3747,11 +3747,11 @@ public class ASTQuery
         return t;
     }
    
-    public fr.inria.corese.core.next.kgram.core.Query getUpdateQuery() {
+    public fr.inria.corese.core.kgram.core.Query getUpdateQuery() {
         return updateQuery;
     }
    
-    public void setUpdateQuery(fr.inria.corese.core.next.kgram.core.Query updateQuery) {
+    public void setUpdateQuery(fr.inria.corese.core.kgram.core.Query updateQuery) {
         this.updateQuery = updateQuery;
     } 
     

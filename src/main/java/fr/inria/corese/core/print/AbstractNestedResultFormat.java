@@ -1,10 +1,10 @@
 package fr.inria.corese.core.print;
 
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.Mapping;
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 

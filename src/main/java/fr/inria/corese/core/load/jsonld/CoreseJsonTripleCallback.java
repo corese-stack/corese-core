@@ -6,7 +6,7 @@ import com.github.jsonldjava.core.JsonLdTripleCallback;
 import com.github.jsonldjava.core.RDFDataset;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.load.AddTripleHelper;
 import fr.inria.corese.core.load.AddTripleHelperDataManager;
 import fr.inria.corese.core.load.ILoadSerialization;

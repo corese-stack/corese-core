@@ -1,6 +1,6 @@
 package fr.inria.corese.core.sparql.datatype;
 
-import fr.inria.corese.core.next.kgram.api.core.Pointerable;
+import fr.inria.corese.core.kgram.api.core.Pointerable;
 
 import java.util.ArrayList;
 

@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.impl.temp;
 
-import fr.inria.corese.core.next.kgram.api.core.ExpType;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.BNode;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Literal;

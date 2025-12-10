@@ -2,7 +2,7 @@ package fr.inria.corese.core.sparql.datatype;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
-import fr.inria.corese.core.next.kgram.api.core.Loopable;
+import fr.inria.corese.core.kgram.api.core.Loopable;
 
 /**
  * <p>Title: Corese</p>

@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.impl.temp;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Namespace;
@@ -237,7 +237,7 @@ class CoreseModelTest {
         IRI realPredicateIRI = new CoreseIRI("http://example.org/realPredicate");
         IRI realObjectIRI = new CoreseIRI("http://example.org/realObject");
 
-        when(mockCoreseGraph.addEdge(any(Node.class), any(Node.class), any(Node.class))).thenReturn(mock(Edge.class));
+        when(mockCoreseGraph.addEdge(any(Node.class), any(Node.class), any(Node.class))).thenReturn(mock(fr.inria.corese.core.kgram.api.core.Edge.class));
 
         boolean added = coreseModel.add(realSubjectIRI, realPredicateIRI, realObjectIRI);
 
@@ -326,8 +326,8 @@ class CoreseModelTest {
     @Test
     @DisplayName("Should return true if the model contains an existing statement without context")
     void testContainsExistingStatementWithoutContext() {
-        Edge mockReturnedEdge = mock(Edge.class);
-        List<Edge> edges = List.of(mockReturnedEdge);
+        fr.inria.corese.core.kgram.api.core.Edge mockReturnedEdge = mock(fr.inria.corese.core.kgram.api.core.Edge.class);
+        List<fr.inria.corese.core.kgram.api.core.Edge> edges = List.of(mockReturnedEdge);
 
         IRI realSubject = new CoreseIRI("http://example.org/subjectToFind");
         IRI realPredicate = new CoreseIRI("http://example.org/predicateToFind");
@@ -336,7 +336,7 @@ class CoreseModelTest {
         when(mockCoreseGraph.getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), any(Node[].class)))
                 .thenReturn(edges);
         when(mockCoreseGraph.getEdgeFactory()).thenReturn(mock(fr.inria.corese.core.EdgeFactory.class));
-        when(mockCoreseGraph.getEdgeFactory().copy(any(Edge.class))).thenReturn(mockReturnedEdge);
+        when(mockCoreseGraph.getEdgeFactory().copy(any(fr.inria.corese.core.kgram.api.core.Edge.class))).thenReturn(mockReturnedEdge);
 
         // Call the contains method
         boolean contains = coreseModel.contains(realSubject, realPredicate, realObject);
@@ -377,8 +377,8 @@ class CoreseModelTest {
     @Test
     @DisplayName("Should return true if the model contains an existing statement with a specific context")
     void testContainsExistingStatementWithContext() {
-        Edge mockReturnedEdge = mock(Edge.class);
-        List<Edge> edges = List.of(mockReturnedEdge);
+        fr.inria.corese.core.kgram.api.core.Edge mockReturnedEdge = mock(fr.inria.corese.core.kgram.api.core.Edge.class);
+        List<fr.inria.corese.core.kgram.api.core.Edge> edges = List.of(mockReturnedEdge);
 
         IRI realSubject = new CoreseIRI("http://example.org/subjectWithSpecificContext");
         IRI realPredicate = new CoreseIRI("http://example.org/predicateWithSpecificContext");
@@ -388,7 +388,7 @@ class CoreseModelTest {
         when(mockCoreseGraph.getEdgesRDF4J(any(Node.class), any(Node.class), any(Node.class), any(Node.class)))
                 .thenReturn(edges);
         when(mockCoreseGraph.getEdgeFactory()).thenReturn(mock(fr.inria.corese.core.EdgeFactory.class));
-        when(mockCoreseGraph.getEdgeFactory().copy(any(Edge.class))).thenReturn(mockReturnedEdge);
+        when(mockCoreseGraph.getEdgeFactory().copy(any(fr.inria.corese.core.kgram.api.core.Edge.class))).thenReturn(mockReturnedEdge);
 
         boolean contains = coreseModel.contains(realSubject, realPredicate, realObject, realContext);
 

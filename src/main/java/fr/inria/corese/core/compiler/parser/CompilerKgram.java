@@ -1,8 +1,8 @@
 package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.core.next.kgram.api.core.*;
-import fr.inria.corese.core.next.kgram.api.core.Filter;
-import fr.inria.corese.core.next.kgram.tool.Message;
+import fr.inria.corese.core.kgram.api.core.Filter;
+import fr.inria.corese.core.kgram.api.core.*;
+import fr.inria.corese.core.kgram.tool.Message;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.*;
 

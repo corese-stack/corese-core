@@ -1,7 +1,7 @@
 package fr.inria.corese.core.producer;
 
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.logic.Distance;
 import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import org.slf4j.Logger;

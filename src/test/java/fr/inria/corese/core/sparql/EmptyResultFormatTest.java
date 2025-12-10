@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.print.CSVFormat;
 import fr.inria.corese.core.print.JSONFormat;
 import fr.inria.corese.core.print.TSVFormat;

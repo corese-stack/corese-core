@@ -1,6 +1,6 @@
 package fr.inria.corese.core.sparql.compiler.java;
 
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.ExprType;
 import fr.inria.corese.core.sparql.triple.function.script.ForLoop;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.script.Let;

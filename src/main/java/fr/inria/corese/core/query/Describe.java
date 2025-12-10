@@ -1,10 +1,10 @@
 package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Query;
-import fr.inria.corese.core.next.kgram.tool.MetaProducer;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.tool.MetaProducer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 

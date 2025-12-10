@@ -10,14 +10,14 @@ import fr.inria.corese.core.compiler.eval.ProxyInterpreter;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitorBasic;
 import fr.inria.corese.core.compiler.parser.NodeImpl;
-import fr.inria.corese.core.next.kgram.api.core.*;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
-import fr.inria.corese.core.next.kgram.api.query.Evaluator;
-import fr.inria.corese.core.next.kgram.api.query.Matcher;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
-import fr.inria.corese.core.next.kgram.core.Mapping;
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Memory;
+import fr.inria.corese.core.kgram.api.core.*;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Evaluator;
+import fr.inria.corese.core.kgram.api.query.Matcher;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Memory;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.LoadFormat;
@@ -44,6 +44,7 @@ import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.transform.TemplateVisitor;
+import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.GraphListen;
 import fr.inria.corese.core.util.MappingsGraph;
@@ -57,8 +58,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static fr.inria.corese.core.next.kgram.api.core.PointerType.GRAPH;
-import static fr.inria.corese.core.next.kgram.api.core.PointerType.MAPPINGS;
+import static fr.inria.corese.core.kgram.api.core.PointerType.GRAPH;
+import static fr.inria.corese.core.kgram.api.core.PointerType.MAPPINGS;
 
 /**
  * Plugin for filter evaluator

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import fr.inria.corese.core.next.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.core.PointerType;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 

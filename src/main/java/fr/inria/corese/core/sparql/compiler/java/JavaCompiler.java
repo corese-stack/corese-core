@@ -1,7 +1,7 @@
 package fr.inria.corese.core.sparql.compiler.java;
 
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.script.ForLoop;
@@ -9,6 +9,8 @@ import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.script.Let;
 import fr.inria.corese.core.sparql.triple.function.script.Statement;
 import fr.inria.corese.core.sparql.triple.parser.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -17,7 +19,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.*;
+import static fr.inria.corese.core.kgram.api.core.ExprType.*;
 
 /**
  * Java Compiler for LDScript Take an AST as input and compile the LDScript
@@ -295,7 +297,7 @@ public class JavaCompiler {
             case ExprType.NOT:
                 not(term, arg);
                 return;
-            case AND:
+            case ExprType.AND:
             case ExprType.OR:
                 bool(term, arg);
                 return;
@@ -348,7 +350,7 @@ public class JavaCompiler {
                 ifthenelse(term, arg);
                 return;
 
-            case RETURN:
+            case ExprType.RETURN:
                 append("return");
                 append(SPACE);
                 toJava(term.getArg(0), true);

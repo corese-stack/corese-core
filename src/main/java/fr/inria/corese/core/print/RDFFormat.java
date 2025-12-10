@@ -13,11 +13,11 @@ import org.apache.commons.text.StringEscapeUtils;
 
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.Mapping;
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.logic.OWL;
 import fr.inria.corese.core.logic.RDF;
 import fr.inria.corese.core.logic.RDFS;

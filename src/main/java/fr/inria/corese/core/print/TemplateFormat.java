@@ -6,12 +6,13 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.compiler.parser.Pragma;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 
 /*

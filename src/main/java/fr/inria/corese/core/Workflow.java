@@ -1,8 +1,8 @@
 package fr.inria.corese.core;
 
 import fr.inria.corese.core.api.Engine;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import org.slf4j.Logger;

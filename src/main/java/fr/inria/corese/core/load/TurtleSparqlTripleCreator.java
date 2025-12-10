@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Stack;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.triple.api.Creator;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Constant;

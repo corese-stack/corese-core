@@ -1,6 +1,6 @@
 package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
@@ -14,8 +14,8 @@ import fr.inria.corese.core.sparql.triple.parser.Term;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
 import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.api.GraphProcessor;
 import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
