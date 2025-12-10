@@ -5,9 +5,9 @@
 package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.Comparator;

@@ -2,9 +2,9 @@ package fr.inria.corese.core.load;
 
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.core.Mapping;
+import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.print.ResultFormat;
 import static fr.inria.corese.core.print.ResultFormat.RDF_XML;
@@ -24,7 +24,6 @@ import fr.inria.corese.core.sparql.triple.parser.URLServer;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import java.io.InputStream;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;

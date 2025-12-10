@@ -2,7 +2,7 @@ package fr.inria.corese.core.sparql.triple.function.aggregate;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
-import static fr.inria.corese.core.kgram.api.core.ExprType.MIN;
+import static fr.inria.corese.core.next.kgram.api.core.ExprType.MIN;
 
 /**
  *

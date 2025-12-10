@@ -1,11 +1,11 @@
 package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Expr;
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.api.query.Environment;
-import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Expr;
+import fr.inria.corese.core.next.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.sparql.api.ComputerProxy;
@@ -13,7 +13,6 @@ import fr.inria.corese.core.sparql.api.GraphProcessor;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.transform.DefaultVisitor;
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static fr.inria.corese.core.kgram.api.core.PointerType.GRAPH;
+import static fr.inria.corese.core.next.kgram.api.core.PointerType.GRAPH;
 
 /**
  * Transformer LDScript functions.

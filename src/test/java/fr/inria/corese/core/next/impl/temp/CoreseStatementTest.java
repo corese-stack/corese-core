@@ -2,8 +2,8 @@ package fr.inria.corese.core.next.impl.temp;
 
 import fr.inria.corese.core.NodeImpl;
 import fr.inria.corese.core.edge.EdgeImpl;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Value;

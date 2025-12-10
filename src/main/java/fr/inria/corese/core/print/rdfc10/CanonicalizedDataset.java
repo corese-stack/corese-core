@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 
 /**
  * Represents a dataset that has undergone canonicalization.

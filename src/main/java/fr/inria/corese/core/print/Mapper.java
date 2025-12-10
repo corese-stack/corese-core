@@ -3,9 +3,9 @@ package fr.inria.corese.core.print;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.core.Mapping;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
 
 public class Mapper {
 	

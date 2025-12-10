@@ -2,7 +2,7 @@ package fr.inria.corese.core;
 
 import fr.inria.corese.core.elasticsearch.EdgeChangeListener;
 import fr.inria.corese.core.logic.Entailment;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import java.util.ArrayList;
 import java.util.Collection;

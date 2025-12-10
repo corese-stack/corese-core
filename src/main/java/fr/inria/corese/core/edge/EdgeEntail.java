@@ -1,7 +1,7 @@
 package fr.inria.corese.core.edge;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 
 /**
  * @author Olivier Corby, Wimmics INRIA I3S, 2016

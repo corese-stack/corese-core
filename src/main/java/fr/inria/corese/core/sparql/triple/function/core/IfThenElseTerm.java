@@ -2,15 +2,13 @@ package fr.inria.corese.core.sparql.triple.function.core;
 
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
-import fr.inria.corese.core.sparql.triple.parser.Term;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.function.term.TermEval;
-import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.next.kgram.api.query.Producer;
 import java.util.ArrayList;
 
 /**

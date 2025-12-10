@@ -1,6 +1,6 @@
 package fr.inria.corese.core.workflow;
 
-import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Mappings;
 import fr.inria.corese.core.print.ResultFormat;
 import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.exceptions.EngineException;

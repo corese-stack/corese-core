@@ -4,7 +4,7 @@ import org.semarglproject.rdf.core.ParseException;
 import org.semarglproject.sink.TripleSink;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.load.AddTripleHelper;
 import fr.inria.corese.core.load.AddTripleHelperDataManager;
 import fr.inria.corese.core.load.ILoadSerialization;

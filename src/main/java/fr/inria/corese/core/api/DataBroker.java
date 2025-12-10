@@ -2,9 +2,9 @@ package fr.inria.corese.core.api;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.NodeImpl;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.logic.RDF;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;

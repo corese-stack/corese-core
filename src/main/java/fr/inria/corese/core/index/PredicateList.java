@@ -6,7 +6,7 @@ import static fr.inria.corese.core.index.EdgeManagerIndexer.RECORD_END;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 
 /**
  * List of predicates of a given Node in NodeManager

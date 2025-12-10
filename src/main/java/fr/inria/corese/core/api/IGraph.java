@@ -1,8 +1,8 @@
 package fr.inria.corese.core.api;
 
 import fr.inria.corese.core.Index;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 public interface IGraph {

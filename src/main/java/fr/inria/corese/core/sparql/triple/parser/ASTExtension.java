@@ -1,9 +1,9 @@
 package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.core.kgram.api.core.ExpType;
-import fr.inria.corese.core.kgram.api.core.Expr;
-import fr.inria.corese.core.kgram.api.query.Hierarchy;
-import fr.inria.corese.core.kgram.filter.Extension;
+import fr.inria.corese.core.next.kgram.api.core.ExpType;
+import fr.inria.corese.core.next.kgram.api.core.Expr;
+import fr.inria.corese.core.next.kgram.api.query.Hierarchy;
+import fr.inria.corese.core.next.kgram.filter.Extension;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import java.util.ArrayList;

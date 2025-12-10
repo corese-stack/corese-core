@@ -1,7 +1,7 @@
 package fr.inria.corese.core.load;
 
 import fr.inria.corese.core.compiler.parser.Pragma;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
