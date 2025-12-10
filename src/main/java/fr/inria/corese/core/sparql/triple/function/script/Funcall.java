@@ -1,15 +1,14 @@
 package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.core.next.kgram.core.Eval;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.kgram.api.core.PointerType;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
-import fr.inria.corese.core.next.kgram.core.SparqlException;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.core.SparqlException;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.UndefinedExpressionException;
@@ -89,7 +88,7 @@ public class Funcall extends LDScript {
         IDatatype dt = null;
         if (function.isSystem()) {
            // fr.inria.corese.core.kgram.core.Eval cc = eval.getComputerEval(env, p, function);
-            Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
+            fr.inria.corese.core.kgram.core.Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
             dt = function.getBody().eval(cc.getEvaluator(), b, cc.getEnvironment(), p);
         } else {
             dt = function.getBody().eval(eval, b, env, p);

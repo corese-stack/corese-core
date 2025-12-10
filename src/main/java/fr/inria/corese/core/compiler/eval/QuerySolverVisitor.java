@@ -1,10 +1,10 @@
 package fr.inria.corese.core.compiler.eval;
 
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Expr;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.*;
-import fr.inria.corese.core.next.kgram.path.Path;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.*;
+import fr.inria.corese.core.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import org.slf4j.Logger;
@@ -238,7 +238,7 @@ public class QuerySolverVisitor extends QuerySolverVisitorBasic {
     }
     
     @Override
-    public IDatatype statement(Eval eval, Node g, Exp e) {
+    public IDatatype statement(Eval eval, Node g, Exp e) { 
         return callback(eval, STATEMENT, toArray(g, e));
     }
        

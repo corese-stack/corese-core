@@ -1,6 +1,7 @@
 package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  * 

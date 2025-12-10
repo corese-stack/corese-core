@@ -6,8 +6,8 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.sparql.api.IDatatype;

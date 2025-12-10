@@ -2,9 +2,9 @@ package fr.inria.corese.core.transform;
 
 import fr.inria.corese.core.compiler.parser.NodeImpl;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.Mapping;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package fr.inria.corese.core.compiler.parser;
 
 import fr.inria.corese.core.compiler.api.QueryVisitor;
-import fr.inria.corese.core.next.kgram.api.core.Regex;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Regex;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.update.ASTUpdate;
 import fr.inria.corese.core.sparql.triple.update.Composite;

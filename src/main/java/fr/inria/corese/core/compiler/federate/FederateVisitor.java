@@ -3,7 +3,7 @@ package fr.inria.corese.core.compiler.federate;
 import fr.inria.corese.core.compiler.api.QueryVisitor;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.federate.util.RewriteErrorManager;
-import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
@@ -238,7 +238,7 @@ public class FederateVisitor implements QueryVisitor, URLParam {
     }
 
     @Override
-    public void visit(fr.inria.corese.core.next.kgram.core.Query query) {
+    public void visit(fr.inria.corese.core.kgram.core.Query query) {
         query.setFederate(true);
         ASTQuery queryAST = query.getAST();
         queryAST.getLog().setAST(queryAST);
@@ -249,7 +249,7 @@ public class FederateVisitor implements QueryVisitor, URLParam {
 
     // before solver query exec
     @Override
-    public void before(fr.inria.corese.core.next.kgram.core.Query q) {
+    public void before(fr.inria.corese.core.kgram.core.Query q) {
 
     }
 

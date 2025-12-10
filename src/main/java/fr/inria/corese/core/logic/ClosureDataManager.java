@@ -2,10 +2,10 @@ package fr.inria.corese.core.logic;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.Distinct;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Distinct;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import java.util.List;
 

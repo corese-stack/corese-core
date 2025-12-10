@@ -1,20 +1,23 @@
 package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import static fr.inria.corese.core.sparql.triple.function.term.TermEval.JAVA_FUNCTION_MESS;
+import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;;
 
 /**
  * Call Corese Java function with parameters as getObject() or

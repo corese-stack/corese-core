@@ -1,10 +1,10 @@
 package fr.inria.corese.core.edge;
 
 import fr.inria.corese.core.GraphObject;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.api.core.PointerType;
-import fr.inria.corese.core.next.kgram.api.core.TripleStore;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.kgram.api.core.TripleStore;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
@@ -12,7 +12,7 @@ import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static fr.inria.corese.core.next.kgram.api.core.PointerType.TRIPLE;
+import static fr.inria.corese.core.kgram.api.core.PointerType.TRIPLE;
 
 /**
  * @author Olivier Corby, Wimmics Inria I3S, 2014

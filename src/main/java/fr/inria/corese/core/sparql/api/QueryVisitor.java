@@ -1,7 +1,7 @@
 package fr.inria.corese.core.sparql.api;
 
-import fr.inria.corese.core.next.kgram.core.Mappings;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 
 public interface QueryVisitor {

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 
 /**

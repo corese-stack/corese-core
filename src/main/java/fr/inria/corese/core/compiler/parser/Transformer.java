@@ -5,11 +5,10 @@ import fr.inria.corese.core.compiler.eval.QuerySolver;
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
 import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import fr.inria.corese.core.compiler.visitor.MetadataVisitor;
-import fr.inria.corese.core.next.kgram.api.core.*;
-import fr.inria.corese.core.next.kgram.api.core.Filter;
-import fr.inria.corese.core.next.kgram.core.*;
-import fr.inria.corese.core.next.kgram.core.Exp;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.*;
+import fr.inria.corese.core.kgram.core.Exp;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.*;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
@@ -750,7 +749,7 @@ public class Transformer implements ExpType {
     }
 
     Exp compileBind(ASTQuery ast, Expression e, Variable var) throws EngineException {
-        Filter f = compileSelect(e, ast);
+        fr.inria.corese.core.kgram.api.core.Filter f = compileSelect(e, ast);
         Node node = compiler.createNode(var);
         Exp exp = Exp.create(Type.BIND);
         exp.setFilter(f);
@@ -983,14 +982,14 @@ public class Transformer implements ExpType {
         }
         for (Expression test : ast.getRegexTest()) {
             // ?x c:isMemberOf[?this != <inria>] + ?y
-            Filter f = compile(test);
+            fr.inria.corese.core.kgram.api.core.Filter f = compile(test);
             q.addPathFilter(f);
         }
     }
 
     void having(Query q, ASTQuery ast) throws EngineException {
         if (ast.getHaving() != null) {
-            Filter having = compileSelect(ast.getHaving(), ast);
+            fr.inria.corese.core.kgram.api.core.Filter having = compileSelect(ast.getHaving(), ast);
             q.setHaving(Exp.create(Type.FILTER, having));
         }
     }
@@ -1026,7 +1025,7 @@ public class Transformer implements ExpType {
 
             if (ee != null) {
                 // select fun() as var
-                Filter f = compileSelect(ee, ast);
+                fr.inria.corese.core.kgram.api.core.Filter f = compileSelect(ee, ast);
 
                 if (f != null) {
                     // select fun() as var
@@ -1187,7 +1186,7 @@ public class Transformer implements ExpType {
      * @param query
      * @param f
      */
-    void checkFilterVariables(Query query, Filter f, List<Exp> select, List<Node> lNodes) {
+    void checkFilterVariables(Query query, fr.inria.corese.core.kgram.api.core.Filter f, List<Exp> select, List<Node> lNodes) {
         switch (f.getExp().oper()) {
             // do not create Node for local variables
             case ExprType.PACKAGE:
@@ -1270,7 +1269,7 @@ public class Transformer implements ExpType {
             } else {
                 // order by fun(?x)
                 // TODO: check rewrite fun() as var
-                Filter f = compile(ee);
+                fr.inria.corese.core.kgram.api.core.Filter f = compile(ee);
                 Node node = createNode();
                 Exp exp = Exp.create(Type.NODE, node);
                 exp.setFilter(f);
@@ -1350,7 +1349,7 @@ public class Transformer implements ExpType {
         if (t.isXPath()) {
             // deprecated ?x xpath() ?y
             exp.setType(Type.EVAL);
-            Filter xpath = compiler.compile(t.getXPath());
+            fr.inria.corese.core.kgram.api.core.Filter xpath = compiler.compile(t.getXPath());
             exp.setFilter(xpath);
         } else if (t.isPath()) {
             path(t, exp);
@@ -1453,7 +1452,7 @@ public class Transformer implements ExpType {
     }
 
     Exp compileFilter(Expression ee, boolean opt) throws EngineException {
-        List<Filter> qvec = compiler.compileFilter(ee);
+        List<fr.inria.corese.core.kgram.api.core.Filter> qvec = compiler.compileFilter(ee);
         Exp exp;
 
         if (qvec.size() == 1) {
@@ -1461,7 +1460,7 @@ public class Transformer implements ExpType {
             compileExist(qvec.get(0).getExp(), opt);
         } else {
             exp = Exp.create(Type.AND);
-            for (Filter qm : qvec) {
+            for (fr.inria.corese.core.kgram.api.core.Filter qm : qvec) {
                 Exp f = Exp.create(Type.FILTER, qm);
                 compileExist(qm.getExp(), opt);
                 exp.add(f);
@@ -1477,8 +1476,8 @@ public class Transformer implements ExpType {
     /**
      * Rewrite fun() as ?var in exp Compile exists {}
      */
-    Filter compile(Expression exp) throws EngineException {
-        Filter f = compiler.compile(exp);
+    fr.inria.corese.core.kgram.api.core.Filter compile(Expression exp) throws EngineException {
+        fr.inria.corese.core.kgram.api.core.Filter f = compiler.compile(exp);
         compileExist(f.getExp(), false);
         return f;
     }
@@ -1486,8 +1485,8 @@ public class Transformer implements ExpType {
     /**
      * Do not rewrite fun() as var
      */
-    Filter compileSelect(Expression exp, ASTQuery ast) throws EngineException {
-        Filter f = exp.compile(ast);
+    fr.inria.corese.core.kgram.api.core.Filter compileSelect(Expression exp, ASTQuery ast) throws EngineException {
+        fr.inria.corese.core.kgram.api.core.Filter f = exp.compile(ast);
         compileExist(f.getExp(), false);
         return f;
     }
@@ -1532,7 +1531,7 @@ public class Transformer implements ExpType {
      * Exp e
      */
     void processPath(Exp exp, Exp ef) throws EngineException {
-        Filter f = ef.getFilter();
+        fr.inria.corese.core.kgram.api.core.Filter f = ef.getFilter();
         Edge e = exp.getEdge();
         Node n = e.getEdgeVariable();
 

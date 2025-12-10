@@ -1,9 +1,10 @@
 package fr.inria.corese.core.visitor.solver;
 
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitorBasic;
+import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.workflow.Data;
-import fr.inria.corese.core.next.kgram.core.Eval;
+import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import java.lang.reflect.InvocationTargetException;

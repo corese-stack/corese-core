@@ -4,22 +4,26 @@ import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.AND;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.CONCAT;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.DIV;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.MINUS;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.MULT;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.OR;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.PLUS;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.XT_APPEND;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.XT_MERGE;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import static fr.inria.corese.core.kgram.api.core.ExprType.AND;
+import static fr.inria.corese.core.kgram.api.core.ExprType.CONCAT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.DIV;
+import static fr.inria.corese.core.kgram.api.core.ExprType.MINUS;
+import static fr.inria.corese.core.kgram.api.core.ExprType.MULT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.OR;
+import static fr.inria.corese.core.kgram.api.core.ExprType.PLUS;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_APPEND;
+import static fr.inria.corese.core.kgram.api.core.ExprType.XT_MERGE;
+import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
-
+import fr.inria.corese.core.sparql.triple.parser.Processor;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * reduce(rq:plus, list)

@@ -1,10 +1,10 @@
 package fr.inria.corese.core.compiler.federate;
 
-import fr.inria.corese.core.next.kgram.api.core.DatatypeValue;
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.Group;
-import fr.inria.corese.core.next.kgram.core.Mapping;
-import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.api.core.DatatypeValue;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Group;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.triple.parser.Service;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
 import java.util.ArrayList;

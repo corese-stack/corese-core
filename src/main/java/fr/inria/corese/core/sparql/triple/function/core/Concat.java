@@ -1,14 +1,14 @@
 package fr.inria.corese.core.sparql.triple.function.core;
 
 
-import fr.inria.corese.core.next.kgram.api.core.Expr;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.CONCAT;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.FORMAT;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.STL_CONCAT;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.STL_FORMAT;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.STL_NUMBER;
-import fr.inria.corese.core.next.kgram.api.query.Environment;
-import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.kgram.api.core.Expr;
+import static fr.inria.corese.core.kgram.api.core.ExprType.CONCAT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.FORMAT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.STL_CONCAT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.STL_FORMAT;
+import static fr.inria.corese.core.kgram.api.core.ExprType.STL_NUMBER;
+import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;

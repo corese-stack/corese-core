@@ -2,8 +2,8 @@ package fr.inria.corese.core.sparql.triple.parser.visitor;
 
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import static fr.inria.corese.core.next.kgram.api.core.ExprType.LOCAL;
+import fr.inria.corese.core.kgram.api.core.ExprType;
+import static fr.inria.corese.core.kgram.api.core.ExprType.LOCAL;
 import fr.inria.corese.core.sparql.triple.function.script.ForLoop;
 import fr.inria.corese.core.sparql.triple.function.script.Let;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;

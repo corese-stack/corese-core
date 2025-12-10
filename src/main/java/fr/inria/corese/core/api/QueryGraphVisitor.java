@@ -1,8 +1,8 @@
 package fr.inria.corese.core.api;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.next.kgram.api.core.Edge;
-import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 
 /**
