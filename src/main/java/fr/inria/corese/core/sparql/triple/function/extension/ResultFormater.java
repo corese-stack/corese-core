@@ -1,13 +1,13 @@
 package fr.inria.corese.core.sparql.triple.function.extension;
 
-import static fr.inria.corese.core.kgram.api.core.ExprType.XT_JSON;
-import static fr.inria.corese.core.kgram.api.core.ExprType.XT_RDF;
-import static fr.inria.corese.core.kgram.api.core.ExprType.XT_XML;
-import static fr.inria.corese.core.kgram.api.core.PointerType.MAPPINGS;
-import fr.inria.corese.core.kgram.api.query.Environment;
+import static fr.inria.corese.core.next.kgram.api.core.ExprType.XT_JSON;
+import static fr.inria.corese.core.next.kgram.api.core.ExprType.XT_RDF;
+import static fr.inria.corese.core.next.kgram.api.core.ExprType.XT_XML;
+import static fr.inria.corese.core.next.kgram.api.core.PointerType.MAPPINGS;
+import fr.inria.corese.core.next.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.next.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.api.ResultFormatDef;

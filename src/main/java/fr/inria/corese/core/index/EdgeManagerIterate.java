@@ -1,7 +1,7 @@
 package fr.inria.corese.core.index;
 
 import fr.inria.corese.core.edge.EdgeGeneric;
-import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
 
 import java.util.Iterator;
 

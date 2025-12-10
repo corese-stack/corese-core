@@ -1,10 +1,10 @@
 package fr.inria.corese.core.rule;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.query.Evaluator;
-import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.api.query.Evaluator;
+import fr.inria.corese.core.next.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.next.kgram.core.Mapping;
+import fr.inria.corese.core.next.kgram.core.Mappings;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.query.QueryProcess;

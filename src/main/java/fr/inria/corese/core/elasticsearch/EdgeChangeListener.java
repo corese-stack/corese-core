@@ -1,7 +1,7 @@
 package fr.inria.corese.core.elasticsearch;
 
 
-import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

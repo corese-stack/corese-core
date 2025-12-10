@@ -1,6 +1,6 @@
 package fr.inria.corese.core.sparql.api;
 
-import fr.inria.corese.core.kgram.api.query.Evaluator;
+import fr.inria.corese.core.next.kgram.api.query.Evaluator;
 
 /**
  * Interface for Interpreter

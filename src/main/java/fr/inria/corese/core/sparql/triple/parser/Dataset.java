@@ -8,15 +8,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.core.kgram.api.core.ExpType;
-import fr.inria.corese.core.kgram.api.core.PointerType;
-import static fr.inria.corese.core.kgram.api.core.PointerType.DATASET;
-import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.next.kgram.api.core.ExpType;
+import fr.inria.corese.core.next.kgram.api.core.PointerType;
+import static fr.inria.corese.core.next.kgram.api.core.PointerType.DATASET;
+import fr.inria.corese.core.next.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.next.kgram.core.Mapping;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import static fr.inria.corese.core.sparql.triple.parser.URLParam.INDEX;
 import static fr.inria.corese.core.sparql.triple.parser.URLServer.STORE;
-import java.io.UnsupportedEncodingException;
+
 import java.net.URLEncoder;
 
 /**

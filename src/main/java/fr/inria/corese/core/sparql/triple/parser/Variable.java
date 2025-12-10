@@ -9,11 +9,11 @@ import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
 import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
 import fr.inria.corese.core.sparql.compiler.java.JavaCompiler;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.next.kgram.api.query.Producer;
 
 /**
  * <p>

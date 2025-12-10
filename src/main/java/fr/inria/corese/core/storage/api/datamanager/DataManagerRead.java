@@ -1,7 +1,7 @@
 package fr.inria.corese.core.storage.api.datamanager;
 
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 
 import java.util.ArrayList;
 import java.util.List;

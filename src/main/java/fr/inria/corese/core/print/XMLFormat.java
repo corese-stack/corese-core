@@ -4,9 +4,9 @@ import java.io.PrintWriter;
 
 import org.apache.commons.text.StringEscapeUtils;
 
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;

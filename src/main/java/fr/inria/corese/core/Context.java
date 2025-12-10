@@ -1,8 +1,8 @@
 package fr.inria.corese.core;
 
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.query.Graphable;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.query.Graphable;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.query.RDFizer;
 import fr.inria.corese.core.rule.RuleEngine;

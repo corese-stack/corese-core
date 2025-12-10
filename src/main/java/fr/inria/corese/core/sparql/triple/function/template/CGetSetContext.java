@@ -1,12 +1,12 @@
 package fr.inria.corese.core.sparql.triple.function.template;
 
-import fr.inria.corese.core.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.kgram.api.core.ExprType;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.kgram.api.query.Producer;
+import fr.inria.corese.core.next.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 

@@ -11,8 +11,8 @@ import java.util.Set;
 
 import fr.inria.corese.core.EdgeFactory;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Namespace;

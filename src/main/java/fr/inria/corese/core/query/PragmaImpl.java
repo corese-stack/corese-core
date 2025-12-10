@@ -4,7 +4,7 @@ import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.api.Engine;
 import fr.inria.corese.core.compiler.parser.Pragma;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.logic.Distance;
 import fr.inria.corese.core.logic.Entailment;
 import fr.inria.corese.core.logic.RDFS;

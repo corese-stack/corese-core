@@ -1,9 +1,9 @@
 package fr.inria.corese.core.visitor.solver;
 
 import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.core.Eval;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.core.Eval;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import java.util.HashMap;

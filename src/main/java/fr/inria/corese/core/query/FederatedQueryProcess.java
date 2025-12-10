@@ -1,8 +1,8 @@
 package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;

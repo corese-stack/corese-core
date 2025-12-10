@@ -6,12 +6,12 @@ import fr.inria.corese.core.edge.TripleNode;
 import fr.inria.corese.core.elasticsearch.EdgeChangeListener;
 import fr.inria.corese.core.index.EdgeManagerIndexer;
 import fr.inria.corese.core.index.NodeManager;
-import fr.inria.corese.core.kgram.api.core.*;
-import fr.inria.corese.core.kgram.api.query.Graphable;
-import fr.inria.corese.core.kgram.core.Distinct;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.kgram.tool.MetaIterator;
+import fr.inria.corese.core.next.kgram.api.core.*;
+import fr.inria.corese.core.next.kgram.api.query.Graphable;
+import fr.inria.corese.core.next.kgram.core.Distinct;
+import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.tool.MetaIterator;
 import fr.inria.corese.core.logic.*;
 import fr.inria.corese.core.producer.DataProducer;
 import fr.inria.corese.core.query.QueryCheck;
@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static fr.inria.corese.core.kgram.api.core.PointerType.GRAPH;
+import static fr.inria.corese.core.next.kgram.api.core.PointerType.GRAPH;
 
 /**
  * Graph Manager Edges are stored in an index An index is a table: predicate ->

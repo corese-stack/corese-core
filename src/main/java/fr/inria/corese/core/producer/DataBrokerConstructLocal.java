@@ -5,9 +5,9 @@ import java.util.List;
 
 import fr.inria.corese.core.api.DataBrokerConstruct;
 import fr.inria.corese.core.query.update.GraphManager;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.Access;

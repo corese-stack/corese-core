@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.impl.temp.literal;
 
 import java.util.Objects;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.base.model.literal.AbstractStringLiteral;
 import fr.inria.corese.core.next.api.literal.CoreDatatype;

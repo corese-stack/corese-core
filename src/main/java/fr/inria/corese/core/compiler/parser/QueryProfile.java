@@ -1,9 +1,9 @@
 package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.api.core.Filter;
-import fr.inria.corese.core.kgram.core.Exp;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.kgram.api.core.Filter;
+import fr.inria.corese.core.next.kgram.core.Exp;
+import fr.inria.corese.core.next.kgram.core.Query;
 
 /**
  * Detect Query Pattern, that may be optimized

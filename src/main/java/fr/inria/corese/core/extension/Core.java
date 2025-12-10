@@ -1,10 +1,10 @@
 package fr.inria.corese.core.extension;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.PointerType;
-import fr.inria.corese.core.kgram.api.query.Environment;
-import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.api.core.PointerType;
+import fr.inria.corese.core.next.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.next.kgram.core.Mappings;
 import fr.inria.corese.core.query.PluginImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;

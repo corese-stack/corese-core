@@ -1,12 +1,12 @@
 package fr.inria.corese.core.query.update;
 
 import fr.inria.corese.core.Event;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.query.ProcessVisitor;
-import fr.inria.corese.core.kgram.core.Eval;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.next.kgram.core.Eval;
+import fr.inria.corese.core.next.kgram.core.Mapping;
+import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
