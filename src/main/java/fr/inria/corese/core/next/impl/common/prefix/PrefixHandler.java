@@ -45,6 +45,12 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         }
     }
 
+    public PrefixHandler(PrefixHandler oHandler) {
+        this.prefixToNamespace = new ConcurrentHashMap<>(oHandler.prefixToNamespace);
+        this.namespaceToPrefix = new ConcurrentHashMap<>(oHandler.namespaceToPrefix);
+        this.defaultNamespace = oHandler.defaultNamespace;
+    }
+
     /**
      * Initializes the handler with standard W3C vocabulary prefixes by using the
      * dedicated Vocabulary enum classes.
@@ -57,14 +63,11 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
                 OWL.class,
                 FOAF.class
         );
-
-        for (Class<? extends Enum<? extends Vocabulary>> vocabClass : vocabularyClasses) {
-            Enum<? extends Vocabulary>[] constants = vocabClass.getEnumConstants();
-            if (constants.length > 0) {
-                Vocabulary vocabInstance = (Vocabulary) constants[0];
-                setPrefix(vocabInstance.getPreferredPrefix(), vocabInstance.getNamespace());
-            }
-        }
+        setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
+        setPrefix(RDFS.getVocabularyPreferredPrefix(), RDFS.getVocabularyNamespace());
+        setPrefix(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
+        setPrefix(OWL.getVocabularyPreferredPrefix(), OWL.getVocabularyNamespace());
+        setPrefix(FOAF.getVocabularyPreferredPrefix(), FOAF.getVocabularyNamespace());
     }
 
     /**
@@ -89,6 +92,7 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         String oldNamespace = prefixToNamespace.get(prefix);
         if (oldNamespace != null && !oldNamespace.equals(namespace)) {
             namespaceToPrefix.remove(oldNamespace);
+            prefixToNamespace.remove(prefix);
         }
 
         prefixToNamespace.put(prefix, namespace);
@@ -140,6 +144,11 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
     @Override
     public boolean hasPrefix(String prefix) {
         return prefixToNamespace.containsKey(prefix);
+    }
+
+    @Override
+    public boolean hasNamespace(String namespace) {
+        return namespaceToPrefix.containsKey(namespace);
     }
 
     /**

@@ -1,9 +1,12 @@
 package fr.inria.corese.core.next.impl.io.serialization.option;
 
+import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.serialization.PrettyPrintOptions;
 import fr.inria.corese.core.next.api.io.serialization.UsesPrefixOptions;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
@@ -305,6 +308,34 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
         protected boolean groupBySubject = true;
         protected boolean sortSubjects = false;
         protected boolean sortPredicates = false;
+
+        // UsesPrefixOptions, PrettyPrintOptions
+        protected AbstractTFamilyBuilder(IOOptions otherOptions) {
+            super(otherOptions);
+            if(otherOptions instanceof AbstractTFamilyOptions otherTFamilyOptions) {
+                this.useRdfTypeShortcut(otherTFamilyOptions.useRdfTypeShortcut());
+                this.useCollections(otherTFamilyOptions.useCollections());
+                this.useMultilineLiterals(otherTFamilyOptions.useMultilineLiterals());
+            }
+            if(otherOptions instanceof UsesPrefixOptions usesPrefixOptions) {
+                this.usePrefixes(usesPrefixOptions.usePrefixes());
+                this.autoDeclarePrefixes(usesPrefixOptions.autoDeclarePrefixes());
+                this.prefixOrdering(usesPrefixOptions.getPrefixOrdering());
+                this.prefixHandler(usesPrefixOptions.getPrefixHandler());
+            }
+            if(otherOptions instanceof PrettyPrintOptions prettyPrintOptions) {
+                this.indent(prettyPrintOptions.getIndent());
+                this.prettyPrint(prettyPrintOptions.prettyPrint());
+                this.maxLineLength(prettyPrintOptions.getMaxLineLength());
+                this.sortSubjects(prettyPrintOptions.sortSubjects());
+                this.sortPredicates(prettyPrintOptions.sortPredicates());
+                this.prefixOrdering(prettyPrintOptions.getPrefixOrdering());
+            }
+        }
+
+        protected AbstractTFamilyBuilder() {
+            super();
+        }
 
         /**
          * Sets whether prefix declarations should be used for compact IRIs.

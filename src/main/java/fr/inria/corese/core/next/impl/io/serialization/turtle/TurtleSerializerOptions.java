@@ -1,7 +1,11 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration for Turtle serialization format.
@@ -32,11 +36,26 @@ public class TurtleSerializerOptions extends AbstractTFamilyOptions {
          * Default constructor initializes all options with their default values for Turtle.
          */
         public Builder() {
+            super();
             lineEnding(System.lineSeparator());
             validateURIs(false);
             useCollections(true);
             blankNodeStyle(BlankNodeStyleEnum.ANONYMOUS);
+        }
 
+        /**
+         * Copy constructor for easy creation of option inheriting setting from others
+         */
+        public Builder(IOOptions otherOption) {
+            super(otherOption);
+            if(otherOption instanceof LineEndingOptions lineEndingOptions) {
+                lineEnding(lineEndingOptions.getLineEnding());
+            }
+            if(otherOption instanceof AbstractTFamilyOptions abstractTFamilyOptions) {
+                validateURIs(abstractTFamilyOptions.validateURIs());
+                useCollections(abstractTFamilyOptions.useCollections());
+                blankNodeStyle(abstractTFamilyOptions.getBlankNodeStyle());
+            }
         }
 
         /**

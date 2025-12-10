@@ -1,13 +1,16 @@
 package fr.inria.corese.core.next.impl.io.serialization.base;
 
 import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.serialization.PrettyPrintOptions;
 import fr.inria.corese.core.next.api.io.serialization.UsesPrefixOptions;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.option.*;
+import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +46,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
     protected final Model model;
     protected AbstractSerializerOptions option;
-    protected final Map<String, String> iriToPrefixMapping;
-    protected final Map<String, String> prefixToIriMapping;
+    protected PrefixHandler prefixHandler;
     protected final Set<Resource> consumedBlankNodes;
     protected final Set<Resource> currentlyWritingBlankNodes;
 
@@ -52,33 +54,24 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Constructs a new abstract TriG/Turtle serializer instance.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param option the {@link AbstractSerializerOptions} to use for serialization. Must not be null.
+     * @param config the {@link AbstractSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    protected AbstractGraphSerializer(Model model, AbstractSerializerOptions option) {
+    protected AbstractGraphSerializer(Model model, IOOptions config) {
         this.model = Objects.requireNonNull(model, "The model cannot be null");
-        this.option = Objects.requireNonNull(option, "The configuration cannot be null");
-        this.iriToPrefixMapping = new HashMap<>();
-        this.prefixToIriMapping = new HashMap<>();
+        Objects.requireNonNull(config, "The configuration cannot be null");
+        if(config instanceof AbstractSerializerOptions abstractSerializerOptions) {
+            this.option = abstractSerializerOptions;
+        } else {
+            throw new IllegalArgumentException("AbstractGraphSerializer expect option object to extend AbstractSerializerOptions. Inheritor class should have taken care of that.");
+        }
+        if(config instanceof UsesPrefixOptions usesPrefixOptions) {
+            this.prefixHandler = usesPrefixOptions.getPrefixHandler();
+        } else {
+            this.prefixHandler = new PrefixHandler(false);
+        }
         this.consumedBlankNodes = new HashSet<>();
         this.currentlyWritingBlankNodes = new HashSet<>();
-        initializePrefixes();
-    }
-
-    /**
-     * Initializes prefix mappings by adding custom prefixes from the configuration.
-     */
-    private void initializePrefixes() {
-        if (option instanceof UsesPrefixOptions prefixOptions && prefixOptions.usePrefixes()) {
-            PrefixHandler prefixHandler = prefixOptions.getPrefixHandler();
-
-            for (String prefix : prefixHandler.getPrefixes()) {
-                String namespace = prefixHandler.getNamespace(prefix);
-                if (namespace != null) {
-                    addPrefixMapping(namespace, prefix);
-                }
-            }
-        }
     }
 
     /**
@@ -128,21 +121,21 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                     option.getLineEnding()));
         }
 
+        Set<String> actuallyUsedNamespaces = Set.of();
         if (option instanceof UsesPrefixOptions prefixOptions
                 && prefixOptions.usePrefixes()
                 && prefixOptions.autoDeclarePrefixes()) {
-            collectUsedNamespaces();
+            actuallyUsedNamespaces = collectUsedNamespaces();
         }
 
-        writePrefixDeclarations(writer);
+        writePrefixDeclarations(writer, actuallyUsedNamespaces);
     }
 
     /**
      * Collects all namespaces used in the model and attempts to assign prefixes to them
      * if auto-declaration is enabled and they are not already mapped.
      */
-    protected void collectUsedNamespaces() {
-
+    protected Set<String> collectUsedNamespaces() {
         Set<String> namespaces = model.stream()
                 .flatMap(stmt -> {
                     List<Value> values = new ArrayList<>(Arrays.asList(
@@ -153,21 +146,55 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                     if (stmt.getContext() != null) {
                         values.add(stmt.getContext());
                     }
+                    if(stmt.getObject().isLiteral()
+                            && ((Literal) stmt.getObject()).getDatatype() != null) {
+                        values.add(((Literal) stmt.getObject()).getDatatype());
+                    }
                     return values.stream();
                 })
                 .filter(Objects::nonNull)
                 .filter(Value::isIRI)
-                .map(v -> getNamespace(v.stringValue()))
+                .map(v -> IRIUtils.guessNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
 
         namespaces.forEach(namespace -> {
-            if (!iriToPrefixMapping.containsKey(namespace)) {
+            if (!this.prefixHandler.hasNamespace(namespace)) {
                 String prefix = getSuggestedPrefix(namespace);
                 if (prefix != null) {
                     addPrefixMapping(namespace, prefix);
                 }
             }
         });
+
+        return namespaces;
+    }
+
+    /**
+     * Writes prefix declarations to the writer, sorted if configured.
+     *
+     * @param writer the {@link Writer} to which prefixes will be written.
+     * @throws IOException if an I/O error occurs.
+     */
+    protected void writePrefixDeclarations(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
+        if(this.option instanceof UsesPrefixOptions prefixOptions
+            && prefixOptions.usePrefixes()) {
+            List<String> prefixes = new ArrayList<>(actuallyUsedNamespaces.stream().map(namespace -> this.prefixHandler.getPrefix(namespace)).toList());
+
+            if (prefixOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
+                Collections.sort(prefixes);
+            }
+
+            for (String prefix : prefixes) {
+                writer.write(String.format("@prefix %s: <%s> .%s",
+                        prefix,
+                        this.prefixHandler.getNamespace(prefix),
+                        option.getLineEnding()));
+            }
+
+            if (!prefixes.isEmpty() || option.getBaseIRI() != null) {
+                writer.write(option.getLineEnding());
+            }
+        }
     }
 
     /**
@@ -177,24 +204,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writePrefixDeclarations(Writer writer) throws IOException {
-        if(this.option instanceof UsesPrefixOptions prefixOptions) {
-            List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
-
-            if (prefixOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
-                Collections.sort(prefixes);
-            }
-
-            for (String prefix : prefixes) {
-                writer.write(String.format("@prefix %s: <%s> .%s",
-                        prefix,
-                        prefixToIriMapping.get(prefix),
-                        option.getLineEnding()));
-            }
-
-            if (!prefixes.isEmpty() || option.getBaseIRI() != null) {
-                writer.write(option.getLineEnding());
-            }
-        }
+        writePrefixDeclarations(writer, Set.of());
     }
 
     /**
@@ -222,7 +232,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeStatement(Writer writer, Statement stmt) throws IOException {
-        String indent = this.option instanceof PrettyPrintOptions prettyOptions && prettyOptions.prettyPrint() ? prettyOptions.getIndent() : SerializationConstants.EMPTY_STRING;
+        String indent = this.option instanceof PrettyPrintOptions prettyOptions
+                && prettyOptions.prettyPrint()
+                    ? prettyOptions.getIndent()
+                    : SerializationConstants.EMPTY_STRING;
         writer.write(indent);
 
         // Subject
@@ -248,7 +261,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writePredicate(Writer writer, Value predicate) throws IOException {
-        if (this.option instanceof AbstractTFamilyOptions tFamilyOptions && tFamilyOptions.useRdfTypeShortcut() && predicate.equals(RDF.type.getIRI())) {
+        if (this.option instanceof AbstractTFamilyOptions tFamilyOptions
+                && tFamilyOptions.useRdfTypeShortcut()
+                && predicate.equals(RDF.type.getIRI())) {
             writer.write(SerializationConstants.RDF_TYPE_SHORTCUT);
         } else {
             writeValue(writer, predicate);
@@ -729,17 +744,17 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @param prefix       The associated prefix.
      */
     protected void addPrefixMapping(String namespaceURI, String prefix) {
-        if (iriToPrefixMapping.containsKey(namespaceURI)) {
-            if (logger.isWarnEnabled() && !iriToPrefixMapping.get(namespaceURI).equals(prefix)) {
+        if (this.prefixHandler.hasNamespace(namespaceURI)) {
+            if (logger.isWarnEnabled() && !this.prefixHandler.getPrefix(namespaceURI).equals(prefix)) {
                 logger.warn("Namespace URI '{}' is already mapped to prefix '{}'. Cannot map to new prefix '{}'.",
-                        namespaceURI, iriToPrefixMapping.get(namespaceURI), prefix);
+                        namespaceURI, this.prefixHandler.getPrefix(namespaceURI), prefix);
             }
             return;
         }
 
-        if (prefixToIriMapping.containsKey(prefix)) {
-            if (logger.isWarnEnabled() && !prefixToIriMapping.get(prefix).equals(namespaceURI)) {
-                String originalNamespace = prefixToIriMapping.get(prefix);
+        if (this.prefixHandler.hasPrefix(prefix)) {
+            if (logger.isWarnEnabled() && !this.prefixHandler.getNamespace(prefix).equals(namespaceURI)) {
+                String originalNamespace = this.prefixHandler.getNamespace(prefix);
                 logger.warn("Prefix '{}' is already mapped to namespace '{}'. Cannot map to new namespace '{}'. " +
                                 "A new unique prefix will be generated for '{}'.",
                         prefix, originalNamespace, namespaceURI, namespaceURI);
@@ -747,31 +762,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             return;
         }
 
-        iriToPrefixMapping.put(namespaceURI, prefix);
-        prefixToIriMapping.put(prefix, namespaceURI);
-    }
-
-    /**
-     * Extracts the namespace URI part from an IRI string.
-     * This is a common heuristic for RDF IRIs.
-     *
-     * @param iriString The full IRI.
-     * @return The namespace URI part.
-     */
-    protected String getNamespace(String iriString) {
-        int hashIdx = iriString.lastIndexOf(SerializationConstants.HASH);
-        int slashIdx = iriString.lastIndexOf(SerializationConstants.SLASH);
-
-        if (hashIdx > -1) {
-            return iriString.substring(0, hashIdx + 1);
-        } else if (slashIdx > -1 && slashIdx < iriString.length() - 1) {
-            int dotIdx = iriString.lastIndexOf(SerializationConstants.POINT);
-            if (dotIdx > slashIdx) {
-                return iriString.substring(0, slashIdx + 1);
-            }
-            return iriString.substring(0, slashIdx + 1);
-        }
-        return iriString;
+        this.prefixHandler.setPrefix(prefix, namespaceURI);
     }
 
     /**
@@ -781,11 +772,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return The prefixed name (e.g., "ex:someResource") or null if no suitable prefix is found.
      */
     protected String getPrefixedName(String iriString) {
-        for (Map.Entry<String, String> entry : iriToPrefixMapping.entrySet()) {
-            String namespace = entry.getKey();
-            String prefix = entry.getValue();
-
+        for (String namespace : this.prefixHandler.getNamespaces()) {
             if (iriString.startsWith(namespace)) {
+                String prefix = this.prefixHandler.getPrefix(namespace);
                 String localName = iriString.substring(namespace.length());
                 if (localName.isEmpty()) {
                     if (!prefix.isEmpty()) {
@@ -808,12 +797,6 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return A suggested prefix, or null if suggestion is not possible.
      */
     protected String getSuggestedPrefix(String namespace) {
-        if (namespace.equals(RDF.getVocabularyNamespace())) return RDF.getVocabularyPreferredPrefix();
-        if (namespace.equals(RDFS.getVocabularyNamespace())) return RDFS.getVocabularyPreferredPrefix();
-        if (namespace.equals(XSD.getVocabularyNamespace())) return XSD.getVocabularyPreferredPrefix();
-        if (namespace.equals(OWL.getVocabularyNamespace())) return OWL.getVocabularyPreferredPrefix();
-        if (namespace.equals(FOAF.getVocabularyNamespace())) return FOAF.getVocabularyPreferredPrefix();
-
         String base = namespace;
         if (base.endsWith(SerializationConstants.HASH) || base.endsWith(SerializationConstants.SLASH)) {
             base = base.substring(0, base.length() - 1);
@@ -838,13 +821,13 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         base = base.replaceAll("[^a-zA-Z0-9]", SerializationConstants.EMPTY_STRING).toLowerCase();
         if (base.isEmpty()) base = "p";
 
-        String candidate = base;
+        String candidatePrefix = base;
         int i = 0;
 
-        while (prefixToIriMapping.containsKey(candidate) && !prefixToIriMapping.get(candidate).equals(namespace)) {
-            candidate = base + (++i);
+        while (this.prefixHandler.hasPrefix(candidatePrefix) && !this.prefixHandler.getNamespace(candidatePrefix).equals(namespace)) {
+            candidatePrefix = base + (++i);
         }
-        return candidate;
+        return candidatePrefix;
     }
 
 

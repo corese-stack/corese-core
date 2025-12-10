@@ -193,6 +193,31 @@ public abstract class AbstractSerializerOptions implements IOOptions, BaseIRIOpt
         protected boolean validateURIs = true;
         protected boolean includeContext = false;
 
+        protected AbstractBuilder(IOOptions otherOptions) {
+            if(otherOptions instanceof AbstractSerializerOptions abstractSerializerOptions) {
+                this.escapeUnicode(abstractSerializerOptions.escapeUnicode());
+                this.trailingDot(abstractSerializerOptions.trailingDot());
+                this.strictMode(abstractSerializerOptions.isStrictMode());
+                this.validateURIs(abstractSerializerOptions.validateURIs());
+                this.includeContext(abstractSerializerOptions.includeContext());
+            }
+            if(otherOptions instanceof BaseIRIOptions baseIRIOptions) {
+                this.baseIRI(baseIRIOptions.getBaseIRI());
+            }
+            if(otherOptions instanceof LineEndingOptions lineEndingOptions) {
+                this.lineEnding(lineEndingOptions.getLineEnding());
+            }
+            if(otherOptions instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
+                this.stableBlankNodeIds(blankNodeIdGenerationOptions.stableBlankNodeIds());
+            }
+            if(otherOptions instanceof DatatypePolicyOptions datatypePolicyOptions) {
+                this.literalDatatypePolicy(datatypePolicyOptions.getLiteralDatatypePolicy());
+            }
+        }
+
+        protected AbstractBuilder() {
+        }
+
         /**
          * Sets the policy for how literal datatypes are printed.
          *

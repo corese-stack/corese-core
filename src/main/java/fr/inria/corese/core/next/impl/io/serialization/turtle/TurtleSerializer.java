@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
+import fr.inria.corese.core.next.api.io.serialization.UsesPrefixOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      * @throws NullPointerException if the provided model is null.
      */
     public TurtleSerializer(Model model) {
-        super(model, TurtleSerializerOptions.defaultConfig());
+        this(model, TurtleSerializerOptions.defaultConfig());
     }
 
     /**
@@ -62,21 +63,10 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      * @throws NullPointerException if the provided model or configuration is null.
      */
     public TurtleSerializer(Model model, IOOptions config) {
-        this(model);
-        Objects.requireNonNull(config, "TurtleConfig cannot be null");
-        if(config instanceof AbstractSerializerOptions turtleSerializerOptions) {
-            this.option = turtleSerializerOptions;
-        } else {
-            TurtleSerializerOptions.Builder optionBuilder = new TurtleSerializerOptions.Builder();
-            if(config instanceof BaseIRIOptions baseIRIOptions) {
-                optionBuilder.baseIRI(baseIRIOptions.getBaseIRI());
-            }
-            if(config instanceof LineEndingOptions lineEndingOptions) {
-                optionBuilder.lineEnding(lineEndingOptions.getLineEnding());
-            }
-            this.option = optionBuilder.build();
-        }
+        super(model, config);
+        Objects.requireNonNull(config, "config cannot be null");
     }
+
     /**
      * Retrieves the RDF format supported by this serializer, which is Turtle
      *

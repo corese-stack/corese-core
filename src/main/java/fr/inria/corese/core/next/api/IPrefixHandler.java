@@ -38,6 +38,14 @@ public interface IPrefixHandler {
     boolean hasPrefix(String prefix);
 
     /**
+     * Checks if a namespace has a prefix
+     *
+     * @param namespace the namespace to check
+     * @return true if the namespace exists in mappings, false otherwise
+     */
+    boolean hasNamespace(String namespace);
+
+    /**
      * Returns all registered prefixes.
      * Order of iteration is implementation-dependent but should be consistent
      * (typically insertion order).

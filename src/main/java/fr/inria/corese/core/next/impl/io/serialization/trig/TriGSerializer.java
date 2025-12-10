@@ -56,7 +56,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
      * @throws NullPointerException if the provided model is null.
      */
     public TriGSerializer(Model model) {
-        super(model, TriGSerializerOptions.defaultConfig());
+        this(model, TriGSerializerOptions.defaultConfig());
     }
 
     /**
@@ -68,20 +68,8 @@ public class TriGSerializer extends AbstractGraphSerializer {
      * @throws NullPointerException if the provided model or configuration is null.
      */
     public TriGSerializer(Model model, IOOptions config) {
-        this(model);
-        Objects.requireNonNull(config, "TriGConfig cannot be null");
-        if(config instanceof AbstractSerializerOptions turtleSerializerOptions) {
-            this.option = turtleSerializerOptions;
-        } else {
-            TriGSerializerOptions.Builder optionBuilder = new TriGSerializerOptions.Builder();
-            if(config instanceof BaseIRIOptions baseIRIOptions) {
-                optionBuilder.baseIRI(baseIRIOptions.getBaseIRI());
-            }
-            if(config instanceof LineEndingOptions lineEndingOptions) {
-                optionBuilder.lineEnding(lineEndingOptions.getLineEnding());
-            }
-            this.option = optionBuilder.build();
-        }
+        super(model, config);
+        Objects.requireNonNull(config, "config cannot be null");
     }
 
     /**
