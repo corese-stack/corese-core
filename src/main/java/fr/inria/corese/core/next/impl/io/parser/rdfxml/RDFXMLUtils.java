@@ -268,25 +268,15 @@ public class RDFXMLUtils {
         }
 
         switch (localName) {
-            case "RDF":
-                throw new ParsingErrorException("rdf:RDF cannot be used as a node element. " +
-                        "Nested rdf:RDF elements are not allowed.");
-            case "ID":
-            case "about":
-            case "bagID":
-            case "parseType":
-            case "resource":
-            case "nodeID":
-            case "datatype":
-            case "aboutEach":
-            case "aboutEachPrefix":
+
+            case "RDF","ID", "about", "bagID", "parseType", "resource", "nodeID", "datatype",
+                 "aboutEach", "aboutEachPrefix","li":
                 throw new ParsingErrorException("'" + localName + "' is not allowed as a node element name from the RDF namespace. " +
                         "RDF namespace names like rdf:ID, rdf:about, rdf:bagID, etc. cannot be used as typed node elements.");
-            case "li":
-                throw new ParsingErrorException("rdf:li cannot be used as a node element. " +
-                        "It can only be used as a property element within containers.");
-        }
 
+            default:
+                break;
+        }
     }
 
     /**
@@ -302,21 +292,14 @@ public class RDFXMLUtils {
             return;
         }
 
-        // According to RDF/XML spec section 5.1
         switch (localName) {
-            case "RDF":
-            case "ID":
-            case "about":
-            case "bagID":
-            case "parseType":
-            case "resource":
-            case "nodeID":
-            case "datatype":
-            case "Description":
-            case "aboutEach":
-            case "aboutEachPrefix":
+            case "RDF", "ID", "about", "bagID", "parseType", "resource", "nodeID",
+                 "datatype", "Description", "aboutEach", "aboutEachPrefix":
                 throw new ParsingErrorException("'" + localName + "' is not allowed as a property element name from the RDF namespace. " +
                         "Only rdf:type, rdf:_n (container membership), and rdf:li are valid RDF property names.");
+
+            default:
+                break;
         }
     }
 

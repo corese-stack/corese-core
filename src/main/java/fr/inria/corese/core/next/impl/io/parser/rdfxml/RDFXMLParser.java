@@ -41,7 +41,7 @@ import static fr.inria.corese.core.next.impl.io.parser.rdfxml.RDFXMLUtils.*;
 public class RDFXMLParser extends AbstractRDFParser {
 
     /** RDF/XML format identifier for this parser. */
-    private final RDFFormat format = RDFFormat.RDFXML;
+    private static final RDFFormat format = RDFFormat.RDFXML;
 
     /** Buffer for accumulating character data between start and end tags. */
     private final StringBuilder characters = new StringBuilder();
@@ -126,16 +126,17 @@ public class RDFXMLParser extends AbstractRDFParser {
      * in {@link SAXException} to stop the SAX parser.
      */
     private class RdfXmlSaxHandler extends DefaultHandler {
+
         @Override
         public void characters(char[] ch, int start, int length) {
-            RDFXMLParser.this.handleCharacters(ch, start, length);
+            handleCharacters(ch, start, length);
         }
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attrs) throws SAXException {
             try {
                 // Delegates start element processing
-                RDFXMLParser.this.handleStartElement(uri, localName, qName, attrs);
+                handleStartElement(uri, localName, qName, attrs);
             } catch (ParsingErrorException e) {
                 // Re-throw as SAXException to halt parsing process
                 throw new SAXException(e);
@@ -146,102 +147,103 @@ public class RDFXMLParser extends AbstractRDFParser {
         public void endElement(String uri, String localName, String qName) throws SAXException {
             try {
                 // Delegates end element processing
-                RDFXMLParser.this.handleEndElement(uri, localName);
+                handleEndElement(uri, localName);
             } catch (ParsingErrorException e) {
                 // Re-throw as SAXException to halt parsing process
                 throw new SAXException(e);
             }
         }
-    }
 
-    /**
-     * Handles character data between XML elements
-     */
-    private void handleCharacters(char[] ch, int start, int length) {
-        characters.append(ch, start, length);
-    }
+        /**
+         * Handles character data between XML elements
+         */
+        private void handleCharacters(char[] ch, int start, int length) {
+            characters.append(ch, start, length);
+        }
 
-    private void handleStartElement(String uri, String localName, String qName, Attributes attrs)
-            throws ParsingErrorException {
+        private void handleStartElement(String uri, String localName, String qName, Attributes attrs)
+                throws ParsingErrorException {
 
-        if (qName.equals(lastElementQName)) {
-            String rdfId = attrs.getValue(RDF.type.getNamespace(), "ID");
-            if (rdfId != null && rdfId.equals(lastElementRdfId)) {
+            if (qName.equals(lastElementQName)) {
+                String rdfId = attrs.getValue(RDF.type.getNamespace(), "ID");
+                if (rdfId != null && rdfId.equals(lastElementRdfId)) {
+                    return;
+                }
+                lastElementRdfId = rdfId;
+            } else {
+                lastElementQName = qName;
+                lastElementRdfId = attrs.getValue(RDF.type.getNamespace(), "ID");
+            }
+
+            // Check for the top-level <rdf:RDF> element
+            if (RDFXMLUtils.isRdfRDF(uri, localName)) {
+                rdfDepth++;
+                if (rdfDepth > 1) {
+                    throw new ParsingErrorException(
+                            "rdf:RDF cannot be used as a node element. Nested rdf:RDF elements are not allowed.");
+                }
                 return;
             }
-            lastElementRdfId = rdfId;
-        } else {
-            lastElementQName = qName;
-            lastElementRdfId = attrs.getValue(RDF.type.getNamespace(), "ID");
+
+            // Clear the character buffer at the start of a new element.
+            characters.setLength(0);
+
+            // Update context based on XML/RDF syntax attributes
+            updateBase(attrs);
+
+            // Handle xml:lang
+            updateLang(attrs);
+
+            // Handle rdf:datatype (applies to property literal values)
+            updateDatatype(attrs);
+
+            if (processContainerElement(localName, uri, qName, attrs)) return;
+            if (processCollectionStart(localName, uri, qName, attrs)) return;
+            if (processCollectionItem(localName, uri, attrs)) return;
+            if (processNodeElement(localName, uri, qName, attrs)) return;
+            processPropertyElement(localName, uri, qName, attrs);
         }
 
-        // Check for the top-level <rdf:RDF> element
-        if (RDFXMLUtils.isRdfRDF(uri, localName)) {
-            rdfDepth++;
-            if (rdfDepth > 1) {
-                throw new ParsingErrorException(
-                        "rdf:RDF cannot be used as a node element. Nested rdf:RDF elements are not allowed.");
-            }
-            return;
-        }
-
-        // Clear the character buffer at the start of a new element.
-        characters.setLength(0);
-
-        // Update context based on XML/RDF syntax attributes
-        updateBase(attrs);
-
-        // Handle xml:lang
-        updateLang(attrs);
-
-        // Handle rdf:datatype (applies to property literal values)
-        updateDatatype(attrs);
-
-        if (processContainerElement(localName, uri, qName, attrs)) return;
-        if (processCollectionStart(localName, uri, qName, attrs)) return;
-        if (processCollectionItem(localName, uri, attrs)) return;
-        if (processNodeElement(localName, uri, qName, attrs)) return;
-        processPropertyElement(localName, uri, qName, attrs);
-    }
-
-    /**
-     * Handles the end of an XML element, processing accumulated literal content or cleaning up context stacks.
-     */
-    private void handleEndElement(String uri, String localName) throws ParsingErrorException {
-        // Handle <rdf:RDF> closing tag cleanup.
-        if (RDFXMLUtils.isRdfRDF(uri, localName)) {
-            rdfDepth--;
-            return;
-        }
-
-        String text = characters.toString().trim();
-        characters.setLength(0);
-
-        if (!ctx.predicateStack.isEmpty() && !text.isEmpty()) {
-            IRI predicate = ctx.predicateStack.pop();
-
-            // CRITICAL FIX: Ensure a subject exists before creating a triple.
-            if (ctx.subjectStack.isEmpty()) {
-                throw new ParsingErrorException(
-                        "Cannot emit literal: no subject available for predicate " + predicate);
+        /**
+         * Handles the end of an XML element, processing accumulated literal content or cleaning up context stacks.
+         */
+        private void handleEndElement(String uri, String localName) throws ParsingErrorException {
+            // Handle <rdf:RDF> closing tag cleanup.
+            if (RDFXMLUtils.isRdfRDF(uri, localName)) {
+                rdfDepth--;
+                return;
             }
 
-            Resource subject = ctx.subjectStack.peek();
-            // Datatype is popped, but lang is peeked (lang applies to parent node scope).
-            String datatypeUri = ctx.datatypeStack.isEmpty() ? null : ctx.datatypeStack.pop();
-            String lang = ctx.langStack.isEmpty() ? null : ctx.langStack.peek();
-            emitter.emitLiteral(subject, predicate, text, datatypeUri, lang);
+            String text = characters.toString().trim();
+            characters.setLength(0);
+
+            if (!ctx.predicateStack.isEmpty() && !text.isEmpty()) {
+                IRI predicate = ctx.predicateStack.pop();
+
+                // CRITICAL FIX: Ensure a subject exists before creating a triple.
+                if (ctx.subjectStack.isEmpty()) {
+                    throw new ParsingErrorException(
+                            "Cannot emit literal: no subject available for predicate " + predicate);
+                }
+
+                Resource subject = ctx.subjectStack.peek();
+                // Datatype is popped, but lang is peeked (lang applies to parent node scope).
+                String datatypeUri = ctx.datatypeStack.isEmpty() ? null : ctx.datatypeStack.pop();
+                String lang = ctx.langStack.isEmpty() ? null : ctx.langStack.peek();
+                emitter.emitLiteral(subject, predicate, text, datatypeUri, lang);
+
+                cleanEndElement(uri, localName);
+                return;
+            }
+
+            if (!ctx.predicateStack.isEmpty()) {
+                ctx.predicateStack.pop();
+            }
 
             cleanEndElement(uri, localName);
-            return;
         }
-
-        if (!ctx.predicateStack.isEmpty()) {
-            ctx.predicateStack.pop();
-        }
-
-        cleanEndElement(uri, localName);
     }
+    
 
     /**
      * Updates the base URI for IRI resolution using the xml:base attribute if present.
@@ -618,10 +620,8 @@ public class RDFXMLParser extends AbstractRDFParser {
             return;
         }
 
-        if (RDFXMLUtils.isDescription(localName, uri) || RDFXMLUtils.isRdfNodeElementType(uri, localName)) {
-            if (!ctx.subjectStack.isEmpty()) {
-                ctx.subjectStack.pop();
-            }
+        if ((RDFXMLUtils.isDescription(localName, uri) || RDFXMLUtils.isRdfNodeElementType(uri, localName)) && !ctx.subjectStack.isEmpty()) {
+            ctx.subjectStack.pop();
         }
     }
 }
