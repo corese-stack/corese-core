@@ -9,7 +9,7 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.core.kgram.api.core.PointerType;
+import fr.inria.corese.core.next.kgram.api.core.PointerType;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;

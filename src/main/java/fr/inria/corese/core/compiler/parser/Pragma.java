@@ -1,11 +1,11 @@
 package fr.inria.corese.core.compiler.parser;
 
-import fr.inria.corese.core.kgram.api.core.ExpType;
-import fr.inria.corese.core.kgram.api.query.Matcher;
-import fr.inria.corese.core.kgram.core.Eval;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.kgram.event.EvalListener;
-import fr.inria.corese.core.kgram.event.EventListener;
+import fr.inria.corese.core.next.kgram.api.core.ExpType;
+import fr.inria.corese.core.next.kgram.api.query.Matcher;
+import fr.inria.corese.core.next.kgram.core.Eval;
+import fr.inria.corese.core.next.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.event.EvalListener;
+import fr.inria.corese.core.next.kgram.event.EventListener;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.cst.RDFS;

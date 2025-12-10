@@ -3,7 +3,7 @@ package fr.inria.corese.core.print;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Mappings;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.transform.TransformerUtils;

@@ -1,12 +1,11 @@
 package fr.inria.corese.core.visitor.solver;
 
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitorBasic;
-import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.core.Eval;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.core.Eval;
+import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

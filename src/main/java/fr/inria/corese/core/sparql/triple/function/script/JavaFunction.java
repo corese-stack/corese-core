@@ -1,11 +1,5 @@
 package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.core.kgram.api.query.Environment;
-import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.api.Computer;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
-
 /**
  *
  * @author Olivier Corby, Wimmics INRIA I3S, 2016

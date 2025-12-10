@@ -1,9 +1,9 @@
 package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.core.kgram.api.core.Pointerable;
+import fr.inria.corese.core.next.kgram.api.core.Pointerable;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.RDF;
-import static fr.inria.corese.core.sparql.datatype.RDF.OWL;
+
 import static fr.inria.corese.core.sparql.datatype.RDF.OWL_SAME_AS;
 import fr.inria.corese.core.sparql.triple.api.ExpressionVisitor;
 import java.util.List;

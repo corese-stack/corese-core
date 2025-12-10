@@ -1,6 +1,6 @@
 package fr.inria.corese.core.sparql.datatype;
 
-import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.next.kgram.api.core.ExpType;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 

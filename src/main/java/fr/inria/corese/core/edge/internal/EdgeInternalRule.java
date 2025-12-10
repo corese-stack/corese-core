@@ -2,7 +2,7 @@ package fr.inria.corese.core.edge.internal;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.edge.EdgeBinary;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 
 /**
  * Graph Edge for internal storage

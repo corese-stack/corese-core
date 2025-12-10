@@ -3,8 +3,8 @@ package fr.inria.corese.core.storage.api.dataManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 
 /**
  * Interface to adapt an external storage system to Corese.

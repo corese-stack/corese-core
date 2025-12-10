@@ -1,6 +1,6 @@
 package fr.inria.corese.core.load;
 
-import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 import org.junit.jupiter.api.BeforeEach;

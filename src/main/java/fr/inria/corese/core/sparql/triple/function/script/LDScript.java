@@ -1,12 +1,12 @@
 package fr.inria.corese.core.sparql.triple.function.script;
 
-import fr.inria.corese.core.kgram.api.core.Expr;
-import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.api.query.Environment;
-import fr.inria.corese.core.kgram.api.query.Evaluator;
-import fr.inria.corese.core.kgram.api.query.Producer;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.sparql.api.Computer;
+import fr.inria.corese.core.next.kgram.api.core.Expr;
+import fr.inria.corese.core.next.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.query.Evaluator;
+import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.next.kgram.core.Eval;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.TermEval;
@@ -156,10 +156,10 @@ public class LDScript extends TermEval {
      * public query q1 which may be different from the query q2 where public
      * function call occur
      */
-    fr.inria.corese.core.kgram.core.Eval getComputerEval(Evaluator evaluator, Environment env, Producer p, Expr function) {
+    Eval getComputerEval(Evaluator evaluator, Environment env, Producer p, Expr function) {
         Query q = getQuery(env, function);
-        fr.inria.corese.core.kgram.core.Eval currentEval = env.getEval();
-        fr.inria.corese.core.kgram.core.Eval eval = new fr.inria.corese.core.kgram.core.Eval(p, evaluator, currentEval.getMatcher());
+        Eval currentEval = env.getEval();
+        Eval eval = new Eval(p, evaluator, currentEval.getMatcher());
         eval.setSPARQLEngine(currentEval.getSPARQLEngine());
         eval.set(currentEval.getProvider());
         eval.init(q);

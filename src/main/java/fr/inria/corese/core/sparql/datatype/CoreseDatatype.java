@@ -1,10 +1,10 @@
 package fr.inria.corese.core.sparql.datatype;
 
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.core.PointerType;
-import fr.inria.corese.core.kgram.api.core.Pointerable;
-import fr.inria.corese.core.kgram.api.core.TripleStore;
-import fr.inria.corese.core.kgram.path.Path;
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.PointerType;
+import fr.inria.corese.core.next.kgram.api.core.Pointerable;
+import fr.inria.corese.core.next.kgram.api.core.TripleStore;
+import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.api.IDatatypeList;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;

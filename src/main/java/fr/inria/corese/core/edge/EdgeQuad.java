@@ -1,6 +1,6 @@
 package fr.inria.corese.core.edge;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.core.Node;
 
 /**
  * Graph Edge as Quad

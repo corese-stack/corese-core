@@ -7,13 +7,12 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Triple;
 import fr.inria.corese.core.compiler.parser.Pragma;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.next.kgram.api.core.Edge;
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.next.kgram.core.Query;
 import fr.inria.corese.core.api.GraphListener;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Edge;
 
 
 /**
