@@ -26,10 +26,11 @@ public class RDFXMLParserTest {
     private static final Logger logger = LoggerFactory.getLogger(RDFXMLParserTest.class);
 
     /**
-     * Helper method to parse the RDF/XML String
-     * @param rdfXml
-     * @return model
-     * @throws Exception
+     * Helper method to parse an RDF/XML string into an RDF model.
+     *
+     * @param rdfXml The RDF/XML content as a string.
+     * @return The resulting {@link Model} populated by the parser.
+     * @throws Exception if an error occurs during parsing or I/O.
      */
     private Model parseRdfXml(String rdfXml) throws Exception {
         Model model = new CoreseModel();
@@ -43,14 +44,11 @@ public class RDFXMLParserTest {
 
     /**
      * Helper method to print the model.
-     * @param model
-     */
-    /**
-     * Helper method to print the model.
-     * @param model
+     *
+     * @param model The {@link Model} whose statements should be printed.
      */
     private void printModel(Model model) {
-        model.stream().forEach(stmt -> {
+        model.forEach(stmt -> {
             Value obj = stmt.getObject();
             String subjectString = stmt.getSubject().stringValue();
             String predicateString = stmt.getPredicate().stringValue();
@@ -81,8 +79,9 @@ public class RDFXMLParserTest {
     }
 
     /**
-     * Test node elements with IRIs
-     * @throws Exception
+     * Test node elements with IRIs.
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testNodeElementsWithIRIs() throws Exception {
@@ -106,12 +105,12 @@ public class RDFXMLParserTest {
         Model model = parseRdfXml(rdfXml);
         printModel(model);
         assertEquals(2, model.size(), "Expected two RDF statements");
-
     }
 
     /**
-     * Test a basic RDF/XML file
-     * @throws Exception
+     * Test parsing a basic RDF/XML
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testBasicRdfParsing() throws Exception {
@@ -132,7 +131,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a RDF/XML file with Complete description of all graph paths
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample3CompleteDescriptionOfAllGraphPaths() throws Exception {
@@ -150,7 +150,7 @@ public class RDFXMLParserTest {
                           </ex:homePage>
                         </rdf:Description>
                       </ex:editor>
-                    </rdf:Description>    
+                    </rdf:Description>
                     <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar">
                       <ex:editor>
                         <rdf:Description>
@@ -158,7 +158,7 @@ public class RDFXMLParserTest {
                         </rdf:Description>
                       </ex:editor>
                     </rdf:Description>
-                    
+                
                     <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar">
                       <dc:title>RDF 1.2 XML Syntax</dc:title>
                     </rdf:Description>
@@ -171,7 +171,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test RDF/XML File Using multiple property elements on a node element
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample4UsingMultiplePropertyElements() throws Exception {
@@ -202,7 +203,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test RDF/XML with Empty property elements
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample5EmptyPropertyElements() throws Exception {
@@ -232,7 +234,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a RDF/XML file with Replacing property elements with string literal content into property attributes
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample6ReplacingPropertyElementsWithStringLiteral() throws Exception {
@@ -259,7 +262,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a Complete RDF/XML
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample7CompleteRDFXML() throws Exception {
@@ -286,7 +290,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a Complete example of xml:lang
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample8CompleteExampleXmlLang() throws Exception {
@@ -315,6 +320,11 @@ public class RDFXMLParserTest {
         assertEquals(6, model.size(), "Expected six RDF statements");
     }
 
+    /**
+     * Test parsing an RDF/XML document that uses
+     *
+     * @throws Exception if parsing fails.
+     */
     @Test
     public void testExample11CompleteExamplerdfDatatype() throws Exception {
         String rdfXml = """
@@ -335,7 +345,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a Complete RDF/XML file with a description of graph using rdf:nodeID
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample12CompleteRDFXMLUsingRdfNodeID() throws Exception {
@@ -367,7 +378,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a RDF/XML file with a Complete example using rdf:parseType=Resource
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample13CompleteExampleUsingRdfparseTypeResource() throws Exception {
@@ -393,11 +405,12 @@ public class RDFXMLParserTest {
     }
 
     /**
-     * Test a RDF/XML file with a Complete example of property attributes on an empty property element
-     * @throws Exception
+     * Test a RDF/XML file with a Complete example of property attributes on an empty property element.
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
-    public void testExample14CompleteExampleOfPorpertyAttributesOnAnEmptyPropertyElement() throws Exception {
+    public void testExample14CompleteExampleOfPropertyAttributesOnAnEmptyPropertyElement() throws Exception {
 
         String rdfXml = """
 <?xml version="1.0"?>
@@ -421,7 +434,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a RDF/XML file with a Complete example with rdf:type
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample15CompleteExampleWithRdfType() throws Exception {
@@ -445,7 +459,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a RDF/XML file with a Complete example using a typed node element to replace an rdf:type
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample16CompleteExampleUsingATypedNodeElementToReplaceAnRdfType() throws Exception {
@@ -468,10 +483,13 @@ public class RDFXMLParserTest {
 
     }
 
-    @Test
+
     /**
-     * Test a XML/RDF File using rdf:ID and xml:base
+     * Test parsing an RDF/XML document
+     *
+     * @throws Exception if parsing fails.
      */
+    @Test
     public void testExample17CompleteExampleUsingRdfIDAndXmlbase() throws Exception {
         String rdfXml = """
 <?xml version="1.0"?>
@@ -494,7 +512,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a Complex example using RDF list properties
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample18ComplexExampleUsingRdfListProperties() throws Exception {
@@ -519,7 +538,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a Complete example using rdf:li
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample19CompleteExampleUsingRdfliProperties() throws Exception {
@@ -545,7 +565,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a Complete example of a RDF collection
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample20CompleteExampleOfARdfCollectionOfNodes() throws Exception {
@@ -572,7 +593,8 @@ public class RDFXMLParserTest {
 
     /**
      * Test a Complete example of rdf:ID reifying a property element
-     * @throws Exception
+     *
+     * @throws Exception if parsing fails.
      */
     @Test
     public void testExample21CompleteExampleOfRdfID() throws Exception {

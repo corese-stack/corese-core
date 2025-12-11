@@ -156,39 +156,46 @@ public abstract class AbstractNTriplesNQuadsListener {
     public int processEscapeSequence(String input, int i, StringBuilder result, String context) {
         char next = input.charAt(i + 1);
 
-        switch (next) {
-            case '"':
+        return switch (next) {
+            case '"' -> {
                 result.append('"');
-                return i + 1;
-            case '\\':
+                yield i + 1;
+            }
+            case '\\' -> {
                 result.append('\\');
-                return i + 1;
-            case '>':
+                yield i + 1;
+            }
+            case '>' -> {
                 result.append('>');
-                return i + 1;
-            case 'n':
+                yield i + 1;
+            }
+            case 'n' -> {
                 result.append('\n');
-                return i + 1;
-            case 't':
+                yield i + 1;
+            }
+            case 't' -> {
                 result.append('\t');
-                return i + 1;
-            case 'r':
+                yield i + 1;
+            }
+            case 'r' -> {
                 result.append('\r');
-                return i + 1;
-            case 'b':
+                yield i + 1;
+            }
+            case 'b' -> {
                 result.append('\b');
-                return i + 1;
-            case 'f':
+                yield i + 1;
+            }
+            case 'f' -> {
                 result.append('\f');
-                return i + 1;
-            case 'u':
-                return processUnicodeEscape(input, i, 4, result, context);
-            case 'U':
-                return processUnicodeEscape(input, i, 8, result, context);
-            default:
+                yield i + 1;
+            }
+            case 'u' -> processUnicodeEscape(input, i, 4, result, context);
+            case 'U' -> processUnicodeEscape(input, i, 8, result, context);
+            default -> {
                 result.append('\\').append(next);
-                return i + 1;
-        }
+                yield i + 1;
+            }
+        };
     }
 
     /**
@@ -248,12 +255,17 @@ public abstract class AbstractNTriplesNQuadsListener {
      * @return Created literal
      */
     public Literal createLiteral(String label, IRI datatypeIRI, String languageTag) {
-        if (datatypeIRI != null) {
-            return factory.createLiteral(label, datatypeIRI);
+        try {
+            if (datatypeIRI != null) {
+                return factory.createLiteral(label, datatypeIRI);
+            }
+            if (languageTag != null) {
+                return factory.createLiteral(label, languageTag);
+            }
+            return factory.createLiteral(label);
+        } catch (IllegalArgumentException e) {
+
+            return factory.createLiteral(label);
         }
-        if (languageTag != null) {
-            return factory.createLiteral(label, languageTag);
-        }
-        return factory.createLiteral(label);
     }
 }

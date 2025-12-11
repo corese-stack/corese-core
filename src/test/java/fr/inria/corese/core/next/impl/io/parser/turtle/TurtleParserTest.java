@@ -33,7 +33,7 @@ public class TurtleParserTest {
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
         assertEquals(1, model.size());
-        assertEquals(2, model.getNamespaces().size()); // Should contains ex: and the relative base uri :
+        assertEquals(1, model.getNamespaces().size()); // Should contains ex: and the relative base uri :
     }
 
 }

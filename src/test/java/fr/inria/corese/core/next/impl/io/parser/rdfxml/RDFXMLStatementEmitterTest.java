@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the RDFXMLStatementEmitter class.
- *
  * This test suite verifies that the emitter correctly adds RDF statements to the provided
  * Model based on various RDF/XML constructs including:
  * - Plain literals
@@ -126,7 +125,7 @@ public class RDFXMLStatementEmitterTest {
         IRI predicate = factory.createIRI("http://example.org/knows");
         emitter.emitBNodeTriple(subject, predicate, "b123");
 
-        assertTrue(model.size() == 1);
+        assertEquals(1, model.size());
         Value obj = model.objects().iterator().next();
         assertTrue(obj.stringValue().contains("_:b123"));
     }

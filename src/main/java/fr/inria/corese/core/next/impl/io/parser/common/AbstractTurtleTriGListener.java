@@ -28,8 +28,6 @@ public abstract class AbstractTurtleTriGListener {
     public Resource currentSubject;
     public IRI currentPredicate;
 
-    private final java.util.Set<String> explicitlyDeclaredPrefixes = new java.util.HashSet<>();
-
     /**
      * Constructs a parser listener with the specified model, factory and base URI.
      *
@@ -50,10 +48,6 @@ public abstract class AbstractTurtleTriGListener {
      * Registers the base URI as the empty prefix namespace.
      */
     public void initializeBasePrefix() {
-        if (this.baseURI != null && !this.baseURI.isEmpty()) {
-            prefixHandler.setPrefix(ParserConstants.EMPTY_STRING, this.baseURI);
-            model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
-        }
     }
 
     /**
@@ -76,8 +70,6 @@ public abstract class AbstractTurtleTriGListener {
     public void updateBaseURI(String newBase) {
         this.baseURI = resolveIRIAgainstBase(newBase);
         validateIRI(this.baseURI);
-        prefixHandler.setPrefix(ParserConstants.EMPTY_STRING, this.baseURI);
-        model.setNamespace(ParserConstants.EMPTY_STRING, this.baseURI);
     }
 
     /**
@@ -91,8 +83,6 @@ public abstract class AbstractTurtleTriGListener {
         validateIRI(resolvedIRI);
         prefixHandler.setPrefix(prefix, resolvedIRI);
         model.setNamespace(prefix, resolvedIRI);
-
-        explicitlyDeclaredPrefixes.add(prefix);
     }
 
     /**
@@ -105,6 +95,7 @@ public abstract class AbstractTurtleTriGListener {
      */
     public String resolveIRI(String raw) {
         try {
+
             raw = raw.trim();
 
             if (raw.equals(ParserConstants.RDF_TYPE_SHORTCUT)) {
@@ -113,7 +104,12 @@ public abstract class AbstractTurtleTriGListener {
 
             if (raw.equals(ParserConstants.COLON)) {
                 String ns = prefixHandler.getNamespace(ParserConstants.EMPTY_STRING);
-                return ns != null ? ns : getEffectiveBaseURI();
+                if (ns == null) {
+                    throw new ParsingErrorException(
+                            "Undeclared prefix: '' (empty prefix). " +
+                                    "Use '@prefix : <namespace> .' to declare it.");
+                }
+                return ns;
             }
 
             if (raw.startsWith(ParserConstants.IRI_START) && raw.endsWith(ParserConstants.IRI_END)) {
@@ -374,7 +370,7 @@ public abstract class AbstractTurtleTriGListener {
     public void removeLastSegment(StringBuilder output) {
         String outputStr = output.toString();
         int lastSlash = outputStr.lastIndexOf(ParserConstants.SLASH);
-        output.setLength(lastSlash >= 0 ? lastSlash : 0);
+        output.setLength(Math.max(lastSlash, 0));
     }
 
     /**
@@ -642,12 +638,11 @@ public abstract class AbstractTurtleTriGListener {
      * Validates that an IRI contains only valid characters after escape sequence processing.
      *
      * @param iri the IRI string to validate (after escape sequences have been processed)
-     * @return true if the IRI is valid
      * @throws ParsingErrorException if the IRI contains forbidden characters
      */
-    private boolean validateIRI(String iri) throws ParsingErrorException {
+    private void validateIRI(String iri) throws ParsingErrorException {
         if (iri == null || iri.isEmpty()) {
-            return true;  // Empty IRIs are acceptable
+            return;
         }
 
         // Check each character in the IRI
@@ -668,7 +663,6 @@ public abstract class AbstractTurtleTriGListener {
                 );
             }
         }
-        return true;
     }
 
     /**
@@ -687,15 +681,5 @@ public abstract class AbstractTurtleTriGListener {
          * XSD double type
          */
         DOUBLE
-    }
-
-    /**
-     * Returns the prefix handler for this listener.
-     * Allows external access to discovered prefixes.
-     *
-     * @return the PrefixHandler instance
-     */
-    public PrefixHandler getPrefixHandler() {
-        return prefixHandler;
     }
 }
