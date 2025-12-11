@@ -2,15 +2,14 @@ package fr.inria.corese.core.next.impl.io.serialization.base;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.serialization.PrettyPrintOptions;
-import fr.inria.corese.core.next.api.io.serialization.UsesPrefixOptions;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.serializer.PrettyPrintOptions;
+import fr.inria.corese.core.next.api.io.serializer.UsesPrefixOptions;
+import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.option.*;
-import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOptions;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RDFXMLCircularTest {
 
     private ValueFactory valueFactory;
-    private fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
+    private fr.inria.corese.core.next.api.io.serializer.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
     private RDFXMLSerializerOptions defaultConfig;
 

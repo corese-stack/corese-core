@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.io.serialization;
+package fr.inria.corese.core.next.api.io.serializer;
 
 public interface LineEndingOptions {
 

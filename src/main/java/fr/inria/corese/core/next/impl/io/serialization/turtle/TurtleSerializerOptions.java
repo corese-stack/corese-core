@@ -1,11 +1,9 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
+import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Configuration for Turtle serialization format.

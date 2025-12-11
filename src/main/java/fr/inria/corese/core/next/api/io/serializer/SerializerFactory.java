@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.io.serialization;
+package fr.inria.corese.core.next.api.io.serializer;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;

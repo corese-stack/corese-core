@@ -6,7 +6,7 @@ import com.apicatalog.jsonld.api.FromRdfApi;
 import com.apicatalog.jsonld.document.RdfDocument;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;

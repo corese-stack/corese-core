@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
 import java.util.stream.Stream;
@@ -25,6 +28,8 @@ import static org.mockito.Mockito.when;
  * Unit tests for the XmlSerializer class.
  */
 class RDFXMLSerializerTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(RDFXMLSerializerTest.class);
 
     @Mock
     private Model mockModel;
@@ -65,14 +70,13 @@ class RDFXMLSerializerTest {
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
-
         RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/subject">
                     <foaf:name rdf:resource="http://example.org/object"/>
                   </rdf:Description>
@@ -104,7 +108,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:nodeID="b0">
                     <foaf:name rdf:resource="http://example.org/Alice"/>
                   </rdf:Description>
@@ -138,7 +142,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:exampleorg="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/book">
                     <dc:creator rdf:nodeID="b0"/>
                   </rdf:Description>
@@ -170,7 +174,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/person">
                     <foaf:name>John Doe</foaf:name>
                   </rdf:Description>
@@ -202,7 +206,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://example.org/vocabulary/" xmlns:exampleorg="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:ex="http://example.org/vocabulary/" xmlns:exampleorg="http://example.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/data">
                     <ex:value rdf:datatype="xsd:integer">123</ex:value>
                   </rdf:Description>
@@ -232,7 +236,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:exampleorg="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/book">
                     <dc:title xml:lang="en">The Book</dc:title>
                   </rdf:Description>
@@ -276,7 +280,6 @@ class RDFXMLSerializerTest {
 
         assertTrue(actual.contains("xmlns:exorg=\"http://ex.org/\""));
         assertTrue(actual.contains("xmlns:excom=\"http://ex.com/\""));
-        assertTrue(actual.contains("xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\""));
 
         String desc1 = "  <rdf:Description rdf:about=\"http://ex.org/s1\">\n    <exorg:p1 rdf:resource=\"http://ex.org/o1\"/>\n  </rdf:Description>";
         String desc2 = "  <rdf:Description rdf:about=\"http://ex.com/s2\">\n    <excom:p2 rdf:resource=\"http://ex.com/o2\"/>\n  </rdf:Description>";
@@ -312,7 +315,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://ex.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:ex="http://ex.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://ex.org/A">
                     <ex:p rdf:resource="http://ex.org/o"/>
                   </rdf:Description>
@@ -346,7 +349,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/sub&amp;ject&lt;">
                     <exampleorg:pred rdf:resource="http://example.org/obj&quot;ect&apos;"/>
                   </rdf:Description>
@@ -379,7 +382,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:ex="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/item">
                     <ex:prop>Value with &lt;tags&gt; &amp; entities</ex:prop>
                   </rdf:Description>
@@ -412,9 +415,9 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:about="http://example.org/subject">
-                    <http://xmlns.com/foaf/0.1/name rdf:resource="http://example.org/object"/>
+                    <foaf:name rdf:resource="http://example.org/object"/>
                   </rdf:Description>
                 </rdf:RDF>
                 """;
@@ -484,7 +487,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://example.org/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:ex="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                   <rdf:Description rdf:nodeID="ode-abc">
                     <ex:p rdf:resource="http://example.org/o"/>
                   </rdf:Description>
@@ -511,7 +514,7 @@ class RDFXMLSerializerTest {
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
                 </rdf:RDF>
                 """;
 

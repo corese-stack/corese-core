@@ -4,20 +4,14 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.serialization.*;
+import fr.inria.corese.core.next.api.io.serializer.*;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,8 +49,7 @@ public class RDFXMLSerializer implements RDFSerializer {
 
     private final Model model;
     private final IOOptions config;
-    private final Map<String, String> iriToPrefixMapping;
-    private final Map<String, String> prefixToIriMapping;
+    private final PrefixHandler prefixHandler;
     private final Map<Resource, String> blankNodeIds;
     private int blankNodeCounter = 0;
     private List<Statement> cachedStatements;
@@ -82,22 +75,15 @@ public class RDFXMLSerializer implements RDFSerializer {
     public RDFXMLSerializer(Model model, IOOptions config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
-        this.iriToPrefixMapping = new HashMap<>();
-        this.prefixToIriMapping = new HashMap<>();
-        this.blankNodeIds = new HashMap<>();
-        initializePrefixes();
-    }
 
-    /**
-     * Initializes prefix mappings by adding custom prefixes from the configuration.
-     * The custom prefixes map in XmlConfig is expected to be {prefix: namespaceURI}.
-     */
-    private void initializePrefixes() {
-        if (this.config instanceof UsesPrefixOptions usesPrefixOptions && usesPrefixOptions.usePrefixes()) {
-            for (Map.Entry<String, String> entry : usesPrefixOptions.getPrefixHandler().getPrefixMap().entrySet()) {
-                addPrefixMapping(entry.getValue(), entry.getKey());
-            }
+        if(config instanceof UsesPrefixOptions usesPrefixOptions
+                && usesPrefixOptions.usePrefixes()) {
+            this.prefixHandler = usesPrefixOptions.getPrefixHandler();
+        } else {
+            this.prefixHandler = new PrefixHandler(false);
+            this.prefixHandler.setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
         }
+        this.blankNodeIds = new HashMap<>();
     }
 
     /**
@@ -146,12 +132,16 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeRdfRootElement(Writer writer) throws IOException {
-        if (this.config instanceof UsesPrefixOptions usesPrefixOptions &&  usesPrefixOptions.usePrefixes() && usesPrefixOptions.autoDeclarePrefixes()) {
-            collectUsedNamespaces();
+        Set<String> actuallyUsedNamespaces = new HashSet<>();
+        actuallyUsedNamespaces.add(RDF.getVocabularyNamespace());
+        if (this.config instanceof UsesPrefixOptions usesPrefixOptions
+                &&  usesPrefixOptions.usePrefixes()
+                && usesPrefixOptions.autoDeclarePrefixes()) {
+            actuallyUsedNamespaces.addAll(collectUsedNamespaces());
         }
 
         writer.write(SerializationConstants.RDF_ROOT_START);
-        writeNamespaceAttributes(writer);
+        writeNamespaceAttributes(writer, actuallyUsedNamespaces);
         writer.write(">");
         if(this.config instanceof LineEndingOptions lineEndingOptions) {
             writer.write(lineEndingOptions.getLineEnding());
@@ -162,7 +152,8 @@ public class RDFXMLSerializer implements RDFSerializer {
 
 
         List<Resource> sortedSubjects = new ArrayList<>(statementsBySubject.keySet());
-        if (this.config instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortSubjects()) {
+        if (this.config instanceof PrettyPrintOptions prettyPrintOptions
+                && prettyPrintOptions.sortSubjects()) {
             Collections.sort(sortedSubjects, Comparator.comparing(Value::stringValue));
         }
 
@@ -187,19 +178,19 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @param writer the {@link Writer} to which attributes will be written.
      * @throws IOException if an I/O error occurs.
      */
-    private void writeNamespaceAttributes(Writer writer) throws IOException {
-        if (!iriToPrefixMapping.containsKey(RDF.getVocabularyNamespace())) {
-            addPrefixMapping(RDF.getVocabularyNamespace(), RDF.getVocabularyPreferredPrefix());
+    private void writeNamespaceAttributes(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
+        logger.info("actually used Namespaces: {}", actuallyUsedNamespaces);
+        ArrayList<String> namespacelist = new ArrayList<>(actuallyUsedNamespaces);
+        if (this.config instanceof PrettyPrintOptions prettyPrintOptions
+                && prettyPrintOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
+            namespacelist.sort(
+                    (ns1, ns2) ->
+                            prefixHandler.getPrefix(ns1).compareTo(prefixHandler.getPrefix(ns2)));
         }
 
-        List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
-        if (this.config instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
-            Collections.sort(prefixes);
-        }
-
-        for (String prefix : prefixes) {
-            String namespaceURI = prefixToIriMapping.get(prefix);
-            writer.write(String.format(" %s%s=\"%s\"", SerializationConstants.XMLNS_PREFIX, prefix, escapeXmlAttribute(namespaceURI)));
+        for(String namespace : namespacelist) {
+            String prefix = this.prefixHandler.getPrefix(namespace);
+            writer.write(String.format(" %s%s=\"%s\"", SerializationConstants.XMLNS_PREFIX, prefix, escapeXmlAttribute(namespace)));
         }
     }
 
@@ -207,26 +198,55 @@ public class RDFXMLSerializer implements RDFSerializer {
      * Collects all namespaces used in the model (subjects, predicates, objects, contexts)
      * and attempts to assign prefixes if auto-declaration is enabled and they are not already mapped.
      */
-    private void collectUsedNamespaces() {
-        Set<String> namespaces = this.cachedStatements.stream()
-                .flatMap(stmt -> Arrays.asList(
-                        stmt.getSubject(),
-                        stmt.getPredicate(),
-                        stmt.getObject()
-                ).stream())
+    private Set<String> collectUsedNamespaces() {
+        // Collecting namespaces of all IRIs in the data
+        Set<String> potentialNamespaces = this.cachedStatements.stream()
+                .flatMap(stmt -> {
+                    List<Value> values = new ArrayList<>(Arrays.asList(
+                            stmt.getSubject(),
+                            stmt.getPredicate(),
+                            stmt.getObject()
+                    ));
+                    if (stmt.getContext() != null) {
+                        values.add(stmt.getContext());
+                    }
+                    if(stmt.getObject().isLiteral()
+                            && ((Literal) stmt.getObject()).getDatatype() != null) {
+                        values.add(((Literal) stmt.getObject()).getDatatype());
+                    }
+                    return values.stream();
+                })
+                .filter(Objects::nonNull)
                 .filter(Value::isIRI)
-                .map(v -> getNamespace(v.stringValue()))
+                .map(v -> IRIUtils.guessNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
+        logger.info("{}", potentialNamespaces);
 
+        // potential namespaces can contain different candidates that are based on each other. We keep the shortest
+        Set<String> copyPotentialNamespaces = Set.copyOf(potentialNamespaces);
+        potentialNamespaces = potentialNamespaces
+                .stream()
+                .filter(potentialNamespace -> copyPotentialNamespaces
+                        .stream()
+                        .noneMatch(otherPotentialNamespace -> (! otherPotentialNamespace.equals(potentialNamespace)) && potentialNamespace.startsWith(otherPotentialNamespace)))
+                .collect(Collectors.toSet());
+        logger.info("{}", potentialNamespaces);
 
-        namespaces.forEach(namespace -> {
-            if (!iriToPrefixMapping.containsKey(namespace)) {
+        potentialNamespaces.forEach(namespace -> {
+            logger.info("{} is in PrefixHandler = {}", namespace, this.prefixHandler.hasNamespace(namespace));
+            if (! this.prefixHandler.hasNamespace(namespace) &&
+                    // removing known namespaces from the list of potential namespaces
+                    this.prefixHandler.getNamespaces()
+                            .stream()
+                            .noneMatch(knownNamespace -> (knownNamespace.startsWith(namespace)))) {
                 String prefix = getSuggestedPrefix(namespace);
                 if (prefix != null) {
                     addPrefixMapping(namespace, prefix);
                 }
             }
         });
+
+        return potentialNamespaces;
     }
 
 
@@ -238,15 +258,17 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @return The prefixed name (e.g., "foaf:name") or null if no suitable prefix is found.
      */
     private String getPrefixedNameInternal(String iriString) {
+        logger.info("getPrefixedNameInternal({})", iriString);
         String longestMatchingNamespace = null;
         String correspondingPrefix = null;
         int longestMatchLength = -1;
 
-        for (Map.Entry<String, String> entry : iriToPrefixMapping.entrySet()) {
-            String namespace = entry.getKey();
-            String prefix = entry.getValue();
-
+        logger.info("{}", this.prefixHandler.getPrefixMap());
+        for (String namespace : this.prefixHandler.getNamespaces()) {
+            logger.info("{} contains {} ? {}", iriString, namespace, iriString.startsWith(namespace));
             if (iriString.startsWith(namespace)) {
+                String prefix = this.prefixHandler.getPrefix(namespace);
+                logger.info("{} = {}", namespace, prefix);
                 if (namespace.length() > longestMatchLength) {
                     longestMatchLength = namespace.length();
                     longestMatchingNamespace = namespace;
@@ -257,7 +279,7 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         if (longestMatchingNamespace != null) {
             String localName = iriString.substring(longestMatchingNamespace.length());
-
+            logger.info("{} = {} : {}", iriString, longestMatchingNamespace, localName);
             if (localName.isEmpty()) {
                 return correspondingPrefix + SerializationConstants.COLON;
             }
@@ -274,34 +296,33 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @param prefix       The associated prefix.
      */
     private void addPrefixMapping(String namespaceURI, String prefix) {
-        if (iriToPrefixMapping.containsKey(namespaceURI)) {
-            if (iriToPrefixMapping.get(namespaceURI).equals(prefix)) {
+        if (this.prefixHandler.hasNamespace(namespaceURI)) {
+            if (this.prefixHandler.getPrefix(namespaceURI).equals(prefix)) {
                 return;
             } else {
 
                 if (logger.isWarnEnabled()) {
                     logger.warn("Namespace URI '{}' is already mapped to prefix '{}'. Cannot map to new prefix '{}'. " +
                                     "Existing mapping for this namespace will be retained.",
-                            namespaceURI, iriToPrefixMapping.get(namespaceURI), prefix);
+                            namespaceURI, this.prefixHandler.getPrefix(namespaceURI), prefix);
                 }
                 return;
             }
         }
 
         String effectivePrefix = prefix;
-        if (prefixToIriMapping.containsKey(prefix)) {
-            if (!prefixToIriMapping.get(prefix).equals(namespaceURI)) {
+        if (this.prefixHandler.hasPrefix(prefix)) {
+            if (! this.prefixHandler.getNamespace(prefix).equals(namespaceURI)) {
                 if (logger.isWarnEnabled()) {
                     logger.warn("Prefix '{}' is already mapped to namespace '{}'. Cannot map to new namespace '{}'. " +
                                     "A new unique prefix will be generated for '{}'.",
-                            prefix, prefixToIriMapping.get(prefix), namespaceURI, namespaceURI);
+                            prefix, this.prefixHandler.getNamespace(prefix), namespaceURI, namespaceURI);
                 }
                 effectivePrefix = generateUniquePrefix(prefix);
             }
         }
 
-        iriToPrefixMapping.put(namespaceURI, effectivePrefix);
-        prefixToIriMapping.put(effectivePrefix, namespaceURI);
+        this.prefixHandler.setPrefix(effectivePrefix, namespaceURI);
     }
 
     /**
@@ -314,7 +335,7 @@ public class RDFXMLSerializer implements RDFSerializer {
     private String generateUniquePrefix(String basePrefix) {
         String candidate = basePrefix;
         int i = 0;
-        while (prefixToIriMapping.containsKey(candidate)) {
+        while (this.prefixHandler.hasPrefix(candidate)) {
             candidate = basePrefix + (++i);
         }
         return candidate;
@@ -469,30 +490,6 @@ public class RDFXMLSerializer implements RDFSerializer {
                         && datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL));
     }
 
-
-    /**
-     * Extracts the namespace URI part from an IRI string.
-     * This is a common heuristic for RDF IRIs.
-     *
-     * @param iriString The full IRI.
-     * @return The namespace URI part.
-     */
-    private String getNamespace(String iriString) {
-        int hashIdx = iriString.lastIndexOf(SerializationConstants.HASH);
-        int slashIdx = iriString.lastIndexOf(SerializationConstants.SLASH);
-
-        if (hashIdx > -1) {
-            return iriString.substring(0, hashIdx + 1);
-        } else if (slashIdx > -1 && slashIdx < iriString.length() - 1) {
-            int dotIdx = iriString.lastIndexOf(SerializationConstants.POINT);
-            if (dotIdx > slashIdx) {
-                return iriString.substring(0, slashIdx + 1);
-            }
-            return iriString.substring(0, slashIdx + 1);
-        }
-        return iriString;
-    }
-
     /**
      * Suggests a prefix for a given namespace URI.
      * Attempts to derive a meaningful prefix or generates a unique one.
@@ -501,14 +498,6 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @return A suggested prefix, or null if suggestion is not possible.
      */
     private String getSuggestedPrefix(String namespace) {
-
-        if (namespace.equals(RDF.getVocabularyNamespace())) return RDF.getVocabularyPreferredPrefix();
-        if (namespace.equals(RDFS.getVocabularyNamespace())) return RDFS.getVocabularyPreferredPrefix();
-        if (namespace.equals(XSD.getVocabularyNamespace())) return XSD.getVocabularyPreferredPrefix();
-        if (namespace.equals(OWL.getVocabularyNamespace())) return OWL.getVocabularyPreferredPrefix();
-        if (namespace.equals(FOAF.getVocabularyNamespace())) return FOAF.getVocabularyPreferredPrefix();
-
-
         String base = namespace;
         if (base.endsWith(SerializationConstants.HASH) || base.endsWith(SerializationConstants.SLASH)) {
             base = base.substring(0, base.length() - 1);
@@ -540,7 +529,7 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         String candidate = base;
         int i = 0;
-        while (prefixToIriMapping.containsKey(candidate) && !prefixToIriMapping.get(candidate).equals(namespace)) {
+        while (this.prefixHandler.hasPrefix(candidate) && !this.prefixHandler.getPrefix(candidate).equals(namespace)) {
             candidate = base + (++i);
         }
         return candidate;

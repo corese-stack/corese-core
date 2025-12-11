@@ -1,12 +1,10 @@
 package fr.inria.corese.core.next.impl.io.serialization.option;
 
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.serialization.PrettyPrintOptions;
-import fr.inria.corese.core.next.api.io.serialization.UsesPrefixOptions;
+import fr.inria.corese.core.next.api.io.serializer.PrettyPrintOptions;
+import fr.inria.corese.core.next.api.io.serializer.UsesPrefixOptions;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;

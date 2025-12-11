@@ -2,9 +2,9 @@ package fr.inria.corese.core.next.impl.io.serialization.option;
 
 import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.api.io.serialization.BlankNodeIdGenerationOptions;
-import fr.inria.corese.core.next.api.io.serialization.DatatypePolicyOptions;
-import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
+import fr.inria.corese.core.next.api.io.serializer.BlankNodeIdGenerationOptions;
+import fr.inria.corese.core.next.api.io.serializer.DatatypePolicyOptions;
+import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
 import java.util.Objects;

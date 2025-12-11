@@ -6,10 +6,6 @@ import java.util.Objects;
 
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
-import fr.inria.corese.core.next.api.io.serialization.UsesPrefixOptions;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

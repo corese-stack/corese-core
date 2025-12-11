@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
-import fr.inria.corese.core.next.api.io.serialization.PrettyPrintOptions;
+import fr.inria.corese.core.next.api.io.serializer.PrettyPrintOptions;
+import fr.inria.corese.core.next.api.io.serializer.UsesPrefixOptions;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
@@ -18,7 +19,7 @@ import java.util.Objects;
  * <p>Use the {@link Builder} class to create instances of {@code RDFXMLSerializerOptions}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class RDFXMLSerializerOptions extends AbstractSerializerOptions implements PrettyPrintOptions {
+public class RDFXMLSerializerOptions extends AbstractSerializerOptions implements PrettyPrintOptions, UsesPrefixOptions {
 
     /**
      * Whether prefix declarations (e.g., `xmlns:prefix="uri"`) should be used for compact IRIs.

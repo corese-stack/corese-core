@@ -16,11 +16,9 @@ import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.api.io.serialization.LineEndingOptions;
-import fr.inria.corese.core.next.api.io.serialization.PrettyPrintOptions;
+import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;
+import fr.inria.corese.core.next.api.io.serializer.PrettyPrintOptions;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractGraphSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 

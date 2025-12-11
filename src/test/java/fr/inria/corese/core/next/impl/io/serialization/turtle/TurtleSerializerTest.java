@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.BeforeEach;
@@ -294,6 +295,8 @@ class TurtleSerializerTest {
         Logger logger = LoggerFactory.getLogger(TurtleSerializerTest.class);
 
         ValueFactory valueFactory;
+        fr.inria.corese.core.next.api.io.serializer.SerializerFactory serializerFactory;
+        ParserFactory parserFactory;
         TurtleSerializerOptions defaultConfig;
         String EXAMPLE_NS = "http://example.org/";
         String PREDICATE_KNOWS = EXAMPLE_NS + "knows";
