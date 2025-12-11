@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
 import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.impl.io.common.IOConstants;
-import fr.inria.corese.core.next.impl.io.parser.util.ParserConstants;
 import org.xml.sax.Attributes;
 
 import java.util.List;
@@ -148,7 +147,7 @@ public class RDFXMLUtils {
                 throw new ParsingErrorException("rdf:nodeID value '" + nodeID + "' is not a valid NCName. " +
                         "NCNames cannot contain colons and must start with a letter or underscore.");
             }
-            return factory.createBNode(ParserConstants.BLANK_NODE_PREFIX + nodeID);
+            return factory.createBNode(IOConstants.BLANK_NODE_PREFIX + nodeID);
         }
 
         if (id != null) {
@@ -359,9 +358,7 @@ public class RDFXMLUtils {
         }
 
         switch (parseType) {
-            case "Resource":
-            case "Literal":
-            case "Collection":
+            case "Resource", "Literal", "Collection":
                 return; // Valid
             default:
                 throw new ParsingErrorException(
