@@ -1,22 +1,6 @@
 package fr.inria.corese.core.next.impl.io.parser.ntriples;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import fr.inria.corese.core.next.api.BNode;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.ValueFactory;
+import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
@@ -25,12 +9,20 @@ import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Circular tests for N-Triples parser and serializer integration.
  * These tests verify that data can be correctly serialized to N-Triples format
  * and then parsed back to an equivalent model (round-trip testing).
- * 
  * The circular testing approach ensures that the parser and serializer
  * are compatible and preserve data integrity across format transformations.
  */
@@ -223,9 +215,8 @@ class NTriplesCircularTest {
      * 
      * @param originalModel The model to serialize and parse back
      * @return The model resulting from parsing the serialized data
-     * @throws Exception If serialization or parsing fails
      */
-    private Model performRoundTrip(Model originalModel) throws Exception {
+    private Model performRoundTrip(Model originalModel) {
         // Serialize to N-Triples
         RDFSerializer serializer = serializerFactory.createSerializer(
                 RDFFormat.NTRIPLES, originalModel, defaultConfig);
@@ -254,7 +245,7 @@ class NTriplesCircularTest {
 
     @Test
     @DisplayName("Round-trip test with simple model containing basic IRIs and literals")
-    void testRoundTripWithSimpleModel() throws Exception {
+    void testRoundTripWithSimpleModel() {
         // Given: A simple model with basic triples
         Model originalModel = createSimpleTestModel();
 
@@ -270,7 +261,7 @@ class NTriplesCircularTest {
 
     @Test
     @DisplayName("Round-trip test with complex model containing diverse RDF value types")
-    void testRoundTripWithComplexModel() throws Exception {
+    void testRoundTripWithComplexModel() {
         // Given: A complex model with various RDF constructs
         Model originalModel = createComplexTestModel();
 
@@ -286,7 +277,7 @@ class NTriplesCircularTest {
 
     @Test
     @DisplayName("Round-trip test with empty model")
-    void testRoundTripWithEmptyModel() throws Exception {
+    void testRoundTripWithEmptyModel() {
         // Given: An empty model
         Model originalModel = new CoreseModel();
 
@@ -301,7 +292,7 @@ class NTriplesCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only typed literals")
-    void testRoundTripWithTypedLiterals() throws Exception {
+    void testRoundTripWithTypedLiterals() {
         // Given: A model with various typed literals
         Model originalModel = createTypedLiteralsTestModel();
 
@@ -317,7 +308,7 @@ class NTriplesCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only language-tagged literals")
-    void testRoundTripWithLanguageTaggedLiterals() throws Exception {
+    void testRoundTripWithLanguageTaggedLiterals() {
         // Given: A model with language-tagged literals
         Model originalModel = createLanguageTaggedLiteralsTestModel();
 
@@ -333,7 +324,7 @@ class NTriplesCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only blank nodes")
-    void testRoundTripWithBlankNodes() throws Exception {
+    void testRoundTripWithBlankNodes() {
         // Given: A model with blank nodes as subjects and objects
         Model originalModel = createBlankNodesTestModel();
 
@@ -350,7 +341,7 @@ class NTriplesCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing special characters and escape sequences")
-    void testRoundTripWithSpecialCharacters() throws Exception {
+    void testRoundTripWithSpecialCharacters() {
         // Given: A model with special characters and escape sequences
         Model originalModel = createSpecialCharactersTestModel();
 

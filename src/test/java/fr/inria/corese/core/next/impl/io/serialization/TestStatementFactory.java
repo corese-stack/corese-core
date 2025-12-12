@@ -68,7 +68,7 @@ public class TestStatementFactory {
     /**
      * Creates a mocked IRI object with a given URI string.
      *
-     * @param uri The string URI for the IRI (e.g., "http://example.org/Person").
+     * @param uri The string URI for the IRI.
      * @return A mocked IRI instance.
      */
     public IRI createIRI(String uri) {

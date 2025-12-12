@@ -22,7 +22,6 @@ import static org.mockito.Mockito.*;
 class NQuadsSerializerTest {
 
     private Model model;
-    private NQuadsSerializerOptions config;
     private NQuadsSerializer nQuadsSerializer;
     private TestStatementFactory factory;
 
@@ -41,7 +40,7 @@ class NQuadsSerializerTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-        config = NQuadsSerializerOptions.defaultConfig();
+        NQuadsSerializerOptions config = NQuadsSerializerOptions.defaultConfig();
         nQuadsSerializer = new NQuadsSerializer(model, config);
         factory = new TestStatementFactory();
 
@@ -266,11 +265,14 @@ class NQuadsSerializerTest {
         NQuadsSerializer serializer = new NQuadsSerializer(currentTestModel, NQuadsSerializerOptions.defaultConfig());
         serializer.write(writer);
 
+        String languageTag = mockLiteralHelloEn.getLanguage()
+                .orElseThrow(() -> new AssertionError("Expected language tag to be present"));
+
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
                 mockExPerson.stringValue(),
                 factory.createIRI("http://example.org/greeting").stringValue(),
                 escapeNQuadsString(hello),
-                mockLiteralHelloEn.getLanguage().get()) + " .\n";
+                languageTag) + " .\n";
 
         assertEquals(expectedOutput, writer.toString());
     }
@@ -330,16 +332,8 @@ class NQuadsSerializerTest {
                 default:
                     if (c <= 0x1F || c == 0x7F) {
                         sb.append(String.format("\\u%04X", (int) c));
-                    } else if (c >= 0x80 && c <= 0xFFFF) {
+                    } else if (c >= 0x80) {
                         sb.append(String.format("\\u%04X", (int) c));
-                    } else if (Character.isHighSurrogate(c)) {
-                        int codePoint = s.codePointAt(i);
-                        if (Character.isValidCodePoint(codePoint)) {
-                            sb.append(String.format("\\U%08X", codePoint));
-                            i++;
-                        } else {
-                            sb.append(c);
-                        }
                     } else {
                         sb.append(c);
                     }

@@ -12,9 +12,6 @@ import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstan
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

@@ -6,8 +6,6 @@ import fr.inria.corese.core.next.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
 
@@ -21,10 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TurtleParserTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(TurtleListener.class);
-
     @Test
-    public void testParseWithPrefixAndTriple() throws Exception {
+    public void testParseWithPrefixAndTriple() {
         String turtle = " @prefix ex: <http://example.org/> . " +
             "ex:Alice ex:knows ex:Bob .";
 

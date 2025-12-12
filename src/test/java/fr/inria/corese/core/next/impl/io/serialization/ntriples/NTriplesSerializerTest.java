@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 class NTriplesSerializerTest {
 
     private Model model;
-    private NTriplesSerializerOptions config;
     private NTriplesSerializer nTriplesSerializer;
     private TestStatementFactory factory;
 
@@ -42,7 +41,7 @@ class NTriplesSerializerTest {
     @BeforeEach
     void setUp() {
         model = mock(Model.class);
-        config = NTriplesSerializerOptions.defaultConfig();
+        NTriplesSerializerOptions config = NTriplesSerializerOptions.defaultConfig();
         nTriplesSerializer = new NTriplesSerializer(model, config);
         factory = new TestStatementFactory();
 
@@ -273,11 +272,14 @@ class NTriplesSerializerTest {
         NTriplesSerializer serializer = new NTriplesSerializer(currentTestModel, NTriplesSerializerOptions.defaultConfig());
         serializer.write(writer);
 
+        String languageTag = mockLiteralHelloEn.getLanguage()
+                .orElseThrow(() -> new AssertionError("Expected language tag to be present"));
+
         String expectedOutput = String.format("<%s> <%s> \"%s\"@%s",
                 mockExPerson.stringValue(),
                 factory.createIRI("http://example.org/greeting").stringValue(),
                 escapeNTriplesString(hello),
-                mockLiteralHelloEn.getLanguage().get()) + " .\n";
+                languageTag) + " .\n";
 
         Assertions.assertEquals(expectedOutput, writer.toString());
     }

@@ -5,14 +5,12 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.stream.Stream;
@@ -44,10 +42,9 @@ class TriGSerializerTest {
      * and that standard prefixes are declared and used.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testBasicTriGSerialization() throws SerializationException, IOException {
+    void testBasicTriGSerialization() throws SerializationException {
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/person1"),
                 factory.createIRI("http://example.org/ns/hasName"),
@@ -89,10 +86,9 @@ class TriGSerializerTest {
      * Verifies that `rdf:type` is serialized as `a` when the option is enabled.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testRdfTypeShortcut() throws SerializationException, IOException {
+    void testRdfTypeShortcut() throws SerializationException {
 
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/person1"),
@@ -136,10 +132,9 @@ class TriGSerializerTest {
      * Verifies that the language tag is appended correctly.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testLiteralWithLanguageTag() throws SerializationException, IOException {
+    void testLiteralWithLanguageTag() throws SerializationException {
 
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/data/book1"),
@@ -186,10 +181,9 @@ class TriGSerializerTest {
      * Verifies that the datatype is printed when `ALWAYS_TYPED` policy is used.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testLiteralWithExplicitXsdStringType() throws SerializationException, IOException {
+    void testLiteralWithExplicitXsdStringType() throws SerializationException {
         IRI mockDatatype = XSD.STRING.getIRI();
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/data/book2"),
@@ -237,10 +231,9 @@ class TriGSerializerTest {
      * Verifies that the `@base` directive is included in the output.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testBaseIRI() throws SerializationException, IOException {
+    void testBaseIRI() throws SerializationException {
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/base/resource1"),
                 factory.createIRI("http://example.org/base/prop"),
@@ -284,13 +277,12 @@ class TriGSerializerTest {
      * Verifies that only prefix declarations (if auto-declared) are written, with no statements.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testEmptyModel() throws SerializationException, IOException {
+    void testEmptyModel() throws SerializationException {
 
         Model emptyModel = mock(Model.class);
-        when(emptyModel.iterator()).thenAnswer(invocation -> Collections.emptyList().iterator());
+        when(emptyModel.iterator()).thenAnswer(invocation -> Collections.emptyIterator());
         when(emptyModel.stream())
                 .thenReturn(Stream.empty())
                 .thenReturn(Stream.empty());
@@ -343,9 +335,7 @@ class TriGSerializerTest {
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, strictConfig);
 
 
-        SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            triGSerializer.write(writer);
-        });
+        SerializationException thrown = assertThrows(SerializationException.class, () -> triGSerializer.write(writer));
 
         assertEquals("TriG", thrown.getFormatName());
 
@@ -379,9 +369,7 @@ class TriGSerializerTest {
         TriGSerializer triGSerializer = new TriGSerializer(mockModel, strictConfig);
 
 
-        SerializationException thrown = assertThrows(SerializationException.class, () -> {
-            triGSerializer.write(writer);
-        });
+        SerializationException thrown = assertThrows(SerializationException.class, () -> triGSerializer.write(writer));
 
         assertEquals("TriG", thrown.getFormatName());
 
@@ -393,10 +381,9 @@ class TriGSerializerTest {
      * Verifies that the literal is wrapped in triple quotes `"""` when `useMultilineLiterals` is true.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testMultilineLiteralSerialization() throws SerializationException, IOException {
+    void testMultilineLiteralSerialization() throws SerializationException {
 
         String multilineText = "This is the first line.\nThis is the second line.";
         Statement mockStatement = factory.createStatement(
@@ -443,10 +430,9 @@ class TriGSerializerTest {
      * Verifies that the graph name and graph block are correctly formatted.
      *
      * @throws SerializationException if a serialization error occurs.
-     * @throws IOException            if an I/O error occurs during writing.
      */
     @Test
-    void testBasicTrigSerializationWithNamedGraph() throws SerializationException, IOException {
+    void testBasicTrigSerializationWithNamedGraph() throws SerializationException {
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/data/person1"),
                 factory.createIRI("http://example.org/data/name"),

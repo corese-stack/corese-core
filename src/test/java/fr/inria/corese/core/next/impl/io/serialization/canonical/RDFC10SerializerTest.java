@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,6 @@ class RDFC10SerializerTest {
     @Mock
     private BNode actualBNodeB3;
 
-
     @Mock
     private IRI mockIRIP;
     @Mock
@@ -80,13 +80,13 @@ class RDFC10SerializerTest {
     @Mock
     private Literal mockLiteral2;
 
-
     private RDFC10Serializer serializer;
     private RDFC10SerializerOptions defaultConfig;
+    private AutoCloseable closeable;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
         defaultConfig = RDFC10SerializerOptions.defaultConfig();
 
         setupBasicMocks();
@@ -99,6 +99,11 @@ class RDFC10SerializerTest {
                 }
             }
         };
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close();
     }
 
     /**
@@ -119,7 +124,6 @@ class RDFC10SerializerTest {
         when(mockIRIQ.isBNode()).thenReturn(false);
         when(mockIRIR.isBNode()).thenReturn(false);
 
-
         when(mockLiteral1.stringValue()).thenReturn("\"literal1\"");
         when(mockLiteral2.stringValue()).thenReturn("\"literal2\"");
         when(mockLiteral1.isBNode()).thenReturn(false);
@@ -133,7 +137,6 @@ class RDFC10SerializerTest {
         when(mockBNodeE1.isBNode()).thenReturn(true);
         when(mockBNodeE2.isBNode()).thenReturn(true);
         when(mockBNodeE3.isBNode()).thenReturn(true);
-
 
         when(canonicalBNodeC0.stringValue()).thenReturn("_:c14n0");
         when(canonicalBNodeC1.stringValue()).thenReturn("_:c14n1");
@@ -193,7 +196,6 @@ class RDFC10SerializerTest {
                 new RDFC10Serializer(null, defaultConfig, mockCanonicalizer));
     }
 
-
     @Test
     @DisplayName("Constructor with null config should throw NullPointerException")
     void testConstructorNullConfig() {
@@ -245,7 +247,6 @@ class RDFC10SerializerTest {
         verify(mockCanonicalizer).canonicalize(any(Model.class));
     }
 
-
     @Test
     @DisplayName("Serialization with context (named graph)")
     void testSerializeWithContext() throws SerializationException {
@@ -295,16 +296,15 @@ class RDFC10SerializerTest {
         assertNotNull(canonicalOutput, "Canonical output should not be null");
         assertFalse(canonicalOutput.isEmpty(), "Canonical output should not be empty");
         String actual = canonicalOutput.trim().replace("\r\n", "\n");
-        String expected = "<http://example.com/p> <http://example.com/q> _:c14n2 .\n" +
-                "<http://example.com/p> <http://example.com/q> _:c14n3 .\n" +
-                "_:c14n0 <http://example.com/r> _:c14n1 .\n" +
-                "_:c14n2 <http://example.com/p> _:c14n1 .\n" +
-                "_:c14n3 <http://example.com/p> _:c14n0 .";
+        String expected = """
+                <http://example.com/p> <http://example.com/q> _:c14n2 .
+                <http://example.com/p> <http://example.com/q> _:c14n3 .
+                _:c14n0 <http://example.com/r> _:c14n1 .
+                _:c14n2 <http://example.com/p> _:c14n1 .
+                _:c14n3 <http://example.com/p> _:c14n0 .""";
 
         assertEquals(expected, actual, "Canonical output should match expected format");
-
     }
-
 
     @Test
     @DisplayName("Test serialization with figure2.ttl")
@@ -316,11 +316,11 @@ class RDFC10SerializerTest {
 
         String actual = canonicalOutput.trim().replace("\r\n", "\n");
 
-        String expected = "<http://example.com/p> <http://example.com/q> _:c14n0 .\n" +
-                "<http://example.com/p> <http://example.com/r> _:c14n1 .\n" +
-                "_:c14n0 <http://example.com/s> <http://example.com/u> .\n" +
-                "_:c14n1 <http://example.com/t> <http://example.com/u> .";
-
+        String expected = """
+                <http://example.com/p> <http://example.com/q> _:c14n0 .
+                <http://example.com/p> <http://example.com/r> _:c14n1 .
+                _:c14n0 <http://example.com/s> <http://example.com/u> .
+                _:c14n1 <http://example.com/t> <http://example.com/u> .""";
 
         assertEquals(expected, actual, "Canonical output should match RDFC-1.0 specification");
     }

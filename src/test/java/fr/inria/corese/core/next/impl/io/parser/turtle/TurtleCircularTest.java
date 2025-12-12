@@ -1,9 +1,5 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -26,11 +22,12 @@ import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializerOp
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * Circular tests for Turtle parser and serializer integration.
  * These tests verify that data can be correctly serialized to Turtle format
  * and then parsed back to an equivalent model (round-trip testing).
- * 
  * The circular testing approach ensures that the parser and serializer
  * are compatible and preserve data integrity across format transformations.
  */
@@ -228,9 +225,8 @@ class TurtleCircularTest {
      * 
      * @param originalModel The model to serialize and parse back
      * @return The model resulting from parsing the serialized data
-     * @throws Exception If serialization or parsing fails
      */
-    private Model performRoundTrip(Model originalModel) throws Exception {
+    private Model performRoundTrip(Model originalModel)  {
         // Serialize to Turtle
         RDFSerializer serializer = serializerFactory.createSerializer(
                 RDFFormat.TURTLE, originalModel, defaultConfig);
@@ -241,8 +237,9 @@ class TurtleCircularTest {
 
         // Verify serialization produced content (only check for non-empty models)
         assertNotNull(serializedContent, "Serialized content should not be null");
-        if (originalModel.size() > 0) {
-            assertTrue(serializedContent.length() > 0, "Serialized content should not be empty for non-empty models");
+        if (!originalModel.isEmpty()) {
+            assertFalse(serializedContent.isEmpty(),
+                    "Serialized content should not be empty for non-empty models");
         }
 
         // Parse back from Turtle
@@ -259,7 +256,7 @@ class TurtleCircularTest {
 
     @Test
     @DisplayName("Round-trip test with simple model containing basic IRIs and literals")
-    void testRoundTripWithSimpleModel() throws Exception {
+    void testRoundTripWithSimpleModel()  {
         // Given: A simple model with basic triples
         Model originalModel = createSimpleTestModel();
 
@@ -275,7 +272,7 @@ class TurtleCircularTest {
 
     @Test
     @DisplayName("Round-trip test with complex model containing diverse RDF value types")
-    void testRoundTripWithComplexModel() throws Exception {
+    void testRoundTripWithComplexModel()  {
         // Given: A complex model with various RDF constructs
         Model originalModel = createComplexTestModel();
 
@@ -291,7 +288,7 @@ class TurtleCircularTest {
 
     @Test
     @DisplayName("Round-trip test with empty model")
-    void testRoundTripWithEmptyModel() throws Exception {
+    void testRoundTripWithEmptyModel()  {
         // Given: An empty model
         Model originalModel = new CoreseModel();
 
@@ -306,7 +303,7 @@ class TurtleCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only typed literals")
-    void testRoundTripWithTypedLiterals() throws Exception {
+    void testRoundTripWithTypedLiterals()  {
         // Given: A model with various typed literals
         Model originalModel = createTypedLiteralsTestModel();
 
@@ -322,7 +319,7 @@ class TurtleCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only language-tagged literals")
-    void testRoundTripWithLanguageTaggedLiterals() throws Exception {
+    void testRoundTripWithLanguageTaggedLiterals()  {
         // Given: A model with language-tagged literals
         Model originalModel = createLanguageTaggedLiteralsTestModel();
 
@@ -338,7 +335,7 @@ class TurtleCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing only blank nodes")
-    void testRoundTripWithBlankNodes() throws Exception {
+    void testRoundTripWithBlankNodes()  {
         // Given: A model with blank nodes as subjects and objects
         Model originalModel = createBlankNodesTestModel();
 
@@ -355,7 +352,7 @@ class TurtleCircularTest {
 
     @Test
     @DisplayName("Round-trip test with model containing special characters and escape sequences")
-    void testRoundTripWithSpecialCharacters() throws Exception {
+    void testRoundTripWithSpecialCharacters()  {
         // Given: A model with special characters and escape sequences
         Model originalModel = createSpecialCharactersTestModel();
 

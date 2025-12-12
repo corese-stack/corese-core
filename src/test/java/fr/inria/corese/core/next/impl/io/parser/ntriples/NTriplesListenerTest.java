@@ -51,12 +51,11 @@ class NTriplesListenerTest {
 
         lenient().when(mockValueFactory.createIRI(anyString())).thenAnswer(invocation -> {
             String uri = invocation.getArgument(0);
-            if (uri.equals("http://example.org/test")) return mockIRI;
-            if (uri.equals("http://example.org/datatype")) return mockDatatypeIRI;
-            if (uri.equals("http://example.org/escaped>iri")) return mock(IRI.class);
-            if (uri.equals("http://example.org/s ubject")) return mock(IRI.class);
-            if (uri.equals("http://example.org/path/€")) return mock(IRI.class);
-            return mock(IRI.class);
+            return switch (uri) {
+                case "http://example.org/test" -> mockIRI;
+                case "http://example.org/datatype" -> mockDatatypeIRI;
+                default -> mock(IRI.class);
+            };
         });
 
         lenient().when(mockValueFactory.createBNode(anyString())).thenAnswer(invocation -> {

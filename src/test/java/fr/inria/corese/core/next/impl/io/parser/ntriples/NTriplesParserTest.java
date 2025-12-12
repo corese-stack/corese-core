@@ -62,12 +62,14 @@ class NTriplesParserTest {
 
         lenient().when(mockValueFactory.createIRI(anyString())).thenAnswer(invocation -> {
             String uri = invocation.getArgument(0);
-            if (uri.equals("http://example.org/subject")) return mockSubjectIRI;
-            if (uri.equals("http://example.org/predicate")) return mockPredicateIRI;
-            if (uri.equals("http://example.org/object")) return mockObjectIRI;
-            if (uri.equals("http://www.w3.org/2001/XMLSchema#integer")) return mockDatatypeIRI;
-            if (uri.equals("http://example.org/escaped>uri")) return mockEscapedIRI;
-            return mock(IRI.class);
+            return switch (uri) {
+                case "http://example.org/subject" -> mockSubjectIRI;
+                case "http://example.org/predicate" -> mockPredicateIRI;
+                case "http://example.org/object" -> mockObjectIRI;
+                case "http://www.w3.org/2001/XMLSchema#integer" -> mockDatatypeIRI;
+                case "http://example.org/escaped>uri" -> mockEscapedIRI;
+                default -> mock(IRI.class);
+            };
         });
 
         lenient().when(mockValueFactory.createBNode(anyString())).thenAnswer(invocation -> {

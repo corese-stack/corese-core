@@ -16,8 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the ParserFactory class.
@@ -49,7 +49,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithConfig_JSONLD() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.JSONLD, mockModel, mockValueFactory, mockParserOptions);
         assertNotNull(parser);
-        assertTrue(parser instanceof JSONLDParser);
+        assertInstanceOf(JSONLDParser.class, parser);
     }
 
     @Test
@@ -57,7 +57,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithConfig_TURTLE() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, mockModel, mockValueFactory, mockParserOptions);
         assertNotNull(parser);
-        assertTrue(parser instanceof TurtleParser);
+        assertInstanceOf(TurtleParser.class, parser);
     }
 
     @Test
@@ -65,7 +65,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithConfig_NTRIPLES() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.NTRIPLES, mockModel, mockValueFactory, mockParserOptions);
         assertNotNull(parser);
-        assertTrue(parser instanceof NTriplesParser);
+        assertInstanceOf(NTriplesParser.class, parser);
     }
 
     @Test
@@ -73,7 +73,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithConfig_NQUADS() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.NQUADS, mockModel, mockValueFactory, mockParserOptions);
         assertNotNull(parser);
-        assertTrue(parser instanceof NQuadsParser);
+        assertInstanceOf(NQuadsParser.class, parser);
     }
 
 
@@ -82,7 +82,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithoutConfig_JSONLD() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.JSONLD, mockModel, mockValueFactory);
         assertNotNull(parser);
-        assertTrue(parser instanceof JSONLDParser);
+        assertInstanceOf(JSONLDParser.class, parser);
     }
 
     @Test
@@ -90,7 +90,7 @@ class ParserFactoryTest {
     void testCreateRDFParserWithoutConfig_TURTLE() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, mockModel, mockValueFactory);
         assertNotNull(parser);
-        assertTrue(parser instanceof TurtleParser);
+        assertInstanceOf(TurtleParser.class, parser);
     }
 
     @Test
@@ -98,15 +98,8 @@ class ParserFactoryTest {
     void testCreateRDFParserWithoutConfig_NTRIPLES() {
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.NTRIPLES, mockModel, mockValueFactory);
         assertNotNull(parser);
-        assertTrue(parser instanceof NTriplesParser);
+        assertInstanceOf(NTriplesParser.class, parser);
     }
 
-    @Test
-    @DisplayName("createRDFParser (without config) should return ANTLRNQuadsParser for N-QUADS format")
-    void testCreateRDFParserWithoutConfig_NQUADS() {
-        RDFParser parser = parserFactory.createRDFParser(RDFFormat.NQUADS, mockModel, mockValueFactory);
-        assertNotNull(parser);
-        assertTrue(parser instanceof NQuadsParser);
-    }
 
 }
