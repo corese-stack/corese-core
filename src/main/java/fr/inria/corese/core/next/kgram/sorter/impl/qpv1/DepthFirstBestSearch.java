@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static fr.inria.corese.core.kgram.api.core.ExpType.Type;
+import static fr.inria.corese.core.next.kgram.api.core.ExpType.Type;
 
 /**
  * An implementation for sorting the triple pattern depth-first &amp; best greedy

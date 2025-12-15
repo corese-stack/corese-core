@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.kgram.sorter.core.*;
 
 import java.util.*;
 
-import static fr.inria.corese.core.kgram.api.core.ExpType.Type;
+import static fr.inria.corese.core.next.kgram.api.core.ExpType.Type;
 
 /**
  * An implementation for sorting the triple pattern Pure depth-first greedy
