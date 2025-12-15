@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.kgram.tool;
 
+import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.next.kgram.api.core.Edge;
 import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.api.core.TripleStore;
-import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.cst.RDFS;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
@@ -174,16 +174,16 @@ public class NodeImpl implements Node {
     
      @Override
     public Edge getEdge() {
-        return getDatatypeValue().getEdge();
+        return (Edge) getDatatypeValue().getEdge();
     }
 
     @Override
     public void setObject(Object o) {
     }
-    
+
     @Override
     public Path getPath() {
-        return atom.getDatatypeValue().getPath();
+        return null;
     }
 
 //    @Override

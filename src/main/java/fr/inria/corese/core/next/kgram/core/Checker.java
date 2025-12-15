@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.api.query.Environment;
 import fr.inria.corese.core.next.kgram.api.query.Matcher;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +98,8 @@ public class Checker {
                 report(edge, exist, match, define);
             } catch (SparqlException ex) {
                 ex.printStackTrace();
+            } catch (EngineException e) {
+                throw new RuntimeException(e);
             }
 
         } else {

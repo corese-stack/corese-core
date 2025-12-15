@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.kgram.core;
 import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.api.query.Matcher;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class EvalGraph {
      * gNode is possible named graphURI stemming from evaluation context
      * It is not the named graph at stake here
      */
-    int eval(Producer p, Node gNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
+    int eval(Producer p, Node gNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException, EngineException {
         int backtrack = n - 1;
         // current named graph URI/VAR
         Node graphNode = exp.getGraphName();
@@ -90,7 +91,7 @@ public class EvalGraph {
      * named graph list may come from Mappings map  from previous statement
      * OR from the "from named" clause OR from dataset named graph list
      */
-    private Mappings graphNodes(Producer p, Exp exp, Mappings map, int n) throws SparqlException {
+    private Mappings graphNodes(Producer p, Exp exp, Mappings map, int n) throws SparqlException, EngineException {
         Memory env = eval.getMemory();
         Query qq = eval.getQuery();
         Matcher mm = eval.getMatcher();
@@ -128,7 +129,7 @@ public class EvalGraph {
      * Node graph: graph URI or Node graph pointer or Node path pointer
      * Exp exp: graph name { BGP }
      */
-    private Mappings graph(Producer p, Node graph, Exp exp, Mappings map, int n) throws SparqlException {
+    private Mappings graph(Producer p, Node graph, Exp exp, Mappings map, int n) throws SparqlException, EngineException {
         boolean external = false;
         Node graphNode = exp.getGraphName();
         Producer np = p;

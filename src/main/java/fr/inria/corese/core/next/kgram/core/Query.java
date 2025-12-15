@@ -2339,7 +2339,7 @@ public class Query extends Exp implements Graphable {
     
     public Expr getLocalExpression(String name){
         if (getExtension() != null){
-            Expr exp = getExtension().get(name);
+            Expr exp = (Expr) getExtension().get(name);
             if (exp != null){
                 return exp.getFunction(); 
             }

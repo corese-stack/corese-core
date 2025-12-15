@@ -148,11 +148,11 @@ public class Mapping
     public static Mapping create(Query q, Binding b) {
         ArrayList<Node> lvar = new ArrayList<>();
         ArrayList<Node> lval = new ArrayList<>();
-        for (Expr varExpr : b.getVariables()) {
+        for (fr.inria.corese.core.kgram.api.core.Expr varExpr : b.getVariables()) {
             Node node = q.getProperAndSubSelectNode(varExpr.getLabel());
             if (node != null && !lvar.contains(node)) {
                 lvar.add(node);
-                lval.add(b.get(varExpr));
+                lval.add((Node) b.get(varExpr));
             }
         }
         return Mapping.create(lvar, lval);
@@ -334,7 +334,7 @@ public class Mapping
         if (node == null) {
             return null;
         }
-        return node.getPath();
+        return (fr.inria.corese.core.next.kgram.path.Path) node.getPath();
     }
 
     public Path getPath(String name) {
@@ -1192,7 +1192,7 @@ public class Mapping
             Eval.logger.error("Mapping unbound ldscript variable: " + varExpr);
             return null;
         }
-        return getBind().get(varExpr);
+        return (Node) getBind().get((fr.inria.corese.core.kgram.api.core.Expr) varExpr);
     }
 
     @Override

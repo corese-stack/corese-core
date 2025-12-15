@@ -49,6 +49,12 @@ public class ProcessVisitorDefault implements ProcessVisitor {
             eval.getBind().visit(e, g, m1, m2);
         }
     }
+
+    void visit(fr.inria.corese.core.kgram.core.Eval eval, fr.inria.corese.core.kgram.api.core.Node g, fr.inria.corese.core.kgram.core.Exp e, fr.inria.corese.core.kgram.core.Mappings m1, fr.inria.corese.core.kgram.core.Mappings m2) {
+        if (eval.getQuery().getGlobalAST().hasMetadata(Metadata.Type.REPORT)) {
+            eval.getBind().visit(e, g, m1, m2);
+        }
+    }
     
     @Override
     public IDatatype graph(Eval eval, Node g, Exp e, Mappings m1) {
