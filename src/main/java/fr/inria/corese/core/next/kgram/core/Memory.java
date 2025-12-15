@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.kgram.event.EventManager;
 import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.next.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
@@ -326,11 +327,11 @@ public class Memory extends PointerObject implements Environment {
      */
     void copy(Binding bind, Exp exp) {
         List<Node> list = exp.getNodes();
-        for (Expr var : bind.getVariables()) {
+        for (fr.inria.corese.core.kgram.api.core.Expr var : bind.getVariables()) {
             Node qn = getNode(var.getLabel(), list);
             if (qn == null) {
             } else {
-                push(qn, bind.get(var));
+                push(qn, (Node) bind.get(var));
             }
         }
     }
@@ -357,11 +358,11 @@ public class Memory extends PointerObject implements Environment {
     /**
      * Store a new result: take a picture of the stack as a Mapping
      */
-    Mapping store(Query q, Producer p) throws SparqlException {
+    Mapping store(Query q, Producer p) throws SparqlException, EngineException {
         return store(query, p, false, false);
     }
 
-    Mapping store(Query q, Producer p, boolean subEval) throws SparqlException {
+    Mapping store(Query q, Producer p, boolean subEval) throws SparqlException, EngineException {
         return store(query, p, subEval, false);
     }
 
@@ -370,7 +371,7 @@ public class Memory extends PointerObject implements Environment {
      * in this case: no select exp, no order by, no group by, etc
      * subEval = false: main or nested select query.
      */
-    Mapping store(Query q, Producer p, boolean subEval, boolean func) throws SparqlException {
+    Mapping store(Query q, Producer p, boolean subEval, boolean func) throws SparqlException, EngineException {
         boolean complete = !q.getGlobalQuery().isAlgebra();
 
         Node detailNode = null;
@@ -381,7 +382,7 @@ public class Memory extends PointerObject implements Environment {
             // detailNode is defined by ASTParser with @report metadata
             detailNode = getQuery().getSelectNode(Binding.SERVICE_REPORT_ZERO);
             if (detailNode != null) {
-                push(detailNode, getReport());
+                push(detailNode, (Node) getReport());
             }
         }
 
@@ -455,7 +456,7 @@ public class Memory extends PointerObject implements Environment {
                             // do nothing
                         } else {
 
-                            node = kgram.eval(f, this, p);
+                            node = (Node) kgram.eval(f, this, p);
                             kgram.getVisitor().select(kgram, f.getExp(), node == null ? null : node.getDatatypeValue());
                             // bind fun(?x) as ?y
                             boolean success = push(e.getNode(), node);
@@ -552,14 +553,14 @@ public class Memory extends PointerObject implements Environment {
         bnode = m;
     }
 
-    Mapping store(Query q, Mapping map, Producer p) throws SparqlException {
+    Mapping store(Query q, Mapping map, Producer p) throws SparqlException, EngineException {
         Node[] gnode = new Node[q.getGroupBy().size()];
         orderGroup(q.getGroupBy(), gnode, p);
         map.setGroupBy(gnode);
         return map;
     }
 
-    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p) throws SparqlException {
+    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p) throws SparqlException, EngineException {
         int n = 0;
         for (Exp e : lExp) {
             Node qNode = e.getNode();
@@ -569,7 +570,7 @@ public class Memory extends PointerObject implements Environment {
             if (nodes[n] == null) {
                 Filter f = e.getFilter();
                 if (f != null && !e.isAggregate()) {
-                    nodes[n] = kgram.eval(f, this, p);
+                    nodes[n] = (Node) kgram.eval(f, this, p);
                 }
 
             }
@@ -1219,7 +1220,7 @@ public class Memory extends PointerObject implements Environment {
 
     @Override
     public Node get(Expr varExpr) {
-        return bind.get(varExpr);
+        return (Node) bind.get((fr.inria.corese.core.kgram.api.core.Expr) varExpr);
     }
 
     public Memory setBinding(Binding b) {

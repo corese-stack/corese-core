@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.kgram.core;
 
 import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 import static fr.inria.corese.core.next.kgram.core.Eval.STOP;
 
@@ -30,7 +31,7 @@ public class EvalJoin {
      * JOIN(e1, e2) Eval e1, eval e2, generate all joins that are compatible in
      * cartesian product
      */
-    int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
+    int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException, EngineException {
         int backtrack = n - 1;
         Memory env = eval.getMemory();
         Mappings map1 = eval.subEval(p, graphNode, graphNode, exp.first(), exp, data);
@@ -69,7 +70,7 @@ public class EvalJoin {
     }
 
 
-    int join(Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException {
+    int join(Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException, EngineException {
         Node commonVariable = map1.getCommonNode(map2);
         if (commonVariable == null) {
             return joinWithoutCommonVariable(p, graphNode, stack, env, map1, map2, n);
@@ -87,7 +88,7 @@ public class EvalJoin {
      * enumerate map1
      * retrieve the index of value of commonVariable in map2 by dichotomy
      */
-    int joinWithCommonVariable(Node commonVariable, Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException {
+    int joinWithCommonVariable(Node commonVariable, Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException, EngineException {
         int backtrack = n - 1;
         if (map1.size() > map2.size()) {
             Mappings tmp = map1;
@@ -172,7 +173,7 @@ public class EvalJoin {
     /**
      * No variable in common: cartesian product of mappings
      */
-    int joinWithoutCommonVariable(Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException {
+    int joinWithoutCommonVariable(Producer p, Node graphNode, Stack stack, Memory env, Mappings map1, Mappings map2, int n) throws SparqlException, EngineException {
         int backtrack = n - 1;
         for (Mapping m1 : map1) {
             if (stop) {

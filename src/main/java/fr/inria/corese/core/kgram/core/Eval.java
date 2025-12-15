@@ -733,7 +733,7 @@ public class Eval implements ExpType, Plugin {
         return getEnvironment().getBind();
     }
 
-    Query getQuery() {
+    public Query getQuery() {
         return query;
     }
 

@@ -121,7 +121,7 @@ public class ApproximateSearchEnv {
                 continue;
             }
 
-            Double s = this.getSimilarity(var, node.getValue());
+            Double s = this.getSimilarity(var, (Node) node.getValue());
             if (s != null) {
                 sim *= s;
             }

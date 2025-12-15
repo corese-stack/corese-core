@@ -393,7 +393,7 @@ public class Binding implements Binder {
     public IDatatype get(Expr var) {
         return getBasic(var, true);
     }
-        
+
     public IDatatype getBasic(Expr var, boolean withStatic) {
         switch (var.getIndex()) {
             case UNBOUND: {
@@ -858,12 +858,23 @@ public class Binding implements Binder {
             dt.set(URI,  g.getDatatypeValue());
         }
     }
-    
+    public void visit(fr.inria.corese.core.next.kgram.core.Exp exp, fr.inria.corese.core.next.kgram.api.core.Node g, fr.inria.corese.core.next.kgram.core.Mappings m1, fr.inria.corese.core.next.kgram.core.Mappings m2) {
+        IDatatype dt = getReport(exp);
+        dt.set(NUMBER, exp.getNum());
+        dt.set(EXP, exp.toString());
+        dt.set(MAP1,  DatatypeMap.createObject(m1));
+        if (m2!=null){
+            dt.set(MAP2,  DatatypeMap.createObject(m2));
+        }
+        if (g!=null){
+            dt.set(URI,  g.getDatatypeValue());
+        }
+    }
     /**
      * share same report for every call on same named graph pattern or service exp
      * exp report contains list(rep_1  rep_n) one rep_i for each uri
      */
-    IDatatype getReport(Exp exp) {
+    IDatatype getReport(fr.inria.corese.core.next.kgram.core.Exp exp) {
         IDatatype dt  = DatatypeMap.newServiceReport();
         
         if (exp.isGraph() || exp.isService()) {
@@ -888,7 +899,31 @@ public class Binding implements Binder {
         
         return dt;
     }
+    IDatatype getReport(Exp exp) {
+        IDatatype dt  = DatatypeMap.newServiceReport();
 
+        if (exp.isGraph() || exp.isService()) {
+            // report -> rep(exp).list = (rep_1 .. rep_n)
+            for (IDatatype pair : getReport()) {
+                IDatatype rep = pair.get(1);
+
+                if (rep.get(NUMBER).intValue() == exp.getNum()) {
+                    rep.get(LIST).getList().add(dt);
+                    return dt;
+                }
+            }
+            // create new report rep for exp and report list in rep
+            IDatatype rep  = DatatypeMap.newServiceReport();
+            IDatatype list = DatatypeMap.newList(dt);
+            getReport().set(STMT + getReport().size(), rep);
+            rep.set(NUMBER, exp.getNum());
+            rep.set(LIST, list);
+        } else {
+            getReport().set(STMT + getReport().size(), dt);
+        }
+
+        return dt;
+    }
     public IDatatype getReport() {
         return report;
     }

@@ -126,7 +126,7 @@ public interface Node extends Pointerable, Comparable {
     }
 
     default void setEdge(Edge e) {
-        getDatatypeValue().setEdge(e);
+        getDatatypeValue().setEdge((fr.inria.corese.core.kgram.api.core.Edge) e);
     }
 
     default boolean isTripleNode() {
