@@ -90,9 +90,14 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         }
 
         String oldNamespace = prefixToNamespace.get(prefix);
-        if (oldNamespace != null && !oldNamespace.equals(namespace)) {
+        if (oldNamespace != null && ! oldNamespace.equals(namespace)) {
             namespaceToPrefix.remove(oldNamespace);
             prefixToNamespace.remove(prefix);
+        }
+        String oldPrefix = namespaceToPrefix.get(namespace);
+        if(oldPrefix != null && ! oldPrefix.equals(prefix)) {
+            namespaceToPrefix.remove(namespace);
+            prefixToNamespace.remove(oldPrefix);
         }
 
         prefixToNamespace.put(prefix, namespace);
@@ -225,6 +230,16 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
     @Override
     public Map<String, String> getPrefixMap() {
         return Collections.unmodifiableMap(new HashMap<>(prefixToNamespace));
+    }
+
+    /**
+     * Returns all namespaces mappings as an unmodifiable map.
+     *
+     * @return an unmodifiable map where keys are namespaces IRIs and values are prefixes
+     */
+    @Override
+    public Map<String, String> getNamespaceMap() {
+        return Collections.unmodifiableMap(new HashMap<>(namespaceToPrefix));
     }
 
     /**

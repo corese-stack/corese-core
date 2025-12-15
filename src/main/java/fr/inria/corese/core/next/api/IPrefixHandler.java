@@ -69,6 +69,13 @@ public interface IPrefixHandler {
     Map<String, String> getPrefixMap();
 
     /**
+     * Returns all namespaces mappings as an unmodifiable map.
+     *
+     * @return an unmodifiable map where keys are namespaces IRIs and values are prefixes
+     */
+    Map<String, String> getNamespaceMap();
+
+    /**
      * Returns all namespace objects as an immutable set.
      * Each Namespace object contains both prefix and IRI.
      *

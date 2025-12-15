@@ -2,14 +2,19 @@ package fr.inria.corese.core.next.impl.io.serialization;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Serializer;
+import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOption;
+import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
@@ -99,7 +104,7 @@ class SerializerFactoryTest {
     @Test
     @DisplayName("createSerializer should return XmlSerializer for RDFXML format")
     void createSerializer_shouldReturnXmlSerializer_forRdfXmlFormat() {
-        RDFXMLSerializerOption config = RDFXMLSerializerOption.defaultConfig();
+        RDFXMLSerializerOptions config = RDFXMLSerializerOptions.defaultConfig();
         try (MockedConstruction<RDFXMLSerializer> mockedConstruction = mockConstruction(RDFXMLSerializer.class)) {
             RDFSerializer serializer = factory.createSerializer(RDFFormat.RDFXML, mockModel, config);
 

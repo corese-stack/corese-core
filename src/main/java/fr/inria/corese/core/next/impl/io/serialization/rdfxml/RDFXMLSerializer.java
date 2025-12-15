@@ -81,7 +81,9 @@ public class RDFXMLSerializer implements RDFSerializer {
             this.prefixHandler = usesPrefixOptions.getPrefixHandler();
         } else {
             this.prefixHandler = new PrefixHandler(false);
+            // These namespaces are part of the RDF/XML standard
             this.prefixHandler.setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
+            this.prefixHandler.setPrefix(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
         }
         this.blankNodeIds = new HashMap<>();
     }
@@ -180,12 +182,33 @@ public class RDFXMLSerializer implements RDFSerializer {
      */
     private void writeNamespaceAttributes(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
         logger.info("actually used Namespaces: {}", actuallyUsedNamespaces);
+        logger.info("Known prefixes: {}", this.prefixHandler.getPrefixMap());
+        logger.info("Known namespaces: {}", this.prefixHandler.getNamespaceMap());
         ArrayList<String> namespacelist = new ArrayList<>(actuallyUsedNamespaces);
+
+        if(this.config instanceof UsesPrefixOptions usesPrefixOptions
+        && usesPrefixOptions.autoDeclarePrefixes()) {
+            logger.info("{}", namespacelist);
+
+            namespacelist.forEach(namespace -> {
+                logger.info("{} is in PrefixHandler = {}", namespace, this.prefixHandler.hasNamespace(namespace));
+                if (! this.prefixHandler.hasNamespace(namespace)) {
+                    String prefix = getSuggestedPrefix(namespace);
+                    if (prefix != null) {
+                        this.prefixHandler.setPrefix(prefix, namespace);
+                    }
+                }
+            });
+        }
+
         if (this.config instanceof PrettyPrintOptions prettyPrintOptions
                 && prettyPrintOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
             namespacelist.sort(
-                    (ns1, ns2) ->
-                            prefixHandler.getPrefix(ns1).compareTo(prefixHandler.getPrefix(ns2)));
+                    (ns1, ns2) -> {
+                        logger.info("{}: {} <> {}: {}", ns1, prefixHandler.getPrefix(ns1), ns2, prefixHandler.getPrefix(ns2));
+                        return prefixHandler.getPrefix(ns1).compareTo(prefixHandler.getPrefix(ns2));
+                    }
+            );
         }
 
         for(String namespace : namespacelist) {
@@ -220,31 +243,7 @@ public class RDFXMLSerializer implements RDFSerializer {
                 .filter(Value::isIRI)
                 .map(v -> IRIUtils.guessNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
-        logger.info("{}", potentialNamespaces);
-
-        // potential namespaces can contain different candidates that are based on each other. We keep the shortest
-        Set<String> copyPotentialNamespaces = Set.copyOf(potentialNamespaces);
-        potentialNamespaces = potentialNamespaces
-                .stream()
-                .filter(potentialNamespace -> copyPotentialNamespaces
-                        .stream()
-                        .noneMatch(otherPotentialNamespace -> (! otherPotentialNamespace.equals(potentialNamespace)) && potentialNamespace.startsWith(otherPotentialNamespace)))
-                .collect(Collectors.toSet());
-        logger.info("{}", potentialNamespaces);
-
-        potentialNamespaces.forEach(namespace -> {
-            logger.info("{} is in PrefixHandler = {}", namespace, this.prefixHandler.hasNamespace(namespace));
-            if (! this.prefixHandler.hasNamespace(namespace) &&
-                    // removing known namespaces from the list of potential namespaces
-                    this.prefixHandler.getNamespaces()
-                            .stream()
-                            .noneMatch(knownNamespace -> (knownNamespace.startsWith(namespace)))) {
-                String prefix = getSuggestedPrefix(namespace);
-                if (prefix != null) {
-                    addPrefixMapping(namespace, prefix);
-                }
-            }
-        });
+        logger.info("Potential namespaces{}", potentialNamespaces);
 
         return potentialNamespaces;
     }
@@ -286,43 +285,6 @@ public class RDFXMLSerializer implements RDFSerializer {
             return correspondingPrefix + SerializationConstants.COLON + localName;
         }
         return null;
-    }
-
-    /**
-     * Adds a prefix-namespace URI mapping to the internal mappings.
-     * Handles potential conflicts to ensure uniqueness.
-     *
-     * @param namespaceURI The namespace URI.
-     * @param prefix       The associated prefix.
-     */
-    private void addPrefixMapping(String namespaceURI, String prefix) {
-        if (this.prefixHandler.hasNamespace(namespaceURI)) {
-            if (this.prefixHandler.getPrefix(namespaceURI).equals(prefix)) {
-                return;
-            } else {
-
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Namespace URI '{}' is already mapped to prefix '{}'. Cannot map to new prefix '{}'. " +
-                                    "Existing mapping for this namespace will be retained.",
-                            namespaceURI, this.prefixHandler.getPrefix(namespaceURI), prefix);
-                }
-                return;
-            }
-        }
-
-        String effectivePrefix = prefix;
-        if (this.prefixHandler.hasPrefix(prefix)) {
-            if (! this.prefixHandler.getNamespace(prefix).equals(namespaceURI)) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Prefix '{}' is already mapped to namespace '{}'. Cannot map to new namespace '{}'. " +
-                                    "A new unique prefix will be generated for '{}'.",
-                            prefix, this.prefixHandler.getNamespace(prefix), namespaceURI, namespaceURI);
-                }
-                effectivePrefix = generateUniquePrefix(prefix);
-            }
-        }
-
-        this.prefixHandler.setPrefix(effectivePrefix, namespaceURI);
     }
 
     /**

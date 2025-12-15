@@ -43,7 +43,7 @@ class RDFXMLSerializerTest {
         closeable = MockitoAnnotations.openMocks(this);
         writer = new StringWriter();
         factory = new TestStatementFactory();
-        mockConfig = RDFXMLSerializerOption.defaultConfig();
+        mockConfig = RDFXMLSerializerOptions.defaultConfig();
     }
 
     @AfterEach
@@ -201,12 +201,14 @@ class RDFXMLSerializerTest {
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
 
+        logger.info("AutoDeclarePrefix ? {}", testConfig.autoDeclarePrefixes());
+
         RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
 
         String expected = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <rdf:RDF xmlns:ex="http://example.org/vocabulary/" xmlns:exampleorg="http://example.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:RDF xmlns:ex="http://example.org/vocabulary/" xmlns:exampleorg="http://example.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
                   <rdf:Description rdf:about="http://example.org/data">
                     <ex:value rdf:datatype="xsd:integer">123</ex:value>
                   </rdf:Description>
