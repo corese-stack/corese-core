@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
@@ -20,16 +21,13 @@ import org.slf4j.LoggerFactory;
 import java.io.StringWriter;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the XmlSerializer class.
  */
 class RDFXMLSerializerTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(RDFXMLSerializerTest.class);
 
     @Mock
     private Model mockModel;
@@ -200,8 +198,6 @@ class RDFXMLSerializerTest {
                 .addPrefix("xsd", "http://www.w3.org/2001/XMLSchema#")
                 .prefixOrdering(PrefixOrderingEnum.ALPHABETICAL)
                 .build();
-
-        logger.info("AutoDeclarePrefix ? {}", testConfig.autoDeclarePrefixes());
 
         RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, testConfig);
         serializer.write(writer);
@@ -521,5 +517,16 @@ class RDFXMLSerializerTest {
                 """;
 
         assertEquals(expected, writer.toString());
+    }
+
+    @Test
+    @DisplayName("Should accept any IOOptions object")
+    void shouldAcceptAnyOptionFile() {
+        assertDoesNotThrow(() -> {
+            IOOptions option = new IOOptions() {
+            };
+            when(mockModel.stream()).thenReturn(Stream.empty());
+            RDFXMLSerializer serializer = new RDFXMLSerializer(mockModel, option);
+        });
     }
 }

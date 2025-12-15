@@ -65,76 +65,22 @@ public class SerializerFactory implements fr.inria.corese.core.next.api.io.seria
         Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> tempRegistry = new HashMap<>();
         Map<RDFFormat, Function<Model, RDFSerializer>> tempDefaultRegistry = new HashMap<>();
 
-        tempRegistry.put(RDFFormat.TURTLE, (model, genericConfig) -> {
-            if (genericConfig instanceof TurtleSerializerOptions specificConfig) {
-                return new TurtleSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected TurtleSerializerOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.TURTLE.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.TURTLE, (model, genericConfig) ->  new TurtleSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.TURTLE, TurtleSerializer::new);
 
-        tempRegistry.put(RDFFormat.NTRIPLES, (model, genericConfig) -> {
-            if (genericConfig instanceof NTriplesSerializerOptions specificConfig) {
-                return new NTriplesSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected NTriplesSerializerOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.NTRIPLES.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.NTRIPLES, (model, genericConfig) ->  new NTriplesSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.NTRIPLES, NTriplesSerializer::new);
 
-        tempRegistry.put(RDFFormat.NQUADS, (model, genericConfig) -> {
-            if (genericConfig instanceof NQuadsSerializerOptions specificConfig) {
-                return new NQuadsSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected NQuadsSerializerOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.NQUADS.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.NQUADS, (model, genericConfig) -> new NQuadsSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.NQUADS, NQuadsSerializer::new);
 
-        tempRegistry.put(RDFFormat.TRIG, (model, genericConfig) -> {
-            if (genericConfig instanceof TriGSerializerOptions specificConfig) {
-                return new TriGSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected TriGSerializerOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.TRIG.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.TRIG, (model, genericConfig) -> new TriGSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.TRIG, TriGSerializer::new);
 
-        tempRegistry.put(RDFFormat.RDFXML, (model, genericConfig) -> {
-            if (genericConfig instanceof RDFXMLSerializerOptions specificConfig) {
-                return new RDFXMLSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected RDFXMLSerializerOption, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.RDFXML.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.RDFXML, (model, genericConfig) -> new RDFXMLSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.RDFXML, RDFXMLSerializer::new);
 
-        tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> {
-            if (genericConfig instanceof JSONLDOptions specificConfig) {
-                return new JSONLDSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected JSONLDOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.JSONLD.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> new JSONLDSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.JSONLD, JSONLDSerializer::new);
 
         tempRegistry.put(RDFFormat.RDFC_1_0, (model, genericConfig) -> {

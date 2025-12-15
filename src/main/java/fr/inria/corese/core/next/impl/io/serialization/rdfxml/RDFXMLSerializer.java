@@ -45,8 +45,6 @@ import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstan
  */
 public class RDFXMLSerializer implements RDFSerializer {
 
-    private static final Logger logger = LoggerFactory.getLogger(RDFXMLSerializer.class);
-
     private final Model model;
     private final IOOptions config;
     private final PrefixHandler prefixHandler;
@@ -181,17 +179,12 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeNamespaceAttributes(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
-        logger.info("actually used Namespaces: {}", actuallyUsedNamespaces);
-        logger.info("Known prefixes: {}", this.prefixHandler.getPrefixMap());
-        logger.info("Known namespaces: {}", this.prefixHandler.getNamespaceMap());
         ArrayList<String> namespacelist = new ArrayList<>(actuallyUsedNamespaces);
 
         if(this.config instanceof UsesPrefixOptions usesPrefixOptions
         && usesPrefixOptions.autoDeclarePrefixes()) {
-            logger.info("{}", namespacelist);
 
             namespacelist.forEach(namespace -> {
-                logger.info("{} is in PrefixHandler = {}", namespace, this.prefixHandler.hasNamespace(namespace));
                 if (! this.prefixHandler.hasNamespace(namespace)) {
                     String prefix = getSuggestedPrefix(namespace);
                     if (prefix != null) {
@@ -204,10 +197,8 @@ public class RDFXMLSerializer implements RDFSerializer {
         if (this.config instanceof PrettyPrintOptions prettyPrintOptions
                 && prettyPrintOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
             namespacelist.sort(
-                    (ns1, ns2) -> {
-                        logger.info("{}: {} <> {}: {}", ns1, prefixHandler.getPrefix(ns1), ns2, prefixHandler.getPrefix(ns2));
-                        return prefixHandler.getPrefix(ns1).compareTo(prefixHandler.getPrefix(ns2));
-                    }
+                    (ns1, ns2) ->
+                        prefixHandler.getPrefix(ns1).compareTo(prefixHandler.getPrefix(ns2))
             );
         }
 
@@ -243,7 +234,6 @@ public class RDFXMLSerializer implements RDFSerializer {
                 .filter(Value::isIRI)
                 .map(v -> IRIUtils.guessNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
-        logger.info("Potential namespaces{}", potentialNamespaces);
 
         return potentialNamespaces;
     }
@@ -257,17 +247,13 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @return The prefixed name (e.g., "foaf:name") or null if no suitable prefix is found.
      */
     private String getPrefixedNameInternal(String iriString) {
-        logger.info("getPrefixedNameInternal({})", iriString);
         String longestMatchingNamespace = null;
         String correspondingPrefix = null;
         int longestMatchLength = -1;
 
-        logger.info("{}", this.prefixHandler.getPrefixMap());
         for (String namespace : this.prefixHandler.getNamespaces()) {
-            logger.info("{} contains {} ? {}", iriString, namespace, iriString.startsWith(namespace));
             if (iriString.startsWith(namespace)) {
                 String prefix = this.prefixHandler.getPrefix(namespace);
-                logger.info("{} = {}", namespace, prefix);
                 if (namespace.length() > longestMatchLength) {
                     longestMatchLength = namespace.length();
                     longestMatchingNamespace = namespace;
@@ -278,7 +264,6 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         if (longestMatchingNamespace != null) {
             String localName = iriString.substring(longestMatchingNamespace.length());
-            logger.info("{} = {} : {}", iriString, longestMatchingNamespace, localName);
             if (localName.isEmpty()) {
                 return correspondingPrefix + SerializationConstants.COLON;
             }
@@ -368,7 +353,6 @@ public class RDFXMLSerializer implements RDFSerializer {
             elementName = prefixedPredicateName;
         } else {
             elementName = predicateString;
-            logger.warn("Predicate IRI '{}' cannot be expressed as a valid prefixed element name. Using full IRI as element name in RDF/XML.", predicateString);
         }
 
         writer.write(currentIndent);
@@ -481,7 +465,6 @@ public class RDFXMLSerializer implements RDFSerializer {
                     base = "p";
                 }
             } catch (java.net.URISyntaxException e) {
-                logger.warn("Malformed URI encountered while suggesting prefix: {}", namespace, e);
                 base = "p";
             }
         }

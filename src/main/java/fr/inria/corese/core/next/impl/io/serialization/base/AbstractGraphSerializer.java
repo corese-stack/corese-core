@@ -2,9 +2,8 @@ package fr.inria.corese.core.next.impl.io.serialization.base;
 
 import fr.inria.corese.core.next.api.*;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.serializer.PrettyPrintOptions;
-import fr.inria.corese.core.next.api.io.serializer.UsesPrefixOptions;
-import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.api.io.serializer.*;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
@@ -44,7 +43,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractGraphSerializer.class);
 
     protected final Model model;
-    protected AbstractSerializerOptions option;
+    protected IOOptions option;
     protected PrefixHandler prefixHandler;
     protected final Set<Resource> consumedBlankNodes;
     protected final Set<Resource> currentlyWritingBlankNodes;
@@ -59,11 +58,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
     protected AbstractGraphSerializer(Model model, IOOptions config) {
         this.model = Objects.requireNonNull(model, "The model cannot be null");
         Objects.requireNonNull(config, "The configuration cannot be null");
-        if(config instanceof AbstractSerializerOptions abstractSerializerOptions) {
-            this.option = abstractSerializerOptions;
-        } else {
-            throw new IllegalArgumentException("AbstractGraphSerializer expect option object to extend AbstractSerializerOptions. Inheritor class should have taken care of that.");
-        }
+        this.option = config;
         if(config instanceof UsesPrefixOptions usesPrefixOptions) {
             this.prefixHandler = usesPrefixOptions.getPrefixHandler();
         } else {
@@ -114,10 +109,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeHeader(Writer writer) throws IOException {
-        if (option.getBaseIRI() != null) {
+        if (option instanceof BaseIRIOptions baseIRIOptions
+                && option instanceof LineEndingOptions lineEndingOptions
+                && baseIRIOptions.getBaseIRI() != null) {
             writer.write(String.format("@base <%s> .%s",
-                    option.getBaseIRI(),
-                    option.getLineEnding()));
+                    baseIRIOptions.getBaseIRI(),
+                    lineEndingOptions.getLineEnding()));
         }
 
         Set<String> actuallyUsedNamespaces = Set.of();
@@ -176,7 +173,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      */
     protected void writePrefixDeclarations(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
         if(this.option instanceof UsesPrefixOptions prefixOptions
-            && prefixOptions.usePrefixes()) {
+                && this.option instanceof LineEndingOptions lineEndingOptions
+                && this.option instanceof BaseIRIOptions baseIRIOptions
+                && prefixOptions.usePrefixes()) {
             List<String> prefixes = new ArrayList<>(actuallyUsedNamespaces.stream().map(namespace -> this.prefixHandler.getPrefix(namespace)).toList());
 
             if (prefixOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
@@ -187,11 +186,11 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 writer.write(String.format("@prefix %s: <%s> .%s",
                         prefix,
                         this.prefixHandler.getNamespace(prefix),
-                        option.getLineEnding()));
+                        lineEndingOptions.getLineEnding()));
             }
 
-            if (!prefixes.isEmpty() || option.getBaseIRI() != null) {
-                writer.write(option.getLineEnding());
+            if (!prefixes.isEmpty() || baseIRIOptions.getBaseIRI() != null) {
+                writer.write(lineEndingOptions.getLineEnding());
             }
         }
     }
@@ -217,7 +216,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         for (Statement stmt : model) {
             if (!isConsumed(stmt.getSubject())) {
                 writeStatement(writer, stmt);
-                writer.write(option.getLineEnding());
+                if(this.option instanceof LineEndingOptions lineEndingOptions) {
+                    writer.write(lineEndingOptions.getLineEnding());
+                }
             }
         }
     }
@@ -337,7 +338,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeIRI(Writer writer, IRI iri) throws IOException {
-        if (option.isStrictMode() && option.validateURIs()) {
+        if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions && abstractSerializerOptions.isStrictMode() && abstractSerializerOptions.validateURIs()) {
             validateIRI(iri);
         }
 
@@ -419,9 +420,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             return false;
         }
 
-        return option.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED ||
-                (!datatype.equals(XSD.xsdString.getIRI()) &&
-                        option.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL);
+        return this.option instanceof DatatypePolicyOptions datatypePolicyOptions &&
+                (datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED
+                        || (!datatype.equals(XSD.xsdString.getIRI()) &&
+                        datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL));
     }
 
     /**
@@ -450,8 +452,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
             firstProperty = false;
 
-            if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint()) {
-                writer.write(option.getLineEnding() + propIndent);
+            if (this.option instanceof PrettyPrintOptions prettyPrintOptions
+                    && this.option instanceof LineEndingOptions lineEndingOptions
+                    && prettyPrintOptions.prettyPrint()) {
+                writer.write(lineEndingOptions.getLineEnding() + propIndent);
             } else {
                 writer.write(SerializationConstants.SPACE);
             }
@@ -461,8 +465,11 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             writeValue(writer, stmt.getObject());
         }
 
-        if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() && !properties.isEmpty() && !firstProperty) {
-            writer.write(option.getLineEnding() + currentIndent);
+        if (this.option instanceof PrettyPrintOptions prettyPrintOptions
+                && this.option instanceof LineEndingOptions lineEndingOptions
+                && prettyPrintOptions.prettyPrint()
+                && !properties.isEmpty() && !firstProperty) {
+            writer.write(lineEndingOptions.getLineEnding() + currentIndent);
         }
 
         writer.write(SerializationConstants.BLANK_NODE_END);
@@ -501,8 +508,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             for (Map.Entry<IRI, List<Statement>> predicateEntry : byPredicate.entrySet()) {
                 if (!firstPredicate) {
                     writer.write(SerializationConstants.SEMICOLON);
-                    if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint()) {
-                        writer.write(option.getLineEnding() + indent + prettyPrintOptions.getIndent());
+                    if (this.option instanceof PrettyPrintOptions prettyPrintOptions
+                            && this.option instanceof LineEndingOptions lineEndingOptions
+                            && prettyPrintOptions.prettyPrint()) {
+                        writer.write(lineEndingOptions.getLineEnding() + indent + prettyPrintOptions.getIndent());
                     } else {
                         writer.write(SerializationConstants.SPACE);
                     }
@@ -516,8 +525,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 for (Statement stmt : predicateEntry.getValue()) {
                     if (!firstObject) {
                         writer.write(SerializationConstants.COMMA);
-                        if (this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint()) {
-                            writer.write(option.getLineEnding() + indent + prettyPrintOptions.getIndent() + prettyPrintOptions.getIndent());
+                        if (this.option instanceof PrettyPrintOptions prettyPrintOptions
+                                && this.option instanceof LineEndingOptions lineEndingOptions
+                                && prettyPrintOptions.prettyPrint()) {
+                            writer.write(lineEndingOptions.getLineEnding() + indent + prettyPrintOptions.getIndent() + prettyPrintOptions.getIndent());
                         } else {
                             writer.write(SerializationConstants.SPACE);
                         }
@@ -529,7 +540,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
 
             writer.write(SerializationConstants.SPACE + SerializationConstants.POINT);
-            writer.write(option.getLineEnding());
+            if(this.option instanceof LineEndingOptions lineEndingOptions) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
         }
     }
 
@@ -867,7 +880,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             throw new SerializationException("Value cannot be null in {} format when strictMode is enabled.", getFormatName());
         }
 
-        if (option.isStrictMode() && value.isLiteral()) {
+        if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions
+                && abstractSerializerOptions.isStrictMode()
+                && value.isLiteral()) {
             validateLiteral((Literal) value);
         }
     }

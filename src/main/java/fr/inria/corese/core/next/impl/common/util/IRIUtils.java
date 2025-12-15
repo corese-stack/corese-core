@@ -17,8 +17,6 @@ import java.util.regex.Pattern;
  */
 public class IRIUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(IRIUtils.class);
-
     // Example 1 : http://webisa.webdatacommons.org/data/sparql?query=q#line1
     private static final Pattern IRI_PATTERN = Pattern.compile("^(?<rootnamespace>" + // http://webisa.webdatacommons.org
                 "(?<protocol>[\\w\\-]+):" + // http:
@@ -50,13 +48,11 @@ public class IRIUtils {
      * @return the guessed namespace of the IRI or an empty string if no match is found.
      */
     public static String guessNamespace(String iri) {
-        logger.info("guessNamespace {}", iri);
         if (isInvalidInput(iri)) {
             return "";
         }
         try {
             Matcher matcher = matchWithTimeout(IRI_PATTERN, iri);
-            logger.info("{} : {}", iri, matcher.matches());
             if (matcher == null || !matcher.matches()) {
                 if (iri.endsWith("#")) {
                     return iri;

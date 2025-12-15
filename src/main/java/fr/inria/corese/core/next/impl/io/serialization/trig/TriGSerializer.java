@@ -19,6 +19,7 @@ import fr.inria.corese.core.next.api.io.IOOptions;
 import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;
 import fr.inria.corese.core.next.api.io.serializer.PrettyPrintOptions;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractGraphSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
@@ -247,7 +248,11 @@ public class TriGSerializer extends AbstractGraphSerializer {
                     sb.append(SerializationConstants.BACK_SLASH).append(SerializationConstants.BACK_SLASH);
                     break;
                 default:
-                    if (option.escapeUnicode() && (c <= 0x1F || c == 0x7F || (c >= 0x80 && c <= 0xFFFF))) {
+                    if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions
+                            && abstractSerializerOptions.escapeUnicode()
+                            && (c <= 0x1F
+                                || c == 0x7F
+                                || (c >= 0x80 && c <= 0xFFFF))) {
                         sb.append(String.format("\\u%04X", (int) c));
                     } else if (Character.isHighSurrogate(c)) {
                         int codePoint = value.codePointAt(i);
