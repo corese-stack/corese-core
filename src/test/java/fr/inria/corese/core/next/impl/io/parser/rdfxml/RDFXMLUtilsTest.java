@@ -75,7 +75,7 @@ public class RDFXMLUtilsTest {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "ID", "", "CDATA", "id123");
         Resource subject = RDFXMLUtils.extractSubject(attrs, factory, "http://example.org/", null);
-        assertEquals("http://example.org/id123", subject.stringValue());
+        assertEquals("http://example.org/#id123", subject.stringValue());
     }
 
     /**
