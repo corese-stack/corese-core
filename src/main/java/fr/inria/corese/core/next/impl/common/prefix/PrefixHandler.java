@@ -45,6 +45,9 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         }
     }
 
+    /**
+     * Copy constructor
+     */
     public PrefixHandler(PrefixHandler oHandler) {
         this.prefixToNamespace = new ConcurrentHashMap<>(oHandler.prefixToNamespace);
         this.namespaceToPrefix = new ConcurrentHashMap<>(oHandler.namespaceToPrefix);

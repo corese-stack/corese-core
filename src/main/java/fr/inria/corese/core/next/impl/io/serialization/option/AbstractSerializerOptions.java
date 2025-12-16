@@ -132,6 +132,7 @@ public abstract class AbstractSerializerOptions implements IOOptions, BaseIRIOpt
      *
      * @return {@code true} if stable blank node IDs are enabled, {@code false} otherwise.
      */
+    @Override
     public boolean stableBlankNodeIds() {
         return stableBlankNodeIds;
     }

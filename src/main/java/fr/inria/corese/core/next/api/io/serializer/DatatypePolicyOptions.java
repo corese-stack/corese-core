@@ -2,6 +2,9 @@ package fr.inria.corese.core.next.api.io.serializer;
 
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 
+/**
+ * Interface for serializer options to determine the policy for the literal datatypes
+ */
 public interface DatatypePolicyOptions {
 
 

@@ -3,6 +3,9 @@ package fr.inria.corese.core.next.api.io.serializer;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
 
+/**
+ * Interface for the options of serializer that can declare prefixes
+ */
 public interface UsesPrefixOptions {
 
     /**

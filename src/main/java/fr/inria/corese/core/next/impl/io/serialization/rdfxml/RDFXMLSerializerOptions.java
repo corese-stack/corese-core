@@ -99,6 +99,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
      *
      * @return {@code true} if prefixes are used, {@code false} otherwise.
      */
+    @Override
     public boolean usePrefixes() {
         return usePrefixes;
     }
@@ -108,6 +109,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
      *
      * @return {@code true} if auto-declaration is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean autoDeclarePrefixes() {
         return autoDeclarePrefixes;
     }
@@ -117,6 +119,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
      *
      * @return The {@link PrefixOrderingEnum} for prefix ordering.
      */
+    @Override
     public PrefixOrderingEnum getPrefixOrdering() {
         return prefixOrdering;
     }
@@ -126,6 +129,7 @@ public class RDFXMLSerializerOptions extends AbstractSerializerOptions implement
      *
      * @return The {@link PrefixHandler} instance.
      */
+    @Override
     public PrefixHandler getPrefixHandler() {
         return prefixHandler;
     }

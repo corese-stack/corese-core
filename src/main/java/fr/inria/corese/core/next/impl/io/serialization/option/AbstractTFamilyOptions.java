@@ -307,7 +307,9 @@ public abstract class AbstractTFamilyOptions extends AbstractSerializerOptions i
         protected boolean sortSubjects = false;
         protected boolean sortPredicates = false;
 
-        // UsesPrefixOptions, PrettyPrintOptions
+        /**
+         * Copy builder
+         */
         protected AbstractTFamilyBuilder(IOOptions otherOptions) {
             super(otherOptions);
             if(otherOptions instanceof AbstractTFamilyOptions otherTFamilyOptions) {

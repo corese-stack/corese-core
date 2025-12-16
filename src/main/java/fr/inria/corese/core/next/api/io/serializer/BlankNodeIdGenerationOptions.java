@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.api.io.serializer;
 
+/**
+ * Interface for options that determine the generation of blank node Ids for serializers.
+ */
 public interface BlankNodeIdGenerationOptions {
 
     /**

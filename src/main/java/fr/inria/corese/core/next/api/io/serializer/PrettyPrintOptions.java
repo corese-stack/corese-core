@@ -2,6 +2,9 @@ package fr.inria.corese.core.next.api.io.serializer;
 
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
 
+/**
+ * Interface for the options of serializer allowing for pretty printing.
+ */
 public interface PrettyPrintOptions {
 
     /**
