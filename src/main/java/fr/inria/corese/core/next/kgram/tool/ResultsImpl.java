@@ -24,23 +24,21 @@ public class ResultsImpl implements Results {
 	public List<Node> getSelect() {
 		return maps.getSelect();
 	}
-	
-	public Iterator<Result> iterator() {
-		final Iterator<Mapping> it = maps.iterator();
-		
-		return new Iterator<>(){
 
+	@Override
+	@SuppressWarnings("NullableProblems")
+	public Iterator<Result> iterator() {
+		Iterator<Mapping> it = maps.iterator();
+		return new Iterator<>() {
+			@Override
 			public boolean hasNext() {
 				return it.hasNext();
 			}
 
+			@Override
 			public Result next() {
 				return it.next();
 			}
-
-			public void remove() {				
-			}
-			
 		};
 	}
 

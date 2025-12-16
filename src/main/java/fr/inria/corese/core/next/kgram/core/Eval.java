@@ -79,7 +79,6 @@ public class Eval implements ExpType, Plugin {
             nbEdge = 0;
     int nbCall = 0;
     int backjump = -1;
-    int level = -1;
     int maxLevel = -1;
     int limit = Integer.MAX_VALUE;
     // subeval = false: eval query/subquery
@@ -367,7 +366,7 @@ public class Eval implements ExpType, Plugin {
      */
     void countProfile() {
         Node n = (Node) DatatypeMap.newInstance(nbResult);
-        Mapping m = Mapping.create(getQuery().getSelectFun().get(0).getNode(), n);
+        Mapping m = Mapping.create(getQuery().getSelectFun().getFirst().getNode(), n);
         getResults().add(m);
     }
 
@@ -615,9 +614,6 @@ public class Eval implements ExpType, Plugin {
         return mem;
     }
 
-    void setLevel(int n) {
-        level = n;
-    }
 
     public void setSubEval(boolean b) {
         isSubEval = b;
@@ -1485,8 +1481,7 @@ public class Eval implements ExpType, Plugin {
 
         if (!isSuccess && optim) {
             // backjump to max index where nodes are bound for first time:
-            int bj = env.getIndex(backtrackNode, exp.getEdge());
-            backtrack = bj;
+            backtrack = env.getIndex(backtrackNode, exp.getEdge());
         }
         path.stop();
         return backtrack;
@@ -1531,20 +1526,19 @@ public class Eval implements ExpType, Plugin {
         return true;
     }
 
-    boolean popBinding(List<Node> varList, Mapping map, int i) {
+    void popBinding(List<Node> varList, Mapping map, int i) {
         int j = 0;
         for (Node qq : varList) {
             Node mapNode = map.getNode(qq);
             if (mapNode != null) {
                 if (j >= i) {
-                    return false;
+                    return;
                 } else {
                     j++;
                 }
                 getMemory().pop(qq);
             }
         }
-        return false;
     }
 
     void free(List<Node> varList, Mapping map) {

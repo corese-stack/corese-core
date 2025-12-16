@@ -25,7 +25,7 @@ class Step {
 	public String toString(){
 		String title = "epsilon";
 		if (prop!=null) title = prop.toString();
-		return title + " -> " + states.get(0) + "; ";
+		return title + " -> " + states.getFirst() + "; ";
 	}
 
 	

@@ -91,7 +91,7 @@ public class QPGEdgeCostModel extends AbstractCostModel {
         }
 
         //3.3 pattern matched, assign weight
-        this.edge.setCost(1.0 / Jtype * 1.0 / Nshare);
+        this.edge.setCost(1.0 / Jtype / Nshare);
     }
 
     @Override

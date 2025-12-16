@@ -60,7 +60,7 @@ public class MatchBind {
 	 */
 	void clean(int size){
 		while (stack.size()>size){
-			reset(stack.get(stack.size()-1));
+			reset(stack.getLast());
 		}
 		if (table.size() != stack.size()){
 			logger.error("Match Bind: Stack and Table have different sizes");

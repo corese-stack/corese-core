@@ -30,11 +30,10 @@ public class Record extends ArrayList<Regex> {
 	}
         
         	
-	Record push(Regex exp){
+	void push(Regex exp){
 		if (exp != null){
 			add(exp);
 		}
-		return this;
 	}
 	
 
@@ -64,13 +63,12 @@ public class Record extends ArrayList<Regex> {
 	}
 	
 	Node getStart(){
-		return stack.get(stack.size()-1);
+		return stack.getLast();
 	}
 	
-	Node popStart(){
-		Node n = stack.get(stack.size()-1);
-		stack.remove(stack.size()-1);
-		return n;
+	void popStart(){
+		stack.getLast();
+		stack.removeLast();
 	}
 	
 	void setTarget(Node n){
@@ -81,8 +79,8 @@ public class Record extends ArrayList<Regex> {
 		return target;
 	}
 	
-	void setSuccess(boolean b){
-		success = b;
+	void setSuccess(){
+		success = true;
 	}
 	
 	boolean isSuccess(){

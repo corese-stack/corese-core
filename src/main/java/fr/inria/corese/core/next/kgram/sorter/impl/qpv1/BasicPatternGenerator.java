@@ -75,11 +75,7 @@ public class BasicPatternGenerator {
     }
 
     private static int[] order3Numbers(int[] numbers) {
-        int[] order = new int[]{0, 1, 2};
-
-        order[0] = 0;
-        order[1] = 1;
-        order[2] = 2;
+        int[] order = {0, 1, 2};  // Simpler syntax
 
         if (numbers[0] > numbers[1]) {
             swap(numbers, 0, 1);
@@ -89,7 +85,6 @@ public class BasicPatternGenerator {
             swap(numbers, 1, 2);
             swap(order, 1, 2);
         }
-
         if (numbers[0] > numbers[1]) {
             swap(numbers, 0, 1);
             swap(order, 0, 1);

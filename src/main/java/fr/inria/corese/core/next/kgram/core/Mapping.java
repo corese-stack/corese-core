@@ -28,7 +28,7 @@ import static fr.inria.corese.core.next.kgram.api.core.PointerType.MAPPING;
  */
 public class Mapping
         extends EnvironmentImpl
-        implements Result, Environment, Pointerable {
+        implements Result, Environment, Pointerable<List<IDatatype>> {
 
 
     static final Edge[] emptyEdge = new Edge[0];
@@ -378,15 +378,13 @@ public class Mapping
         for (Node e : getTargetNodes()) {
             sb.append(getQueryNodes()[i]);
             sb.append(" = ").append(e).append(sep);
-            if (e != null && e.getNodeObject() != null && e.getNodeObject() != this) {
-                if ((e.getNodeObject() instanceof TripleStore)) {
-                } else {
-                    sb.append(sep).append(e.getNodeObject()).append(sep);
-                }
+            if (e != null && e.getNodeObject() != null
+                    && e.getNodeObject() != this
+                    && !(e.getNodeObject() instanceof TripleStore)) {
+                sb.append(sep).append(e.getNodeObject()).append(sep);
             }
             i++;
         }
-
         return sb.toString();
     }
 
@@ -403,11 +401,8 @@ public class Mapping
         if (getMappings() != null) {
             for (Mapping map : getMappings()) {
                 Node n = map.getNode(varString);
-                if (n != null) {
-                    if (distinct && list.contains(n)) {
-                    } else {
-                        list.add(n);
-                    }
+                if (n != null && (!distinct || !list.contains(n))) {
+                    list.add(n);
                 }
             }
         }
@@ -777,14 +772,10 @@ public class Mapping
      * return true if no shared variable return false
      */
     public boolean compatible(Mapping minus) {
-        return compatible(minus, false);
-    }
-
-    boolean compatible(Mapping map, boolean defaultValue) {
-        if (map.getSelect() == null) {
-            return compatible1(map, defaultValue);
+        if (minus.getSelect() == null) {
+            return compatible1(minus);
         } else {
-            return compatible2(map, defaultValue);
+            return compatible2(minus);
         }
     }
 
@@ -804,8 +795,8 @@ public class Mapping
      * Environment
      */
 
-    boolean compatible1(Mapping map, boolean defaultValue) {
-        boolean sameVarValue = defaultValue;
+    boolean compatible1(Mapping map) {
+        boolean sameVarValue = false;
         for (Node node : getSelectQueryNodes()) {
             if (node.isVariable()) {
                 Node val1 = getNodeValue(node);
@@ -820,8 +811,8 @@ public class Mapping
         return sameVarValue;
     }
 
-    boolean compatible2(Mapping map, boolean defaultValue) {
-        boolean sameVarValue = defaultValue;
+    boolean compatible2(Mapping map) {
+        boolean sameVarValue = false;
         for (Node node1 : getSelectQueryNodes()) {
             if (node1.isVariable()) {
                 Node node2 = map.getSelectQueryNode(node1.getLabel());

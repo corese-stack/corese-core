@@ -16,38 +16,36 @@ import java.util.List;
 
 /**
  * Filter Exp Pattern Matcher
- * 
+ *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *
  */
-
 public class Pattern implements ExprType, Expr {
 	int type, oper;
 	String label;
 	// recursive pattern, ako *
-	boolean rec = false, 
-		matchConstant = true;
-    List<Expr> args;
+	boolean rec = false;
+	boolean matchConstant = true;
+	List<Expr> args;
 	Expr exp;
 
-
-	Pattern(int t){
+	Pattern(int t) {
 		type = t;
 		oper = JOKER;
 		args = new ArrayList<>();
-		}
-	
-	Pattern(int t, int o){
+	}
+
+	Pattern(int t, int o) {
 		this(t);
 		oper = o;
 	}
-	
-	Pattern(int t, int o, Expr e1){
+
+	Pattern(int t, int o, Expr e1) {
 		this(t, o);
 		add(e1);
 	}
-	
-	Pattern(int t, int o, Expr e1, Expr e2){
+
+	Pattern(int t, int o, Expr e1, Expr e2) {
 		this(t, o, e1);
 		add(e2);
 	}
@@ -58,278 +56,250 @@ public class Pattern implements ExprType, Expr {
 		add(new Pattern(e1));
 		add(new Pattern(e2));
 	}
-	
-	static Pattern variable(String label){
+
+	static Pattern variable(String label) {
 		Pattern p = new Pattern(VARIABLE);
 		p.setLabel(label);
 		return p;
 	}
-	
-	static Pattern constant(){
+
+	static Pattern constant() {
 		return new Pattern(CONSTANT);
 	}
-	
-	
-	void add(Expr exp){
+
+	void add(Expr exp) {
 		args.add(exp);
 	}
-	
+
 	public int arity() {
 		return args.size();
 	}
-	
-	void setRec(boolean b){
+
+	void setRec() {
 		rec = true;
 	}
 
-	boolean isRec(){
+	boolean isRec() {
 		return rec;
 	}
-	
-	void setMatchConstant(boolean b){
-		matchConstant = b;
+
+	void setMatchConstant() {
+		matchConstant = false;
 	}
 
-	boolean isMatchConstant(){
+	boolean isMatchConstant() {
 		return matchConstant;
 	}
-	
+
 	public Expr getExp(int i) {
 		return args.get(i);
 	}
 
-	
 	public Expr getExp() {
 		return exp;
 	}
 
-	
 	public List<Expr> getExpList() {
 		return args;
 	}
 
-	
 	public Filter getFilter() {
 		return null;
 	}
 
-	
 	public int getIndex() {
 		return 0;
 	}
 
-	
 	public String getLabel() {
 		return label;
 	}
-	
-	void setLabel(String l){
+
+	void setLabel(String l) {
 		label = l;
 	}
 
-	
-        @Override
+	@Override
 	public IDatatype getValue() {
 		return null;
 	}
 
-	
 	public boolean isAggregate() {
 		return false;
 	}
 
-	
 	public boolean isBound() {
 		return false;
 	}
 
-	
 	public int oper() {
 		return oper;
 	}
 
-	
 	public void setExp(Expr e) {
 		exp = e;
 	}
 
-	
 	public void setIndex(int index) {
 	}
 
-	
 	public int type() {
 		return type;
 	}
-	
-	
-	public String toString(){
-		String str = "pat(";
-		str += type + ", " + oper;
-		str +=")";
-		return str;
+
+	public String toString() {
+		return "pat(" + type + ", " + oper + ")";
 	}
 
 	@Override
 	public Exp getPattern() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean isDistinct() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public String getModality() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean isVariable() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public Expr getArg() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setArg(Expr exp) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public boolean isRecAggregate() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isExist() {
-		// TODO Auto-generated method stub
 		return false;
 	}
-	
-        @Override
+
+	@Override
 	public boolean isRecExist() {
-		// TODO Auto-generated method stub
 		return false;
 	}
-        
-        @Override
-        public boolean isFuncall(){
-            return false;
-        }
 
-    @Override
-    public void setOper(int n) {
-    }
+	@Override
+	public boolean isFuncall() {
+		return false;
+	}
 
-    @Override
-    public void setExp(int i, Expr e) {
-    }
+	@Override
+	public void setOper(int n) {
+	}
 
+	@Override
+	public void setExp(int i, Expr e) {
+	}
 
-    @Override
-    public Expr getDefine() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public Expr getDefine() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public void setDefine(Expr exp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public void setDefine(Expr exp) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public int subtype() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    @Override
-    public Expr getFunction() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public int subtype() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public Expr getBody() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public Expr getFunction() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-        @Override
-    public Expr getVariable() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public Expr getBody() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public Expr getDefinition() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public Expr getVariable() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public boolean isSystem() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public Expr getDefinition() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public boolean isTrace() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public boolean isSystem() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public boolean isDebug() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public boolean isTrace() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public boolean isPublic() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public boolean isDebug() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public IDatatype getDatatypeValue() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public boolean isPublic() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public void setPublic(boolean b) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public IDatatype getDatatypeValue() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public void setSubtype(int n) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public void setPublic(boolean b) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public boolean match(int oper) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public void setSubtype(int n) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public boolean isConstant() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public boolean match(int oper) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public boolean hasMetadata(String type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public boolean isConstant() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public boolean isDynamic() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public boolean hasMetadata(String type) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    @Override
-    public IDatatype evalWE(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	@Override
+	public boolean isDynamic() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public IDatatype evalWE(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

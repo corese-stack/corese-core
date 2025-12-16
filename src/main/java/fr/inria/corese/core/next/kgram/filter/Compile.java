@@ -65,6 +65,7 @@ public class Compile implements ExprType {
 	 * x p t . y p z filter(y = x)
 	 * we can bind y = x before enumerate y p z
 	 */
+	@SuppressWarnings("unused")
 	public void process(Query q, Exp exp) {
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
@@ -141,10 +142,10 @@ public class Compile implements ExprType {
 		return null;
 	}
 	
-	Exp buildVar(Exp exp, ExpType.Type type){
+	Exp buildVar(Exp exp){
 		List<Node> lNode = query.getNodes(exp);
 		if (lNode.size()==2){
-			Exp bind = Exp.create(type);
+			Exp bind = Exp.create(ExpType.Type.TEST);
 			for (Node node : lNode){
 				bind.add(Exp.create(ExpType.Type.NODE, node));
 			}
@@ -170,7 +171,7 @@ public class Compile implements ExprType {
 		else {
 			pat = new Pattern(TERM, GL, VARIABLE, VARIABLE);
 			if (matcher.match(pat, ee)){
-				Exp test = buildVar(exp, ExpType.Type.TEST);
+				Exp test = buildVar(exp);
 				if (test!=null)
 					exp.add(test);
 			}
@@ -185,8 +186,8 @@ public class Compile implements ExprType {
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
 		Pattern pat = new Pattern(BOOLEAN, OR, new Pattern(TERM, EQ, VARIABLE, CONSTANT));
-		pat.setRec(true);
-		pat.setMatchConstant(false);
+		pat.setRec();
+		pat.setMatchConstant();
 		if (matcher.match(pat, ee)) {
 			Node node = query.getProperAndSubSelectNode(ff.getVariables().getFirst());
 			if (node != null){

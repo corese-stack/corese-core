@@ -222,8 +222,8 @@ public class QPGNodeCostModel extends AbstractCostModel {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("model [");
-        for (int i = 0; i < this.pattern.length; i++) {
-            s.append(this.pattern[i]).append(", ");
+        for (int j : this.pattern) {
+            s.append(j).append(", ");
         }
 
         s.append(node.getCost()).append("] ");

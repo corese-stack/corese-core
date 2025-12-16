@@ -136,31 +136,29 @@ public class Matcher implements ExprType {
 	 * FUNCTION ANY
 	 */
 	boolean matchBoolFunAny(Expr qe, Expr te, MatchBind bind) {
-		if (qe.arity() == 0){
+		if (qe.arity() == 0) {
 			// qe e.g. Pattern(ANY, ANY) with no args
 			// first time: bind the pattern
 			bind.setValue(qe, te);
 			return true;
 		}
-		if (te.arity() == 0){
+		if (te.arity() == 0) {
 			// qe has arity, te has not: fail
 			return false;
 		}
 
 		int size = bind.size();
 		int i = 0;
-		Expr qarg = qe.getExp(0);
-		for (Expr targ : te.getExpList()){
+		Expr qarg;
 
-			if (i < qe.arity()){
+		for (Expr targ : te.getExpList()) {
+			if (i < qe.arity()) {
 				// use pattern ith arg
 				qarg = qe.getExp(i++);
-			}
-			else if (rec){
+			} else if (rec) {
 				// reuse pattern 0th arg
 				qarg = qe.getExp(0);
-			}
-			else {
+			} else {
 				// query has less arguments than target
 				// and query args match target args
 				// should reset bindings here
@@ -168,29 +166,24 @@ public class Matcher implements ExprType {
 				return false;
 			}
 
-			if (process(qarg, targ, bind)){
-				// OK
-			}
-			else if (rec){
-				// recursive match of Pattern qe on argument targ
-				// qe = OR(EXP)
-				// qarg = EXP
-				// targ = OR(EXP1, EXP2)
-				if (process(qe, targ, bind)){
-					// OK
-				}
-				else {
+			if (!process(qarg, targ, bind)) {
+				if (rec) {
+					// recursive match of Pattern qe on argument targ
+					// qe = OR(EXP)
+					// qarg = EXP
+					// targ = OR(EXP1, EXP2)
+					if (!process(qe, targ, bind)) {
+						bind.clean(size);
+						return false;
+					}
+				} else {
 					bind.clean(size);
 					return false;
 				}
 			}
-			else {
-				bind.clean(size);
-				return false;
-			}
 		}
 
-		if (! bind.hasValue(qe)){
+		if (!bind.hasValue(qe)) {
 			// because when rec = true, qe may have already been bound to an arg of te
 			bind.setValue(qe, te);
 		}
@@ -202,10 +195,8 @@ public class Matcher implements ExprType {
 		Expr fst = qe.getExp(0), snd = qe.getExp(1);
 		
 		if (isGL(qe.oper()) && qe.oper() != te.oper()) {
-			if (qe.oper() == GL){
-				// OK
-			}
-			else if (inverse(qe.oper(), te.oper())){
+
+			if (inverse(qe.oper(), te.oper())) {
 				// qe(x < y) VS te(y > x)
 				// try switch qe args
 				fst = qe.getExp(1);

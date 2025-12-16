@@ -19,7 +19,6 @@ import java.util.List;
  *
  */
 public class Checker implements ExprType {
-	static final String AFALSE = "false";
 	public static boolean verbose = true;
 	
 	static final int BOOL = BOOLEAN;
@@ -29,7 +28,7 @@ public class Checker implements ExprType {
 
 	Matcher matcher;
 	Query query;
-	
+
 	public Checker(Query q){
 		matcher = new Matcher();
 		query = q;
@@ -72,11 +71,11 @@ public class Checker implements ExprType {
 	boolean match(Expr ee){
 
 
-		return match(ee, alwaysFalse(), AFALSE);
+		return match(ee, alwaysFalse());
 	}
-	
-	
-	boolean match(Expr ee, List<Pattern> pat, String mes){
+
+
+	boolean match(Expr ee, List<Pattern> pat) {
 		boolean suc = false, b;
 		
 		for (Pattern p : pat){
@@ -130,28 +129,28 @@ public class Checker implements ExprType {
 	// always false
 	Pattern neqSelf(){
 		// EXP != EXP
-		Pattern exp = pat(JOKER);
+		Pattern exp = pat();
 		return term(NE, exp, exp);
 		
 	}
 	
 	Pattern ltSelf(){
 		// EXP < EXP
-		Pattern exp = pat(JOKER);
+		Pattern exp = pat();
 		return term(LT, exp, exp);
 		
 	}
 	
 	Pattern notEqSelf(){
 		// !(EXP = EXP)
-		Pattern exp = pat(JOKER);
+		Pattern exp = pat();
 		return not(term(EQ, exp, exp));
 		
 	}
 	
 	Pattern notGeSelf(){
 		// !(EXP >= EXP)
-		Pattern exp = pat(JOKER);
+		Pattern exp = pat();
 		return not(term(GE, exp, exp));
 		
 	}
@@ -160,14 +159,14 @@ public class Checker implements ExprType {
 	
 	Pattern patNotPat(){
 		// EXP && ! EXP
-		Pattern exp = pat(JOKER);
+		Pattern exp = pat();
 		return and(exp, not(exp));
 	}
 	
 	
 	Pattern notOr(){
 		// ! (EXP || ! EXP)
-		Pattern exp = pat(JOKER);
+		Pattern exp = pat();
 		return not(or(exp, not(exp)));
 	}
 
@@ -177,38 +176,38 @@ public class Checker implements ExprType {
 	//  ?x = xpath() && ?x != xpath()
 	Pattern eqNeq(){
 		// EXP1 = EXP2 && EXP1 != EXP2
-		Pattern e1 = pat(JOKER);
-		Pattern e2 = pat(JOKER);
+		Pattern e1 = pat();
+		Pattern e2 = pat();
         return and(term(EQ, e1, e2), term(NE, e1, e2));
 	}
 	
 	
 	Pattern eqGt(){
 		// EXP1 = EXP2 && EXP1 > EXP2
-		Pattern e1 = pat(JOKER);
-		Pattern e2 = pat(JOKER);
+		Pattern e1 = pat();
+		Pattern e2 = pat();
 		return and(term(EQ, e1, e2), term(GT, e1, e2));
 	}
 	
 	Pattern ltGt(){
 		// EXP1 > EXP2 && EXP1 < EXP2
-		Pattern e1 = pat(JOKER);
-		Pattern e2 = pat(JOKER);
+		Pattern e1 = pat();
+		Pattern e2 = pat();
 		return and(term(GT, e1, e2), term(LT, e1, e2));
 	}
 	
 
 	Pattern gtNotGe(){
 		// EXP1 > EXP2 && ! (EXP1 >= EXP2)
-		Pattern e1 = pat(JOKER);
-		Pattern e2 = pat(JOKER);
+		Pattern e1 = pat();
+		Pattern e2 = pat();
 		return and(term(GT, e1, e2), not(term(GE, e1, e2)));
 	}
 
 	Pattern eqNotGe(){
 		// EXP1 = EXP2 && ! (EXP1 >= EXP2)
-		Pattern e1 = pat(JOKER);
-		Pattern e2 = pat(JOKER);
+		Pattern e1 = pat();
+		Pattern e2 = pat();
 		return and(term(EQ, e1, e2), not(term(GE, e1, e2)));
 	}
 
@@ -216,15 +215,14 @@ public class Checker implements ExprType {
 	Pattern constant(){
 		return Pattern.constant();
 	}
-	
-	
 
-	Pattern pat(int type){
-		return new Pattern(type);
+
+	Pattern pat() {
+		return new Pattern(ExprType.JOKER);
 	}
-	
-	Pattern pat(int type, int ope, Pattern e1){
-		return new Pattern(type, ope, e1);
+
+	Pattern pat(Pattern e1) {
+		return new Pattern(ExprType.BOOLEAN, ExprType.NOT, e1);
 	}
 	
 	Pattern pat(int type, int ope, Pattern e1, Pattern e2){
@@ -232,7 +230,7 @@ public class Checker implements ExprType {
 	}
 	
 	Pattern not(Pattern e){
-		return pat(BOOLEAN, NOT, e);
+		return pat(e);
 	}
 	
 	Pattern and(Pattern e1, Pattern e2){

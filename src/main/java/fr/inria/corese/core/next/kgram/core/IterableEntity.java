@@ -19,6 +19,7 @@ class IterableEntity implements Iterable<Edge>, Iterator<Edge> {
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Iterator<Edge> iterator() {
         return this;
     }

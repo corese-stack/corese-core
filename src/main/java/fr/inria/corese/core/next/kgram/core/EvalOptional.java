@@ -43,9 +43,8 @@ public class EvalOptional {
     int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException, EngineException {
         int backtrack = n - 1;
         Memory env = eval.getMemory();
-        Node queryNode = null;
 
-        Mappings map1 = eval.subEval(p, graphNode, queryNode, exp.first(), exp, data);
+        Mappings map1 = eval.subEval(p, graphNode, null, exp.first(), exp, data);
         if (isStop()) {
             return STOP;
         }
@@ -85,7 +84,7 @@ public class EvalOptional {
             // Every Mapping fail filter, rest() will always fail: skip optional rest()
             map2 = Mappings.create(env.getQuery());
         } else {
-            map2 = eval.subEval(p, graphNode, queryNode, rest, exp, map);
+            map2 = eval.subEval(p, graphNode, null, rest, exp, map);
         }
 
         eval.getVisitor().optional(eval, eval.getGraphNode(graphNode), exp, map1, map2);
@@ -107,7 +106,7 @@ public class EvalOptional {
                 }
                 Mapping merge = m1.merge(m2);
                 if (merge != null) {
-                    success = filter(env, p, queryNode, graphNode, merge, exp);
+                    success = filter(env, p, graphNode, merge, exp);
                     if (success) {
                         nbsuc++;
                         if (env.push(merge, n)) {
@@ -166,7 +165,7 @@ public class EvalOptional {
     }
 
 
-    boolean filter(Environment memory, Producer p, Node queryNode, Node gNode, Mapping map, Exp exp) throws SparqlException {
+    boolean filter(Environment memory, Producer p, Node gNode, Mapping map, Exp exp) throws SparqlException {
         if (exp.isPostpone()) {
             // A optional B
             // filters of B must be evaluated now
