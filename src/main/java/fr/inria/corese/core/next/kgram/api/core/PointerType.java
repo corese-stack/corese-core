@@ -24,10 +24,10 @@ public enum PointerType {
     METADATA("metadata"),
     CONTEXT("context"),
     NSMANAGER("nsmanager"),
-    VISITOR("visitor"),
+    VISITOR("visitor")
     ;
 
-    protected String name;
+    final String name;
 
     PointerType(String n) {
         name = DT + n;

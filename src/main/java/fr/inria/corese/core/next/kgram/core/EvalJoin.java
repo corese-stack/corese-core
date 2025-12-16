@@ -19,8 +19,8 @@ public class EvalJoin {
         this.eval = eval;
     }
 
-    void setStop(boolean b) {
-        stop = b;
+    void setStop() {
+        stop = true;
     }
 
     Query getQuery() {
@@ -35,7 +35,7 @@ public class EvalJoin {
         int backtrack = n - 1;
         Memory env = eval.getMemory();
         Mappings map1 = eval.subEval(p, graphNode, graphNode, exp.first(), exp, data);
-        if (map1.size() == 0) {
+        if (map1.isEmpty()) {
             eval.getVisitor().join(eval, eval.getGraphNode(graphNode), exp, map1, map1);
             return backtrack;
         }
@@ -62,7 +62,7 @@ public class EvalJoin {
 
         eval.getVisitor().join(eval, eval.getGraphNode(graphNode), exp, map1, map2);
 
-        if (map2.size() == 0) {
+        if (map2.isEmpty()) {
             return backtrack;
         }
 

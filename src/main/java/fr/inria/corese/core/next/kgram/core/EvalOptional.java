@@ -53,7 +53,7 @@ public class EvalOptional {
             return backtrack;
         }
 
-        Mappings map2 = null;
+        Mappings map2;
         Exp rest = exp.rest();
         MappingSet set1 = new MappingSet(getQuery(), map1);
         Mappings map = set1.prepareMappingsRest(rest);
@@ -67,8 +67,7 @@ public class EvalOptional {
              *
              */
 
-            Mappings nmap = filter(graphNode, exp, env, p, map);
-            map = nmap;
+            map = filter(graphNode, exp, env, p, map);
         }
 
         /*
@@ -99,7 +98,7 @@ public class EvalOptional {
             if (isStop()) {
                 return STOP;
             }
-            boolean success = false;
+            boolean success;
             int nbsuc = 0;
 
             for (Mapping m2 : set.getCandidateMappings(m1)) {
@@ -166,9 +165,7 @@ public class EvalOptional {
         return map;
     }
 
-    /**
-     *
-     */
+
     boolean filter(Environment memory, Producer p, Node queryNode, Node gNode, Mapping map, Exp exp) throws SparqlException {
         if (exp.isPostpone()) {
             // A optional B

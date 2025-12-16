@@ -6,14 +6,10 @@ import fr.inria.corese.core.next.kgram.api.query.Producer;
  * Interface for estimating the cost of nodes and edges in QPGraph
  *
  * @author Fuqi Song, WImmics Inria I3S
- * @date 19 mai 2014
  */
 public interface IEstimate {
 
-    double MAX_COST = 1.0;
-    double MIN_COST = 0.0;
     //approximate minimum value, but not equal to 0
-    double MIN_COST_0 = 1.0 / Double.MAX_VALUE;
     double NA_COST = -1;
 
     /**

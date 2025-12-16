@@ -17,12 +17,8 @@ import static fr.inria.corese.core.next.kgram.sorter.core.Const.plannable;
 /**
  * A new sorter for QP
  *
- * @author Fuqi Song, Wimmics Inria I3S
- * @date 5 juin 2014
  */
 public class SorterNew extends Sorter {
-
-    boolean print = false;
 
     public void sort(Exp expression, List<Exp> bindings, Producer prod, int planType) {
         if (expression.size() < 2) return;
@@ -30,7 +26,6 @@ public class SorterNew extends Sorter {
         Map<Integer, List<Exp>> ESGs = tokenize(expression);
         if (ESGs.isEmpty()) return;
 
-        long start = System.currentTimeMillis();
 
         // === Iterate each sub set and create ESG and sorting === 
         for (Entry<Integer, List<Exp>> entrySet : ESGs.entrySet()) {
@@ -39,17 +34,14 @@ public class SorterNew extends Sorter {
 
             // ** 1 create graph (list of nodes and their edges) **
             QPGraph bpg = new QPGraph(exps, bindings);
-            long stop1 = System.currentTimeMillis();
 
             // ** 2 estimate cost/selectivity **
             // ** 2.1 find the corresponding algorithm **
             IEstimate ies;
-            switch (planType) {
-                case Query.QP_HEURISTICS_BASED:
-                    ies = new HeuristicsBasedEstimation();
-                    break;
-                default:
-                    ies = new HeuristicsBasedEstimation();
+            if (planType == Query.QP_HEURISTICS_BASED) {
+                ies = new HeuristicsBasedEstimation();
+            } else {
+                ies = new HeuristicsBasedEstimation();
             }
 
             // ** 2.2 estimate **
@@ -57,13 +49,9 @@ public class SorterNew extends Sorter {
 
             // ** 3 sort and find the order **
             ISort is;
-            switch (planType) {
-                case Query.QP_HEURISTICS_BASED:
-                default:
-                    is = new DepthFirstBestSearch();
-            }
+            is = new DepthFirstBestSearch();
 
-            List l = is.sort(bpg);
+            List<QPGNode> l = is.sort(bpg);
 
             //** For the following case where a graph has a bound value, put the BIND before 
             //** the graph pattern (because normally we put BIND just after where its variable 
@@ -97,8 +85,8 @@ public class SorterNew extends Sorter {
     // (4, <T3, T4, VA>)
     // (8, <T5, T6>)
     private Map<Integer, List<Exp>> tokenize(Exp e) {
-        List<Exp> aESG = new ArrayList<Exp>();
-        Map<Integer, List<Exp>> ESGs = new LinkedHashMap<Integer, List<Exp>>();
+        List<Exp> aESG = new ArrayList<>();
+        Map<Integer, List<Exp>> ESGs = new LinkedHashMap<>();
         ESGs.put(0, aESG);
 
         // == 1. split the expressions
@@ -107,7 +95,7 @@ public class SorterNew extends Sorter {
             Exp ee = exps.get(i);
             if (plannable(ee.type())) {
                 if (i > 0 && !plannable(exps.get(i - 1).type())) {
-                    aESG = new ArrayList<Exp>();
+                    aESG = new ArrayList<>();
                     ESGs.put(i, aESG);
                 }
 

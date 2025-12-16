@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.kgram.api.core;
 
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 
 /**
@@ -10,20 +9,12 @@ import fr.inria.corese.core.sparql.triple.parser.AccessRight;
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public interface Edge extends Pointerable {
+public interface Edge extends Pointerable<Object> {
 
-    // rdf star reference node index: index of t = 2 in tuple(s p o t)
-    int REF_INDEX = 2;
 
     // nb nodes to consider in sparql query processing
     default int nbNode() {
         return 2;
-    }
-
-    // nb nodes to consider in graph index
-    // edge triple node (g, t = (s p o)) has 2 nodes s,o for index and 3 nodes s,o,t for sparql
-    default int nbNodeIndex() {
-        return nbNode();
     }
 
     /**
@@ -36,6 +27,7 @@ public interface Edge extends Pointerable {
 
     Node getNode(int i);
 
+    @SuppressWarnings("unused")
     default void setNode(int i, Node n) {
     }
 
@@ -51,6 +43,7 @@ public interface Edge extends Pointerable {
     // edge variable or edge node
     Node getProperty();
 
+    @SuppressWarnings("unused")
     default void setProperty(Node node) {
     }
 
@@ -58,8 +51,6 @@ public interface Edge extends Pointerable {
     /**
      * Is node returned by getNode()
      *
-     * @param node
-     * @return
      */
     default boolean contains(Node node) {
         return false;
@@ -72,7 +63,7 @@ public interface Edge extends Pointerable {
     default int getEdgeIndex() {
         return -1;
     }
-
+    @SuppressWarnings("unused")
     default void setEdgeIndex(int n) {
     }
 
@@ -80,7 +71,7 @@ public interface Edge extends Pointerable {
     default AccessRight.AccessRights getLevel() {
         return AccessRight.AccessRights.NONE;
     }
-
+    @SuppressWarnings("unused")
     default Edge setLevel(AccessRight.AccessRights b) {
         return this;
     }
@@ -95,7 +86,7 @@ public interface Edge extends Pointerable {
     Node getNode();
 
     Node getGraph();
-
+    @SuppressWarnings("unused")
     default void setGraph(Node n) {
     }
 
@@ -117,7 +108,7 @@ public interface Edge extends Pointerable {
     default boolean isNested() {
         return false;
     }
-
+    @SuppressWarnings("unused")
     default void setNested(boolean b) {
     }
 
@@ -135,7 +126,7 @@ public interface Edge extends Pointerable {
     default boolean isCreated() {
         return false;
     }
-
+    @SuppressWarnings("unused")
     default void setCreated(boolean b) {
     }
 
@@ -167,9 +158,6 @@ public interface Edge extends Pointerable {
         return getNode(0).getDatatypeValue();
     }
 
-    default IDatatype getPropertyValue() {
-        return getPredicateValue();
-    }
 
     default IDatatype getPredicateValue() {
         if (getProperty() == null) {
@@ -182,31 +170,8 @@ public interface Edge extends Pointerable {
         return getNode(1).getDatatypeValue();
     }
 
-    // for rdf star only
-    default boolean hasReferenceNode() {
-        return nbNode() > REF_INDEX && getReferenceNode().getDatatypeValue().isTriple();
-    }
-
-    default Node getReferenceNode() {
-        if (nbNode() <= REF_INDEX) {
-            return null;
-        }
-        return getNode(REF_INDEX);
-    }
-
-    default void setReferenceNode(Node node) {
-        setNode(REF_INDEX, node);
-    }
-
     default boolean isTripleNode() {
         return false;
-    }
-
-    default Node getTripleNode() {
-        return null;
-    }
-
-    default void setTripleNode(Node node) {
     }
 
     default boolean sameTerm(Edge e) {
@@ -233,17 +198,6 @@ public interface Edge extends Pointerable {
         return getObjectValue().equals(e.getObjectValue())
                 && getSubjectValue().equals(e.getSubjectValue())
                 && getPredicateValue().equals(e.getPredicateValue());
-    }
-
-    default int compareWithoutGraph(Edge e) throws CoreseDatatypeException {
-        int res = getSubjectValue().compare(e.getSubjectValue());
-        if (res == 0) {
-            res = getPredicateValue().compare(e.getPredicateValue());
-        }
-        if (res == 0) {
-            res = getObjectValue().compare(e.getObjectValue());
-        }
-        return res;
     }
 
 }

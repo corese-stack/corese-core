@@ -12,7 +12,6 @@ import java.util.List;
  * Estimate the selectivity of triple pattern by heuristics
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 23 juin 2014
  */
 public class HeuristicsBasedEstimation implements IEstimate {
 
@@ -31,7 +30,7 @@ public class HeuristicsBasedEstimation implements IEstimate {
     //assign costs for nodes based on ?-tuple pattern
     private void estimateNodes() {
         // 1. get all models of nodes in QPG
-        List<QPGNodeCostModel> models = new ArrayList<QPGNodeCostModel>();
+        List<QPGNodeCostModel> models = new ArrayList<>();
         for (QPGNode n : this.graph.getAllNodes()) {
             if (n.getType() == ExpType.Type.EDGE || n.getType() == ExpType.Type.GRAPH) {
                 QPGNodeCostModel p = n.getCostModel();
@@ -54,10 +53,10 @@ public class HeuristicsBasedEstimation implements IEstimate {
         // l2: t21
         // l3: t31, t32, t33
         // l4..
-        List<List<QPGNodeCostModel>> modelList = new ArrayList<List<QPGNodeCostModel>>();
+        List<List<QPGNodeCostModel>> modelList = new ArrayList<>();
         //** 1 Group the patterns by their pattern
         for (int i = 0; i < models.size(); i++) {
-            List l = new ArrayList<QPGNodeCostModel>();
+            List<QPGNodeCostModel> l = new ArrayList<>();
 
             QPGNodeCostModel model = models.get(i);
             l.add(model);

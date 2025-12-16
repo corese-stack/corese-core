@@ -11,11 +11,9 @@ import java.util.Map;
 
 /**
  * Data structure: Key -> (node -> Value)
- *
  * Key: (?var, <uri>) Value: (node, similarity, algs)
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 29 oct. 2015
  */
 public class ApproximateSearchEnv {
 
@@ -25,7 +23,7 @@ public class ApproximateSearchEnv {
     
     public ApproximateSearchEnv() {
         this.id = code++;
-        this.all = new HashMap<Key, Map<Node, Value>>();
+        this.all = new HashMap<>();
     }
 
     public void add(Expr var, Node uri, Node node, String alg, double sim) {
@@ -38,17 +36,11 @@ public class ApproximateSearchEnv {
                 value.put(node, r);
             }
         } else {
-            Map<Node, Value> m = new HashMap<Node, Value>();
+            Map<Node, Value> m = new HashMap<>();
             Value r = new Value(node, alg, sim);
             m.put(node, r);
             all.put(key, m);
         }
-    }
-
-    public Double getSimilarity(Expr var, Node node, String algs) {
-        Key key = new Key(var);
-        Value r = this.get(key, node);
-        return (r != null && r.getAlgorithms().equalsIgnoreCase(algs)) ? r.getSimilarity() : null;
     }
 
     public Double getSimilarity(Expr var, Node node) {
@@ -75,7 +67,7 @@ public class ApproximateSearchEnv {
             Map<Node, Value> value = entrySet.getValue();
             sb.append(key).append("\n");
             for (Value v : value.values()) {
-                sb.append("\t" + v.toString()).append("\n");
+                sb.append("\t").append(v.toString()).append("\n");
             }
         }
         return sb.toString();
@@ -84,8 +76,6 @@ public class ApproximateSearchEnv {
     /**
      * Aggregate and get value of similarity using all existing variables
      * 
-     * @param env
-     * @return 
      */
     public Double aggregate(Environment env) {
         List<Expr> lv = this.getVariables();
@@ -94,16 +84,12 @@ public class ApproximateSearchEnv {
 
     /**
      * Aggreate with existing variables (excpet for the given variable)
-     * @param env
-     * @param var
-     * @param sim
-     * @return 
      */
     public Double aggregate(Environment env, Expr var, double sim) {
         List<Expr> lv = this.getVariables();
         lv.remove(var);
 
-        Double cb = (lv.isEmpty()) ? 1 : aggregate(env, lv);
+        double cb = (lv.isEmpty()) ? 1 : aggregate(env, lv);
         return cb * sim;
     }
 
@@ -130,7 +116,7 @@ public class ApproximateSearchEnv {
     }
 
     public List<Expr> getVariables() {
-        List lv = new ArrayList<Expr>();
+        List<Expr> lv = new ArrayList<>();
         for (Key k : this.all.keySet()) {
             lv.add(k.getVar());
         }
@@ -138,7 +124,7 @@ public class ApproximateSearchEnv {
         return lv;
     }
 
-    class Key {
+    static class Key {
 
         private final Expr var;
         private Node uri;
@@ -162,8 +148,7 @@ public class ApproximateSearchEnv {
 
         @Override
         public int hashCode() {
-            int hash = 5;
-            return hash;
+            return 5;
         }
 
         @Override
@@ -185,11 +170,11 @@ public class ApproximateSearchEnv {
         }
     }
 
-    class Value {
+    static class Value {
 
         private final Node node;
         private double similarity = -1;
-        private String algorithms = "";
+        private final String algorithms;
 
         public Value(Node node, String algorithms, double sim) {
             this(node, algorithms);

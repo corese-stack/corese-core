@@ -17,37 +17,9 @@ public class Stack {
 	List<Integer> sizes;
 	
 	Stack(){
-		steps = new ArrayList<Step>();
-		sizes = new ArrayList<Integer>();
+		steps = new ArrayList<>();
+		sizes = new ArrayList<>();
 	}
-	
-	
-	void clear(){
-		steps.clear();
-		sizes.clear();
-	}
-	
-	void push(Step st, Path path){
-		steps.add(st);
-		sizes.add(path.size());
-	}
-	
-	void pop(Step st, Path path){
-		steps.remove(steps.size()-1);
-		sizes.remove(sizes.size()-1);
-	}
-	
-	boolean loop(Step st, Path path){
-		int index = steps.lastIndexOf(st);
-		if (index == -1) return false;
-        return sizes.get(index) == path.size();
-    }
-	
-	int size(Step st){
-		int index = steps.lastIndexOf(st);
-		if (index == -1) return -1;
-		return sizes.get(index);
-	}
-	
+
 
 }

@@ -7,9 +7,9 @@ import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.core.Exp;
 import fr.inria.corese.core.next.kgram.sorter.impl.qpv1.QPGNodeCostModel;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static fr.inria.corese.core.kgram.sorter.core.Const.*;
 
@@ -18,14 +18,13 @@ import static fr.inria.corese.core.kgram.sorter.core.Const.*;
  * an object exp) with cost
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 19 mai 2014
  */
 public class QPGNode {
 
     // the expression that the node encapsulates
     private final Exp exp;
     private final ExpType.Type type;
-    private QPGNodeCostModel costModel = null;
+    private final QPGNodeCostModel costModel;
     private double cost = -1;
     //the nested QPG in a QPG node, ex, GRAPH
     //and for future extionson, ex, UNION
@@ -63,24 +62,21 @@ public class QPGNode {
      * subject, predicate, or object
      *
      * @param i type
-     * @return
      */
     public Node getExpNode(int i) {
         if (this.type != ExpType.Type.EDGE) {
             return null;
         }
 
-        switch (i) {
-            case SUBJECT:
-                return this.exp.getEdge().getNode(0);
-            case PREDICATE:
+        return switch (i) {
+            case SUBJECT -> this.exp.getEdge().getNode(0);
+            case PREDICATE -> {
                 Edge e = this.exp.getEdge();
-                return (e.getEdgeVariable() == null ? e.getEdgeNode() : e.getEdgeVariable());
-            case OBJECT:
-                return this.exp.getEdge().getNode(1);
-            default:
-                return null;
-        }
+                yield (e.getEdgeVariable() == null ? e.getEdgeNode() : e.getEdgeVariable());
+            }
+            case OBJECT -> this.exp.getEdge().getNode(1);
+            default -> null;
+        };
     }
 
     /**
@@ -90,7 +86,7 @@ public class QPGNode {
      * @return true: shared; false: not share
      */
     public boolean isShared(QPGNode n) {
-        return this.shared(n).size() > 0;
+        return !this.shared(n).isEmpty();
     }
 
     public List<String> shared(QPGNode n) {
@@ -108,12 +104,10 @@ public class QPGNode {
                         return this.isShared(bpn1.exp.getEdge(), bpn2.exp.getEdge());
                     case GRAPH:
                         return this.isShared(bpn2.exp, bpn1.exp.getEdge());
-                    case FILTER:
+                    case FILTER, BIND:
                         return this.isShared(bpn2.exp.getFilter(), bpn1.exp.getEdge());
                     case VALUES:
                         return this.isShared(bpn2.exp.getNodeList(), bpn1.exp.getEdge());
-                    case BIND:
-                        return this.isShared(bpn2.exp.getFilter(), bpn1.exp.getEdge());
                     default:
                 }
                 break;
@@ -155,7 +149,7 @@ public class QPGNode {
                 break;
         }
 
-        return new ArrayList();
+        return new ArrayList<>();
     }
 
     //check between edge and values
@@ -209,50 +203,42 @@ public class QPGNode {
     }
 
     private List<Node> getVariablesInEdge(Edge e) {
-        List<Node> l = new ArrayList<Node>();
-        if (e.getNode(0).isVariable()) {
-            l.add(e.getNode(0));
-        }
-        if (e.getEdgeVariable() != null) {
-            l.add(e.getEdgeVariable());
-        }
-        if (e.getNode(1).isVariable()) {
-            l.add(e.getNode(1));
-        }
-
-        //remove duplicated items
-        HashSet h = new HashSet(l);
-        l.clear();
-        l.addAll(h);
-
-        return l;
+        return Stream.of(
+                        e.getNode(0),
+                        e.getEdgeVariable(),
+                        e.getNode(1)
+                )
+                .filter(Objects::nonNull)
+                .filter(Node::isVariable)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     //GRAPH{GRAPHNODE{NODE{data:aliceFoaf } } AND{EDGE{?alice foaf:mbox <mailto:alice@work.example>} ...}}
     private List<Node> getVariablesInGraph(Exp graph) {
-        //todo
-        List<Node> l = new ArrayList<Node>();
-        for (Exp e : graph) {
-            for (Exp ee : e) {
-                if (ee.type() == ExpType.Type.NODE) {
-                    l.add(ee.getNode());
-                }
-                if (ee.type() == ExpType.Type.EDGE) {
-                    l.addAll(getVariablesInEdge(ee.getEdge()));
+        Set<Node> uniqueVariables = new LinkedHashSet<>();
+
+        for (Exp outerExp : graph) {
+            for (Exp innerExp : outerExp) {
+                if (innerExp.type() == ExpType.Type.NODE) {
+                    Node node = innerExp.getNode();
+                    if (node != null && node.isVariable()) {
+                        uniqueVariables.add(node);
+                    }
+                } else if (innerExp.type() == ExpType.Type.EDGE) {
+                    Edge edge = innerExp.getEdge();
+                    if (edge != null) {
+                        uniqueVariables.addAll(getVariablesInEdge(edge));
+                    }
                 }
             }
         }
-        //remove duplicated items
-        HashSet h = new HashSet(l);
-        l.clear();
-        l.addAll(h);
 
-        return l;
+        return new ArrayList<>(uniqueVariables);
     }
-
     //compare between a list of strings and a list of nodes
     private List<String> compareString(List<String> l1, List<Node> l2) {
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         for (String n1 : l1) {
             for (Node n2 : l2) {
                 if (n1.equalsIgnoreCase(n2.getLabel())) {
@@ -267,14 +253,14 @@ public class QPGNode {
 
     //compare between a list of strings and a list of nodes
     private List<String> compareString(List<String> l1, Node n) {
-        List<Node> l2 = new ArrayList<Node>();
+        List<Node> l2 = new ArrayList<>();
         l2.add(n);
         return compareString(l1, l2);
     }
 
     //compare between two lists of nodes
     private List<String> compare(List<Node> l1, List<Node> l2) {
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         for (Node n1 : l1) {
             for (Node n2 : l2) {
                 if (n1.same(n2)) {
@@ -289,13 +275,13 @@ public class QPGNode {
 
     //compare between a single node and a list of nodes
     private List<String> compare(List<Node> l2, Node n) {
-        List<Node> l1 = new ArrayList<Node>();
+        List<Node> l1 = new ArrayList<>();
         l1.add(n);
         return this.compare(l1, l2);
     }
 
     private List<String> compare(Node n1, Node n2) {
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         if (n1.same(n2)) {
             l.add(n1.getLabel());
         }

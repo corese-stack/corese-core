@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.kgram.filter;
 
 import fr.inria.corese.core.next.kgram.api.core.Expr;
-import fr.inria.corese.core.next.kgram.api.query.Hierarchy;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
@@ -28,10 +27,7 @@ public interface Extension {
     
     Expr getMethod(String label, IDatatype type, IDatatype[] param);
     
-    Hierarchy getHierarchy();
-    
-    void setHierarchy(Hierarchy hierarchy);
-    
+
     void removeNamespace(String name);
     
     boolean isDefined(Expr exp);

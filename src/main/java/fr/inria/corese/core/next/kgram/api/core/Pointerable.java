@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.kgram.core.Exp;
 import fr.inria.corese.core.next.kgram.core.Mapping;
 import fr.inria.corese.core.next.kgram.core.Mappings;
 import fr.inria.corese.core.next.kgram.core.Query;
-import fr.inria.corese.core.next.kgram.path.Path;
 
 import java.util.ArrayList;
 
@@ -13,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author Olivier Corby - Wimmics Inria I3S - 2015
  */
-public interface Pointerable extends Loopable {
+public interface Pointerable<T> extends Loopable<T> {
 
     default PointerType pointerType() {
         return PointerType.UNDEF;
@@ -48,9 +47,6 @@ public interface Pointerable extends Loopable {
         return null;
     }
 
-    default Path getPathObject() {
-        return null;
-    }
 
     default TripleStore getTripleStore() {
         return null;
@@ -66,7 +62,7 @@ public interface Pointerable extends Loopable {
 
 
     @Override
-    default Iterable getLoop() {
+    default Iterable<T> getLoop() {
         return new ArrayList<>(0);
     }
 
@@ -74,7 +70,7 @@ public interface Pointerable extends Loopable {
         return Integer.toString(hashCode());
     }
 
-    default int compare(Pointerable obj) {
+    default int compare(Pointerable<?> obj) {
         return Integer.compare(hashCode(), obj.hashCode());
     }
 

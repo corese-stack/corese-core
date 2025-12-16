@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.kgram.api.core.Edge;
 import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.api.core.TripleStore;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.cst.RDFS;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
@@ -16,8 +15,6 @@ public class NodeImpl implements Node {
 
     Atom atom;
     int index = -1;
-    private boolean matchNodeList = false;
-    private boolean matchCardinality = false;
 
     public NodeImpl(Atom at) {
         atom = at;
@@ -33,18 +30,6 @@ public class NodeImpl implements Node {
 
     public static NodeImpl createResource(String name) {
         return new NodeImpl(Constant.create(name));
-    }
-
-    public static NodeImpl createConstant(String name) {
-        return new NodeImpl(Constant.create(name, RDFS.xsdstring));
-    }
-
-    public static NodeImpl createConstant(String name, String datatype) {
-        return new NodeImpl(Constant.create(name, datatype));
-    }
-
-    public static NodeImpl createConstant(String name, String datatype, String lang) {
-        return new NodeImpl(Constant.create(name, null, lang));
     }
 
     public Atom getAtom() {
@@ -87,7 +72,7 @@ public class NodeImpl implements Node {
 
     @Override
     public int compare(Node node) {
-        if (node.getValue() instanceof IDatatype) {
+        if (node.getValue() != null) {
             return getValue().compareTo(getValue(node));
         }
         return getLabel().compareTo(node.getLabel());
@@ -186,15 +171,6 @@ public class NodeImpl implements Node {
         return null;
     }
 
-//    @Override
-//    public Object getProperty(int p) {
-//        return null;
-//    }
-//
-//    @Override
-//    public void setProperty(int p, Object o) {
-//    }
-
     @Override
     public String getKey() {
         return INITKEY;
@@ -208,26 +184,6 @@ public class NodeImpl implements Node {
     public TripleStore getTripleStore() {
         return null;
     }
-    
-    
-    @Override
-    public boolean isMatchCardinality() {
-        return matchCardinality;
-    }
 
-    
-    public void setMatchCardinality(boolean matchCardinality) {
-        this.matchCardinality = matchCardinality;
-    }
 
-    
-    @Override
-    public boolean isMatchNodeList() {
-        return matchNodeList;
-    }
-
-   
-    public void setMatchNodeList(boolean matchNodeList) {
-        this.matchNodeList = matchNodeList;
-    }
 }

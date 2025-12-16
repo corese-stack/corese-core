@@ -19,7 +19,6 @@ import java.util.List;
 public interface Producer {
 
     int DEFAULT = 0;
-    int SKIP_DUPLICATE_TEST = 1;
     // Producer delivers from Path of from Provenance Graph
     int EXTENSION = 2;
 
@@ -27,6 +26,7 @@ public interface Producer {
      * KGRAM calls this method before executing a query. It enables to
      * initialize the Producer
      */
+    @SuppressWarnings("unused")
     default void init(Query q) {
     }
 
@@ -54,16 +54,6 @@ public interface Producer {
      */
     Iterable<Node> getGraphNodes(Node gNode, List<Node> from, Environment env);
 
-    /**
-     * Check whether a node is a graph node and if yes, check it is member of
-     * from (if any)
-     *
-     * @param gNode The graph query node
-     * @param from  The from named node list (may be empty)
-     * @param env   The binding environment
-     * @return true if the node is a graph node
-     */
-    boolean isGraphNode(Node gNode, List<Node> from, Environment env);
 
     /**
      * Return candidate edges that match a query edge. Matcher checks conformity
@@ -83,21 +73,21 @@ public interface Producer {
      */
     Iterable<Edge> getEdges(Node gNode, List<Node> from, Edge qEdge, Environment env);
 
+    @SuppressWarnings("unused")
     default Iterable<Edge> getEdges(Node s, Node p, Node o, List<Node> from) {
         return new ArrayList<>(0);
     }
 
+    @SuppressWarnings("unused")
     default Edge insert(Node g, Node s, Node p, Node o) {
         return null;
     }
 
+    @SuppressWarnings("unused")
     default Iterable<Edge> delete(Node g, Node s, Node p, Node o) {
         return null;
     }
 
-    default boolean hasDataManager() {
-        return false;
-    }
 
     //return IDatatype list of IDatatype edge
     // ldscript iterator
@@ -113,16 +103,14 @@ public interface Producer {
 
     Mappings getMappings(Node gNode, List<Node> from, Exp exp, Environment env) throws SparqlException;
 
-    /**
-     * ************** PATH *************
+    /*
+     *  * ************** PATH *************
      */
     /**
      * Start the processing of a path instruction with qEdge as pseudo query
      * edge. index is the index of the node in qEdge where to start path. It is
      * the index of the node that we want to enumerate in getNodes()
      *
-     * @param qEdge
-     * @param index
      */
     void initPath(Edge qEdge, int index);
 
@@ -194,14 +182,6 @@ public interface Producer {
      */
     boolean isBindable(Node node);
 
-    /**
-     * Given a value from the filter language, return a list of Node that
-     * represent this value use case: select (xpath('/book/title') ?as list)
-     *
-     * @param value
-     * @return List<Node>
-     */
-    List<Node> toNodeList(IDatatype value);
 
     DatatypeValueFactory getDatatypeValueFactory();
 
@@ -212,7 +192,6 @@ public interface Producer {
      * java.sql.ResultSet
      *
      * @param qNodes the query nodes to bind with values of object
-     * @param value
      * @return Mappings
      */
     Mappings map(List<Node> qNodes, IDatatype value);

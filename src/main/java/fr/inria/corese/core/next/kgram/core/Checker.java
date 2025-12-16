@@ -75,7 +75,7 @@ public class Checker {
         Edge edge = exp.getEdge();
         boolean exist = false;
         boolean match = false;
-        boolean define = false;
+        boolean define ;
 
         for (Edge ent : producer.getEdges(gNode, query.getFrom(gNode), edge, env)) {
 
@@ -94,11 +94,9 @@ public class Checker {
             Mappings map;
             try {
                 map = ee.query(q);
-                define = map.size() > 0;
+                define = !map.isEmpty();
                 report(edge, exist, match, define);
-            } catch (SparqlException ex) {
-                ex.printStackTrace();
-            } catch (EngineException e) {
+            }  catch (EngineException | SparqlException e) {
                 throw new RuntimeException(e);
             }
 
@@ -111,12 +109,12 @@ public class Checker {
     void report(Edge edge, boolean exist, boolean match, boolean define) {
         query.addInfo(edge.toString(),
                 " defined:" + define + " exist: " + exist + " match: " + match);
-        logger.info("Edge: " + edge + ": " + exist + " " + match + " " + define);
+        logger.info("Edge: {}: {} {} {}", edge, exist, match, define);
     }
 
     void report(Edge edge, boolean exist, boolean match) {
         query.addInfo(edge.toString(), " exist: " + exist + " match: " + match);
-        logger.info("Edge: " + edge + ": " + exist + " " + match);
+        logger.info("Edge: {}: {} {}", edge, exist, match);
     }
 
 

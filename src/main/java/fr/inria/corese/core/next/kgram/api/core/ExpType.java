@@ -8,24 +8,16 @@ package fr.inria.corese.core.next.kgram.api.core;
 public interface ExpType {
 
     String KGRAM = "http://ns.inria.fr/corese.core.kgram/";
-    String DEFAULT_GRAPH = KGRAM + "default";
-    String SKOLEM_MARKER = "/.well-known/genid/";
-    String SKOLEM = "http://ns.inria.fr" + SKOLEM_MARKER;
     String SPARQL = "http://ns.inria.fr/sparql-function/";
     String STL = "http://ns.inria.fr/sparql-template/";
     String EXT = "http://ns.inria.fr/sparql-extension/";
     String DOM = "http://ns.inria.fr/sparql-extension/dom/";
-    String CUSTOM = "http://ns.inria.fr/sparql-custom/";
     String BNODE = EXT + "bnode";
-    String UXT = "http://ns.inria.fr/sparql-extension/user/";
     String DT = "http://ns.inria.fr/sparql-datatype/";
-    String SWL = "http://ns.inria.fr/sparql-workflow/";
-    String TYPE_METADATA = "@type";
 
 
-    String KPREF = "kg";
 
-    public enum Type {
+    enum Type {
     	EMPTY("EMPTY"),
 		AND("AND"),
 		UNION("UNION"),

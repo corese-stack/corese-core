@@ -14,11 +14,7 @@ import java.util.*;
  */
 public class Visit {
     int count = 0;
-    public static boolean speedUp = false;
 
-    //HashMap<State, List<Node>> table;
-    //HashMap<Regex, List<Node>> etable;
-    //HashMap<Regex, Table> eetable;
     ExpVisitedNode visitedNode;
     HashMap<Regex, Integer> ctable;
     HashMap<Regex, Node> startNode;
@@ -26,36 +22,23 @@ public class Visit {
     LTable ltable;
     ArrayList<Regex> regexList;
 
-    boolean isReverse = false,
+    boolean isReverse,
             // isCounting = false : new sparql semantics  
-            isCounting = false;
+            isCounting;
 
     Visit(boolean isRev, boolean isCount) {
         isCounting = isCount;
         isReverse = isRev && isCount;
-        //table = new HashMap<State, List<Node>>();
-        //etable = new HashMap<Regex, List<Node>>();
-        //eetable = new HashMap<Regex, Table>();
+
         visitedNode = new ExpVisitedNode(isReverse);
         startNode = new HashMap<>();
         ctable = new HashMap<Regex, Integer>();
-        regexList = new ArrayList<Regex>();
+        regexList = new ArrayList<>();
         tdistinct = new DTable();
         ltable = new LTable();
     }
     
-    void setNode(Regex exp, Node n) {
-        startNode.put(exp, n);
-    }
-    
-    Node getNode(Regex exp) {
-        return startNode.get(exp);
-    }
-
-//    class Table1 extends HashMap<Node, Node> {
-//    }
-
-    class NodeTable extends TreeMap<Node, Node> {
+    static class NodeTable extends TreeMap<Node, Node> {
 
         NodeTable() {
             super(new Compare());
@@ -63,7 +46,7 @@ public class Visit {
     }
 
     class ExpVisitedNode extends HashMap<Regex, VisitedNode> {
-        boolean isReverse = false;
+        boolean isReverse;
 
         ExpVisitedNode(boolean b) {
             isReverse = b;
@@ -88,8 +71,7 @@ public class Visit {
             if (table == null) {
                 return false;
             }
-            boolean b = table.loop(exp, start);
-            return b;
+            return table.loop(exp, start);
         }
 
         boolean exist(Regex exp) {
@@ -98,35 +80,24 @@ public class Visit {
 
     }
 
-    VisitedNode getTable(Regex exp) {
-        return visitedNode.get(exp);
-    }
-
-    class VisitedNode {
+    static class VisitedNode {
 
         NodeTable table;
         List<Node> list;
-        boolean isReverse = false;
+        boolean isReverse;
         int n;
-        
-        int getIndex() {
-            return n;
-        }
+
 
         VisitedNode(boolean b, int n) {
             this.n = n;
             isReverse = b;
             if (isReverse) {
-                list = new ArrayList<Node>();
+                list = new ArrayList<>();
             } else {
                 table = new NodeTable();
             }
         }
-        
-        int size() {
-            return table.size();
-        }
-        
+
         void clear() {
             if (table != null) table.clear();
             if (list != null) list.clear();
@@ -140,9 +111,6 @@ public class Visit {
             return table.toString();
         }
 
-        Collection<Node> values() {
-            return table.values();
-        }
 
         void add(Node n) {
             if (isReverse) {
@@ -199,14 +167,14 @@ public class Visit {
 
     }
 
-    class DTable extends TreeMap<Node, NodeTable> {
+    static class DTable extends TreeMap<Node, NodeTable> {
 
         DTable() {
             super(new Compare());
         }
     }
 
-    class Compare implements Comparator<Node> {
+    static class Compare implements Comparator<Node> {
 
         // TODO: xsd:integer & xsd:decimal may be considered as same node
         // in loop checking
@@ -219,13 +187,9 @@ public class Visit {
         return new Visit(isReverse, isCount);
     }
 
-    void clear() {
-        //table.clear();
-    }
 
-    /**
+    /*
      * ************************************
-     *
      * With Regex
      *
      *************************************
@@ -287,10 +251,7 @@ public class Visit {
             visitedNode.put(exp, t);
         }
     }
-    
-    VisitedNode cleanVisitedNode(Regex exp) {
-        return nunset(exp);
-    }
+
 
     VisitedNode nunset(Regex exp) {
         VisitedNode t = visitedNode.get(exp);
@@ -371,7 +332,6 @@ public class Visit {
 
     /**
      * **************************************
-     *
      * ?x distinct(exp+) ?y
      *
      */
@@ -392,7 +352,7 @@ public class Visit {
         t.put(node, node);
     }
 
-    /**
+    /*
      * ********************************************
      * ?x short(regex) ?y ?x distinct(regex) ?y
      *
@@ -400,7 +360,7 @@ public class Visit {
     /**
      * Table for managing path length for each node
      */
-    class LTable extends TreeMap<Node, Record> {
+    static class LTable extends TreeMap<Node, Record> {
 
         LTable() {
             super(new Compare());
@@ -426,7 +386,7 @@ public class Visit {
         }
     }
 
-    class Record {
+    static class Record {
 
         Regex exp;
         Integer len;
@@ -447,25 +407,15 @@ public class Visit {
      */
     void start(Node node) {
         if (!isCounting) {
-            //visitedNode.clear(); // @todo
             clearall();
         }
     }
     
-    void clearLast() {
-        if (! regexList.isEmpty()) {
-            VisitedNode t = getVisitedNode(regexList.get(regexList.size()-1));
-            if (t != null) {
-                t.clear();
-            }
-        }
-    }
-    
+
     /**
      * New start node: clean the table of visited nodes
      */
     void clearall() {
-        int i = 0;
         for (Regex exp : regexList) {
             VisitedNode t = getVisitedNode(exp);
             if (t != null) {

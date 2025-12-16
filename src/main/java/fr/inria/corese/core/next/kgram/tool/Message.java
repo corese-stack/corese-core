@@ -1,11 +1,8 @@
 package fr.inria.corese.core.next.kgram.tool;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Message {
 
-    static Logger logger = LoggerFactory.getLogger(Message.class);
 
     public enum Prefix {
         UNDEF_VAR("Undefined variable: "),

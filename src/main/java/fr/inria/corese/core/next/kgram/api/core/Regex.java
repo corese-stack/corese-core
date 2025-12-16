@@ -21,16 +21,12 @@ public interface Regex {
     int PARA = 8;
     int TEST = 9;
     int CHECK = 10;
-    int REVERSE = 11;
-
 
     String getName();
 
     String getLongName();
 
     IDatatype getDatatypeValue();
-
-    String toRegex();
 
     int retype();
 
@@ -39,8 +35,6 @@ public interface Regex {
     boolean isConstant();
 
     boolean isAlt();
-
-    boolean isPara();
 
     boolean isSeq();
 
@@ -82,8 +76,6 @@ public interface Regex {
     Regex transform();
 
     Regex translate();
-
-    boolean isNotOrReverse();
 
     int regLength();
 

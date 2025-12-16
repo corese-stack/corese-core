@@ -14,19 +14,17 @@ public class Record extends ArrayList<Regex> {
 	
 	Visit visit;
         Node target;
-	Regex exp;
-	
+
 	ArrayList<Node> stack;
 	
 	boolean success = false;
 	
 	Record(Visit v){
 		visit = v;
-		stack = new ArrayList<Node>();
+		stack = new ArrayList<>();
 	}
 	
-	Record(){}
-	
+
 	Visit getVisit(){
 		return visit;
 	}
@@ -39,13 +37,7 @@ public class Record extends ArrayList<Regex> {
 		return this;
 	}
 	
-	Record set(Regex exp){
-		if (exp != null){
-			set(size()-1, exp);
-		}
-		return this;
-	}
-	
+
 	Regex pop(){
 		if (size() == 0){
 			return null;
@@ -57,9 +49,7 @@ public class Record extends ArrayList<Regex> {
 	
 	
 	/*************************************************************
-	 * 
 	 * Stack dedicated to PARA: e1 || e2
-	 * 
 	 * e1 goes from start to target
 	 * then e2 checks that there is a path from start to target
 	 * pushStart() store start node 

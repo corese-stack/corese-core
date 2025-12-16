@@ -15,16 +15,5 @@ public interface AST {
 
     boolean isDelete();
 
-    // update query starts with insert/delete
-    boolean isUpdateInsert();
-
-    boolean isUpdateDelete();
-
-    boolean isUpdateInsertData();
-
-    boolean isUpdateDeleteData();
-
-    boolean isUpdateLoad();
-
     boolean hasMetadata(String name);
 }

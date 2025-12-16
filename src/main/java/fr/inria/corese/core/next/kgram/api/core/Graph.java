@@ -13,6 +13,4 @@ public interface Graph {
 
     Node getNode(Node dt);
 
-    Node getVertex(Node dt);
-
 }

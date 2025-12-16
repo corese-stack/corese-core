@@ -15,9 +15,8 @@ public class Sorter {
    
    
     public void sort(Query q, Exp exp, List<String> lVar, List<Exp> lBind) {
-        int hasService = 0;
 
-        List<Node> lNode = new ArrayList<Node>();
+        List<Node> lNode = new ArrayList<>();
 
         for (int i = 0; i < exp.size(); i++) {
             Exp e1 = exp.get(i);
@@ -54,25 +53,6 @@ public class Sorter {
 
     }
 
-    void check(Query q, Exp exp, List<Node> list) {
-        if (!(exp.isEdge() || exp.isPath())) {
-            return;
-        }
-
-        boolean connect = false;
-
-        for (int i = 0; i < exp.nbNode(); i++) {
-            Node n = exp.getNode(i);
-            if (list.contains(n)) {
-                connect = true;
-                break;
-            }
-        }
-
-        if (!connect) {
-            q.addInfo("Disconnected: ", exp);
-        }
-    }
 
     public boolean leaveFirst() {
         return true;
@@ -101,11 +81,7 @@ public class Sorter {
             n2 += 1;
         }
 
-//        if (n1 == 0 && n2 == 0) {
-//            if (beforeBind(q, e2, e1)) {
-//                return true;
-//            }
-//        }
+
         return n2 > n1;
     }
 
@@ -114,7 +90,7 @@ public class Sorter {
      */
     protected boolean beforeBind(Query q, Exp e2, Exp e1) {
         Mappings list = q.getActualMappings();
-        if (list != null && list.size() > 0) {
+        if (list != null && !list.isEmpty()) {
             Mapping map = list.get(0);
             if (e1.bind(map)) {
                 return false;

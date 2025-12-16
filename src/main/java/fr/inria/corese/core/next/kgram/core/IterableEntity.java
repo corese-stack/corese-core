@@ -31,8 +31,7 @@ class IterableEntity implements Iterable<Edge>, Iterator<Edge> {
     @Override
     public Edge next() {
         Edge obj = it.next();
-        if (obj instanceof Node) {
-            Node n = (Node) obj;
+        if (obj instanceof Node n) {
             return (Edge) n.getNodeObject();
         }
 

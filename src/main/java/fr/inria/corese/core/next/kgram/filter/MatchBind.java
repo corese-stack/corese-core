@@ -21,11 +21,10 @@ public class MatchBind {
 
 	Hashtable<Expr, Expr> table;
 	List<Expr> stack;
-	boolean success = true;
-	
+
 	MatchBind (){
-		table = new Hashtable<Expr, Expr>();
-		stack = new ArrayList<Expr>();
+		table = new Hashtable<>();
+		stack = new ArrayList<>();
 	}
 	
 	static MatchBind create(){

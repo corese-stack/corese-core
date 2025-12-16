@@ -8,7 +8,6 @@ import java.util.List;
  * Interface for sorting and rewriting the QPG nodes
  * 
  * @author Fuqi Song, WImmics Inria I3S
- * @date 19 mai 2014
  */
 public interface ISort {
 
@@ -22,9 +21,6 @@ public interface ISort {
 
     /**
      * Rewrite the SPARQL exp according to give order of nodes
-     * @param exp
-     * @param nodes 
-     * @param start 
      */
     void rewrite(Exp exp, List<QPGNode> nodes, int start);
 }

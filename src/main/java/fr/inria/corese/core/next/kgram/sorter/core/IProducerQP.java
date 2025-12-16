@@ -6,7 +6,6 @@ package fr.inria.corese.core.next.kgram.sorter.core;
  * graph
  *
  * @author Fuqi Song, WImmics Inria I3S
- * @date 4 juin 2014
  */
 public interface IProducerQP {
 
@@ -15,15 +14,11 @@ public interface IProducerQP {
      * 
      * @param type: ALL, return the number of all triples in the graph
      *              SUBJECT( PREDICATE| OBJECT): return the number of disinct SUBJECT( PREDICATE| OBJECT)
-     * @return 
      */
     int getSize(int type);
 
     /**
      * Return the count of triples according the given type
-     * @param n
-     * @param type
-     * @return 
      */
     int getCount(QPGNode n, int type);
 }

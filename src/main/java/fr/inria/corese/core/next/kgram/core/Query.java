@@ -36,13 +36,10 @@ public class Query extends Exp implements Graphable {
 
     public static final int STD_PROFILE = -1;
     public static final int COUNT_PROFILE = 1;
-    public static final int DEFAULT_SLICE = 20;
 
-	
     private static final Logger logger = LoggerFactory.getLogger(Query.class);
 
     public static final String PATHNODE = "pathNode";
-    public static final String BPATH = "_:_path_";
 
     public static boolean test = true;
     public static boolean testJoin = false;
@@ -70,7 +67,7 @@ public class Query extends Exp implements Graphable {
 
     private int number = 0;
     boolean distinct = false;
-    int iNode = 0, iEdge = 0, iPath = 0;
+    int iNode = 0, iEdge = 0;
     private int edgeIndex = -1;
     List<Node> from, named, selectNode;
     // all nodes (on demand)
@@ -140,7 +137,6 @@ public class Query extends Exp implements Graphable {
 
     boolean 
             isAggregate = false;
-    boolean isFunctional = false;
     boolean isRelax = false;
     boolean isDistribute = false;
     boolean isOptimize = false;
@@ -186,8 +182,6 @@ public class Query extends Exp implements Graphable {
 
     private boolean isService = false;
 
-    private final boolean isBind = false;
-
     private boolean isSynchronized = false;
     private boolean lock = true;
 
@@ -196,8 +190,6 @@ public class Query extends Exp implements Graphable {
 
     // member of a set of templates of a pprinter (not a single query that is a template)
     private boolean isPrinterTemplate = false;
-
-    private boolean isAllResult = false;
 
     private Exp templateGroup, templateNL;
     private final List<Node> argList;
@@ -213,7 +205,6 @@ public class Query extends Exp implements Graphable {
     private BgpGenerator bgpGenerator;
     private List<Edge> queryEdgeList;
 
-    private HashMap<Edge, Exp> edgeAndContext;
     private Mappings selection;
     private Mappings discorevy;
 
@@ -277,8 +268,8 @@ public class Query extends Exp implements Graphable {
     
     @Override
     public StringBuilder toString(StringBuilder sb) {
-    
-        if (getSelectFun().size() > 0) {
+
+        if (!getSelectFun().isEmpty()) {
             sb.append("select ");
             sb.append(getSelectFun());
             sb.append("\n");
@@ -302,7 +293,7 @@ public class Query extends Exp implements Graphable {
             sb.append(getHaving());
         }
         Exp val = getValues();
-        if (val != null && val.getMappings().size() > 0) {
+        if (val != null && !val.getMappings().isEmpty()) {
             sb.append("\n");
             sb.append("values");
             sb.append(val.getNodeList());
@@ -315,25 +306,6 @@ public class Query extends Exp implements Graphable {
     }
     
     
-    /**
-     * Add values () {} for this Mappings
-     */
-    public void addMappings(Mappings map) {
-        Exp values = createValues(getNodeListValues(map), map);
-        getBody().add(values);
-        setMappings(map);
-    }
-    
-    List<Node> getNodeListValues(Mappings map) {
-        List<Node> list = new ArrayList<>();
-        for (Node qn : map.getNodeListValues()) {
-            Node node = getSelectNode(qn.getLabel());
-            if (node != null) {
-                list.add(node);
-            }
-        }
-        return list;
-    }
 
     public void set(Sorter s) {
         querySorter.setSorter(s);
@@ -345,10 +317,6 @@ public class Query extends Exp implements Graphable {
 
     Query get(Edge e) {
         return table.get(e);
-    }
-
-    public void addQuery(Query q) {
-        queries.add(q);
     }
 
     public List<Query> getQueries() {
@@ -385,37 +353,13 @@ public class Query extends Exp implements Graphable {
         mode = m;
     }
 
-    public void setPlanProfile(int n) {
-        planner = n;
-    }
-
     public int getPlanProfile() {
         return planner;
     }
-      
-    
-//    public boolean hasFunctional() {
-//        return  // bind functional
-//                hasFunctional || 
-//                // query functional
-//                isFunctional();
-//    }
-//
-//    
-//    public void setHasFunctional(boolean hasFunctional) {
-//        this.hasFunctional = hasFunctional;
-//    }
-    
-    public void addError(String mes) {
-        addError(mes, null);
-    }
-    
+
+
     public void addError(String mes, Object obj) {
         getGlobalQuery().setError(mes, obj);
-    }
-
-    public void addError(String mes, Object obj, boolean duplicate) {
-        getGlobalQuery().setError(mes, obj, duplicate);
     }
 
     void setError(String mes, Object obj) {
@@ -493,9 +437,6 @@ public class Query extends Exp implements Graphable {
         }
     }
     
-    boolean needEdge(){
-        return getGlobalQuery().isRelax() || getGlobalQuery().isRule();
-    }
 
     public Query getGlobalQuery() {
         if (query != null) {
@@ -519,16 +460,7 @@ public class Query extends Exp implements Graphable {
         return query != null;
     }
     
-    /**
-     * Select Query is empty and does nothing
-     */
-    boolean isEmpty(){
-        return isSelect()
-                && getSelectFun().isEmpty()
-                && getBody().size() == 0
-                && getValues().getMappings() == null;            
-    }
-    
+
     public boolean isSelectExpression(){
          for (Exp e : getSelectFun()) {
              if (e.getFilter() != null){
@@ -542,17 +474,6 @@ public class Query extends Exp implements Graphable {
         return isCheckLoop;
     }
 
-    public void setCheckLoop(boolean b) {
-        isCheckLoop = b;
-    }
-
-    boolean isPipe() {
-        return isPipe;
-    }
-
-    public void setPipe(boolean b) {
-        isPipe = b;
-    }
 
     /**
      * Fake local graph node
@@ -568,14 +489,6 @@ public class Query extends Exp implements Graphable {
 
     public Node getPathNode() {
         return pathNode;
-    }
-
-    public void setPathNode(Node n) {
-        pathNode = n;
-    }
-
-    public void addPathFilter(Filter f) {
-        pathFilter.add(f);
     }
 
     /**
@@ -615,17 +528,6 @@ public class Query extends Exp implements Graphable {
         return null;
     }
 
-    public static boolean isSPARQL2() {
-        return true;
-    }
-    
-    public String getFromName() {
-        List<Node> from = getFrom();
-        if (from != null && from.size() == 1) {
-            return from.get(0).getLabel();
-        }
-        return null;
-    }
 
     List<Node> getFrom(Node gNode) {
         if (gNode == null) {
@@ -661,10 +563,6 @@ public class Query extends Exp implements Graphable {
 
     public List<Node> getPatternSelectNodes() {
         return patternSelectNodes;
-    }
-
-    public List<Node> getQuerySelectNodes() {
-        return querySelectNodes;
     }
 
     public List<Node> getBindingNodes() {
@@ -714,22 +612,6 @@ public class Query extends Exp implements Graphable {
     public List<Exp> getSelectFun() {
         return selectExp;
     }
-         /**
-     *
-     * use case: select ?x
-     */
-    public Node getSelectNodes(String name) {
-        Node node = get(getPatternNodes(), name);
-        if (node != null) {
-            return node;
-        }
-        node = get(getPatternSelectNodes(), name);
-        if (node != null) {
-            return getExtNode(node);
-        }
-        return node;
-    }
-    
 
     public Node getPatternNode(String name) {
         return get(patternNodes, name);
@@ -837,18 +719,6 @@ public class Query extends Exp implements Graphable {
         isRelax = b;
     }
 
-    /**
-     * To relax types on other property than rdf:type
-     */
-    public boolean isRelax(Edge q) {
-        boolean b = isRelax && relaxEdges.contains(q.getEdgeNode());
-        return b;
-    }
-
-    public void addRelax(Node n) {
-        relaxEdges.add(n);
-    }
-
     public boolean isDistribute() {
         if (query != null) {
             return query.isDistribute();
@@ -857,10 +727,7 @@ public class Query extends Exp implements Graphable {
         }
     }
 
-    public void setDistribute(boolean b) {
-        isDistribute = b;
-    }
-    
+
     public boolean isSelect(){
         return ! (isConstruct() || isUpdate() || isInsert() || isDelete());
     }
@@ -919,10 +786,6 @@ public class Query extends Exp implements Graphable {
                 if (exp.isAggregate() && !exp.isExpGroupBy()) {
                     setAggregate(true);
                 } 
-//                else if (exp.getFilter().isFunctional()) {
-//                    setFunctional(true);
-//                    getOuterQuery().setHasFunctional(true);                   
-//                }
             }
         }
         for (Exp exp : getOrderBy()) {
@@ -932,36 +795,17 @@ public class Query extends Exp implements Graphable {
         }
     }
 
-    public void addFailure(Filter exp) {
-        failure.add(exp);
-    }
-
-    public List<Filter> getFailures() {
-        return failure;
-    }
 
     public void setSelectFun(List<Exp> s) {
         selectExp = s;
     }
     
-    public void addSelect(Exp exp) {
-        selectExp.add(exp);
-    }
-
     public void addSelect(Node node) {
         selectExp.add(Exp.create(Type.NODE, node));
     }
 
-    public void addOrderBy(Exp exp) {
-        orderBy.add(exp);
-    }
-
     public void addOrderBy(Node node) {
         orderBy.add(Exp.create(Type.NODE, node));
-    }
-
-    public void addGroupBy(Exp exp) {
-        groupBy.add(exp);
     }
 
     public void addGroupBy(Node node) {
@@ -1000,20 +844,8 @@ public class Query extends Exp implements Graphable {
         return isListGroup;
     }
 
-    public void setListGroup(boolean b) {
-        isListGroup = b;
-    }
-
-    public void setListPath(boolean b) {
-        isListPath = b;
-    }
-
     public boolean isListPath() {
         return isListPath;
-    }
-
-    public void setCountPath(boolean b) {
-        isCountPath = b;
     }
 
     public boolean isCountPath() {
@@ -1030,10 +862,6 @@ public class Query extends Exp implements Graphable {
 
     public boolean isConnect() {
         return isConnect;
-    }
-
-    public void setConnect(boolean b) {
-        isConnect = b;
     }
 
     public void setHaving(Exp f) {
@@ -1064,22 +892,10 @@ public class Query extends Exp implements Graphable {
         return delete;
     }
 
-    public int nbFun() {
-        int nbfun = 0;
-        for (Exp e : getSelectFun()) {
-            if (e.getFilter() != null) {
-                nbfun++;
-            }
-        }
-        return nbfun;
-    }
-
     /**
      * Check that select variables and expressions are compatible with group by
      * &amp; aggregates use case:
-     *
      * SELECT ?P (COUNT(?O) AS ?C) WHERE { ?S ?P ?O }
-     *
      * SELECT ((?O1 + ?O2) AS ?O12) (COUNT(?O1) AS ?C) WHERE { ?S :p ?O1; :q ?O2
      * } GROUP BY (?S)
      *
@@ -1100,7 +916,6 @@ public class Query extends Exp implements Graphable {
 
     /**
      * If there is an aggregate, there should be no variable in select
-     *
      * SELECT ?P (COUNT(?O) AS ?C) WHERE { ?S ?P ?O }
      */
     boolean checkAggregate() {
@@ -1124,7 +939,6 @@ public class Query extends Exp implements Graphable {
     /**
      *
      * Check that select variables and expressions are compatible with group by
-     *
      * SELECT ((?O1 + ?O2) AS ?O12) (COUNT(?O1) AS ?C) WHERE { ?S :p ?O1; :q ?O2
      * } GROUP BY (?S)
      *
@@ -1191,9 +1005,6 @@ public class Query extends Exp implements Graphable {
         return iEdge;
     }
 
-    public synchronized int nbPath() {
-        return iPath++;
-    }
 
     /**
      * Called by Eval before query evaluation
@@ -1270,10 +1081,6 @@ public class Query extends Exp implements Graphable {
         if (getPathNode() != null) {
             index(getPathNode());
         }
-    }
-
-    void compile(Filter f) {
-        querySorter.compile(f);
     }
 
     void index(List<Exp> list) {
@@ -1370,7 +1177,7 @@ public class Query extends Exp implements Graphable {
      */ 
     public void collect() {
         if (getPathNode() != null) {
-            /**
+            /*
              * use case: ?x ex:prop @[?this != <John>] + ?y collect ?this first
              * because it may be within @[exists {?this ?p ?y}} and even worse
              * within @[exists {select ?this where {?this ?p ?y}}]
@@ -1477,16 +1284,13 @@ public class Query extends Exp implements Graphable {
     }
 
     void collectExist(Expr exp) {
-        switch (exp.oper()) {
-            case ExprType.EXIST:
-                Exp pat = getPattern(exp);
-                collect(pat, true);
-                break;
-
-            default:
-                for (Expr ee : exp.getExpList()) {
-                    collectExist(ee);
-                }
+        if (exp.oper() == ExprType.EXIST) {
+            Exp pat = getPattern(exp);
+            collect(pat, true);
+        } else {
+            for (Expr ee : exp.getExpList()) {
+                collectExist(ee);
+            }
         }
     }
 
@@ -1660,16 +1464,6 @@ public class Query extends Exp implements Graphable {
         return false;
     }
 
-    boolean inSelect(Node qNode) {
-        for (Exp exp : getSelectFun()) {
-            Node node = exp.getNode();
-            if (node == qNode) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Generate or retrieve index of node 
      * If node is in a sub query, return the
@@ -1705,10 +1499,6 @@ public class Query extends Exp implements Graphable {
 
     int getNodeIndex() {
         return iNode;
-    }
-
-    void setNodeIndex(int n) {
-        iNode = n;
     }
 
     /**
@@ -1747,24 +1537,6 @@ public class Query extends Exp implements Graphable {
   
 
    
-    public boolean isPrinterTemplate() {
-        return isPrinterTemplate;
-    }
-
-    
-    public void setPrinterTemplate(boolean isPrinterTemplate) {
-        this.isPrinterTemplate = isPrinterTemplate;
-    }
-
-    public boolean isMatchBlank() {
-        return isMatch;
-    }
-
-    
-    public void setMatchBlank(boolean match) {
-        this.isMatch = match;
-    }
-
     public List<Node> getArgList() {
         return argList;
     }
@@ -1778,22 +1550,7 @@ public class Query extends Exp implements Graphable {
         return edgeList;
     }
 
-    
-    public void setEdgeList(List<Edge> edgeList) {
-        this.edgeList = edgeList;
-    }
 
-    
-    public List<Node> getConstructNodes() {
-        return constructNodes;
-    }
-
-    
-    public void setConstructNodes(List<Node> constructNodes) {
-        this.constructNodes = constructNodes;
-    }
-
-    
     public int getEdgeIndex() {
         return edgeIndex;
     }
@@ -1819,22 +1576,6 @@ public class Query extends Exp implements Graphable {
         return profile;
     }
 
-    public void setNumbering(boolean b) {
-        isNumbering = b;
-    }
-
-    public boolean isNumbering() {
-        return isNumbering;
-    }
-    
-    public Query getTemplateProfile() {
-        return templateProfile;
-    }
-    
-    public void setTemplateProfile(Query templateProfile) {
-        this.templateProfile = templateProfile;
-    }
-
     /**
      * Compute node list for filter variables use case: Pattern compiler (?x =
      * cst) TODO: does not dive into minus {PAT}
@@ -1855,31 +1596,8 @@ public class Query extends Exp implements Graphable {
         return lNode;
     }
 
-    /**
-     * use case: select count(distinct ?x)
-     */
-    public List<Node> getAggNodes(Filter f) {
-        ArrayList<Node> lNode = new ArrayList<>();
-        getAggNodes(f.getExp(), lNode);
-        return lNode;
-    }
-
-    void getAggNodes(Expr exp, ArrayList<Node> lNode) {
-        if (exp.type() == ExprType.VARIABLE) {
-            Node node = getProperAndSubSelectNode(exp.getLabel());
-            if (node != null && !lNode.contains(node)) {
-                lNode.add(node);
-            }
-        } else {
-            for (Expr ee : exp.getExpList()) {
-                getAggNodes(ee, lNode);
-            }
-        }
-    }
 
     /**
-     * ******************************************************************
-     *
      * Dependency with filter exp for tracking filter(exists {PAT})
      *
      */
@@ -1905,7 +1623,6 @@ public class Query extends Exp implements Graphable {
 
     /**
      * ********************************************************************
-     *
      * Pipeline using operators on queries: union/and/optional/minus
      * q1.union(q2).and(q3).optional(q4).minus(q5)
      *
@@ -1933,11 +1650,6 @@ public class Query extends Exp implements Graphable {
         Query q1 = this;
         Exp exp = Exp.create(Type.AND, q1, Exp.create(Type.OPTION, Exp.create(Type.AND, q2)));
         return Query.create(exp).complete(q1, q2);
-    }
-
-    public Query ifthen(Query q1, Query q2) {
-
-        return this;
     }
 
     public Query orderBy(Node node) {
@@ -1984,7 +1696,7 @@ public class Query extends Exp implements Graphable {
     }
 
     void setSelect(Query q1, Query q2) {
-        List<Exp> list = new ArrayList<Exp>();
+        List<Exp> list = new ArrayList<>();
         list.addAll(q1.getSelectFun());
         for (Exp exp : q2.getSelectFun()) {
             if (!contain(list, exp.getNode())) {
@@ -2033,17 +1745,6 @@ public class Query extends Exp implements Graphable {
         return ftable.get(name);
     }
 
-    public Expr getProfile(String name) {
-        if (templateProfile == null) {
-            return null;
-        }
-        Filter f = templateProfile.getFilter(name);
-        if (f == null) {
-            return null;
-        }
-        return f.getExp();
-    }
-
     public Filter getGlobalFilter(String name) {
         return getGlobalQuery().getFilter(name);
     }
@@ -2052,30 +1753,9 @@ public class Query extends Exp implements Graphable {
         ftable.put(name, filter);
     }
 
-    public Iterable<String> getFilterNames() {
-        return ftable.keySet();
-    }
 
     public Object getPragma(String name) {
         return pragma.get(name);
-    }
-
-    public String getStringPragma(String name) {
-        return (String) pragma.get(name);
-    }
-
-    public boolean hasPragma(String name) {
-        return pragma.get(name) != null;
-
-    }
-
-    public boolean isPragma(String name) {
-        Object obj = pragma.get(name);
-        if (obj == null || !(obj instanceof Boolean)) {
-            return false;
-        }
-        Boolean b = (Boolean) obj;
-        return b;
     }
 
     public void setPragma(String name, Object value) {
@@ -2092,11 +1772,6 @@ public class Query extends Exp implements Graphable {
     
     public boolean isRecordEdge(){
         return isRule() || isRelax();
-    }
-
-    public boolean setDetail(boolean b) {
-        isDetail = b;
-        return b;
     }
 
     public boolean isDetail() {
@@ -2165,50 +1840,12 @@ public class Query extends Exp implements Graphable {
         this.number = number;
     }
 
-    public boolean isAllResult() {
-        return true; //isAllResult;
-    }
-
-    public void setAllResult(boolean isAllResult) {
-        this.isAllResult = isAllResult;
-    }
 
     public Exp getTemplateGroup() {
         return templateGroup;
     }
 
-    public void setTemplateGroup(Exp templateGroup) {
-        this.templateGroup = templateGroup;
-    }
 
-    public Exp getTemplateNL() {
-        return templateNL;
-    }
-
-    public void setTemplateNL(Exp nl) {
-        this.templateNL = nl;
-    }
-
-    public boolean isStdOptional() {
-        return isOptional;
-    }
-
-    public void recordPredicate(Node p, Edge edge) {
-        Integer i = ptable.get(p.getLabel());
-        if (i == null) {
-            i = 0;
-        }
-        ptable.put(p.getLabel(), i + 1);
-        etable.put(p.getLabel(), edge);
-    }
-
-    public int nbPredicate(Node p) {
-        Integer n = ptable.get(p.getLabel());
-        if (n == null) {
-            return 0;
-        }
-        return n;
-    }
 
     public Edge getEdge(Node p) {
         return etable.get(p.getLabel());
@@ -2219,41 +1856,16 @@ public class Query extends Exp implements Graphable {
         return queryProfile;
     }
 
-    
-    public void setQueryProfile(int queryProfile) {
-        this.queryProfile = queryProfile;
-    }
 
-    
-    public boolean isPathType() {
-        return isPathType;
-    }
-
-    
-    public void setPathType(boolean isPathType) {
-        this.isPathType = isPathType;
-    }
-
-    
     public boolean isStorePath() {
         return isStorePath;
     }
 
-    
-    public void setStorePath(boolean isStorePath) {
-        this.isStorePath = isStorePath;
-    }
 
-   
     public boolean isCachePath() {
         return isCachePath;
     }
 
-    public void setCachePath(boolean isCachePath) {
-        this.isCachePath = isCachePath;
-    }
-
-   
     public int getID() {
         return id;
     }
@@ -2317,12 +1929,8 @@ public class Query extends Exp implements Graphable {
     public void setExtension(ASTExtension ext) {
         this.extension = ext;
     }
-    
-    public boolean hasDefinition(){
-        return getExtension() != null || getGlobalQuery().getExtension() != null;
-    }
-    
-    
+
+
     // API for Eval event-driven function call 
     public Expr getExpression(String name){
         return getExpression(name, false);
@@ -2384,7 +1992,7 @@ public class Query extends Exp implements Graphable {
 
     @Override
     public String getDatatypeLabel() {
-        return String.format("[Query]");
+        return "[Query]";
     }
     
    
@@ -2392,12 +2000,7 @@ public class Query extends Exp implements Graphable {
         return isUseBind;
     }
 
-   
-    public void setUseBind(boolean isUseBind) {
-        this.isUseBind = isUseBind;
-    }
 
-    
     public BgpGenerator getBgpGenerator() {
         return bgpGenerator;
     }
@@ -2405,24 +2008,8 @@ public class Query extends Exp implements Graphable {
     public void setBgpGenerator(BgpGenerator bgpGenerator) {
         this.bgpGenerator = bgpGenerator;
     }
-    
-    public HashMap<Edge, Exp> getEdgeAndContext() {
-        if (getBgpGenerator() == null){
-            return  null;
-        }
-        return getBgpGenerator().getEdgeAndContext();
-    }
- 
 
-    public List<Edge> getQueryEdgeList() {
-        return queryEdgeList;
-    }
 
-    public void setQueryEdgeList(List<Edge> queryEdgeList) {
-        this.queryEdgeList = queryEdgeList;
-    }
-
-   
     public boolean isFun() {
         return isFun;
     }
@@ -2431,24 +2018,8 @@ public class Query extends Exp implements Graphable {
     public void setFun(boolean isFun) {
         this.isFun = isFun;
     }
-	 
-//    public Object getTemplateVisitor() {
-//        if (query == null){
-//            return templateVisitor;
-//        }
-//        return query.getTemplateVisitor();
-//    }
-//     
-//    public void setTemplateVisitor(Object tv) {
-//        if (query == null){
-//             templateVisitor = tv;
-//        }
-//        else {
-//            query.setTemplateVisitor(tv);
-//        }
-//    }
 
-   
+
     public Context getContext() {
         if (query == null){
             return context;
@@ -2471,21 +2042,7 @@ public class Query extends Exp implements Graphable {
         return isTransformationTemplate;
     }
 
-    
-    public void setTransformationTemplate(boolean isTransformationTemplate) {
-        this.isTransformationTemplate = isTransformationTemplate;
-    }
 
-    
-    public ArrayList<Query> getSubQueryList() {
-        return subQueryList;
-    }
-
-    
-    public void setSubQueryList(ArrayList<Query> subQueryList) {
-        this.subQueryList = subQueryList;
-    }
-    
     public HashMap getEnvironment(){
         return tprinter;
     }
@@ -2497,7 +2054,6 @@ public class Query extends Exp implements Graphable {
     /**
      * Use case: PluginImpl kgram()
      * Query inherits q transformer information
-     * @param q 
      */
     public void complete(Query q, Context context){
         setEnvironment(q.getEnvironment());
@@ -2526,17 +2082,7 @@ public class Query extends Exp implements Graphable {
         this.priority = priority;
     }
 
-    
-    public boolean isInitMode() {
-        return initMode;
-    }
 
-    
-    public void setInitMode(boolean initMode) {
-        this.initMode = initMode;
-    }
-
-    
     public void setInsert(boolean isInsert) {
         this.isInsert = isInsert;
     }
@@ -2544,28 +2090,7 @@ public class Query extends Exp implements Graphable {
     public boolean isInsert() {
         return isInsert;
     }
-    
-    public boolean isUpdateInsert() {
-        return getAST().isUpdateInsert();
-    }
-    
-    public boolean isUpdateDelete() {
-        return getAST().isUpdateDelete();
-    }
-    
-    public boolean isUpdateInsertData() {
-        return getAST().isUpdateInsertData();
-    }
-    
-    public boolean isUpdateDeleteData() {
-        return getAST().isUpdateDeleteData();
-    }
-    
-    public boolean isUpdateLoad() {
-        return getAST().isUpdateLoad();
-    }
-    
-  
+
     public boolean isLock() {
         return lock;
     }
@@ -2585,17 +2110,7 @@ public class Query extends Exp implements Graphable {
         this.parallel = parallel;
     }
 
-   
-    public boolean isServiceResult() {
-        return serviceResult;
-    }
 
-    
-    public void setServiceResult(boolean serviceResult) {
-        this.serviceResult = serviceResult;
-    }
-
-   
     public boolean isFederate() {
         return federate;
     }
@@ -2635,16 +2150,6 @@ public class Query extends Exp implements Graphable {
         this.uri = uri;
     }
 
-   
-    public boolean isImportFailure() {
-        return importFailure;
-    }
-
-   
-    public void setImportFailure(boolean importFailure) {
-        this.importFailure = importFailure;
-    }
-
     public Mappings getSelection() {
         return selection;
     }
@@ -2657,8 +2162,5 @@ public class Query extends Exp implements Graphable {
         return discorevy;
     }
 
-    public void setDiscorevy(Mappings discorevy) {
-        this.discorevy = discorevy;
-    }
 
 }
