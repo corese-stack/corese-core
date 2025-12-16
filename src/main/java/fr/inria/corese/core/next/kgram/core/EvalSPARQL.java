@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.kgram.core;
 import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.api.IDatatype;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
@@ -13,6 +15,8 @@ import java.util.HashMap;
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */
 public class EvalSPARQL {
+
+    private static final Logger logger = LoggerFactory.getLogger(EvalSPARQL.class);
 
     Eval eval;
     Query query;
@@ -73,7 +77,7 @@ public class EvalSPARQL {
         return map1.joiner(map2, cmn);
     }
 
-
+    @SuppressWarnings("unused")
     Mappings graph(Node graph, Producer p, Exp exp, Mapping m) {
         return bgp(exp.getGraphName(), p, exp.rest(), m);
     }
@@ -176,14 +180,14 @@ public class EvalSPARQL {
 
     Mappings basic(Node graph, Producer p, Exp exp, Mapping m) {
         exp.setType(Exp.Type.AND);
-        Mappings map = null;
         try {
-            map = eval.exec(graph, p, exp, m);
+            return eval.exec(graph, p, exp, m);
         } catch (SparqlException ex) {
-            ex.printStackTrace();
+            logger.error("Error executing basic pattern: {}", ex.getMessage(), ex);
+            return null;
+        } finally {
+            exp.setType(Exp.Type.BGP);
         }
-        exp.setType(Exp.Type.BGP);
-        return map;
     }
 
     private Mappings filter(Producer p, Exp exp, Mappings map) {

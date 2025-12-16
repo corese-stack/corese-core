@@ -143,7 +143,7 @@ public class DepthFirstBestSearch implements ISort {
         for (QPGNode f : filters) {
             //if there are no edges left linking to the filter (values, etc...)
             //add this filter to the sequence, just after the triples patterns
-            if (!visited.contains(f) && !intersect(this.g.getLinkedNodes(f), notVisited, binds)) {
+            if (!visited.contains(f) && isDisjoint(this.g.getLinkedNodes(f), notVisited, binds)) {
                 visited.add(f);
             }
         }
@@ -200,7 +200,7 @@ public class DepthFirstBestSearch implements ISort {
 
             //for BIND, it also can have FILTERs and VALUES, and also it can depends on the
             //other BINDs expressions, so need to check recusively
-            while (q.getType()== Type.BIND && !visited.contains(q) && !intersect(linkedBinds, notVisited, binds)) {
+            while (q.getType()== Type.BIND && !visited.contains(q) && isDisjoint(linkedBinds, notVisited, binds)) {
                 this.addValues(q);
 
                 visited.add(q);
@@ -215,7 +215,7 @@ public class DepthFirstBestSearch implements ISort {
     /**
      * Check if the first list has same nodes with the other two lists of nodes
      */
-    private boolean intersect(List<QPGNode> list, List<QPGNode> notVisited, List<QPGNode> binds) {
+    private boolean isDisjoint(List<QPGNode> list, List<QPGNode> notVisited, List<QPGNode> binds) {
         for (QPGNode q : list) {
             if (notVisited.contains(q) || binds.contains(q)) {
                 return true;

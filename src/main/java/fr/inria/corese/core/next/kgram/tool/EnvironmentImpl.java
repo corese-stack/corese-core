@@ -123,7 +123,7 @@ public class EnvironmentImpl implements Environment {
 		return null;
 	}
 
-	public Map getMap() {
+	public Map<String, IDatatype> getMap() {
 		return null;
 	}
 

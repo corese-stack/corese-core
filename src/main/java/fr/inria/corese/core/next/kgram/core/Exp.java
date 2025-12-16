@@ -332,10 +332,9 @@ public class Exp extends PointerObject
         return sb;
     }
 
-    StringBuilder nl(StringBuilder sb, int n) {
+    void nl(StringBuilder sb, int n) {
         sb.append(NL);
         indent(sb, n);
-        return sb;
     }
 
     void indent(StringBuilder sb, int n) {
@@ -504,7 +503,7 @@ public class Exp extends PointerObject
 
     public Exp last() {
         if (!args.isEmpty()) {
-            return args.get(args.size() - 1);
+            return args.getLast();
         } else {
             return null;
         }
@@ -949,10 +948,7 @@ public class Exp extends PointerObject
         switch (type()) {
 
             case FILTER:
-            case OPT_BIND:
-                break;
-
-            case OPTION:
+            case OPT_BIND, OPTION:
                 break;
 
             case OPTIONAL:
@@ -1637,26 +1633,7 @@ public class Exp extends PointerObject
         this.number = number;
     }
 
-    boolean isEvaluableWithMappings() {
-        return isAndJoinRec() || isRecFederate();
-    }
 
-    /**
-     * if exp = and(join(and(edge) service()))
-     * then pass Mappings map as parameter
-     */
-    boolean isAndJoinRec() {
-        if (isAnd()) {
-            if (size() != 1) {
-                return false;
-            }
-            return get(0).isAndJoinRec();
-        } else if (isJoin()) {
-            Exp fst = get(0);
-            return fst.isAnd() && fst.size() > 0 && fst.get(0).isEdgePath();
-        }
-        return false;
-    }
 
     /**
      * exp is rest of minus, optional: exp is AND
@@ -1697,7 +1674,7 @@ public class Exp extends PointerObject
             return this;
         }
         Exp res = duplicate();
-        res.getExpList().add(0, getValues(map));
+        res.getExpList().addFirst(getValues(map));
         return res;
     }
 
@@ -1824,7 +1801,7 @@ public class Exp extends PointerObject
      * preceding exp list = e1 e2 f1 e3 return JOIN(AND(JOIN(e1, e2) f1), e3 ).
      */
     Exp join(List<Exp> list) {
-        Exp exp = list.get(0);
+        Exp exp = list.getFirst();
 
         for (int i = 1; i < list.size(); i++) {
 

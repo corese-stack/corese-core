@@ -22,11 +22,6 @@ public class ProcessVisitorDefault implements ProcessVisitor {
         return slice;
     }
     
-    @Override
-    public int slice(Node serv, Mappings map) {
-        return slice;
-    }
-
 
     @Override
     public IDatatype defaultValue() {

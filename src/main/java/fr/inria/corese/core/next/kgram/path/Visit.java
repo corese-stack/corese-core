@@ -32,7 +32,7 @@ public class Visit {
 
         visitedNode = new ExpVisitedNode(isReverse);
         startNode = new HashMap<>();
-        ctable = new HashMap<Regex, Integer>();
+        ctable = new HashMap<>();
         regexList = new ArrayList<>();
         tdistinct = new DTable();
         ltable = new LTable();
@@ -122,7 +122,7 @@ public class Visit {
 
         void remove(Node n) {
             if (isReverse) {
-                list.remove(list.size() - 1);
+                list.removeLast();
             } else {
                 table.remove(n);
             }
@@ -147,9 +147,7 @@ public class Visit {
                 }
 
                 for (int i = last; i >= 0; i--) {
-                    if (count < min) {
-                        // continue
-                    } else if (count == min) {
+                    if (count == min) {
                         node = list.get(i);
                     } else {
                         if (list.get(i).equals(node)) {
@@ -269,14 +267,11 @@ public class Visit {
             nstart(exp, node);
         }
     }
-    
+
     void nstart(Regex exp, Node node) {
-        switch (exp.retype()) {
-            case Regex.PLUS:
-                break;
-            default:
-                visitedNode.add(exp, node); // @todo
-            }
+        if (exp.retype() != Regex.PLUS) {
+            visitedNode.add(exp, node);
+        }
     }
 
     /**
@@ -289,12 +284,9 @@ public class Visit {
     }
     
     void nleave(Regex exp, Node node) {
-        switch (exp.retype()) {
-            case Regex.PLUS:
-                break;
-            default:
-                visitedNode.remove(exp, node); // @todo
-            }
+        if (exp.retype() != Regex.PLUS) {
+            visitedNode.remove(exp, node);
+        }
     }
 
     /**
@@ -405,7 +397,7 @@ public class Visit {
     /**
      * New start node: clean the table of visited nodes
      */
-    void start(Node node) {
+    void start() {
         if (!isCounting) {
             clearall();
         }

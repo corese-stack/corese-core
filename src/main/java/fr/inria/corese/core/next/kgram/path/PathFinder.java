@@ -37,14 +37,14 @@ import java.util.List;
  * short to get only shortest
  * Path weight: ?x (rdf:first@2 / rdf:rest@1* / ^rdf:first@2) * ?y
  * Constaint: ?x exp
- * @{?this a foaf:Person} ?y ?x exp
- * @[a foaf:Person] ?y
+ * @ {?this a foaf:Person} ?y ?x exp
+ * @ [a foaf:Person] ?y
  * Parallel Path: ?x (foaf:knows || ^rdfs:seeAlso) + ?y
  * Check Loop: pf.setCheckLoop(true) => exp+ exp{n,m} without loop
  * exec.setPathLoop(false) pragma {kg:path kg:loop false}
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
- * @thanx Corentin Follenfant for the idea of property weight into the regex
+ * @ thanx Corentin Follenfant for the idea of property weight into the regex
  *
  ********************************************************
  */
@@ -57,13 +57,12 @@ public class PathFinder {
     // synchronized buffer between this and projection
     private Buffer mbuffer;
     private Environment memory;
-    private EventManager manager;
     private ResultListener listener;
     private Eval kgram;
-    private Producer producer;
-    private Matcher matcher;
-    private Evaluator evaluator;
-    private Query query;
+    private final Producer producer;
+    private final Matcher matcher;
+    private final Evaluator evaluator;
+    private final Query query;
     private Mappings lMap;
     HashMap<Integer, Mappings> store;
     private Filter filter;
@@ -93,10 +92,11 @@ public class PathFinder {
     private boolean isCountPath = false;
     private boolean isCache = false;
     private final boolean trace = true;
-    private int maxLength = Integer.MAX_VALUE,
-            min = 0, max = maxLength,
-            userMin = -1,
-            userMax = -1;
+    private final int maxLength = Integer.MAX_VALUE;
+    private int min = 0;
+    private int max = maxLength;
+    private int userMin = -1;
+    private int userMax = -1;
     private final int count = 0;
     private Regex regexp1, regexp;
     // depth or width first 
@@ -132,7 +132,7 @@ public class PathFinder {
         matcher = match;
         evaluator = eval;
         lMap = new Mappings();
-        store = new HashMap<Integer, Mappings>();
+        store = new HashMap<>();
     }
 
     public static PathFinder create(Producer p, Matcher match, Evaluator eval, Query q) {
@@ -151,7 +151,6 @@ public class PathFinder {
      
 
     public void set(EventManager man) {
-        manager = man;
     }
 
     public void set(ResultListener rl) {
@@ -217,7 +216,7 @@ public class PathFinder {
     boolean match(Edge edge, List<String> lVar, int index) {
         return lVar.size() == 1
                 && edge.getNode(index).isVariable()
-                && edge.getNode(index).getLabel().equals(lVar.get(0));
+                && edge.getNode(index).getLabel().equals(lVar.getFirst());
     }
 
     /**
@@ -324,7 +323,7 @@ public class PathFinder {
         // buffer store path enumeration
         mbuffer = new Buffer();
         // path enumeration in a thread 
-        path = new GraphPath(this, mem, mbuffer);
+        path = new GraphPath(this, mem);
         // launch path computing (one by one) eg launch process() below
         path.start();
     }
@@ -601,8 +600,7 @@ public class PathFinder {
 
     /**
      * exp
-     *
-     * @{?this rdf:type c:Person}
+     * @ {?this rdf:type c:Person}
      */
     boolean test(Filter filter, Path path, Node qNode, Node node) {
         mem.push(qNode, node);
@@ -680,7 +678,7 @@ public class PathFinder {
                 // this is a parallel path check, path is finished: stop it
                 if (start.match(stack.getTarget())) {
                     // it is successful 
-                    stack.setSuccess(true);
+                    stack.setSuccess();
                 }
                 return;
             }
@@ -791,7 +789,7 @@ public class PathFinder {
 
                         if (isNew) {
                             // clean the table of visited nodes as we have a new start node
-                            visit.start(node);
+                            visit.start();
                         }
 
                         // visit start node
@@ -838,8 +836,8 @@ public class PathFinder {
                     if (suc) {
                         eval(stack, path, rel.getNode(oo), src);
                     }
-                    
-                    path.remove(ent, eweight);
+
+                    path.remove(eweight);
 
                     if (hasHandler) {
                         handler.leave(ent, exp, size);

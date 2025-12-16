@@ -4,10 +4,7 @@ import fr.inria.corese.core.next.kgram.api.core.Expr;
 import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.api.query.Environment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Data structure: Key -> (node -> Value)
@@ -153,15 +150,14 @@ public class ApproximateSearchEnv {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == null) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
                 return false;
             }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final Key other = (Key) obj;
-            return this.var == other.var || (this.var != null && this.var.equals(other.var));
-            //only that var is equal is ok
+            Key other = (Key) obj;
+            return Objects.equals(this.var, other.var);
         }
 
         @Override

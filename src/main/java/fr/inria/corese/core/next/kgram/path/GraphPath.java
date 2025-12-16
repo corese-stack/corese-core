@@ -26,10 +26,9 @@ public class GraphPath extends Thread {
 	 * 
 	 */
 	
-	public GraphPath(PathFinder pc, Environment mem, Buffer buf){
+	public GraphPath(PathFinder pc, Environment mem){
 		this.finder  = pc;
 		this.mem = mem;
-        //private Buffer buf;
     }
 	
 	void process(){

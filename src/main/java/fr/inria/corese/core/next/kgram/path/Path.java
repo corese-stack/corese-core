@@ -15,17 +15,15 @@ import java.util.List;
 import static fr.inria.corese.core.next.kgram.api.core.PointerType.PATH;
 
 /**
- *
  * List of relations between two resources found by path Can be used as a
  * Producer to enumerate path edges/nodes
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
- *
  */
-public class Path extends ProducerDefault implements Pointerable {
+public class Path extends ProducerDefault implements Pointerable<Edge> {
 
-    boolean isShort = false,
-            isReverse = false;
+    boolean isShort = false;
+    boolean isReverse = false;
     int max = Integer.MAX_VALUE;
     int weight = 0;
     ArrayList<Edge> path;
@@ -49,18 +47,17 @@ public class Path extends ProducerDefault implements Pointerable {
         return path;
     }
 
-
     @Override
     public String getDatatypeLabel() {
         if (path.size() == 1) {
-            return String.format("(1)[%s]", path.get(0));
+            return String.format("(1)[%s]", path.getFirst());
         }
         if (path.size() > 1) {
-            return String.format("(%s)[%s ...]", path.size(), path.get(0));
+            return String.format("(%s)[%s ...]", path.size(), path.getFirst());
         }
         return "(0)[]";
     }
-    
+
     @Override
     public PointerType pointerType() {
         return PATH;
@@ -91,13 +88,13 @@ public class Path extends ProducerDefault implements Pointerable {
         weight += w;
     }
 
-    public void remove(Edge ent, int w) {
-        path.remove(path.size() - 1);
+    public void remove(int w) {
+        path.removeLast();
         weight -= w;
     }
 
     public void remove() {
-        path.remove(path.size() - 1);
+        path.removeLast();
     }
 
     // after reverse path
@@ -113,19 +110,13 @@ public class Path extends ProducerDefault implements Pointerable {
     // edge may be EdgeInv in case of ^p
     // firstNode is the SPARQL binding of subject node
     public Node firstNode() {
-        int fst = 0;
-        if (isReverse) {
-            fst = size() - 1;
-        }
+        int fst = isReverse ? size() - 1 : 0;
         return get(fst).getNode(0);
     }
 
     // lastNode is the SPARQL binding of object node
     public Node lastNode() {
-        int lst = size() - 1;
-        if (isReverse) {
-            lst = 0;
-        }
+        int lst = isReverse ? 0 : size() - 1;
         return get(lst).getNode(1);
     }
 
@@ -170,7 +161,7 @@ public class Path extends ProducerDefault implements Pointerable {
             // when r is reverse, add real target relation
             if (ent instanceof EdgeInv) {
                 ent = ((EdgeInv) ent).getEdgeEntity();
-            } 
+            }
             path.add(p.copy(ent));
         }
         path.setWeight(weight);
@@ -194,7 +185,6 @@ public class Path extends ProducerDefault implements Pointerable {
         weight = w;
     }
 
-
     public Path reverse() {
         for (int i = 0; i < length() / 2; i++) {
             Edge tmp = path.get(i);
@@ -203,21 +193,18 @@ public class Path extends ProducerDefault implements Pointerable {
         }
         return this;
     }
-    
-
-    
 
     @Override
     public String toString() {
-        String str = "path[" + path.size() + "]{";
+        StringBuilder str = new StringBuilder("path[" + path.size() + "]{");
         if (path.size() > 1) {
-            str += "\n";
+            str.append("\n");
         }
         for (Edge edge : path) {
-            str += edge + "\n";
+            str.append(edge).append("\n");
         }
-        str += "}";
-        return str;
+        str.append("}");
+        return str.toString();
     }
 
     @Override
@@ -226,13 +213,12 @@ public class Path extends ProducerDefault implements Pointerable {
     }
 
     @Override
-    public Iterable getLoop() {
+    public Iterable<Edge> getLoop() {
         return path;
     }
-    
+
     @Override
-    public Edge getValue(String var, int n){
+    public Edge getValue(String var, int n) {
         return path.get(n);
     }
-    
 }

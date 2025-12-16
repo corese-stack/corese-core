@@ -27,25 +27,6 @@ public class Merge extends Group {
 	
 	public static class ListMappings extends ArrayList <Mappings> {
 
-	/*
-	 * Find the index of map in list by dichotomy
-	 */
-//	int find(Mapping map, int first, int last){
-//		if (first >= last) {
-//			return first;
-//		}
-//		else {
-//			int mid = (first + last) / 2;
-//			Mapping fmap = get(mid).get(0);
-//			int res = comparator(map, fmap);
-//			if (res <= 0) {
-//				return find(map, first, mid);
-//			}
-//			else {
-//				return find(map, mid+1, last);
-//			}
-//		}
-//	}
 
 }
 
