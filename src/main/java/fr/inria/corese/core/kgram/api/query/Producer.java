@@ -185,7 +185,6 @@ public interface Producer {
     // cast java value into IDatatype value
     IDatatype getValue(Object value);
 
-    // DatatypeValue from IDatatype or from Java value
     IDatatype getDatatypeValue(Object value);
 
     /**

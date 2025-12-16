@@ -13,19 +13,14 @@ import static fr.inria.corese.core.next.kgram.api.core.ExpType.Type;
 /**
  * An implementation for sorting the triple pattern depth-first &amp; best greedy
  * algorithm
- *
  * 1 start with the one with least cost, if there are more than 2 with same cost
  * then choose the one with more edges, if still the same, then just pick one
- *
  * 2 search next node by considering all the adjacent nodes of the visited nodes
- *
  * 3 recursively search until all nodes have been visited
- *
  * 4 every time one node is added to visited, check FILTER &amp; VALUES
  * ++ 4.1 now also check BIND 20Jan2015
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 23 Oct. 2014
  */
 public class DepthFirstBestSearch implements ISort {
 
@@ -33,9 +28,9 @@ public class DepthFirstBestSearch implements ISort {
     private QPGraph g = null;
 
     public DepthFirstBestSearch() {
-        this.visited = new ArrayList<QPGNode>();
-        this.notVisited = new ArrayList<QPGNode>();
-        this.binds = new ArrayList<QPGNode>();
+        this.visited = new ArrayList<>();
+        this.notVisited = new ArrayList<>();
+        this.binds = new ArrayList<>();
     }
 
     @Override
@@ -49,7 +44,7 @@ public class DepthFirstBestSearch implements ISort {
 
         //each loop is a sub graph
         while (!notVisited.isEmpty()) {
-            Map<QPGNode, Double> nextNodesPool = new LinkedHashMap<QPGNode, Double>();
+            Map<QPGNode, Double> nextNodesPool = new LinkedHashMap<>();
             QPGNode first = findFirst(notVisited, nextNodesPool);
             route(first, nextNodesPool);
         }
@@ -79,7 +74,7 @@ public class DepthFirstBestSearch implements ISort {
     private QPGNode findFirst(List<QPGNode> lNodes, Map<QPGNode, Double> pool) {
         if (lNodes == null || lNodes.isEmpty()) return null;
 
-        QPGNode minNode = lNodes.get(0);
+        QPGNode minNode = lNodes.getFirst();
         for (QPGNode node : lNodes) {
             double cost = node.getCost();
             if (cost == IEstimate.NA_COST) continue;
@@ -219,10 +214,6 @@ public class DepthFirstBestSearch implements ISort {
 
     /**
      * Check if the first list has same nodes with the other two lists of nodes
-     * @param list
-     * @param notVisited
-     * @param binds
-     * @return 
      */
     private boolean intersect(List<QPGNode> list, List<QPGNode> notVisited, List<QPGNode> binds) {
         for (QPGNode q : list) {

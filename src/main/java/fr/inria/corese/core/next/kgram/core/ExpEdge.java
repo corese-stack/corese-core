@@ -44,12 +44,8 @@ public class ExpEdge extends Exp {
         if (list.isEmpty()) {
             return null;
         }
-        return list.get(0);
+        return list.getFirst();
     }
-    
-    public List<Filter> getFilters(int node) {
-        return getFilters(node, ExprType.JOKER);
-    }  
     
     /**
      * node: subject|predicate|object

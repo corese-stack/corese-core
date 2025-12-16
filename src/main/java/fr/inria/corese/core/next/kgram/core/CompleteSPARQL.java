@@ -38,7 +38,6 @@ public class CompleteSPARQL {
      * select (exp as var)
      * group by, order by
      *
-     * @param map
      */
     void complete(Producer p, Mappings map) throws SparqlException {
         selectExpression(query, p, map);
@@ -48,17 +47,15 @@ public class CompleteSPARQL {
 
     void distinct(Query q, Mappings map) {
         if (q.isAggregate() || !map.isDistinct()) {
-            // do nothing
-        } else {
-            ArrayList<Mapping> list = new ArrayList<>(map.size());
-            list.addAll(map.getList());
-            map.getList().clear();
-            for (Mapping m : list) {
-                map.submit(m);
-            }
+            return;
         }
-    }
 
+        new ArrayList<>(map.getList()).forEach(m -> {
+            map.getList().clear();
+            map.submit(m);
+        });
+    }
+    @SuppressWarnings("UnusedReturnValue")
     Mappings selectExpression(Query q, Producer p, Mappings map) throws SparqlException {
         if (query.isSelectExpression()) {
             HashMap<String, IDatatype> bnode = new HashMap<>();
@@ -68,7 +65,7 @@ public class CompleteSPARQL {
                 m.setQuery(q);
                 Mapping res = selectExpression(q, p, m);
                 if (res == null) {
-                    logger.warn("Select: exp != var value: " + m);
+                    logger.warn("Select: exp != var value: {}", m);
                 }
             }
         }

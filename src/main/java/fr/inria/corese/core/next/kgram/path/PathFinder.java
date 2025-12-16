@@ -16,44 +16,30 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * ********************************************************
- *
  * ?x rdf:resf * /rdf:first
- *
  * write paths in a synchronized buffer
- *
  * ?x ^(p/q) ?y ::= ?y p/q ?x -> ?x inv(q)/inv(p) ?y
- *
- *
  * ?x p/q uri path is computed backward from uri to ?x with index=1 other=0
  * isReverse=true sequence is eval as q/p, all other exp are the same
- *
- *
  * ?x ^(p/q) uri ::= uri p/q ?x -> ?x inv(q)/inv(p) uri
- *
  * PP Extensions
- *
  * Path Variable: ?x exp :: $path ?y
- *
  * Path Length: pathLength($path)
- *
  * Path Enumeration: ?x exp :: $path ?y graph $path {?a ?p ?b}
- *
  * Shortest path: ?x distinct short exp ?y ; ?x short exp ?y -- TODO: complete
  * short to get only shortest
- *
  * Path weight: ?x (rdf:first@2 / rdf:rest@1* / ^rdf:first@2) * ?y
- *
  * Constaint: ?x exp
  * @{?this a foaf:Person} ?y ?x exp
  * @[a foaf:Person] ?y
- *
  * Parallel Path: ?x (foaf:knows || ^rdfs:seeAlso) + ?y
- *
- *
  * Check Loop: pf.setCheckLoop(true) => exp+ exp{n,m} without loop
  * exec.setPathLoop(false) pragma {kg:path kg:loop false}
  *
@@ -91,12 +77,11 @@ public class PathFinder {
     // the inverse of the index (i.e. the other arg)
     private int other;
     private boolean isStop = false;
-    private boolean hasEvent = false;
     private boolean hasListener = false;
     private boolean// true if breadth first (else depth first)
             isBreadth;
-    private boolean isDistinct = !true;
-    private boolean defaultBreadth = !true;
+    private boolean isDistinct = false;
+    private boolean defaultBreadth = false;
     private boolean// true if accept subproperty in regexp
             isSubProperty;
     private boolean isReverse;
@@ -106,7 +91,7 @@ public class PathFinder {
             isList = false;
     private boolean checkLoop = false;
     private boolean isCountPath = false;
-    private boolean isCache = !true;
+    private boolean isCache = false;
     private final boolean trace = true;
     private int maxLength = Integer.MAX_VALUE,
             min = 0, max = maxLength,
@@ -116,23 +101,9 @@ public class PathFinder {
     private Regex regexp1, regexp;
     // depth or width first 
     private String mode = "";
-    private final static String DISTINCT = "distinct";
-    private final static String DEPTH = "d";
-    private final static String BREADTH = "b";
-    private final static String PROPERTY = "p";
-    // heuristic to eliminate path of length > path already found to *same* target
-    private final static String SHORT = "s";
-    // very short: eliminate any path >= best current path ('vs' = previous 's') to *any* target
-    private final static String ALL = "a";
-    public final static String INVERSE = "i";
+
     private boolean isStorePath = true;
 
-    /**
-     * @return the isStorePath
-     */
-    public boolean isStorePath() {
-        return isStorePath;
-    }
 
     /**
      * @param isStorePath the isStorePath to set
@@ -153,25 +124,6 @@ public class PathFinder {
      */
     public void setCache(boolean isCache) {
         this.isCache = isCache;
-    }
-
-    class ITable extends Hashtable<Node, Integer> {
-
-        void setDistance(Node c, int i) {
-            put(c, i); //adistance[i]);
-        }
-
-        int getDistance(Node c) {
-            Integer i = get(c);
-            if (i == null) {
-                return -1;
-            } else {
-                return i;
-            }
-        }
-    }
-
-    public PathFinder() {
     }
 
     public PathFinder(Producer p, Matcher match, Evaluator eval, Query q) {
@@ -197,13 +149,9 @@ public class PathFinder {
         kgram = ev;
     }
      
-    public void setDefaultBreadth(boolean b) {
-        defaultBreadth = b;
-    }
 
     public void set(EventManager man) {
         manager = man;
-        hasEvent = true;
     }
 
     public void set(ResultListener rl) {
@@ -309,10 +257,6 @@ public class PathFinder {
         return n;
     }
 
-    void setPathLength(int n) {
-        maxLength = n;
-    }
-
     /**
      * Enumerate all path, return a list of path 50% faster that thread but
      * enumerate *all* path
@@ -340,8 +284,7 @@ public class PathFinder {
      */
     Mappings getMappings(Node cstart) {
         if (isCache() && cstart != null) {
-            Mappings map = store.get(cstart.getIndex());
-            return map;
+            return store.get(cstart.getIndex());
         }
         return null;
     }
@@ -395,11 +338,6 @@ public class PathFinder {
         isStop = true;
     }
 
-    public void interrupt() {
-        if (path != null) {
-            path.interrupt();
-        }
-    }
 
     /**
      * init at creation time, no need to change. pmax comes from pathLength() &lt;=
@@ -478,8 +416,7 @@ public class PathFinder {
             return null;
         }
         Node qc = edge.getNode(i);
-        Node node = memory.getNode(qc);
-        return node;
+        return memory.getNode(qc);
     }
 
     void process(Node cstart, Environment memory) {
@@ -581,7 +518,7 @@ public class PathFinder {
      */
     Node getPathNode(Path p) {
         Filter f = query.getGlobalFilter(Query.PATHNODE);
-        Node node = null;
+        Node node;
         try {
             //node = evaluator.eval(f, memory, producer);
             node = (Node) f.getExp().evalWE(evaluator, memory.getBind(), memory, producer);
@@ -635,7 +572,7 @@ public class PathFinder {
 
         final Iterator<Node> it = iter.iterator();
 
-        return () -> new Iterator<Node>() {
+        return () -> new Iterator<>() {
             @Override
             public boolean hasNext() {
                 return it.hasNext();
@@ -678,8 +615,6 @@ public class PathFinder {
         }
         boolean test = true;
         try {
-           // test = evaluator.test(filter, mem);
-            //test = evaluator.test(filter, mem, producer);
             test = filter.getExp().test(evaluator, mem.getBind(), mem, producer);
         } catch (EngineException ex) {
             test = false;
@@ -706,7 +641,7 @@ public class PathFinder {
         return test;
     }
 
-    /**
+    /*
      * *******************************************************************************
      *
      * New version interprets regex directly with a stack
@@ -722,8 +657,8 @@ public class PathFinder {
         try {
             eval(stack, path, start, src);
         } catch (StackOverflowError e) {
-            logger.error("** Property Path Size: " + path.size());
-            logger.error("** Property Path Error: \n" + e);
+            logger.error("** Property Path Size: {}", path.size());
+            logger.error("** Property Path Error: \n{}", String.valueOf(e));
         }
     }
 
@@ -822,9 +757,6 @@ public class PathFinder {
                     if (ent == null) {
                         continue;
                     }
-
-                    //cedge++;
-                    //trace(ent);
 
                     Edge rel = ent;
                     Node node = rel.getNode(ii);
@@ -981,7 +913,6 @@ public class PathFinder {
                 // additional statement to perform checking after
                 // a standard operation occurs
 
-                Node target = start;
                 Regex test = exp.getArg(0);
 
                 switch (test.retype()) {
@@ -995,7 +926,7 @@ public class PathFinder {
                         Record st = new Record(Visit.create(isReverse, isCountPath));
                         // push e2
                         st.push(test.getArg(1));
-                        st.setTarget(target);
+                        st.setTarget(start);
                         // retrieve the common start of path e1 and e2
                         Node prev = stack.getStart();
 
@@ -1014,7 +945,7 @@ public class PathFinder {
                         // check that target has not already been reached by option
                         // because sparql 1.1 option is not counting 
 
-                        if (stack.getVisit().nloop(test, target)) {
+                        if (stack.getVisit().nloop(test, start)) {
                             // target already reached: 
                             // do nothing and backtrack
                         } else {
@@ -1079,20 +1010,6 @@ public class PathFinder {
 
     }
 
-    Regex test(Regex exp) {
-
-        return exp;
-    }
-
-    int reverse(int i) {
-        switch (i) {
-            case 0:
-                return 1;
-            case 1:
-                return 0;
-        }
-        return 0;
-    }
 
     boolean isDistinct(Record stack, Node start, Node target) {
         boolean b = stack.getVisit().isDistinct(start, target);
@@ -1229,7 +1146,6 @@ public class PathFinder {
      * Distinguish 1. first execution where index(exp+) = 0  and 2. next executions where index(exp+) = 1
      * 1.    stack := (exp, exp+, rest) ; eval(stack)
      * 2. a) stack = (rest) ; eval(stack) b) stack := (exp, exp+, rest) ; eval(stack)
-     * 
      * In addition there are two cases whether start node is bound or not
      * If start is bound, OK
      * If start is not bound, it will be bound by case LABEL: above
@@ -1299,10 +1215,6 @@ public class PathFinder {
 
             //
             visit.nremove(exp, start);
-        }
-
-        if (isFirst) {
-            //visit.nunset(exp); // @todo
         }
 
     }
@@ -1381,10 +1293,6 @@ public class PathFinder {
             }
         }
 
-    }
-
-    Regex star(Regex exp) {
-        return exp;
     }
 
     boolean hasMax(Regex exp) {

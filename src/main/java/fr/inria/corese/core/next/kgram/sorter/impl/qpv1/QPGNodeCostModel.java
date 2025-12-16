@@ -19,7 +19,6 @@ import static fr.inria.corese.core.kgram.sorter.core.IEstimate.MIN_COST_0;
  * Class for constructing the pattern of a triple, including many parameters
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 25 juin 2014 new
  */
 public class QPGNodeCostModel extends AbstractCostModel {
 
@@ -30,7 +29,7 @@ public class QPGNodeCostModel extends AbstractCostModel {
     private final static int S = 0, P = 1, O = 2, G = 3, FF = 4, FV = 5;
     private final static int PARAMETER_LEN = 6;
     //list of vairables appeared in the expression
-    List<String> variables = new ArrayList<String>();
+    List<String> variables = new ArrayList<>();
     private final int[] pattern = new int[PARAMETER_LEN];
 
     private final QPGNode node;
@@ -94,7 +93,6 @@ public class QPGNodeCostModel extends AbstractCostModel {
      * Set the paramters other than basic paremeters, only can be set after
      * construction of the whole basic pattern graph
      *
-     * @param graph
      */
     public void setParameters(QPGraph graph) {
         this.setFilterNumber(graph);
@@ -110,7 +108,7 @@ public class QPGNodeCostModel extends AbstractCostModel {
         int noOfFilter = 0, noOfVariable = 0;
 
         //1 get all variables in all filters
-        List<String> variablesInFilters = new ArrayList<String>();
+        List<String> variablesInFilters = new ArrayList<>();
 
         //**2 check triple pattern has how many filters FF
         for (QPGNode n : nodes) {
@@ -148,8 +146,6 @@ public class QPGNodeCostModel extends AbstractCostModel {
     /**
      * Find match by using triple patterns list
      *
-     * @param basicPatterns
-     * @return
      */
     public final int match(int[][] basicPatterns) {
         for (int i = 0; i < basicPatterns.length; i++) {
@@ -169,12 +165,11 @@ public class QPGNodeCostModel extends AbstractCostModel {
     /**
      * Sort a list of triple patterns according to predefined rules
      *
-     * @param patterns
      * @param bp basic patterns
      * @param ip interface producer
      */
     public static void sort(List<QPGNodeCostModel> patterns, final int[][] bp, final IProducerQP ip) {
-        Collections.sort(patterns, new Comparator<QPGNodeCostModel>() {
+        Collections.sort(patterns, new Comparator<>() {
 
             @Override
             public int compare(QPGNodeCostModel m1, QPGNodeCostModel m2) {
@@ -226,13 +221,13 @@ public class QPGNodeCostModel extends AbstractCostModel {
 
     @Override
     public String toString() {
-        String s = "model [";
+        StringBuilder s = new StringBuilder("model [");
         for (int i = 0; i < this.pattern.length; i++) {
-            s += this.pattern[i] + ", ";
+            s.append(this.pattern[i]).append(", ");
         }
 
-        s += node.getCost() + "] ";
-        return s;
+        s.append(node.getCost()).append("] ");
+        return s.toString();
     }
 
     public boolean isBound(List<Exp> bindings, Node var) {

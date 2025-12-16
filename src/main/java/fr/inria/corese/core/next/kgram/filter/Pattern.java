@@ -12,7 +12,6 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,15 +30,11 @@ public class Pattern implements ExprType, Expr {
     List<Expr> args;
 	Expr exp;
 
-	Pattern(){
-		type = JOKER;
-		oper = JOKER;
-	}
 
 	Pattern(int t){
 		type = t;
 		oper = JOKER;
-		args = new ArrayList<Expr>();
+		args = new ArrayList<>();
 		}
 	
 	Pattern(int t, int o){
@@ -56,11 +51,7 @@ public class Pattern implements ExprType, Expr {
 		this(t, o, e1);
 		add(e2);
 	}
-	
-	Pattern(int t, int o, int e1){
-		this(t, o);
-		add(new Pattern(e1));
-	}
+
 	
 	public Pattern(int t, int o, int e1, int e2){
 		this(t, o);
@@ -75,43 +66,8 @@ public class Pattern implements ExprType, Expr {
 	}
 	
 	static Pattern constant(){
-		Pattern p = new Pattern(CONSTANT);
-		return p;
+		return new Pattern(CONSTANT);
 	}
-	
-	
-	Pattern pat(int type){
-		return new Pattern(type);
-	}
-	
-	Pattern pat(int type, int ope, Pattern e1){
-		return new Pattern(type, ope, e1);
-	}
-	
-	Pattern pat(int type, int ope, Pattern e1, Pattern e2){
-		return new Pattern(type, ope, e1, e2);
-	}
-	
-	Pattern not(Pattern e){
-		return pat(BOOLEAN, NOT, e);
-	}
-	
-	Pattern and(Pattern e1, Pattern e2){
-		return pat(BOOLEAN, AND, e1, e2);
-	}
-	
-	Pattern or(Pattern e1, Pattern e2){
-		return pat(BOOLEAN, OR, e1, e2);
-	}
-	
-	Pattern term(int ope, Pattern e1, Pattern e2){
-		return pat(TERM, ope, e1, e2);
-	}
-	
-	Pattern fun(int ope, Pattern e1, Pattern e2){
-		return pat(FUNCTION, ope, e1, e2);
-	}
-	
 	
 	
 	void add(Expr exp){
@@ -280,14 +236,7 @@ public class Pattern implements ExprType, Expr {
     @Override
     public void setExp(int i, Expr e) {
     }
-    
-     public void addExp(int i, Expr e) {
-    }
 
-    
-    public void local(Expr var) {
-        
-    }
 
     @Override
     public Expr getDefine() {
@@ -340,16 +289,6 @@ public class Pattern implements ExprType, Expr {
     }
 
     @Override
-    public boolean isTester() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public String getShortName() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public boolean isPublic() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -370,11 +309,6 @@ public class Pattern implements ExprType, Expr {
     }
 
     @Override
-    public void setModality(String mod) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public boolean match(int oper) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -385,27 +319,7 @@ public class Pattern implements ExprType, Expr {
     }
 
     @Override
-    public List<String> getMetadataValues(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int getNbVariable() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public IDatatype[] getArguments(int n) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public boolean hasMetadata(String type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Collection<String> getMetadataList() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

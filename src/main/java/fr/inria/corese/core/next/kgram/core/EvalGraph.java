@@ -19,8 +19,8 @@ public class EvalGraph {
         eval = e;
     }
 
-    void setStop(boolean b) {
-        stop = b;
+    void setStop() {
+        stop = true;
     }
 
     /**
@@ -29,15 +29,11 @@ public class EvalGraph {
      */
     int eval(Producer p, Node gNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException, EngineException {
         int backtrack = n - 1;
-        // current named graph URI/VAR
         Node graphNode = exp.getGraphName();
-        // URI or value of VAR or null if unbound
         Node graph = eval.getNode(p, graphNode);
         Mappings res;
 
         if (graph == null) {
-            // named graph VAR is unbound
-            // iterate named graph list, using from named if any
             res = graphNodes(p, exp, data, n);
         } else {
             res = graph(p, graph, exp, data, n);
@@ -46,6 +42,7 @@ public class EvalGraph {
         if (res == null) {
             return backtrack;
         }
+
         Memory env = eval.getMemory();
 
         for (Mapping m : res) {
@@ -53,33 +50,29 @@ public class EvalGraph {
                 return Eval.STOP;
             }
 
-            Node namedGraph = null;
+            Node namedGraph;
             if (graphNode.isVariable()) {
                 namedGraph = m.getNode(graphNode);
                 if (namedGraph != null && !namedGraph.equals(m.getNamedGraph())) {
-                    // graph ?g { s p o optional { o q ?g }}
-                    // variable ?g bound by exp not equal to named graph variable ?g
                     continue;
                 }
             }
 
-            if (env.push(m, n)) {
-                boolean pop = false;
-                if (env.push(graphNode, m.getNamedGraph())) {
-                    pop = true;
-                } else {
-                    env.pop(m);
-                    continue;
-                }
+            if (!env.push(m, n)) {
+                continue;
+            }
 
-                backtrack = eval.eval(p, gNode, stack, n + 1);
+            if (!env.push(graphNode, m.getNamedGraph())) {
                 env.pop(m);
-                if (pop) {
-                    env.pop(graphNode);
-                }
-                if (backtrack < n) {
-                    return backtrack;
-                }
+                continue;
+            }
+
+            backtrack = eval.eval(p, gNode, stack, n + 1);
+            env.pop(graphNode);
+            env.pop(m);
+
+            if (backtrack < n) {
+                return backtrack;
             }
         }
 
@@ -129,6 +122,7 @@ public class EvalGraph {
      * Node graph: graph URI or Node graph pointer or Node path pointer
      * Exp exp: graph name { BGP }
      */
+    @SuppressWarnings("unused")
     private Mappings graph(Producer p, Node graph, Exp exp, Mappings map, int n) throws SparqlException, EngineException {
         boolean external = false;
         Node graphNode = exp.getGraphName();
@@ -141,7 +135,6 @@ public class EvalGraph {
             external = true;
         }
 
-        Exp main = exp;
         Exp body = exp.rest();
         Mappings res;
         Node varNode = null;
@@ -157,7 +150,7 @@ public class EvalGraph {
         }
 
         if (eval.isFederate(exp)) {
-            res = eval.subEval(np, target, varNode, body, main, map, null, false, external);
+            res = eval.subEval(np, target, varNode, body, exp, map, null, false, external);
         } else {
             Exp ee = body;
             Mappings data = null;
@@ -174,7 +167,7 @@ public class EvalGraph {
                 }
             }
 
-            res = eval.subEval(np, target, varNode, ee, main, data, null, false, external);
+            res = eval.subEval(np, target, varNode, ee, exp, data, null, false, external);
         }
         res.setNamedGraph(graph);
 

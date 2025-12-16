@@ -25,7 +25,6 @@ public interface Environment {
     /**
      * Return current query
      *
-     * @return
      */
     Query getQuery();
 
@@ -51,40 +50,30 @@ public interface Environment {
     /**
      * Return the target node bound to query node with label
      *
-     * @param label
-     * @return
      */
     Node getNode(String label);
 
     /**
      * Return the target node bound to query node with label
      *
-     * @param qNode
-     * @return
      */
     Node getNode(Node qNode);
 
     /**
      * Return the query node at index n
      *
-     * @param n
-     * @return
      */
     Node getQueryNode(int n);
 
     /**
      * Return the query node with label
      *
-     * @param label
-     * @return
-     */
+    */
     Node getQueryNode(String label);
 
     /**
      * Test whether query node is bound
      *
-     * @param qNode
-     * @return
      */
     boolean isBound(Node qNode);
 
@@ -92,15 +81,10 @@ public interface Environment {
     /**
      * Return the path length corresponding to query node
      *
-     * @param qNode
-     * @return
      */
     int pathLength(Node qNode);
 
     Path getPath(Node qNode);
-
-    int pathWeight(Node qNode);
-
 
     // aggregates
 
@@ -112,8 +96,6 @@ public interface Environment {
     int count();
 
     EventManager getEventManager();
-
-    boolean hasEventManager();
 
     Object getObject();
 

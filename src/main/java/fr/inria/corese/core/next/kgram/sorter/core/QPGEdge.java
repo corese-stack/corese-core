@@ -9,7 +9,6 @@ import java.util.List;
  * Basic Query triple Pattern Graph edge used to connect two QPG nodes
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 27 juin 2014
  */
 public class QPGEdge {
 
@@ -18,10 +17,10 @@ public class QPGEdge {
 
     private final QPGNode n1;
     private final QPGNode n2;
-    private AbstractCostModel costModel = null;
+    private final AbstractCostModel costModel;
     private double cost = -1;
     //private boolean directed = false;
-    private List<String> variables = null;
+    private final List<String> variables;
     private int type;
 
     public QPGEdge(QPGNode n1, QPGNode n2) {
@@ -60,8 +59,6 @@ public class QPGEdge {
     /**
      * Get one of the nodes in the edge
      *
-     * @param in
-     * @return
      */
     public QPGNode get(int in) {
         return in == 0 ? n1 : (in == 1 ? n2 : null);
@@ -70,8 +67,6 @@ public class QPGEdge {
     /**
      * Get the other node in the edge
      *
-     * @param n
-     * @return
      */
     public QPGNode get(QPGNode n) {
         return n1.equals(n) ? n2 : n1;
@@ -80,13 +75,12 @@ public class QPGEdge {
     /**
      * Get the two nodes in a list
      *
-     * @return
      */
     public List<QPGNode> getNodes() {
-        List l = new ArrayList();
-        l.add(n1);
-        l.add(n2);
-        return l;
+        List<QPGNode> nodes = new ArrayList<>(2);
+        nodes.add(n1);
+        nodes.add(n2);
+        return nodes;
     }
 
     @Override

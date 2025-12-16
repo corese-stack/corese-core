@@ -18,8 +18,7 @@ public class ResultsImpl implements Results {
 	}
 	
 	public static ResultsImpl create(Mappings ms){
-		ResultsImpl res = new ResultsImpl(ms);
-		return res;
+        return new ResultsImpl(ms);
 	}
 	
 	public List<Node> getSelect() {
@@ -29,7 +28,7 @@ public class ResultsImpl implements Results {
 	public Iterator<Result> iterator() {
 		final Iterator<Mapping> it = maps.iterator();
 		
-		return new Iterator<Result>(){
+		return new Iterator<>(){
 
 			public boolean hasNext() {
 				return it.hasNext();

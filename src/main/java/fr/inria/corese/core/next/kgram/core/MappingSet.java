@@ -34,14 +34,6 @@ public class MappingSet {
     List<String> varList;
     boolean isBound = false;
     private Query query;
-    private Mappings targetMapping;
-
-
-    MappingSet(Query q, Mappings map1, Mappings map2) {
-        set1 = new MappingSet(q, map1);
-        set2 = new MappingSet(q, map2);
-        setQuery(q);
-    }
 
 
     MappingSet(Query q, Exp exp, MappingSet s1, MappingSet s2) {
@@ -61,14 +53,6 @@ public class MappingSet {
 
     Mappings getMappings() {
         return map;
-    }
-
-    List<String> getVarList() {
-        return varList;
-    }
-
-    boolean isBound() {
-        return isBound;
     }
 
     /**
@@ -94,14 +78,13 @@ public class MappingSet {
         return false;
     }
 
-    MappingSet start() {
+    void start() {
         varList = computeVarList();
         isBound = isBound(varList);
 
         if (isBound) {
             set2.getMappings().sort(varList);
         }
-        return this;
     }
 
     @Override
@@ -216,83 +199,6 @@ public class MappingSet {
         }
     }
 
-    /**
-     * @return the targetMapping
-     */
-    public Mappings getJoinMappings() {
-        return targetMapping;
-    }
-
-    /**
-     * @param targetMapping the targetMapping to set
-     */
-    public void setJoinMappings(Mappings targetMapping) {
-        this.targetMapping = targetMapping;
-    }
-
-    /**
-     * exp a Join, Minus, Optional, Union
-     */
-    Exp prepareRest(Exp exp) {
-        Mappings map = prepareMappings(exp);
-        return getRest(exp, map);
-    }
-
-    Exp getRest(Exp exp, Mappings map) {
-        return (map == null) ? exp.rest() : setMappings(exp, map);
-    }
-
-    /**
-     * Process intermediate Mappings
-     * either as parameter of eval(rest, map)
-     * or as values clause inserted in rest
-     * exp is A optional B | A minus B | A join B
-     */
-    Exp setMappings(Exp exp, Mappings map) {
-        setJoinMappings(map);
-        return exp.rest();
-    }
-
-    /**
-     * Process intermediate Mappings
-     * either as parameter of eval(rest, map)
-     * or as values clause inserted in rest
-     * exp is A optional B | A minus B | A join B
-     */
-    Exp setMappings2(Exp exp, Mappings map) {
-        Exp rest = exp.rest();
-        if (exp.isJoin()) {
-            // join is generated to enable us to pass
-            // Mappings map as parameter to right argument
-            // join (A, bgp(B))
-            // join (A, union(B, C))
-            // join (A, graph(B))
-            // join (A, service)
-            setJoinMappings(map);
-        } else if (isFederate() || rest.isEvaluableWithMappings()) {
-            // user case:
-            // A optional rest | A minus rest
-            // and 1) rest recursively starts with service clause
-            // or  2) rest recursively starts with edge/path
-            // --2) special case taken into account in eval and()
-            // eval(rest, map) may take Mappings map argument into account
-            setJoinMappings(map);
-        } else {
-            // inject Mappings map in copy of rest as a values clause
-            // eval(values+rest)
-            // use case: exp = optional, minus
-            rest = rest.complete(map);
-        }
-        return rest;
-    }
-
-    boolean isFederate() {
-        return getQuery().getGlobalQuery().isFederate();
-    }
-
-    Mappings prepareMappings(Exp exp) {
-        return prepareMappingsRest(exp.rest());
-    }
 
     /**
      * in-scope variables in exp except bind except those that are only in

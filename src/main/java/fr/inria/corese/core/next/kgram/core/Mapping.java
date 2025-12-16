@@ -8,8 +8,6 @@ import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.next.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.next.kgram.tool.EnvironmentImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.api.IDatatypeList;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
@@ -107,28 +105,6 @@ public class Mapping
         return new Mapping(qnodes, nodes);
     }
 
-    public static Mapping safeCreate(Node[] qnodes, Node[] nodes) {
-        for (Node node : nodes) {
-            if (node == null) {
-                return cleanCreate(qnodes, nodes);
-            }
-        }
-        return simpleCreate(qnodes, nodes);
-    }
-
-    static Mapping cleanCreate(Node[] qnodes, Node[] nodes) {
-        ArrayList<Node> query = new ArrayList<>();
-        ArrayList<Node> value = new ArrayList<>();
-        int i = 0;
-        for (Node node : nodes) {
-            if (node != null) {
-                query.add(qnodes[i]);
-                value.add(nodes[i]);
-            }
-            i++;
-        }
-        return create(query, value);
-    }
 
     public static Mapping create(Node qnode, Node node) {
         Node[] qnodes = new Node[1];
@@ -256,9 +232,6 @@ public class Mapping
         init(lqNodes, ltNodes);
     }
 
-    public void dispose() {
-        setMappings(null);
-    }
 
     @Override
     public Mappings getMappings() {
@@ -334,7 +307,7 @@ public class Mapping
         if (node == null) {
             return null;
         }
-        return (fr.inria.corese.core.next.kgram.path.Path) node.getPath();
+        return node.getPath();
     }
 
     public Path getPath(String name) {
@@ -368,14 +341,6 @@ public class Mapping
         return path.length();
     }
 
-    @Override
-    public int pathWeight(Node qNode) {
-        Path path = getPath(qNode);
-        if (path == null) {
-            return -1;
-        }
-        return path.weight();
-    }
 
     boolean isPath(int n) {
         return getPath(n) != null;
@@ -404,11 +369,6 @@ public class Mapping
 
     @Override
     public Object getObject() {
-        return this;
-    }
-
-    @Override
-    public Object getPointerObject() {
         return this;
     }
 
@@ -488,13 +448,6 @@ public class Mapping
         }
     }
 
-    /**
-     * min(?l, groupBy(?x, ?y)) retrieve value of ?x ?y in an array
-     */
-    Node getGroupNode(int n) {
-        return getGroupAlter()[n];
-    }
-
     Node[] getGroupNodes() {
         return getGroupAlter();
     }
@@ -505,10 +458,6 @@ public class Mapping
 
     public Node[] getDistinct() {
         return getDistinctNodes();
-    }
-
-    public Node getTNode(Node node) {
-        return getNode(node);
     }
 
     public Node getGroupBy(int n) {
@@ -597,10 +546,6 @@ public class Mapping
         getOrderByNodes()[n] = node;
     }
 
-    public void setGroupBy(int n, Node node) {
-        getGroupByNodes()[n] = node;
-    }
-
     public Node getNode(int n) {
         return getTargetNodes()[n];
     }
@@ -623,10 +568,6 @@ public class Mapping
             return null;
         }
         return node.getNodeObject();
-    }
-
-    public Map<String, Node> getNodeValues() {
-        return values;
     }
 
     // variable name only
@@ -699,17 +640,6 @@ public class Mapping
         return null;
     }
 
-    Node getNodeBasic(String label) {
-        int n = 0;
-        for (Node qnode : getQueryNodes()) {
-            if (qnode.getLabel().equals(label)) {
-                return getTargetNodes()[n];
-            }
-            n++;
-        }
-        return null;
-    }
-
     /**
      * Use case:
      * let (((?var, ?val)) = ?m)
@@ -739,7 +669,6 @@ public class Mapping
     /**
      * List of variable binding
      *
-     * @return
      */
     @Override
     public Iterable<List<IDatatype>> getLoop() {
@@ -761,13 +690,6 @@ public class Mapping
         return list;
     }
 
-    public IDatatype getDatatypeList() {
-        IDatatypeList dt = DatatypeMap.newList();
-        for (List<IDatatype> list : getList()) {
-            dt.add(DatatypeMap.newList(list));
-        }
-        return dt;
-    }
 
     @Override
     public Node[] getQueryNodes() {
@@ -841,12 +763,7 @@ public class Mapping
         for (String varString : varList) {
             Node val1 = getNodeValue(varString);
             Node val2 = map.getNodeValue(varString);
-            if (val1 == null || val2 == null) {
-                // do nothing as if variable were not in Mapping
-                // use case: select count(*) as ?c
-                // ?c is in QueryNodes but has no value
-                // use case: minus {option{}}
-            } else if (val1.match(val2)) {
+            if (val1.match(val2)) {
                 success = true;
             } else {
                 return false;
@@ -893,12 +810,7 @@ public class Mapping
             if (node.isVariable()) {
                 Node val1 = getNodeValue(node);
                 Node val2 = map.getNodeValue(node);
-                if (val1 == null || val2 == null) {
-                    // do nothing as if variable were not in Mapping
-                    // use case: select count(*) as ?c
-                    // ?c is in QueryNodes but has no value
-                    // use case: minus {option{}}
-                } else if (!val1.match(val2)) { // was same
+                if (!val1.match(val2)) { // was same
                     return false;
                 } else {
                     sameVarValue = true;
@@ -916,12 +828,7 @@ public class Mapping
                 if (node2 != null) {
                     Node val1 = getNodeValue(node1);
                     Node val2 = map.getNodeValue(node2);
-                    if (val1 == null || val2 == null) {
-                        // do nothing as if variable were not in Mapping
-                        // use case: select count(*) as ?c
-                        // ?c is in QueryNodes but has no value
-                        // use case: minus {option{}}
-                    } else if (!val1.match(val2)) { // was same
+                    if (!val1.match(val2)) { // was same
                         return false;
                     } else {
                         sameVarValue = true;
@@ -1084,37 +991,6 @@ public class Mapping
         return new Mapping(q, t);
     }
 
-    Mapping rename(List<Exp> lExp) {
-        if (getSelect() != null) {
-            rename(lExp, getSelect());
-        }
-        rename(lExp, getQueryNodes());
-        return this;
-    }
-
-    Node[] rename(List<Exp> lExp, Node[] qNodes) {
-        int i = 0;
-        for (Node node : qNodes) {
-            Node tNode = get(lExp, node);
-            if (tNode != null) {
-                qNodes[i] = tNode;
-            }
-            i++;
-        }
-        return qNodes;
-    }
-
-    Node get(List<Exp> lExp, Node node) {
-        for (Exp exp : lExp) {
-            Filter f = exp.getFilter();
-            if (f != null
-                    && f.getExp().type() == ExprType.VARIABLE
-                    && f.getExp().getLabel().equals(node.getLabel())) {
-                return exp.getNode();
-            }
-        }
-        return null;
-    }
 
     /**
      * Share one target node (independently of query node)
@@ -1182,14 +1058,10 @@ public class Mapping
         return bind != null && bind.hasBind();
     }
 
-    Binding getCreateBind() {
-        return bind;
-    }
-
     @Override
     public Node get(Expr varExpr) {
         if (getBind() == null) {
-            Eval.logger.error("Mapping unbound ldscript variable: " + varExpr);
+            Eval.logger.error("Mapping unbound ldscript variable: {}", varExpr);
             return null;
         }
         return (Node) getBind().get((fr.inria.corese.core.kgram.api.core.Expr) varExpr);

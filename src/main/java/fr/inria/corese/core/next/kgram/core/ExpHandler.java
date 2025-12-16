@@ -11,8 +11,8 @@ import java.util.List;
 public class ExpHandler {
 
     private List<Node> nodeList;
-    private List<Node> selectNodeList;
-    private List<Node> existNodeList;
+    private final List<Node> selectNodeList;
+    private final List<Node> existNodeList;
 
     private boolean inSubScope = false;
     private boolean bind = false;
@@ -26,16 +26,6 @@ public class ExpHandler {
         nodeList = new ArrayList<>();
         selectNodeList = new ArrayList<>();
         existNodeList = new ArrayList<>();
-    }
-
-    public ExpHandler(boolean exist, boolean inSubScope, boolean bind, boolean blank) {
-        this();
-        setExist(exist).setInSubScope(inSubScope).setBind(bind).setBlank(blank);
-    }
-
-    public ExpHandler(boolean exist, boolean inSubScope, boolean bind) {
-        this();
-        setExist(exist).setInSubScope(inSubScope).setBind(bind);
     }
 
     public ExpHandler(boolean inSubScope, boolean bind) {
@@ -89,8 +79,7 @@ public class ExpHandler {
      * <p>
      * lNode = {} lSelNode = {?x, ?y} lExistNode = {?x, ?y}
      * overload select nodes of subquery by exists nodes
-     *
-     * @hint: this code would be useful if nodes ?y and ?y were different
+     * this code would be useful if nodes ?y and ?y were different
      * currently they are the same, hence it is useless
      */
     Node overloadSelectNodeByExistNode(Node node) {
@@ -122,16 +111,9 @@ public class ExpHandler {
         return selectNodeList;
     }
 
-    public void setSelectNodeList(List<Node> selectNodeList) {
-        this.selectNodeList = selectNodeList;
-    }
 
     public List<Node> getExistNodeList() {
         return existNodeList;
-    }
-
-    public void setExistNodeList(List<Node> existNodeList) {
-        this.existNodeList = existNodeList;
     }
 
     public boolean isInSubScope() {

@@ -9,7 +9,6 @@ import static fr.inria.corese.core.kgram.sorter.core.Const.*;
  * of Subject, Predicate and Object Ns, Np and No
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 8 août 2014
  */
 public class BasicPatternGenerator {
 
@@ -18,14 +17,6 @@ public class BasicPatternGenerator {
     private final static int[] default_order = {P, S, O};//p<s<o
     private final static int TRIPLE_LEN = 3, PATTERN_LEN = 8;
 
-    /**
-     * Generate the default basic pattern orders using Np &lt; Ns &lt; No
-     *
-     * @return
-     */
-    public static int[][] generateBasicPattern() {
-        return generateBasicPattern(null, true);
-    }
 
     private static int[] getNumbers(IProducerQP ip) {
         int[] numbers = null;
@@ -46,9 +37,6 @@ public class BasicPatternGenerator {
      * Generate the basic patterns using the numbers of distince subject,
      * predicate and objects
      *
-     * @param producer
-     * @param regen if re-generate the patterns
-     * @return
      */
     public static int[][] generateBasicPattern(IProducerQP producer, boolean regen) {
         if (BASIC_PATTERN != null && !regen) {

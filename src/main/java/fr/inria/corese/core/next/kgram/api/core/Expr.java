@@ -7,7 +7,6 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -34,23 +33,15 @@ public interface Expr {
 
     boolean isDebug();
 
-    boolean isTester();
-
     String getLabel();
 
-    String getShortName();
-
     String getModality();
-
-    void setModality(String mod);
 
     List<Expr> getExpList();
 
     Expr getExp(int i);
 
     void setExp(int i, Expr e);
-
-    void addExp(int i, Expr e);
 
     Expr getArg();
 
@@ -107,14 +98,6 @@ public interface Expr {
     Expr getVariable();
 
     Expr getDefinition();
-
-    int getNbVariable();
-
-    IDatatype[] getArguments(int n);
-
-    List<String> getMetadataValues(String name);
-
-    Collection<String> getMetadataList();
 
     boolean hasMetadata(String name);
 

@@ -280,8 +280,7 @@ public class Pragma {
                 break;
             case LISTEN:
                 if (property.equals(RDFS.RDFTYPE)) {
-                    // kg:listen rdf:type <fr.inria.corese.core.kgram.event.StatListener>
-                    EventListener el = (EventListener) create(object);
+                     EventListener el = (EventListener) create(object);
                     if (el != null) {
                         kgram.addEventListener(el);
                     }

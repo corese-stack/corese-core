@@ -16,9 +16,6 @@ import java.util.List;
  */
 public class QuerySorter implements ExpType {
 
-    private final boolean isSort = true;
-    private final boolean testJoin = false;
-
     private Sorter sort;
     private Query query;
     Compile compiler;
@@ -32,12 +29,10 @@ public class QuerySorter implements ExpType {
     }
     
     void setSort(Query q) {
-        switch (q.getPlanProfile()) {
-            case Query.QP_HEURISTICS_BASED:
-                sort = new SorterNew();
-                break;
-            default:
-                sort = new Sorter();
+        if (q.getPlanProfile() == Query.QP_HEURISTICS_BASED) {
+            sort = new SorterNew();
+        } else {
+            sort = new Sorter();
         }
     }
 
@@ -76,9 +71,6 @@ public class QuerySorter implements ExpType {
     }
 
     /**
-     * ***************************************************
-     */
-    /**
      * Recursively sort edges and filters edges are sorted wrt connection:
      * successive edges share variables if possible In each BGP, filters are
      * inserted at the earliest place where their variables are bound lVar is
@@ -86,6 +78,7 @@ public class QuerySorter implements ExpType {
      */
     Exp compile(Exp exp, VString varList, boolean option) {
         Type type = exp.type();
+        boolean testJoin = false;
         switch (type) {
 
             case EDGE:
@@ -122,9 +115,7 @@ public class QuerySorter implements ExpType {
                 }
 
                // Query planning
-               if (isSort) {
-                   exp = queryPlan(exp, varList);
-               }
+                exp = queryPlan(exp, varList);
 
                 int size = varList.size();
 
@@ -177,7 +168,6 @@ public class QuerySorter implements ExpType {
      * Sort exp statements
      */
     Exp queryPlan(Exp exp, VString lVar) {
-        int num = exp.size();
         // identify remarkable filters such as ?x = <uri>
         // create OPT_BIND(?x = <uri>) store it in FILTER 
         List<Exp> lBind = findBindings(exp);
@@ -261,33 +251,7 @@ public class QuerySorter implements ExpType {
         }
     }
 
-    // put the binding variables to concerned edge
-    void setBind(Exp exp, List<Exp> bindings) {
-        for (Exp bid : bindings) {
-            Node n = bid.get(0).getNode();
-            if (bid.type() == Type.OPT_BIND
-                    // no bind (?x = ?y) in case of JOIN
-                    && (!Query.testJoin || bid.isBindCst())) {
 
-                for (Exp g : exp) {
-                    if (((g.isEdge() || g.isPath()) && g.getEdge().contains(n))
-                            && (!bid.isBindCst() || g.bind(bid.first().getNode()))) {
-                        if (g.getBind() == null) {
-                            bid.status(true);
-                            g.setBind(bid);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    boolean contains(Exp exp, Node n) {
-        if (!exp.isEdge()) {
-            return false;
-        }
-        return exp.getEdge().contains(n);
-    }
 
     void compile(Filter f, VString lVar, boolean opt) {
         compile(f.getExp(), lVar, opt);
@@ -318,9 +282,7 @@ public class QuerySorter implements ExpType {
 
     /**
      * Move filter at place where variables are bound in exp 
-     * @varList: list of bound variables 
-     * @todo: exists {} could be eval earlier
-     */
+      */
     void sortFilter(Exp exp, VString varList) {
         int size = varList.size();
         List<String> filterVarList;
@@ -423,11 +385,11 @@ public class QuerySorter implements ExpType {
     }
     
     boolean isService(Exp exp) {
-        switch (exp.type()) {
-            case SERVICE: return true;
-            case UNION:  return unionService(exp);
-        }
-        return false;
+        return switch (exp.type()) {
+            case SERVICE -> true;
+            case UNION -> unionService(exp);
+            default -> false;
+        };
     }
     
     boolean unionService(Exp exp) {
@@ -510,7 +472,7 @@ public class QuerySorter implements ExpType {
         this.prod = prod;
     }
 
-    class VString extends ArrayList<String> {
+    static class VString extends ArrayList<String> {
 
         void clear(int size) {
             if (size == 0) {

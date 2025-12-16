@@ -12,22 +12,18 @@ import java.util.List;
  * If Filter leads to optimization, we tag the Filter Exp 
  * with e.g. a BIND(?x = ?y)
  * Query.bind() will handle later this tag BIND
- * 
  * (1)
  * x p t . y p z . filter(y = x)
  * ->
  * x p t . bind(y, x) . y p z
- * 
  * (2)
  * x p t filter(?x = <uri>)
  * ->
  * bind(x, <uri>) . x p t
- * 
  * (3)
  * x p t filter(?x = <uri> || ?x = <uri2>)
  * ->
  * bind(x, (<uri>, <uri2>)) . x p t
- * 
  * (4)
  * optional{} !bound(?x)
  * !bound() backjump before optional{}
@@ -69,7 +65,7 @@ public class Compile implements ExprType {
 	 * x p t . y p z filter(y = x)
 	 * we can bind y = x before enumerate y p z
 	 */
-            public void process(Query q, Exp exp){
+	public void process(Query q, Exp exp) {
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
 				
@@ -93,26 +89,6 @@ public class Compile implements ExprType {
 			
 		}
                 
-	}
-	
-	/**
-	 * ! bound(?x)
-	 */
-	void not(Exp exp){
-		Filter ff = exp.getFilter();
-		Expr ee = ff.getExp();
-		Pattern pat = new Pattern(BOOLEAN, NOT, new Pattern(FUNCTION, BOUND, VARIABLE));
-		if (matcher.match(pat, ee)){ 
-			// ! bound(?x)
-			List<String> list = ff.getVariables();
-			if (list.size()>0){
-				Node node = query.getProperAndSubSelectNode(list.get(0));
-				if (node != null){
-					exp.setNode(node);
-					exp.status(true);
-				}
-			}
-		}
 	}
 	
 
@@ -153,12 +129,12 @@ public class Compile implements ExprType {
 	Exp buildCst(Exp exp, ExpType.Type type){
 		Filter ff = exp.getFilter();
 		Expr ee = ff.getExp();
-		Node node = query.getProperAndSubSelectNode(ff.getVariables().get(0));
+		Node node = query.getProperAndSubSelectNode(ff.getVariables().getFirst());
 		if (node != null){
 			// variable ?x
 			Exp bind = Exp.create(type, Exp.create(ExpType.Type.NODE, node));
 			List<Expr> list = new ArrayList<>();
-			list.add(getConstants(ee).get(0));
+			list.add(getConstants(ee).getFirst());
 			bind.setObject(list);
 			return bind;
 		}
@@ -212,7 +188,7 @@ public class Compile implements ExprType {
 		pat.setRec(true);
 		pat.setMatchConstant(false);
 		if (matcher.match(pat, ee)) {
-			Node node = query.getProperAndSubSelectNode(ff.getVariables().get(0));
+			Node node = query.getProperAndSubSelectNode(ff.getVariables().getFirst());
 			if (node != null){
 				List<Expr> list = getConstants(ee);
 				Exp bind = Exp.create(ExpType.Type.OPT_BIND, Exp.create(ExpType.Type.NODE, node));
@@ -236,7 +212,7 @@ public class Compile implements ExprType {
             return;
         }
         List<Expr> values = expr.getExp(1).getExpList();
-        List<Expr> list = new ArrayList<Expr>();
+		List<Expr> list = new ArrayList<>();
         //all has to be constants
         for (Expr e : values) {
             if (e.type() != CONSTANT) {
@@ -245,7 +221,7 @@ public class Compile implements ExprType {
             list.add(e);
         }
 
-        Node node = query.getProperAndSubSelectNode(lvar.get(0));
+        Node node = query.getProperAndSubSelectNode(lvar.getFirst());
         if (node != null) {
             Exp bind = Exp.create(ExpType.Type.OPT_BIND, Exp.create(ExpType.Type.NODE, node));
             bind.setObject(list);
@@ -284,7 +260,7 @@ public class Compile implements ExprType {
     }
     */
 	List<Expr> getConstants(Expr exp){
-		List<Expr> list = new ArrayList<Expr>();
+		List<Expr> list = new ArrayList<>();
 		return getConstants(exp, list);
 	}
 	

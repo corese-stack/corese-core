@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.kgram.tool.EdgeInv;
 import fr.inria.corese.core.next.kgram.tool.ProducerDefault;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static fr.inria.corese.core.next.kgram.api.core.PointerType.PATH;
@@ -25,17 +24,15 @@ import static fr.inria.corese.core.next.kgram.api.core.PointerType.PATH;
  */
 public class Path extends ProducerDefault implements Pointerable {
 
-    boolean loopNode = true,
-            isShort = false,
+    boolean isShort = false,
             isReverse = false;
     int max = Integer.MAX_VALUE;
     int weight = 0;
     ArrayList<Edge> path;
-    int radius = 0;
 
     public Path() {
         setMode(Producer.EXTENSION);
-        path = new ArrayList<Edge>();
+        path = new ArrayList<>();
     }
 
     public Path(boolean b) {
@@ -45,23 +42,14 @@ public class Path extends ProducerDefault implements Pointerable {
 
     Path(int n) {
         setMode(Producer.EXTENSION);
-        path = new ArrayList<Edge>(n);
+        path = new ArrayList<>(n);
     }
 
     public ArrayList<Edge> getEdges() {
         return path;
     }
-    
-    @Override
-    public Path getPathObject() {
-        return this;
-    }
-    
-    @Override
-    public Object getPointerObject() {
-        return this;
-    }
-    
+
+
     @Override
     public String getDatatypeLabel() {
         if (path.size() == 1) {
@@ -88,10 +76,6 @@ public class Path extends ProducerDefault implements Pointerable {
 
     int getMax() {
         return max;
-    }
-
-    void checkLoopNode(boolean b) {
-        loopNode = b;
     }
 
     public void clear() {
@@ -170,8 +154,7 @@ public class Path extends ProducerDefault implements Pointerable {
         Path path = new Path(size());
         for (Edge ent : this.path) {
             // when r is reverse, add real target relation
-            if (ent instanceof EdgeInv) {
-                EdgeInv ee = (EdgeInv) ent;
+            if (ent instanceof EdgeInv ee) {
                 path.add(ee.getEdgeEntity());
             } else {
                 path.add(ent);
@@ -211,18 +194,6 @@ public class Path extends ProducerDefault implements Pointerable {
         weight = w;
     }
 
-    // nb getResultValues()
-    public int nbValues() {
-        return 1 + 2 * path.size();
-    }
-
-    public void setRadius(int d) {
-        radius = d;
-    }
-
-    public int radius() {
-        return radius;
-    }
 
     public Path reverse() {
         for (int i = 0; i < length() / 2; i++) {
@@ -233,48 +204,7 @@ public class Path extends ProducerDefault implements Pointerable {
         return this;
     }
     
-    public Iterator<Node> nodeIterator() {
 
-        return new Iterator<Node>() {
-            private int i = 0;
-            private int j = 0;
-            private int ii;
-            private boolean hasNext = length() > 0;
-
-            @Override
-            public boolean hasNext() {
-                return hasNext;
-            }
-
-            @Override
-            public Node next() {
-                switch (j) {
-                    case 0:
-                        j = 1;
-                        return path.get(i).getNode(0);
-                    case 1:
-                        ii = i;
-                        if (i == path.size() - 1) {
-                            j = 2;
-                        } else {
-                            j = 0;
-                            i++;
-                        }
-                        return path.get(ii).getEdgeNode();
-                    case 2:
-                        hasNext = false;
-                        j = -1;
-                        return path.get(i).getNode(1);
-                }
-                return null;
-            }
-
-            @Override
-            public void remove() {
-            }
-        };
-
-    }
     
 
     @Override

@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.kgram.api.core;
 
 import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.api.IDatatype.NodeKind;
 
 import static fr.inria.corese.core.next.kgram.api.core.PointerType.NODE;
 
@@ -12,22 +11,13 @@ import static fr.inria.corese.core.next.kgram.api.core.PointerType.NODE;
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public interface Node extends Pointerable, Comparable {
+public interface Node extends Pointerable<Object>, Comparable<Node> {
     String INITKEY = "";
 
-    int DEPTH = 0;
-    int LENGTH = 1;
     int REGEX = 2;
     int OBJECT = 3;
 
 
-    int PSIZE = 4;
-
-    int STATUS = 4;
-
-    default NodeKind getNodeKind() {
-        return getValue().getNodeKind();
-    }
 
     @Override
     default PointerType pointerType() {
@@ -37,7 +27,6 @@ public interface Node extends Pointerable, Comparable {
     /**
      * Query nodes have an index computed by KGRAM
      *
-     * @return
      */
     int getIndex();
 
@@ -66,13 +55,6 @@ public interface Node extends Pointerable, Comparable {
         return getDatatypeValue().compareTo(node.getDatatypeValue());
     }
 
-    @Override
-    default int compareTo(Object obj) {
-        if(obj instanceof Node) {
-            return compareTo((Node) obj);
-        }
-        return -1;
-    }
 
     String getLabel();
 
@@ -129,7 +111,4 @@ public interface Node extends Pointerable, Comparable {
         getDatatypeValue().setEdge((fr.inria.corese.core.kgram.api.core.Edge) e);
     }
 
-    default boolean isTripleNode() {
-        return false;
-    }
 }

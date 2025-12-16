@@ -178,7 +178,7 @@ public class Graph extends GraphObject implements
     private List<GraphListener> listenerList;
     // @deprecated history management
     private Context context;
-    // semantic distance in class/property Hierarchy
+    // semantic distance in class/property
     private Distance classDistance, propertyDistance;
     private boolean isSkolem = SKOLEM_DEFAULT;
     private int tagCount = 0;

@@ -6,7 +6,7 @@ import java.util.List;
 import fr.inria.corese.core.kgram.api.core.Regex;
 
 /**
- * Regex Automaton Transition
+ * Regex Transition
  * 
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *

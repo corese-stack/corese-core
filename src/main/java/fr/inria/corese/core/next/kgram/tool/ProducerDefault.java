@@ -28,8 +28,7 @@ public class ProducerDefault implements Producer {
     @Override
     public Iterable<Edge> getEdges(Node node, List<Node> from, Edge edge,
                                    Environment env) {
-        ArrayList<Edge> list = new ArrayList<Edge>();
-        return list;
+        return new ArrayList<>();
     }
 
     @Override
@@ -46,11 +45,6 @@ public class ProducerDefault implements Producer {
     }
 
     @Override
-    public void init(Query q) {
-
-    }
-
-    @Override
     public void initPath(Edge edge, int index) {
     }
 
@@ -59,19 +53,10 @@ public class ProducerDefault implements Producer {
         return null;
     }
 
-    @Override
-    public List<Node> toNodeList(IDatatype  obj) {
-        return new ArrayList<>();
-    }
 
     @Override
     public Mappings map(List<Node> nodes, IDatatype object) {
         return null;
-    }
-
-    @Override
-    public boolean isGraphNode(Node node, List<Node> from, Environment env) {
-        return false;
     }
 
     @Override
@@ -81,7 +66,7 @@ public class ProducerDefault implements Producer {
 
     @Override
     public Iterable<Node> getNodes(Node gNode, List<Node> from, Edge edge, Environment env, List<Regex> exp, int index) {
-        return new ArrayList<Node>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -122,8 +107,7 @@ public class ProducerDefault implements Producer {
     @Override
     public Mappings getMappings(Node gNode, List<Node> from, Exp exp, Environment env) {
         //create a new Mappings: empty
-        Mappings maps = new Mappings();
-        return maps;
+        return new Mappings();
     }
 
     @Override

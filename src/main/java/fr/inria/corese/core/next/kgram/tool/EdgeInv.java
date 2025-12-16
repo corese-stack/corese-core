@@ -9,26 +9,21 @@ import static fr.inria.corese.core.next.kgram.api.core.PointerType.TRIPLE;
 
 public class EdgeInv extends PointerObject implements Edge {
 
-    Edge edge;
-    Edge ent;
-
-//    public EdgeInv(Edge e) {
-//        edge = e;
-//    }
+    private final Edge edge;
+    private final Edge ent;
 
     public EdgeInv(Edge e) {
-        ent = e;
-        edge = e;
+        this.ent = e;
+        this.edge = e;
     }
 
     @Override
     public String toString() {
-        return "inverse(" + edge.toString() + ")";
+        return "inverse(" + edge + ")";
     }
 
     @Override
     public boolean contains(Node n) {
-
         return edge.contains(n);
     }
 
@@ -36,7 +31,7 @@ public class EdgeInv extends PointerObject implements Edge {
     public int nbNode() {
         return edge.nbNode();
     }
-    
+
     @Override
     public int nbGraphNode() {
         return edge.nbGraphNode();
@@ -73,31 +68,22 @@ public class EdgeInv extends PointerObject implements Edge {
 
     @Override
     public Node getNode(int n) {
-        switch (n) {
-            case 0:
-                return edge.getNode(1);
-            case 1:
-                return edge.getNode(0);
-            default:
-                return edge.getNode(n);
-        }
-    }
-    
-    @Override
-    public void setNode(int i, Node n) {
-        
+        return switch (n) {
+            case 0 -> edge.getNode(1);
+            case 1 -> edge.getNode(0);
+            default -> edge.getNode(n);
+        };
     }
 
     @Override
     public Node getEdgeVariable() {
         return edge.getEdgeVariable();
     }
-    
+
     @Override
     public Node getProperty() {
         return edge.getProperty();
     }
-
 
     @Override
     public Node getNode() {
@@ -115,7 +101,7 @@ public class EdgeInv extends PointerObject implements Edge {
     }
 
     @Override
-    public Iterable getLoop() {
+    public Iterable<Object> getLoop() {
         return ent.getLoop();
     }
 

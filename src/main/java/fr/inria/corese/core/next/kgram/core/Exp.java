@@ -20,11 +20,9 @@ public class Exp extends PointerObject
         implements ExpType, ExpPattern, Iterable<Exp> {
 
 
-    public static final int ANY = -1;
     public static final int SUBJECT = 0;
     public static final int OBJECT = 1;
     public static final int PREDICATE = 2;
-    public static final int GRAPH_NAME = 3;
 
     static final String NL = "\n";
     static final String SP = " ";
@@ -39,9 +37,7 @@ public class Exp extends PointerObject
     boolean skip;
     boolean isFail = false;
     boolean isPath = false;
-    boolean isFree = false;
     boolean isAggregate = false;
-    boolean isBGP = false;
     boolean isSilent = false;
     VExp args;
     Edge edge;
@@ -58,9 +54,7 @@ public class Exp extends PointerObject
     Object object;
     Producer producer;
     Regex regex;
-    Exp next;
     Mappings map;
-    Mappings templateMap;
     HashMap<Node, Mappings> cache;
     int min = -1;
     int max = -1;
@@ -70,7 +64,6 @@ public class Exp extends PointerObject
     private boolean generated = false;
     private Node arg;
     //  service with several URI:
-    private List<Node> nodeSet;
     private List<Node> simpleNodeList;
     private Exp postpone;
     private List<Exp> inscopeFilter;
@@ -213,13 +206,6 @@ public class Exp extends PointerObject
         return isPostpone;
     }
 
-    public List<Node> getNodeSet() {
-        return nodeSet;
-    }
-
-    public void setNodeSet(List<Node> nodeSet) {
-        this.nodeSet = nodeSet;
-    }
 
     // draft for BGP
     public Exp duplicate() {
@@ -228,10 +214,6 @@ public class Exp extends PointerObject
             exp.add(e);
         }
         return exp;
-    }
-
-    public boolean hasArg() {
-        return !args.isEmpty();
     }
 
     @Override
@@ -257,11 +239,6 @@ public class Exp extends PointerObject
 
     public void set(int n, Exp e) {
         args.set(n, e);
-    }
-
-    @Override
-    public Query getQuery() {
-        return null;
     }
 
     public void insert(Exp e) {
@@ -392,19 +369,10 @@ public class Exp extends PointerObject
     }
 
     public boolean isStatement() {
-        switch (type()) {
-            case BGP:
-            case JOIN:
-            case UNION:
-            case OPTIONAL:
-            case MINUS:
-            case GRAPH:
-            case QUERY:
-                return true;
-
-            default:
-                return false;
-        }
+        return switch (type()) {
+            case BGP, JOIN, UNION, OPTIONAL, MINUS, GRAPH, QUERY -> true;
+            default -> false;
+        };
     }
 
     public int getIndex() {
@@ -472,10 +440,6 @@ public class Exp extends PointerObject
         return type == Type.JOIN;
     }
 
-    public boolean isAndJoin() {
-        return isJoin() || (isBGPAnd() && size() == 1 && get(0).isJoin());
-    }
-
     public boolean isAnd() {
         return type == Type.AND;
     }
@@ -504,21 +468,8 @@ public class Exp extends PointerObject
         return type == Type.SERVICE;
     }
 
-    public boolean isAtomic() {
-        return type == Type.FILTER || type == Type.EDGE || type == Type.NODE
-                || type == Type.ACCEPT;
-    }
-
     public void setType(Type n) {
         type = n;
-    }
-
-    Exp getNext() {
-        return next;
-    }
-
-    void setNext(Exp e) {
-        next = e;
     }
 
     public List<Exp> getExpList() {
@@ -537,7 +488,7 @@ public class Exp extends PointerObject
 
     public Exp first() {
         if (!args.isEmpty()) {
-            return args.get(0);
+            return args.getFirst();
         } else {
             return empty;
         }
@@ -644,10 +595,6 @@ public class Exp extends PointerObject
         return expGroupBy;
     }
 
-    public void setExpGroupBy(List<Exp> l) {
-        expGroupBy = l;
-    }
-
     public boolean isFail() {
         return isFail;
     }
@@ -686,10 +633,6 @@ public class Exp extends PointerObject
 
     public Node getGraphName() {
         return first().first().getNode();
-    }
-
-    public Node getServiceNode() {
-        return first().getNode();
     }
 
     public Node getGraphNode() {
@@ -811,15 +754,10 @@ public class Exp extends PointerObject
     }
 
     boolean isSimple() {
-        switch (type) {
-            case EDGE:
-            case PATH:
-            case EVAL:
-            case OPT_BIND:
-                return true;
-            default:
-                return false;
-        }
+        return switch (type) {
+            case EDGE, PATH, EVAL, OPT_BIND -> true;
+            default -> false;
+        };
     }
 
     /**
@@ -1222,19 +1160,10 @@ public class Exp extends PointerObject
     }
 
     boolean isSkipStatement() {
-        switch (type()) {
-            case JOIN:
-            case UNION:
-            case OPTIONAL:
-            case MINUS:
-            case GRAPH:
-            case QUERY:
-            case SERVICE:
-                return true;
-
-            default:
-                return false;
-        }
+        return switch (type()) {
+            case JOIN, UNION, OPTIONAL, MINUS, GRAPH, QUERY, SERVICE -> true;
+            default -> false;
+        };
     }
 
     /**
@@ -1297,16 +1226,8 @@ public class Exp extends PointerObject
         return getInScopeNodeList();
     }
 
-    public List<Node> getRecordInScopeNodes() {
-        return getRecordInScopeNodes(true);
-    }
-
     public List<Node> getRecordInScopeNodesWithoutBind() {
         return getRecordInScopeNodes(false);
-    }
-
-    public List<Node> getRecordInScopeNodesForService() {
-        return getRecordInScopeNodesWithoutBind();
     }
 
     /**
@@ -1410,9 +1331,6 @@ public class Exp extends PointerObject
         return type() == Type.OPT_BIND && size() == 1;
     }
 
-    boolean isBindVar() {
-        return type() == Type.OPT_BIND && size() == 2;
-    }
 
     /**
      * Add BIND ?x = ?y
@@ -1472,16 +1390,6 @@ public class Exp extends PointerObject
         return false;
     }
 
-    boolean match(Node node, Filter f) {
-        if (!node.isVariable() || f.getExp().isRecExist()) {
-            return false;
-        }
-        List<String> lVar = f.getVariables();
-        if (lVar.size() != 1) {
-            return false;
-        }
-        return lVar.get(0).equals(node.getLabel());
-    }
 
     /**
      * this is FILTER with TEST ?x &lt; ?y
@@ -1490,55 +1398,6 @@ public class Exp extends PointerObject
         return getFilter().getExp().oper();
     }
 
-    boolean check(Exp filter, int index) {
-        int oper = filter.oper();
-        if (oper == ExprType.LT || oper == ExprType.LE) {
-            return index == 0;
-        } else if (oper == ExprType.GT || oper == ExprType.GE) {
-            return index == 1;
-        }
-        return false;
-    }
-
-    boolean order(Exp filter, int index) {
-        int oper = filter.oper();
-        if (oper == ExprType.LT || oper == ExprType.LE) {
-            return index == 0;
-        } else if (oper == ExprType.GT || oper == ExprType.GE) {
-            return index == 1;
-        }
-        return true;
-    }
-
-    /**
-     * index of Node in Edge
-     */
-    public int indexNode(Node node) {
-        if (!isEdge()) {
-            return -1;
-        }
-        for (int i = 0; i < nbNode(); i++) {
-            if (node.same(getNode(i))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * index of node in FILTER ?x &lt; ?y
-     */
-    public int indexVar(Node node) {
-        Expr ee = getFilter().getExp();
-        String name = node.getLabel();
-        for (int i = 0; i < 2; i++) {
-            if (ee.getExp(i).type() == ExprType.VARIABLE
-                    && ee.getExp(i).getLabel().equals(name)) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     boolean isBound(List<String> lvar, List<Node> lnode) {
         for (String varString : lvar) {
@@ -1833,14 +1692,6 @@ public class Exp extends PointerObject
         return type() == type || (isBGPAnd() && size() > 0 && get(0).type() == type);
     }
 
-    boolean isGraphFirstWith(Type type) {
-        return type() == Type.GRAPH && size() > 1 && get(1).isFirstWith(type);
-    }
-
-    boolean isJoinFirstWith(Type type) {
-        return isFirstWith(type) || isGraphFirstWith(type);
-    }
-
     Exp complete(Mappings map) {
         if (map == null || !map.isNodeList()) {
             return this;
@@ -1882,90 +1733,12 @@ public class Exp extends PointerObject
         this.simpleNodeList = simpleNodeList;
     }
 
-    public Query getExternQuery() {
-        return externQuery;
-    }
-
-    public void setExternQuery(Query externQuery) {
-        this.externQuery = externQuery;
-    }
-
     public int getNum() {
         return num;
     }
 
     public void setNum(int num) {
         this.num = num;
-    }
-
-    /**
-     * isAlgebra() only, not used
-     * This is a BGP
-     * if it contains several statements (union, minus, optional, graph, query, bgp), JOIN them
-     * if it contains statement and basic (eg triple/path/filter/values/bind)
-     * crate BGP for basics and JOIN them
-     * otherwise leave as is
-     * called by compiler transformer when algebra = true (default is false)
-     */
-    public void dispatch() {
-        if (size() == 0) {
-            return;
-        }
-        int nb = 0;
-        int ns = 0;
-        for (Exp exp : this) {
-            if (exp.isStatement()) {
-                ns++;
-            } else {
-                nb++;
-            }
-        }
-        if (ns == 0 || (ns == 1 && nb == 0)) {
-            return;
-        }
-        doDispatch();
-    }
-
-
-
-
-    /*
-     *
-     * Alternative interpreter not used
-     *
-     */
-
-    void doDispatch() {
-        Exp join = Exp.create(Type.JOIN);
-        Exp basic = Exp.create(Type.BGP);
-        for (Exp exp : this) {
-            if (exp.isStatement()) {
-                if (basic.size() > 0) {
-                    join.add(basic);
-                    basic = Exp.create(Type.BGP);
-                }
-                join.add(exp);
-            } else {
-                basic.add(exp);
-            }
-        }
-        if (basic.size() > 0) {
-            join.add(basic);
-        }
-        Exp body = join.dispatch(0);
-        getExpList().clear();
-        add(body);
-    }
-
-    /**
-     * create binary JOIN from nary
-     */
-    Exp dispatch(int i) {
-        if (i == size() - 1) {
-            return last();
-        } else {
-            return Exp.create(Type.JOIN, get(i), dispatch(i + 1));
-        }
     }
 
     /**
@@ -2085,7 +1858,7 @@ public class Exp extends PointerObject
         }
     }
 
-    class VExp extends ArrayList<Exp> {
+    static class VExp extends ArrayList<Exp> {
     }
 
 

@@ -13,7 +13,8 @@ import java.util.List;
 /**
  * @author Olivier Corby, Wimmics INRIA I3S, 2018
  */
-public interface ProcessVisitor extends Pointerable {
+@SuppressWarnings("unused")
+public interface ProcessVisitor extends Pointerable<Object> {
 
     int SLICE_DEFAULT = 20;
 
@@ -35,15 +36,8 @@ public interface ProcessVisitor extends Pointerable {
     default void setProcessor(Eval e) {
     }
 
-    default void setDefaultValue(IDatatype val) {
-    }
-
     default IDatatype defaultValue() {
         return null;
-    }
-
-    default IDatatype initParam() {
-        return defaultValue();
     }
 
     // before query and before lock graph
@@ -71,59 +65,12 @@ public interface ProcessVisitor extends Pointerable {
         return defaultValue();
     }
 
-    default IDatatype beforeUpdate(Query q) {
-        return defaultValue();
-    }
-
-    default IDatatype afterUpdate(Mappings map) {
-        return defaultValue();
-    }
-
-    default IDatatype beforeLoad(IDatatype path) {
-        return defaultValue();
-    }
-
-    default IDatatype afterLoad(IDatatype path) {
-        return defaultValue();
-    }
-
-    default IDatatype beforeEntailment(IDatatype path) {
-        return defaultValue();
-    }
-
-    default IDatatype afterEntailment(IDatatype path) {
-        return defaultValue();
-    }
-
-    default IDatatype loopEntailment(IDatatype path) {
-        return defaultValue();
-    }
-
-    default IDatatype prepareEntailment(IDatatype path) {
-        return defaultValue();
-    }
-
     default boolean entailment() {
         return false;
     }
 
     default IDatatype entailment(Query rule, List<Edge> construct, List<Edge> where) {
         return defaultValue();
-    }
-
-    default IDatatype beforeRule(Query q) {
-        return defaultValue();
-    }
-
-    default IDatatype afterRule(Query q, Object res) {
-        return defaultValue();
-    }
-
-    // success = true when there is no solution 
-    // because rule where part test condition where constraint fails
-    // res = Mappings or List<Edge>
-    default IDatatype constraintRule(Query q, Object res, IDatatype success) {
-        return success;
     }
 
     default IDatatype start(Query q) {
@@ -156,11 +103,6 @@ public interface ProcessVisitor extends Pointerable {
 
     @Deprecated
     default int slice(Node serv, Mappings map) {
-        return SLICE_DEFAULT;
-    }
-
-    // return result for ldscript call java:setSlice()
-    default int setSlice(int n) {
         return SLICE_DEFAULT;
     }
 

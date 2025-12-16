@@ -6,7 +6,7 @@ import java.util.List;
 import fr.inria.corese.core.kgram.api.core.Regex;
 
 /**
- * Regex Automaton State
+ * Regex State
  * 
  * @author Olivier Corby, Edelweiss, INRIA 2010
  *

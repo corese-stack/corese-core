@@ -13,8 +13,7 @@ import fr.inria.corese.core.next.kgram.api.core.ExprType;
 public class Matcher implements ExprType {
 	boolean 
 		rec = false,
-		matchConstant = true,
-		trace = false;
+		matchConstant = true;
 	
 	
 	public boolean match(Pattern qe, Expr te){
@@ -25,8 +24,7 @@ public class Matcher implements ExprType {
 	boolean match(Pattern qe, Expr te, MatchBind bind){
 		rec = qe.isRec();
 		matchConstant = qe.isMatchConstant();
-		boolean b = process(qe, te, bind);
-		return b;
+        return process(qe, te, bind);
 	}
 	
 	
@@ -34,7 +32,6 @@ public class Matcher implements ExprType {
 	
 	/**
 	 * Expr matcher
-	 * 
 	 * Special case:
 	 * OR(EXP) with rec=true
 	 * means match OR(EXP) recursively with OR(EXP1, OR(EXP2, EXP3))
@@ -60,17 +57,15 @@ public class Matcher implements ExprType {
 		if (! matchType(qe, te))	return false;
 			
 		// When Pattern is already bound, recurse on its value
-		switch (qe.type()){
-		case CONSTANT:
-			if (matchConstant && bind.hasValue(qe)){
-				return process(bind.getValue(qe), te, bind);
-			}
-			break;
-		default:
-			if (bind.hasValue(qe)){
-				return process(bind.getValue(qe), te, bind);
-			}
-		}
+        if (qe.type() == CONSTANT) {
+            if (matchConstant && bind.hasValue(qe)) {
+                return process(bind.getValue(qe), te, bind);
+            }
+        } else {
+            if (bind.hasValue(qe)) {
+                return process(bind.getValue(qe), te, bind);
+            }
+        }
 			
 
 		switch (qe.type()){
@@ -280,11 +275,10 @@ public class Matcher implements ExprType {
 	boolean matchType(Expr qe, Expr te){
 		if (qe.oper() == EXIST || te.oper() == EXIST) return false;
 		if (qe.type() == JOKER) return true;
-		switch (qe.type()){
-			case VARIABLE:
-			case CONSTANT: return match(qe.type(), te.type());
-			default: return match(qe.type(), te.type()) && match(qe.oper(), te.oper());
-		}
+        return switch (qe.type()) {
+            case VARIABLE, CONSTANT -> match(qe.type(), te.type());
+            default -> match(qe.type(), te.type()) && match(qe.oper(), te.oper());
+        };
 	}
 
 }

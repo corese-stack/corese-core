@@ -53,9 +53,8 @@ public class EventImpl implements Event {
 		String str = getTitle();
 		if (object != null){
 			str += " ";
-			if (object instanceof Exp){
-				Exp exp = (Exp) object;
-				if (exp.isEdge()){
+			if (object instanceof Exp exp){
+                if (exp.isEdge()){
 					str += "("+ exp.getEdge().getEdgeIndex() + ") ";
 				}
 			}
@@ -90,7 +89,7 @@ public class EventImpl implements Event {
 	}
 	
 	static void init(){
-		titles = new Hashtable<Integer, String>();
+		titles = new Hashtable<>();
 		deftitle(BEGIN, "begin");
 		deftitle(START, "start");
 		deftitle(ENUM, 	"enum");
@@ -129,23 +128,19 @@ public class EventImpl implements Event {
 	
 	
 	public static EventImpl create(int type){
-		EventImpl e = new EventImpl(type);
-		return e;
+        return new EventImpl(type);
 	}
 	
 	public static EventImpl create(int type, Object obj){
-		EventImpl e = new EventImpl(type, obj);
-		return e;
+        return new EventImpl(type, obj);
 	}
 	
 	public static EventImpl create(int type, Object obj, Object arg){
-		EventImpl e = new EventImpl(type, obj, arg);
-		return e;
+        return new EventImpl(type, obj, arg);
 	}
 
 	public static EventImpl create(int type, Object obj, Object arg, Object arg2){
-		EventImpl e = new EventImpl(type, obj, arg, arg2);
-		return e;
+        return new EventImpl(type, obj, arg, arg2);
 	}
 	
 	public int getSort(){
@@ -157,13 +152,13 @@ public class EventImpl implements Event {
 	}
 	
 	public Object getArg(int n){
-		switch (n){
-		case 0: return object;
-		case 1: return arg;
-		case 2: return arg2;
-		}
-		return null;
-	}
+        return switch (n) {
+            case 0 -> object;
+            case 1 -> arg;
+            case 2 -> arg2;
+            default -> null;
+        };
+    }
 	
 	public Exp getExp(){
 		if (object instanceof Exp){

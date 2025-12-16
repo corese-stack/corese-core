@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.kgram.event;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Event Manager to trace KGRAM execution
@@ -14,36 +14,13 @@ public class EventManager implements Iterable<EventListener> {
 
     boolean isEval = false;
 
-    List<EventListener> observers = new Vector<EventListener>();
+    List<EventListener> observers = new ArrayList<>();
 
     public static EventManager create() {
         return new EventManager();
     }
 
-    public void addEventListener(EventListener el) {
-        observers.add(el);
-        isEval = isEval || (el.handle(Event.START));
 
-    }
-
-    public void removeEventListener(EventListener el) {
-        observers.remove(el);
-    }
-
-    public void removeEventListener(int sort) {
-        for (int i = 0; i < observers.size();) {
-            EventListener el = observers.get(i);
-            if (el.handle(sort)) {
-                observers.remove(el);
-            } else {
-                i++;
-            }
-        }
-    }
-
-    public List<EventListener> getEventListeners() {
-        return observers;
-    }
 
     public void setObject(Object obj) {
         for (EventListener el : observers) {
@@ -52,15 +29,14 @@ public class EventManager implements Iterable<EventListener> {
     }
 
     public boolean handle(int sort) {
-        switch (sort) {
-            case Event.START:
-                return isEval;
-            default:
-                return true;
+        if (sort == Event.START) {
+            return isEval;
         }
+        return true;
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Iterator<EventListener> iterator() {
         return observers.iterator();
     }

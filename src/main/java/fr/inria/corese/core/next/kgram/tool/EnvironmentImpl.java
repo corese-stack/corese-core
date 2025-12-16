@@ -78,17 +78,8 @@ public class EnvironmentImpl implements Environment {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	public int pathWeight(Node node) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-//	@Override
-//	public void aggregate(Evaluator eval, Producer p, Filter f) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+
 
 	@Override
 	public Query getQuery() {
@@ -106,12 +97,6 @@ public class EnvironmentImpl implements Environment {
 	public Node getGraphNode() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public boolean hasEventManager() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override

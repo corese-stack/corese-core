@@ -10,11 +10,9 @@ import fr.inria.corese.core.next.kgram.api.query.Environment;
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
 public class GraphPath extends Thread {
-	
 
-	//private Buffer buf;
-	private final Buffer mbuf;
-	private final Environment mem;
+
+    private final Environment mem;
 	private final PathFinder finder;
 
 
@@ -31,8 +29,8 @@ public class GraphPath extends Thread {
 	public GraphPath(PathFinder pc, Environment mem, Buffer buf){
 		this.finder  = pc;
 		this.mem = mem;
-		this.mbuf  = buf;
-	}
+        //private Buffer buf;
+    }
 	
 	void process(){
             Node cstart = finder.get(mem, finder.getIndex());

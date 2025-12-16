@@ -15,9 +15,8 @@ import java.util.*;
  */
 public class Group implements Comparator<Mappings> {
 
-    private static boolean compareIndex = false;
+    private static final boolean compareIndex = false;
     TreeMapping table;
-    Node fake;
 
     boolean isDistinct = false;
     // min(?l, groupBy(?x, ?y))
@@ -41,10 +40,6 @@ public class Group implements Comparator<Mappings> {
     }
 
 
-    public static void setCompareIndex(boolean b) {
-        compareIndex = b;
-    }
-
     public static Group create(List<Node> lNode) {
         return new Group(lNode);
     }
@@ -65,9 +60,6 @@ public class Group implements Comparator<Mappings> {
         this.isFake = afake;
     }
 
-    public void dispose() {
-        table.clear();
-    }
 
     public List<Node> getNodeList() {
         return nodes;
@@ -84,11 +76,11 @@ public class Group implements Comparator<Mappings> {
     public void setExtend(boolean b) {
         isExtend = b;
     }
-
+    @SuppressWarnings("unused")
     public void setDuplicate(boolean b) {
     }
 
-    // TODO
+    @SuppressWarnings("unused")
     boolean accept(Node node) {
         return true;
     }
@@ -98,14 +90,6 @@ public class Group implements Comparator<Mappings> {
         Mapping m1 = lm1.get(0);
         Mapping m2 = lm2.get(0);
         return lm1.compare(m1, m2);
-    }
-
-    Node getGroupBy(Mapping map, Node qNode, int n) {
-        if (isDistinct) {
-            return map.getDistinctNode(n);
-        } else {
-            return map.getGroupBy(qNode, n);
-        }
     }
 
     /**

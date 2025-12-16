@@ -13,16 +13,15 @@ import java.util.Map;
  * represent exp in a graph
  *
  * @author Fuqi Song, Wimmics Inria I3S
- * @date 19 mai 2014
  */
 public class QPGraph {
 
     // list of nodes
-    private List<QPGNode> nodes = null;
+    private final List<QPGNode> nodes;
     // list of edges
-    private List<QPGEdge> edges = null;
+    private final List<QPGEdge> edges;
     // identified bound values
-    private List<Exp> bindings = null;
+    private final List<Exp> bindings;
 
     // data structure that used to represents the graph
     // map(node, edges)
@@ -109,14 +108,6 @@ public class QPGraph {
     }
 
     /**
-     * Return all the edges contained in the graph
-     *
-     */
-    public List<QPGEdge> getAllEdges() {
-        return this.edges;
-    }
-
-    /**
      * Return all the edges with certain type contained in the graph
      *
      * @param edgeType type of edge: SIMPLE | BI_DIRECT
@@ -135,9 +126,6 @@ public class QPGraph {
     /**
      * Get all edges linked to a given node
      *
-     * @param node
-     * @param edgeType: SIMPLE | BI_DIRECT
-     * @return
      */
     public List<QPGEdge> getEdges(QPGNode node, int edgeType) {
         List<QPGEdge> lEdges = new ArrayList<>();
@@ -157,8 +145,6 @@ public class QPGraph {
     /**
      * Return the edges linked to the given node
      *
-     * @param node
-     * @return
      */
     public List<QPGEdge> getEdges(QPGNode node) {
         return this.graph.get(node);
@@ -177,7 +163,6 @@ public class QPGraph {
     /**
      * Return list of nodes contained in the triple pattern graph
      *
-     * @return
      */
     public List<QPGNode> getAllNodes() {
         return this.getAllNodes(ExpType.Type.EMPTY);
@@ -187,7 +172,6 @@ public class QPGraph {
      * Return list of nodes that contain triple pattern expression (edge)
      *
      * @param type EDGE, VALUES, FILTER, GRAPH, otherwise return all
-     * @return
      */
     public List<QPGNode> getAllNodes(ExpType.Type type) {
         if (Const.plannable(type)) {
@@ -223,10 +207,6 @@ public class QPGraph {
     /**
      * Get nodes linked to the given node
      *
-     * @param n node
-     * @param directed
-     * @param in
-     * @return list
      */
     public List<QPGNode> getLinkedNodes(QPGNode n, boolean directed, boolean in) {
         if (!directed) {
@@ -256,7 +236,6 @@ public class QPGraph {
     /**
      * Get the list of vairable bound to constants
      *
-     * @return
      */
     public List<Exp> getBindings() {
         return this.bindings;

@@ -18,18 +18,8 @@ public interface Matcher {
     // equality of types
     int UNDEF = -1;
 
-    int STRICT = 0;
-    // exploit type inference (subsumption)
-    int SUBSUME = 1;
-    // type inference and accept generalization of types
-    int GENERAL = 2;
-    // subsume + generalize
-    int MIX = 3;
     // accept any types
     int RELAX = 4;
-    // exploit rules
-    int INFERENCE = 5;
-
 
     /**
      * Checks whether a candidate edge matches a query edge.
@@ -62,11 +52,6 @@ public interface Matcher {
      * Check that the candidate nodes are the same or are equivalent.
      * May use owl:sameAs
      *
-     * @param qNode
-     * @param n1
-     * @param n2
-     * @param env   The binding environment
-     * @return
      */
     boolean same(Node qNode, Node n1, Node n2, Environment env);
 

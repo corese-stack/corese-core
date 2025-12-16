@@ -29,19 +29,8 @@ public interface Event {
 	
 	int RESULT 	= 19;
 	int END 	= 20;
-	
 
-	// warning events
-	
-	
-	int UNDEF_PROPERTY 	= 30;
-	int UNDEF_CLASS 	= 31;
-	int UNDEF_GRAPH 	= 32;
 
-	
-	
-	
-	
 	int ALL 	= 50;
 	
 	
@@ -72,7 +61,6 @@ public interface Event {
 	// pprint current Mapping
     int MAP 	= 110;
 	int VERBOSE = 111;
-	int NONVERBOSE = 113;
 	int HELP = 112;
 
 

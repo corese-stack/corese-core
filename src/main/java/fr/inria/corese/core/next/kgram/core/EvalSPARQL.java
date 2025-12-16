@@ -27,40 +27,16 @@ public class EvalSPARQL {
     }
 
     Mappings eval(Node graph, Producer p, Exp exp, Mapping m) {
-        Mappings map;
 
-        switch (exp.type()) {
-
-            case BGP:
-                map = bgp(graph, p, exp, m);
-                break;
-
-            case JOIN:
-                map = join(graph, p, exp, m);
-                break;
-
-            case UNION:
-                map = union(graph, p, exp, m);
-                break;
-
-            case MINUS:
-                map = minus(graph, p, exp, m);
-                break;
-
-            case OPTIONAL:
-                map = optional(graph, p, exp, m);
-                break;
-
-            case GRAPH:
-                map = graph(graph, p, exp, m);
-                break;
-
-            default:
-                map = Mappings.create(query);
-
-        }
-
-        return map;
+        return switch (exp.type()) {
+            case BGP -> bgp(graph, p, exp, m);
+            case JOIN -> join(graph, p, exp, m);
+            case UNION -> union(graph, p, exp, m);
+            case MINUS -> minus(graph, p, exp, m);
+            case OPTIONAL -> optional(graph, p, exp, m);
+            case GRAPH -> graph(graph, p, exp, m);
+            default -> Mappings.create(query);
+        };
     }
 
 
@@ -75,10 +51,10 @@ public class EvalSPARQL {
     }
 
     Mappings join(Mappings map1, Mappings map2) {
-        if (map1.size() == 0) {
+        if (map1.isEmpty()) {
             return map1;
         }
-        if (map2.size() == 0) {
+        if (map2.isEmpty()) {
             return map2;
         }
 
@@ -111,7 +87,7 @@ public class EvalSPARQL {
         for (Mapping ma : m1) {
             int nbsuc = 0;
             for (Mapping mb : m2) {
-                boolean success = false;
+                boolean success ;
                 Mapping m = ma.merge(mb);
                 if (m != null) {
                     success = true;

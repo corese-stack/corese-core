@@ -16,7 +16,6 @@ public interface Filter {
     /**
      * List of variable names contained in the filter
      *
-     * @return
      */
     List<String> getVariables();
 
@@ -26,7 +25,6 @@ public interface Filter {
      * Evaluable expression processed by KGRAM generic Interpreter
      * Expr api refer also to sparql.triple.parser.Expression
      *
-     * @return
      */
     Expr getExp();
 
@@ -35,14 +33,12 @@ public interface Filter {
     /**
      * Does filter contain a bound() function
      *
-     * @return
      */
     boolean isBound();
 
     /**
      * Is it an aggregate function such as count() min() sum()
      *
-     * @return
      */
     boolean isAggregate();
 

@@ -6,7 +6,6 @@ import java.util.List;
 
 
 /***********************************************
- * 
  * group by any
  * group Mapping who share one node (from any variable)
  * Connected components
@@ -26,9 +25,9 @@ public class Merge extends Group {
 	}
 	
 	
-	public class ListMappings extends ArrayList <Mappings> {
-	
-	/**
+	public static class ListMappings extends ArrayList <Mappings> {
+
+	/*
 	 * Find the index of map in list by dichotomy
 	 */
 //	int find(Mapping map, int first, int last){
@@ -43,16 +42,16 @@ public class Merge extends Group {
 //				return find(map, first, mid);
 //			}
 //			else {
-//				return find(map, mid+1, last); 
+//				return find(map, mid+1, last);
 //			}
-//		}		
+//		}
 //	}
-	
+
 }
-	
+
 	
 	public Collection<ListMappings> values(){
-		List<ListMappings> ll = new ArrayList<ListMappings>();
+		List<ListMappings> ll = new ArrayList<>();
 		ll.add(list);
 		return ll;
 	}
@@ -103,7 +102,7 @@ public class Merge extends Group {
 	ListMappings merge(ListMappings list){
 		ListMappings nlist = null;
 		boolean merge = true;
-		int count = 0;
+
 		
 		while (merge){
 			nlist = new ListMappings();
