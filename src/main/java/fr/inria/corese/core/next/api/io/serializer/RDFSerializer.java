@@ -37,7 +37,7 @@ public interface RDFSerializer {
      */
     default String getFormatName() {
         return getRDFFormat().getName();
-    };
+    }
 
     /**
      * Gets the RDF format that this serializer generates.
