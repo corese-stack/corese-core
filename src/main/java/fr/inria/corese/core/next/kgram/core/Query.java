@@ -393,10 +393,7 @@ public class Query extends Exp implements Graphable {
         return errors;
     }
 
-    public void addInfo(String mes) {
-        addInfo(mes, null);
-    }
-    
+
     public void addInfo(String mes, Object obj) {
         if (info == null) {
             info = new ArrayList<>();
@@ -1918,14 +1915,7 @@ public class Query extends Exp implements Graphable {
         return getGlobalQuery().getExtension();
     }
     
-    public ASTExtension getCreateExtension() {
-        if (getExtension() == null) {
-            setExtension(new ASTExtension());
-        }
-        return getExtension();
-    }
 
-   
     public void setExtension(ASTExtension ext) {
         this.extension = ext;
     }

@@ -259,6 +259,7 @@ public class MappingSet {
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public Iterator<Mapping> iterator() {
             return this;
         }

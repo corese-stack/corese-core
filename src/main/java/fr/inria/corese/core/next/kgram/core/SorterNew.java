@@ -9,7 +9,10 @@ import fr.inria.corese.core.next.kgram.sorter.core.QPGraph;
 import fr.inria.corese.core.next.kgram.sorter.impl.qpv1.DepthFirstBestSearch;
 import fr.inria.corese.core.next.kgram.sorter.impl.qpv1.HeuristicsBasedEstimation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import static fr.inria.corese.core.next.kgram.sorter.core.Const.plannable;
@@ -20,7 +23,7 @@ import static fr.inria.corese.core.next.kgram.sorter.core.Const.plannable;
  */
 public class SorterNew extends Sorter {
 
-    public void sort(Exp expression, List<Exp> bindings, Producer prod, int planType) {
+    public void sort(Exp expression, List<Exp> bindings, Producer prod) {
         if (expression.size() < 2) return;
 
         Map<Integer, List<Exp>> ESGs = tokenize(expression);
@@ -37,12 +40,7 @@ public class SorterNew extends Sorter {
 
             // ** 2 estimate cost/selectivity **
             // ** 2.1 find the corresponding algorithm **
-            IEstimate ies;
-            if (planType == Query.QP_HEURISTICS_BASED) {
-                ies = new HeuristicsBasedEstimation();
-            } else {
-                ies = new HeuristicsBasedEstimation();
-            }
+            IEstimate ies = new HeuristicsBasedEstimation();
 
             // ** 2.2 estimate **
             ies.estimate(bpg, prod, bindings);
@@ -104,12 +102,7 @@ public class SorterNew extends Sorter {
         }
 
         // == 2.remove the ones containing less that 2 expressions
-        Iterator<Entry<Integer, List<Exp>>> it = ESGs.entrySet().iterator();
-        while (it.hasNext()) {
-            if (it.next().getValue().size() < 2) {
-                it.remove();
-            }
-        }
+        ESGs.entrySet().removeIf(integerListEntry -> integerListEntry.getValue().size() < 2);
 
         return ESGs;
     }
