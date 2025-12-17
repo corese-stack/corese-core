@@ -13,8 +13,6 @@ import fr.inria.corese.core.next.api.io.serializer.*;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Literal;
@@ -270,22 +268,6 @@ public class RDFXMLSerializer implements RDFSerializer {
             return correspondingPrefix + SerializationConstants.COLON + localName;
         }
         return null;
-    }
-
-    /**
-     * Generates a unique prefix based on a given base string, ensuring it's not already in use.
-     * This method appends numbers to the base prefix until a unique one is found.
-     *
-     * @param basePrefix The desired base prefix (e.g., "foaf").
-     * @return A unique prefix (e.g., "foaf", "foaf1", "foaf2").
-     */
-    private String generateUniquePrefix(String basePrefix) {
-        String candidate = basePrefix;
-        int i = 0;
-        while (this.prefixHandler.hasPrefix(candidate)) {
-            candidate = basePrefix + (++i);
-        }
-        return candidate;
     }
 
     /**
