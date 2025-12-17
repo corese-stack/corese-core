@@ -1106,7 +1106,7 @@ public class Eval implements ExpType, Plugin {
     Mappings unionBranch(Producer p, Node graphNode, Exp exp, Exp main, Mappings data) throws SparqlException, EngineException {
         Node queryNode = null;
 
-        if (exp.isFirstWith(Type.UNION)) {
+        if (exp.isFirstWith()) {
             // union in union: eval inner union with parameter data as is
             return subEval(p, graphNode, queryNode, exp, main, data);
         } else if (isFederate(exp) || exp.isUnion() || isParameterUnionMappings()) {

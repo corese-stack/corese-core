@@ -12,19 +12,18 @@ import java.util.List;
  *
  */
 public class Sorter {
-   
-   
+
+
     public void sort(Query q, Exp exp, List<String> lVar, List<Exp> lBind) {
 
         List<Node> lNode = new ArrayList<>();
 
         for (int i = 0; i < exp.size(); i++) {
             Exp e1 = exp.get(i);
-           
+
             if (e1.isSortable()) {
-                if (lNode.isEmpty() && lVar.isEmpty() && leaveFirst()) {
-                    // let first edge at its place
-                } else {
+                if (!lNode.isEmpty() || !lVar.isEmpty() || !leaveFirst()) {
+                    // Process expressions unless we're leaving first edge at its place
                     for (int j = i + 1; j < exp.size(); j++) {
                         Exp e2 = exp.get(j);
                         if (e2.isOption()) {
@@ -41,7 +40,6 @@ public class Sorter {
                                 }
                                 exp.set(i, e2);
                                 e1 = e2;
-                                //break;
                             }
                         }
                     }
@@ -50,7 +48,6 @@ public class Sorter {
                 e1.bind(lNode);
             }
         }
-
     }
 
 

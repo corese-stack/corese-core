@@ -1467,16 +1467,6 @@ public class Mappings extends PointerObject
         this.nodeList = nodeList;
     }
 
-    /**
-     * Generate nodeList for values clause for this Mappings
-     */
-    public List<Node> getNodeListValues() {
-        if (isEmpty()) {
-            return new ArrayList<>();
-        }
-        return get(0).getQueryNodeList();
-    }
-
     public Binding getBinding() {
         return binding;
     }
@@ -1507,30 +1497,11 @@ public class Mappings extends PointerObject
         }
     }
 
-    public String getLink(String name) {
-        for (var url : getLinkList()) {
-            if (url.contains(name)) {
-                return url;
-            }
-        }
-        return null;
-    }
-
-    public String getLastLink(String name) {
-        for (int i = getLinkList().size() - 1; i >= 0; i--) {
-            var url = getLinkList().get(i);
-            if (url.contains(name)) {
-                return url;
-            }
-        }
-        return null;
-    }
-
-    public String getLink() {
+     public String getLink() {
         if (getLinkList().isEmpty()) {
             return null;
         }
-        return getLinkList().get(0);
+        return getLinkList().getFirst();
     }
 
     public void setLink(String link) {
@@ -1587,26 +1558,6 @@ public class Mappings extends PointerObject
 
     public void setReport(IDatatype detail) {
         this.detail = detail;
-    }
-
-    public Mappings completeReport(String key, IDatatype value) {
-        if (getReport() != null) {
-            getReport().complete(key, value);
-        } else {
-            basicCompleteReport(key, value);
-        }
-        return this;
-    }
-
-    public Mappings basicCompleteReport(String key, IDatatype value) {
-        for (Mapping m : this) {
-            if (m.getReport() == null) {
-                return this;
-            } else {
-                m.getReport().set(key, value);
-            }
-        }
-        return this;
     }
 
     public boolean contains(IDatatype value) {

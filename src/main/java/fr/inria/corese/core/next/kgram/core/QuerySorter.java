@@ -78,7 +78,6 @@ public class QuerySorter implements ExpType {
      */
     Exp compile(Exp exp, VString varList, boolean option) {
         Type type = exp.type();
-        boolean testJoin = false;
         switch (type) {
 
             case EDGE:
@@ -137,16 +136,6 @@ public class QuerySorter implements ExpType {
 
                 varList.clear(size);
 
-                if (testJoin && exp.type() == Type.AND) {
-                    // group in separate BGP statements that are not connected
-                    // by variables
-                    // generate a JOIN between BGP.
-                    Exp res = exp.join();
-                    if (res != exp) {
-                        exp.getExpList().clear();
-                        exp.add(res);
-                    }
-                }
         }
         InScopeNodes(exp);
 
@@ -181,7 +170,7 @@ public class QuerySorter implements ExpType {
 
                 case Query.QP_HEURISTICS_BASED:
                     sort = new SorterNew();
-                    ((SorterNew) sort).sort(exp, lBind, getProducer(), getQuery().getPlanProfile());
+                    ((SorterNew) sort).sort(exp, lBind, getProducer());
                     setBind(getQuery(), exp);
                     break;
 

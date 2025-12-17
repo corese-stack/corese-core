@@ -52,8 +52,7 @@ public class PathFinder {
 
     private static final Logger logger = LoggerFactory.getLogger(PathFinder.class);
     public static long cedge = 0, cresult = 0, ctest = 0;
-    // thread that enumerates the path
-    private GraphPath path;
+
     // synchronized buffer between this and projection
     private Buffer mbuffer;
     private Environment memory;
@@ -64,46 +63,38 @@ public class PathFinder {
     private final Evaluator evaluator;
     private final Query query;
     private Mappings lMap;
-    HashMap<Integer, Mappings> store;
+    private final HashMap<Integer, Mappings> store;
     private Filter filter;
     private Memory mem;
     private Edge edge;
     private Node gNode, targetNode, regexNode, varNode;
     private List<Node> from;
     private Node[] qNodes;
+
     // index of node in edge that is the start of the path
     private int index = 0;
     // the inverse of the index (i.e. the other arg)
     private int other;
     private boolean isStop = false;
     private boolean hasListener = false;
-    private boolean// true if breadth first (else depth first)
-            isBreadth;
     private boolean isDistinct = false;
-    private boolean defaultBreadth = false;
-    private boolean// true if accept subproperty in regexp
-            isSubProperty;
+
     private boolean isReverse;
     private boolean isShort;
     private boolean isOne;
-    private boolean// if true: return list of path instead of thread buffer: 50% faster but enumerate all path
-            isList = false;
+
+    // if true: return list of path instead of thread buffer: 50% faster but enumerate all path
+    private boolean isList = false;
     private boolean checkLoop = false;
     private boolean isCountPath = false;
     private boolean isCache = false;
-    private final boolean trace = true;
+    private boolean isStorePath = true;
+
     private final int maxLength = Integer.MAX_VALUE;
     private int min = 0;
     private int max = maxLength;
-    private int userMin = -1;
-    private int userMax = -1;
-    private final int count = 0;
-    private Regex regexp1, regexp;
-    // depth or width first 
-    private String mode = "";
 
-    private boolean isStorePath = true;
-
+    private Regex regexp;
 
     /**
      * @param isStorePath the isStorePath to set
@@ -138,25 +129,24 @@ public class PathFinder {
     public static PathFinder create(Producer p, Matcher match, Evaluator eval, Query q) {
         return new PathFinder(p, match, eval, q);
     }
-    
-     public static PathFinder create(Eval eval, Producer p, Query q) {
+
+    public static PathFinder create(Eval eval, Producer p, Query q) {
         PathFinder pf = new PathFinder(p, eval.getMatcher(), eval.getEvaluator(), q);
         pf.setEval(eval);
         return pf;
     }
-    
+
     void setEval(Eval ev) {
         kgram = ev;
     }
-     
 
+    @SuppressWarnings("unused")
     public void set(EventManager man) {
     }
 
     public void set(ResultListener rl) {
         listener = rl;
         hasListener = rl != null;
-
     }
 
     public void setCheckLoop(boolean b) {
@@ -176,7 +166,6 @@ public class PathFinder {
 
     /**
      * Start/init computation of a new list of path
-     *
      */
     public void start(Edge edge, Node node, Memory env, Filter f) {
         regexNode = node;
@@ -184,7 +173,6 @@ public class PathFinder {
         if (f != null) {
             lVar = f.getVariables();
         }
-        //lMap.clear();
         lMap = new Mappings();
         this.edge = edge;
         int n = index(edge, env, lVar);
@@ -192,7 +180,7 @@ public class PathFinder {
         index = n;
         targetNode = env.getNode(edge.getNode(other));
         varNode = edge.getEdgeVariable();
-        if (f != null) {           
+        if (f != null) {
             if (match(edge, lVar, index)) {
                 filter = f;
                 init(env);
@@ -226,7 +214,7 @@ public class PathFinder {
      * index 0
      */
     int index(Edge edge, Environment mem, List<String> lVar) {
-        int n = -1; // index;
+        int n = -1;
         // which arg is bound if any ?
         for (int i = 0; i < 2; i++) {
             if (mem.isBound(edge.getNode(i))) {
@@ -271,7 +259,6 @@ public class PathFinder {
             return map;
         }
 
-        //lMap.clear();
         lMap = new Mappings();
         process(cstart, memory);
         putMappings(cstart, lMap);
@@ -319,13 +306,12 @@ public class PathFinder {
     }
 
     void mstart(Environment mem) {
-        //isStop = false;
         // buffer store path enumeration
         mbuffer = new Buffer();
-        // path enumeration in a thread 
-        path = new GraphPath(this, mem);
+        // path enumeration in a thread
+        GraphPath graphPath = new GraphPath(this, mem);
         // launch path computing (one by one) eg launch process() below
-        path.start();
+        graphPath.start();
     }
 
     public void run() {
@@ -337,22 +323,19 @@ public class PathFinder {
         isStop = true;
     }
 
-
     /**
      * init at creation time, no need to change. pmax comes from pathLength() &lt;=
      * pmax
      */
+    @SuppressWarnings("unused")
     public void init(Regex exp, Object smode, int pmin, int pmax) {
         cedge = 0;
         cresult = 0;
         ctest = 0;
-        regexp1 = exp.transform();
+
+        Regex regexp1 = exp.transform();
         regexp = exp;
 
-        mode = (String) smode;
-
-        isBreadth = defaultBreadth;
-        isSubProperty = true;
         isReverse = false;
         isShort = false;
         isOne = false;
@@ -365,9 +348,6 @@ public class PathFinder {
             }
         }
 
-        userMin = pmin;
-        userMax = pmax;
-
         // set min and max path length
         // filter pathLength($path) > val
         // the length of the minimal path that matches regex:
@@ -376,14 +356,13 @@ public class PathFinder {
         max = Math.max(max, length);
 
         // user default values
-        if (userMin != -1) {
-            min = Math.max(min, userMin);
+        if (pmin != -1) {
+            min = Math.max(min, pmin);
         }
         // either IntegerMax or pathLength($p) <= max
-        if (userMax != -1) {
-            max = userMax;
+        if (pmax != -1) {
+            max = pmax;
         }
-
     }
 
     public Edge getEdge() {
@@ -402,12 +381,6 @@ public class PathFinder {
             other = 1;
             isReverse = false;
         }
-
-    }
-
-    // number of enumerated relations
-    public int getCount() {
-        return count;
     }
 
     Node get(Environment memory, int i) {
@@ -420,15 +393,13 @@ public class PathFinder {
 
     void process(Node cstart, Environment memory) {
         // Is the source of edge bound ?
-        // In which case all path relations come from same source 
+        // In which case all path relations come from same source
         Node csource = null;
         if (gNode != null) {
             csource = gNode.isConstant() ? gNode : memory.getNode(gNode);
-            //csource = memory.getNode(gNode);
         }
 
         // the start concept for path
-        //Node cstart = get(memory, index);
         Path path = new Path(isReverse);
         path.setMax(max);
         path.setIsShort(isShort);
@@ -438,13 +409,13 @@ public class PathFinder {
             producer.initPath(edge, 0);
         }
 
+        Regex regexp1 = regexp.transform();
         eval(regexp1, path, cstart, csource);
 
         // in order to stop enumeration, return null
         if (!isList) {
             mbuffer.put(null, false);
         }
-
     }
 
     /**
@@ -453,7 +424,6 @@ public class PathFinder {
      * memory the list of edges
      */
     private Mapping result(Path path, Node gNode, Node src, Node start, boolean isReverse) {
-        //if (edge.getIndex()==1)logger.debug(producer.getGraphNode(edge, edge) + " " + edge);
         Edge ee = edge;
         int length = 3;
         int ip = 2, is = 3;
@@ -465,6 +435,7 @@ public class PathFinder {
         if (src != null) {
             length += 1;
         }
+
         Node n1, n2;
         if (path.size() == 0) {
             n1 = start;
@@ -519,7 +490,6 @@ public class PathFinder {
         Filter f = query.getGlobalFilter(Query.PATHNODE);
         Node node;
         try {
-            //node = evaluator.eval(f, memory, producer);
             node = (Node) f.getExp().evalWE(evaluator, memory.getBind(), memory, producer);
             node.setObject(p);
         } catch (EngineException e) {
@@ -533,26 +503,26 @@ public class PathFinder {
      */
     private boolean check(Node n0, Node n1) {
         if (index == 0) {
-            if (!matcher.match(edge.getNode(1), n1, memory)) { 
+            if (!matcher.match(edge.getNode(1), n1, memory)) {
                 return false;
             }
             return targetNode == null || targetNode.match(n1);
         } else {
-            if (!matcher.match(edge.getNode(0), n0, memory)) { 
+            if (!matcher.match(edge.getNode(0), n0, memory)) {
                 return false;
             }
             return targetNode == null || targetNode.match(n0);
         }
     }
-   
+
     /**
-     * cstart is bound when edge node is a bound variable 
+     * cstart is bound when edge node is a bound variable
      * cstart is not bound when edge node is a constant, this case
      * is processed by Producer
      */
-    private Iterable<Node> getNodeIterator(Node cstart, Node csrc) {
+    private Iterable<Node> getNodeIterator(Node cstart) {
         if (cstart == null) {
-            return getNodeIterator(csrc, edge, from, null);
+            return getNodeIterator(edge, from, null);
         } else {
             // start is bound
             ArrayList<Node> list = new ArrayList<>();
@@ -561,8 +531,7 @@ public class PathFinder {
         }
     }
 
-    public Iterable<Node> getNodeIterator(Node csrc, final Edge edge, List<Node> from, List<Regex> regex) {
-
+    public Iterable<Node> getNodeIterator(final Edge edge, List<Node> from, List<Regex> regex) {
         Iterable<Node> iter = producer.getNodes(gNode, from, edge, memory, regex, index);
 
         if (filter == null) {
@@ -576,7 +545,7 @@ public class PathFinder {
             public boolean hasNext() {
                 return it.hasNext();
             }
-            
+
             @Override
             public Node next() {
                 while (hasNext()) {
@@ -591,7 +560,7 @@ public class PathFinder {
                 }
                 return null;
             }
-            
+
             @Override
             public void remove() {
             }
@@ -605,13 +574,11 @@ public class PathFinder {
     boolean test(Filter filter, Path path, Node qNode, Node node) {
         mem.push(qNode, node);
         if (varNode != null) {
-            // TODO: fix it
             Node pathNode = getPathNode(path);
             mem.push(varNode, pathNode);
-            //mem.push(varNode, varNode);
             mem.pushPath(varNode, path);
         }
-        boolean test = true;
+        boolean test;
         try {
             test = filter.getExp().test(evaluator, mem.getBind(), mem, producer);
         } catch (EngineException ex) {
@@ -628,9 +595,8 @@ public class PathFinder {
     boolean test(Node node) {
         Node qNode = edge.getNode(index);
         mem.push(qNode, node);
-        boolean test = true;
+        boolean test;
         try {
-            //test = evaluator.test(filter, mem, producer);
             test = filter.getExp().test(evaluator, mem.getBind(), mem, producer);
         } catch (EngineException ex) {
             test = false;
@@ -666,18 +632,15 @@ public class PathFinder {
      * bound in the later case, index = 1
      */
     void eval(Record stack, Path path, Node start, Node src) {
-        //trace(start.toString());
-
         if (isStop) {
             return;
         }
 
         if (stack.isEmpty()) {
-
             if (stack.getTarget() != null) {
                 // this is a parallel path check, path is finished: stop it
                 if (start.match(stack.getTarget())) {
-                    // it is successful 
+                    // it is successful
                     stack.setSuccess();
                 }
                 return;
@@ -689,17 +652,12 @@ public class PathFinder {
 
         Regex exp = stack.pop();
 
-        //logger.debug(exp.toString() + " " + start);
-
         switch (exp.retype()) {
-
             case Regex.TEST: {
                 // exp @[ ?this != <John> ]
-
                 boolean b = true;
-                
+
                 if (start != null) {
-                    //ctest ++;
                     b = test(exp.getExpr().getFilter(), path, regexNode, start);
                 }
 
@@ -710,10 +668,8 @@ public class PathFinder {
             }
             break;
 
-
             case Regex.LABEL:
             case Regex.NOT: {
-
                 if (path.size() >= path.getMax()) {
                     stack.push(exp);
                     return;
@@ -740,7 +696,6 @@ public class PathFinder {
                 ResultListener handler = listener;
 
                 for (Edge ent : pp.getEdges(gg, ff, ee, env, exp, src, start, ii)) {
-
                     if (isStop) {
                         stack.push(exp);
                         return;
@@ -768,8 +723,8 @@ public class PathFinder {
 
                     if (hasFilter && isStart) {
                         // test a filter on the index node
-                        boolean test = test(rel.getNode(ii));
-                        if (!test) {
+                        boolean testResult = test(rel.getNode(ii));
+                        if (!testResult) {
                             continue;
                         }
                     }
@@ -783,7 +738,6 @@ public class PathFinder {
                     }
 
                     if (isStart) {
-
                         boolean isNew = previous == null || !previous.match(node);
                         previous = node;
 
@@ -797,7 +751,6 @@ public class PathFinder {
                         // in case there is e1 || e2
                         stack.pushStart(node);
 
-
                         if (hasShort) {
                             // reset node length to zero when start changes
                             if (isNew) {
@@ -806,7 +759,6 @@ public class PathFinder {
                             }
                         }
                     }
-
 
                     if (hasShort) {
                         // shortest path
@@ -828,11 +780,11 @@ public class PathFinder {
                     if (hasHandler) {
                         handler.enter(ent, exp, size);
                     }
-                   
+
                     path.add(ent, eweight);
 
                     boolean suc = kgram.getVisitor().step(kgram, src, ee, path, path.firstNode(), path.lastNode());
-                    
+
                     if (suc) {
                         eval(stack, path, rel.getNode(oo), src);
                     }
@@ -847,17 +799,13 @@ public class PathFinder {
                         visit.nleave(node);
                         stack.popStart();
                     }
-
                 }
-
-
 
                 stack.push(exp);
             }
             break;
 
             case Regex.SEQ: {
-
                 int fst = 0, rst = 1;
                 if (isReverse) {
                     // path walk from right to left
@@ -876,13 +824,10 @@ public class PathFinder {
                 stack.pop();
                 stack.pop();
                 stack.push(exp);
-
             }
             break;
 
-
             case Regex.PARA:
-
                 // e1 || e2
                 if (start != null) {
                     stack.pushStart(start);
@@ -902,25 +847,19 @@ public class PathFinder {
                 }
                 // push para
                 stack.push(exp);
-
                 break;
-
-
 
             case Regex.CHECK:
                 // additional statement to perform checking after
                 // a standard operation occurs
-
                 Regex test = exp.getArg(0);
 
                 switch (test.retype()) {
-
                     case Regex.PARA:
-
                         // check(e1 || e2)
                         // e1 has computed a path from former start to this start (which is now target of e2)
                         // check there is a parallel path e2 from start to target
-                        // create new Record to check loop specific to path e2 
+                        // create new Record to check loop specific to path e2
                         Record st = new Record(Visit.create(isReverse, isCountPath));
                         // push e2
                         st.push(test.getArg(1));
@@ -937,27 +876,18 @@ public class PathFinder {
                         stack.push(exp);
                         break;
 
-
-
                     case Regex.OPTION:
                         // check that target has not already been reached by option
-                        // because sparql 1.1 option is not counting 
-
-                        if (stack.getVisit().nloop(test, start)) {
-                            // target already reached: 
-                            // do nothing and backtrack
-                        } else {
+                        // because sparql 1.1 option is not counting
+                        if (!stack.getVisit().nloop(test, start)) {
+                            // target not yet reached: continue evaluation
                             eval(stack, path, start, src);
                         }
 
                         stack.push(exp);
                         break;
                 }
-
-
                 break;
-
-
 
             case Regex.PLUS:
                 // exp+
@@ -968,12 +898,10 @@ public class PathFinder {
                 plus(exp, stack, path, start, src);
                 break;
 
-
             case Regex.COUNT:
                 // exp{1,n}
                 count(exp, stack, path, start, src);
                 break;
-
 
             case Regex.STAR:
                 // exp*
@@ -984,9 +912,7 @@ public class PathFinder {
                 star(exp, stack, path, start, src);
                 break;
 
-
             case Regex.ALT:
-
                 stack.push(exp.getArg(0));
                 eval(stack, path, start, src);
                 stack.pop();
@@ -998,16 +924,11 @@ public class PathFinder {
                 stack.push(exp);
                 break;
 
-
             case Regex.OPTION:
-
                 option(exp, stack, path, start, src);
                 break;
-
         }
-
     }
-
 
     boolean isDistinct(Record stack, Node start, Node target) {
         boolean b = stack.getVisit().isDistinct(start, target);
@@ -1018,7 +939,6 @@ public class PathFinder {
     }
 
     void result(Record stack, Path path, Node start, Node src) {
-
         if (path.size() > 0) {
             if (isDistinct) {
                 // distinct (start,target)
@@ -1039,14 +959,12 @@ public class PathFinder {
                 }
             }
         } else {
-            resultNode(stack, path, start, src);
+            resultNode(path, start, src);
         }
     }
-    
-    
-     void resultNode(Record stack, Path path, Node start, Node src) {
-        for (Node node : getNodeIterator(start, src)) {
 
+    void resultNode(Path path, Node start, Node src) {
+        for (Node node : getNodeIterator(start)) {
             if (isStop) {
                 return;
             }
@@ -1074,7 +992,6 @@ public class PathFinder {
     }
 
     void option(Regex exp, Record stack, Path path, Node start, Node src) {
-
         if (stack.getVisit().nloop(exp, start)) {
             stack.push(exp);
             return;
@@ -1095,14 +1012,12 @@ public class PathFinder {
         stack.push(exp);
 
         stack.getVisit().nunset(exp);
-
     }
 
     /**
      * exp*
      */
     void star(Regex exp, Record stack, Path path, Node start, Node src) {
-
         // start is the first node of exp*
         boolean isFirst = stack.getVisit().nfirst(exp);
 
@@ -1115,14 +1030,10 @@ public class PathFinder {
         // use case: (p*/q)*
         // we must save each visited of p*
         // because it expands to p*/q . p*/q ...
-        // and each occurrence of p* must have its own visited 
-
+        // and each occurrence of p* must have its own visited
         Visit.VisitedNode save = stack.getVisit().nunset(exp);
         eval(stack, path, start, src);
         stack.getVisit().nset(exp, save);
-
-        // first step: zero length 
-        //eval(stack, path, start, src);
 
         // restore exp*
         stack.push(exp);
@@ -1147,14 +1058,14 @@ public class PathFinder {
      * In addition there are two cases whether start node is bound or not
      * If start is bound, OK
      * If start is not bound, it will be bound by case LABEL: above
-     * ?x p+ ?y 
-     * When index(p+) = 0, start is not bound, execute(p/p+). When we come back to p+ in the stack, 
+     * ?x p+ ?y
+     * When index(p+) = 0, start is not bound, execute(p/p+). When we come back to p+ in the stack,
      */
     void plus(Regex exp, Record stack, Path path, Node start, Node src) {
         Visit visit = stack.getVisit();
         // start is the first node of exp+
-        boolean isFirst = visit.nfirst(exp);
-        
+        visit.nfirst(exp);
+
         if (visit.count(exp) == 0) {
             // case 1: first execution of exp+
 
@@ -1173,12 +1084,11 @@ public class PathFinder {
             stack.pop();
             visit.count(exp, -1);
 
-            if (!isCountPath) { 
+            if (!isCountPath) {
                 // std sparql
                 // leave exp+
                 visit.nremove(exp, start);
             }
-
         } else {
             // case 2:
             // next execution of exp+ after first one
@@ -1197,11 +1107,11 @@ public class PathFinder {
 
             // eval rest
             eval(stack, path, start, src);
-            
+
             // switch on exp+ index and visitedNode table
             visit.set(exp, 1);
             visit.nset(exp, save);
-            
+
             // (2) loop again
             // push exp+
             stack.push(exp);
@@ -1211,19 +1121,15 @@ public class PathFinder {
             eval(stack, path, start, src);
             stack.pop();
 
-            //
             visit.nremove(exp, start);
         }
-
     }
 
     /**
      * exp{n,m} exp{n,}
      */
     void count(Regex exp, Record stack, Path path, Node start, Node src) {
-
         if (stack.getVisit().count(exp) >= exp.getMin()) {
-
             if (checkLoop(exp)) {
                 if (stack.getVisit().nloop(exp, start)) {
                     stack.push(exp);
@@ -1241,7 +1147,6 @@ public class PathFinder {
 
             if (stack.getVisit().count(exp) < exp.getMax()) {
                 // max length not reached, can continue
-
                 stack.getVisit().count(exp, +1);
                 stack.push(exp.getArg(0));
                 eval(stack, path, start, src);
@@ -1252,24 +1157,20 @@ public class PathFinder {
             if (checkLoop(exp)) {
                 stack.getVisit().nremove(exp, start);
             }
-
         } else {
             // count(exp) < exp.getMin()
-
             if (isReverse) {
                 if (checkLoop(exp)) {
                     // use case: ?x exp{2,} <uri>
                     // path goes backward
                     stack.getVisit().ninsert(exp, start);
                 }
-            } // TODO: draft
-            else if (checkLoop) {
+            } else if (checkLoop) {
                 if (stack.getVisit().nloop(exp, start)) {
                     stack.push(exp);
                     return;
                 }
             }
-
 
             stack.push(exp);
 
@@ -1285,12 +1186,10 @@ public class PathFinder {
                     // path goes backward
                     stack.getVisit().nremove(exp, start);
                 }
-            } // TODO: draft
-            else if (checkLoop) {
+            } else if (checkLoop) {
                 stack.getVisit().nremove(exp, start);
             }
         }
-
     }
 
     boolean hasMax(Regex exp) {

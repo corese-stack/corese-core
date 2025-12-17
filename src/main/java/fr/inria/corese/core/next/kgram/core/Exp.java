@@ -19,21 +19,17 @@ import static fr.inria.corese.core.next.kgram.api.core.PointerType.STATEMENT;
 public class Exp extends PointerObject
         implements ExpType, ExpPattern, Iterable<Exp> {
 
-
     public static final int SUBJECT = 0;
     public static final int OBJECT = 1;
     public static final int PREDICATE = 2;
 
     static final String NL = "\n";
     static final String SP = " ";
-    // group edge even if there is a disconnected filter
-    public static boolean groupEdge = true;
     static Exp empty = new Exp(Type.EMPTY);
     Type type;
     int index = -1;
     // optional success
-    boolean // default status must be false (for order by desc())
-            status = false;
+    boolean status = false;
     boolean skip;
     boolean isFail = false;
     boolean isPath = false;
@@ -70,14 +66,12 @@ public class Exp extends PointerObject
     private Exp path;
     private Exp bind;
     private Exp values;
-    private Query externQuery;
     private int level = -1;
     // service number
     private int number = -1;
     private int num = -1;
     private boolean isSystem = false;
     private boolean mappings = false;
-
 
     Exp(Type t) {
         type = t;
@@ -206,7 +200,6 @@ public class Exp extends PointerObject
         return isPostpone;
     }
 
-
     // draft for BGP
     public Exp duplicate() {
         Exp exp = Exp.create(type());
@@ -309,19 +302,16 @@ public class Exp extends PointerObject
         if (type() == Type.VALUES) {
             nl(sb, 0);
             sb.append(getMappings().toString(true));
-        } else if (type() == Type.WATCH || type() == Type.CONTINUE || type() == Type.BACKJUMP) {
-            // skip because loop
-        } else {
+        } else if (type() != Type.WATCH && type() != Type.CONTINUE && type() != Type.BACKJUMP) {
+            // Process normal types (skip WATCH, CONTINUE, BACKJUMP because of loop)
             if (isOptional() && isPostpone()) {
                 sb.append("POSTPONE ");
                 getPostpone().toString(sb);
                 nl(sb, n);
             }
-            int i = 0;
             for (Exp e : this) {
                 nl(sb, n);
                 e.toString(sb, n + 1).append(SP);
-                i++;
             }
         }
 
@@ -383,12 +373,12 @@ public class Exp extends PointerObject
     }
 
     public boolean isBGPFilter() {
-        return isBGP() && isOnly(Type.FILTER);
+        return isBGP() && isOnly();
     }
 
-    boolean isOnly(Type type) {
+    boolean isOnly() {
         for (Exp exp : this) {
-            if (exp.type() != type) {
+            if (exp.type() != Type.FILTER) {
                 return false;
             }
         }
@@ -510,6 +500,7 @@ public class Exp extends PointerObject
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Iterator<Exp> iterator() {
         return args.iterator();
     }
@@ -682,6 +673,7 @@ public class Exp extends PointerObject
         producer = p;
     }
 
+    @SuppressWarnings("unchecked")
     public List<Object> getObjectValues() {
         if (object instanceof List) {
             return (List<Object>) object;
@@ -835,7 +827,6 @@ public class Exp extends PointerObject
             }
         }
         return false;
-
     }
 
     /**
@@ -885,7 +876,6 @@ public class Exp extends PointerObject
      */
     int nbNode() {
         switch (type) {
-
             case EDGE:
             case PATH:
             case EVAL:
@@ -907,11 +897,9 @@ public class Exp extends PointerObject
      */
     Node getNode(int n) {
         switch (type) {
-
             case EDGE:
             case PATH:
             case EVAL:
-
                 if (n < edge.nbNode()) {
                     return edge.getNode(n);
                 } else {
@@ -946,7 +934,6 @@ public class Exp extends PointerObject
      */
     public void share(List<String> filterVar, List<String> expVar) {
         switch (type()) {
-
             case FILTER:
             case OPT_BIND, OPTION:
                 break;
@@ -967,7 +954,6 @@ public class Exp extends PointerObject
                         expVar.add(varString);
                     }
                 }
-
                 break;
 
             case QUERY:
@@ -1003,9 +989,7 @@ public class Exp extends PointerObject
                 for (Exp exp : this) {
                     exp.share(filterVar, expVar);
                 }
-
         }
-
     }
 
     void share(Node node, List<String> fVar, List<String> eVar) {
@@ -1040,9 +1024,7 @@ public class Exp extends PointerObject
      * optional = true :  we are inside an optional
      */
     void getNodes(ExpHandler h) {
-
         switch (type()) {
-
             case FILTER:
                 // get exists {} nodes
                 if (h.isExist()) {
@@ -1077,7 +1059,6 @@ public class Exp extends PointerObject
                     h.add(nodeEval);
                 }
                 break;
-
 
             case VALUES:
                 for (Node varNode : getNodeList()) {
@@ -1135,7 +1116,6 @@ public class Exp extends PointerObject
                         }
                     }
                 }
-
                 break;
 
             case QUERY:
@@ -1152,7 +1132,6 @@ public class Exp extends PointerObject
                     }
                 }
         }
-
     }
 
     boolean isSkipStatement() {
@@ -1199,7 +1178,6 @@ public class Exp extends PointerObject
     void getExistNodes(Expr exp, ExpHandler h, List<Node> lExistNode) {
         if (exp.oper() == ExprType.EXIST) {
             Exp pat = getPattern(exp);
-            // @todo: subscope = false|true ?
             List<Node> lNode = pat.getTheNodes(h.copy());
             for (Node exprNode : lNode) {
                 add(lExistNode, exprNode);
@@ -1214,7 +1192,6 @@ public class Exp extends PointerObject
     /**
      * Compute inscope variables for variable binding for MappingSet
      */
-
     public List<Node> getRecordInScopeNodes(boolean bind) {
         if (getInScopeNodeList() == null) {
             setInScopeNodeList(getInScopeNodes(bind));
@@ -1267,13 +1244,7 @@ public class Exp extends PointerObject
     }
 
     void add(List<Node> lNode, Node node) {
-        add(lNode, node, false);
-    }
-
-    void add(List<Node> lNode, Node node, boolean blank) {
-        if (node != null
-                && (blank || (node.isVariable() && !node.isBlank()))
-                && !lNode.contains(node)) {
+        if (node != null && node.isVariable() && !node.isBlank() && !lNode.contains(node)) {
             lNode.add(node);
         }
     }
@@ -1327,14 +1298,12 @@ public class Exp extends PointerObject
         return type() == Type.OPT_BIND && size() == 1;
     }
 
-
     /**
      * Add BIND ?x = ?y
      */
     List<Exp> varBind() {
         List<Exp> lBind = new ArrayList<>();
-        for (int i = 0; i < size(); i++) {
-            Exp f = get(i);
+        for (Exp f : this) {
             if ((f.type() == Type.VALUES) || (f.isFilter() && f.size() > 0)) {
                 Exp bindExp = f.first();
                 if ((bindExp.type() == Type.OPT_BIND) && (bindExp.isBindCst())) {
@@ -1386,40 +1355,11 @@ public class Exp extends PointerObject
         return false;
     }
 
-
     /**
      * this is FILTER with TEST ?x &lt; ?y
      */
     public int oper() {
         return getFilter().getExp().oper();
-    }
-
-
-    boolean isBound(List<String> lvar, List<Node> lnode) {
-        for (String varString : lvar) {
-            if (!isBound(varString, lnode)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    boolean isBound(String variableString, List<Node> lnode) {
-        for (Node boundNode : lnode) {
-            if (boundNode.isVariable() && boundNode.getLabel().equals(variableString)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean intersect(List<Node> nodes, List<Node> list) {
-        for (Node intersectNode : nodes) {
-            if (list.contains(intersectNode)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void cache(Node n) {
@@ -1633,8 +1573,6 @@ public class Exp extends PointerObject
         this.number = number;
     }
 
-
-
     /**
      * exp is rest of minus, optional: exp is AND
      * exp is rest of join: AND is not mandatory, it may be a service
@@ -1665,8 +1603,8 @@ public class Exp extends PointerObject
                 get(1).isRecFederate();
     }
 
-    boolean isFirstWith(Type type) {
-        return type() == type || (isBGPAnd() && size() > 0 && get(0).type() == type);
+    boolean isFirstWith() {
+        return type() == Type.UNION || (isBGPAnd() && size() > 0 && get(0).type() == Type.UNION);
     }
 
     Exp complete(Mappings map) {
@@ -1719,112 +1657,6 @@ public class Exp extends PointerObject
     }
 
     /**
-     * If content is disconnected, generate join(e1, e2)
-     * called by QuerySorter when testJoin=true (default is false)
-     * not used.
-     */
-    Exp join() {
-        List<Node> connectedNode = null;
-        Exp connectedExp = Exp.create(Type.AND);
-        List<Exp> disconnectedExp = new ArrayList<>();
-        boolean disconnectedFilter = false;
-
-        for (int i = 0; i < size(); i++) {
-            Exp e = get(i);
-
-            if (e.type() == Type.FILTER) {
-                Filter f = e.getFilter();
-                List<String> lvar = f.getVariables();
-
-                if (connectedNode == null || isBound(lvar, connectedNode)) {
-                    // filter is first
-                    // or filter is bound by current exp : add it to exp
-                    connectedExp.add(e);
-                } else {
-                    // filter not bound by current exp
-                    if (!disconnectedFilter) {
-                        add(disconnectedExp, connectedExp);
-                        disconnectedFilter = true;
-                    }
-                    add(disconnectedExp, e);
-                }
-                continue;
-            } else {// TODO: UNION
-                List<Node> nodes;
-                if (type() == Type.MINUS || type() == Type.OPTIONAL) {
-                    nodes = e.first().getAllNodes();
-                } else {
-                    nodes = e.getAllNodes();
-                }
-
-                if (disconnectedFilter) {
-                    if (!groupEdge) {
-                        connectedExp = Exp.create(Type.AND);
-                        connectedNode = null;
-                    }
-                    disconnectedFilter = false;
-                }
-
-                if (connectedNode == null) {
-                    connectedNode = nodes;
-                } else if (intersect(nodes, connectedNode)) {
-                    connectedNode.addAll(nodes);
-                } else {
-                    add(disconnectedExp, connectedExp);
-                    connectedExp = Exp.create(Type.AND);
-                    connectedNode = nodes;
-                }
-            }
-
-            connectedExp.add(e);
-        }
-
-        if (connectedExp.size() > 0) {
-            add(disconnectedExp, connectedExp);
-        }
-
-        if (disconnectedExp.size() <= 1) {
-            return this;
-        } else {
-            return join(disconnectedExp);
-        }
-    }
-
-    void add(List<Exp> list, Exp exp) {
-        if (!list.contains(exp)) {
-            list.add(exp);
-        }
-    }
-
-    /**
-     * JOIN the exp of the list, except filters which are in a BGP with
-     * preceding exp list = e1 e2 f1 e3 return JOIN(AND(JOIN(e1, e2) f1), e3 ).
-     */
-    Exp join(List<Exp> list) {
-        Exp exp = list.getFirst();
-
-        for (int i = 1; i < list.size(); i++) {
-
-            Exp cur = list.get(i);
-
-            if (cur.type() == Type.FILTER || exp.type() == Type.FILTER) {
-                // and
-                if (exp.type() == Type.AND) {
-                    exp.add(cur);
-                } else {
-                    exp = Exp.create(Type.AND, exp, cur);
-                }
-            } else {
-                // variables that may be bound from environment (e.g. values)
-                exp = Exp.create(Type.JOIN, exp, cur);
-                exp.bindNodes();
-            }
-        }
-
-        return exp;
-    }
-
-    /**
      * Nodes that may be bound by previous clause or by environment except
      * minus, etc.
      * use case:  join
@@ -1837,6 +1669,4 @@ public class Exp extends PointerObject
 
     static class VExp extends ArrayList<Exp> {
     }
-
-
 }
