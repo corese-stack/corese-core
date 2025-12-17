@@ -1650,7 +1650,7 @@ public class Query extends Exp implements Graphable {
     }
 
     public Query orderBy(Node node) {
-        if (node != null && !contain(getOrderBy(), node)) {
+        if (node != null && doesNotContain(getOrderBy(), node)) {
             addOrderBy(node);
         }
         return this;
@@ -1661,7 +1661,7 @@ public class Query extends Exp implements Graphable {
     }
 
     public Query groupBy(Node node) {
-        if (node != null && !contain(getGroupBy(), node)) {
+        if (node != null && doesNotContain(getGroupBy(), node)) {
             addGroupBy(node);
         }
         return this;
@@ -1672,7 +1672,7 @@ public class Query extends Exp implements Graphable {
     }
 
     public Query select(Node node) {
-        if (node != null && !contain(getSelectFun(), node)) {
+        if (node != null && doesNotContain(getSelectFun(), node)) {
             addSelect(node);
         }
         return this;
@@ -1696,7 +1696,7 @@ public class Query extends Exp implements Graphable {
         List<Exp> list = new ArrayList<>();
         list.addAll(q1.getSelectFun());
         for (Exp exp : q2.getSelectFun()) {
-            if (!contain(list, exp.getNode())) {
+            if (doesNotContain(list, exp.getNode())) {
                 list.add(exp);
             }
         }
