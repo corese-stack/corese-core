@@ -1,17 +1,17 @@
 package fr.inria.corese.core.next.impl.io.serialization.trig;
 
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
 
 /**
  * Configuration for TriG serialization format.
- * This class extends {@link AbstractTFamilyOption} and provides specific defaults
+ * This class extends {@link AbstractTFamilyOptions} and provides specific defaults
  * and options tailored for TriG, which extends Turtle with named graphs.
  *
  * <p>Use the {@link Builder} class to create instances of {@code TriGConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class TriGSerializerOptions extends AbstractTFamilyOption {
+public class TriGSerializerOptions extends AbstractTFamilyOptions {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
@@ -27,7 +27,7 @@ public class TriGSerializerOptions extends AbstractTFamilyOption {
      * Provides a fluent API for constructing {@code TriGConfig} instances with default values
      * specific to the TriG format.
      */
-    public static class Builder extends AbstractTFamilyOption.AbstractTFamilyBuilder<Builder> {
+    public static class Builder extends AbstractTFamilyOptions.AbstractTFamilyBuilder<Builder> {
         /**
          * Default constructor initializes all options with their default values for TriG.
          */

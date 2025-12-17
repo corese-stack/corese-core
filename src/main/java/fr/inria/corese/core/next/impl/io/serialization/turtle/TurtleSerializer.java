@@ -5,13 +5,15 @@ import java.io.Writer;
 import java.util.Objects;
 
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.impl.io.serialization.base.AbstractGraphSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
 /**
@@ -57,10 +59,11 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      * @param config the {@link TurtleSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public TurtleSerializer(Model model, TurtleSerializerOptions config) {
+    public TurtleSerializer(Model model, IOOptions config) {
         super(model, config);
-        Objects.requireNonNull(config, "TurtleConfig cannot be null");
+        Objects.requireNonNull(config, "config cannot be null");
     }
+
     /**
      * Retrieves the RDF format supported by this serializer, which is Turtle
      *
@@ -81,7 +84,7 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      */
     @Override
     protected void doWriteStatements(Writer writer) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = (AbstractTFamilyOption) option;
+        AbstractTFamilyOptions tFamilyConfig = (AbstractTFamilyOptions) option;
 
         if (tFamilyConfig.useCompactTriples() && tFamilyConfig.groupBySubject()) {
             writeOptimizedStatements(writer);
@@ -150,12 +153,16 @@ public class TurtleSerializer extends AbstractGraphSerializer {
                     if (Character.isISOControl(c) ||c == 0x7F) {
                         sb.append(String.format("\\u%04X", (int) c));
                 }
-                    else if (option.escapeUnicode() && c >= 0x80 && c <= 0xFFFF) {
+                    else if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions
+                            && abstractSerializerOptions.escapeUnicode()
+                            && c >= 0x80
+                            && c <= 0xFFFF) {
                         sb.append(String.format("\\u%04X", (int) c));
                     } else if (Character.isHighSurrogate(c)) {
                         int codePoint = value.codePointAt(i);
                         if (Character.isValidCodePoint(codePoint)) {
-                            if (option.escapeUnicode()) {
+                            if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions
+                                    && abstractSerializerOptions.escapeUnicode()) {
                                 sb.append(String.format("\\U%08X", codePoint));
                             } else {
                                 sb.append(Character.toChars(codePoint));

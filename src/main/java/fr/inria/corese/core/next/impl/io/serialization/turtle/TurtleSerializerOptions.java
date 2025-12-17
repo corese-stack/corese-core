@@ -1,17 +1,19 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOption;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
 
 /**
  * Configuration for Turtle serialization format.
- * This class extends {@link AbstractTFamilyOption} and provides specific defaults
+ * This class extends {@link AbstractTFamilyOptions} and provides specific defaults
  * and options tailored for Turtle, such as using collections and anonymous blank nodes.
  *
  * <p>Use the {@link Builder} class to create instances of {@code TurtleConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class TurtleSerializerOptions extends AbstractTFamilyOption {
+public class TurtleSerializerOptions extends AbstractTFamilyOptions {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
@@ -27,16 +29,31 @@ public class TurtleSerializerOptions extends AbstractTFamilyOption {
      * Provides a fluent API for constructing {@code TurtleConfig} instances with default values
      * specific to the Turtle format.
      */
-    public static class Builder extends AbstractTFamilyOption.AbstractTFamilyBuilder<Builder> {
+    public static class Builder extends AbstractTFamilyOptions.AbstractTFamilyBuilder<Builder> {
         /**
          * Default constructor initializes all options with their default values for Turtle.
          */
         public Builder() {
+            super();
             lineEnding(System.lineSeparator());
             validateURIs(false);
             useCollections(true);
             blankNodeStyle(BlankNodeStyleEnum.ANONYMOUS);
+        }
 
+        /**
+         * Copy constructor for easy creation of option inheriting setting from others
+         */
+        public Builder(IOOptions otherOption) {
+            super(otherOption);
+            if(otherOption instanceof LineEndingOptions lineEndingOptions) {
+                lineEnding(lineEndingOptions.getLineEnding());
+            }
+            if(otherOption instanceof AbstractTFamilyOptions abstractTFamilyOptions) {
+                validateURIs(abstractTFamilyOptions.validateURIs());
+                useCollections(abstractTFamilyOptions.useCollections());
+                blankNodeStyle(abstractTFamilyOptions.getBlankNodeStyle());
+            }
         }
 
         /**

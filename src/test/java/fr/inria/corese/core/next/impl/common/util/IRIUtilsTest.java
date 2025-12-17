@@ -20,6 +20,8 @@ public class IRIUtilsTest {
     private static final String uriToHTMLPageWithQueryAndFragment = "https://www.syuno-pit.biz/tezukayama-bandai-2.html?query=1#fragment";
     private static final String uriToHTMLPageWithFragment = "https://www.syuno-pit.biz/tezukayama-bandai-2.html#fragment";
     private static final String blankNode = "_:n2d65906b09534cabb44314ff2e2b248axb4";
+    private static final String uriWithUnexpectedCharactersObject = "http://example.org/obj&quot;ect&apos";
+    private static final String uriWithUnexpectedCharactersSubject = "http://example.org/sub&ject";
 
     // Array of strings that should be recognized as correct IRIs. Some of them taken from the official IRI documentation.
     private static final String[] correctARIs = { uriSchema, uriWithFragment, uriWithQuery, uriWithPort, uriWithPortAndQuery, uriWithPortAndQueryAndFragment, uriWithPortAndFragment, uriToHTMLPage, uriToHTMLPageWithQuery, uriToHTMLPageWithQueryAndFragment, uriToHTMLPageWithFragment, "ftp://ftp.is.co.za/rfc/rfc1808.txt", "http://www.ietf.org/rfc/rfc2396.txt", "ldap://[2001:db8::7]/c=GB?objectClass?one", "mailto:John.Doe@example.com", "news:comp.infosystems.www.servers.unix", "tel:+1-816-555-1212", "telnet://192.0.2.16:80/", "urn:oasis:names:specification:docbook:dtd:xml:4.1.2", "http://foo.co.uk/", "http://regexr.com/foo.html?q=bar" };
@@ -40,6 +42,8 @@ public class IRIUtilsTest {
         assertEquals("https://www.syuno-pit.biz/tezukayama-bandai-2.html#", IRIUtils.guessNamespace(uriToHTMLPageWithFragment));
         assertEquals("", IRIUtils.guessNamespace(blankNode));
         assertEquals("http://www.w3.org/2001/XMLSchema#", IRIUtils.guessNamespace("http://www.w3.org/2001/XMLSchema#"));
+        assertEquals("http://example.org/", IRIUtils.guessNamespace(uriWithUnexpectedCharactersObject));
+        assertEquals("http://example.org/", IRIUtils.guessNamespace(uriWithUnexpectedCharactersSubject));
     }
 
     @Test
@@ -56,6 +60,8 @@ public class IRIUtilsTest {
         assertEquals("fragment", IRIUtils.guessLocalName(uriToHTMLPageWithQueryAndFragment));
         assertEquals("fragment", IRIUtils.guessLocalName(uriToHTMLPageWithFragment));
         assertEquals("", IRIUtils.guessLocalName(blankNode));
+        assertEquals("obj&quot;ect&apos", IRIUtils.guessLocalName(uriWithUnexpectedCharactersObject));
+        assertEquals("sub&ject", IRIUtils.guessLocalName(uriWithUnexpectedCharactersSubject));
     }
 
     @Test

@@ -5,6 +5,11 @@ import java.io.Writer;
 import java.util.Objects;
 
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.api.io.serializer.BlankNodeIdGenerationOptions;
+import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractNFamilyOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +38,7 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
      * @throws NullPointerException if the provided model is null.
      */
     public NTriplesSerializer(Model model) {
-        this(model, NTriplesSerializerOptions.defaultConfig());
+        super(model, NTriplesSerializerOptions.defaultConfig());
     }
 
     /**
@@ -44,9 +49,24 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
      *               This config object should be an instance of {@code NTriplesConfig} or a subclass thereof.
      * @throws NullPointerException if the provided model or config is null.
      */
-    public NTriplesSerializer(Model model, NTriplesSerializerOptions config) {
-        super(model, config);
+    public NTriplesSerializer(Model model, IOOptions config) {
+        this(model);
         Objects.requireNonNull(config, "NTriplesConfig cannot be null");
+        if(config instanceof AbstractNFamilyOptions nFamilyOptions) {
+            this.config = nFamilyOptions;
+        } else {
+            NTriplesSerializerOptions.Builder optionBuilder = new NTriplesSerializerOptions.Builder();
+            if(config instanceof BaseIRIOptions baseIRIOptions) {
+                optionBuilder.baseIRI(baseIRIOptions.getBaseIRI());
+            }
+            if(config instanceof LineEndingOptions lineEndingOptions) {
+                optionBuilder.lineEnding(lineEndingOptions.getLineEnding());
+            }
+            if(config instanceof BlankNodeIdGenerationOptions blankNodeIdGenerationOptions) {
+                optionBuilder.stableBlankNodeIds(blankNodeIdGenerationOptions.stableBlankNodeIds());
+            }
+            this.config = optionBuilder.build();
+        }
     }
     /**
      * Retrieves the RDF format supported by this serializer, which is N-TRIPLES.

@@ -1,17 +1,17 @@
 package fr.inria.corese.core.next.impl.io.serialization.canonical;
 
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOption;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 
 /**
  * Configuration for Canonical RDF serialization format (RDFC-1.0).
- * This class extends {@link AbstractSerializerOption} and provides specific defaults
+ * This class extends {@link AbstractSerializerOptions} and provides specific defaults
  * and options tailored for the RDFC-10 canonicalization algorithm.
  * It includes options relevant to blank node canonicalization, such as the hashing algorithm
  * to use, the depth factor for graph isomorphism, and the permutation limit.
  * Use the {@link Builder} class to create instances of {@code CanonicalOption}.
  * A predefined default configuration is available via {@link #defaultConfig()}.
  */
-public class RDFC10SerializerOptions extends AbstractSerializerOption {
+public class RDFC10SerializerOptions extends AbstractSerializerOptions {
 
     /**
      * Enumeration for the supported hashing algorithms.
@@ -74,7 +74,7 @@ public class RDFC10SerializerOptions extends AbstractSerializerOption {
      * Provides a fluent API for constructing {@code CanonicalOption} instances with default values
      * specific to the Canonical RDF format.
      */
-    public static class Builder extends AbstractSerializerOption.AbstractBuilder<Builder> {
+    public static class Builder extends AbstractSerializerOptions.AbstractBuilder<Builder> {
         private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA_256;
         private int depthFactor = 5;
         private int permutationLimit = 50000;

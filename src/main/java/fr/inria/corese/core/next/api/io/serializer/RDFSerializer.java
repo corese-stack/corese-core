@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.io.serialization;
+package fr.inria.corese.core.next.api.io.serializer;
 
 import java.io.Writer;
 
@@ -37,7 +37,7 @@ public interface RDFSerializer {
      */
     default String getFormatName() {
         return getRDFFormat().getName();
-    };
+    }
 
     /**
      * Gets the RDF format that this serializer generates.

@@ -15,7 +15,7 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializerOptions;
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TriGCircularTest {
 
     private ValueFactory valueFactory;
-    private fr.inria.corese.core.next.api.io.serialization.SerializerFactory serializerFactory;
+    private fr.inria.corese.core.next.api.io.serializer.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
     private TriGSerializerOptions defaultConfig;
 

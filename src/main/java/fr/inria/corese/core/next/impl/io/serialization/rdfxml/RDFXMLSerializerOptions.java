@@ -1,7 +1,9 @@
 package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
+import fr.inria.corese.core.next.api.io.serializer.PrettyPrintOptions;
+import fr.inria.corese.core.next.api.io.serializer.UsesPrefixOptions;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOption;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -11,13 +13,13 @@ import java.util.Objects;
 
 /**
  * Configuration for RDF/XML serialization format.
- * This class extends {@link AbstractSerializerOption} directly as RDF/XML has
+ * This class extends {@link AbstractSerializerOptions} directly as RDF/XML has
  * distinct serialization characteristics not shared by the Turtle or N-Family formats.
  *
- * <p>Use the {@link Builder} class to create instances of {@code RDFXMLSerializerOption}.
+ * <p>Use the {@link Builder} class to create instances of {@code RDFXMLSerializerOptions}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class RDFXMLSerializerOption extends AbstractSerializerOption {
+public class RDFXMLSerializerOptions extends AbstractSerializerOptions implements PrettyPrintOptions, UsesPrefixOptions {
 
     /**
      * Whether prefix declarations (e.g., `xmlns:prefix="uri"`) should be used for compact IRIs.
@@ -76,7 +78,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @param builder The builder instance containing the desired configuration values.
      */
-    protected RDFXMLSerializerOption(Builder builder) {
+    protected RDFXMLSerializerOptions(Builder builder) {
         super(builder);
 
         this.usePrefixes = builder.usePrefixes;
@@ -97,6 +99,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return {@code true} if prefixes are used, {@code false} otherwise.
      */
+    @Override
     public boolean usePrefixes() {
         return usePrefixes;
     }
@@ -106,6 +109,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return {@code true} if auto-declaration is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean autoDeclarePrefixes() {
         return autoDeclarePrefixes;
     }
@@ -115,6 +119,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return The {@link PrefixOrderingEnum} for prefix ordering.
      */
+    @Override
     public PrefixOrderingEnum getPrefixOrdering() {
         return prefixOrdering;
     }
@@ -124,19 +129,9 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return The {@link PrefixHandler} instance.
      */
+    @Override
     public PrefixHandler getPrefixHandler() {
         return prefixHandler;
-    }
-
-    /**
-     * Returns an unmodifiable map of custom URI prefixes for backward compatibility.
-     *
-     * @return A map where keys are prefix names and values are namespace URIs.
-     * @deprecated Use {@link #getPrefixHandler()} instead for full prefix management capabilities.
-     */
-    @Deprecated
-    public Map<String, String> getCustomPrefixes() {
-        return prefixHandler.getPrefixMap();
     }
 
     /**
@@ -144,6 +139,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return {@code true} if pretty-printing is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean prettyPrint() {
         return prettyPrint;
     }
@@ -153,6 +149,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return The indentation string.
      */
+    @Override
     public String getIndent() {
         return indent;
     }
@@ -162,6 +159,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return The maximum line length.
      */
+    @Override
     public int getMaxLineLength() {
         return maxLineLength;
     }
@@ -171,6 +169,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return {@code true} if subject sorting is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean sortSubjects() {
         return sortSubjects;
     }
@@ -180,6 +179,7 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      *
      * @return {@code true} if predicate sorting is enabled, {@code false} otherwise.
      */
+    @Override
     public boolean sortPredicates() {
         return sortPredicates;
     }
@@ -194,11 +194,11 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
     }
 
     /**
-     * Public Builder for {@link RDFXMLSerializerOption}.
-     * Provides a fluent API for constructing {@code RDFXMLSerializerOption} instances with default values
+     * Public Builder for {@link RDFXMLSerializerOptions}.
+     * Provides a fluent API for constructing {@code RDFXMLSerializerOptions} instances with default values
      * specific to the RDF/XML format.
      */
-    public static class Builder extends AbstractSerializerOption.AbstractBuilder<Builder> {
+    public static class Builder extends AbstractSerializerOptions.AbstractBuilder<Builder> {
         protected boolean usePrefixes = true;
         protected boolean autoDeclarePrefixes = true;
         protected PrefixOrderingEnum prefixOrdering = PrefixOrderingEnum.ALPHABETICAL;
@@ -364,13 +364,13 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
         }
 
         /**
-         * Builds and returns a new {@link RDFXMLSerializerOption} instance with the current builder settings.
+         * Builds and returns a new {@link RDFXMLSerializerOptions} instance with the current builder settings.
          *
-         * @return A new {@code RDFXMLSerializerOption} instance.
+         * @return A new {@code RDFXMLSerializerOptions} instance.
          */
         @Override
-        public RDFXMLSerializerOption build() {
-            return new RDFXMLSerializerOption(this);
+        public RDFXMLSerializerOptions build() {
+            return new RDFXMLSerializerOptions(this);
         }
     }
 
@@ -379,9 +379,9 @@ public class RDFXMLSerializerOption extends AbstractSerializerOption {
      * This provides a convenient way to get a standard RDF/XML configuration without
      * manually building it.
      *
-     * @return A {@code RDFXMLSerializerOption} instance with default settings.
+     * @return A {@code RDFXMLSerializerOptions} instance with default settings.
      */
-    public static RDFXMLSerializerOption defaultConfig() {
+    public static RDFXMLSerializerOptions defaultConfig() {
         return new Builder().build();
     }
 }

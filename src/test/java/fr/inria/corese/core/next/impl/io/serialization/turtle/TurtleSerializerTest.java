@@ -5,8 +5,10 @@ import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.common.literal.XSD;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,10 +72,6 @@ class TurtleSerializerTest {
 
         String expected = """
                 @prefix ns: <http://example.org/ns/> .
-                @prefix owl: <http://www.w3.org/2002/07/owl#> .
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
                   ns:person1 ns:hasName "John Doe" .
                 """;
@@ -104,6 +102,9 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
+        TurtleSerializerOptions options = TurtleSerializerOptions.builder()
+                .prefixHandler(new PrefixHandler(true))
+                .build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, defaultConfig);
 
 
@@ -114,10 +115,7 @@ class TurtleSerializerTest {
         String expected = """
                 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
                 @prefix ns: <http://example.org/ns/> .
-                @prefix owl: <http://www.w3.org/2002/07/owl#> .
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
                   ns:person1 a foaf:Person .
                 """;
@@ -172,10 +170,7 @@ class TurtleSerializerTest {
         String expected = """
                 @prefix 11: <http://purl.org/dc/elements/1.1/> .
                 @prefix data: <http://example.org/data/> .
-                @prefix owl: <http://www.w3.org/2002/07/owl#> .
                 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
                   data:book1 11:title "The Odyssey"@en .
                 """;
@@ -209,15 +204,12 @@ class TurtleSerializerTest {
 
         StringWriter writer = new StringWriter();
 
-        PrefixHandler prefixHandler = new PrefixHandler(true);
-        prefixHandler.setPrefix("data", "http://example.org/data/");
-        prefixHandler.setPrefix("dc", "http://purl.org/dc/elements/1.1/");
-
         TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
                 .literalDatatypePolicy(LiteralDatatypePolicyEnum.ALWAYS_TYPED)
                 .usePrefixes(true)
                 .autoDeclarePrefixes(true)
-                .prefixHandler(prefixHandler)
+                .addPrefix("data", "http://example.org/data/")
+                .addPrefix("dc", "http://purl.org/dc/elements/1.1/")
                 .build();
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, config);
 
@@ -229,9 +221,6 @@ class TurtleSerializerTest {
         String expected = """
                 @prefix data: <http://example.org/data/> .
                 @prefix dc: <http://purl.org/dc/elements/1.1/> .
-                @prefix owl: <http://www.w3.org/2002/07/owl#> .
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
                   data:book2 dc:creator "Homer"^^xsd:string .
@@ -396,10 +385,6 @@ class TurtleSerializerTest {
         String expected = """
                 @base <http://example.org/base/> .
                 @prefix base: <http://example.org/base/> .
-                @prefix owl: <http://www.w3.org/2002/07/owl#> .
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
                   base:resource1 base:prop "Test" .
                 """;
@@ -432,13 +417,7 @@ class TurtleSerializerTest {
 
         verify(emptyModel, times(2)).stream();
 
-        String expected = """
-                @prefix owl: <http://www.w3.org/2002/07/owl#> .
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-                
-                """;
+        String expected = "";
         String actual = writer.toString().replace("\r\n", "\n");
         assertEquals(expected, actual);
     }
@@ -546,11 +525,7 @@ class TurtleSerializerTest {
 
         String expected = """
                 @prefix book: <http://example.org/book/> .
-                @prefix owl: <http://www.w3.org/2002/07/owl#> .
                 @prefix properties: <http://example.org/properties/> .
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
                 
                   book:1 properties:description\s""" + "\"\"\"" + multilineText + "\"\"\"" + " .\n";
 

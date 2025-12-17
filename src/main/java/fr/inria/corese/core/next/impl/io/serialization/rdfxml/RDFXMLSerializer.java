@@ -4,21 +4,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.serializer.*;
+import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Literal;
@@ -26,7 +20,6 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.Value;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
@@ -50,53 +43,45 @@ import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstan
  */
 public class RDFXMLSerializer implements RDFSerializer {
 
-    private static final Logger logger = LoggerFactory.getLogger(RDFXMLSerializer.class);
-
     private final Model model;
-    private final RDFXMLSerializerOption config;
-    private final Map<String, String> iriToPrefixMapping;
-    private final Map<String, String> prefixToIriMapping;
+    private final IOOptions config;
+    private final PrefixHandler prefixHandler;
     private final Map<Resource, String> blankNodeIds;
     private int blankNodeCounter = 0;
     private List<Statement> cachedStatements;
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and default configuration.
-     * The default configuration is obtained from {@link RDFXMLSerializerOption#defaultConfig()}.
+     * The default configuration is obtained from {@link RDFXMLSerializerOptions#defaultConfig()}.
      *
      * @param model the {@link Model} to serialize. Must not be null.
      * @throws NullPointerException if the provided model is null.
      */
     public RDFXMLSerializer(Model model) {
-        this(model, RDFXMLSerializerOption.defaultConfig());
+        this(model, RDFXMLSerializerOptions.defaultConfig());
     }
 
     /**
      * Constructs a new {@code XmlSerializer} instance with the specified model and custom configuration.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param config the {@link RDFXMLSerializerOption} to use for serialization. Must not be null.
+     * @param config the {@link RDFXMLSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    public RDFXMLSerializer(Model model, RDFXMLSerializerOption config) {
+    public RDFXMLSerializer(Model model, IOOptions config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
-        this.iriToPrefixMapping = new HashMap<>();
-        this.prefixToIriMapping = new HashMap<>();
-        this.blankNodeIds = new HashMap<>();
-        initializePrefixes();
-    }
 
-    /**
-     * Initializes prefix mappings by adding custom prefixes from the configuration.
-     * The custom prefixes map in XmlConfig is expected to be {prefix: namespaceURI}.
-     */
-    private void initializePrefixes() {
-        if (config.usePrefixes()) {
-            for (Map.Entry<String, String> entry : config.getCustomPrefixes().entrySet()) {
-                addPrefixMapping(entry.getValue(), entry.getKey());
-            }
+        if(config instanceof UsesPrefixOptions usesPrefixOptions
+                && usesPrefixOptions.usePrefixes()) {
+            this.prefixHandler = usesPrefixOptions.getPrefixHandler();
+        } else {
+            this.prefixHandler = new PrefixHandler(false);
+            // These namespaces are part of the RDF/XML standard
+            this.prefixHandler.setPrefix(RDF.getVocabularyPreferredPrefix(), RDF.getVocabularyNamespace());
+            this.prefixHandler.setPrefix(XSD.getVocabularyPreferredPrefix(), XSD.getVocabularyNamespace());
         }
+        this.blankNodeIds = new HashMap<>();
     }
 
     /**
@@ -132,7 +117,9 @@ public class RDFXMLSerializer implements RDFSerializer {
      */
     private void writeXmlDeclaration(Writer writer) throws IOException {
         writer.write(SerializationConstants.XML_DECLARATION_START);
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
     }
 
     /**
@@ -143,30 +130,44 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeRdfRootElement(Writer writer) throws IOException {
-        if (config.usePrefixes() && config.autoDeclarePrefixes()) {
-            collectUsedNamespaces();
+        Set<String> actuallyUsedNamespaces = new HashSet<>();
+        actuallyUsedNamespaces.add(RDF.getVocabularyNamespace());
+        if (this.config instanceof UsesPrefixOptions usesPrefixOptions
+                &&  usesPrefixOptions.usePrefixes()
+                && usesPrefixOptions.autoDeclarePrefixes()) {
+            actuallyUsedNamespaces.addAll(collectUsedNamespaces());
         }
 
         writer.write(SerializationConstants.RDF_ROOT_START);
-        writeNamespaceAttributes(writer);
+        writeNamespaceAttributes(writer, actuallyUsedNamespaces);
         writer.write(">");
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
 
         Map<Resource, List<Statement>> statementsBySubject = cachedStatements.stream()
                 .collect(Collectors.groupingBy(Statement::getSubject));
 
 
         List<Resource> sortedSubjects = new ArrayList<>(statementsBySubject.keySet());
-        if (config.sortSubjects()) {
+        if (this.config instanceof PrettyPrintOptions prettyPrintOptions
+                && prettyPrintOptions.sortSubjects()) {
             Collections.sort(sortedSubjects, Comparator.comparing(Value::stringValue));
         }
 
+        String zeroIndent = "";
         for (Resource subject : sortedSubjects) {
-            writeDescriptionElement(writer, subject, statementsBySubject.get(subject), config.getIndent());
+            if(this.config instanceof PrettyPrintOptions prettyPrintOptions) {
+                writeDescriptionElement(writer, subject, statementsBySubject.get(subject), prettyPrintOptions.getIndent());
+            } else {
+                writeDescriptionElement(writer, subject, statementsBySubject.get(subject), zeroIndent);
+            }
         }
 
         writer.write(SerializationConstants.RDF_ROOT_END);
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
     }
 
     /**
@@ -175,19 +176,33 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @param writer the {@link Writer} to which attributes will be written.
      * @throws IOException if an I/O error occurs.
      */
-    private void writeNamespaceAttributes(Writer writer) throws IOException {
-        if (!iriToPrefixMapping.containsKey(RDF.getVocabularyNamespace())) {
-            addPrefixMapping(RDF.getVocabularyNamespace(), RDF.getVocabularyPreferredPrefix());
+    private void writeNamespaceAttributes(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
+        ArrayList<String> namespacelist = new ArrayList<>(actuallyUsedNamespaces);
+
+        if(this.config instanceof UsesPrefixOptions usesPrefixOptions
+        && usesPrefixOptions.autoDeclarePrefixes()) {
+
+            namespacelist.forEach(namespace -> {
+                if (! this.prefixHandler.hasNamespace(namespace)) {
+                    String prefix = getSuggestedPrefix(namespace);
+                    if (prefix != null) {
+                        this.prefixHandler.setPrefix(prefix, namespace);
+                    }
+                }
+            });
         }
 
-        List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
-        if (config.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
-            Collections.sort(prefixes);
+        if (this.config instanceof PrettyPrintOptions prettyPrintOptions
+                && prettyPrintOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
+            namespacelist.sort(
+                    (ns1, ns2) ->
+                        prefixHandler.getPrefix(ns1).compareTo(prefixHandler.getPrefix(ns2))
+            );
         }
 
-        for (String prefix : prefixes) {
-            String namespaceURI = prefixToIriMapping.get(prefix);
-            writer.write(String.format(" %s%s=\"%s\"", SerializationConstants.XMLNS_PREFIX, prefix, escapeXmlAttribute(namespaceURI)));
+        for(String namespace : namespacelist) {
+            String prefix = this.prefixHandler.getPrefix(namespace);
+            writer.write(String.format(" %s%s=\"%s\"", SerializationConstants.XMLNS_PREFIX, prefix, escapeXmlAttribute(namespace)));
         }
     }
 
@@ -195,26 +210,30 @@ public class RDFXMLSerializer implements RDFSerializer {
      * Collects all namespaces used in the model (subjects, predicates, objects, contexts)
      * and attempts to assign prefixes if auto-declaration is enabled and they are not already mapped.
      */
-    private void collectUsedNamespaces() {
-        Set<String> namespaces = this.cachedStatements.stream()
-                .flatMap(stmt -> Arrays.asList(
-                        stmt.getSubject(),
-                        stmt.getPredicate(),
-                        stmt.getObject()
-                ).stream())
+    private Set<String> collectUsedNamespaces() {
+        // Collecting namespaces of all IRIs in the data
+        Set<String> potentialNamespaces = this.cachedStatements.stream()
+                .flatMap(stmt -> {
+                    List<Value> values = new ArrayList<>(Arrays.asList(
+                            stmt.getSubject(),
+                            stmt.getPredicate(),
+                            stmt.getObject()
+                    ));
+                    if (stmt.getContext() != null) {
+                        values.add(stmt.getContext());
+                    }
+                    if(stmt.getObject().isLiteral()
+                            && ((Literal) stmt.getObject()).getDatatype() != null) {
+                        values.add(((Literal) stmt.getObject()).getDatatype());
+                    }
+                    return values.stream();
+                })
+                .filter(Objects::nonNull)
                 .filter(Value::isIRI)
-                .map(v -> getNamespace(v.stringValue()))
+                .map(v -> IRIUtils.guessNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
 
-
-        namespaces.forEach(namespace -> {
-            if (!iriToPrefixMapping.containsKey(namespace)) {
-                String prefix = getSuggestedPrefix(namespace);
-                if (prefix != null) {
-                    addPrefixMapping(namespace, prefix);
-                }
-            }
-        });
+        return potentialNamespaces;
     }
 
 
@@ -230,11 +249,9 @@ public class RDFXMLSerializer implements RDFSerializer {
         String correspondingPrefix = null;
         int longestMatchLength = -1;
 
-        for (Map.Entry<String, String> entry : iriToPrefixMapping.entrySet()) {
-            String namespace = entry.getKey();
-            String prefix = entry.getValue();
-
+        for (String namespace : this.prefixHandler.getNamespaces()) {
             if (iriString.startsWith(namespace)) {
+                String prefix = this.prefixHandler.getPrefix(namespace);
                 if (namespace.length() > longestMatchLength) {
                     longestMatchLength = namespace.length();
                     longestMatchingNamespace = namespace;
@@ -245,67 +262,12 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         if (longestMatchingNamespace != null) {
             String localName = iriString.substring(longestMatchingNamespace.length());
-
             if (localName.isEmpty()) {
                 return correspondingPrefix + SerializationConstants.COLON;
             }
             return correspondingPrefix + SerializationConstants.COLON + localName;
         }
         return null;
-    }
-
-    /**
-     * Adds a prefix-namespace URI mapping to the internal mappings.
-     * Handles potential conflicts to ensure uniqueness.
-     *
-     * @param namespaceURI The namespace URI.
-     * @param prefix       The associated prefix.
-     */
-    private void addPrefixMapping(String namespaceURI, String prefix) {
-        if (iriToPrefixMapping.containsKey(namespaceURI)) {
-            if (iriToPrefixMapping.get(namespaceURI).equals(prefix)) {
-                return;
-            } else {
-
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Namespace URI '{}' is already mapped to prefix '{}'. Cannot map to new prefix '{}'. " +
-                                    "Existing mapping for this namespace will be retained.",
-                            namespaceURI, iriToPrefixMapping.get(namespaceURI), prefix);
-                }
-                return;
-            }
-        }
-
-        String effectivePrefix = prefix;
-        if (prefixToIriMapping.containsKey(prefix)) {
-            if (!prefixToIriMapping.get(prefix).equals(namespaceURI)) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Prefix '{}' is already mapped to namespace '{}'. Cannot map to new namespace '{}'. " +
-                                    "A new unique prefix will be generated for '{}'.",
-                            prefix, prefixToIriMapping.get(prefix), namespaceURI, namespaceURI);
-                }
-                effectivePrefix = generateUniquePrefix(prefix);
-            }
-        }
-
-        iriToPrefixMapping.put(namespaceURI, effectivePrefix);
-        prefixToIriMapping.put(effectivePrefix, namespaceURI);
-    }
-
-    /**
-     * Generates a unique prefix based on a given base string, ensuring it's not already in use.
-     * This method appends numbers to the base prefix until a unique one is found.
-     *
-     * @param basePrefix The desired base prefix (e.g., "foaf").
-     * @return A unique prefix (e.g., "foaf", "foaf1", "foaf2").
-     */
-    private String generateUniquePrefix(String basePrefix) {
-        String candidate = basePrefix;
-        int i = 0;
-        while (prefixToIriMapping.containsKey(candidate)) {
-            candidate = basePrefix + (++i);
-        }
-        return candidate;
     }
 
     /**
@@ -319,7 +281,10 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     private void writeDescriptionElement(Writer writer, Resource subject, List<Statement> statements, String currentIndent) throws IOException {
-        String nextIndent = currentIndent + config.getIndent();
+        String nextIndent = currentIndent;
+        if(this.config instanceof PrettyPrintOptions prettyPrintOptions) {
+            nextIndent = currentIndent + prettyPrintOptions.getIndent();
+        }
 
         writer.write(currentIndent);
         if (subject.isIRI()) {
@@ -327,13 +292,15 @@ public class RDFXMLSerializer implements RDFSerializer {
         } else if (subject.isBNode()) {
             writer.write(String.format("%s %s=\"%s\">", SerializationConstants.RDF_DESCRIPTION_START, SerializationConstants.RDF_NODEID_ATTRIBUTE, getBlankNodeId(subject)));
         }
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
 
         Map<IRI, List<Statement>> statementsByPredicate = statements.stream()
                 .collect(Collectors.groupingBy(Statement::getPredicate));
 
         List<IRI> sortedPredicates = new ArrayList<>(statementsByPredicate.keySet());
-        if (config.sortPredicates()) {
+        if (this.config instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortPredicates()) {
             Collections.sort(sortedPredicates, Comparator.comparing(Value::stringValue));
         }
 
@@ -345,7 +312,9 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         writer.write(currentIndent);
         writer.write(SerializationConstants.RDF_DESCRIPTION_END);
-        writer.write(config.getLineEnding());
+        if(this.config instanceof LineEndingOptions lineEndingOptions) {
+            writer.write(lineEndingOptions.getLineEnding());
+        }
     }
 
     /**
@@ -366,7 +335,6 @@ public class RDFXMLSerializer implements RDFSerializer {
             elementName = prefixedPredicateName;
         } else {
             elementName = predicateString;
-            logger.warn("Predicate IRI '{}' cannot be expressed as a valid prefixed element name. Using full IRI as element name in RDF/XML.", predicateString);
         }
 
         writer.write(currentIndent);
@@ -374,10 +342,14 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         if (object.isIRI()) {
             writer.write(String.format(" %s=\"%s\"/>", SerializationConstants.RDF_RESOURCE_ATTRIBUTE, escapeXmlAttribute(object.stringValue())));
-            writer.write(config.getLineEnding());
+            if(this.config instanceof LineEndingOptions lineEndingOptions) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
         } else if (object.isBNode()) {
             writer.write(String.format(" %s=\"%s\"/>", SerializationConstants.RDF_NODEID_ATTRIBUTE, getBlankNodeId((Resource) object)));
-            writer.write(config.getLineEnding());
+            if(this.config instanceof LineEndingOptions lineEndingOptions) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
         } else if (object.isLiteral()) {
             Literal literal = (Literal) object;
 
@@ -397,15 +369,12 @@ public class RDFXMLSerializer implements RDFSerializer {
                 writer.write(">");
             }
 
-            if (config.useMultilineLiterals() && (literal.stringValue().contains(SerializationConstants.LINE_FEED) || literal.stringValue().contains(SerializationConstants.CARRIAGE_RETURN))) {
-
-                writer.write(escapeXmlContent(literal.stringValue()));
-            } else {
-                writer.write(escapeXmlContent(literal.stringValue()));
-            }
+            writer.write(escapeXmlContent(literal.stringValue()));
 
             writer.write(String.format("</%s>", elementName));
-            writer.write(config.getLineEnding());
+            if(this.config instanceof LineEndingOptions lineEndingOptions) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
         } else {
             throw new IllegalArgumentException("Unsupported value type for RDF/XML serialization: " + object.getClass().getName());
         }
@@ -419,7 +388,7 @@ public class RDFXMLSerializer implements RDFSerializer {
      */
     private String getBlankNodeId(Resource bNode) {
         return blankNodeIds.computeIfAbsent(bNode, k -> {
-            if (config.stableBlankNodeIds()) {
+            if (this.config instanceof BlankNodeIdGenerationOptions bnGenOptions && bnGenOptions.stableBlankNodeIds()) {
                 return "b" + (blankNodeCounter++);
             } else {
                 return bNode.stringValue().substring(2);
@@ -443,33 +412,10 @@ public class RDFXMLSerializer implements RDFSerializer {
             return false;
         }
 
-        return config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED ||
-                (!datatype.equals(XSD.xsdString.getIRI()) &&
-                        config.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL);
-    }
-
-
-    /**
-     * Extracts the namespace URI part from an IRI string.
-     * This is a common heuristic for RDF IRIs.
-     *
-     * @param iriString The full IRI.
-     * @return The namespace URI part.
-     */
-    private String getNamespace(String iriString) {
-        int hashIdx = iriString.lastIndexOf(SerializationConstants.HASH);
-        int slashIdx = iriString.lastIndexOf(SerializationConstants.SLASH);
-
-        if (hashIdx > -1) {
-            return iriString.substring(0, hashIdx + 1);
-        } else if (slashIdx > -1 && slashIdx < iriString.length() - 1) {
-            int dotIdx = iriString.lastIndexOf(SerializationConstants.POINT);
-            if (dotIdx > slashIdx) {
-                return iriString.substring(0, slashIdx + 1);
-            }
-            return iriString.substring(0, slashIdx + 1);
-        }
-        return iriString;
+        return config instanceof DatatypePolicyOptions datatypePolicyOptions
+                && (datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED
+                    || (!datatype.equals(XSD.xsdString.getIRI())
+                        && datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL));
     }
 
     /**
@@ -480,14 +426,6 @@ public class RDFXMLSerializer implements RDFSerializer {
      * @return A suggested prefix, or null if suggestion is not possible.
      */
     private String getSuggestedPrefix(String namespace) {
-
-        if (namespace.equals(RDF.getVocabularyNamespace())) return RDF.getVocabularyPreferredPrefix();
-        if (namespace.equals(RDFS.getVocabularyNamespace())) return RDFS.getVocabularyPreferredPrefix();
-        if (namespace.equals(XSD.getVocabularyNamespace())) return XSD.getVocabularyPreferredPrefix();
-        if (namespace.equals(OWL.getVocabularyNamespace())) return OWL.getVocabularyPreferredPrefix();
-        if (namespace.equals(FOAF.getVocabularyNamespace())) return FOAF.getVocabularyPreferredPrefix();
-
-
         String base = namespace;
         if (base.endsWith(SerializationConstants.HASH) || base.endsWith(SerializationConstants.SLASH)) {
             base = base.substring(0, base.length() - 1);
@@ -509,7 +447,6 @@ public class RDFXMLSerializer implements RDFSerializer {
                     base = "p";
                 }
             } catch (java.net.URISyntaxException e) {
-                logger.warn("Malformed URI encountered while suggesting prefix: {}", namespace, e);
                 base = "p";
             }
         }
@@ -519,7 +456,7 @@ public class RDFXMLSerializer implements RDFSerializer {
 
         String candidate = base;
         int i = 0;
-        while (prefixToIriMapping.containsKey(candidate) && !prefixToIriMapping.get(candidate).equals(namespace)) {
+        while (this.prefixHandler.hasPrefix(candidate) && !this.prefixHandler.getPrefix(candidate).equals(namespace)) {
             candidate = base + (++i);
         }
         return candidate;

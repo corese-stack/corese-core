@@ -4,23 +4,17 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Canonicalizer;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10Serializer;
 import fr.inria.corese.core.next.impl.io.serialization.canonical.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.jsonld.JSONLDSerializer;
 import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.nquads.NQuadsSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.rdfxml.RDFXMLSerializerOption;
 import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 
 import java.util.Collections;
@@ -31,7 +25,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * Default implementation of {@link fr.inria.corese.core.next.api.io.serialization.SerializerFactory}.
+ * Default implementation of {@link fr.inria.corese.core.next.api.io.serializer.SerializerFactory}.
  * This factory is responsible for creating instances of {@link RDFSerializer}
  * based on the requested {@link RDFFormat}. It uses a registry pattern
  * to map each format to its corresponding serializer constructor,
@@ -44,7 +38,7 @@ import java.util.function.Function;
  * to default configurations if an incompatible type is provided.
  * </p>
  */
-public class SerializerFactory implements fr.inria.corese.core.next.api.io.serialization.SerializerFactory {
+public class SerializerFactory implements fr.inria.corese.core.next.api.io.serializer.SerializerFactory {
 
     private final Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> registry;
     private final Map<RDFFormat, Function<Model, RDFSerializer>> defaultRegistry;
@@ -65,76 +59,22 @@ public class SerializerFactory implements fr.inria.corese.core.next.api.io.seria
         Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> tempRegistry = new HashMap<>();
         Map<RDFFormat, Function<Model, RDFSerializer>> tempDefaultRegistry = new HashMap<>();
 
-        tempRegistry.put(RDFFormat.TURTLE, (model, genericConfig) -> {
-            if (genericConfig instanceof TurtleSerializerOptions specificConfig) {
-                return new TurtleSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected TurtleSerializerOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.TURTLE.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.TURTLE, (model, genericConfig) ->  new TurtleSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.TURTLE, TurtleSerializer::new);
 
-        tempRegistry.put(RDFFormat.NTRIPLES, (model, genericConfig) -> {
-            if (genericConfig instanceof NTriplesSerializerOptions specificConfig) {
-                return new NTriplesSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected NTriplesSerializerOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.NTRIPLES.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.NTRIPLES, (model, genericConfig) ->  new NTriplesSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.NTRIPLES, NTriplesSerializer::new);
 
-        tempRegistry.put(RDFFormat.NQUADS, (model, genericConfig) -> {
-            if (genericConfig instanceof NQuadsSerializerOptions specificConfig) {
-                return new NQuadsSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected NQuadsSerializerOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.NQUADS.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.NQUADS, (model, genericConfig) -> new NQuadsSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.NQUADS, NQuadsSerializer::new);
 
-        tempRegistry.put(RDFFormat.TRIG, (model, genericConfig) -> {
-            if (genericConfig instanceof TriGSerializerOptions specificConfig) {
-                return new TriGSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected TriGSerializerOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.TRIG.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.TRIG, (model, genericConfig) -> new TriGSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.TRIG, TriGSerializer::new);
 
-        tempRegistry.put(RDFFormat.RDFXML, (model, genericConfig) -> {
-            if (genericConfig instanceof RDFXMLSerializerOption specificConfig) {
-                return new RDFXMLSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected RDFXMLSerializerOption, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.RDFXML.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.RDFXML, (model, genericConfig) -> new RDFXMLSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.RDFXML, RDFXMLSerializer::new);
 
-        tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> {
-            if (genericConfig instanceof JSONLDOptions specificConfig) {
-                return new JSONLDSerializer(model, specificConfig);
-            }
-            throw new SerializationException(
-                    "Invalid configuration type. Expected JSONLDOptions, got: " +
-                            genericConfig.getClass().getSimpleName(),
-                    RDFFormat.JSONLD.getName()
-            );
-        });
+        tempRegistry.put(RDFFormat.JSONLD, (model, genericConfig) -> new JSONLDSerializer(model, genericConfig));
         tempDefaultRegistry.put(RDFFormat.JSONLD, JSONLDSerializer::new);
 
         tempRegistry.put(RDFFormat.RDFC_1_0, (model, genericConfig) -> {

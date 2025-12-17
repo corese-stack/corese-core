@@ -1,16 +1,16 @@
 package fr.inria.corese.core.next.impl.io.serialization.nquads;
 
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractNFamilyOption;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractNFamilyOptions;
 
 /**
  * Configuration for N-Quads serialization format.
- * This class extends {@link AbstractNFamilyOption} and provides specific defaults
+ * This class extends {@link AbstractNFamilyOptions} and provides specific defaults
  * and options tailored for N-Quads, which extends N-Quads with named graphs.
  *
  * <p>Use the {@link Builder} class to create instances of {@code NQuadsConfig}.
  * A predefined default configuration is available via {@link #defaultConfig()}.</p>
  */
-public class NQuadsSerializerOptions extends AbstractNFamilyOption {
+public class NQuadsSerializerOptions extends AbstractNFamilyOptions {
 
     /**
      * Protected constructor to be used by the {@link Builder}.
@@ -26,7 +26,7 @@ public class NQuadsSerializerOptions extends AbstractNFamilyOption {
      * Provides a fluent API for constructing {@code NQuadsConfig} instances with default values
      * specific to the N-Quads format.
      */
-    public static class Builder extends AbstractNFamilyOption.AbstractNFamilyBuilder<Builder> {
+    public static class Builder extends AbstractNFamilyOptions.AbstractNFamilyBuilder<Builder> {
         /**
          * Default constructor initializes all options with their default values for N-Quads.
          */

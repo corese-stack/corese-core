@@ -2,13 +2,13 @@ package fr.inria.corese.core.next.impl.io.serialization.base;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
 import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +18,9 @@ import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.Value;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.impl.common.literal.RDF;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOption;
 import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
 
@@ -38,16 +37,16 @@ public abstract class AbstractLineBasedSerializer implements RDFSerializer {
     private static final Logger logger = LoggerFactory.getLogger(AbstractLineBasedSerializer.class);
 
     protected final Model model;
-    protected final AbstractSerializerOption config;
+    protected AbstractSerializerOptions config;
 
     /**
      * Constructs a new line-based serializer.
      *
      * @param model  the {@link Model} to be serialized. Must not be null.
-     * @param config the {@link AbstractSerializerOption} to use for serialization. Must not be null.
+     * @param config the {@link AbstractSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or config is null.
      */
-    protected AbstractLineBasedSerializer(Model model, AbstractSerializerOption config) {
+    protected AbstractLineBasedSerializer(Model model, AbstractSerializerOptions config) {
         this.model = Objects.requireNonNull(model, "Model cannot be null");
         this.config = Objects.requireNonNull(config, "Configuration cannot be null");
     }

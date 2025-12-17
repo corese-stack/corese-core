@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.api.io.common;
 
-import fr.inria.corese.core.next.api.io.IOOptions;
 
 /**
  * Options for RDF parsers and serializers that support a base IRI.

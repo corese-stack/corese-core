@@ -14,14 +14,19 @@ import java.util.regex.Pattern;
  */
 public class IRIUtils {
 
-    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<namespace>" +
-            "(?<protocol>[\\w\\-]+):(?<dblSlashes>\\/\\/)?" +
-            "(?<domain>([\\w\\-_:@]+\\.)*[\\w\\-_:]*))" +
-            "((?<path>\\/([\\w\\-\\._\\:]+\\/)*)" +
-            "(?<finalPath>[\\w\\-\\._\\:]+)?" +
-            "(?<query>\\?[\\w\\-_\\:\\?\\=]+)?" +
-            "(?<anchor>(\\#))?" +
-            "(?<fragment>([\\w\\-_]+))?)?$");
+    // Example 1 : http://webisa.webdatacommons.org/data/sparql?query=q#line1
+    private static final Pattern IRI_PATTERN = Pattern.compile("^(?<rootnamespace>" + // http://webisa.webdatacommons.org
+                "(?<protocol>[\\w\\-]+):" + // http:
+                "(?<dblSlashes>\\/\\/)?" + // //
+                "(?<domain>([\\w\\[\\]\\-_:@]+\\.)*[\\w\\-_:]*)" + // webisa.webdatacommons.org
+            ")" +
+            "(?<path>\\/([\\w\\-\\._\\:]+\\/)*)*" + // /data/
+            "(?<finalPath>[\\w&<>;\\-\\._\\:\\\"\\\']+)?" + // sparql
+            "(?<query>\\?[\\w\\-\\\"\\\'_\\:\\?\\=]+)?" + // ?query=q
+            "(?<anchor>\\#)?" + // #
+            "(?<fragment>[\\w\\-_]+)?" + // line1
+            "$"
+    );
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
@@ -54,20 +59,21 @@ public class IRIUtils {
                     return iri;
                 }
             } else if (matcher.matches()) {
+                // This is a blank node
                 if (matcher.group("protocol") != null && matcher.group("protocol").equals("_")) {
                     return "";
                 }
+
                 StringBuilder namespace = new StringBuilder();
-                namespace.append(matcher.group("protocol")).append(":");
-                if (matcher.group("dblSlashes") != null) {
-                    namespace.append(matcher.group("dblSlashes"));
-                }
-                namespace.append(matcher.group("domain"));
+                namespace.append(matcher.group("rootnamespace"));
                 if (matcher.group("path") != null) {
                     namespace.append(matcher.group("path"));
                 }
-                if((matcher.group("fragment") != null || matcher.group("anchor") != null) && matcher.group("finalPath") != null) {
-                    namespace.append(matcher.group("finalPath")).append("#");
+                if(matcher.group("anchor") != null) {
+                    if(matcher.group("finalPath") != null) {
+                        namespace.append(matcher.group("finalPath"));
+                    }
+                    namespace.append(matcher.group("anchor"));
                 }
 
                 return namespace.toString();

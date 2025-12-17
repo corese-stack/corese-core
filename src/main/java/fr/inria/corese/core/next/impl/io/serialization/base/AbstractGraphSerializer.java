@@ -1,8 +1,11 @@
 package fr.inria.corese.core.next.impl.io.serialization.base;
 
 import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.io.serialization.RDFSerializer;
+import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.api.io.serializer.*;
 import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.impl.common.vocabulary.*;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 import fr.inria.corese.core.next.impl.io.serialization.option.*;
@@ -28,8 +31,8 @@ import java.util.stream.Collectors;
  *
  * <p>Note: Many features related to compact syntax, pretty-printing, and advanced
  * prefix management are specific to Turtle Trig formats and require the
- * provided {@link AbstractSerializerOption} to be an instance of
- * {@link AbstractSerializerOption} at runtime. An {@link IllegalStateException}
+ * provided {@link AbstractSerializerOptions} to be an instance of
+ * {@link AbstractSerializerOptions} at runtime. An {@link IllegalStateException}
  * will be thrown if an incompatible configuration is used for such features.</p>
  */
 public abstract class AbstractGraphSerializer implements RDFSerializer {
@@ -40,9 +43,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractGraphSerializer.class);
 
     protected final Model model;
-    protected final AbstractSerializerOption option;
-    protected final Map<String, String> iriToPrefixMapping;
-    protected final Map<String, String> prefixToIriMapping;
+    protected IOOptions option;
+    protected PrefixHandler prefixHandler;
     protected final Set<Resource> consumedBlankNodes;
     protected final Set<Resource> currentlyWritingBlankNodes;
 
@@ -50,49 +52,20 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * Constructs a new abstract TriG/Turtle serializer instance.
      *
      * @param model  the {@link Model} to serialize. Must not be null.
-     * @param option the {@link AbstractSerializerOption} to use for serialization. Must not be null.
+     * @param config the {@link AbstractSerializerOptions} to use for serialization. Must not be null.
      * @throws NullPointerException if the provided model or configuration is null.
      */
-    protected AbstractGraphSerializer(Model model, AbstractSerializerOption option) {
+    protected AbstractGraphSerializer(Model model, IOOptions config) {
         this.model = Objects.requireNonNull(model, "The model cannot be null");
-        this.option = Objects.requireNonNull(option, "The configuration cannot be null");
-        this.iriToPrefixMapping = new HashMap<>();
-        this.prefixToIriMapping = new HashMap<>();
+        Objects.requireNonNull(config, "The configuration cannot be null");
+        this.option = config;
+        if(config instanceof UsesPrefixOptions usesPrefixOptions) {
+            this.prefixHandler = usesPrefixOptions.getPrefixHandler();
+        } else {
+            this.prefixHandler = new PrefixHandler(false);
+        }
         this.consumedBlankNodes = new HashSet<>();
         this.currentlyWritingBlankNodes = new HashSet<>();
-        initializePrefixes();
-    }
-
-    /**
-     * Helper method to safely cast the generic config to AbstractTFamilyConfig.
-     * This should be called before accessing any methods specific to AbstractTFamilyConfig.
-     *
-     * @return The config cast to AbstractTFamilyConfig.
-     * @throws SerializationException if the config is not an instance of AbstractTFamilyConfig.
-     */
-    private AbstractTFamilyOption getTFamilyOption() {
-        if (!(option instanceof AbstractTFamilyOption)) {
-            throw new SerializationException("Current serializer configuration is not an instance of AbstractTFamilyOption. " +
-                    "Features like prefixes, compact syntax, and pretty-printing are only available for T-Family formats.", this.getFormatName());
-        }
-        return (AbstractTFamilyOption) option;
-    }
-
-    /**
-     * Initializes prefix mappings by adding custom prefixes from the configuration.
-     */
-    private void initializePrefixes() {
-        if (option instanceof AbstractTFamilyOption && getTFamilyOption().usePrefixes()) {
-            AbstractTFamilyOption tFamilyOption = getTFamilyOption();
-            PrefixHandler prefixHandler = tFamilyOption.getPrefixHandler();
-
-            for (String prefix : prefixHandler.getPrefixes()) {
-                String namespace = prefixHandler.getNamespace(prefix);
-                if (namespace != null) {
-                    addPrefixMapping(namespace, prefix);
-                }
-            }
-        }
     }
 
     /**
@@ -136,27 +109,29 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeHeader(Writer writer) throws IOException {
-        if (option.getBaseIRI() != null) {
+        if (option instanceof BaseIRIOptions baseIRIOptions
+                && option instanceof LineEndingOptions lineEndingOptions
+                && baseIRIOptions.getBaseIRI() != null) {
             writer.write(String.format("@base <%s> .%s",
-                    option.getBaseIRI(),
-                    option.getLineEnding()));
+                    baseIRIOptions.getBaseIRI(),
+                    lineEndingOptions.getLineEnding()));
         }
 
-        if (option instanceof AbstractSerializerOption
-                && getTFamilyOption().usePrefixes()
-                && getTFamilyOption().autoDeclarePrefixes()) {
-            collectUsedNamespaces();
+        Set<String> actuallyUsedNamespaces = Set.of();
+        if (option instanceof UsesPrefixOptions prefixOptions
+                && prefixOptions.usePrefixes()
+                && prefixOptions.autoDeclarePrefixes()) {
+            actuallyUsedNamespaces = collectUsedNamespaces();
         }
 
-        writePrefixDeclarations(writer);
+        writePrefixDeclarations(writer, actuallyUsedNamespaces);
     }
 
     /**
      * Collects all namespaces used in the model and attempts to assign prefixes to them
      * if auto-declaration is enabled and they are not already mapped.
      */
-    protected void collectUsedNamespaces() {
-
+    protected Set<String> collectUsedNamespaces() {
         Set<String> namespaces = model.stream()
                 .flatMap(stmt -> {
                     List<Value> values = new ArrayList<>(Arrays.asList(
@@ -167,21 +142,57 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                     if (stmt.getContext() != null) {
                         values.add(stmt.getContext());
                     }
+                    if(stmt.getObject().isLiteral()
+                            && ((Literal) stmt.getObject()).getDatatype() != null) {
+                        values.add(((Literal) stmt.getObject()).getDatatype());
+                    }
                     return values.stream();
                 })
                 .filter(Objects::nonNull)
                 .filter(Value::isIRI)
-                .map(v -> getNamespace(v.stringValue()))
+                .map(v -> IRIUtils.guessNamespace(v.stringValue()))
                 .collect(Collectors.toSet());
 
         namespaces.forEach(namespace -> {
-            if (!iriToPrefixMapping.containsKey(namespace)) {
+            if (!this.prefixHandler.hasNamespace(namespace)) {
                 String prefix = getSuggestedPrefix(namespace);
                 if (prefix != null) {
                     addPrefixMapping(namespace, prefix);
                 }
             }
         });
+
+        return namespaces;
+    }
+
+    /**
+     * Writes prefix declarations to the writer, sorted if configured.
+     *
+     * @param writer the {@link Writer} to which prefixes will be written.
+     * @throws IOException if an I/O error occurs.
+     */
+    protected void writePrefixDeclarations(Writer writer, Set<String> actuallyUsedNamespaces) throws IOException {
+        if(this.option instanceof UsesPrefixOptions prefixOptions
+                && this.option instanceof LineEndingOptions lineEndingOptions
+                && this.option instanceof BaseIRIOptions baseIRIOptions
+                && prefixOptions.usePrefixes()) {
+            List<String> prefixes = new ArrayList<>(actuallyUsedNamespaces.stream().map(namespace -> this.prefixHandler.getPrefix(namespace)).toList());
+
+            if (prefixOptions.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
+                Collections.sort(prefixes);
+            }
+
+            for (String prefix : prefixes) {
+                writer.write(String.format("@prefix %s: <%s> .%s",
+                        prefix,
+                        this.prefixHandler.getNamespace(prefix),
+                        lineEndingOptions.getLineEnding()));
+            }
+
+            if (!prefixes.isEmpty() || baseIRIOptions.getBaseIRI() != null) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
+        }
     }
 
     /**
@@ -191,24 +202,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writePrefixDeclarations(Writer writer) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
-        List<String> prefixes = new ArrayList<>(prefixToIriMapping.keySet());
-
-        if (tFamilyConfig.getPrefixOrdering() == PrefixOrderingEnum.ALPHABETICAL) {
-            Collections.sort(prefixes);
-        }
-
-        for (String prefix : prefixes) {
-            writer.write(String.format("@prefix %s: <%s> .%s",
-                    prefix,
-                    prefixToIriMapping.get(prefix),
-                    option.getLineEnding()));
-        }
-
-        if (!prefixes.isEmpty() || option.getBaseIRI() != null) {
-            writer.write(option.getLineEnding());
-        }
+        writePrefixDeclarations(writer, Set.of());
     }
 
     /**
@@ -222,7 +216,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         for (Statement stmt : model) {
             if (!isConsumed(stmt.getSubject())) {
                 writeStatement(writer, stmt);
-                writer.write(option.getLineEnding());
+                if(this.option instanceof LineEndingOptions lineEndingOptions) {
+                    writer.write(lineEndingOptions.getLineEnding());
+                }
             }
         }
     }
@@ -236,9 +232,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeStatement(Writer writer, Statement stmt) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
-        String indent = tFamilyConfig.prettyPrint() ? tFamilyConfig.getIndent() : SerializationConstants.EMPTY_STRING;
+        String indent = this.option instanceof PrettyPrintOptions prettyOptions
+                && prettyOptions.prettyPrint()
+                    ? prettyOptions.getIndent()
+                    : SerializationConstants.EMPTY_STRING;
         writer.write(indent);
 
         // Subject
@@ -264,8 +261,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writePredicate(Writer writer, Value predicate) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-        if (tFamilyConfig.useRdfTypeShortcut() && predicate.equals(RDF.type.getIRI())) {
+        if (this.option instanceof AbstractTFamilyOptions tFamilyOptions
+                && tFamilyOptions.useRdfTypeShortcut()
+                && predicate.equals(RDF.type.getIRI())) {
             writer.write(SerializationConstants.RDF_TYPE_SHORTCUT);
         } else {
             writeValue(writer, predicate);
@@ -303,12 +301,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
             boolean isSubject = model.stream().anyMatch(stmt -> stmt.getSubject().equals(bNode));
 
-            if (!isSubject && option instanceof AbstractSerializerOption) {
-                if (getTFamilyOption().useCollections() && bNode.isBNode()) {
+            if (!isSubject && option instanceof AbstractTFamilyOptions abstractTFOptions) {
+                if (abstractTFOptions.useCollections() && bNode.isBNode()) {
                     handled = writeRDFList(writer, bNode);
                 }
 
-                if (!handled && getTFamilyOption().getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS && bNode.isBNode()) {
+                if (!handled && abstractTFOptions.getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS && bNode.isBNode()) {
                     List<Statement> properties = model.stream()
                             .filter(stmt -> stmt.getSubject().equals(bNode))
                             .toList();
@@ -340,12 +338,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeIRI(Writer writer, IRI iri) throws IOException {
-        if (option.isStrictMode() && option.validateURIs()) {
+        if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions && abstractSerializerOptions.isStrictMode() && abstractSerializerOptions.validateURIs()) {
             validateIRI(iri);
         }
 
         String prefixed = null;
-        if (option instanceof AbstractSerializerOption && getTFamilyOption().usePrefixes()) {
+        if (option instanceof UsesPrefixOptions prefixOptions && prefixOptions.usePrefixes()) {
             prefixed = getPrefixedName(iri.stringValue());
         }
 
@@ -369,8 +367,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         String value = literal.stringValue();
 
         boolean useTripleQuotes = false;
-        if (option instanceof AbstractTFamilyOption) {
-            useTripleQuotes = getTFamilyOption().useMultilineLiterals() &&
+        if (option instanceof AbstractTFamilyOptions tFamilyOptions) {
+            useTripleQuotes = tFamilyOptions.useMultilineLiterals() &&
                     (value.contains(SerializationConstants.LINE_FEED) || value.contains(SerializationConstants.CARRIAGE_RETURN) || value.contains("\"\"\""));
         }
 
@@ -422,9 +420,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             return false;
         }
 
-        return option.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED ||
-                (!datatype.equals(XSD.xsdString.getIRI()) &&
-                        option.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL);
+        return this.option instanceof DatatypePolicyOptions datatypePolicyOptions &&
+                (datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.ALWAYS_TYPED
+                        || (!datatype.equals(XSD.xsdString.getIRI()) &&
+                        datatypePolicyOptions.getLiteralDatatypePolicy() == LiteralDatatypePolicyEnum.MINIMAL));
     }
 
     /**
@@ -436,10 +435,8 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeInlineBlankNode(Writer writer, List<Statement> properties) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
-        String currentIndent = tFamilyConfig.prettyPrint() ? tFamilyConfig.getIndent() : SerializationConstants.EMPTY_STRING;
-        String propIndent = tFamilyConfig.prettyPrint() ? currentIndent + tFamilyConfig.getIndent() : "";
+        String currentIndent = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() ? prettyPrintOptions.getIndent() : SerializationConstants.EMPTY_STRING;
+        String propIndent = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() ? currentIndent + prettyPrintOptions.getIndent() : "";
 
         writer.write(SerializationConstants.BLANK_NODE_START);
 
@@ -455,8 +452,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
             firstProperty = false;
 
-            if (tFamilyConfig.prettyPrint()) {
-                writer.write(option.getLineEnding() + propIndent);
+            if (this.option instanceof PrettyPrintOptions prettyPrintOptions
+                    && this.option instanceof LineEndingOptions lineEndingOptions
+                    && prettyPrintOptions.prettyPrint()) {
+                writer.write(lineEndingOptions.getLineEnding() + propIndent);
             } else {
                 writer.write(SerializationConstants.SPACE);
             }
@@ -466,8 +465,11 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             writeValue(writer, stmt.getObject());
         }
 
-        if (tFamilyConfig.prettyPrint() && !properties.isEmpty() && !firstProperty) {
-            writer.write(option.getLineEnding() + currentIndent);
+        if (this.option instanceof PrettyPrintOptions prettyPrintOptions
+                && this.option instanceof LineEndingOptions lineEndingOptions
+                && prettyPrintOptions.prettyPrint()
+                && !properties.isEmpty() && !firstProperty) {
+            writer.write(lineEndingOptions.getLineEnding() + currentIndent);
         }
 
         writer.write(SerializationConstants.BLANK_NODE_END);
@@ -482,9 +484,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @throws IOException if an I/O error occurs.
      */
     protected void writeOptimizedStatements(Writer writer) throws IOException {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
-        Map<Resource, List<Statement>> bySubject = tFamilyConfig.sortSubjects() ?
+        Map<Resource, List<Statement>> bySubject = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortSubjects() ?
                 new TreeMap<>(Comparator.comparing(Resource::stringValue)) :
                 new HashMap<>();
 
@@ -493,12 +493,12 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 .forEach(stmt -> bySubject.computeIfAbsent(stmt.getSubject(), k -> new ArrayList<>()).add(stmt));
 
         for (Map.Entry<Resource, List<Statement>> subjectEntry : bySubject.entrySet()) {
-            String indent = tFamilyConfig.prettyPrint() ? tFamilyConfig.getIndent() : SerializationConstants.EMPTY_STRING;
+            String indent = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.prettyPrint() ? prettyPrintOptions.getIndent() : SerializationConstants.EMPTY_STRING;
             writer.write(indent);
             writeValue(writer, subjectEntry.getKey());
             writer.write(SerializationConstants.SPACE);
 
-            Map<IRI, List<Statement>> byPredicate = tFamilyConfig.sortPredicates() ?
+            Map<IRI, List<Statement>> byPredicate = this.option instanceof PrettyPrintOptions prettyPrintOptions && prettyPrintOptions.sortPredicates() ?
                     new TreeMap<>(Comparator.comparing(IRI::stringValue)) :
                     new HashMap<>();
 
@@ -508,8 +508,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             for (Map.Entry<IRI, List<Statement>> predicateEntry : byPredicate.entrySet()) {
                 if (!firstPredicate) {
                     writer.write(SerializationConstants.SEMICOLON);
-                    if (tFamilyConfig.prettyPrint()) {
-                        writer.write(option.getLineEnding() + indent + tFamilyConfig.getIndent());
+                    if (this.option instanceof PrettyPrintOptions prettyPrintOptions
+                            && this.option instanceof LineEndingOptions lineEndingOptions
+                            && prettyPrintOptions.prettyPrint()) {
+                        writer.write(lineEndingOptions.getLineEnding() + indent + prettyPrintOptions.getIndent());
                     } else {
                         writer.write(SerializationConstants.SPACE);
                     }
@@ -523,8 +525,10 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
                 for (Statement stmt : predicateEntry.getValue()) {
                     if (!firstObject) {
                         writer.write(SerializationConstants.COMMA);
-                        if (tFamilyConfig.prettyPrint()) {
-                            writer.write(option.getLineEnding() + indent + tFamilyConfig.getIndent() + tFamilyConfig.getIndent());
+                        if (this.option instanceof PrettyPrintOptions prettyPrintOptions
+                                && this.option instanceof LineEndingOptions lineEndingOptions
+                                && prettyPrintOptions.prettyPrint()) {
+                            writer.write(lineEndingOptions.getLineEnding() + indent + prettyPrintOptions.getIndent() + prettyPrintOptions.getIndent());
                         } else {
                             writer.write(SerializationConstants.SPACE);
                         }
@@ -536,7 +540,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             }
 
             writer.write(SerializationConstants.SPACE + SerializationConstants.POINT);
-            writer.write(option.getLineEnding());
+            if(this.option instanceof LineEndingOptions lineEndingOptions) {
+                writer.write(lineEndingOptions.getLineEnding());
+            }
         }
     }
 
@@ -638,19 +644,17 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return A {@link Set} of {@link Resource} representing the blank nodes that will be serialized inline.
      */
     protected Set<Resource> precomputeInlineBlankNodesAndLists() {
-        AbstractTFamilyOption tFamilyConfig = getTFamilyOption();
-
         Set<Resource> precomputed = new HashSet<>();
         for (Statement stmt : model) {
             if (stmt.getSubject().isBNode()) {
                 Resource bNodeSubject = stmt.getSubject();
-                if (tFamilyConfig.useCollections() && isRDFListHead(bNodeSubject)) {
+                if (this.option instanceof AbstractTFamilyOptions tFamilyOptions && tFamilyOptions.useCollections() && isRDFListHead(bNodeSubject)) {
                     Set<Resource> listNodes = detectListNodes(bNodeSubject);
                     if (!listNodes.isEmpty()) {
                         precomputed.addAll(listNodes);
                     }
                 }
-                if (tFamilyConfig.getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS) {
+                if (this.option instanceof AbstractTFamilyOptions tFamilyOptions && tFamilyOptions.getBlankNodeStyle() == BlankNodeStyleEnum.ANONYMOUS) {
                     List<Statement> properties = model.stream()
                             .filter(s -> s.getSubject().equals(bNodeSubject))
                             .toList();
@@ -752,17 +756,17 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @param prefix       The associated prefix.
      */
     protected void addPrefixMapping(String namespaceURI, String prefix) {
-        if (iriToPrefixMapping.containsKey(namespaceURI)) {
-            if (logger.isWarnEnabled() && !iriToPrefixMapping.get(namespaceURI).equals(prefix)) {
+        if (this.prefixHandler.hasNamespace(namespaceURI)) {
+            if (logger.isWarnEnabled() && !this.prefixHandler.getPrefix(namespaceURI).equals(prefix)) {
                 logger.warn("Namespace URI '{}' is already mapped to prefix '{}'. Cannot map to new prefix '{}'.",
-                        namespaceURI, iriToPrefixMapping.get(namespaceURI), prefix);
+                        namespaceURI, this.prefixHandler.getPrefix(namespaceURI), prefix);
             }
             return;
         }
 
-        if (prefixToIriMapping.containsKey(prefix)) {
-            if (logger.isWarnEnabled() && !prefixToIriMapping.get(prefix).equals(namespaceURI)) {
-                String originalNamespace = prefixToIriMapping.get(prefix);
+        if (this.prefixHandler.hasPrefix(prefix)) {
+            if (logger.isWarnEnabled() && !this.prefixHandler.getNamespace(prefix).equals(namespaceURI)) {
+                String originalNamespace = this.prefixHandler.getNamespace(prefix);
                 logger.warn("Prefix '{}' is already mapped to namespace '{}'. Cannot map to new namespace '{}'. " +
                                 "A new unique prefix will be generated for '{}'.",
                         prefix, originalNamespace, namespaceURI, namespaceURI);
@@ -770,31 +774,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             return;
         }
 
-        iriToPrefixMapping.put(namespaceURI, prefix);
-        prefixToIriMapping.put(prefix, namespaceURI);
-    }
-
-    /**
-     * Extracts the namespace URI part from an IRI string.
-     * This is a common heuristic for RDF IRIs.
-     *
-     * @param iriString The full IRI.
-     * @return The namespace URI part.
-     */
-    protected String getNamespace(String iriString) {
-        int hashIdx = iriString.lastIndexOf(SerializationConstants.HASH);
-        int slashIdx = iriString.lastIndexOf(SerializationConstants.SLASH);
-
-        if (hashIdx > -1) {
-            return iriString.substring(0, hashIdx + 1);
-        } else if (slashIdx > -1 && slashIdx < iriString.length() - 1) {
-            int dotIdx = iriString.lastIndexOf(SerializationConstants.POINT);
-            if (dotIdx > slashIdx) {
-                return iriString.substring(0, slashIdx + 1);
-            }
-            return iriString.substring(0, slashIdx + 1);
-        }
-        return iriString;
+        this.prefixHandler.setPrefix(prefix, namespaceURI);
     }
 
     /**
@@ -804,11 +784,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return The prefixed name (e.g., "ex:someResource") or null if no suitable prefix is found.
      */
     protected String getPrefixedName(String iriString) {
-        for (Map.Entry<String, String> entry : iriToPrefixMapping.entrySet()) {
-            String namespace = entry.getKey();
-            String prefix = entry.getValue();
-
+        for (String namespace : this.prefixHandler.getNamespaces()) {
             if (iriString.startsWith(namespace)) {
+                String prefix = this.prefixHandler.getPrefix(namespace);
                 String localName = iriString.substring(namespace.length());
                 if (localName.isEmpty()) {
                     if (!prefix.isEmpty()) {
@@ -831,12 +809,6 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
      * @return A suggested prefix, or null if suggestion is not possible.
      */
     protected String getSuggestedPrefix(String namespace) {
-        if (namespace.equals(RDF.getVocabularyNamespace())) return RDF.getVocabularyPreferredPrefix();
-        if (namespace.equals(RDFS.getVocabularyNamespace())) return RDFS.getVocabularyPreferredPrefix();
-        if (namespace.equals(XSD.getVocabularyNamespace())) return XSD.getVocabularyPreferredPrefix();
-        if (namespace.equals(OWL.getVocabularyNamespace())) return OWL.getVocabularyPreferredPrefix();
-        if (namespace.equals(FOAF.getVocabularyNamespace())) return FOAF.getVocabularyPreferredPrefix();
-
         String base = namespace;
         if (base.endsWith(SerializationConstants.HASH) || base.endsWith(SerializationConstants.SLASH)) {
             base = base.substring(0, base.length() - 1);
@@ -861,13 +833,13 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
         base = base.replaceAll("[^a-zA-Z0-9]", SerializationConstants.EMPTY_STRING).toLowerCase();
         if (base.isEmpty()) base = "p";
 
-        String candidate = base;
+        String candidatePrefix = base;
         int i = 0;
 
-        while (prefixToIriMapping.containsKey(candidate) && !prefixToIriMapping.get(candidate).equals(namespace)) {
-            candidate = base + (++i);
+        while (this.prefixHandler.hasPrefix(candidatePrefix) && !this.prefixHandler.getNamespace(candidatePrefix).equals(namespace)) {
+            candidatePrefix = base + (++i);
         }
-        return candidate;
+        return candidatePrefix;
     }
 
 
@@ -908,7 +880,9 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
             throw new SerializationException("Value cannot be null in {} format when strictMode is enabled.", getFormatName());
         }
 
-        if (option.isStrictMode() && value.isLiteral()) {
+        if (this.option instanceof AbstractSerializerOptions abstractSerializerOptions
+                && abstractSerializerOptions.isStrictMode()
+                && value.isLiteral()) {
             validateLiteral((Literal) value);
         }
     }
