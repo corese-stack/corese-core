@@ -243,10 +243,7 @@ public class Memory extends PointerObject implements Environment {
         if (sub == null) {
             // exists {}
             copyInto(mem, exp);
-        } // subquery
-        else if (eval.getMode() == Evaluator.Mode.SPARQL_MODE) {
-            // SPARQL does not bind args
-        } else {
+        } else if (eval.getMode() != Evaluator.Mode.SPARQL_MODE) {
             // bind subquery select nodes
             // take only from this memory the nodes
             // that are select nodes of sub query
@@ -281,7 +278,7 @@ public class Memory extends PointerObject implements Environment {
      */
     void copyInto(Memory mem, Exp exp) {
         if (hasBind()) {
-            // bind ldscript variables as sparql 
+            // bind ldscript variables as sparql
             // pattern matching variables
             mem.copy(getBind(), exp);
         }
@@ -310,8 +307,7 @@ public class Memory extends PointerObject implements Environment {
         List<Node> list = exp.getNodes();
         for (fr.inria.corese.core.kgram.api.core.Expr var : bind.getVariables()) {
             Node qn = getNode(var.getLabel(), list);
-            if (qn == null) {
-            } else {
+            if (qn != null) {
                 push(qn, (Node) bind.get(var));
             }
         }
@@ -1026,7 +1022,7 @@ public class Memory extends PointerObject implements Environment {
         int index = varExpr.getIndex();
         switch (varExpr.subtype()) {
             // ldscript variable
-            // normally we do not get here because ldscript variable is 
+            // normally we do not get here because ldscript variable is
             // instance of VariableLocal and eval() call Binding directly
             // however, it is not a bug, it is just less efficient to be here
             case ExprType.LOCAL:
@@ -1191,8 +1187,8 @@ public class Memory extends PointerObject implements Environment {
      *
      */
     @Override
-    public Iterable getLoop() {
-        return getList();
+    public Iterable<Object> getLoop() {
+        return new ArrayList<>(0);
     }
 
     List<List<IDatatype>> getList() {

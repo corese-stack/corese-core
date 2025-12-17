@@ -695,10 +695,6 @@ public class Mapping
         this.queryNodes = qNodes;
     }
 
-    public List<Node> getQueryNodeList() {
-        return Arrays.asList(getQueryNodes());
-    }
-
     @Override
     public Node[] getNodes() {
         return getTargetNodes();

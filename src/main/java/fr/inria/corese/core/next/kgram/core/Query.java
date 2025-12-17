@@ -148,7 +148,6 @@ public class Query extends Exp implements Graphable {
     boolean isDelete = false;
     boolean isUpdate = false;
     boolean isCheckLoop = false;
-    boolean isPipe = false;
     boolean isListGroup = false;
     boolean isListPath = true;
     private boolean parallel = true;

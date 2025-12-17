@@ -30,7 +30,6 @@ public class Mappings extends PointerObject
         implements Comparator<Mapping>, Iterable<Mapping> {
 
     private static final String NL = "\n";
-    private static final String AGGREGATE_LOCAL = "@local";
     private static final int SELECT = -1;
     private static final int HAVING = -2;
     // SPARQL: -1 (unbound first)
@@ -815,7 +814,7 @@ public class Mappings extends PointerObject
      * Compute select aggregate, order by aggregate and having on one group or on
      * whole result (in both case: this Mappings)
      */
-    private boolean aggregate(Query q, Evaluator eval, Exp exp, Memory memory, Producer p, int n) throws SparqlException, EngineException {
+    private void aggregate(Query q, Evaluator eval, Exp exp, Memory memory, Producer p, int n) throws SparqlException, EngineException {
         int iselect = SELECT;
         // get first Mapping in current group
         Mapping firstMap = get(0);
@@ -864,7 +863,6 @@ public class Mappings extends PointerObject
         }
 
         memory.pop(firstMap);
-        return res;
     }
 
     Node eval(Filter f, Evaluator eval, Environment env, Producer p) throws SparqlException, EngineException {
@@ -889,9 +887,7 @@ public class Mappings extends PointerObject
 
     void finish(Query qq) {
         setNbsolutions(size());
-        if (qq.getAST().hasMetadata(AGGREGATE_LOCAL)) {
-            // keep results as is
-        } else if (qq.hasGroupBy() && !qq.isConstruct()) {
+        if (qq.hasGroupBy() && !qq.isConstruct()) {
             // after group by (and aggregate), leave one Mapping for each group
             // with result of the group
             groupBy();

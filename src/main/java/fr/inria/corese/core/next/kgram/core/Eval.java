@@ -804,7 +804,7 @@ public class Eval implements ExpType, Plugin {
         pathFinder.setCountPath(query.isCountPath());
         pathFinder.init(exp.getRegex(), exp.getObject(), exp.getMin(), exp.getMax());
         // TODO: check this with clean()
-        if (p.getMode() == Producer.EXTENSION && p.getQuery() == memory.getQuery()) {
+        if (p.getMode() != Producer.EXTENSION && p.getQuery() == memory.getQuery()) {
             // do nothing
         } else {
             lPathFinder.add(pathFinder);
@@ -900,7 +900,7 @@ public class Eval implements ExpType, Plugin {
             send(Event.START, exp, graphNode, stack);
         }
 
-        if (exp.isFail()) {
+        if (!exp.isFail()) {
             // a false filter was detected at compile time
             // or exp was identified as always failing
             // no use to eval this exp
@@ -1035,9 +1035,8 @@ public class Eval implements ExpType, Plugin {
     private int minus(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException, EngineException {
         int backtrack = n - 1;
         Memory env = getMemory();
-        Node queryGraphNode = null;
 
-        Mappings map1 = subEval(p, graphNode, queryGraphNode, exp.first(), exp, data);
+        Mappings map1 = subEval(p, graphNode, null, exp.first(), exp, data);
         if (stop) {
             return STOP;
         }
@@ -1049,7 +1048,7 @@ public class Eval implements ExpType, Plugin {
         Exp rest = exp.rest();
         Mappings minusMappings = set1.prepareMappingsRest(rest);
 
-        Mappings map2 = subEval(p, graphNode, queryGraphNode, rest, exp, minusMappings);
+        Mappings map2 = subEval(p, graphNode, null, rest, exp, minusMappings);
 
         getVisitor().minus(this, getGraphNode(graphNode), exp, map1, map2);
 
@@ -1104,18 +1103,16 @@ public class Eval implements ExpType, Plugin {
      * clause
      */
     Mappings unionBranch(Producer p, Node graphNode, Exp exp, Exp main, Mappings data) throws SparqlException, EngineException {
-        Node queryNode = null;
-
         if (exp.isFirstWith()) {
             // union in union: eval inner union with parameter data as is
-            return subEval(p, graphNode, queryNode, exp, main, data);
+            return subEval(p, graphNode, null, exp, main, data);
         } else if (isFederate(exp) || exp.isUnion() || isParameterUnionMappings()) {
             Mappings unionData = unionData(exp, data);
-            return subEval(p, graphNode, queryNode, exp, main, unionData);
+            return subEval(p, graphNode, null, exp, main, unionData);
         } else {
             // exp += values(var, map)
             Exp ee = exp.complete(data);
-            return subEval(p, graphNode, queryNode, ee, main, null);
+            return subEval(p, graphNode, null, ee, main, null);
         }
     }
 
@@ -1314,9 +1311,7 @@ public class Eval implements ExpType, Plugin {
         Memory env = getMemory();
         boolean success = true;
 
-        if (exp.isPostpone()) {
-            // use case: optional { filter (exp) }, eval later
-        } else {
+        if (!exp.isPostpone()) {
             success = test(graphNode, exp.getFilter(), env, p);
 
             if (hasFilter) {
@@ -1614,40 +1609,39 @@ public class Eval implements ExpType, Plugin {
                 return STOP;
             }
 
-            Edge edge = entity;
-            if (edge != null) {
+            if (entity != null) {
                 nbEdge++;
-                if (hasListener && !listener.listen(exp, qEdge, edge)) {
+                if (hasListener && !listener.listen(exp, qEdge, entity)) {
                     continue;
                 }
 
-                graph = edge.getGraph();
-                boolean bmatch = match(qEdge, edge, graphNode, graph, env);
+                graph = entity.getGraph();
+                boolean bmatch = match(qEdge, entity, graphNode, graph, env);
 
                 if (matchNBNode) {
-                    bmatch &= (qEdge.nbNode() == edge.nbNode());
+                    bmatch &= (qEdge.nbNode() == entity.nbNode());
                 }
 
                 if (bmatch) {
                     if (hasCandidate) {
-                        IDatatype dt = getVisitor().candidate(this, getGraphNode(graphNode), qEdge, edge);
+                        IDatatype dt = getVisitor().candidate(this, getGraphNode(graphNode), qEdge, entity);
                         if (dt != null) {
                             bmatch = dt.booleanValue();
                         }
                     }
 
-                    bmatch &= push(p, qEdge, edge, graphNode, graph, n);
+                    bmatch &= push(p, qEdge, entity, graphNode, graph, n);
                 }
 
                 if (isEvent) {
-                    send(evENUM, exp, edge, bmatch);
+                    send(evENUM, exp, entity, bmatch);
                 }
 
                 if (bmatch) {
                     isSuccess = true;
                     backtrack = eval(p, graphNode, stack, n + 1);
 
-                    env.pop(qEdge, edge);
+                    env.pop(qEdge, entity);
                     if (hasGraphNode) {
                         env.pop(graphNode);
                     }
