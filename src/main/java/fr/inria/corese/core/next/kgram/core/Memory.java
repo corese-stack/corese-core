@@ -24,7 +24,7 @@ public class Memory extends PointerObject implements Environment {
 
     static final Edge[] emptyEdges = new Edge[0];
     static final Edge[] emptyEntities = new Edge[0];
-    public static boolean IS_EDGE = !true;
+    public static boolean IS_EDGE = false;
     // number of times nodes are bound by Stack
     // decrease with backtrack
     int[] nbNodes, nbEdges,
@@ -238,7 +238,7 @@ public class Memory extends PointerObject implements Environment {
      * TODO: let ( .., exists {}),
      * MUST push BGP solution and then push Bind
      */
-    Memory copyInto(Query sub, Memory mem, Exp exp) {
+    void copyInto(Query sub, Memory mem, Exp exp) {
         int n = 0;
         if (sub == null) {
             // exists {}
@@ -261,7 +261,6 @@ public class Memory extends PointerObject implements Environment {
             }
             mem.share(this);
         }
-        return mem;
     }
 
     /**

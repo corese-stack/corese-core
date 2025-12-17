@@ -1249,13 +1249,13 @@ public class Exp extends PointerObject
         }
     }
 
-    boolean contain(List<Exp> lExp, Node node) {
+    boolean doesNotContain(List<Exp> lExp, Node node) {
         for (Exp exp : lExp) {
             if (exp.getNode().equals(node)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -1388,13 +1388,13 @@ public class Exp extends PointerObject
         Exp p = Exp.create(Type.BGP);
         Exp rest = rest();
         for (Exp exp : rest) {
-            if (exp.isFilter() && !rest.simpleBind(exp.getFilter())) {
+            if (exp.isFilter() && rest.hasUnboundVariables(exp.getFilter())) {
                 p.add(exp);
                 exp.setPostpone(true);
             } else if (exp.isOptional() || exp.isMinus()) {
                 Exp first = exp.first();
                 for (Exp e : first) {
-                    if (e.isFilter() && !first.simpleBind(e.getFilter())) {
+                    if (e.isFilter() && first.hasUnboundVariables(e.getFilter())) {
                         p.add(e);
                         e.setPostpone(true);
                     }
@@ -1449,19 +1449,19 @@ public class Exp extends PointerObject
     }
 
     /**
-     * Filter variables of f are bound by triple, path, values or bind, locally in this Exp
+     * Check if filter variables are NOT bound by triple, path, values or bind, locally in this Exp
      */
-    boolean simpleBind(Filter f) {
+    boolean hasUnboundVariables(Filter f) {
         List<String> varList = f.getVariables();
         List<String> nodeList = getNodeVariables();
 
         for (String variable : varList) {
             if (!nodeList.contains(variable)) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     /**
