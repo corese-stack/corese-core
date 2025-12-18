@@ -422,9 +422,8 @@ public class Memory extends PointerObject implements Environment {
                         Node node = null;
                         boolean isBound = isBound(e.getNode());
 
-                        if (e.isAggregate()) {
-                            // do nothing
-                        } else {
+                        if (!e.isAggregate()) {
+
 
                             node = (Node) kgram.eval(f, this, p);
                             kgram.getVisitor().select(kgram, f.getExp(), node == null ? null : node.getDatatypeValue());
@@ -802,8 +801,7 @@ public class Memory extends PointerObject implements Environment {
                 if (!qNode.isBlank() || isBlank) {
                     // do not push service bnode
                     Node node = res.getNode(k);
-                    if (push(qNode, node, n)) {
-                    } else {
+                    if (!push(qNode, node, n)) {
                         for (int i = 0; i < k; i++) {
                             pop(res.getQueryNode(i));
                         }
@@ -841,8 +839,7 @@ public class Memory extends PointerObject implements Environment {
                 Node tNode = list.get(qNode.getLabel());
                 if (tNode != null) {
                     Node node = map.getNodeProtect(k);
-                    if (push(tNode, node, n)) {
-                    } else {
+                    if (!push(tNode, node, n)) {
                         // pop
                         for (int i = 0; i < k; i++) {
                             Node qq = map.getQueryNode(i);
@@ -899,11 +896,6 @@ public class Memory extends PointerObject implements Environment {
         }
     }
 
-    public void pushPath(Node qNode, Path path) {
-    }
-
-    public void popPath(Node qNode) {
-    }
 
     Node getNode(int n) {
         return nodes[n];

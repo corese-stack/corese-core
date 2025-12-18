@@ -576,7 +576,6 @@ public class PathFinder {
         if (varNode != null) {
             Node pathNode = getPathNode(path);
             mem.push(varNode, pathNode);
-            mem.pushPath(varNode, path);
         }
         boolean test;
         try {
@@ -587,7 +586,6 @@ public class PathFinder {
         mem.pop(qNode);
         if (varNode != null) {
             mem.pop(varNode);
-            mem.popPath(varNode);
         }
         return test;
     }

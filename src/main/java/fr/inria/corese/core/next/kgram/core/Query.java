@@ -1012,7 +1012,7 @@ public class Query extends Exp implements Graphable {
                 return;
             } else {
                 basicComplete(prod);
-                setCompiled(true);
+                setCompiled();
             }
         }
     }
@@ -1412,7 +1412,7 @@ public class Query extends Exp implements Graphable {
     int indexExpQuery(Query query, Exp exp, boolean isExist) {
         int min = Integer.MAX_VALUE;
         Query qq = exp.getQuery();
-        qq.setCompiled(true);
+        qq.setCompiled();
         qq.setGlobalQuery(this);
         qq.setOuterQuery(query);
         qq.setAggregate();
@@ -1522,7 +1522,7 @@ public class Query extends Exp implements Graphable {
             return;
         }
         if (isDistinct() && getSelectFun().size() == 1) {
-            Node qNode = getSelectFun().get(0).getNode();
+            Node qNode = getSelectFun().getFirst().getNode();
             for (Exp exp : this) {
                 if (exp.distinct(qNode)) {
                     return;
@@ -1729,8 +1729,8 @@ public class Query extends Exp implements Graphable {
         return service;
     }
 
-    void setCompiled(boolean isCompiled) {
-        this.isCompiled = isCompiled;
+    void setCompiled() {
+        this.isCompiled = true;
     }
 
     boolean isCompiled() {
@@ -1947,8 +1947,7 @@ public class Query extends Exp implements Graphable {
     // subquery inherit from global query
     public Expr getGlobalExpression(String name) {
         if (getGlobalQuery() != this) {
-            Expr ee = getGlobalQuery().getLocalExpression(name);
-            return ee;
+            return getGlobalQuery().getLocalExpression(name);
         }
         return null;
     }
@@ -2032,11 +2031,11 @@ public class Query extends Exp implements Graphable {
     }
 
 
-    public HashMap getEnvironment(){
+    public HashMap<String, Object> getEnvironment() {
         return tprinter;
     }
-    
-    public void setEnvironment(HashMap map){
+
+    public void setEnvironment(HashMap<String, Object> map) {
         tprinter = map;
     }
     
