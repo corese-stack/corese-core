@@ -2,7 +2,10 @@ package fr.inria.corese.core.next.kgram.core;
 
 import fr.inria.corese.core.next.kgram.api.core.*;
 import fr.inria.corese.core.next.kgram.api.query.*;
-import fr.inria.corese.core.next.kgram.event.*;
+import fr.inria.corese.core.next.kgram.event.Event;
+import fr.inria.corese.core.next.kgram.event.EventImpl;
+import fr.inria.corese.core.next.kgram.event.EventManager;
+import fr.inria.corese.core.next.kgram.event.ResultListener;
 import fr.inria.corese.core.next.kgram.path.PathFinder;
 import fr.inria.corese.core.next.kgram.tool.ResultsImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -554,7 +557,7 @@ public class Eval implements ExpType, Plugin {
         if (!extern || getVisitor().isShareable()) {
             ev.setVisitor(getVisitor());
         }
-        ev.startExtFun(q);
+        ev.startExtFun();
         if (hasEvent) {
             ev.setEventManager(manager);
         }
@@ -734,13 +737,13 @@ public class Eval implements ExpType, Plugin {
         if (hasEvent) {
             results.setEventManager(manager);
         }
-        startExtFun(q);
+        startExtFun();
         // set new results in case of sub query (for aggregates)
         memory.setEval(this);
         memory.setResults(results);
     }
 
-    void startExtFun(Query q) {
+    void startExtFun() {
         hasStatement = getVisitor().statement();
         hasProduce = getVisitor().produce();
         hasCandidate = getVisitor().candidate();
@@ -900,12 +903,7 @@ public class Eval implements ExpType, Plugin {
             send(Event.START, exp, graphNode, stack);
         }
 
-        if (!exp.isFail()) {
-            // a false filter was detected at compile time
-            // or exp was identified as always failing
-            // no use to eval this exp
-        } else {
-
+        if (exp.isFail()) {
             if (exp.isBGPAble()) {
                 // @deprecated
                 // evaluate and record result for next time
@@ -1756,14 +1754,9 @@ public class Eval implements ExpType, Plugin {
                         Node value = res.getNode(subNode);
                         if (value != null) {
                             env.pop(outNode);
-                            env.popPath(outNode);
                         }
                     }
                     return false;
-                } else {
-                    if (res.isPath(subNode)) {
-                        env.pushPath(outNode, res.getPath(subNode));
-                    }
                 }
             }
             k++;
@@ -1783,7 +1776,6 @@ public class Eval implements ExpType, Plugin {
             if (ans.isBound(subNode)) {
                 Node outNode = qq.getOuterNodeSelf(subNode);
                 env.pop(outNode);
-                env.popPath(outNode);
             }
         }
     }

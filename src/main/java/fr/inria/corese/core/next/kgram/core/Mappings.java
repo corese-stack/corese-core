@@ -222,6 +222,7 @@ public class Mappings extends PointerObject
     }
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public Iterator<Mapping> iterator() {
         return getMappingList().iterator();
     }
@@ -667,7 +668,7 @@ public class Mappings extends PointerObject
 
     // standard node comparator where argument may be null
     int compare(Node n1, Node n2) {
-        int res = 0;
+        int res;
         if (n1 != null && n2 != null) { // sort ?x
             res = comparator(n1, n2);
         } //      unbound
@@ -815,7 +816,6 @@ public class Mappings extends PointerObject
      * whole result (in both case: this Mappings)
      */
     private void aggregate(Query q, Evaluator eval, Exp exp, Memory memory, Producer p, int n) throws SparqlException, EngineException {
-        int iselect = SELECT;
         // get first Mapping in current group
         Mapping firstMap = get(0);
         // bind the Mapping in memory to retrieve group by variables
@@ -852,7 +852,7 @@ public class Mappings extends PointerObject
 
             for (Mapping map : this) {
 
-                if (n == iselect) {
+                if (n == SELECT) {
                     // select (count(?x) as ?c)
                     map.setNode(exp.getNode(), aggregateValue);
                 } else {
