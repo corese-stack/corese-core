@@ -5,30 +5,16 @@ import fr.inria.corese.core.storage.api.dataManager.DataManagerBuilder;
 
 public class CoreseGraphDataManagerBuilder implements DataManagerBuilder {
 
-    //////////////////////////
-    // Mandatory parameters //
-    //////////////////////////
-
-    /////////////////////////
-    // Optional parameters //
-    /////////////////////////
 
     private Graph graph;
     private boolean defGraph = false;
 
-    //////////////////
-    // Constructors //
-    //////////////////
 
     /**
      * Create a CoreseGraphDataManagerBuilder.
      */
     public CoreseGraphDataManagerBuilder() {
     }
-
-    ////////////
-    // Setter //
-    ////////////
 
     /**
      * Build the dataManager from an existing Corese Graphn
@@ -42,9 +28,6 @@ public class CoreseGraphDataManagerBuilder implements DataManagerBuilder {
         return this;
     }
 
-    ///////////
-    // Build //
-    ///////////
 
     @Override
     public CoreseGraphDataManager build() {

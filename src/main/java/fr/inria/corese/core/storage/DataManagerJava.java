@@ -1,37 +1,32 @@
 package fr.inria.corese.core.storage;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.proxy.GraphSpecificFunction;
 import fr.inria.corese.core.sparql.triple.parser.Access;
-import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
-import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.sparql.triple.parser.HashMapList;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.parser.URLServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DataManager on top of json (or xml) document
- *
  * a) implemented in java as graph data manager
  * path = path of insert where query that creates a graph (from json, xml, etc.)
  * update query creates graph data manager
- * 
  * b) implemented in ldscript when path contains ldscript (draft for testing)
  * path = path of ldscript function definition
  * 1- read (json) file with us:read() ldscript determine json file
@@ -71,7 +66,7 @@ public class DataManagerJava extends CoreseGraphDataManager {
     // creation time in StorageFactory
     @Override
     public void start(HashMapList<String> map) {
-        logger.info("Start data manager: " + getStoragePath());
+        logger.info("Start data manager: {}", getStoragePath());
         if (map == null) {
             init();
         } else {
@@ -107,7 +102,7 @@ public class DataManagerJava extends CoreseGraphDataManager {
         if (queryPath != null) {
             setQueryPath(queryPath);
             setQuery(null);
-            logger.info("Service query path= " + queryPath);
+            logger.info("Service query path= {}", queryPath);
             init();
             return true;
         } else {
@@ -116,7 +111,7 @@ public class DataManagerJava extends CoreseGraphDataManager {
                 query = clean(query);
                 setQuery(query);
                 setQueryPath(null);
-                logger.info("Service query = " + query);
+                logger.info("Service query = {}", query);
                 init();
                 return true;
             }
@@ -156,14 +151,14 @@ public class DataManagerJava extends CoreseGraphDataManager {
         try {
             if (getLoad()!=null) {
                 for (String name : getLoad()) {
-                    logger.info("Load " + name);
+                    logger.info("Load {}", name);
                     ld.parse(name);
                 }
             }
             // query who creates rdf graph (from json)
             String q;
             if (getQueryPath() != null) {
-                logger.info("Load " + getQueryPath());
+                logger.info("Load {}", getQueryPath());
                 q = ql.readWE(getQueryPath());
             } else if (getQuery() != null) {
                 q = getQuery();
@@ -174,7 +169,7 @@ public class DataManagerJava extends CoreseGraphDataManager {
             if (getMap() != null && getMap().containsKey(PARAM)) {
                 q = String.format(q, getMap().getFirst(PARAM));
             }
-            logger.info("Process query:\n" + q);
+            logger.info("Process query:\n{}", q);
             // update query creates rdf graph (from json)
             // this is graph of current DataManager
             Mappings map = getQueryProcess().query(q);
@@ -187,8 +182,6 @@ public class DataManagerJava extends CoreseGraphDataManager {
             logger.error(ex.getMessage());
         }
         finally {
-            //Access.set(Feature.READ, read);
-            //Access.set(Feature.READ_FILE, readFile);
             Access.setDefaultResultWhenEmptyAccept(false);
         }
     }
@@ -212,12 +205,12 @@ public class DataManagerJava extends CoreseGraphDataManager {
     @Override
     public Iterable<Edge> getEdges(Node s, Node p, Node o, List<Node> graphList) {
         if (isLdscript()) {
-            return iterateJson(s, p, o, graphList);
+            return iterateJson(s, p, o);
         }
         return super.getEdges(s, p, o, graphList);
     }
 
-    Iterable<Edge> iterateJson(Node s, Node p, Node o, List<Node> graphList) {
+    Iterable<Edge> iterateJson(Node s, Node p, Node o) {
         try {
             IDatatype dt = getQueryProcess().funcall(iterateFunction, getJsonDocument(), value(s), value(p), value(o));
             if (dt == null) {
@@ -246,17 +239,6 @@ public class DataManagerJava extends CoreseGraphDataManager {
         return edgeList;
     }
 
-    boolean filter(IDatatype dt, Node s, Node p, Node o) {
-        Edge e = dt.getEdge();
-        if (isJoker(p)) {
-            return true;
-        }
-        return e.getPropertyNode().equals(p);
-    }
-
-    boolean isJoker(Node n) {
-        return n.getDatatypeValue().equals(joker);
-    }
 
     public QueryProcess getQueryProcess() {
         return queryProcess;

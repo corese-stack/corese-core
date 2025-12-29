@@ -42,7 +42,6 @@ public class CoreseGraphDataManager implements DataManager {
      * Please use the CoreseGraphDataManagerBuilder to create a
      * CoreseGraphDataManager.
      * 
-     * @param g
      */
     protected CoreseGraphDataManager(Graph g) {
         setGraph(g);
@@ -57,11 +56,6 @@ public class CoreseGraphDataManager implements DataManager {
     @Override
     public void startReadTransaction() {
         getGraph().init();
-    }
-
-    @Override
-    public void endReadTransaction() {
-
     }
 
     @Override
@@ -87,7 +81,7 @@ public class CoreseGraphDataManager implements DataManager {
 
     @Override
     public void init(HashMapList<String> map) {
-        logger.info("Init data manager: " + map);
+        logger.info("Init data manager: {}", map);
         if (map.containsKey(DEBUG)) {
             setDebug(map.booleanValue(DEBUG));
         }

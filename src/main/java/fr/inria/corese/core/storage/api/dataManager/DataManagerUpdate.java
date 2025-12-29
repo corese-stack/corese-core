@@ -10,9 +10,7 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  * Interface to adapt an external storage system to Corese.
- * 
  * {@code DataManagerUpdate} for {@code update} and {@code construct} queries.
- * 
  * This interface is also used by the internal Corese graph.
  * 
  * @author Olivier Corby
@@ -62,7 +60,6 @@ public interface DataManagerUpdate {
 
     /**
      * Add an edges to the graph
-     * 
      * In case of rdf star triple :
      * subject (resp object) may be a triple
      * edge.getSubjectNode().isTriple() == true
@@ -130,7 +127,7 @@ public interface DataManagerUpdate {
      */
     default boolean clear(List<Node> contexts, boolean silent) {
         Iterable<Edge> deleted = this.delete(null, null, null, contexts);
-        Boolean succes = deleted.iterator().hasNext();
+        boolean succes = deleted.iterator().hasNext();
 
         if (silent) {
             return true;
@@ -171,8 +168,7 @@ public interface DataManagerUpdate {
      */
     default boolean copyGraph(Node source_context, Node target_context, boolean silent) {
         this.clear(List.of(target_context), silent);
-        Boolean result = this.addGraph(source_context, target_context, silent);
-        return result;
+        return this.addGraph(source_context, target_context, silent);
     }
 
     /**
@@ -186,7 +182,7 @@ public interface DataManagerUpdate {
      *         true, else false.
      */
     default boolean moveGraph(Node source_context, Node target_context, boolean silent) {
-        Boolean result = this.copyGraph(source_context, target_context, silent);
+        boolean result = this.copyGraph(source_context, target_context, silent);
         this.clear(List.of(source_context), silent);
         return result;
     }
@@ -202,7 +198,6 @@ public interface DataManagerUpdate {
     /**
      * Clear and undeclare a context in graph.
      * 
-     * @param context
      */
     default void unDeclareContext(Node context) {
         this.clear(List.of(context), false);
