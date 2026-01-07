@@ -61,6 +61,7 @@ public class RDFaParser extends AbstractRDFParser {
     private Set<RDFaIncompleteStatement> localIncompleteStatements = null;
     private Map<IRI, Set<Value>> localListMappings = null;
     private String currentLanguage = null;
+    private Value currentPropertyValue = null;
     private Map<String, IRI> localTermMappings = null;
     private String localDefaultVocabulary = null;
 
@@ -106,19 +107,7 @@ public class RDFaParser extends AbstractRDFParser {
 
             this.currentContext.setDefaultVocabulary(null);
 
-            skipElement = false;
-            newSubject = null;
-            currentObjectResource = null;
-            typedResource = null;
-            localIRIMappings = new HashMap<>();
-            localIncompleteStatements = new HashSet<>();
-            localListMappings = this.currentContext.getListMappings();
-            currentLanguage = this.currentContext.getLanguage();
-            localTermMappings = this.currentContext.getTermMappings();
-            localDefaultVocabulary = this.currentContext.getDefaultVocabulary();
-
             SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
             InputSource inputSource = new InputSource(reader);
             saxParser.parse(inputSource, new XMLSaxHandler());
@@ -143,53 +132,89 @@ public class RDFaParser extends AbstractRDFParser {
 
     private void startProcessElement(String uri, String localName, String qName, Attributes attrs) {
         this.currentElementAttributes = attrs;
-    }
+        logger.info("{} {}", qName, debugAttributesToString());
 
-    private void endProcessElement(String uri, String localName, String qName) {
-        String currentElementName = qName;
+        this.characters = new StringBuilder();
 
-        // The current element is examined for any change to the default vocabulary via @vocab. If @vocab is present and contains a value, the local default vocabulary is updated according to the section on CURIE and IRI Processing. If the value is empty, then the local default vocabulary MUST be reset to the Host Language defined default (if any).
-        if (this.currentElementAttributes.getValue(RDFaAttributes.VOCAB.getName()) != null
-                && !this.currentElementAttributes.getValue(RDFaAttributes.VOCAB.getName()).isEmpty()) {
-            localDefaultVocabulary = this.currentElementAttributes.getValue(RDFaAttributes.VOCAB.getName());
+        this.skipElement = false;
+        this.newSubject = null;
+        this.currentObjectResource = null;
+        this.typedResource = null;
+        this.localIRIMappings = this.currentContext.getIriMappings();
+        this.localIncompleteStatements = null;
+        this.localListMappings = this.currentContext.getListMappings();
+        this.currentLanguage = this.currentContext.getLanguage();
+        this.localTermMappings = this.currentContext.getTermMappings();
+        this.localDefaultVocabulary = this.currentContext.getDefaultVocabulary();
+
+        // HTML-specific base element
+        if (qName.equals(BASE_TAG)
+                && isAttributePresent(RDFaAttributes.HREF)) {
+            Resource resourceBase = getAttributeResourceValue(RDFaAttributes.HREF);
+            if (resourceBase.isIRI()) {
+                this.currentContext.setBaseIri((IRI) resourceBase);
+            }
         }
 
-        // The current element is examined for IRI mappings and these are added to the local list of IRI mappings. Note that an IRI mapping will simply overwrite any current mapping in the list that has the same name;
+        // 2. The current element is examined for any change to the default vocabulary via @vocab. If @vocab is present and contains a value, the local default vocabulary is updated according to the section on CURIE and IRI Processing. If the value is empty, then the local default vocabulary MUST be reset to the Host Language defined default (if any).
+        if (isAttributePresent(RDFaAttributes.VOCAB)
+                && !getAttributeStringValue(RDFaAttributes.VOCAB).isEmpty()) {
+            this.localDefaultVocabulary = getAttributeStringValue(RDFaAttributes.VOCAB);
+        }
+
+        // 3. The current element is examined for IRI mappings and these are added to the local list of IRI mappings. Note that an IRI mapping will simply overwrite any current mapping in the list that has the same name;
         for (int i = 0; i < this.currentElementAttributes.getLength(); i++) {
             String attribute = this.currentElementAttributes.getQName(i);
             if (attribute.startsWith(XMLNS_PREFIX)) {
                 String attributeValue = this.currentElementAttributes.getValue(i);
-                String prefixName = this.currentElementAttributes.getLocalName(i);
+                String prefixName = attribute.replace(XMLNS_PREFIX + ":", "");
                 IRI prefixNamespace = getValueFactory().createIRI(attributeValue, "");
-                localIRIMappings.put(prefixName, prefixNamespace);
+                this.localIRIMappings.put(prefixName, prefixNamespace);
             }
         }
-        if (this.currentElementAttributes.getValue(RDFaAttributes.PREFIX.getName()) != null
-                && !this.currentElementAttributes.getValue(RDFaAttributes.PREFIX.getName()).isEmpty()) {
-            String prefixDeclaration = this.currentElementAttributes.getValue(RDFaAttributes.PREFIX.getName());
+        if (isAttributePresent(RDFaAttributes.PREFIX)
+                && !getAttributeStringValue(RDFaAttributes.PREFIX).isEmpty()) {
+            String prefixDeclaration = getAttributeStringValue(RDFaAttributes.PREFIX);
             String prefixName = getPrefixFromDeclaration(prefixDeclaration);
             IRI prefixIRI = getPrefixIriFromDeclaration(prefixDeclaration);
-            localIRIMappings.put(prefixName, prefixIRI);
+            this.localIRIMappings.put(prefixName, prefixIRI);
         }
 
-        // If the current element contains no @rel or @rev attribute, then the next step is to establish a value for new subject. This step has two possible alternatives.
-        if (this.currentElementAttributes.getValue(RDFaAttributes.REL.getName()) == null
-                && this.currentElementAttributes.getValue(RDFaAttributes.REV.getName()) == null) {
-            // If the current element contains the @property attribute, but does not contain either the @content or @datatype attributes, then
-            if (this.currentElementAttributes.getValue(RDFaAttributes.PROPERTY.getName()) != null
-                    && !this.currentElementAttributes.getValue(RDFaAttributes.PROPERTY.getName()).isEmpty()
-                    && this.currentElementAttributes.getValue(RDFaAttributes.CONTENT.getName()) == null
-                    && this.currentElementAttributes.getValue(RDFaAttributes.DATATYPE.getName()) == null) {
-                if (this.currentElementAttributes.getValue(RDFaAttributes.ABOUT.getName()) != null) {
-                    this.newSubject = getResourceFromElementAttribute(RDFaAttributes.ABOUT);
+        // 4. The current element is also parsed for any language information, and if present, current language is set accordingly;
+        // Host Languages that incorporate RDFa MAY provide a mechanism for specifying the natural language of an element and its contents (e.g., XML provides the general-purpose XML attribute @xml:lang).
+        if (isAttributePresent(RDFaAttributes.LANG_ALT)
+                && !getAttributeStringValue(RDFaAttributes.LANG_ALT).isEmpty()) {
+            this.currentLanguage = getAttributeStringValue(RDFaAttributes.LANG_ALT);
+        }
+
+        // 5. If the current element contains no @rel or @rev attribute, then the next step is to establish a value for new subject. This step has two possible alternatives.
+        if (!isAttributePresent(RDFaAttributes.REL)
+                && !isAttributePresent(RDFaAttributes.REV)) {
+            // 5.1. If the current element contains the @property attribute, but does not contain either the @content or @datatype attributes, then
+            if (isAttributePresent(RDFaAttributes.PROPERTY)
+                    && !getAttributeStringValue(RDFaAttributes.PROPERTY).isEmpty()
+                    && !isAttributePresent(RDFaAttributes.CONTENT)
+                    && !isAttributePresent(RDFaAttributes.DATATYPE)
+                    && (isAttributePresent(RDFaAttributes.ABOUT)
+                    || isRootElement
+                    || this.currentContext.getParentObjectResource() != null)) {
+                // new subject is set to the resource obtained from the first match from the following rule:
+                // by using the resource from @about, if present, obtained according to the section on CURIE and IRI Processing;
+                if (isAttributePresent(RDFaAttributes.ABOUT)) {
+                    this.newSubject = getAttributeResourceValue(RDFaAttributes.ABOUT);
+                    // otherwise, if the element is the root element of the document, then act as if there is an empty @about present, and process it according to the rule for @about, above;
                 } else if (isRootElement) {
                     this.newSubject = this.currentContext.getBaseIri();
+                    // otherwise, if parent object is present, new subject is set to the value of parent object.
                 } else if (this.currentContext.getParentObjectResource() != null) {
                     this.newSubject = this.currentContext.getParentObjectResource();
                 }
-                if (this.currentElementAttributes.getValue(RDFaAttributes.TYPEOF.getName()) != null) {
-                    if (this.currentElementAttributes.getValue(RDFaAttributes.ABOUT.getName()) != null) {
+                // If @typeof is present then typed resource is set to the resource obtained from the first match from the following rules:
+                if (isAttributePresent(RDFaAttributes.TYPEOF)) {
+                    // by using the resource from @about, if present, obtained according to the section on CURIE and IRI Processing;
+                    if (isAttributePresent(RDFaAttributes.ABOUT)) {
                         this.typedResource = this.newSubject;
+                        // otherwise, if the element is the root element of the document, then act as if there is an empty @about present and process it according to the previous rule;
                     } else if (isRootElement) {
                         Optional<Resource> emptyAboutResource = resolveStringResource("");
                         if (emptyAboutResource.isPresent()) {
@@ -197,33 +222,46 @@ public class RDFaParser extends AbstractRDFParser {
                         } else {
                             throw new ParsingErrorException("Expected to be able to generate typedResource from empty CURIE");
                         }
+                        // otherwise,
                     } else {
-                        if (this.currentElementAttributes.getValue(RDFaAttributes.RESOURCE.getName()) != null) {
-                            this.newSubject = getResourceFromElementAttribute(RDFaAttributes.RESOURCE);
-                        } else if (this.currentElementAttributes.getValue(RDFaAttributes.HREF.getName()) != null) {
-                            this.newSubject = getResourceFromElementAttribute(RDFaAttributes.HREF);
-                        } else if (this.currentElementAttributes.getValue(RDFaAttributes.SRC.getName()) != null) {
-                            this.newSubject = getResourceFromElementAttribute(RDFaAttributes.SRC);
+                        // by using the resource from @resource, if present, obtained according to the section on CURIE and IRI Processing;
+                        if (isAttributePresent(RDFaAttributes.RESOURCE)) {
+                            this.typedResource = getAttributeResourceValue(RDFaAttributes.RESOURCE);
+                            // otherwise, by using the IRI from @href, if present, obtained according to the section on CURIE and IRI Processing;
+                        } else if (isAttributePresent(RDFaAttributes.HREF)) {
+                            this.typedResource = getAttributeResourceValue(RDFaAttributes.HREF);
+                            // otherwise, by using the IRI from @src, if present, obtained according to the section on CURIE and IRI Processing;
+                        } else if (isAttributePresent(RDFaAttributes.SRC)) {
+                            this.typedResource = getAttributeResourceValue(RDFaAttributes.SRC);
+                            // otherwise, the value of typed resource is set to a newly created bnode.
                         } else {
                             this.typedResource = getValueFactory().createBNode();
                         }
+                        // The value of the current object resource is then set to the value of typed resource.
                         this.currentObjectResource = this.typedResource;
                     }
                 }
-                // otherwise:
+                logger.info("{}", this.newSubject);
+                // 5.2. otherwise:
             } else {
-                if (this.currentElementAttributes.getValue(RDFaAttributes.ABOUT.getName()) != null
-                        && this.currentElementAttributes.getValue(RDFaAttributes.HREF.getName()) != null
-                        && this.currentElementAttributes.getValue(RDFaAttributes.SRC.getName()) != null
-                        && this.currentElementAttributes.getValue(RDFaAttributes.RESOURCE.getName()) != null) {
-                    if (this.currentElementAttributes.getValue(RDFaAttributes.ABOUT.getName()) != null) {
-                        this.newSubject = getResourceFromElementAttribute(RDFaAttributes.ABOUT);
-                    } else if (this.currentElementAttributes.getValue(RDFaAttributes.RESOURCE.getName()) != null) {
-                        this.newSubject = getResourceFromElementAttribute(RDFaAttributes.RESOURCE);
-                    } else if (this.currentElementAttributes.getValue(RDFaAttributes.HREF.getName()) != null) {
-                        this.newSubject = getResourceFromElementAttribute(RDFaAttributes.HREF);
-                    } else if (this.currentElementAttributes.getValue(RDFaAttributes.SRC.getName()) != null) {
-                        this.newSubject = getResourceFromElementAttribute(RDFaAttributes.SRC);
+                if (isAttributePresent(RDFaAttributes.ABOUT)
+                        || isAttributePresent(RDFaAttributes.HREF)
+                        || isAttributePresent(RDFaAttributes.SRC)
+                        || isAttributePresent(RDFaAttributes.RESOURCE)) {
+                    if (isAttributePresent(RDFaAttributes.ABOUT)) {
+                        this.newSubject = getAttributeResourceValue(RDFaAttributes.ABOUT);
+                        logger.info("{}", this.newSubject);
+                    } else if (isAttributePresent(RDFaAttributes.RESOURCE)) {
+                        this.newSubject = getAttributeResourceValue(RDFaAttributes.RESOURCE);
+                        logger.info("{}", this.newSubject);
+                    } else if (isAttributePresent(RDFaAttributes.HREF)) {
+                        this.newSubject = getAttributeResourceValue(RDFaAttributes.HREF);
+                        logger.info("{}", this.newSubject);
+                    } else if (isAttributePresent(RDFaAttributes.SRC)) {
+                        this.newSubject = getAttributeResourceValue(RDFaAttributes.SRC);
+                        logger.info("{}", this.newSubject);
+                    } else {
+                        logger.info("No subject retrieved");
                     }
                 } else {
                     if (isRootElement) {
@@ -233,28 +271,30 @@ public class RDFaParser extends AbstractRDFParser {
                         } else {
                             throw new ParsingErrorException("Expected to be able to generate newSubject from empty CURIE");
                         }
-                    } else if (this.currentElementAttributes.getValue(RDFaAttributes.TYPEOF.getName()) != null) {
+                    } else if (isAttributePresent(RDFaAttributes.TYPEOF)) {
                         this.newSubject = getValueFactory().createBNode();
+                        logger.info("{}", this.newSubject);
                     } else if (this.currentContext.getParentObjectResource() != null) {
                         this.newSubject = this.currentContext.getParentObjectResource();
-                        if (this.currentElementAttributes.getValue(RDFaAttributes.PROPERTY.getName()) == null) {
+                        if (!isAttributePresent(RDFaAttributes.PROPERTY)) {
                             skipElement = true;
                         }
                     }
-                    if (this.currentElementAttributes.getValue(RDFaAttributes.TYPEOF.getName()) != null) {
-                        this.typedResource = this.newSubject;
-                    }
+                }
+                if (isAttributePresent(RDFaAttributes.TYPEOF)) {
+                    this.typedResource = this.newSubject;
                 }
             }
         }
 
-        //  If the current element does contain a @rel or @rev attribute, then the next step is to establish both a value for new subject and a value for current object resource:
-        if (this.currentElementAttributes.getValue(RDFaAttributes.REL.getName()) != null
-                && this.currentElementAttributes.getValue(RDFaAttributes.REV.getName()) != null) {
-            if (this.currentElementAttributes.getValue(RDFaAttributes.ABOUT.getName()) != null) {
-                this.newSubject = getResourceFromElementAttribute(RDFaAttributes.ABOUT);
+        // 6. If the current element does contain a @rel or @rev attribute, then the next step is to establish both a value for new subject and a value for current object resource:
+        if (isAttributePresent(RDFaAttributes.REL)
+                || isAttributePresent(RDFaAttributes.REV)) {
+            if (isAttributePresent(RDFaAttributes.ABOUT)) {
+                this.newSubject = getAttributeResourceValue(RDFaAttributes.ABOUT);
+                logger.info("{}", this.newSubject);
             }
-            if (this.currentElementAttributes.getValue(RDFaAttributes.TYPEOF.getName()) != null) {
+            if (isAttributePresent(RDFaAttributes.TYPEOF)) {
                 this.typedResource = this.newSubject;
             }
             if (this.newSubject == null) {
@@ -269,57 +309,58 @@ public class RDFaParser extends AbstractRDFParser {
                     this.newSubject = this.currentContext.getParentObjectResource();
                 }
             }
-            if (this.currentElementAttributes.getValue(RDFaAttributes.RESOURCE.getName()) != null) {
-                this.currentObjectResource = getResourceFromElementAttribute(RDFaAttributes.RESOURCE);
-            } else if (this.currentElementAttributes.getValue(RDFaAttributes.HREF.getName()) != null) {
-                this.currentObjectResource = getResourceFromElementAttribute(RDFaAttributes.HREF);
-            } else if (this.currentElementAttributes.getValue(RDFaAttributes.SRC.getName()) != null) {
-                this.currentObjectResource = getResourceFromElementAttribute(RDFaAttributes.SRC);
-            } else if (this.currentElementAttributes.getValue(RDFaAttributes.TYPEOF.getName()) != null
-                    && this.currentElementAttributes.getValue(RDFaAttributes.ABOUT.getName()) == null) {
+            if (isAttributePresent(RDFaAttributes.RESOURCE)) {
+                this.currentObjectResource = getAttributeResourceValue(RDFaAttributes.RESOURCE);
+            } else if (isAttributePresent(RDFaAttributes.HREF)) {
+                this.currentObjectResource = getAttributeResourceValue(RDFaAttributes.HREF);
+            } else if (isAttributePresent(RDFaAttributes.SRC)) {
+                this.currentObjectResource = getAttributeResourceValue(RDFaAttributes.SRC);
+            } else if (isAttributePresent(RDFaAttributes.TYPEOF)
+                    && !isAttributePresent(RDFaAttributes.ABOUT)) {
                 this.currentObjectResource = this.getValueFactory().createBNode();
             }
-            if (this.currentElementAttributes.getValue(RDFaAttributes.TYPEOF.getName()) != null
-                    && this.currentElementAttributes.getValue(RDFaAttributes.ABOUT.getName()) == null
+            if (isAttributePresent(RDFaAttributes.TYPEOF)
+                    && !isAttributePresent(RDFaAttributes.ABOUT)
                     && (this.currentObjectResource == null || this.currentObjectResource.isResource())) {
-                this.typedResource = (Resource) this.currentObjectResource;
+                this.typedResource = this.currentObjectResource;
             }
         }
+        logger.info("{} : subject {}", qName, this.newSubject);
 
-        //  If in any of the previous steps a typed resource was set to a non-null value, it is now used to provide a subject for type values;
+        // 7. If in any of the previous steps a typed resource was set to a non-null value, it is now used to provide a subject for type values;
         if (this.typedResource != null) {
-            Resource typeIri = getResourceFromElementAttribute(RDFaAttributes.TYPEOF);
+            Resource typeIri = getAttributeResourceValue(RDFaAttributes.TYPEOF);
             this.getModel().add(this.typedResource, RDF.type.getIRI(), typeIri);
         }
 
-        //  If in any of the previous steps a new subject was set to a non-null value different from the parent object;
+        // 8. If in any of the previous steps a new subject was set to a non-null value different from the parent object;
         if (this.newSubject != null && this.newSubject != this.currentContext.getParentObjectResource()) {
             this.localListMappings = new HashMap<>();
         }
 
-        //  If in any of the previous steps a current object resource was set to a non-null value, it is now used to generate triples and add entries to the local list mapping:
+        // 9. If in any of the previous steps a current object resource was set to a non-null value, it is now used to generate triples and add entries to the local list mapping:
         if (this.currentObjectResource != null) {
-            if (this.currentElementAttributes.getValue(RDFaAttributes.INLIST.getName()) != null
-                    && this.currentElementAttributes.getValue(RDFaAttributes.REL.getName()) != null) {
-                IRI relResource = (IRI) getResourceFromElementAttribute(RDFaAttributes.REL);
+            if (isAttributePresent(RDFaAttributes.INLIST)
+                    && isAttributePresent(RDFaAttributes.REL)) {
+                IRI relResource = (IRI) getAttributeResourceValue(RDFaAttributes.REL);
                 if (!localListMappings.containsKey(relResource)) {
                     this.localListMappings.put(relResource, new HashSet<>());
                 }
                 this.localListMappings.get(relResource).add(this.currentObjectResource);
             }
-            if (this.currentElementAttributes.getValue(RDFaAttributes.INLIST.getName()) == null) {
-                if (this.currentElementAttributes.getValue(RDFaAttributes.REL.getName()) != null) {
-                    Resource relResource = getResourceFromElementAttribute(RDFaAttributes.REL);
+            if (!isAttributePresent(RDFaAttributes.INLIST)) {
+                if (isAttributePresent(RDFaAttributes.REL)) {
+                    Resource relResource = getAttributeResourceValue(RDFaAttributes.REL);
                     if (relResource.isIRI()) {
                         this.getModel().add(newSubject, (IRI) relResource, currentObjectResource);
                     } else {
                         throw new ParsingErrorException("Value of attribute @rel expected to be an IRI but was " + this.currentElementAttributes.getValue(RDFaAttributes.REL.getName()));
                     }
                 }
-                if (this.currentElementAttributes.getValue(RDFaAttributes.REV.getName()) != null) {
-                    Resource revResource = getResourceFromElementAttribute(RDFaAttributes.REV);
+                if (isAttributePresent(RDFaAttributes.REV)) {
+                    Resource revResource = getAttributeResourceValue(RDFaAttributes.REV);
                     if (!revResource.isIRI()) {
-                        throw new ParsingErrorException("Value of attribute @rev expected to be an IRI but was " + this.currentElementAttributes.getValue(RDFaAttributes.REV.getName()));
+                        throw new ParsingErrorException("Value of attribute @rev expected to be an IRI but was " + getAttributeStringValue(RDFaAttributes.REV));
                     }
                     if (!currentObjectResource.isResource()) {
                         throw new ParsingErrorException("object resource expected to be a resource but was " + currentObjectResource);
@@ -329,15 +370,18 @@ public class RDFaParser extends AbstractRDFParser {
             }
         }
 
-        //  If however current object resource was set to null, but there are predicates present, then they must be stored as incomplete triples, pending the discovery of a subject that can be used as the object. Also, current object resource should be set to a newly created bnode (so that the incomplete triples have a subject to connect to if they are ultimately turned into triples);
+        // 10. If however current object resource was set to null, but there are predicates present, then they must be stored as incomplete triples, pending the discovery of a subject that can be used as the object. Also, current object resource should be set to a newly created bnode (so that the incomplete triples have a subject to connect to if they are ultimately turned into triples);
         if (this.currentObjectResource == null) {
+            if(this.localIncompleteStatements == null) {
+                this.localIncompleteStatements = new HashSet<>();
+            }
             this.currentObjectResource = getValueFactory().createBNode();
-            if (this.currentElementAttributes.getValue(RDFaAttributes.REL.getName()) != null) {
-                if (!getResourceFromElementAttribute(RDFaAttributes.REL).isIRI()) {
+            if (isAttributePresent(RDFaAttributes.REL)) {
+                if (!getAttributeResourceValue(RDFaAttributes.REL).isIRI()) {
                     throw new ParsingErrorException("Value of attribute @rel expected to be an IRI but was " + this.currentElementAttributes.getValue(RDFaAttributes.REL.getName()));
                 }
-                IRI relIRI = (IRI) getResourceFromElementAttribute(RDFaAttributes.REL);
-                if (this.currentElementAttributes.getValue(RDFaAttributes.INLIST.getName()) != null) {
+                IRI relIRI = (IRI) getAttributeResourceValue(RDFaAttributes.REL);
+                if (isAttributePresent(RDFaAttributes.INLIST)) {
                     if (!localListMappings.containsKey(relIRI)) {
                         this.localListMappings.put(relIRI, new HashSet<>());
                     }
@@ -345,34 +389,37 @@ public class RDFaParser extends AbstractRDFParser {
                 } else {
                     this.localIncompleteStatements.add(new RDFaIncompleteStatement(relIRI, RDFaIncompleteStatement.Direction.FORWARD));
                 }
-            } else if (this.currentElementAttributes.getValue(RDFaAttributes.REV.getName()) != null) {
-                if (!getResourceFromElementAttribute(RDFaAttributes.REV).isIRI()) {
+            } else if (isAttributePresent(RDFaAttributes.REV)) {
+                if (!getAttributeResourceValue(RDFaAttributes.REV).isIRI()) {
                     throw new ParsingErrorException("Value of attribute @rev expected to be an IRI but was " + this.currentElementAttributes.getValue(RDFaAttributes.REV.getName()));
                 }
-                IRI revIRI = (IRI) getResourceFromElementAttribute(RDFaAttributes.REV);
+                IRI revIRI = (IRI) getAttributeResourceValue(RDFaAttributes.REV);
                 this.localIncompleteStatements.add(new RDFaIncompleteStatement(revIRI, RDFaIncompleteStatement.Direction.BACKWARD));
             }
         }
 
-        // The next step of the iteration is to establish any current property value;
-        if (this.currentElementAttributes.getValue(RDFaAttributes.PROPERTY.getName()) != null) {
-            IRI propertyIRI = (IRI) getResourceFromElementAttribute(RDFaAttributes.PROPERTY);
-            Value currentPropertyValue = null;
-            if (this.currentElementAttributes.getValue(RDFaAttributes.DATATYPE.getName()) != null
-                    && getResourceFromElementAttribute(RDFaAttributes.DATATYPE).isIRI()
-                    && getResourceFromElementAttribute(RDFaAttributes.DATATYPE) != RDF.XMLLiteral.getIRI()) {
-                IRI datatypeIRI = (IRI) getResourceFromElementAttribute(RDFaAttributes.DATATYPE);
-                if (this.currentElementAttributes.getValue(RDFaAttributes.CONTENT.getName()) != null) {
-                    String contentString = this.currentElementAttributes.getValue(RDFaAttributes.CONTENT.getName());
+        // 11. The next step of the iteration is to establish any current property value;
+        if (isAttributePresent(RDFaAttributes.PROPERTY)) {
+            IRI propertyIRI = (IRI) getAttributeResourceValue(RDFaAttributes.PROPERTY);
+            // as a typed literal if @datatype is present, does not have an empty value according to the section on CURIE and IRI Processing, and is not set to XMLLiteral in the vocabulary http://www.w3.org/1999/02/22-rdf-syntax-ns#.
+            // The actual literal is either the value of @content (if present) or a string created by concatenating the value of all descendant text nodes, of the current element in turn. The final string includes the datatype IRI, as described in [RDF-SYNTAX-GRAMMAR], which will have been obtained according to the section on CURIE and IRI Processing.
+            if (isAttributePresent(RDFaAttributes.DATATYPE)
+                    && getAttributeResourceValue(RDFaAttributes.DATATYPE).isIRI()
+                    && getAttributeResourceValue(RDFaAttributes.DATATYPE) != RDF.XMLLiteral.getIRI()) {
+                IRI datatypeIRI = (IRI) getAttributeResourceValue(RDFaAttributes.DATATYPE);
+                if (isAttributePresent(RDFaAttributes.CONTENT)) {
+                    String contentString = getAttributeStringValue(RDFaAttributes.CONTENT);
                     currentPropertyValue = getValueFactory().createLiteral(contentString, datatypeIRI);
                 } else {
                     String contentString = this.characters.toString().trim();
                     currentPropertyValue = getValueFactory().createLiteral(contentString);
                     this.characters = new StringBuilder();
                 }
-            } else if (this.currentElementAttributes.getValue(RDFaAttributes.DATATYPE.getName()) != null
-                    && this.currentElementAttributes.getValue(RDFaAttributes.DATATYPE.getName()).isEmpty()) {
-                if (this.currentElementAttributes.getValue(RDFaAttributes.CONTENT.getName()) != null) {
+                //  otherwise, as a plain literal if @datatype is present but has an empty value according to the section on CURIE and IRI Processing.
+                // The actual literal is either the value of @content (if present) or a string created by concatenating the value of all descendant text nodes, of the current element in turn.
+            } else if (isAttributePresent(RDFaAttributes.DATATYPE)
+                    && getAttributeStringValue(RDFaAttributes.DATATYPE).isEmpty()) {
+                if (isAttributePresent(RDFaAttributes.CONTENT)) {
                     String contentString = this.currentElementAttributes.getValue(RDFaAttributes.CONTENT.getName());
                     currentPropertyValue = getValueFactory().createLiteral(contentString);
                 } else {
@@ -380,27 +427,41 @@ public class RDFaParser extends AbstractRDFParser {
                     currentPropertyValue = getValueFactory().createLiteral(contentString);
                     this.characters = new StringBuilder();
                 }
+                // otherwise, as an XML literal if @datatype is present and is set to XMLLiteral in the vocabulary http://www.w3.org/1999/02/22-rdf-syntax-ns#.
+                // The value of the XML literal is a string created by serializing to text, all nodes that are descendants of the current element, i.e., not including the element itself, and giving it a datatype of XMLLiteral in the vocabulary http://www.w3.org/1999/02/22-rdf-syntax-ns#. The format of the resulting serialized content is as defined in Exclusive XML Canonicalization Version 1.0 [XML-EXC-C14N].
                 //} else if (this.currentElementAttributes.getValue(RDFaAttributes.DATATYPE.getName()) != null
-                //        && getResourceFromElementAttribute( RDFaAttributes.DATATYPE).isIRI()
-                //        && getResourceFromElementAttribute( RDFaAttributes.DATATYPE) == RDF.XMLLiteral.getIRI()) {
-            } else if (this.currentElementAttributes.getValue(RDFaAttributes.CONTENT.getName()) != null) {
+                //        && getAttributeResourceValue( RDFaAttributes.DATATYPE).isIRI()
+                //        && getAttributeResourceValue( RDFaAttributes.DATATYPE) == RDF.XMLLiteral.getIRI()) {
+                // otherwise, as a plain literal using the value of @content if @content is present.
+            } else if (isAttributePresent(RDFaAttributes.CONTENT)) {
                 String contentString = this.currentElementAttributes.getValue(RDFaAttributes.CONTENT.getName());
                 currentPropertyValue = getValueFactory().createLiteral(contentString);
-            } else if (this.currentElementAttributes.getValue(RDFaAttributes.REL.getName()) == null
-                    && this.currentElementAttributes.getValue(RDFaAttributes.REV.getName()) == null
-                    && this.currentElementAttributes.getValue(RDFaAttributes.CONTENT.getName()) == null) {
-                if (this.currentElementAttributes.getValue(RDFaAttributes.RESOURCE.getName()) != null) {
-                    currentPropertyValue = getResourceFromElementAttribute(RDFaAttributes.RESOURCE);
-                } else if (this.currentElementAttributes.getValue(RDFaAttributes.HREF.getName()) != null) {
-                    currentPropertyValue = getResourceFromElementAttribute(RDFaAttributes.HREF);
-                } else if (this.currentElementAttributes.getValue(RDFaAttributes.SRC.getName()) != null) {
-                    currentPropertyValue = getResourceFromElementAttribute(RDFaAttributes.SRC);
+                //  otherwise, if the @rel, @rev, and @content attributes are not present, as a resource obtained from one of the following:
+                //    by using the resource from @resource, if present, obtained according to the section on CURIE and IRI Processing;
+                //    otherwise, by using the IRI from @href, if present, obtained according to the section on CURIE and IRI Processing;
+                //    otherwise, by using the IRI from @src, if present, obtained according to the section on CURIE and IRI Processing.
+            } else if (!isAttributePresent(RDFaAttributes.REL)
+                    && !isAttributePresent(RDFaAttributes.REV)
+                    && !isAttributePresent(RDFaAttributes.CONTENT)
+                    && (isAttributePresent(RDFaAttributes.RESOURCE)
+                    || isAttributePresent(RDFaAttributes.HREF)
+                    || isAttributePresent(RDFaAttributes.SRC)
+            )) {
+                if (isAttributePresent(RDFaAttributes.RESOURCE)) {
+                    currentPropertyValue = getAttributeResourceValue(RDFaAttributes.RESOURCE);
+                } else if (isAttributePresent(RDFaAttributes.HREF)) {
+                    currentPropertyValue = getAttributeResourceValue(RDFaAttributes.HREF);
+                } else if (isAttributePresent(RDFaAttributes.SRC)) {
+                    currentPropertyValue = getAttributeResourceValue(RDFaAttributes.SRC);
                 }
-            } else if (this.currentElementAttributes.getValue(RDFaAttributes.TYPEOF.getName()) != null
-                    && this.currentElementAttributes.getValue(RDFaAttributes.ABOUT.getName()) == null) {
+                // otherwise, if @typeof is present and @about is not, the value of typed resource.
+            } else if (isAttributePresent(RDFaAttributes.TYPEOF)
+                    && !isAttributePresent(RDFaAttributes.ABOUT)) {
                 currentPropertyValue = typedResource;
+                // otherwise as a plain literal.
             } else {
                 String contentString = this.characters.toString().trim();
+                // Additionally, if there is a value for current language then the value of the plain literal should include this language information, as described in [RDF-SYNTAX-GRAMMAR]. The actual literal is either the value of @content (if present) or a string created by concatenating the text content of each of the descendant elements of the current element in document order.
                 if (this.currentLanguage != null
                         && !this.currentLanguage.isEmpty()) {
                     currentPropertyValue = getValueFactory().createLiteral(contentString, this.currentLanguage);
@@ -410,66 +471,91 @@ public class RDFaParser extends AbstractRDFParser {
                 this.characters = new StringBuilder();
             }
 
-            if (this.currentElementAttributes.getValue(RDFaAttributes.INLIST.getName()) != null) {
+            // The current property value is then used with each predicate as follows:
+            // If the element also includes the @inlist attribute, the current property value is added to the local list mapping as follows:
+            if (isAttributePresent(RDFaAttributes.INLIST)) {
+                // if the local list mapping does not contain a list associated with the predicate IRI, instantiate a new list and add to local list mappings
                 if (!this.localListMappings.containsKey(propertyIRI)) {
                     this.localListMappings.put(propertyIRI, new HashSet<>());
                 }
+                // add the current property value to the list associated with the predicate IRI in the local list mapping
                 this.localListMappings.get(propertyIRI).add(currentPropertyValue);
+                // Otherwise the current property value is used to generate a triple as follows:
+                // subject new subject
+                // predicate full IRI
+                // object current property value
             } else {
-                this.getModel().add(this.newSubject, propertyIRI, currentPropertyValue);
+                this.getModel().add(this.newSubject, propertyIRI, this.currentPropertyValue);
             }
         }
 
-        //  If the skip element flag is 'false', and new subject was set to a non-null value, then any incomplete triples within the current context should be completed:
-        if (!skipElement
-                && newSubject != null) {
+        // 12. If the skip element flag is 'false', and new subject was set to a non-null value, then any incomplete triples within the current context should be completed:
+        if (!this.skipElement
+                && this.newSubject != null) {
+            if(this.localIncompleteStatements == null) {
+                this.localIncompleteStatements = new HashSet<>();
+            }
             for (RDFaIncompleteStatement incompleteStatement : this.currentContext.getIncompleteStatement()) {
                 if (incompleteStatement.getDirection() == RDFaIncompleteStatement.Direction.NONE) {
-                    localListMappings.get(incompleteStatement.getPredicate()).add(newSubject);
+                    localListMappings.get(incompleteStatement.getPredicate()).add(this.newSubject);
                 } else if (incompleteStatement.getDirection() == RDFaIncompleteStatement.Direction.FORWARD) {
-                    this.getModel().add(currentContext.getParentSubjectResource(), incompleteStatement.getPredicate(), newSubject);
+                    this.getModel().add(this.currentContext.getParentSubjectResource(), incompleteStatement.getPredicate(), this.newSubject);
                 } else if (incompleteStatement.getDirection() == RDFaIncompleteStatement.Direction.BACKWARD) {
-                    this.getModel().add(newSubject, incompleteStatement.getPredicate(), currentContext.getParentSubjectResource());
+                    this.getModel().add(this.newSubject, incompleteStatement.getPredicate(), this.currentContext.getParentSubjectResource());
                 }
             }
         }
 
-        //  Next, all elements that are children of the current element are processed using the rules described here, using a new evaluation context, initialized as follows:
-        Map<IRI, Set<Value>> oldListMappings = currentContext.getListMappings();
-        if (skipElement) {
-            currentContext = new RDFaEvaluationContext(this.currentContext);
-            currentContext.clearIriMappings();
-            initializeNewContext(currentContext);
-            currentContext.setLanguage(currentLanguage);
-            currentContext.addIriMappings(localIRIMappings);
+        // 13. Next, all elements that are children of the current element are processed using the rules described here, using a new evaluation context, initialized as follows:
+        // If the skip element flag is 'true' then the new evaluation context is a copy of the current context that was passed in to this level of processing, with the language and list of IRI mappings values replaced with the local values;
+        if (this.skipElement) {
+            this.currentContext = new RDFaEvaluationContext(this.currentContext);
+            this.currentContext.clearIriMappings();
+            initializeNewContext(this.currentContext);
+            this.currentContext.setLanguage(this.currentLanguage);
+            this.currentContext.addIriMappings(this.localIRIMappings);
+            // Otherwise, the values are:
         } else {
             Resource oldParentSubject = this.currentContext.getParentSubjectResource();
-            currentContext = new RDFaEvaluationContext(this.currentContext.getBaseIri());
-            initializeNewContext(currentContext);
-            currentContext.setParentSubjectResource(newSubject);
-            if (currentObjectResource != null) {
-                currentContext.setParentObjectResource(currentObjectResource);
-            }
-            if (newSubject != null) {
-                currentContext.setParentObjectResource(newSubject);
+            // the base is set to the base value of the current evaluation context;
+            this.currentContext = new RDFaEvaluationContext(this.currentContext.getBaseIri());
+            initializeNewContext(this.currentContext);
+            // the parent subject is set to the value of new subject, if non-null, or the value of the parent subject of the current evaluation context;
+            this.currentContext.setParentSubjectResource(this.newSubject);
+            // the parent object is set to value of current object resource, if non-null, or the value of new subject, if non-null, or the value of the parent subject of the current evaluation context;
+            if (this.currentObjectResource != null) {
+                this.currentContext.setParentObjectResource(this.currentObjectResource);
+            } else if (this.newSubject != null) {
+                this.currentContext.setParentObjectResource(this.newSubject);
             } else {
-                currentContext.setParentObjectResource(oldParentSubject);
+                this.currentContext.setParentObjectResource(oldParentSubject);
             }
-            currentContext.addIriMappings(localIRIMappings);
-            currentContext.setIncompleteStatements(localIncompleteStatements);
-            currentContext.setListMappings(localListMappings);
-            currentContext.setLanguage(currentLanguage);
-            currentContext.setDefaultVocabulary(localDefaultVocabulary);
+            // the list of IRI mappings is set to the local list of IRI mappings;
+            this.currentContext.addIriMappings(this.localIRIMappings);
+            // the list of incomplete triples is set to the local list of incomplete triples;
+            this.currentContext.setIncompleteStatements(this.localIncompleteStatements);
+            // the list mapping is set to the local list mapping;
+            this.currentContext.setListMappings(this.localListMappings);
+            // language is set to the value of current language.
+            this.currentContext.setLanguage(this.currentLanguage);
+            // the default vocabulary is set to the value of the local default vocabulary.
+            this.currentContext.setDefaultVocabulary(this.localDefaultVocabulary);
         }
 
-        // Finally, if there is one or more mapping in the local list mapping, list triples are generated as follows:
-        for (Map.Entry<IRI, Set<Value>> listMapping : localListMappings.entrySet()) {
+        this.isRootElement = false;
+    }
+
+    private void endProcessElement(String uri, String localName, String qName) {
+        Map<IRI, Set<Value>> oldListMappings = this.currentContext.getListMappings();
+
+        // 14. Finally, if there is one or more mapping in the local list mapping, list triples are generated as follows:
+        for (Map.Entry<IRI, Set<Value>> listMapping : this.localListMappings.entrySet()) {
             IRI propertyIRI = listMapping.getKey();
             Set<Value> propertyList = listMapping.getValue();
 
             if (!oldListMappings.containsKey(propertyIRI)) {
                 if (propertyList.isEmpty()) {
-                    getModel().add(newSubject, propertyIRI, RDF.nil.getIRI());
+                    getModel().add(this.newSubject, propertyIRI, RDF.nil.getIRI());
                 } else {
                     ArrayList<BNode> bnodes = new ArrayList<>();
                     for (int i = 0; i < propertyList.size(); i++) {
@@ -487,12 +573,11 @@ public class RDFaParser extends AbstractRDFParser {
 
                         bnodeIndex++;
                     }
-                    getModel().add(newSubject, propertyIRI, bnodes.getFirst());
+                    getModel().add(this.newSubject, propertyIRI, bnodes.getFirst());
                 }
             }
         }
 
-        isRootElement = false;
     }
 
     /**
@@ -551,7 +636,7 @@ public class RDFaParser extends AbstractRDFParser {
         return getValueFactory().createIRI(prefixArray[1].toLowerCase());
     }
 
-    private Resource getResourceFromElementAttribute(RDFaAttributes attribute) {
+    private Resource getAttributeResourceValue(RDFaAttributes attribute) {
         String attributeValue = this.currentElementAttributes.getValue(attribute.getName());
         Optional<Resource> resourceResolution = resolveStringResource(attributeValue);
         if (resourceResolution.isPresent()) {
@@ -561,6 +646,13 @@ public class RDFaParser extends AbstractRDFParser {
         }
     }
 
+    private boolean isAttributePresent(RDFaAttributes attribute) {
+        return this.currentElementAttributes.getValue(attribute.getName()) != null;
+    }
+
+    private String getAttributeStringValue(RDFaAttributes attribute) {
+        return this.currentElementAttributes.getValue(attribute.getName());
+    }
 
     /**
      * Resolves the string representation of a resource found in attributes of an element, be it an IRI, <a href="https://www.w3.org/TR/rdfa-core/#s_curieprocessing">CURIE</a> or relative URI
@@ -605,7 +697,7 @@ public class RDFaParser extends AbstractRDFParser {
             return Optional.of(this.getValueFactory().createBNode(localNameString));
         } else if (IRIUtils.isStandardIRI(currentContext.getBaseIri().stringValue() + resultString)) {
             String concatenatedRelativeUri = currentContext.getBaseIri().stringValue() + resultString;
-            return Optional.of(getValueFactory().createIRI(concatenatedRelativeUri));
+            return Optional.of(this.getValueFactory().createIRI(concatenatedRelativeUri));
         }
         return Optional.empty();
     }
@@ -637,5 +729,19 @@ public class RDFaParser extends AbstractRDFParser {
         context.addTermMapping("describedby", getValueFactory().createIRI("http://www.w3.org/2007/05/powder-s#describedby"));
         context.addTermMapping("license", getValueFactory().createIRI("http://www.w3.org/1999/xhtml/vocab#license"));
         context.addTermMapping("role", getValueFactory().createIRI("http://www.w3.org/1999/xhtml/vocab#role"));
+    }
+
+    private String debugAttributesToString() {
+        StringBuilder sb = new StringBuilder();
+
+        if (this.currentElementAttributes != null) {
+            for (int i = 0; i < this.currentElementAttributes.getLength(); i++) {
+                String attributeLocalName = this.currentElementAttributes.getQName(i);
+                String attributeValue = this.currentElementAttributes.getValue(i);
+                sb.append(attributeLocalName).append(" : ").append(attributeValue).append(" ");
+            }
+        }
+
+        return sb.toString();
     }
 }

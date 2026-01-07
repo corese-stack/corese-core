@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.impl.io.parser.rdfa.model;
 
 public enum RDFaAttributes {
     ABOUT("about"),
+    BASE("base"),
     CONTENT("content"),
     DATATYPE("datatype"),
     HREF("href"),

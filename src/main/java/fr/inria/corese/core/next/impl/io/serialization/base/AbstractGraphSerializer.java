@@ -129,7 +129,7 @@ public abstract class AbstractGraphSerializer implements RDFSerializer {
 
     /**
      * Collects all namespaces used in the model and attempts to assign prefixes to them
-     * if auto-declaration is enabled and they are not already mapped.
+     * if auto-declaration is enabled, and they are not already mapped.
      */
     protected Set<String> collectUsedNamespaces() {
         Set<String> namespaces = model.stream()

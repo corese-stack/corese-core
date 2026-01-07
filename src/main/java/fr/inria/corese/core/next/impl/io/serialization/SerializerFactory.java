@@ -92,6 +92,7 @@ public class SerializerFactory implements fr.inria.corese.core.next.api.io.seria
                     RDFFormat.RDFC_1_0.getName()
             );
         });
+
         tempDefaultRegistry.put(RDFFormat.RDFC_1_0, model -> {
             RDFC10SerializerOptions defaultConfig = RDFC10SerializerOptions.defaultConfig();
             RDFC10Canonicalizer rdfc10Canonicalizer = new RDFC10Canonicalizer(
