@@ -119,7 +119,9 @@ public class RDFaEvaluationContext  {
     }
 
     public void addIriMappings(Map<String, IRI> otherMappings) {
-        this.iriMappings.putAll(otherMappings);
+        if(otherMappings != null) {
+            this.iriMappings.putAll(otherMappings);
+        }
     }
 
     public void clearIriMappings() {
