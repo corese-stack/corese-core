@@ -33,6 +33,7 @@ public interface DataManagerRead {
      * @param predicate The predicate to count.
      * @return Number of edges with a specific predicate.
      */
+    @SuppressWarnings("unused")
     default int countEdges(Node predicate) {
         return 0;
     }
@@ -99,6 +100,7 @@ public interface DataManagerRead {
      * @return An {@link Iterable} over all predicates of edges that match the
      *         context.
      */
+    @SuppressWarnings("unused")
     default Iterable<Node> predicates(Node context) {
         return new ArrayList<>(0);
     }
@@ -110,6 +112,7 @@ public interface DataManagerRead {
      * @param context Context to match, {@code null} to match with any contexts.
      * @return An {@link Iterable} over all node in graph that match the context.
      */
+    @SuppressWarnings("unused")
     default Iterable<Node> getNodes(Node context) {
         return new ArrayList<>(0);
     }

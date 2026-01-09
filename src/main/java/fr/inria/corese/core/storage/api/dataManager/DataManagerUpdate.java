@@ -70,6 +70,7 @@ public interface DataManagerUpdate {
      * @param edge Edge to add to the graph.
      * @return The edge inserted, null if no inserted.
      */
+    @SuppressWarnings("unused")
     default Edge insert(Edge edge) {
         return null;
     }
@@ -92,6 +93,7 @@ public interface DataManagerUpdate {
      *                  context matching one of these will be removed.
      * @return An {@link Iterable} over all removed edges.
      */
+    @SuppressWarnings("unused")
     default Iterable<Edge> delete(Node subject, Node predicate, Node object, List<Node> contexts) {
         return null;
     }
@@ -152,6 +154,7 @@ public interface DataManagerUpdate {
      * @return True if the graph has been modified or {@code silent} parameter is
      *         true, else false.
      */
+    @SuppressWarnings("unused")
     default boolean addGraph(Node source_context, Node target_context, boolean silent) {
         return false;
     }
@@ -192,6 +195,7 @@ public interface DataManagerUpdate {
      * 
      * @param context New context to declare.
      */
+    @SuppressWarnings("unused")
     default void declareContext(Node context) {
     }
 

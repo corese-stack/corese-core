@@ -8,7 +8,19 @@ public class CoreseGraphDataManagerBuilder implements DataManagerBuilder {
 
     private Graph graph;
     private boolean defGraph = false;
+    private boolean enableTransactions = false;
 
+
+    /**
+     * Enables transaction support.
+     *
+     * @param enable true to enable transactions
+     * @return this builder
+     */
+    public CoreseGraphDataManagerBuilder withTransactions(boolean enable) {
+        this.enableTransactions = enable;
+        return this;
+    }
 
     /**
      * Create a CoreseGraphDataManagerBuilder.

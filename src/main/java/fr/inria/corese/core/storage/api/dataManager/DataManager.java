@@ -13,9 +13,6 @@ import fr.inria.corese.core.sparql.triple.parser.HashMapList;
  */
 public interface DataManager extends DataManagerRead, DataManagerUpdate {
 
-    /* ******************
-     * MetaDataManager *
-     *******************/
 
     /**
      * Indicates whether or not this DataManage has a MetaDataManager.
@@ -70,9 +67,6 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
     default void setRuleDataManager(boolean b) {
     }
 
-    /* ***************
-     * Transactions *
-     ****************/
 
 
     /**
