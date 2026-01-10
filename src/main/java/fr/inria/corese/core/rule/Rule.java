@@ -14,7 +14,6 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.core.UUIDFunction;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.sparql.triple.printer.SPIN;
 import fr.inria.corese.core.util.SPINProcess;
 import org.slf4j.LoggerFactory;
 
@@ -87,13 +86,6 @@ public class Rule {
 
     public static Rule create(Query q) {
         return new Rule(UUIDFunction.getUUID(), q);
-    }
-
-    String toGraph() {
-        ASTQuery ast = getQuery().getAST();
-        SPIN sp = SPIN.create();
-        sp.visit(ast, "kg:r" + getIndex());
-        return sp.toString();
     }
 
     void set(List<Node> list) {

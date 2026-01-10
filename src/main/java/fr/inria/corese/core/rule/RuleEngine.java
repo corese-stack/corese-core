@@ -29,7 +29,6 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.sparql.triple.printer.SPIN;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorRule;
@@ -62,7 +61,7 @@ import static fr.inria.corese.core.rule.RuleEngine.Profile.*;
  * @author Olivier Corby, Edelweiss INRIA 2011
  * Wimmics INRIA I3S, 2014
  */
-public class RuleEngine implements Engine, Graphable {
+public class RuleEngine implements Engine {
 
     public enum ProfileType {
         OWL_RL_FULL, STD, OWL_RL, OWL_RL_LITE, OWL_RL_EXT, OWL_RL_TEST, RDFS_RL
@@ -1047,26 +1046,6 @@ public class RuleEngine implements Engine, Graphable {
         this.test = test;
     }
 
-    @Override
-    public String toGraph() {
-        return toRDF();
-    }
-
-    /**
-     * Return the rule base as a SPIN graph
-     * graph eng:engine {}
-     */
-    public String toRDF() {
-        SPIN sp = SPIN.create();
-        for (Rule r : getRules()) {
-            sp.init();
-            ASTQuery ast = (ASTQuery) r.getAST();
-            sp.visit(ast, "kg:r" + r.getIndex());
-            sp.nl();
-        }
-        return sp.toString();
-    }
-
     /**
      * graph eng:record {}
      */
@@ -1097,16 +1076,6 @@ public class RuleEngine implements Engine, Graphable {
             str.append(r.toRDF());
         }
         return str.toString();
-    }
-
-    @Override
-    public Object getGraph() {
-        return spinGraph;
-    }
-
-    @Override
-    public void setGraph(Object obj) {
-        spinGraph = obj;
     }
 
     public Context getContext() {

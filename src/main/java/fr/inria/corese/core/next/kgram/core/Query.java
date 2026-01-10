@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.kgram.core;
 import fr.inria.corese.core.next.kgram.api.core.*;
 import fr.inria.corese.core.next.kgram.api.core.Filter;
 import fr.inria.corese.core.next.kgram.api.query.DQPFactory;
-import fr.inria.corese.core.next.kgram.api.query.Graphable;
 import fr.inria.corese.core.next.kgram.api.query.Matcher;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
 import fr.inria.corese.core.next.kgram.filter.Compile;
@@ -23,7 +22,7 @@ import java.util.List;
  * @author Olivier Corby, Edelweiss, INRIA 2009
  *
  */
-public class Query extends Exp implements Graphable {
+public class Query extends Exp  {
 
 
     public static final int QP_T0 = 0; //No QP settings
@@ -1879,23 +1878,6 @@ public class Query extends Exp implements Graphable {
    
     public void setProvenance(Node provenance) {
         this.provenance = provenance;
-    }
-
-   
-    @Override
-    public Object getGraph() {
-        return graph;
-    }
-
- 
-    @Override
-    public void setGraph(Object graph) {
-        this.graph = graph;
-    }
-
-    @Override
-    public String toGraph() {
-        return getAST().toGraph();
     }
 
     public void setExtension(boolean b) {
