@@ -18,10 +18,9 @@ import fr.inria.corese.core.sparql.triple.api.ASTVisitor;
 import fr.inria.corese.core.sparql.triple.cst.Keyword;
 import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
 import fr.inria.corese.core.sparql.triple.cst.RDFS;
-import fr.inria.corese.core.sparql.triple.printer.SPIN;
 import fr.inria.corese.core.sparql.triple.update.ASTUpdate;
 import fr.inria.corese.core.kgram.api.core.ExprType;
-import fr.inria.corese.core.kgram.api.query.ASTQ;
+import fr.inria.corese.core.kgram.api.query.AST;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.QueryVisitor;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
@@ -49,7 +48,7 @@ import java.util.UUID;
  */
 public class ASTQuery 
         extends ASTObject 
-        implements Keyword, ASTVisitable, ASTQ, Message {
+        implements Keyword, ASTVisitable, AST, Message {
 
     public static boolean STRICT_MODE;
    
@@ -264,22 +263,6 @@ public class ASTQuery
             return Level.USER_DEFAULT;
         }
         return getContext().getLevel();
-    }
-
-    @Override
-    public String toGraph() {
-        SPIN sp = SPIN.create();
-        sp.visit(this);
-        return sp.toString();
-    }
-
-    @Override
-    public void setGraph(Object obj) {
-    }
-
-    @Override
-    public Object getGraph() {
-        return null;
     }
 
     public ASTExtension getDefine() {

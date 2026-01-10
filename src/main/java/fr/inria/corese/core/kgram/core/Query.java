@@ -6,7 +6,6 @@ import java.util.List;
 
 import fr.inria.corese.core.kgram.api.core.*;
 import fr.inria.corese.core.kgram.api.query.DQPFactory;
-import fr.inria.corese.core.kgram.api.query.Graphable;
 import fr.inria.corese.core.kgram.api.query.Matcher;
 import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.filter.Compile;
@@ -26,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * @author Olivier Corby, Edelweiss, INRIA 2009
  *
  */
-public class Query extends Exp implements Graphable {
+public class Query extends Exp  {
 
 
     public static final int QP_T0 = 0; //No QP settings
@@ -101,8 +100,6 @@ public class Query extends Exp implements Graphable {
     Node gNode, pathNode;
     // outer main query that contains this (when subquery)
     private Node provenance;
-    // SPIN graph
-    private Object graph;
     Query query, outerQuery;
     private ArrayList<Query> subQueryList;
     ASTQuery ast;
@@ -2276,7 +2273,7 @@ public class Query extends Exp implements Graphable {
         this.provenance = provenance;
     }
 
-   
+/*
     @Override
     public Object getGraph() {
         return graph;
@@ -2292,7 +2289,7 @@ public class Query extends Exp implements Graphable {
     public String toGraph() {
         return getAST().toGraph();
     }
-
+*/
     public void setExtension(boolean b) {
         isExtension = b;
     }
