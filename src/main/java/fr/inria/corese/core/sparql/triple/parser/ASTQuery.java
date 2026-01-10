@@ -243,21 +243,9 @@ public class ASTQuery
     private final List<Triple> tripleList;
     private List<Triple> pathList;
     private fr.inria.corese.core.kgram.core.Query updateQuery;
-/* --- dead code removal ---
-    private AccessRight accessRight; */
     private ASTSelector astSelector;
 
 
-/* --- dead code removal ---
-    public boolean isUserQuery() {
-        Context c = getContext();
-        if (c == null) {
-            return false;
-        }
-        return c.isUserQuery();
-    }
- --- dead code removal --- */
-    
     public Level getLevel() {
         if (getContext() == null) {
             return Level.USER_DEFAULT;
@@ -296,13 +284,6 @@ public class ASTQuery
     }
 
     
-/* --- dead code removal ---
-    public void setUndefined(HashMap<String, Expression> undefined) {
-        this.undefined = undefined;
-    }
- --- dead code removal --- */
-
-    
     public boolean isFail() {
         return isFail;
     }
@@ -311,13 +292,6 @@ public class ASTQuery
     public void setFail(boolean isFail) {
         this.isFail = isFail;
     }
-
-    
-/* --- dead code removal ---
-    public boolean isRelax() {
-        return isRelax;
-    }
- --- dead code removal --- */
 
     
     public void setRelax(boolean isRelax) {
@@ -376,14 +350,6 @@ public class ASTQuery
     public static ASTQuery create() {
         return new ASTQuery();
     }
-
-/* --- dead code removal ---
-    public static ASTQuery create(Exp exp) {
-        ASTQuery ast = new ASTQuery();
-        ast.setBody(exp);
-        return ast;
-    }
- --- dead code removal --- */
 
     /**
      * AST for a subquery share prefix declaration
@@ -473,18 +439,6 @@ public class ASTQuery
     public boolean isDeleteData() {
         return isDeleteData;
     }
-
-/* --- dead code removal ---
-    public boolean isValidate() {
-        return validate;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setValidate(boolean b) {
-        validate = b;
-    }
- --- dead code removal --- */
 
     /**
      * collect var for select * check scope for BIND(exp as var) and select exp
@@ -587,22 +541,6 @@ public class ASTQuery
         dataBlank = new HashMap<>();
     }
 
-/* --- dead code removal ---
-    public HashMap<String, Atom> getDataBlank() {
-        return dataBlank;
-    }
- --- dead code removal --- */
-
-   
-/* --- dead code removal ---
-    public void addInfo(String info) {
-        if (vinfo == null) {
-            vinfo = new ArrayList<>(1);
-        }
-        vinfo.add(info);
-    }
- --- dead code removal --- */
-
     public void addFail(boolean b) {
         getGlobalAST().setFail(b);
     }
@@ -614,12 +552,6 @@ public class ASTQuery
     public void addError(String error) {
         getGlobalAST().setError(error);
     }
-
-/* --- dead code removal ---
-    public void addError(String error, Object obj) {
-        getGlobalAST().setError(error + obj);
-    }
- --- dead code removal --- */
 
     void undefined(Expression t) {
         if (!getGlobalAST().getDefine().isDefined(t)) {
@@ -639,16 +571,6 @@ public class ASTQuery
     public List<String> getErrors() {
         return getGlobalAST().errors();
     }
-    
-/* --- dead code removal ---
-    public String getErrorString() {
-        StringBuilder sb = new StringBuilder();
-        for (String str : getErrors()){
-            sb.append(str).append(NL);
-        }
-        return sb.toString();
-    }
- --- dead code removal --- */
     
     public String getUpdateTitle() {
         if (isInsert()) {
@@ -678,12 +600,6 @@ public class ASTQuery
         return errors;
     }
 
-/* --- dead code removal ---
-    public void setConnex(boolean connex) {
-        this.connex = connex;
-    }
- --- dead code removal --- */
-
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
     }
@@ -695,42 +611,6 @@ public class ASTQuery
     public void setStrictDistinct(boolean strictDistinct) {
         this.strictDistinct = strictDistinct;
     }
-
-/* --- dead code removal ---
-    public boolean isStrictDistinct() {
-        return strictDistinct;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setRDF(boolean rdf) {
-        this.rdf = rdf;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setJSON(boolean b) {
-        isJSON = b;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public boolean isJSON() {
-        return isJSON;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setMaxDisplay(int maxDisplay) {
-        MaxDisplay = maxDisplay;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setMaxProjection(int maxProjection) {
-        MaxProjection = maxProjection;
-    }
- --- dead code removal --- */
 
     public void setMaxResult(int maxResult) {
         MaxResult = maxResult;
@@ -760,21 +640,9 @@ public class ASTQuery
         return relax;
     }
 
-/* --- dead code removal ---
-    public void setOne(boolean one) {
-        this.one = one;
-    }
- --- dead code removal --- */
-
     public void setDistance(String dist) {
         distance = dist;
     }
-
-/* --- dead code removal ---
-    public String getDistance() {
-        return distance;
-    }
- --- dead code removal --- */
 
     public void setRule(boolean rule) {
         this.rule = rule;
@@ -798,12 +666,6 @@ public class ASTQuery
         this.text = text;
     }
 
-/* --- dead code removal ---
-    public void setThreshold(float threshold) {
-        Threshold = threshold;
-    }
- --- dead code removal --- */
-
     public boolean isConnex() {
         return connex;
     }
@@ -820,12 +682,6 @@ public class ASTQuery
         return rdf;
     }
 
-/* --- dead code removal ---
-    public int getMaxDisplay() {
-        return MaxDisplay;
-    }
- --- dead code removal --- */
-
     public int getMaxProjection() {
         return MaxProjection;
     }
@@ -841,18 +697,6 @@ public class ASTQuery
     public boolean isMore() {
         return more;
     }
-
-/* --- dead code removal ---
-    public void setLoad(boolean b) {
-        isLoad = b;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public boolean isLoad() {
-        return isLoad;
-    }
- --- dead code removal --- */
 
     /**
      * NS Manager
@@ -885,19 +729,6 @@ public class ASTQuery
     public void setDefaultBase(String ns) {
         base = ns;
     }
-
-//    public Exp getQueryExp() {
-//        return query;
-//    }
-
-/* --- dead code removal ---
-    public Exp getExtBody() {
-//        if (query != null) {
-//            return query;
-//        }
-        return getBody();
-    }
- --- dead code removal --- */
 
     public boolean isRule() {
         return rule;
@@ -982,22 +813,6 @@ public class ASTQuery
     public String getText() {
         return text;
     }
-
-/* --- dead code removal ---
-    public float getThreshold() {
-        return Threshold;
-    }
- --- dead code removal --- */
-
-    /**
-     * created for the new parser
-     */
-/* --- dead code removal ---
-    public static Term createRegExp(Expression exp) {
-        Term term = Term.function(REGEX, exp);
-        return term;
-    }
- --- dead code removal --- */
 
     boolean checkBlank(Expression exp) {
         if (exp.isBlankNode()) {
@@ -1172,12 +987,6 @@ public class ASTQuery
          metadata = m;
     }
     
-/* --- dead code removal ---
-    public void setMetadata(Metadata.Type type) {
-        getCreateMetadata().add(type);
-    }
- --- dead code removal --- */
-    
     public void setAnnotation(Metadata m){
          if (m != null) {
             setMetadata(m);
@@ -1208,33 +1017,11 @@ public class ASTQuery
         return getMetadata();
     }
     
-/* --- dead code removal ---
-    public boolean isFederateIndex() {
-        if (hasMetadata(Metadata.Type.INDEX)) {
-            return true;
-        }
-        return !getDataset().getIndex().isEmpty();
-    }
- --- dead code removal --- */
-    
-/* --- dead code removal ---
-    public boolean isFederate() {
-        return getGlobalAST().hasMetadata(Metadata.Type.FEDERATE)
-            || getGlobalAST().hasMetadata(Metadata.Type.FEDERATION);
-    }
- --- dead code removal --- */
-
     // hasMetadata functions for string value only
     // not for other datatype value such as number, boolean
     public boolean hasMetadata(Metadata.Type type) {
         return getMetadata() != null && getMetadata().hasMetadata(type);
     }
-    
-/* --- dead code removal ---
-    public boolean hasMetadata(String... type) {
-        return metadata != null && metadata.hasMetadata(type);
-    }
- --- dead code removal --- */
     
     @Override
     public boolean hasMetadata(String type) {
@@ -1367,12 +1154,6 @@ public class ASTQuery
         return new TryCatch(e1, let);
     }
     
-/* --- dead code removal ---
-    public Term defThrow(Expression exp) {
-        return Term.function(Processor.THROW, exp);
-    }
- --- dead code removal --- */
-       
     
     /**
          * map(rq:fun, ?list)
@@ -1392,26 +1173,6 @@ public class ASTQuery
         }
     }
     
-    /**
-     * 
-     * aggregate(?x, xt:mediane) ->
-     * aggregate(?x, xt:mediane(?y))
-     * TODO: fix it as above
-     */
-/* --- dead code removal ---
-    void processAggregate(Term term) {
-        if (term.getArgs().size() == 2) {
-            Expression rst = term.getArg(1);
-            if (rst.isConstant()) {
-                Term fun = createFunction(rst.getConstant());
-                Variable var = ASTQuery.createVariable("?_agg_var");
-                fun.add(var);
-                term.setArg(1, fun);
-            }
-        }
-    }
- --- dead code removal --- */
-    
       int arity(Term t){
           if (t.getLabel().equals(Processor.REDUCE)){
               return 2;
@@ -1422,27 +1183,6 @@ public class ASTQuery
       boolean isDefined(String uri){
           return Processor.getOper(uri) != ExprType.UNDEF;
       }
-    
-    /**
-     * exp = exists { select where }
-     * use case: let (select where)
-     */
-/* --- dead code removal ---
-    void complete(ExpressionList lvar, Expression exp, boolean nest) {
-        if (lvar.isEmpty() && ! lvar.isNested() && exp.isTerm()) {
-            Exp query = exp.getTerm().getExistContent();
-            if (query != null){
-                ASTQuery ast = query.getAST();
-                ast.validate();
-                ExpressionList el = new ExpressionList();
-                for (Variable var : ast.getSelect()) { 
-                    el.add(var);
-                }
-                lvar.add(el);
-            }
-        }
-    }
- --- dead code removal --- */
     
     /**
      * exp = exists { select where }
@@ -1514,12 +1254,6 @@ public class ASTQuery
         return getFactory().let(el, body, dynamic);
     }
     
-/* --- dead code removal ---
-    public List<Expression> defLetList(Variable var, Constant type, Expression exp) {
-        return getFactory().defLetList(var, type, exp);
-    }
- --- dead code removal --- */
-    
     public Term defLet(Variable var, Constant type, Expression exp) {
         return getFactory().defLet(var, type, exp);
     }
@@ -1537,13 +1271,6 @@ public class ASTQuery
         Variable var = new Variable(FOR_VAR + nbd++);
         return defLoop(var, exp, getFactory().createLet(getFactory().defLet(lvar, var), body, false));
     }
-    
-/* --- dead code removal ---
-    public void exportFunction(Expression def) {
-        def.getArg(0).setPublic(true);
-        def.setPublic(true);
-    }
- --- dead code removal --- */
     
     public Term createFunction(Constant name) {
         Term term = createFunction(name.getName(), name.getLongName());
@@ -1613,16 +1340,6 @@ public class ASTQuery
         return t;
     }
     
- 
-/* --- dead code removal ---
-    public Term createReturn(Expression exp) {
-        Term term = createFunction(Processor.RETURN);
-        term.setCName(Constant.createResource(Processor.RETURN));
-        term.add(exp);
-        return term;
-    }
- --- dead code removal --- */
-       
      /**
      * mapfun(st:concat, us:cell, ?list) 
      * ::=
@@ -1671,12 +1388,6 @@ public class ASTQuery
     public Constant createLDSList(IDatatype dt){
         return Constant.create(dt);
     }
-    
-/* --- dead code removal ---
-    public RDFList createRDFList(List<Atom> list) {
-        return createRDFList(list, L_DEFAULT);
-    }
- --- dead code removal --- */
     
      /**
      * Create an RDF List (rdf:first/rdf:rest) if close = true, end by rdf:nil
@@ -1773,29 +1484,10 @@ public class ASTQuery
                 createQName(RDFS.qrdfFirst));
     }
 
-/* --- dead code removal ---
-    static Term createTerm(String s) {
-        Term term = new Term(s);
-        return term;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public Term createGet(Expression exp, int n) {
-        return Term.function("get", exp, Constant.create(n));
-    }
- --- dead code removal --- */
-
     public static Variable createVariable(String s) {
         return Variable.create(s);
     }
     
-/* --- dead code removal ---
-    public Variable createVariable() {
-        return Variable.create("?_var_" + nbvar++);
-    }
- --- dead code removal --- */
-
     public static Variable createVariable(String s, ASTQuery aq) {
         Variable var = createVariable(s);
         // if we are in "describe *", add this variable to the list of variable to describe
@@ -1858,12 +1550,6 @@ public class ASTQuery
         return cst;
     }
     
-/* --- dead code removal ---
-    public Triple createTriple(Atom predicate, List<Atom> list) {
-        return createTriple(predicate, list, false);
-    }
- --- dead code removal --- */
-
     public Triple createTriple(Atom predicate, List<Atom> list, boolean nested) {
         Triple t = createTriple(list.get(0), predicate, list.get(1));
         // triple target list must contain additional args only 
@@ -1925,12 +1611,6 @@ public class ASTQuery
     public void leaveService() {
         getGlobalAST().setSubmitTriple(true);
     }
-    
-/* --- dead code removal ---
-    public boolean hasUndefinedService() {
-        return getBody().hasUndefinedService();
-    }
- --- dead code removal --- */
     
     void submit(Triple t) {
         if (getGlobalAST().isSubmitTriple()) {
@@ -2149,13 +1829,6 @@ public class ASTQuery
         return Term.create(Term.RE_SEQ, e1, e2);
     }
 
-/* --- dead code removal ---
-    Expression alter(Expression e1, Expression e2) {
-        return Term.create(Term.RE_ALT, e1, e2);
-
-    }
- --- dead code removal --- */
-
     public Expression createOperator(String s1, String s2, Expression exp) {
         int n1 = 0, n2 = Integer.MAX_VALUE;
         if (s1 != null) {
@@ -2175,12 +1848,6 @@ public class ASTQuery
         t.setMax(n2);
         return t;
     }
-
-/* --- dead code removal ---
-    public Constant createConstant(String s, String datatype) {
-        return createConstant(s, datatype, null);
-    }
- --- dead code removal --- */
 
     // Literal
     public Constant createConstant(String s, String datatype, String lang) {
@@ -2247,27 +1914,9 @@ public class ASTQuery
         isCheck = b;
     }
 
-/* --- dead code removal ---
-    public boolean isNosort() {
-        return nosort;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setNosort(boolean b) {
-        nosort = b;
-    }
- --- dead code removal --- */
-
     public boolean isSorted() {
         return sorted;
     }
-
-/* --- dead code removal ---
-    public void setSorted(boolean b) {
-        sorted = b;
-    }
- --- dead code removal --- */
 
     public int getOffset() {
         return Offset;
@@ -2289,12 +1938,6 @@ public class ASTQuery
         where = b;
     }
 
-/* --- dead code removal ---
-    public boolean isWhere() {
-        return where;
-    }
- --- dead code removal --- */
-
     public long getNbBNode() {
         nbBNode++;
         return nbBNode;
@@ -2311,12 +1954,6 @@ public class ASTQuery
     public Variable newBlankNode() {
         return newBlankNode(BNVAR + getNbBNode());
     }
-    
-/* --- dead code removal ---
-    public Constant createBlankNode() {
-        return Constant.createBlank("_:bb" + nbbnode++);
-    }
- --- dead code removal --- */
     
     public Constant createTripleReference() {
         return Constant.createTripleReference("_:bb" + nbbnode++);
@@ -2374,18 +2011,6 @@ public class ASTQuery
         return var;
     }
 
-    /*   /**
-     * use case: select sql() as (?x, ?y)
-     *
-     * @param var1
-     * @param var2
-     */
-/* --- dead code removal ---
-    public void addVariable(Variable var1, Variable var2) {
-        var1.addVariable(var2);
-    }
- --- dead code removal --- */
-
 
     public void setDescribe(Atom at) {
         setResultForm(QT_DESCRIBE);
@@ -2408,13 +2033,6 @@ public class ASTQuery
     boolean isDescribeAll() {
         return describeAll;
     }
-
-
-/* --- dead code removal ---
-    public boolean isSPARQLCompliant() {
-        return isSPARQLCompliant;
-    }
- --- dead code removal --- */
 
     public void setSPARQLCompliant(boolean b) {
         isSPARQLCompliant = b;
@@ -2578,28 +2196,11 @@ public class ASTQuery
      ***********************************************************
      */
     
-/* --- dead code removal ---
-    public String toJava() throws IOException, EngineException{
-          JavaCompiler jc = new JavaCompiler();
-          jc.compile(this);
-          return jc.toString();
-    }
- --- dead code removal --- */
-    
     @Override
     public String toString() {
        return new ASTPrinter(this).toString();
     }
     
-    // service s1 s2 -> service s1 union service s2
-/* --- dead code removal ---
-    public String toString(boolean std) {
-       return new ASTPrinter(this)
-               .setService(true)
-               .toString();
-    }
- --- dead code removal --- */
-       
     boolean isData() {
         return isInsertData() || isDeleteData();
     }
@@ -2713,12 +2314,6 @@ public class ASTQuery
         return delete;
     }
 
-/* --- dead code removal ---
-    public static int getTripleId() {
-        return nbt++;
-    }
- --- dead code removal --- */
-
     public Exp getBody() {
         return bodyExp;
     }
@@ -2726,18 +2321,6 @@ public class ASTQuery
     public Exp getSaveBody() {
         return bodySave;
     }
-
-/* --- dead code removal ---
-    public void setSaveBody(Exp exp) {
-        bodySave = exp;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public Exp getHead() {
-        return constructExp;
-    }
- --- dead code removal --- */
 
     public void setBody(Exp bodyExp) {
         this.bodyExp = bodyExp;
@@ -2774,36 +2357,6 @@ public class ASTQuery
         return getPragma(RDFS.COSPRAGMA);
     }
 
-/* --- dead code removal ---
-    public boolean hasPragma(String subject, String property, String object) {
-        if (getPragma() == null) {
-            return false;
-        }
-        for (Exp exp : getPragma().getBody()) {
-            if (exp.isRelation()) {
-                Triple t = (Triple) exp;
-                if (t.getSubject().getName().equals(subject)
-                        && t.getProperty().getName().equals(property)
-                        && t.getObject().getName().equals(object)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void addPragma(Triple t) {
-        Exp pragma = getPragma();
-        if (pragma == null) {
-            pragma = BasicGraphPattern.create();
-            setPragma(pragma);
-        }
-        pragma.add(t);
-    }
- --- dead code removal --- */
-
     public Exp getPrefixExp() {
         return prefixExp;
     }
@@ -2818,12 +2371,6 @@ public class ASTQuery
     public void setPrefixExp(Exp exp) {
         prefixExp = exp;
     }
-
-/* --- dead code removal ---
-    public void definePrefix(String prefix, String ns) {
-        defNamespace(prefix, ns);
-    }
- --- dead code removal --- */
 
     public void defNamespace(String prefix, String ns) {
         defNSNamespace(prefix, ns);
@@ -2848,12 +2395,6 @@ public class ASTQuery
         return service;
     }
 
-/* --- dead code removal ---
-    public boolean hasService() {
-        return service != null;
-    }
- --- dead code removal --- */
-    
     public ASTQuery getSetSubQuery(Service s) {
         Exp bgp = s.getBodyExp();
         ASTQuery aa;
@@ -2907,16 +2448,6 @@ public class ASTQuery
         return s;
     }
 
-/* --- dead code removal ---
-    public void setCount(String var) {
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setSort(String var, boolean breverse) {
-    }
- --- dead code removal --- */
-
     public void setSort(Expression sortExpression) {
         setSort(sortExpression, false);
     }
@@ -2951,17 +2482,6 @@ public class ASTQuery
         lGroup = list;
     }
 
-/* --- dead code removal ---
-    public boolean isGroupBy(String name) {
-        for (Expression exp : lGroup) {
-            if (exp.isVariable() && exp.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
- --- dead code removal --- */
-
     public void setGroup(List<Variable> list) {
         for (Variable var : list) {
             setGroup(var);
@@ -2987,30 +2507,6 @@ public class ASTQuery
         }
     }
 
-/* --- dead code removal ---
-    public List<Variable> getVariableBindings() {
-        if (values != null) {
-            return values.getVarList();
-        }
-        return null;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void clearBindings() {
-        values = null;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public List<List<Constant>> getValueBindings() {
-        if (values != null) {
-            return values.getValues();
-        }
-        return null;
-    }
- --- dead code removal --- */
-    
     public Values createValues(List<Variable> list, Expression exp) {
         return complete(Values.create(list, exp));
     }
@@ -3121,11 +2617,6 @@ public class ASTQuery
         }
     }
 
-/* --- dead code removal ---
-    public void setSelect() {
-    }
- --- dead code removal --- */
-
     public List<Boolean> getReverse() {
         return reverseTable;
     }
@@ -3134,33 +2625,11 @@ public class ASTQuery
         reverseTable = list;
     }
 
-/* --- dead code removal ---
-    public String toSparql() {
-        return toString();
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setDescribe(boolean describe) {
-        if (describe) {
-            setResultForm(QT_DESCRIBE);
-        }
-    }
- --- dead code removal --- */
-
     public void setAsk(boolean b) {
         if (b) {
             setResultForm(QT_ASK);
         }
     }
-
-/* --- dead code removal ---
-    public void setSelect(boolean b) {
-        if (b) {
-            setResultForm(QT_SELECT);
-        }
-    }
- --- dead code removal --- */
 
     public void setTemplate(boolean b) {
         isTemplate = b;
@@ -3198,60 +2667,9 @@ public class ASTQuery
         return isDelete;
     }
 
-/* --- dead code removal ---
-    public boolean isSPARQLQuery() {
-        return isSelect() || isAsk() || isDescribe() || (isConstruct() && !isInsert());
-    }
- --- dead code removal --- */
-
     public boolean isSPARQLUpdate() {
         return isUpdate() || isInsert() || isDelete();
     }
-
-/* --- dead code removal ---
-    public void setDefaultThreshold(float threshold) {
-        DefaultThreshold = threshold;
-        setThreshold(threshold);
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setDefaultMaxProjection(int maxProjection) {
-        DefaultMaxProjection = maxProjection;
-        setMaxProjection(maxProjection);
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setDefaultMaxLength(int maxLength) {
-        DefaultMaxLength = maxLength;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public int getDefaultMaxLength() {
-        return DefaultMaxLength;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setDefaultMaxResult(int maxResult) {
-        DefaultMaxResult = maxResult;
-        setMaxResult(maxResult);
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public float getDefaultThreshold() {
-        return DefaultThreshold;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public int getDefaultMaxProjection() {
-        return DefaultMaxProjection;
-    }
- --- dead code removal --- */
 
     public int getDefaultMaxResult() {
         return DefaultMaxResult;
@@ -3261,27 +2679,9 @@ public class ASTQuery
         return RootPropertyQN;
     }
 
-/* --- dead code removal ---
-    public static void setRootPropertyQN(String rootPropertyQN) {
-        RootPropertyQN = rootPropertyQN;
-    }
- --- dead code removal --- */
-
     public static String getRootPropertyURI() {
         return RootPropertyURI;
     }
-
-/* --- dead code removal ---
-    public static void setRootPropertyURI(String rootPropertyURI) {
-        RootPropertyURI = rootPropertyURI;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public boolean isDefineExp(Expression exp) {
-        return selectExp.get(exp) != null;
-    }
- --- dead code removal --- */
 
     public Expression getExpression(String name) {
         return selectFunctions.get(name);
@@ -3320,26 +2720,9 @@ public class ASTQuery
         return list;
     }
 
-/* --- dead code removal ---
-    public Expression getExtExpression(String name) {
-        Expression sexp = getExpression(name);
-        if (sexp == null) {
-            return null;
-        }
-        // rewrite var as exp
-        return sexp.process(this);
-    }
- --- dead code removal --- */
-
     public HashMap<String, Expression> getSelectFunctions() {
         return selectFunctions;
     }
-
-/* --- dead code removal ---
-    public void setSelectFunctions(HashMap<String, Expression> selectFunctions) {
-        this.selectFunctions = selectFunctions;
-    }
- --- dead code removal --- */
 
     public void set(ASTUpdate u) {
         setResultForm(ASTQuery.QT_UPDATE);
@@ -3403,12 +2786,6 @@ public class ASTQuery
         return atemp;
     }
     
-/* --- dead code removal ---
-    public ASTTemplate getTemplate(){
-        return atemp;
-    }
- --- dead code removal --- */
-    
     public int getPriority() {
         return priority;
     }
@@ -3427,28 +2804,6 @@ public class ASTQuery
         atemp.compileTemplate();
     }
 
-    /**
-     * Aggregate that build the result of a template when there are several
-     * results default is group_concat draft: agg_and
-     */
-/* --- dead code removal ---
-    public static void setTemplateAggregate(String s) {
-        ASTTemplate.setTemplateAggregate(s);
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public static void setTemplateConcat(String s) {
-        ASTTemplate.setTemplateConcat(s);
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public void setName(String label) {
-        name = label;
-    }
- --- dead code removal --- */
-
     public void setName(Constant cst) {
         name = cst.getLabel();
     }
@@ -3461,12 +2816,6 @@ public class ASTQuery
         return isAllResult;
     }
 
-/* --- dead code removal ---
-    private void setAllResult(boolean isAllResult) {
-        this.isAllResult = isAllResult;
-    }
- --- dead code removal --- */
-     
     public Term getTemplateGroup() {
         return atemp.getTemplateGroup();
     }
@@ -3551,28 +2900,10 @@ public class ASTQuery
         }
     }
 
-/* --- dead code removal ---
-    public List<String> getApproximateSearchOptions(String key) {
-        return this.approximateSearchOptions.get(key);
-    }
- --- dead code removal --- */
-
     public List<QueryVisitor> getVisitorList() {
         return visitList;
     }
    
-/* --- dead code removal ---
-    public void setVisitorList(List<QueryVisitor> visitList) {
-        this.visitList = visitList;
-    }
- --- dead code removal --- */
-    
-/* --- dead code removal ---
-    public void addVisitor(QueryVisitor vis) {
-        visitList.add(vis);
-    }
- --- dead code removal --- */
-       
     public boolean isLDScript() {
         return ldscript;
     }
@@ -3651,13 +2982,6 @@ public class ASTQuery
         return this;
     }
      
-/* --- dead code removal ---
-     public ASTQuery groupby(Expression e, Variable var) {
-        setGroup(e, var);
-        return this;
-    } 
- --- dead code removal --- */
-    
     public ASTQuery where(Exp... exp) {
         if (exp.length == 1) {
             setBody(abgp(exp[0]));
@@ -3712,12 +3036,6 @@ public class ASTQuery
         return new Minus(abgp(e1), abgp(e2));
     }
     
-/* --- dead code removal ---
-    public Exp filter(Expression e) {
-        return createFilter(e);
-    }
- --- dead code removal --- */
-    
     public Term count(Expression exp) {
         return Term.function(Processor.COUNT, exp);
     }
@@ -3764,29 +3082,12 @@ public class ASTQuery
         return getContext();
     }
     
-/* --- dead code removal ---
-    public Context getContext(fr.inria.corese.core.kgram.core.Query q) {
-        if (getContext() != null) {
-            return getContext();
-        }
-        q.setContext(getCreateContext());
-        return getContext();
-    }
- --- dead code removal --- */
-    
-    
     // log generated by service interpreter ProviderImpl and Service (corese core)
     // through QueryProcess
     public ContextLog getLog() {
         return getCreateContext().getLog();
     }
     
-/* --- dead code removal ---
-    public synchronized ContextLog getLogSync() {
-        return getLog();
-    }
- --- dead code removal --- */
-
     public HashMap<String, Expression> getGroupByMap() {
         return groupBy;
     }
@@ -3871,18 +3172,6 @@ public class ASTQuery
         return pathList;
     }
 
-/* --- dead code removal ---
-    public void setPathList(List<Triple> pathList) {
-        this.pathList = pathList;
-    }
- --- dead code removal --- */
-
-/* --- dead code removal ---
-    public boolean isFederateVisit() {
-        return federateVisit;
-    }
- --- dead code removal --- */
-
     public void setFederateVisit(boolean federateVisit) {
         this.federateVisit = federateVisit;
     }
@@ -3890,12 +3179,6 @@ public class ASTQuery
     public List<Service> getServiceExpList() {
         return serviceExpList;
     }
-
-/* --- dead code removal ---
-    public void setServiceExpList(List<Service> serviceExpList) {
-        this.serviceExpList = serviceExpList;
-    }
- --- dead code removal --- */
 
     public ASTSelector getAstSelector() {
         return astSelector;
@@ -3908,12 +3191,6 @@ public class ASTQuery
     public ASTFactory getFactory() {
         return factory;
     }
-
-/* --- dead code removal ---
-    public void setFactory(ASTFactory factory) {
-        this.factory = factory;
-    }
- --- dead code removal --- */
 
     public boolean isSubmitTriple() {
         return submitTriple;
