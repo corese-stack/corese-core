@@ -181,6 +181,7 @@ class QueryEngineTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testCleanMethod() {
         ArrayList<Query> internalList = null;
         try {

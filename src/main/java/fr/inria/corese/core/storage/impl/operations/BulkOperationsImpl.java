@@ -21,13 +21,14 @@ public class BulkOperationsImpl implements BulkOperations {
 
     private static final Logger logger = LoggerFactory.getLogger(BulkOperationsImpl.class);
 
+    /** The underlying Corese graph where operations are performed. */
     private final Graph graph;
 
     /**
-     * Constructs bulk operations for a graph.
+     * Constructs a new bulk operations handler for the specified graph.
      *
-     * @param graph Graph to operate on
-     * @throws IllegalArgumentException if graph is null
+     * @param graph the Corese Graph instance to operate on; must not be null.
+     * @throws IllegalArgumentException if the provided graph is null.
      */
     public BulkOperationsImpl(Graph graph) {
         if (graph == null) {
@@ -36,6 +37,14 @@ public class BulkOperationsImpl implements BulkOperations {
         this.graph = graph;
     }
 
+    /**
+     * Inserts a list of edges into the graph in a batch.
+     *
+     * @param edges the list of edges to insert; must not be null or empty.
+     * @return a {@link MutationResult} summarizing the successes and failures of the batch operation.
+     * @throws DataManagerException if a critical system error occurs during insertion.
+     * @throws IllegalArgumentException if the edges list is null or empty.
+     */
     @Override
     public MutationResult insertBatch(List<Edge> edges) throws DataManagerException {
         if (edges == null || edges.isEmpty()) {
@@ -77,6 +86,14 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Deletes a list of specific edges from the graph.
+     *
+     * @param edges the list of edges to remove; must not be null or empty.
+     * @return a {@link MutationResult} summarizing the edges removed and any failures.
+     * @throws DataManagerException if a critical system error occurs during deletion.
+     * @throws IllegalArgumentException if the edges list is null or empty.
+     */
     @Override
     public MutationResult deleteBatch(List<Edge> edges) throws DataManagerException {
         if (edges == null || edges.isEmpty()) {
@@ -127,6 +144,13 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Deletes all edges matching the specified pattern.
+     *
+     * @param pattern the pattern defining subject, predicate, object, and/or context filters.
+     * @return a {@link MutationResult} containing the list of affected edges.
+     * @throws DataManagerException if the pattern-based deletion fails.
+     */
     @Override
     public MutationResult deleteByPattern(EdgePattern pattern) throws DataManagerException {
         if (pattern == null) {
@@ -178,6 +202,14 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Clears specific named graphs (contexts) from the system.
+     *
+     * @param contexts the list of context nodes to clear. If null or empty, clears all data.
+     * @param silent if true, suppresses errors when a specific context does not exist.
+     * @return a {@link MutationResult} summarizing the operation.
+     * @throws DataManagerException if a context clear operation fails critically.
+     */
     @Override
     public MutationResult clearContexts(List<Node> contexts, boolean silent)
             throws DataManagerException {
@@ -223,6 +255,12 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Deletes all data from the graph, including all edges and all named graphs.
+     *
+     * @return a {@link MutationResult} reflecting the state before and after clear.
+     * @throws DataManagerException if the clearing operation fails.
+     */
     @Override
     public MutationResult clearAll() throws DataManagerException {
         logger.warn("Clearing ALL data from graph");
@@ -252,6 +290,15 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Merges the contents of a source graph into a target graph.
+     *
+     * @param sourceContext the URI/Label of the source graph.
+     * @param targetContext the URI/Label of the target graph.
+     * @param silent if true, ignores missing source graphs.
+     * @return a {@link MutationResult} representing the merge outcome.
+     * @throws DataManagerException if the operation fails at the graph level.
+     */
     @Override
     public MutationResult addGraph(Node sourceContext, Node targetContext, boolean silent)
             throws DataManagerException {
@@ -293,6 +340,15 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Replaces the contents of a target graph with a copy of the source graph.
+     *
+     * @param sourceContext the URI/Label of the source graph.
+     * @param targetContext the URI/Label of the target graph.
+     * @param silent if true, ignores missing source graphs.
+     * @return a {@link MutationResult} representing the copy outcome.
+     * @throws DataManagerException if the operation fails at the graph level.
+     */
     @Override
     public MutationResult copyGraph(Node sourceContext, Node targetContext, boolean silent)
             throws DataManagerException {
@@ -334,6 +390,15 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Moves the contents of a source graph to a target graph, clearing the source graph.
+     *
+     * @param sourceContext the URI/Label of the source graph.
+     * @param targetContext the URI/Label of the target graph.
+     * @param silent if true, ignores missing source graphs.
+     * @return a {@link MutationResult} representing the move outcome.
+     * @throws DataManagerException if the operation fails at the graph level.
+     */
     @Override
     public MutationResult moveGraph(Node sourceContext, Node targetContext, boolean silent)
             throws DataManagerException {
@@ -375,6 +440,13 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Explicitly declares a new context (named graph) in the system without adding edges.
+     *
+     * @param context the context node to declare.
+     * @return a successful {@link MutationResult}.
+     * @throws DataManagerException if the declaration fails.
+     */
     @Override
     public MutationResult declareContext(Node context) throws DataManagerException {
         if (context == null) {
@@ -398,6 +470,13 @@ public class BulkOperationsImpl implements BulkOperations {
         }
     }
 
+    /**
+     * Removes a context declaration and all its associated edges.
+     *
+     * @param context the context node to undeclare.
+     * @return a {@link MutationResult} summarizing the removed edges.
+     * @throws DataManagerException if the undeclare operation fails.
+     */
     @Override
     public MutationResult undeclareContext(Node context) throws DataManagerException {
         if (context == null) {

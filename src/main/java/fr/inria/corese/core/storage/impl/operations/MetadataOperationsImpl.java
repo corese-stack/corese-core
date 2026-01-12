@@ -22,13 +22,16 @@ public class MetadataOperationsImpl implements MetadataOperations {
 
     private static final Logger logger = LoggerFactory.getLogger(MetadataOperationsImpl.class);
 
+    /**
+     * The underlying Corese graph instance.
+     */
     private final Graph graph;
 
     /**
-     * Constructs metadata operations for a graph.
+     * Constructs a new metadata operations handler for the specified graph.
      *
-     * @param graph Graph to query
-     * @throws IllegalArgumentException if graph is null
+     * @param graph the Corese Graph to query; must not be null.
+     * @throws IllegalArgumentException if the provided graph is null.
      */
     public MetadataOperationsImpl(Graph graph) {
         if (graph == null) {
@@ -37,19 +40,25 @@ public class MetadataOperationsImpl implements MetadataOperations {
         this.graph = graph;
     }
 
+    /**
+     * Retrieves all unique predicates used within the specified context.
+     *
+     * @param context the context (named graph) node. Note: Standard Corese implementation currently returns all predicates.
+     * @return an unmodifiable Set of predicate nodes.
+     * @throws DataManagerException if the metadata retrieval fails.
+     */
     @Override
     public Set<Node> getPredicates(Node context) throws DataManagerException {
         try {
             logger.debug("Getting predicates for context: {}", context);
 
-            // Graph.getSortedProperties() returns all predicates
-            // Note: context parameter is not used by Graph implementation
+            // Graph.getSortedProperties() returns all predicates in the graph
             Iterable<Node> iterable = graph.getSortedProperties();
 
-            // Convert to Set
+            // Convert to Set to ensure uniqueness and provide standard API access
             Set<Node> predicates = iterableToSet(iterable);
 
-            logger.debug("Found {} predicates", predicates.size());
+            logger.debug("Found {} unique predicates", predicates.size());
             return Collections.unmodifiableSet(predicates);
 
         } catch (Exception e) {
@@ -62,6 +71,13 @@ public class MetadataOperationsImpl implements MetadataOperations {
         }
     }
 
+    /**
+     * Retrieves all unique nodes (subjects or objects) within the specified context.
+     *
+     * @param context the context node to filter by; if null, retrieves nodes from all contexts.
+     * @return an unmodifiable Set of nodes.
+     * @throws DataManagerException if the node retrieval fails.
+     */
     @Override
     public Set<Node> getNodes(Node context) throws DataManagerException {
         try {
@@ -69,15 +85,14 @@ public class MetadataOperationsImpl implements MetadataOperations {
 
             Iterable<Node> iterable;
             if (context == null) {
-                // All nodes
+                // Retrieves an iterator over all nodes in the entire graph
                 iterable = graph.getNodeGraphIterator();
             } else {
-                // Nodes in specific context
+                // Retrieves an iterator over nodes specific to the named graph
                 Node graphNode = graph.getNode(context);
                 iterable = graph.getNodeGraphIterator(graphNode);
             }
 
-            // Convert to Set
             Set<Node> nodes = iterableToSet(iterable);
 
             logger.debug("Found {} nodes", nodes.size());
@@ -93,15 +108,20 @@ public class MetadataOperationsImpl implements MetadataOperations {
         }
     }
 
+    /**
+     * Retrieves all named graph identifiers (contexts) currently defined in the system.
+     *
+     * @return an unmodifiable Set of context nodes.
+     * @throws DataManagerException if the context retrieval fails.
+     */
     @Override
     public Set<Node> getContexts() throws DataManagerException {
         try {
             logger.debug("Getting all contexts");
 
-            // Graph.getGraphNodes() returns all named graphs
+            // Graph.getGraphNodes() returns nodes representing named graphs
             Iterable<Node> iterable = graph.getGraphNodes(new ArrayList<>(0));
 
-            // Convert to Set
             Set<Node> contexts = iterableToSet(iterable);
 
             logger.debug("Found {} contexts", contexts.size());
@@ -117,18 +137,24 @@ public class MetadataOperationsImpl implements MetadataOperations {
         }
     }
 
+    /**
+     * Collects and returns general statistics about the graph size and density.
+     *
+     * @return a {@link GraphStatistics} object containing counts for edges, nodes, predicates, and contexts.
+     * @throws DataManagerException if statistics collection fails.
+     */
     @Override
     public GraphStatistics getStatistics() throws DataManagerException {
         try {
             logger.debug("Collecting graph statistics");
 
-            // Collect statistics
+            // Aggregate metrics from current graph state
             long edgeCount = graph.size();
             long nodeCount = getNodes(null).size();
             long predicateCount = getPredicates(null).size();
             long contextCount = getContexts().size();
 
-            // Build GraphStatistics with Builder pattern
+            // Build GraphStatistics using the builder pattern
             GraphStatistics stats = GraphStatistics.builder()
                     .edgeCount(edgeCount)
                     .nodeCount(nodeCount)
@@ -136,7 +162,7 @@ public class MetadataOperationsImpl implements MetadataOperations {
                     .contextCount(contextCount)
                     .build();
 
-            logger.debug("Statistics: {}", stats);
+            logger.debug("Statistics collected: {}", stats);
             return stats;
 
         } catch (Exception e) {
@@ -150,11 +176,11 @@ public class MetadataOperationsImpl implements MetadataOperations {
     }
 
     /**
-     * Converts an Iterable to a Set.
-     * Helper method to convert Graph's Iterable results to Sets.
+     * Helper method to convert a Corese {@link Iterable} of nodes into a {@link HashSet}.
+     * Ensures that null nodes are ignored and duplicates are removed.
      *
-     * @param iterable Iterable to convert
-     * @return Set containing all elements
+     * @param iterable the iterable to convert.
+     * @return a Set containing the extracted nodes.
      */
     private Set<Node> iterableToSet(Iterable<Node> iterable) {
         Set<Node> set = new HashSet<>();

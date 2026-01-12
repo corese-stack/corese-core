@@ -20,13 +20,14 @@ public class MutationOperationsImpl implements MutationOperations {
 
     private static final Logger logger = LoggerFactory.getLogger(MutationOperationsImpl.class);
 
+    /** The underlying Corese graph instance to be mutated. */
     private final Graph graph;
 
     /**
-     * Constructs mutation operations for a graph.
+     * Constructs mutation operations for a specific graph.
      *
-     * @param graph Graph to mutate
-     * @throws IllegalArgumentException if graph is null
+     * @param graph the Corese Graph to mutate; must not be null.
+     * @throws IllegalArgumentException if the provided graph is null.
      */
     public MutationOperationsImpl(Graph graph) {
         if (graph == null) {
@@ -35,6 +36,13 @@ public class MutationOperationsImpl implements MutationOperations {
         this.graph = graph;
     }
 
+    /**
+     * Inserts a single edge into the graph.
+     *
+     * @param edge the edge object to insert.
+     * @return a {@link MutationResult} indicating success or failure.
+     * @throws DataManagerException if the insertion fails at the storage level.
+     */
     @Override
     public MutationResult insertEdge(Edge edge) throws DataManagerException {
         if (edge == null) {
@@ -44,7 +52,7 @@ public class MutationOperationsImpl implements MutationOperations {
         try {
             logger.debug("Inserting edge: {}", edge);
 
-            // Use Graph's insertEdgeWithTargetNode
+            // Use Graph's specific method for inserting an edge while ensuring target nodes exist
             Edge inserted = graph.insertEdgeWithTargetNode(edge);
 
             if (inserted != null) {
@@ -65,6 +73,16 @@ public class MutationOperationsImpl implements MutationOperations {
         }
     }
 
+    /**
+     * Inserts an edge defined by its individual components into the specified contexts.
+     *
+     * @param subject the subject node.
+     * @param predicate the predicate node.
+     * @param object the object node.
+     * @param contexts the list of context (named graph) nodes where the edge should be stored.
+     * @return a {@link MutationResult} summarizing the insertion.
+     * @throws DataManagerException if the insertion fails.
+     */
     @Override
     public MutationResult insertEdge(Node subject, Node predicate, Node object, List<Node> contexts)
             throws DataManagerException {
@@ -77,13 +95,13 @@ public class MutationOperationsImpl implements MutationOperations {
             logger.debug("Inserting edge: ({}, {}, {}) in contexts: {}",
                     subject, predicate, object, contexts);
 
-            // Track size before insert
+            // Capture graph size to verify insertion if the result set is ambiguous
             int sizeBefore = graph.size();
 
-            // Use Graph's insert method
+            // Perform the insertion in the Corese graph
             Iterable<Edge> inserted = graph.insert(subject, predicate, object, contexts);
 
-            // Convert Iterable to List
+            // Process returned edges
             List<Edge> insertedList = new ArrayList<>();
             if (inserted != null) {
                 for (Edge e : inserted) {
@@ -93,20 +111,18 @@ public class MutationOperationsImpl implements MutationOperations {
                 }
             }
 
-            // Check if insertion actually happened
             int sizeAfter = graph.size();
             boolean insertionOccurred = (sizeAfter > sizeBefore) || !insertedList.isEmpty();
 
             if (insertionOccurred) {
                 logger.debug("Inserted edge successfully");
 
-                // If we got edges back, use them
                 if (!insertedList.isEmpty()) {
                     if (insertedList.size() == 1) {
                         return MutationResult.success(insertedList.getFirst(), "Edge inserted");
                     }
 
-                    // Multiple edges (multiple contexts)
+                    // Handle multi-context insertion results
                     MutationResult.BulkBuilder builder = MutationResult.bulkBuilder()
                             .totalAttempted(insertedList.size())
                             .addAffectedEdges(insertedList)
@@ -118,7 +134,7 @@ public class MutationOperationsImpl implements MutationOperations {
 
                     return builder.build();
                 } else {
-                    // Insertion happened but no edges returned - create edge reference
+                    // Fallback edge creation for result reporting if the iterator was empty but size changed
                     Edge edge = graph.create(
                             contexts != null && !contexts.isEmpty() ? contexts.getFirst() : graph.getDefaultGraphNode(),
                             subject, predicate, object
@@ -127,7 +143,6 @@ public class MutationOperationsImpl implements MutationOperations {
                 }
             } else {
                 logger.warn("Edge insertion did not change graph size (possible duplicate)");
-                // May be a duplicate - still return success with note
                 Edge edge = graph.create(
                         contexts != null && !contexts.isEmpty() ? contexts.getFirst() : graph.getDefaultGraphNode(),
                         subject, predicate, object
@@ -145,6 +160,13 @@ public class MutationOperationsImpl implements MutationOperations {
         }
     }
 
+    /**
+     * Deletes a specific edge object from the graph.
+     *
+     * @param edge the edge to delete.
+     * @return a {@link MutationResult} indicating if the edge was found and deleted.
+     * @throws DataManagerException if the deletion fails.
+     */
     @Override
     public MutationResult deleteEdge(Edge edge) throws DataManagerException {
         if (edge == null) {
@@ -154,10 +176,9 @@ public class MutationOperationsImpl implements MutationOperations {
         try {
             logger.debug("Deleting edge: {}", edge);
 
-            // Use Graph's deleteEdgeWithTargetNode
+            // Corese graph returns an Iterable of deleted edges
             Iterable<Edge> deleted = graph.deleteEdgeWithTargetNode(edge);
 
-            // Convert to list
             List<Edge> deletedList = new ArrayList<>();
             if (deleted != null) {
                 for (Edge e : deleted) {
@@ -168,7 +189,6 @@ public class MutationOperationsImpl implements MutationOperations {
             }
 
             if (!deletedList.isEmpty()) {
-                // Return first deleted edge (typically only one)
                 return MutationResult.success(deletedList.getFirst(), "Edge deleted");
             } else {
                 logger.warn("Edge deletion returned empty (edge may not exist)");
@@ -185,6 +205,17 @@ public class MutationOperationsImpl implements MutationOperations {
         }
     }
 
+    /**
+     * Deletes edges matching the specified subject, predicate, and object in the given contexts.
+     * Supports wildcards (null values).
+     *
+     * @param subject the subject node (or null for wildcard).
+     * @param predicate the predicate node (or null for wildcard).
+     * @param object the object node (or null for wildcard).
+     * @param contexts the list of contexts to search in.
+     * @return a {@link MutationResult} summarizing all deleted edges.
+     * @throws DataManagerException if the deletion process fails.
+     */
     @Override
     public MutationResult deleteEdges(Node subject, Node predicate, Node object, List<Node> contexts)
             throws DataManagerException {
@@ -193,13 +224,13 @@ public class MutationOperationsImpl implements MutationOperations {
             logger.debug("Deleting edges: ({}, {}, {}) in contexts: {}",
                     subject, predicate, object, contexts);
 
-            // Use graph.iterate() to find matching edges (supports null wildcards)
+            // Iterate over matching edges based on pattern
             Iterable<Edge> matchingEdges = graph.iterate(subject, predicate, object, contexts);
 
-            // Delete each matching edge
             List<Edge> deletedList = new ArrayList<>();
             for (Edge edge : matchingEdges) {
                 if (edge != null) {
+                    // Delete the specific edge instance
                     List<Edge> deleted = graph.delete(edge);
                     if (deleted != null) {
                         for (Edge e : deleted) {
@@ -213,7 +244,6 @@ public class MutationOperationsImpl implements MutationOperations {
 
             logger.debug("Deleted {} edge(s)", deletedList.size());
 
-            // Build bulk result
             MutationResult.BulkBuilder builder = MutationResult.bulkBuilder()
                     .totalAttempted(deletedList.size())
                     .addAffectedEdges(deletedList)
@@ -235,6 +265,12 @@ public class MutationOperationsImpl implements MutationOperations {
         }
     }
 
+    /**
+     * Generates a unique blank node identifier within the graph context.
+     *
+     * @return a new blank node ID string.
+     * @throws DataManagerException if the ID generation fails.
+     */
     @Override
     public String generateBlankNode() throws DataManagerException {
         try {

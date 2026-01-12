@@ -24,15 +24,18 @@ public class TransactionManagerImpl implements TransactionManager {
     private final boolean transactionSupport;
     private final IsolationLevel defaultIsolationLevel;
 
-    // Thread-local storage for current transaction per thread
+    /**
+     * Thread-local storage to track the current active transaction handle for the calling thread.
+     */
     private final ThreadLocal<TransactionImpl> currentTransaction = new ThreadLocal<>();
 
     /**
-     * Constructs a transaction manager.
+     * Constructs a new TransactionManager.
      *
-     * @param graph                 Graph to manage
-     * @param transactionSupport    Whether transactions are enabled
-     * @param defaultIsolationLevel Default isolation level
+     * @param graph                 the underlying Corese Graph.
+     * @param transactionSupport    flag indicating if transaction features are enabled.
+     * @param defaultIsolationLevel the isolation level to use when none is specified.
+     * @throws IllegalArgumentException if graph or defaultIsolationLevel is null.
      */
     public TransactionManagerImpl(
             Graph graph,
@@ -67,7 +70,7 @@ public class TransactionManagerImpl implements TransactionManager {
     @Override
     public Transaction beginTransaction(IsolationLevel isolationLevel) throws DataManagerException {
         if (!supportsTransactions()) {
-            throw new UnsupportedOperationException("Transactions are not supported");
+            throw new UnsupportedOperationException("Transactions are not supported by this manager configuration.");
         }
 
         if (isolationLevel == null) {
@@ -76,20 +79,18 @@ public class TransactionManagerImpl implements TransactionManager {
 
         if (!getSupportedIsolationLevels().contains(isolationLevel)) {
             throw new IllegalArgumentException(
-                    "Isolation level " + isolationLevel + " is not supported"
+                    "Isolation level " + isolationLevel + " is not supported by the current storage backend."
             );
         }
 
-        // Check if there's already an active transaction
-        if (hasActiveTransaction()) {
-            TransactionImpl existing = currentTransaction.get();
-            logger.warn("Starting new transaction while transaction {} is still active",
+        // Check for existing active transaction to prevent unsupported nesting
+        TransactionImpl existing = currentTransaction.get();
+        if (existing != null && existing.isActive()) {
+            logger.warn("Attempted to start a new transaction while transaction {} is still active.",
                     existing.getId());
-            // For now, we don't support nested transactions
             throw new DataManagerException(
                     ErrorCode.TRANSACTION_ERROR,
-                    "Nested transactions are not supported. " +
-                            "Current transaction: " + existing.getId()
+                    "Nested transactions are not supported. Current active transaction: " + existing.getId()
             );
         }
         
@@ -105,7 +106,7 @@ public class TransactionManagerImpl implements TransactionManager {
             }
         };
 
-        // Create and register transaction
+        // Create the new transaction handle and register it to the current thread
         TransactionImpl transaction = new TransactionImpl(isolationLevel, callback);
         currentTransaction.set(transaction);
 
@@ -127,17 +128,16 @@ public class TransactionManagerImpl implements TransactionManager {
 
     @Override
     public Set<IsolationLevel> getSupportedIsolationLevels() {
-        // For now, we support all isolation levels
-        // In a real implementation, this would depend on the backend storage
+        // Corese currently supports standard levels, but this may be restricted by specific backends
         return EnumSet.allOf(IsolationLevel.class);
     }
 
     /**
-     * Performs the actual commit operation.
-     * Called by the transaction when commit() is invoked.
+     * Executes the internal commit logic for a transaction.
+     * This method is triggered by the {@link TransactionImpl#commit()} method via the callback.
      *
-     * @param transaction Transaction to commit
-     * @throws DataManagerException if commit fails
+     * @param transaction the transaction to commit.
+     * @throws DataManagerException if the graph commit fails.
      */
     private void performCommit(TransactionImpl transaction) throws DataManagerException {
         try {
@@ -145,7 +145,7 @@ public class TransactionManagerImpl implements TransactionManager {
 
             graph.init();
 
-            // Clear thread-local
+            // Clear the thread-local reference as the transaction lifecycle is ending
             currentTransaction.remove();
 
             logger.debug("Commit completed for transaction {}", transaction.getId());
@@ -154,26 +154,27 @@ public class TransactionManagerImpl implements TransactionManager {
             logger.error("Failed to commit transaction {}", transaction.getId(), e);
             throw new DataManagerException(
                     ErrorCode.TRANSACTION_ERROR,
-                    "Failed to commit transaction: " + e.getMessage(),
+                    "Failed to commit transaction changes to the graph: " + e.getMessage(),
                     e
             );
         }
     }
 
     /**
-     * Performs the actual rollback operation.
-     * Called by the transaction when rollback() is invoked.
+     * Executes the internal rollback logic for a transaction.
+     * This method is triggered by the {@link TransactionImpl#rollback()} method via the callback.
      *
-     * @param transaction Transaction to rollback
-     * @throws DataManagerException if rollback fails
+     * @param transaction the transaction to roll back.
+     * @throws DataManagerException if the rollback operation fails.
      */
     private void performRollback(TransactionImpl transaction) throws DataManagerException {
         try {
             logger.debug("Performing rollback for transaction {}", transaction.getId());
 
+            // Placeholder for rolling back volatile or buffered changes in the graph
             graph.init();
 
-            // Clear thread-local
+            // Clear the thread-local reference
             currentTransaction.remove();
 
             logger.debug("Rollback completed for transaction {}", transaction.getId());
@@ -182,7 +183,7 @@ public class TransactionManagerImpl implements TransactionManager {
             logger.error("Failed to rollback transaction {}", transaction.getId(), e);
             throw new DataManagerException(
                     ErrorCode.TRANSACTION_ERROR,
-                    "Failed to rollback transaction: " + e.getMessage(),
+                    "Failed to rollback transaction changes: " + e.getMessage(),
                     e
             );
         }

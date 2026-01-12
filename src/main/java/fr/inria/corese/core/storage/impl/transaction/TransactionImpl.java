@@ -24,23 +24,38 @@ public class TransactionImpl implements Transaction {
     private final Instant startTime;
     private final TransactionCallback callback;
 
+    /**
+     * Thread-safe reference to the current state of the transaction.
+     */
     private final AtomicReference<TransactionState> state;
 
     /**
      * Callback interface for transaction operations.
-     * Allows the TransactionManager to be notified of commits/rollbacks.
+     * Allows the TransactionManager or DataManager to be notified of lifecycle changes.
      */
     public interface TransactionCallback {
+        /**
+         * Invoked when the transaction is requested to commit.
+         *
+         * @param transaction the transaction being committed.
+         * @throws DataManagerException if the commit operation fails.
+         */
         void onCommit(TransactionImpl transaction) throws DataManagerException;
 
+        /**
+         * Invoked when the transaction is requested to rollback.
+         *
+         * @param transaction the transaction being rolled back.
+         * @throws DataManagerException if the rollback operation fails.
+         */
         void onRollback(TransactionImpl transaction) throws DataManagerException;
     }
 
     /**
-     * Constructs a new transaction.
+     * Constructs a new transaction handle.
      *
-     * @param isolationLevel Isolation level
-     * @param callback       Callback for commit/rollback operations
+     * @param isolationLevel the requested isolation level for this transaction.
+     * @param callback       the callback to handle persistence of changes.
      */
     public TransactionImpl(IsolationLevel isolationLevel, TransactionCallback callback) {
         this.id = UUID.randomUUID().toString();
@@ -62,7 +77,12 @@ public class TransactionImpl implements Transaction {
         return isolationLevel;
     }
 
-
+    /**
+     * Commits the changes made during this transaction.
+     *
+     * @throws IllegalStateException if the transaction is not in an ACTIVE state.
+     * @throws DataManagerException  if the commit fails at the storage level.
+     */
     @Override
     public void commit() throws DataManagerException {
         TransactionState currentState = state.get();
@@ -76,20 +96,19 @@ public class TransactionImpl implements Transaction {
         logger.debug("Committing transaction {}", id);
 
         try {
-            // Notify callback
+            // Execute the commit logic via the registered callback
             callback.onCommit(this);
 
-            // Update state
+            // Atomically update state to COMMITTED
             if (!state.compareAndSet(TransactionState.ACTIVE, TransactionState.COMMITTED)) {
                 throw new IllegalStateException(
-                        "Transaction state changed during commit"
+                        "Transaction state changed during commit process"
                 );
             }
 
             logger.info("Transaction {} committed successfully", id);
 
         } catch (DataManagerException e) {
-            // Mark as failed
             state.set(TransactionState.FAILED);
             logger.error("Failed to commit transaction {}", id, e);
             throw e;
@@ -105,6 +124,12 @@ public class TransactionImpl implements Transaction {
         }
     }
 
+    /**
+     * Reverts the changes made during this transaction.
+     *
+     * @throws IllegalStateException if the transaction is not in an ACTIVE state.
+     * @throws DataManagerException  if the rollback operation fails.
+     */
     @Override
     public void rollback() throws DataManagerException {
         TransactionState currentState = state.get();
@@ -118,13 +143,13 @@ public class TransactionImpl implements Transaction {
         logger.debug("Rolling back transaction {}", id);
 
         try {
-            // Notify callback
+            // Execute the rollback logic via the registered callback
             callback.onRollback(this);
 
-            // Update state
+            // Atomically update state to ROLLED_BACK
             if (!state.compareAndSet(TransactionState.ACTIVE, TransactionState.ROLLED_BACK)) {
                 throw new IllegalStateException(
-                        "Transaction state changed during rollback"
+                        "Transaction state changed during rollback process"
                 );
             }
 
@@ -156,16 +181,21 @@ public class TransactionImpl implements Transaction {
         return state.get();
     }
 
+    /**
+     * Closes the transaction. If the transaction is still active, an automatic rollback is performed.
+     *
+     * @throws DataManagerException if an automatic rollback fails.
+     */
     @Override
     public void close() throws DataManagerException {
         TransactionState currentState = state.get();
 
         if (currentState.isActive()) {
-            logger.warn("Transaction {} not committed, performing automatic rollback", id);
+            logger.warn("Transaction {} closed while still active; performing automatic rollback", id);
             try {
                 rollback();
             } catch (DataManagerException e) {
-                logger.error("Failed to auto-rollback transaction {}", id, e);
+                logger.error("Failed to perform auto-rollback for transaction {}", id, e);
                 throw e;
             }
         }
