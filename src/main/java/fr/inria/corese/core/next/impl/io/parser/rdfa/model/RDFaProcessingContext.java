@@ -3,13 +3,17 @@ package fr.inria.corese.core.next.impl.io.parser.rdfa.model;
 import fr.inria.corese.core.next.api.IRI;
 import fr.inria.corese.core.next.api.Resource;
 import fr.inria.corese.core.next.api.Value;
+import org.xml.sax.Attributes;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class RDFaLocalValues {
+/**
+ * Corresponds to the local values for the valuation of an element and the current context at the moment of its evaluation
+ */
+public class RDFaProcessingContext {
 
     // Local context
     private boolean skipElement = false;
@@ -22,15 +26,25 @@ public class RDFaLocalValues {
     private String currentLanguage = null;
     private Value currentPropertyValue = null;
     private String defaultVocabulary = null;
+    private Attributes currentElementAttributes = null;
 
-    public RDFaLocalValues() {
+    /**
+     * Buffer for accumulating character data between start and end tags.
+     */
+    private StringBuilder characters = new StringBuilder();
+
+    private boolean isRootElement = true;
+
+    private RDFaEvaluationContext evaluationContext = null;
+
+    public RDFaProcessingContext() {
     }
 
     /**
      * Constructor to be used in step 1 of RDFa processing
      * @param context
      */
-    public RDFaLocalValues(RDFaEvaluationContext context) {
+    public RDFaProcessingContext(RDFaEvaluationContext context) {
         this.skipElement = false;
         this.newSubject = null;
         this.currentObjectResource = null;
@@ -40,9 +54,10 @@ public class RDFaLocalValues {
         this.listMappings = context.getListMappings();
         this.currentLanguage = context.getLanguage();
         this.defaultVocabulary = context.getDefaultVocabulary();
+        this.evaluationContext = context;
     }
 
-    public RDFaLocalValues(RDFaLocalValues other) {
+    public RDFaProcessingContext(RDFaProcessingContext other) {
         this.skipElement = other.skipElement;
         this.newSubject = other.newSubject;
         this.currentObjectResource = other.currentObjectResource;
@@ -167,7 +182,45 @@ public class RDFaLocalValues {
         sb.append("currentLanguage: ").append(this.currentLanguage).append(" ");
         sb.append("currentPropertyValue: ").append(this.currentPropertyValue).append(" ");
         sb.append("defaultVocabulary: ").append(this.defaultVocabulary).append(" ");
+        sb.append("characters: ").append(this.getCharacters()).append(" ");
+        sb.append("Evaluation context: ").append(this.getEvaluationContext()).append(" ");
 
         return sb.toString();
+    }
+
+    public String getCharacters() {
+        return characters.toString();
+    }
+
+    public void setCharacters(StringBuilder characters) {
+        this.characters = characters;
+    }
+
+    public void addCharacters(char[] ch, int start, int length) {
+        this.characters.append(ch, start, length);
+    }
+
+    public Attributes getCurrentElementAttributes() {
+        return currentElementAttributes;
+    }
+
+    public void setCurrentElementAttributes(Attributes currentElementAttributes) {
+        this.currentElementAttributes = currentElementAttributes;
+    }
+
+    public boolean isRootElement() {
+        return isRootElement;
+    }
+
+    public void setRootElement(boolean rootElement) {
+        isRootElement = rootElement;
+    }
+
+    public RDFaEvaluationContext getEvaluationContext() {
+        return evaluationContext;
+    }
+
+    public void setEvaluationContext(RDFaEvaluationContext evaluationContext) {
+        this.evaluationContext = evaluationContext;
     }
 }

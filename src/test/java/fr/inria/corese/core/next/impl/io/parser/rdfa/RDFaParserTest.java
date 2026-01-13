@@ -142,7 +142,7 @@ class RDFaParserTest {
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
-        parser.parse(new ByteArrayInputStream(testDataString.getBytes()));
+        parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://www.w3.org/2006/07/SWD/RDFa/testsuite/xhtml1-testcases/");
 
         assertEquals(RDFFormat.RDFA, parser.getRDFFormat());
         logModelContent(referenceModel);

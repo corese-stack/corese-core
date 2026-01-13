@@ -198,7 +198,8 @@ public class RDFaEvaluationContext  {
 
         sb.append("BaseURI: ").append(this.getBaseIri().stringValue()).append(" ");
         sb.append("Mappings: [");
-        this.getIriMappings().forEach((key, value) -> sb.append("(").append(key).append(", ").append(value.stringValue()).append(") "));
+//        this.getIriMappings().forEach((key, value) -> sb.append("(").append(key).append(", ").append(value.stringValue()).append(") "));
+        sb.append(this.iriMappings.size());
         sb.append("] ");
         if(this.getParentSubjectResource() != null) {
             sb.append("Subject:").append(this.getParentSubjectResource().stringValue()).append(" ");
