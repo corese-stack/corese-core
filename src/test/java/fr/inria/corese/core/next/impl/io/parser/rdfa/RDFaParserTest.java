@@ -303,6 +303,10 @@ class RDFaParserTest {
             Statement statementTest = itStatementTest.next();
             assertEquals(statementRef.getSubject(), statementTest.getSubject());
             assertEquals(statementRef.getPredicate(), statementTest.getPredicate());
+            assertEquals(statementRef.getObject().isLiteral(), statementTest.getObject().isLiteral());
+            if(statementRef.getObject().isLiteral()) {
+                assertEquals(((Literal) statementRef.getObject()).getDatatype(), ((Literal) statementTest.getObject()).getDatatype());
+            }
             assertEquals(statementRef.getObject(), statementTest.getObject());
             assertEquals(statementRef.getContext(), statementTest.getContext());
         }

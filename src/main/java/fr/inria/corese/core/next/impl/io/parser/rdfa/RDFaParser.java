@@ -562,7 +562,7 @@ public class RDFaParser extends AbstractRDFParser {
                 } else {
                     String contentString = this.currentProcessingContext().getCharacters().trim();
                     if(! contentString.isEmpty()) {
-                        this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                        this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
                         this.clearAllCharactersBuffers();
                     }
                 }
@@ -570,13 +570,14 @@ public class RDFaParser extends AbstractRDFParser {
                 // The actual literal is either the value of @content (if present) or a string created by concatenating the value of all descendant text nodes, of the current element in turn.
             } else if (isAttributePresent(RDFaAttributes.DATATYPE)
                     && getAttributeStringValue(RDFaAttributes.DATATYPE).isEmpty()) {
+                IRI datatypeIRI = (IRI) getAttributeResourceValue(RDFaAttributes.DATATYPE);
                 if (isAttributePresent(RDFaAttributes.CONTENT)) {
                     String contentString = this.currentElementAttributes().getValue(RDFaAttributes.CONTENT.getName());
-                    this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                    this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
                 } else {
                         String contentString = this.currentProcessingContext().getCharacters().trim();
                     if(! contentString.isEmpty()) {
-                        this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                        this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
                         this.clearAllCharactersBuffers();
                     }
                 }
