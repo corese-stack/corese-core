@@ -21,7 +21,6 @@ public class RDFaProcessingContext {
     private Resource newSubject = null;
     private Resource currentObjectResource = null;
     private Resource typedResource = null;
-    private Map<String, IRI> iRIMappings = new HashMap<>();
     private Set<RDFaIncompleteStatement> incompleteStatements = null;
     private Map<IRI, Set<Value>> listMappings = new HashMap<>();
     private String currentLanguage = null;
@@ -50,7 +49,6 @@ public class RDFaProcessingContext {
         this.newSubject = null;
         this.currentObjectResource = null;
         this.typedResource = null;
-        this.iRIMappings = context.getIriMappings();
         this.incompleteStatements = context.getIncompleteStatement();
         this.listMappings = context.getListMappings();
         this.currentLanguage = context.getLanguage();
@@ -63,7 +61,6 @@ public class RDFaProcessingContext {
         this.newSubject = other.newSubject;
         this.currentObjectResource = other.currentObjectResource;
         this.typedResource = other.typedResource;
-        this.iRIMappings = other.iRIMappings;
         this.incompleteStatements = other.incompleteStatements;
         this.listMappings = other.listMappings;
         this.currentLanguage = other.currentLanguage;
@@ -101,21 +98,6 @@ public class RDFaProcessingContext {
 
     public void setTypedResource(Resource typedResource) {
         this.typedResource = typedResource;
-    }
-
-    public Map<String, IRI> getIRIMappings() {
-        return iRIMappings;
-    }
-
-    public void setIRIMappings(Map<String, IRI> iRIMappings) {
-        this.iRIMappings = iRIMappings;
-    }
-
-    public void addIRIMappings(String key, IRI value) {
-        if(this.iRIMappings == null) {
-            this.iRIMappings = new HashMap<>();
-        }
-        this.iRIMappings.put(key, value);
     }
 
     public Set<RDFaIncompleteStatement> getIncompleteStatements() {

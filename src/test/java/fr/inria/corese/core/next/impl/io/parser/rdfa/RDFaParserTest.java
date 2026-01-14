@@ -194,7 +194,7 @@ class RDFaParserTest {
         String testDataString = """
                 <html>
                   <head>
-                  <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
+                    <meta xmlns:dbp="http://dbpedia.org/property/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#"></meta>
                   </head>
                   <body>
                     <div about="http://dbpedia.org/resource/Albert_Einstein">

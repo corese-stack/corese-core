@@ -46,6 +46,11 @@ public class RDFaParser extends AbstractRDFParser {
     private String baseIri = SerializationConstants.getDefaultBaseURI();
 
     /**
+     * An index of IRI prefixes
+     */
+    private Map<String, IRI> iriMappings = new HashMap<>();
+
+    /**
      * Buffer/Pile of local value to adapt the parsing algorithm to SAX processing
      */
     private final LinkedList<RDFaProcessingContext> processingContexts = new LinkedList<>();
@@ -58,6 +63,11 @@ public class RDFaParser extends AbstractRDFParser {
         super(model, factory, config);
         if (getConfig() instanceof BaseIRIOptions baseIRIOptions) {
             this.baseIri = baseIRIOptions.getBaseIRI();
+
+        }
+        // Initializing the iri mappings with the default prefixes as defined by https://www.w3.org/TR/rdfa-core/#xmlrdfaconformance
+        for (RDFaInitialPrefixes prefixObject : RDFaInitialPrefixes.values()) {
+            this.addIriMapping(prefixObject.getPrefix(), getValueFactory().createIRI(prefixObject.getName()));
         }
     }
 
@@ -96,7 +106,7 @@ public class RDFaParser extends AbstractRDFParser {
 
     private void addPrefix(String prefix, String uri) {
         IRI prefixIRI = getValueFactory().createIRI(uri);
-        currentProcessingContext().getEvaluationContext().addIriMapping(prefix, prefixIRI);
+        this.addIriMapping(prefix, prefixIRI);
     }
 
     /**
@@ -118,12 +128,12 @@ public class RDFaParser extends AbstractRDFParser {
             processingContext = new RDFaProcessingContext(currentProcessingContext().getEvaluationContext());
             processingContext.setElementAttributes(attrs);
             processingContext.setRootElement(false);
+            this.setIriMappings(this.getIriMappings());
             // 13. Next, all elements that are children of the current element are processed using the rules described here, using a new evaluation context, initialized as follows:
             // If the skip element flag is 'true' then the new evaluation context is a copy of the current context that was passed in to this level of processing, with the language and list of IRI mappings values replaced with the local values;
             if (this.currentProcessingContext().isSkipElement()) {
                 processingContext.setEvaluationContext(new RDFaEvaluationContext(currentProcessingContext().getEvaluationContext()));
                 processingContext.getEvaluationContext().setLanguage(this.currentProcessingContext().getCurrentLanguage());
-                processingContext.getEvaluationContext().setIriMappings(this.currentProcessingContext().getIRIMappings());
                 // Otherwise, the values are:
             } else {
                 Resource oldParentSubject = currentProcessingContext().getEvaluationContext().getParentSubjectResource();
@@ -142,8 +152,6 @@ public class RDFaParser extends AbstractRDFParser {
                     processingContext.getEvaluationContext().setParentObjectResource(oldParentSubject);
                 }
                 logger.info("13 context parent object resource: {}", currentProcessingContext().getEvaluationContext().getParentObjectResource());
-                // the list of IRI mappings is set to the local list of IRI mappings;
-                processingContext.getEvaluationContext().setIriMappings(this.currentProcessingContext().getIRIMappings());
                 // the list of incomplete triples is set to the local list of incomplete triples;
                 processingContext.getEvaluationContext().setIncompleteStatements(this.currentProcessingContext().getIncompleteStatements());
                 // the list mapping is set to the local list mapping;
@@ -194,13 +202,13 @@ public class RDFaParser extends AbstractRDFParser {
         // 3. The current element is examined for IRI mappings and these are added to the local list of IRI mappings. Note that an IRI mapping will simply overwrite any current mapping in the list that has the same name;
         for (int i = 0; i < this.currentElementAttributes().getLength(); i++) {
             String attribute = this.currentElementAttributes().getQName(i);
-//            logger.info("3 {} attribute: {}", qName, attribute);
+            logger.info("3 {} attribute: {}", qName, attribute);
             if (attribute.startsWith(XMLNS_PREFIX)) {
                 String attributeValue = this.currentElementAttributes().getValue(i);
                 String prefixName = attribute.replace(XMLNS_PREFIX + ":", "");
-//                logger.info("3 {} {} : {}", prefixName, attributeValue);
+                logger.info("3 {} {} : {}", qName, prefixName, attributeValue);
                 IRI prefixNamespace = getValueFactory().createIRI(attributeValue, "");
-                this.currentProcessingContext().addIRIMappings(prefixName, prefixNamespace);
+                this.addIriMapping(prefixName, prefixNamespace);
             }
         }
         if (isAttributePresent(RDFaAttributes.PREFIX)
@@ -208,10 +216,10 @@ public class RDFaParser extends AbstractRDFParser {
             String prefixDeclaration = getAttributeStringValue(RDFaAttributes.PREFIX);
             String prefixName = getPrefixFromDeclaration(prefixDeclaration);
             IRI prefixIRI = getPrefixIriFromDeclaration(prefixDeclaration);
-            this.currentProcessingContext().addIRIMappings(prefixName, prefixIRI);
+            this.addIriMapping(prefixName, prefixIRI);
         }
 
-//        logger.info("3 {} {}", qName, this.currentProcessingContext());
+        logger.info("3 {} {}", qName, this.currentProcessingContext());
 
         // 4. The current element is also parsed for any language information, and if present, current language is set accordingly;
         // Host Languages that incorporate RDFa MAY provide a mechanism for specifying the natural language of an element and its contents (e.g., XML provides the general-purpose XML attribute @xml:lang).
@@ -737,18 +745,18 @@ public class RDFaParser extends AbstractRDFParser {
             String prefixString = resultString.substring(0, colonIndex);
             String localNameString = resultString.substring(colonIndex + 1);
             // Basic resolution following https://www.w3.org/TR/rdfa-syntax/#s_convertingcurietouri
-            if (currentProcessingContext().getEvaluationContext().hasIriMapping(prefixString)) {
-                IRI namespaceIRI = currentProcessingContext().getEvaluationContext().getIriMapping(prefixString);
+            if (this.hasIriMapping(prefixString)) {
+                IRI namespaceIRI = this.getIriMapping(prefixString);
 
                 return Optional.of(this.getValueFactory().createIRI(namespaceIRI.stringValue(), localNameString));
-            } else if (this.currentProcessingContext().getIRIMappings().containsKey(prefixString)) {
-                IRI namespaceIRI = this.currentProcessingContext().getIRIMappings().get(prefixString);
+            } else if (this.getIriMappings().containsKey(prefixString)) {
+                IRI namespaceIRI = this.getIriMappings().get(prefixString);
 
                 return Optional.of(this.getValueFactory().createIRI(namespaceIRI.stringValue(), localNameString));
             } else if (prefixString.isEmpty()) { // CURIE is relative to the base URI
                 return Optional.of(this.getValueFactory().createIRI(currentProcessingContext().getEvaluationContext().getBaseIri().stringValue(), localNameString));
             } else {
-                throw new ParsingErrorException("CURIE " + stringResource + " uses unknown prefix among " + this.currentProcessingContext().getEvaluationContext().getIriMappings() + " and " + this.currentProcessingContext().getIRIMappings());
+                throw new ParsingErrorException("CURIE " + stringResource + " uses unknown prefix among " + this.getIriMappings().keySet() + " and " + this.getIriMappings().keySet());
             }
         } else if (IRIUtils.isStandardIRI(resultString)) {  // Full IRI
             return Optional.of(this.getValueFactory().createIRI(resultString));
@@ -784,10 +792,6 @@ public class RDFaParser extends AbstractRDFParser {
     }
 
     private void initializeEvaluationContextMappings(RDFaEvaluationContext context) {
-        // Initializing the iri mappings with the default prefixes as defined by https://www.w3.org/TR/rdfa-core/#xmlrdfaconformance
-        for (RDFaInitialPrefixes prefixObject : RDFaInitialPrefixes.values()) {
-            context.addIriMapping(prefixObject.getPrefix(), getValueFactory().createIRI(prefixObject.getName()));
-        }
 
         // <a href="https://www.w3.org/2011/rdfa-context/rdfa-1.1">https://www.w3.org/2011/rdfa-context/rdfa-1.1</a> sets a list of predefined terms mappings for RDFa contexts.
         context.addTermMapping("describedby", getValueFactory().createIRI("http://www.w3.org/2007/05/powder-s#describedby"));
@@ -795,17 +799,37 @@ public class RDFaParser extends AbstractRDFParser {
         context.addTermMapping("role", getValueFactory().createIRI("http://www.w3.org/1999/xhtml/vocab#role"));
     }
 
-    private String debugAttributesToString() {
-        StringBuilder sb = new StringBuilder();
+    private Map<String, IRI> getIriMappings() {
+        return iriMappings;
+    }
 
-        if (this.currentElementAttributes() != null) {
-            for (int i = 0; i < this.currentElementAttributes().getLength(); i++) {
-                String attributeLocalName = this.currentElementAttributes().getQName(i);
-                String attributeValue = this.currentElementAttributes().getValue(i);
-                sb.append(attributeLocalName).append(" : ").append(attributeValue).append(" ");
-            }
+    private void setIriMappings(Map<String, IRI> iriMappings) {
+        this.iriMappings = iriMappings;
+    }
+
+    private boolean hasIriMapping(String prefix) {
+        return this.iriMappings.containsKey(prefix);
+    }
+
+    /**
+     * @param prefix the prefix WITHOUT ":"
+     * @return the IRI associated to the prefix in this context
+     */
+    private IRI getIriMapping(String prefix) {
+        return this.iriMappings.get(prefix);
+    }
+
+    private void addIriMapping(String prefix, IRI prefixIri) {
+        this.iriMappings.put(prefix, prefixIri);
+    }
+
+    private void addIriMappings(Map<String, IRI> otherMappings) {
+        if(otherMappings != null) {
+            this.iriMappings.putAll(otherMappings);
         }
+    }
 
-        return sb.toString();
+    private void clearIriMappings() {
+        this.iriMappings.clear();
     }
 }

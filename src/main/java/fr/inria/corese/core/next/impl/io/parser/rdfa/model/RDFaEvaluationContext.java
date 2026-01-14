@@ -27,11 +27,6 @@ public class RDFaEvaluationContext  {
     private Resource parentObjectResource = null;
 
     /**
-     * An index of locally defined IRI prefixes
-     */
-    private Map<String, IRI> iriMappings = new HashMap<>();
-
-    /**
      * Set of statement in the process of building.
      */
     private Set<RDFaIncompleteStatement> incompleteStatement = new HashSet<>();
@@ -62,7 +57,6 @@ public class RDFaEvaluationContext  {
         this.baseIri = context.baseIri;
         this.defaultVocabulary = context.defaultVocabulary;
         this.incompleteStatement = new HashSet<>(context.incompleteStatement);
-        this.iriMappings = new HashMap<>(context.iriMappings);
         this.language = context.language;
         this.listMappings = new HashMap<>(context.listMappings);
         this.parentObjectResource = context.parentObjectResource;
@@ -92,40 +86,6 @@ public class RDFaEvaluationContext  {
 
     public void setParentObjectResource(Resource parentObjectResource) {
         this.parentObjectResource = parentObjectResource;
-    }
-
-    public Map<String, IRI> getIriMappings() {
-        return iriMappings;
-    }
-
-    public void setIriMappings(Map<String, IRI> iriMappings) {
-        this.iriMappings = iriMappings;
-    }
-
-    public boolean hasIriMapping(String prefix) {
-        return this.iriMappings.containsKey(prefix);
-    }
-
-    /**
-     * @param prefix the prefix WITHOUT ":"
-     * @return the IRI associated to the prefix in this context
-     */
-    public IRI getIriMapping(String prefix) {
-        return this.iriMappings.get(prefix);
-    }
-
-    public void addIriMapping(String prefix, IRI prefixIri) {
-        this.iriMappings.put(prefix, prefixIri);
-    }
-
-    public void addIriMappings(Map<String, IRI> otherMappings) {
-        if(otherMappings != null) {
-            this.iriMappings.putAll(otherMappings);
-        }
-    }
-
-    public void clearIriMappings() {
-        this.iriMappings.clear();
     }
 
     public Set<RDFaIncompleteStatement> getIncompleteStatement() {
@@ -197,10 +157,6 @@ public class RDFaEvaluationContext  {
         StringBuilder sb = new StringBuilder();
 
         sb.append("BaseURI: ").append(this.getBaseIri().stringValue()).append(" ");
-        sb.append("Mappings: [");
-//        this.getIriMappings().forEach((key, value) -> sb.append("(").append(key).append(", ").append(value.stringValue()).append(") "));
-        sb.append(this.iriMappings.size());
-        sb.append("] ");
         if(this.getParentSubjectResource() != null) {
             sb.append("Subject:").append(this.getParentSubjectResource().stringValue()).append(" ");
         } else {
