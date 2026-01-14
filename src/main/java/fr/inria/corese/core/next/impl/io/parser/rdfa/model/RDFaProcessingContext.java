@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Corresponds to the local values for the valuation of an element and the current context at the moment of its evaluation
+ * Corresponds to the local values for the processing of an element and the current context at the moment of its evaluation
  */
 public class RDFaProcessingContext {
 
@@ -26,7 +26,7 @@ public class RDFaProcessingContext {
     private String currentLanguage = null;
     private Value currentPropertyValue = null;
     private String defaultVocabulary = null;
-    private Attributes elementAttributes = null;
+    private Map<String, String> elementAttributes = new HashMap<>();
 
     /**
      * Buffer for accumulating character data between start and end tags.
@@ -36,9 +36,6 @@ public class RDFaProcessingContext {
     private boolean isRootElement = true;
 
     private RDFaEvaluationContext evaluationContext = null;
-
-    public RDFaProcessingContext() {
-    }
 
     /**
      * Constructor to be used in step 1 of RDFa processing
@@ -167,6 +164,7 @@ public class RDFaProcessingContext {
         sb.append("defaultVocabulary: ").append(this.defaultVocabulary).append(" ");
         sb.append("characters: ").append(this.getCharacters().trim()).append(" ");
         sb.append("Evaluation context: ").append(this.getEvaluationContext()).append(" ");
+        sb.append("Attributes: ").append(this.elementAttributes.keySet()).append(" ");
 
         return sb.toString();
     }
@@ -183,12 +181,14 @@ public class RDFaProcessingContext {
         this.characters.append(ch, start, length);
     }
 
-    public Attributes getElementAttributes() {
+    public Map<String, String> getElementAttributes() {
         return elementAttributes;
     }
 
     public void setElementAttributes(Attributes elementAttributes) {
-        this.elementAttributes = elementAttributes;
+        for(int i = 0; i < elementAttributes.getLength(); i++) {
+            this.elementAttributes.put(elementAttributes.getQName(i), elementAttributes.getValue(i));
+        }
     }
 
     public boolean isRootElement() {
