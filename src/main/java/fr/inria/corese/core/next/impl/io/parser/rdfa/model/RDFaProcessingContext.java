@@ -16,6 +16,7 @@ import java.util.Set;
 public class RDFaProcessingContext {
 
     // Local context
+    private String elementName = null;
     private boolean skipElement = false;
     private Resource newSubject = null;
     private Resource currentObjectResource = null;
@@ -26,7 +27,7 @@ public class RDFaProcessingContext {
     private String currentLanguage = null;
     private Value currentPropertyValue = null;
     private String defaultVocabulary = null;
-    private Attributes currentElementAttributes = null;
+    private Attributes elementAttributes = null;
 
     /**
      * Buffer for accumulating character data between start and end tags.
@@ -175,14 +176,14 @@ public class RDFaProcessingContext {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
+        sb.append(this.elementName).append(" ");
         sb.append("newSubject: ").append(this.newSubject).append(" ");
         sb.append("currentObjectResource: ").append(this.currentObjectResource).append(" ");
         sb.append("typedResource: ").append(this.typedResource).append(" ");
         sb.append("currentLanguage: ").append(this.currentLanguage).append(" ");
         sb.append("currentPropertyValue: ").append(this.currentPropertyValue).append(" ");
         sb.append("defaultVocabulary: ").append(this.defaultVocabulary).append(" ");
-        sb.append("characters: ").append(this.getCharacters()).append(" ");
+        sb.append("characters: ").append(this.getCharacters().trim()).append(" ");
         sb.append("Evaluation context: ").append(this.getEvaluationContext()).append(" ");
 
         return sb.toString();
@@ -200,12 +201,12 @@ public class RDFaProcessingContext {
         this.characters.append(ch, start, length);
     }
 
-    public Attributes getCurrentElementAttributes() {
-        return currentElementAttributes;
+    public Attributes getElementAttributes() {
+        return elementAttributes;
     }
 
-    public void setCurrentElementAttributes(Attributes currentElementAttributes) {
-        this.currentElementAttributes = currentElementAttributes;
+    public void setElementAttributes(Attributes elementAttributes) {
+        this.elementAttributes = elementAttributes;
     }
 
     public boolean isRootElement() {
@@ -222,5 +223,13 @@ public class RDFaProcessingContext {
 
     public void setEvaluationContext(RDFaEvaluationContext evaluationContext) {
         this.evaluationContext = evaluationContext;
+    }
+
+    public String getElementName() {
+        return elementName;
+    }
+
+    public void setElementName(String elementName) {
+        this.elementName = elementName;
     }
 }

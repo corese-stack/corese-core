@@ -60,14 +60,14 @@ public class RDFaEvaluationContext  {
 
     public RDFaEvaluationContext(RDFaEvaluationContext context) {
         this.baseIri = context.baseIri;
-        this.parentSubjectResource = context.parentSubjectResource;
-        this.parentObjectResource = context.parentObjectResource;
-        this.iriMappings = new HashMap<>(context.iriMappings);
+        this.defaultVocabulary = context.defaultVocabulary;
         this.incompleteStatement = new HashSet<>(context.incompleteStatement);
+        this.iriMappings = new HashMap<>(context.iriMappings);
         this.language = context.language;
         this.listMappings = new HashMap<>(context.listMappings);
+        this.parentObjectResource = context.parentObjectResource;
+        this.parentSubjectResource = context.parentSubjectResource;
         this.termMappings = new HashMap<>(context.termMappings);
-        this.defaultVocabulary = context.defaultVocabulary;;
     }
 
     public IRI getBaseIri() {
