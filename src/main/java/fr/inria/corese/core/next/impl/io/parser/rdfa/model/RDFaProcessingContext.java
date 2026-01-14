@@ -175,8 +175,8 @@ public class RDFaProcessingContext {
         return characters.toString();
     }
 
-    public void setCharacters(StringBuilder characters) {
-        this.characters = characters;
+    public void clearCharacters() {
+        this.characters = new StringBuilder();
     }
 
     public void addCharacters(char[] ch, int start, int length) {

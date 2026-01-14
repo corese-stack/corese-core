@@ -119,6 +119,12 @@ public class RDFaParser extends AbstractRDFParser {
         }
     }
 
+    private void clearAllCharactersBuffers() {
+        for (RDFaProcessingContext value : this.processingContexts) {
+            value.clearCharacters();
+        }
+    }
+
     private void startProcessElement(String uri, String localName, String qName, Attributes attrs) {
         logger.info("startProcessElement {}", qName);
 
@@ -555,7 +561,10 @@ public class RDFaParser extends AbstractRDFParser {
                     this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
                 } else {
                     String contentString = this.currentProcessingContext().getCharacters().trim();
-                    this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                    if(! contentString.isEmpty()) {
+                        this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                        this.clearAllCharactersBuffers();
+                    }
                 }
                 //  otherwise, as a plain literal if @datatype is present but has an empty value according to the section on CURIE and IRI Processing.
                 // The actual literal is either the value of @content (if present) or a string created by concatenating the value of all descendant text nodes, of the current element in turn.
@@ -565,8 +574,11 @@ public class RDFaParser extends AbstractRDFParser {
                     String contentString = this.currentElementAttributes().getValue(RDFaAttributes.CONTENT.getName());
                     this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
                 } else {
-                    String contentString = this.currentProcessingContext().getCharacters().trim();
-                    this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                        String contentString = this.currentProcessingContext().getCharacters().trim();
+                    if(! contentString.isEmpty()) {
+                        this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                        this.clearAllCharactersBuffers();
+                    }
                 }
                 // otherwise, as an XML literal if @datatype is present and is set to XMLLiteral in the vocabulary http://www.w3.org/1999/02/22-rdf-syntax-ns#.
                 // The value of the XML literal is a string created by serializing to text, all nodes that are descendants of the current element, i.e., not including the element itself, and giving it a datatype of XMLLiteral in the vocabulary http://www.w3.org/1999/02/22-rdf-syntax-ns#. The format of the resulting serialized content is as defined in Exclusive XML Canonicalization Version 1.0 [XML-EXC-C14N].
@@ -602,30 +614,35 @@ public class RDFaParser extends AbstractRDFParser {
                 // otherwise as a plain literal.
             } else {
                 String contentString = this.currentProcessingContext().getCharacters().trim();
-                // Additionally, if there is a value for current language then the value of the plain literal should include this language information, as described in [RDF-SYNTAX-GRAMMAR]. The actual literal is either the value of @content (if present) or a string created by concatenating the text content of each of the descendant elements of the current element in document order.
-                if (this.currentProcessingContext().getCurrentLanguage() != null
-                        && !this.currentProcessingContext().getCurrentLanguage().isEmpty()) {
-                    this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, this.currentProcessingContext().getCurrentLanguage()));
-                } else {
-                    this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                if(! contentString.isEmpty()) {
+                    // Additionally, if there is a value for current language then the value of the plain literal should include this language information, as described in [RDF-SYNTAX-GRAMMAR]. The actual literal is either the value of @content (if present) or a string created by concatenating the text content of each of the descendant elements of the current element in document order.
+                    if (this.currentProcessingContext().getCurrentLanguage() != null
+                            && !this.currentProcessingContext().getCurrentLanguage().isEmpty()) {
+                        this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, this.currentProcessingContext().getCurrentLanguage()));
+                    } else {
+                        this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString));
+                    }
+                    this.clearAllCharactersBuffers();
                 }
             }
 
             // The current property value is then used with each predicate as follows:
             // If the element also includes the @inlist attribute, the current property value is added to the local list mapping as follows:
-            if (isAttributePresent(RDFaAttributes.INLIST)) {
-                // if the local list mapping does not contain a list associated with the predicate IRI, instantiate a new list and add to local list mappings
-                if (!this.currentProcessingContext().getListMappings().containsKey(propertyIRI)) {
-                    this.currentProcessingContext().addListMappings(propertyIRI, new HashSet<>());
+            if(this.currentProcessingContext().getCurrentPropertyValue() != null) {
+                if (isAttributePresent(RDFaAttributes.INLIST)) {
+                    // if the local list mapping does not contain a list associated with the predicate IRI, instantiate a new list and add to local list mappings
+                    if (!this.currentProcessingContext().getListMappings().containsKey(propertyIRI)) {
+                        this.currentProcessingContext().addListMappings(propertyIRI, new HashSet<>());
+                    }
+                    // add the current property value to the list associated with the predicate IRI in the local list mapping
+                    this.currentProcessingContext().addListMapping(propertyIRI, this.currentProcessingContext().getCurrentPropertyValue());
+                    // Otherwise the current property value is used to generate a triple as follows:
+                    // subject new subject
+                    // predicate full IRI
+                    // object current property value
+                } else {
+                    this.getModel().add(this.currentProcessingContext().getNewSubject(), propertyIRI, this.currentProcessingContext().getCurrentPropertyValue());
                 }
-                // add the current property value to the list associated with the predicate IRI in the local list mapping
-                this.currentProcessingContext().addListMapping(propertyIRI, this.currentProcessingContext().getCurrentPropertyValue());
-                // Otherwise the current property value is used to generate a triple as follows:
-                // subject new subject
-                // predicate full IRI
-                // object current property value
-            } else {
-                this.getModel().add(this.currentProcessingContext().getNewSubject(), propertyIRI, this.currentProcessingContext().getCurrentPropertyValue());
             }
         }
 

@@ -384,6 +384,9 @@ class RDFaParserTest {
 
         referenceModel.add(aeDateOfBirthStatement);
 
+        logModelContent(referenceModel);
+        logModelContent(testModel);
+
         assertEquals(1, testModel.size());
         assertEquals(referenceModel.size(), testModel.size());
         Iterator<Statement> itStatementRef = referenceModel.iterator();
