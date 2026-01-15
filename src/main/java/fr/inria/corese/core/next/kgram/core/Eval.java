@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.kgram.path.PathFinder;
 import fr.inria.corese.core.next.kgram.tool.ResultsImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.next.kgram.api.core.BindingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -216,7 +216,7 @@ public class Eval implements ExpType, Plugin {
         if (hasEvent) {
             send(Event.END, q, map);
         }
-        map.setBinding(getBind());
+        map.setBindingContext(getBind());
         clean();
         return map;
     }
@@ -627,11 +627,11 @@ public class Eval implements ExpType, Plugin {
         memory = mem;
     }
 
-    public Binding getBinding() {
+    public BindingContext getBinding() {
         return getEnvironment().getBind();
     }
 
-    public Binding getBind() {
+    public BindingContext getBind() {
         return getEnvironment().getBind();
     }
 
@@ -1351,7 +1351,6 @@ public class Eval implements ExpType, Plugin {
         }
     }
 
-    // evalWE clean the binding stack if an EngineException is thrown
     IDatatype eval(Filter f, Environment env, Producer p) {
         return f.getExp().evalWE(getEvaluator(), env.getBind(), env, p);
     }

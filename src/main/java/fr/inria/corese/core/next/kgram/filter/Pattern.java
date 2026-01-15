@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.kgram.filter;
 
+import fr.inria.corese.core.next.kgram.api.core.BindingContext;
 import fr.inria.corese.core.next.kgram.api.core.Expr;
 import fr.inria.corese.core.next.kgram.api.core.ExprType;
 import fr.inria.corese.core.next.kgram.api.core.Filter;
@@ -8,7 +9,6 @@ import fr.inria.corese.core.next.kgram.api.query.Producer;
 import fr.inria.corese.core.next.kgram.core.Exp;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -298,7 +298,7 @@ public class Pattern implements ExprType, Expr {
 	}
 
 	@Override
-	public IDatatype evalWE(Computer eval, Binding b, Environment env, Producer p)  {
+	public IDatatype evalWE(Computer eval, BindingContext b, Environment env, Producer p) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

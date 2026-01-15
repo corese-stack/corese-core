@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.next.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.next.kgram.tool.EnvironmentImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 import java.util.*;
@@ -52,7 +51,7 @@ public class Mapping
     private Node graphNode;
     // value of graph ?g variable when eval named graph pattern
     private Node targetGraphNode;
-    private Binding bind;
+    private BindingContext bindingContext;
     private Eval eval;
     private IDatatype report;
 
@@ -91,7 +90,7 @@ public class Mapping
         return new Mapping();
     }
 
-    public static Mapping create(Binding b) {
+    public static Mapping create(BindingContext b) {
         Mapping m = new Mapping();
         m.setBind(b);
         return m;
@@ -121,16 +120,35 @@ public class Mapping
      * function us:fun(?x){let (select ?x where {}) {}}
      * variable ?x appears twice in the stack because it is redefined in the let clause
      */
-    public static Mapping create(Query q, Binding b) {
+    public static Mapping create(Query q, BindingContext b) {
+        if (b instanceof fr.inria.corese.core.next.kgram.adapter.BindingAdapter) {
+            fr.inria.corese.core.sparql.triple.function.term.Binding binding =
+                    ((fr.inria.corese.core.next.kgram.adapter.BindingAdapter) b).delegate();
+
+            ArrayList<Node> lvar = new ArrayList<>();
+            ArrayList<Node> lval = new ArrayList<>();
+            for (fr.inria.corese.core.kgram.api.core.Expr varExpr : binding.getVariables()) {
+                Node node = q.getProperAndSubSelectNode(varExpr.getLabel());
+                if (node != null && !lvar.contains(node)) {
+                    lvar.add(node);
+                    lval.add((Node) binding.get(varExpr));
+                }
+            }
+            return Mapping.create(lvar, lval);
+        }
+
         ArrayList<Node> lvar = new ArrayList<>();
         ArrayList<Node> lval = new ArrayList<>();
-        for (fr.inria.corese.core.kgram.api.core.Expr varExpr : b.getVariables()) {
-            Node node = q.getProperAndSubSelectNode(varExpr.getLabel());
+
+        for (Map.Entry<String, Node> entry : b.getBindings().entrySet()) {
+            String varLabel = entry.getKey();
+            Node node = q.getProperAndSubSelectNode(varLabel);
             if (node != null && !lvar.contains(node)) {
                 lvar.add(node);
-                lval.add((Node) b.get(varExpr));
+                lval.add(entry.getValue());
             }
         }
+
         return Mapping.create(lvar, lval);
     }
 
@@ -1031,18 +1049,18 @@ public class Mapping
     }
 
     @Override
-    public Binding getBind() {
-        return bind;
+    public BindingContext getBind() {
+        return bindingContext;
     }
 
     @Override
-    public void setBind(Binding b) {
-        bind = b;
+    public void setBind(BindingContext b) {
+        bindingContext = b;
     }
 
     @Override
     public boolean hasBind() {
-        return bind != null && bind.hasBind();
+        return bindingContext != null && bindingContext.hasBind();
     }
 
     @Override
@@ -1051,7 +1069,7 @@ public class Mapping
             Eval.logger.error("Mapping unbound ldscript variable: {}", varExpr);
             return null;
         }
-        return (Node) getBind().get((fr.inria.corese.core.kgram.api.core.Expr) varExpr);
+        return (Node) getBind().get(varExpr);
     }
 
     @Override

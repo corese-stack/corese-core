@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.kgram.tool;
 
+import fr.inria.corese.core.next.kgram.api.core.BindingContext;
 import fr.inria.corese.core.next.kgram.api.core.Edge;
 import fr.inria.corese.core.next.kgram.api.core.Expr;
 import fr.inria.corese.core.next.kgram.api.core.Node;
@@ -163,7 +164,7 @@ public class EnvironmentImpl implements Environment {
     }
 
     @Override
-    public Binding getBind() {
+    public BindingContext  getBind() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -179,7 +180,7 @@ public class EnvironmentImpl implements Environment {
     }
 
     @Override
-    public void setBind(Binding b) {
+    public void setBind(BindingContext b) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
