@@ -23,7 +23,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Olivier Corby, Wimmics Inria I3S, 2013
  *
+ * @deprecated
+ * This class should be removed as requires SPIN which should also be removed.
+ * The remaining uses of this class should be removed when re-structure of SPARQL is done
  */
+@Deprecated
 public class SPINProcess {
 
     Graph graph;
@@ -34,10 +38,12 @@ public class SPINProcess {
     // use case: W3C test case query have the query location path as default base
     private String defaultBase;
 
-    public static SPINProcess create() {
+    @Deprecated
+   public static SPINProcess create() {
         return new SPINProcess();
     }
 
+    @Deprecated
     SPINProcess() {
         exec = QueryProcess.create(Graph.create());
     }
@@ -46,6 +52,7 @@ public class SPINProcess {
      * PPrint SPARQL query into SPIN Turtle using Visitor, parse SPIN Turtle
      * into RDF Graph, PPrint RDF graph using templates back into SPARQL
      */
+    @Deprecated
     public String toSpinSparql(String sparql) throws EngineException {
         Query qq = exec.compile(sparql);
         if (isSPARQLCompliant && !qq.isCorrect()) {
@@ -54,10 +61,12 @@ public class SPINProcess {
         return toSpinSparql(exec.getAST(qq));
     }
 
+    @Deprecated
     public String toSpin(String sparql) throws EngineException {
         return toSpin(sparql, true);
     }
 
+    @Deprecated
     public String toSpin(String sparql, boolean nsm) throws EngineException {
         Query qq = exec.compile(sparql);
         ASTQuery ast = exec.getAST(qq);
@@ -67,20 +76,24 @@ public class SPINProcess {
         return sp.toString();
     }
 
+    @Deprecated
     public Graph toSpinGraph(String sparql) throws EngineException {
         return toGraph(toSpin(sparql));
     }
 
+    @Deprecated
     public String toSpin(ASTQuery ast, String src) throws EngineException {
         SPIN sp = SPIN.create();
         sp.visit(ast, src);
         return sp.toString();
     }
 
+    @Deprecated
     public Graph toSpinGraph(ASTQuery ast) throws EngineException {
         return toGraph(toSpin(ast, null), Graph.create());
     }
 
+    @Deprecated
     String toSpinSparql(ASTQuery ast) throws EngineException {
         SPIN sp = SPIN.create();
         sp.visit(ast);
@@ -88,11 +101,13 @@ public class SPINProcess {
         return toSparql(spin, ast.getNSM());
     }
 
+    @Deprecated
     public Graph toGraph(String spin) {
         graph = Graph.create();
         return toGraph(spin, graph);
     }
 
+    @Deprecated
     public Graph toGraph(String spin, Graph g) {
         Load ld = Load.create(g);
         try {
@@ -103,11 +118,13 @@ public class SPINProcess {
         return g;
     }
 
+    @Deprecated
     public String toSparql(String spin, NSManager nsm) throws EngineException {
         Graph g = toGraph(spin);
         return toSparql(g, nsm);
     }
 
+    @Deprecated
     public String toSparql(Graph g, NSManager nsm) throws EngineException {
         Transformer p = Transformer.create(g, TransformerUtils.SPIN);
         if (nsm != null) {
@@ -124,6 +141,7 @@ public class SPINProcess {
     /**
      * @param nsm the nsm to set
      */
+    @Deprecated
     public void setNSM(NSManager nsm) {
         this.nsm = nsm;
     }
