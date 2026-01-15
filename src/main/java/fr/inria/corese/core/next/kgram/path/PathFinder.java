@@ -12,7 +12,6 @@ import fr.inria.corese.core.next.kgram.core.*;
 import fr.inria.corese.core.next.kgram.event.EventManager;
 import fr.inria.corese.core.next.kgram.event.ResultListener;
 import fr.inria.corese.core.next.kgram.tool.EdgeInv;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -492,7 +491,7 @@ public class PathFinder {
         try {
             node = (Node) f.getExp().evalWE(evaluator, memory.getBind(), memory, producer);
             node.setObject(p);
-        } catch (EngineException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return node;
@@ -580,7 +579,7 @@ public class PathFinder {
         boolean test;
         try {
             test = filter.getExp().test(evaluator, mem.getBind(), mem, producer);
-        } catch (EngineException ex) {
+        } catch (Exception ex) {
             test = false;
         }
         mem.pop(qNode);
@@ -596,7 +595,7 @@ public class PathFinder {
         boolean test;
         try {
             test = filter.getExp().test(evaluator, mem.getBind(), mem, producer);
-        } catch (EngineException ex) {
+        } catch (Exception ex) {
             test = false;
         }
         mem.pop(qNode);

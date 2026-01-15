@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.kgram.api.query.Producer;
 import fr.inria.corese.core.next.kgram.core.Exp;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
 import java.util.ArrayList;
@@ -299,7 +298,7 @@ public class Pattern implements ExprType, Expr {
 	}
 
 	@Override
-	public IDatatype evalWE(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
+	public IDatatype evalWE(Computer eval, Binding b, Environment env, Producer p)  {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

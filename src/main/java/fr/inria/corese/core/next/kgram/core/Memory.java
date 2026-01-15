@@ -6,7 +6,6 @@ import fr.inria.corese.core.next.kgram.event.EventManager;
 import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.next.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
@@ -332,7 +331,7 @@ public class Memory extends PointerObject implements Environment {
         }
     }
 
-    Mapping store(Query q, Producer p, boolean subEval) throws EngineException {
+    Mapping store(Query q, Producer p, boolean subEval) throws SparqlException {
         return store(query, p, subEval, false);
     }
 
@@ -341,7 +340,7 @@ public class Memory extends PointerObject implements Environment {
      * in this case: no select exp, no order by, no group by, etc
      * subEval = false: main or nested select query.
      */
-    Mapping store(Query q, Producer p, boolean subEval, boolean func) throws EngineException {
+    Mapping store(Query q, Producer p, boolean subEval, boolean func) throws SparqlException {
         boolean complete = !q.getGlobalQuery().isAlgebra();
 
         Node detailNode = null;
@@ -522,7 +521,7 @@ public class Memory extends PointerObject implements Environment {
         bnode = m;
     }
 
-    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p) throws EngineException {
+    void orderGroup(List<Exp> lExp, Node[] nodes, Producer p) throws SparqlException {
         int n = 0;
         for (Exp e : lExp) {
             Node qNode = e.getNode();
