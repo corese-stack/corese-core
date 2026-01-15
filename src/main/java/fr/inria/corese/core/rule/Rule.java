@@ -11,7 +11,6 @@ import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.logic.Closure;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.function.core.UUIDFunction;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.util.SPINProcess;
@@ -84,9 +83,11 @@ public class Rule {
         return new Rule(n, q, type);
     }
 
-    public static Rule create(Query q) {
+    /* --- dead code removal ---
+public static Rule create(Query q) {
         return new Rule(UUIDFunction.getUUID(), q);
     }
+ --- dead code removal --- */
 
     void set(List<Node> list) {
         predicates = list;
@@ -116,9 +117,10 @@ public class Rule {
         num = n;
     }
 
-    /**
+    /* --- dead code removal ---
+/**
      * Index of edge with predicate p If there is only one occurrence of p
-     */
+     *_/
     public int getIndex(Node p) {
 
         return -1;
@@ -131,6 +133,7 @@ public class Rule {
     void setGeneric(boolean b) {
         isGeneric = true;
     }
+ --- dead code removal --- */
 
     public int type() {
         if (rtype == UNDEF) {
@@ -260,19 +263,21 @@ public class Rule {
         ruleRecord = null;
     }
 
-    /**
+    /* --- dead code removal ---
+/**
      * @return the time
-     */
+     *_/
     public double getTime() {
         return time;
     }
 
     /**
      * @param time the time to set
-     */
+     *_/
     public void setTime(double time) {
         this.time = time;
     }
+ --- dead code removal --- */
 
     /**
      * @return the provenance
@@ -302,9 +307,11 @@ public class Rule {
         this.ruleRecord = ruleRecord;
     }
 
-    public String getRuleType() {
+    /* --- dead code removal ---
+public String getRuleType() {
         return type;
     }
+ --- dead code removal --- */
 
     /**
      * @param type the type to set
