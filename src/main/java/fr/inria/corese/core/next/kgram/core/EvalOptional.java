@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.kgram.core;
 import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.api.query.Environment;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 import static fr.inria.corese.core.next.kgram.core.Eval.STOP;
 
@@ -40,7 +39,7 @@ public class EvalOptional {
      * if m1.compatible(m2): merge = m1.merge(m2) if eval(F(merge)) result +=
      * merge ...
      */
-    int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException, EngineException {
+    int eval(Producer p, Node graphNode, Exp exp, Mappings data, Stack stack, int n) throws SparqlException {
         int backtrack = n - 1;
         Memory env = eval.getMemory();
 

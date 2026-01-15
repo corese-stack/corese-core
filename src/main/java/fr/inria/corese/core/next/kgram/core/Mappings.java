@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.kgram.event.Event;
 import fr.inria.corese.core.next.kgram.event.EventImpl;
 import fr.inria.corese.core.next.kgram.event.EventManager;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Context;
@@ -737,17 +736,17 @@ public class Mappings extends PointerObject
      * Mappings for each kind of aggregate we could enumerate Mappings once and
      * compute all aggregates for each map
      */
-    public void aggregate(Query q, Evaluator evaluator, Environment env, Producer p) throws SparqlException, EngineException {
+    public void aggregate(Query q, Evaluator evaluator, Environment env, Producer p) throws SparqlException {
         if (env instanceof Memory) {
             aggregate(q, evaluator, (Memory) env, p);
         }
     }
 
-    public void aggregate(Evaluator evaluator, Memory memory, Producer p) throws SparqlException, EngineException {
+    public void aggregate(Evaluator evaluator, Memory memory, Producer p) throws SparqlException {
         aggregate(getQuery(), evaluator, memory, p);
     }
 
-    public void aggregate(Query q, Evaluator evaluator, Memory memory, Producer p) throws SparqlException, EngineException {
+    public void aggregate(Query q, Evaluator evaluator, Memory memory, Producer p) throws SparqlException {
         if (size() == 0) {
             if (q.isAggregate()) {
                 // SPARQL semantics requires that aggregate empty result set return one empty result
@@ -780,7 +779,7 @@ public class Mappings extends PointerObject
      * select (aggregate() as ?c)
      * order by aggregate()
      */
-    void aggregateExpList(Query q, Evaluator evaluator, Memory memory, Producer p, List<Exp> list, boolean isSelect) throws SparqlException, EngineException {
+    void aggregateExpList(Query q, Evaluator evaluator, Memory memory, Producer p, List<Exp> list, boolean isSelect) throws SparqlException {
         int n = 0;
         for (Exp exp : list) {
             if (exp.isAggregate()) {
@@ -799,7 +798,7 @@ public class Mappings extends PointerObject
     /**
      * select count(?doc) as ?count group by ?person ?date order by ?count
      */
-    private void aggregateSwitch(Query q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException, EngineException {
+    private void aggregateSwitch(Query q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException {
         if (exp.isExpGroupBy()) {
             // min(?l, groupBy(?x, ?y)) as ?min
             evalGroupByExp(q, eval, exp, mem, p, n);
@@ -815,7 +814,7 @@ public class Mappings extends PointerObject
      * Compute select aggregate, order by aggregate and having on one group or on
      * whole result (in both case: this Mappings)
      */
-    private void aggregate(Query q, Evaluator eval, Exp exp, Memory memory, Producer p, int n) throws SparqlException, EngineException {
+    private void aggregate(Query q, Evaluator eval, Exp exp, Memory memory, Producer p, int n) throws SparqlException {
         // get first Mapping in current group
         Mapping firstMap = get(0);
         // bind the Mapping in memory to retrieve group by variables
@@ -865,14 +864,14 @@ public class Mappings extends PointerObject
         memory.pop(firstMap);
     }
 
-    Node eval(Filter f, Evaluator eval, Environment env, Producer p) throws SparqlException, EngineException {
+    Node eval(Filter f, Evaluator eval, Environment env, Producer p) throws SparqlException {
         return (Node) f.getExp().evalWE(eval, env.getBind(), env, p);
     }
 
     /**
      * Process aggregate for each group select, order by, having
      */
-    private void aggregateGroupMembers(Query q, Group group, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException, EngineException {
+    private void aggregateGroupMembers(Query q, Group group, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException {
         int mappingCount = 0;
         for (Mappings map : group.getValues()) {
             if (hasEvent) {
@@ -928,7 +927,7 @@ public class Mappings extends PointerObject
     }
 
     // min(?l, groupBy(?x, ?y)) as ?min
-    void evalGroupByExp(Query q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException, EngineException {
+    void evalGroupByExp(Query q, Evaluator eval, Exp exp, Memory mem, Producer p, int n) throws SparqlException {
         Group g = createGroup(exp);
         aggregateGroupMembers(q, g, eval, exp, mem, p, n);
         if (exp.isHaving()) {
@@ -944,7 +943,7 @@ public class Mappings extends PointerObject
      * exp : min(?l, groupBy(?x, ?y), (?l = ?min)) as ?min) test the filter,
      * remove Mappping that fail
      */
-    void having(Evaluator eval, Exp exp, Memory mem, Producer p, Group g) throws  EngineException {
+    void having(Evaluator eval, Exp exp, Memory mem, Producer p, Group g) {
         Filter f = exp.getHavingFilter();
         clear();
         for (Mappings lm : g.getValues()) {
@@ -961,11 +960,11 @@ public class Mappings extends PointerObject
     /**
      * Template perform additionnal group_concat(?out)
      */
-    void template(Evaluator eval, Memory mem, Producer p) throws SparqlException, EngineException {
+    void template(Evaluator eval, Memory mem, Producer p) throws SparqlException {
         template(eval, getQuery(), mem, p);
     }
 
-    void template(Evaluator eval, Query q, Memory mem, Producer p) throws SparqlException, EngineException {
+    void template(Evaluator eval, Query q, Memory mem, Producer p) throws SparqlException {
         if (q.isTemplate() && size() > 0 && !(isFake() && q.isTransformationTemplate())) {
             // fake in transformation template -> fail
             // fake in query template -> not fail
@@ -976,7 +975,7 @@ public class Mappings extends PointerObject
     /**
      * Template perform additionnal group_concat(?out)
      */
-    public Node apply(Evaluator eval, Exp exp, Memory memory, Producer p) throws SparqlException, EngineException {
+    public Node apply(Evaluator eval, Exp exp, Memory memory, Producer p) throws SparqlException {
         Mapping firstMap = get(0);
         // bind the Mapping in memory to retrieve group by variables
         memory.aggregate(firstMap);

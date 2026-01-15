@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.kgram.api.query.Environment;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
 import java.util.List;
@@ -101,9 +100,9 @@ public interface Expr {
 
     boolean hasMetadata(String name);
 
-    IDatatype evalWE(Computer eval, Binding b, Environment env, Producer p) throws EngineException;
+    IDatatype evalWE(Computer eval, Binding b, Environment env, Producer p) ;
 
-    default boolean test(Computer eval, Binding b, Environment env, Producer p) throws EngineException {
+    default boolean test(Computer eval, Binding b, Environment env, Producer p) {
         IDatatype dt = evalWE(eval, b, env, p);
         if (dt == null) {
             return false;
