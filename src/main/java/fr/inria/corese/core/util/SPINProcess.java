@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author Olivier Corby, Wimmics Inria I3S, 2013
  *
  * @deprecated
- * This class should be removed as requires SPIN which should also be removed.
+ * This class should be removed as it requires SPIN which should also be removed.
  * The remaining uses of this class should be removed when re-structure of SPARQL is done
  */
 @Deprecated
