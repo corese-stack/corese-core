@@ -12,7 +12,6 @@ import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.transform.Transformer;
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import fr.inria.corese.core.transform.TransformerUtils;
@@ -41,15 +40,6 @@ public class SPINProcess {
 
     SPINProcess() {
         exec = QueryProcess.create(Graph.create());
-    }
-
-    public Graph getGraph() {
-        return graph;
-    }
-
-    public void setDefaultBase(String str) {
-        defaultBase = str;
-        exec.setDefaultBase(str);
     }
 
     /**
@@ -81,22 +71,10 @@ public class SPINProcess {
         return toGraph(toSpin(sparql));
     }
 
-    public Graph toSpinGraph(String sparql, Graph g) throws EngineException {
-        return toGraph(toSpin(sparql), g);
-    }
-
-    public String toSpin(ASTQuery ast) throws EngineException {
-        return toSpin(ast, null);
-    }
-
     public String toSpin(ASTQuery ast, String src) throws EngineException {
         SPIN sp = SPIN.create();
         sp.visit(ast, src);
         return sp.toString();
-    }
-
-    public Graph toSpinGraph(ASTQuery ast, Graph g, String src) throws EngineException {
-        return toGraph(toSpin(ast, src), g);
     }
 
     public Graph toSpinGraph(ASTQuery ast) throws EngineException {
@@ -108,10 +86,6 @@ public class SPINProcess {
         sp.visit(ast);
         String spin = sp.toString();
         return toSparql(spin, ast.getNSM());
-    }
-
-    public String toSparql(String spin) throws EngineException {
-        return toSparql(spin, nsm);
     }
 
     public Graph toGraph(String spin) {
@@ -134,10 +108,6 @@ public class SPINProcess {
         return toSparql(g, nsm);
     }
 
-    public String toSparql(Graph g) throws EngineException {
-        return toSparql(g, nsm);
-    }
-
     public String toSparql(Graph g, NSManager nsm) throws EngineException {
         Transformer p = Transformer.create(g, TransformerUtils.SPIN);
         if (nsm != null) {
@@ -149,27 +119,6 @@ public class SPINProcess {
             throw new EngineException("Uncorrect SPIN Query");
         }
         return s;
-    }
-
-    /**
-     * @return the isSPARQLCompliant
-     */
-    public boolean isSPARQLCompliant() {
-        return isSPARQLCompliant;
-    }
-
-    /**
-     * @param isSPARQLCompliant the isSPARQLCompliant to set
-     */
-    public void setSPARQLCompliant(boolean isSPARQLCompliant) {
-        this.isSPARQLCompliant = isSPARQLCompliant;
-    }
-
-    /**
-     * @return the nsm
-     */
-    public NSManager getNSM() {
-        return nsm;
     }
 
     /**
