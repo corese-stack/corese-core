@@ -60,7 +60,7 @@ public class Memory extends PointerObject implements Environment {
     private IDatatype detail;
     private boolean isFake = false;
     private boolean isEdge = IS_EDGE;
-    private Binding bind;
+    private BindingContext bindingContext;
     private ApproximateSearchEnv appxSearchEnv;
 
     public Memory() {
@@ -288,7 +288,7 @@ public class Memory extends PointerObject implements Environment {
     /**
      * Share global variable, context, etc.
      */
-    public void share(Binding target, Binding source) {
+    public void share(BindingContext target, BindingContext source) {
         if (source != null && target != null) {
             target.share(source);
         }
@@ -308,6 +308,25 @@ public class Memory extends PointerObject implements Environment {
             Node qn = getNode(var.getLabel(), list);
             if (qn != null) {
                 push(qn, (Node) bind.get(var));
+            }
+        }
+    }
+
+    /**
+     * Copy this BindingContext local variable stack into this memory
+     */
+    void copy(BindingContext bindCtx, Exp exp) {
+        if (bindCtx instanceof fr.inria.corese.core.next.kgram.adapter.BindingAdapter) {
+            Binding binding = ((fr.inria.corese.core.next.kgram.adapter.BindingAdapter) bindCtx).delegate();
+            copy(binding, exp);
+        } else {
+            List<Node> list = exp.getNodes();
+            for (Map.Entry<String, Node> entry : bindCtx.getBindings().entrySet()) {
+                String varLabel = entry.getKey();
+                Node qn = getNode(varLabel, list);
+                if (qn != null) {
+                    push(qn, entry.getValue());
+                }
             }
         }
     }
@@ -1141,27 +1160,27 @@ public class Memory extends PointerObject implements Environment {
 
     @Override
     public Node get(Expr varExpr) {
-        return (Node) bind.get((fr.inria.corese.core.kgram.api.core.Expr) varExpr);
+        return (Node) bindingContext.get(varExpr);
     }
 
-    public Memory setBinding(Binding b) {
+    public Memory setBinding(BindingContext b) {
         setBind(b);
         return this;
     }
 
     @Override
-    public Binding getBind() {
-        return bind;
+    public BindingContext getBind() {
+        return bindingContext;
     }
 
     @Override
-    public void setBind(Binding b) {
-        bind = b;
+    public void setBind(BindingContext b) {
+        bindingContext = b;
     }
 
     @Override
     public boolean hasBind() {
-        return bind != null && bind.hasBind();
+        return bindingContext != null && bindingContext.hasBind();
     }
 
     @Override

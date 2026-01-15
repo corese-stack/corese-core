@@ -370,7 +370,7 @@ public class Binding implements Binder {
         valList.add(val); 
     }
     
-    void set(Expr var, IDatatype val) {
+    public void set(Expr var, IDatatype val) {
         int index = getIndex(var);
         varList.set(index, var);
         valList.set(index, val);

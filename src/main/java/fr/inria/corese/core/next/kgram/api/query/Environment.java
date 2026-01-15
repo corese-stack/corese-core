@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.kgram.api.query;
 
+import fr.inria.corese.core.next.kgram.api.core.BindingContext;
 import fr.inria.corese.core.next.kgram.api.core.Edge;
 import fr.inria.corese.core.next.kgram.api.core.Expr;
 import fr.inria.corese.core.next.kgram.api.core.Node;
@@ -8,7 +9,6 @@ import fr.inria.corese.core.next.kgram.event.EventManager;
 import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.next.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 import java.util.Map;
@@ -28,9 +28,9 @@ public interface Environment {
      */
     Query getQuery();
 
-    Binding getBind();
+    BindingContext getBind();
 
-    void setBind(Binding b);
+    void setBind(BindingContext b);
 
     boolean hasBind();
 

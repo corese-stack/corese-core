@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.kgram.event.Event;
 import fr.inria.corese.core.next.kgram.event.EventImpl;
 import fr.inria.corese.core.next.kgram.event.EventManager;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
@@ -73,7 +72,7 @@ public class Mappings extends PointerObject
     // parse error in service result
     private boolean error = false;
     // return Binding stack as part of result to share it
-    private Binding binding;
+    private BindingContext bindingContext;
     // Federate Service manage provenance
     private Object provenance;
     // Linked Result URL List
@@ -1462,12 +1461,12 @@ public class Mappings extends PointerObject
         this.nodeList = nodeList;
     }
 
-    public Binding getBinding() {
-        return binding;
+    public BindingContext getBindingContext() {
+        return bindingContext;
     }
 
-    public void setBinding(Binding binding) {
-        this.binding = binding;
+    public void setBindingContext(BindingContext ctx) {
+        bindingContext = ctx;
     }
 
     public boolean isError() {
