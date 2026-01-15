@@ -36,15 +36,11 @@ import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
-import fr.inria.corese.core.sparql.storage.api.IStorage;
-import fr.inria.corese.core.sparql.storage.util.StorageFactory;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.transform.TemplateVisitor;
-import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.GraphListen;
 import fr.inria.corese.core.util.MappingsGraph;
@@ -94,14 +90,16 @@ public class PluginImpl
     public static final String TRANSFORMER = EXT + "transformer";
     public static final String BINDING = EXT + "binding";
     public static final String DYNAMIC_CAPTURE = EXT + "dynamic";
-    private static final String NL = System.getProperty("line.separator");
+/* --- dead code removal ---
+    private static final String NL = System.getProperty("line.separator"); */
     private static final IDatatype SUB_CLASS_OF = DatatypeMap.newResource(RDFS.SUBCLASSOF);
     private static final String QM = "?";
     static public Logger logger = LoggerFactory.getLogger(PluginImpl.class);
     static String DEF_PPRINTER = TransformerUtils.PPRINTER;
     static int nbBufferedValue = 0;
+/* --- dead code removal ---
     // draft storage for large literal values (not used)
-    private static IStorage storageMgr;
+    private static IStorage storageMgr; */
     String PPRINTER = DEF_PPRINTER;
     MatcherImpl match;
     int index = 0;
@@ -303,6 +301,7 @@ public class PluginImpl
         return getValue(dd);
     }
 
+/* --- dead code removal ---
     // utility
     IDatatype ancestor(Graph g, IDatatype dt1, IDatatype dt2) {
         Node n1 = g.getNode(dt1);
@@ -328,6 +327,7 @@ public class PluginImpl
         double dd = distance.similarity(n1, n2);
         return getValue(dd);
     }
+ --- dead code removal --- */
 
     /**
      * Similarity of a query solution when @relax mode
@@ -902,6 +902,7 @@ public class PluginImpl
         return g.getNode(dt, false, false);
     }
 
+/* --- dead code removal ---
     IDatatype db(Environment env, Graph g) {
         ASTQuery ast = env.getQuery().getAST();
         String name = ast.getMetadataValue(Metadata.Type.DB);
@@ -912,6 +913,7 @@ public class PluginImpl
         Producer p = QueryProcess.getCreateProducer(g, QueryProcess.DB_FACTORY, name);
         return DatatypeMap.createObject(p);
     }
+ --- dead code removal --- */
 
     // function xt:sparql
     // xt:sparql(query)
@@ -1102,12 +1104,14 @@ public class PluginImpl
         return null;
     }
 
+/* --- dead code removal ---
     String getLabel(IDatatype dt) {
         if (dt == null) {
             return null;
         }
         return dt.getLabel();
     }
+ --- dead code removal --- */
 
     Graph getGraph(Producer p) {
         if (p.getGraph() instanceof Graph) {
@@ -1116,6 +1120,7 @@ public class PluginImpl
         return null;
     }
 
+/* --- dead code removal ---
     public TemplateVisitor getVisitor(Binding b, Environment env, Producer p) {
         return pt.getVisitor(b, env, p);
     }
@@ -1125,7 +1130,7 @@ public class PluginImpl
      * value to disk using Fuqi StrManager Each STTL Transformation would have
      * its own StrManager Managed in the Context to be shared between
      * subtransformation (cf OWL2)
-     */
+     *_/
     public IDatatype getBufferedValue(StringBuilder sb, Environment env) {
         if (storageMgr == null) {
             createManager();
@@ -1143,6 +1148,7 @@ public class PluginImpl
         storageMgr = StorageFactory.create(IStorage.STORAGE_FILE, null);
         storageMgr.enable(true);
     }
+ --- dead code removal --- */
 
     @Override
     public GraphProcessor getGraphProcessor() {
