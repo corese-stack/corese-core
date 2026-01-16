@@ -1,14 +1,13 @@
 package fr.inria.corese.core.next.kgram.api.query;
 
 import fr.inria.corese.core.next.kgram.core.Eval;
-import fr.inria.corese.core.sparql.api.Computer;
 
 /**
  * Interface for the connector that evaluates filters
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */
-public interface Evaluator extends Computer {
+public interface Evaluator {
 
     Mode getMode();
 

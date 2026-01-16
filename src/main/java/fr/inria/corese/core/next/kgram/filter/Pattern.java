@@ -1,23 +1,21 @@
 package fr.inria.corese.core.next.kgram.filter;
 
-import fr.inria.corese.core.next.kgram.api.core.BindingContext;
-import fr.inria.corese.core.next.kgram.api.core.Expr;
-import fr.inria.corese.core.next.kgram.api.core.ExprType;
-import fr.inria.corese.core.next.kgram.api.core.Filter;
+import fr.inria.corese.core.next.kgram.api.core.*;
 import fr.inria.corese.core.next.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
 import fr.inria.corese.core.next.kgram.core.Exp;
-import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Filter Exp Pattern Matcher
+ * Filter Expression Pattern Matcher.
+ *
+ * This class provides pattern matching capabilities for filter expressions.
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
- *
  */
 public class Pattern implements ExprType, Expr {
 	int type, oper;
@@ -49,7 +47,7 @@ public class Pattern implements ExprType, Expr {
 		add(e2);
 	}
 
-	
+
 	public Pattern(int t, int o, int e1, int e2){
 		this(t, o);
 		add(new Pattern(e1));
@@ -119,7 +117,7 @@ public class Pattern implements ExprType, Expr {
 	}
 
 	@Override
-	public IDatatype getValue() {
+	public DatatypeValue getValue() {
 		return null;
 	}
 
@@ -263,7 +261,7 @@ public class Pattern implements ExprType, Expr {
 	}
 
 	@Override
-	public IDatatype getDatatypeValue() {
+	public DatatypeValue getDatatypeValue() {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
@@ -298,7 +296,7 @@ public class Pattern implements ExprType, Expr {
 	}
 
 	@Override
-	public IDatatype evalWE(Computer eval, BindingContext b, Environment env, Producer p) {
+	public IDatatype evalWE(Evaluator eval, BindingContext b, Environment env, Producer p) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

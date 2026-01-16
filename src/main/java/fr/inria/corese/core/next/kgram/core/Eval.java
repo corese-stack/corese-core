@@ -11,6 +11,7 @@ import fr.inria.corese.core.next.kgram.tool.ResultsImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.next.kgram.api.core.BindingContext;
+import fr.inria.corese.core.next.kgram.adapter.DatatypeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -379,11 +380,11 @@ public class Eval implements ExpType, Plugin {
         initialResults = lMap;
     }
 
-   /**
+    /**
      * this eval is a fresh copy
      * use by compiler interpreter for exists {}
      */
-   public Mappings subEval(Query q, Node gNode, Stack stack, int n) throws SparqlException {
+    public Mappings subEval(Query q, Node gNode, Stack stack, int n) throws SparqlException {
         return subEval(q, gNode, stack, null, n);
     }
 
@@ -1351,12 +1352,15 @@ public class Eval implements ExpType, Plugin {
         }
     }
 
+
     IDatatype eval(Filter f, Environment env, Producer p) {
-        return f.getExp().evalWE(getEvaluator(), env.getBind(), env, p);
+        DatatypeValue result = (DatatypeValue) f.getExp().evalWE(getEvaluator(), env.getBind(), env, p);
+        return DatatypeAdapter.unwrap(result);
     }
 
     IDatatype eval(Expr e, Environment env, Producer p) {
-        return e.evalWE(getEvaluator(), env.getBind(), env, p);
+        DatatypeValue result = (DatatypeValue) e.evalWE(getEvaluator(), env.getBind(), env, p);
+        return DatatypeAdapter.unwrap(result);
     }
 
     // values var { unnext(exp) }
