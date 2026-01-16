@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.kgram.api.core;
 
 import fr.inria.corese.core.next.kgram.api.query.Environment;
+import fr.inria.corese.core.next.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.List;
@@ -45,9 +45,19 @@ public interface Expr {
 
     void setArg(Expr exp);
 
-    IDatatype getValue();
+    /**
+     * Returns the constant value of this expression, if any.
+     *
+     * @return the datatype value, or null if not a constant
+     */
+    DatatypeValue getValue();
 
-    IDatatype getDatatypeValue();
+    /**
+     * Returns the datatype value of this expression.
+     *
+     * @return the datatype value
+     */
+    DatatypeValue getDatatypeValue();
 
     int type();
 
@@ -99,9 +109,27 @@ public interface Expr {
 
     boolean hasMetadata(String name);
 
-    IDatatype evalWE(Computer eval, BindingContext b, Environment env, Producer p);
+    /**
+     * Evaluates this expression with the given context.
+     *
+     * @param eval the evaluator to use
+     * @param b the binding context
+     * @param env the environment
+     * @param p the producer
+     * @return the result of the evaluation
+     */
+    IDatatype evalWE(Evaluator eval, BindingContext b, Environment env, Producer p);
 
-    default boolean test(Computer eval, BindingContext b, Environment env, Producer p) {
+    /**
+     * Tests if this expression evaluates to true.
+     *
+     * @param eval the evaluator to use
+     * @param b the binding context
+     * @param env the environment
+     * @param p the producer
+     * @return true if the expression is truthy
+     */
+    default boolean test(Evaluator eval, BindingContext b, Environment env, Producer p) {
         IDatatype dt = evalWE(eval, b, env, p);
         if (dt == null) {
             return false;
