@@ -290,7 +290,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
      * @return {@link RDFFormat#TRIG}.
      */
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.TRIG;
     }
 }

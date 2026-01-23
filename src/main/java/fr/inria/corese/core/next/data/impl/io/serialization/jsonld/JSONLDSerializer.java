@@ -60,7 +60,7 @@ public class JSONLDSerializer implements RDFSerializer {
     }
 
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.JSONLD;
     }
 }

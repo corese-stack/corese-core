@@ -100,7 +100,7 @@ public class RDFXMLSerializer implements RDFSerializer {
     }
 
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.RDFXML;
     }
 

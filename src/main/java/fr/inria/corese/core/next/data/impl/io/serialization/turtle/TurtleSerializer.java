@@ -70,7 +70,7 @@ public class TurtleSerializer extends AbstractGraphSerializer {
      * @return {@link RDFFormat#TURTLE}.
      */
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.TURTLE;
     }
 

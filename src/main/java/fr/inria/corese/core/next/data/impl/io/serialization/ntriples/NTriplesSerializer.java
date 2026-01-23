@@ -74,7 +74,7 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
      * @return {@link RDFFormat#NTRIPLES}.
      */
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.NTRIPLES;
     }
 

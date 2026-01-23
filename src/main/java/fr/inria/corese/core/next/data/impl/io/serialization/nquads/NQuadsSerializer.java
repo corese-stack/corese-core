@@ -76,7 +76,7 @@ public class NQuadsSerializer extends AbstractLineBasedSerializer {
      * @return {@link RDFFormat#NQUADS}.
      */
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.NQUADS;
     }
 
