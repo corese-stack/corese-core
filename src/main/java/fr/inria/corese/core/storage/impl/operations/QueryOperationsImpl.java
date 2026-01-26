@@ -3,10 +3,10 @@ package fr.inria.corese.core.storage.impl.operations;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.ErrorCode;
-import fr.inria.corese.core.storage.api.dataManager.support.model.EdgePattern;
-import fr.inria.corese.core.storage.api.dataManager.operations.QueryOperations;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.ErrorCode;
+import fr.inria.corese.core.storage.api.datamanager.support.model.EdgePattern;
+import fr.inria.corese.core.storage.api.datamanager.operations.QueryOperations;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

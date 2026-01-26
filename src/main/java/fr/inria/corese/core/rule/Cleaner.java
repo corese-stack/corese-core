@@ -10,7 +10,7 @@ import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.util.Property;
 
 import java.io.IOException;

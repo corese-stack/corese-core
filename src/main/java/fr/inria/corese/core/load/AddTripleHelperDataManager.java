@@ -2,7 +2,7 @@ package fr.inria.corese.core.load;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.Entailment;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;

@@ -1,7 +1,7 @@
 package fr.inria.corese.core.producer;
 
 import fr.inria.corese.core.api.DataBroker;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 
 /**
  * Broker between ProducerImpl and external DataManager

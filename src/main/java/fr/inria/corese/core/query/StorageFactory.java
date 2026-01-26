@@ -2,7 +2,7 @@ package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.query.DatasetManager.TypeDataBase;
 import fr.inria.corese.core.sparql.triple.parser.URLServer;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;

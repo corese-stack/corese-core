@@ -25,7 +25,7 @@ import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import fr.inria.corese.core.storage.CoreseGraphDataManagerBuilder;
 import fr.inria.corese.core.storage.DataManagerJava;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.util.Property;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.ResponseProcessingException;

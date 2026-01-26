@@ -1,10 +1,10 @@
-package fr.inria.corese.core.storage.api.dataManager.operations;
+package fr.inria.corese.core.storage.api.datamanager.operations;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
-import fr.inria.corese.core.storage.api.dataManager.support.model.EdgePattern;
-import fr.inria.corese.core.storage.api.dataManager.support.model.MutationResult;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.model.EdgePattern;
+import fr.inria.corese.core.storage.api.datamanager.support.model.MutationResult;
 
 import java.util.List;
 
@@ -116,6 +116,18 @@ public interface BulkOperations {
     MutationResult declareContext(Node context) throws DataManagerException;
 
     /**
+     * Declares (creates) multiple contexts in a single batch operation.
+     * More efficient than calling declareContext() multiple times.
+     * Useful for pre-creating multiple named graphs.
+     *
+     * @param contexts List of contexts to declare
+     * @return Bulk mutation result with statistics
+     * @throws DataManagerException     if operation fails
+     * @throws IllegalArgumentException if contexts is null or empty
+     */
+    MutationResult declareContexts(List<Node> contexts) throws DataManagerException;
+
+    /**
      * Undeclares (deletes) a context and all its edges.
      *
      * @param context Context to undeclare
@@ -124,5 +136,16 @@ public interface BulkOperations {
      * @throws IllegalArgumentException if context is null
      */
     MutationResult undeclareContext(Node context) throws DataManagerException;
+
+    /**
+     * Undeclares (deletes) multiple contexts and all their edges in a single batch operation.
+     * More efficient than calling undeclareContext() multiple times.
+     *
+     * @param contexts List of contexts to undeclare
+     * @return Bulk mutation result with all deleted edges
+     * @throws DataManagerException     if operation fails
+     * @throws IllegalArgumentException if contexts is null or empty
+     */
+    MutationResult undeclareContexts(List<Node> contexts) throws DataManagerException;
 
 }

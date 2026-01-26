@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager.support.model;
+package fr.inria.corese.core.storage.api.datamanager.support.model;
 
 import fr.inria.corese.core.kgram.api.core.Node;
 

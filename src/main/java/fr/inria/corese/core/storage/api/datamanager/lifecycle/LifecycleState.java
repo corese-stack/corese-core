@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager.lifecycle;
+package fr.inria.corese.core.storage.api.datamanager.lifecycle;
 
 /**
  * Possible lifecycle states of the DataManager.
@@ -44,7 +44,7 @@ public enum LifecycleState {
      *
      * @return true if usable (RUNNING)
      */
-    public boolean isUsable() {
+    public boolean isRunnig() {
         return this == RUNNING;
     }
 }

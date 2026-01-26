@@ -1,6 +1,6 @@
-package fr.inria.corese.core.storage.api.dataManager.transaction;
+package fr.inria.corese.core.storage.api.datamanager.transaction;
 
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
 
 import java.util.Optional;
 import java.util.Set;

@@ -7,7 +7,7 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.logic.RDF;
 import fr.inria.corese.core.producer.DataProducer;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;

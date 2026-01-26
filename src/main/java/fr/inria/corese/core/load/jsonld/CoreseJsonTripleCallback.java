@@ -11,7 +11,7 @@ import fr.inria.corese.core.load.AddTripleHelper;
 import fr.inria.corese.core.load.AddTripleHelperDataManager;
 import fr.inria.corese.core.load.ILoadSerialization;
 import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 
 /**
  * Implementation of interface from Jsonld-java (json-ld parser) for adding

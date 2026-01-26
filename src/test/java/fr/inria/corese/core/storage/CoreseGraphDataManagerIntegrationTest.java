@@ -2,19 +2,20 @@ package fr.inria.corese.core.storage;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.storage.api.dataManager.support.config.DataManagerConfig;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
-import fr.inria.corese.core.storage.api.dataManager.support.model.EdgePattern;
-import fr.inria.corese.core.storage.api.dataManager.support.model.GraphStatistics;
-import fr.inria.corese.core.storage.api.dataManager.support.model.MutationResult;
+import fr.inria.corese.core.storage.api.datamanager.support.config.DataManagerConfig;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.model.EdgePattern;
+import fr.inria.corese.core.storage.api.datamanager.support.model.GraphStatistics;
+import fr.inria.corese.core.storage.api.datamanager.support.model.MutationResult;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration tests for CoresGraphDataManager.
@@ -26,15 +27,14 @@ class CoreseGraphDataManagerIntegrationTest {
     private CoreseGraphDataManager dataManager;
 
     @BeforeEach
-    void setUp() throws DataManagerException {
+    void setUp() {
         dataManager = new CoreseGraphDataManagerBuilder().build();
 
         // Initialize with transaction support enabled
         DataManagerConfig config = DataManagerConfig.builder()
-                .debug(false)
-                .transactionSupport(true)
+                .storagePath("http://ns.inria.fr/corese/my-dataset")
+                .debug(true)
                 .build();
-        dataManager.getLifecycle().initialize(config);
     }
 
     @Test
@@ -124,13 +124,5 @@ class CoreseGraphDataManagerIntegrationTest {
         assertEquals(0, dataManager.getGraph().size());
     }
 
-    @Test
-    @DisplayName("Lifecycle shutdown should properly clean up resources")
-    void testLifecycleShutdown() throws DataManagerException {
-        assertTrue(dataManager.getLifecycle().isInitialized());
 
-        dataManager.getLifecycle().shutdown();
-
-        assertFalse(dataManager.getLifecycle().isInitialized());
-    }
 }

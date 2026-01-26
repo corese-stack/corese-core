@@ -1,11 +1,11 @@
 package fr.inria.corese.core.storage.impl.lifecycle;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.storage.api.dataManager.lifecycle.DataManagerLifecycle;
-import fr.inria.corese.core.storage.api.dataManager.lifecycle.LifecycleState;
-import fr.inria.corese.core.storage.api.dataManager.support.config.DataManagerConfig;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.ErrorCode;
+import fr.inria.corese.core.storage.api.datamanager.lifecycle.DataManagerLifecycle;
+import fr.inria.corese.core.storage.api.datamanager.lifecycle.LifecycleState;
+import fr.inria.corese.core.storage.api.datamanager.support.config.DataManagerConfig;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,7 +197,7 @@ public class LifecycleManagerImpl implements DataManagerLifecycle {
      * @throws IllegalStateException if the current state is not usable (e.g., NOT_INITIALIZED or SHUTDOWN).
      */
     public void checkUsable() {
-        if (!state.isUsable()) {
+        if (!state.isRunnig()) {
             throw new IllegalStateException(
                     "DataManager is not in a usable state. Current state: " + state
             );

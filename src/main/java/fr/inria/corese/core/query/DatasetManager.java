@@ -5,7 +5,7 @@ import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.storage.CoreseGraphDataManagerBuilder;
 import fr.inria.corese.core.storage.DataManagerJava;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.util.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

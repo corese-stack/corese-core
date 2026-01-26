@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager.transaction;
+package fr.inria.corese.core.storage.api.datamanager.transaction;
 
 public enum TransactionState {
     /**

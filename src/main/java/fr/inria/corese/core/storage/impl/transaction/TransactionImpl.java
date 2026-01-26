@@ -1,10 +1,10 @@
 package fr.inria.corese.core.storage.impl.transaction;
 
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.ErrorCode;
-import fr.inria.corese.core.storage.api.dataManager.transaction.IsolationLevel;
-import fr.inria.corese.core.storage.api.dataManager.transaction.Transaction;
-import fr.inria.corese.core.storage.api.dataManager.transaction.TransactionState;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.ErrorCode;
+import fr.inria.corese.core.storage.api.datamanager.transaction.IsolationLevel;
+import fr.inria.corese.core.storage.api.datamanager.transaction.Transaction;
+import fr.inria.corese.core.storage.api.datamanager.transaction.TransactionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

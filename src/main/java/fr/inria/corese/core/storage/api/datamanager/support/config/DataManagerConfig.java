@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager.support.config;
+package fr.inria.corese.core.storage.api.datamanager.support.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +63,7 @@ public final class DataManagerConfig {
     /**
      * Returns the storage path.
      *
-     * @return Storage path
+     * @return Storage path (never null)
      */
     public String getStoragePath() {
         return storagePath;
@@ -103,23 +103,28 @@ public final class DataManagerConfig {
     public static final class Builder {
         private final Map<String, Object> properties = new HashMap<>();
         private boolean transactionSupport = false;
-        private String storagePath = "http://ns.inria.fr/corese/dataset";
+        private String storagePath = null;
         private boolean debug = false;
 
         private Builder() {
         }
 
         /**
-         * Adds a generic property.
+         * Adds a custom property to the configuration.
          *
-         * @param key   Property key
-         * @param value Property value
-         * @return This builder (for chaining)
+         * @param key   Property key (must not be null, empty, or blank)
+         * @param value Property value (must not be null)
+         * @return this builder instance
+         * @throws IllegalArgumentException if key is null/empty/blank or value is null
          */
         public Builder property(String key, Object value) {
-            if (key != null && value != null) {
-                properties.put(key, value);
+            if (key == null || key.isBlank()) {
+                throw new IllegalArgumentException("Property key cannot be null, empty, or blank");
             }
+            if (value == null) {
+                throw new IllegalArgumentException("Property value cannot be null");
+            }
+            this.properties.put(key, value);
             return this;
         }
 
@@ -145,15 +150,18 @@ public final class DataManagerConfig {
         }
 
         /**
-         * Sets the storage path.
+         * Sets the storage path for the DataManager.
+         * This is a required configuration parameter.
          *
-         * @param path Storage path
-         * @return This builder (for chaining)
+         * @param path Storage path (must not be null, empty, or blank)
+         * @return this builder instance
+         * @throws IllegalArgumentException if path is null, empty, or blank
          */
         public Builder storagePath(String path) {
-            if (path != null && !path.isEmpty()) {
-                this.storagePath = path;
+            if (path == null || path.isBlank()) {
+                throw new IllegalArgumentException("Storage path cannot be null, empty, or blank");
             }
+            this.storagePath = path;
             return this;
         }
 
@@ -172,8 +180,15 @@ public final class DataManagerConfig {
          * Builds the DataManagerConfig instance.
          *
          * @return New configured instance
+         * @throws IllegalStateException if storagePath has not been set
          */
         public DataManagerConfig build() {
+            if (storagePath == null || storagePath.isBlank()) {
+                throw new IllegalStateException(
+                        "Storage path must be set before building configuration. " +
+                                "Use storagePath(String) to specify the storage location."
+                );
+            }
             return new DataManagerConfig(this);
         }
     }

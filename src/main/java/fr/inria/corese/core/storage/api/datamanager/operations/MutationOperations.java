@@ -1,9 +1,9 @@
-package fr.inria.corese.core.storage.api.dataManager.operations;
+package fr.inria.corese.core.storage.api.datamanager.operations;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
-import fr.inria.corese.core.storage.api.dataManager.support.model.MutationResult;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.model.MutationResult;
 
 import java.util.List;
 

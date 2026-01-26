@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager;
+package fr.inria.corese.core.storage.api.datamanager;
 
 import fr.inria.corese.core.producer.MetadataManager;
 import fr.inria.corese.core.sparql.triple.parser.HashMapList;

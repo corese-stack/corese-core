@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager.support.exception;
+package fr.inria.corese.core.storage.api.datamanager.support.exception;
 
 /**
  * Specific exception for DataManager operations.

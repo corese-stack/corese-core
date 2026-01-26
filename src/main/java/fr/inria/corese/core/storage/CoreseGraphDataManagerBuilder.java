@@ -1,7 +1,7 @@
 package fr.inria.corese.core.storage;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.storage.api.dataManager.DataManagerBuilder;
+import fr.inria.corese.core.storage.api.datamanager.DataManagerBuilder;
 
 public class CoreseGraphDataManagerBuilder implements DataManagerBuilder {
 

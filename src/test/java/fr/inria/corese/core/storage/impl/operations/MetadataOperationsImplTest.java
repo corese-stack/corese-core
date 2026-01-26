@@ -2,8 +2,8 @@ package fr.inria.corese.core.storage.impl.operations;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
-import fr.inria.corese.core.storage.api.dataManager.support.model.GraphStatistics;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.model.GraphStatistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

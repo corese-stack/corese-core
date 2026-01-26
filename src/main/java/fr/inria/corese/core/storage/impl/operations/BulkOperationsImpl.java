@@ -3,11 +3,11 @@ package fr.inria.corese.core.storage.impl.operations;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.storage.api.dataManager.operations.BulkOperations;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.ErrorCode;
-import fr.inria.corese.core.storage.api.dataManager.support.model.EdgePattern;
-import fr.inria.corese.core.storage.api.dataManager.support.model.MutationResult;
+import fr.inria.corese.core.storage.api.datamanager.operations.BulkOperations;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.ErrorCode;
+import fr.inria.corese.core.storage.api.datamanager.support.model.EdgePattern;
+import fr.inria.corese.core.storage.api.datamanager.support.model.MutationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,6 +150,7 @@ public class BulkOperationsImpl implements BulkOperations {
      * @param pattern the pattern defining subject, predicate, object, and/or context filters.
      * @return a {@link MutationResult} containing the list of affected edges.
      * @throws DataManagerException if the pattern-based deletion fails.
+     * @throws IllegalArgumentException if pattern is null.
      */
     @Override
     public MutationResult deleteByPattern(EdgePattern pattern) throws DataManagerException {
@@ -298,6 +299,7 @@ public class BulkOperationsImpl implements BulkOperations {
      * @param silent if true, ignores missing source graphs.
      * @return a {@link MutationResult} representing the merge outcome.
      * @throws DataManagerException if the operation fails at the graph level.
+     * @throws IllegalArgumentException if contexts are null.
      */
     @Override
     public MutationResult addGraph(Node sourceContext, Node targetContext, boolean silent)
@@ -348,6 +350,7 @@ public class BulkOperationsImpl implements BulkOperations {
      * @param silent if true, ignores missing source graphs.
      * @return a {@link MutationResult} representing the copy outcome.
      * @throws DataManagerException if the operation fails at the graph level.
+     * @throws IllegalArgumentException if contexts are null.
      */
     @Override
     public MutationResult copyGraph(Node sourceContext, Node targetContext, boolean silent)
@@ -398,6 +401,7 @@ public class BulkOperationsImpl implements BulkOperations {
      * @param silent if true, ignores missing source graphs.
      * @return a {@link MutationResult} representing the move outcome.
      * @throws DataManagerException if the operation fails at the graph level.
+     * @throws IllegalArgumentException if contexts are null.
      */
     @Override
     public MutationResult moveGraph(Node sourceContext, Node targetContext, boolean silent)
@@ -446,6 +450,7 @@ public class BulkOperationsImpl implements BulkOperations {
      * @param context the context node to declare.
      * @return a successful {@link MutationResult}.
      * @throws DataManagerException if the declaration fails.
+     * @throws IllegalArgumentException if context is null.
      */
     @Override
     public MutationResult declareContext(Node context) throws DataManagerException {
@@ -471,11 +476,57 @@ public class BulkOperationsImpl implements BulkOperations {
     }
 
     /**
+     * Declares multiple contexts in a single batch operation.
+     *
+     * @param contexts the list of context nodes to declare; must not be null or empty.
+     * @return a {@link MutationResult} summarizing the successes and failures.
+     * @throws DataManagerException if a critical system error occurs during declaration.
+     * @throws IllegalArgumentException if contexts is null or empty.
+     */
+    @Override
+    public MutationResult declareContexts(List<Node> contexts) throws DataManagerException {
+        if (contexts == null || contexts.isEmpty()) {
+            throw new IllegalArgumentException("Contexts list cannot be null or empty");
+        }
+
+        logger.info("Declaring batch of {} context(s)", contexts.size());
+
+        MutationResult.BulkBuilder builder = MutationResult.bulkBuilder()
+                .totalAttempted(contexts.size())
+                .message("Batch declare of " + contexts.size() + " context(s)");
+
+        try {
+            for (Node context : contexts) {
+                try {
+                    graph.addGraphNode(context);
+                    builder.incrementSuccess();
+                } catch (Exception e) {
+                    builder.addFailure(null, "Failed to declare context " + context + ": " + e.getMessage(), e);
+                }
+            }
+
+            MutationResult result = builder.build();
+            logger.info("Batch declare completed: success={}, failure={}",
+                    result.getSuccessCount(), result.getFailureCount());
+            return result;
+
+        } catch (Exception e) {
+            logger.error("Batch declare contexts failed", e);
+            throw new DataManagerException(
+                    ErrorCode.MUTATION_FAILED,
+                    "Batch declare contexts failed: " + e.getMessage(),
+                    e
+            );
+        }
+    }
+
+    /**
      * Removes a context declaration and all its associated edges.
      *
      * @param context the context node to undeclare.
      * @return a {@link MutationResult} summarizing the removed edges.
      * @throws DataManagerException if the undeclare operation fails.
+     * @throws IllegalArgumentException if context is null.
      */
     @Override
     public MutationResult undeclareContext(Node context) throws DataManagerException {
@@ -494,6 +545,36 @@ public class BulkOperationsImpl implements BulkOperations {
             throw new DataManagerException(
                     ErrorCode.MUTATION_FAILED,
                     "Undeclare context failed: " + e.getMessage(),
+                    e
+            );
+        }
+    }
+
+    /**
+     * Undeclares multiple contexts and all their edges in a single batch operation.
+     *
+     * @param contexts the list of context nodes to undeclare; must not be null or empty.
+     * @return a {@link MutationResult} summarizing all removed edges.
+     * @throws DataManagerException if a critical system error occurs during undeclaration.
+     * @throws IllegalArgumentException if contexts is null or empty.
+     */
+    @Override
+    public MutationResult undeclareContexts(List<Node> contexts) throws DataManagerException {
+        if (contexts == null || contexts.isEmpty()) {
+            throw new IllegalArgumentException("Contexts list cannot be null or empty");
+        }
+
+        logger.info("Undeclaring batch of {} context(s)", contexts.size());
+
+        try {
+            // Delegate to clearContexts which already handles batch operations
+            return clearContexts(contexts, false);
+
+        } catch (Exception e) {
+            logger.error("Batch undeclare contexts failed", e);
+            throw new DataManagerException(
+                    ErrorCode.MUTATION_FAILED,
+                    "Batch undeclare contexts failed: " + e.getMessage(),
                     e
             );
         }

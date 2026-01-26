@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager.support.exception;
+package fr.inria.corese.core.storage.api.datamanager.support.exception;
 
 /**
  * Error codes for DataManager operations.
@@ -29,7 +29,14 @@ public enum ErrorCode {
     UNSUPPORTED_OPERATION("UNSUPPORTED", "Operation not supported"),
 
     /** Invalid state */
-    INVALID_STATE("INVALID_STATE", "Invalid state");
+    INVALID_STATE("INVALID_STATE", "Invalid state"),
+
+    RESTART_FAILED_ROLLBACK_SUCCESS("RESTART_FAIL_ROLLBACK_OK",
+            "Restart failed but previous configuration restored"),
+
+    /** Restart failed and rollback also failed (critical) */
+    RESTART_FAILED_ROLLBACK_FAILED("RESTART_FAIL_ROLLBACK_FAIL",
+            "Restart failed and unable to restore previous configuration"),;
 
     private final String code;
     private final String description;

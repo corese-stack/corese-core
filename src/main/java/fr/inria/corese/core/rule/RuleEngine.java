@@ -30,7 +30,7 @@ import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.sparql.triple.printer.SPIN;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorRule;
 import org.slf4j.Logger;

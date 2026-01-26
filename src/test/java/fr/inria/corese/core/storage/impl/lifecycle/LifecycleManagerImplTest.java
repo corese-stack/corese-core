@@ -1,9 +1,9 @@
 package fr.inria.corese.core.storage.impl.lifecycle;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.storage.api.dataManager.lifecycle.LifecycleState;
-import fr.inria.corese.core.storage.api.dataManager.support.config.DataManagerConfig;
-import fr.inria.corese.core.storage.api.dataManager.support.exception.DataManagerException;
+import fr.inria.corese.core.storage.api.datamanager.lifecycle.LifecycleState;
+import fr.inria.corese.core.storage.api.datamanager.support.config.DataManagerConfig;
+import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,12 +16,33 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("LifecycleManagerImpl Tests")
 class LifecycleManagerImplTest {
 
+    private static final String TEST_STORAGE_PATH = "http://ns.inria.fr/corese/test-dataset";
+
     private LifecycleManagerImpl lifecycleManager;
 
     @BeforeEach
     void setUp() {
         Graph graph = new Graph();
         lifecycleManager = new LifecycleManagerImpl(graph);
+    }
+
+    /**
+     * Helper method to create a default test configuration.
+     */
+    private DataManagerConfig createDefaultConfig() {
+        return DataManagerConfig.builder()
+                .storagePath(TEST_STORAGE_PATH)
+                .build();
+    }
+
+    /**
+     * Helper method to create a test configuration with debug enabled.
+     */
+    private DataManagerConfig createDebugConfig() {
+        return DataManagerConfig.builder()
+                .storagePath(TEST_STORAGE_PATH)
+                .debug(true)
+                .build();
     }
 
     @Test
@@ -34,10 +55,7 @@ class LifecycleManagerImplTest {
     @Test
     @DisplayName("Initialize with valid config should succeed")
     void testInitializeSuccess() throws DataManagerException {
-        DataManagerConfig config = DataManagerConfig.builder()
-                .debug(true)
-                .build();
-
+        DataManagerConfig config = createDebugConfig();
         lifecycleManager.initialize(config);
 
         assertEquals(LifecycleState.RUNNING, lifecycleManager.getState());
@@ -54,7 +72,7 @@ class LifecycleManagerImplTest {
     @Test
     @DisplayName("Shutdown after initialization should succeed")
     void testShutdownSuccess() throws DataManagerException {
-        DataManagerConfig config = DataManagerConfig.builder().build();
+        DataManagerConfig config = createDefaultConfig();
         lifecycleManager.initialize(config);
 
         lifecycleManager.shutdown();
@@ -63,14 +81,16 @@ class LifecycleManagerImplTest {
         assertFalse(lifecycleManager.isInitialized());
     }
 
-
     @Test
     @DisplayName("Restart should reinitialize successfully")
     void testRestartSuccess() throws DataManagerException {
-        DataManagerConfig config1 = DataManagerConfig.builder().debug(false).build();
+        DataManagerConfig config1 = DataManagerConfig.builder()
+                .storagePath(TEST_STORAGE_PATH)
+                .debug(false)
+                .build();
         lifecycleManager.initialize(config1);
 
-        DataManagerConfig config2 = DataManagerConfig.builder().debug(true).build();
+        DataManagerConfig config2 = createDebugConfig();
         lifecycleManager.restart(config2);
 
         assertEquals(LifecycleState.RUNNING, lifecycleManager.getState());
@@ -80,7 +100,7 @@ class LifecycleManagerImplTest {
     @Test
     @DisplayName("checkUsable when RUNNING should not throw")
     void testCheckUsableWhenRunning() throws DataManagerException {
-        DataManagerConfig config = DataManagerConfig.builder().build();
+        DataManagerConfig config = createDefaultConfig();
         lifecycleManager.initialize(config);
 
         // Should not throw
@@ -96,7 +116,7 @@ class LifecycleManagerImplTest {
     @Test
     @DisplayName("checkUsable after shutdown should throw IllegalStateException")
     void testCheckUsableAfterShutdown() throws DataManagerException {
-        DataManagerConfig config = DataManagerConfig.builder().build();
+        DataManagerConfig config = createDefaultConfig();
         lifecycleManager.initialize(config);
         lifecycleManager.shutdown();
 
@@ -115,12 +135,14 @@ class LifecycleManagerImplTest {
 
         assertTrue(lifecycleManager.isInitialized());
         assertEquals(LifecycleState.RUNNING, lifecycleManager.getState());
+        assertEquals(customPath, config.getStoragePath());
     }
 
     @Test
     @DisplayName("Initialize with transaction support enabled")
     void testInitializeWithTransactionSupport() throws DataManagerException {
         DataManagerConfig config = DataManagerConfig.builder()
+                .storagePath(TEST_STORAGE_PATH)
                 .transactionSupport(true)
                 .build();
 
@@ -133,6 +155,7 @@ class LifecycleManagerImplTest {
     @DisplayName("Initialize with custom properties")
     void testInitializeWithCustomProperties() throws DataManagerException {
         DataManagerConfig config = DataManagerConfig.builder()
+                .storagePath(TEST_STORAGE_PATH)
                 .property("custom.key", "custom.value")
                 .property("another.key", "another.value")
                 .build();
@@ -146,11 +169,15 @@ class LifecycleManagerImplTest {
     @Test
     @DisplayName("Multiple restarts should work correctly")
     void testMultipleRestarts() throws DataManagerException {
-        DataManagerConfig config1 = DataManagerConfig.builder().debug(false).build();
+        DataManagerConfig config1 = DataManagerConfig.builder()
+                .storagePath(TEST_STORAGE_PATH)
+                .debug(false)
+                .build();
         lifecycleManager.initialize(config1);
 
         for (int i = 0; i < 3; i++) {
             DataManagerConfig config = DataManagerConfig.builder()
+                    .storagePath(TEST_STORAGE_PATH)
                     .debug(i % 2 == 0)
                     .build();
             lifecycleManager.restart(config);
@@ -165,7 +192,7 @@ class LifecycleManagerImplTest {
     void testStateTransitions() throws DataManagerException {
         assertEquals(LifecycleState.NOT_INITIALIZED, lifecycleManager.getState());
 
-        DataManagerConfig config = DataManagerConfig.builder().build();
+        DataManagerConfig config = createDefaultConfig();
         lifecycleManager.initialize(config);
         assertEquals(LifecycleState.RUNNING, lifecycleManager.getState());
 
