@@ -10,7 +10,6 @@ import fr.inria.corese.core.next.kgram.core.*;
 import fr.inria.corese.core.next.kgram.event.EventManager;
 import fr.inria.corese.core.next.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 import java.util.Map;

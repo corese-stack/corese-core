@@ -935,7 +935,7 @@ public class Mapping
         }
     }
 
-    Mapping join(Mapping m) {
+    public Mapping join(Mapping m) {
         List<Node> qNodes = new ArrayList<>();
         List<Node> tNodes = new ArrayList<>();
 
