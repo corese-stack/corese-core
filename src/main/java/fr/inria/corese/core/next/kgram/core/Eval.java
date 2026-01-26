@@ -533,7 +533,7 @@ public class Eval implements ExpType, Plugin {
      * Copy current evaluator to eval subquery same memory (share bindings) new
      * exp stack
      */
-    Eval copy(Memory m, Producer p) {
+    public Eval copy(Memory m, Producer p) {
         return copy(m, p, getEvaluator(), query, false);
     }
 
@@ -714,7 +714,7 @@ public class Eval implements ExpType, Plugin {
     }
 
     // partial init (for global query and subqueries)
-    private void start(Query q) {
+    public void start(Query q) {
         limit = q.getLimitOffset();
         starter(q);
     }
@@ -817,7 +817,7 @@ public class Eval implements ExpType, Plugin {
      * What should be done before throw LimitException - close path threads if
      * any
      */
-    private void clean() {
+    public void clean() {
         for (PathFinder pf : lPathFinder) {
             pf.stop();
         }
@@ -1854,7 +1854,7 @@ public class Eval implements ExpType, Plugin {
     }
 
 
-    void createManager() {
+    public void createManager() {
         if (manager == null) {
             setEventManager(new EventManager());
             if (memory != null) {

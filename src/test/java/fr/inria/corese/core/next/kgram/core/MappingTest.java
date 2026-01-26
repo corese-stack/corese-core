@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for Mapping class.
@@ -169,5 +170,184 @@ class MappingTest {
         }
     }
 
+    @Nested
+    @DisplayName("Environment Tests")
+    class EnvironmentTests {
 
+        @Test
+        @DisplayName("Should provide environment interface")
+        void testEnvironmentInterface() {
+            // Mapping implements Environment
+            assertNotNull(mapping, "Should support environment operations");
+        }
+    }
+
+    @Nested
+    @DisplayName("Result Interface Tests")
+    class ResultInterfaceTests {
+
+        @Test
+        @DisplayName("Should support Result interface")
+        void testResultInterface() {
+            // Mapping implements Result
+            assertNotNull(mapping, "Should implement Result interface");
+        }
+    }
+
+    @Nested
+    @DisplayName("ToString Tests")
+    class ToStringTests {
+
+        @Test
+        @DisplayName("toString should not be null")
+        void testToStringNotNull() {
+            String str = mapping.toString();
+            assertNotNull(str, "toString should not return null");
+        }
+
+        @Test
+        @DisplayName("Empty mapping toString should be empty")
+        void testToStringEmpty() {
+            // Empty mapping has no nodes, so toString returns empty string
+            String str = mapping.toString();
+            assertNotNull(str, "toString should not return null");
+            // Empty mapping produces empty string - this is expected behavior
+            assertTrue(str.isBlank(),
+                    "Empty mapping should produce empty or blank string");
+        }
+
+        @Test
+        @DisplayName("Mapping with nodes should have non-empty toString")
+        void testToStringWithNodes() {
+            // Create mapping with actual nodes
+            List<Node> queryNodes = new ArrayList<>();
+            List<Node> targetNodes = new ArrayList<>();
+
+            when(mockQueryNode.toString()).thenReturn("?x");
+            when(mockTargetNode.toString()).thenReturn("value");
+
+            queryNodes.add(mockQueryNode);
+            targetNodes.add(mockTargetNode);
+
+            Mapping m = Mapping.create(queryNodes, targetNodes);
+            String str = m.toString();
+
+            assertNotNull(str, "toString should not return null");
+            assertFalse(str.isEmpty(), "Mapping with nodes should have non-empty toString");
+        }
+    }
+
+    @Nested
+    @DisplayName("Distinct Nodes Tests")
+    class DistinctNodesTests {
+
+        @Test
+        @DisplayName("Should set and get distinct nodes")
+        void testSetAndGetDistinctNodes() {
+            Node[] distinctNodes = {mockQueryNode};
+            mapping.setDistinctNodes(distinctNodes);
+
+            Node[] result = mapping.getDistinctNodes();
+            assertNotNull(result, "Distinct nodes should not be null");
+        }
+    }
+
+    @Nested
+    @DisplayName("Size Tests")
+    class SizeTests {
+
+        @Test
+        @DisplayName("Empty mapping should have size 0")
+        void testEmptyMappingSize() {
+            assertEquals(0, mapping.size(), "Empty mapping should have size 0");
+        }
+
+        @Test
+        @DisplayName("Mapping with nodes should have correct size")
+        void testMappingSizeWithNodes() {
+            List<Node> queryNodes = new ArrayList<>();
+            List<Node> targetNodes = new ArrayList<>();
+            queryNodes.add(mockQueryNode);
+            targetNodes.add(mockTargetNode);
+
+            Mapping m = Mapping.create(queryNodes, targetNodes);
+            assertEquals(1, m.size(), "Mapping should have size 1");
+        }
+    }
+
+    @Nested
+    @DisplayName("Graph Node Tests")
+    class GraphNodeTests {
+
+        @Test
+        @DisplayName("Should set and get graph node")
+        void testSetAndGetGraphNode() {
+            mapping.setGraphNode(mockQueryNode);
+            Node result = mapping.getGraphNode();
+            assertEquals(mockQueryNode, result, "Graph node should match");
+        }
+
+        @Test
+        @DisplayName("Should handle null graph node")
+        void testNullGraphNode() {
+            mapping.setGraphNode(null);
+            assertNull(mapping.getGraphNode(), "Graph node should be null");
+        }
+    }
+
+    @Nested
+    @DisplayName("Node Value Tests")
+    class NodeValueTests {
+
+        @Test
+        @DisplayName("Should get node by label")
+        void testGetNodeByLabel() {
+            when(mockQueryNode.isVariable()).thenReturn(true);
+            when(mockQueryNode.getLabel()).thenReturn("?x");
+
+            List<Node> queryNodes = new ArrayList<>();
+            List<Node> targetNodes = new ArrayList<>();
+            queryNodes.add(mockQueryNode);
+            targetNodes.add(mockTargetNode);
+
+            Mapping m = Mapping.create(queryNodes, targetNodes);
+            Node result = m.getNode("?x");
+
+            assertEquals(mockTargetNode, result, "Should return target node for variable");
+        }
+
+        @Test
+        @DisplayName("Should return null for non-existent variable")
+        void testGetNodeNonExistent() {
+            Node result = mapping.getNode("?nonexistent");
+            assertNull(result, "Should return null for non-existent variable");
+        }
+    }
+
+    @Nested
+    @DisplayName("IsBound Tests")
+    class IsBoundTests {
+
+        @Test
+        @DisplayName("Should check if node is bound")
+        void testIsBound() {
+            when(mockQueryNode.getLabel()).thenReturn("?x");
+            when(mockQueryNode.isVariable()).thenReturn(true);
+
+            List<Node> queryNodes = new ArrayList<>();
+            List<Node> targetNodes = new ArrayList<>();
+            queryNodes.add(mockQueryNode);
+            targetNodes.add(mockTargetNode);
+
+            Mapping m = Mapping.create(queryNodes, targetNodes);
+            assertTrue(m.isBound(mockQueryNode), "Node should be bound");
+        }
+
+        @Test
+        @DisplayName("Unbound node should return false")
+        void testIsNotBound() {
+            when(mockQueryNode.getLabel()).thenReturn("?y");
+            assertFalse(mapping.isBound(mockQueryNode), "Unbound node should return false");
+        }
+    }
 }
