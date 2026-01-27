@@ -15,7 +15,7 @@ public interface Namespace extends Serializable {
     /**
      * @return The name of the namespace, which is the start of an IRI.
      */
-    String getName();
+    String getNamespace();
 
     /**
      * @param o

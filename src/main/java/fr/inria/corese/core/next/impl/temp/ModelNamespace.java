@@ -29,7 +29,7 @@ public class ModelNamespace extends AbstractNamespace {
     }
 
     @Override
-    public String getName() {
+    public String getNamespace() {
         return namespaceURI;
     }
 }

@@ -110,9 +110,33 @@ class RDFaParserTest {
                   </body>
                 </html>
                 """;
-        String currentSubjectNTriples = """
+        String currentSubjectNTriples = defaultTurtlePrefixes + """
                 <> dc:creator "Jo" .
                 """;
+
+        Model parsedModel = new CoreseModel();
+        Model resultModel = new CoreseModel();
+        ValueFactory factory = new CoreseAdaptedValueFactory();
+        RDFParser testedParser = new RDFaParser(parsedModel, factory);
+        RDFParser resultParser = parserFactory.createRDFParser(RDFFormat.TURTLE, resultModel, valueFactory);
+
+        assertEquals(RDFFormat.RDFA, testedParser.getRDFFormat());
+
+        resultParser.parse(new ByteArrayInputStream(currentSubjectNTriples.getBytes()), "http://example.org/");
+        testedParser.parse(new ByteArrayInputStream(currentSubjectXHTML.getBytes()), "http://example.org/");
+
+        logModelContent(parsedModel);
+        assertEquals(resultModel.size(), parsedModel.size());
+        Iterator<Statement> itStatementRef = resultModel.iterator();
+        Iterator<Statement> itStatementTest = parsedModel.iterator();
+        while(itStatementRef.hasNext() && itStatementTest.hasNext()) {
+            Statement statementRef = itStatementRef.next();
+            Statement statementTest = itStatementTest.next();
+            assertEquals(statementRef.getSubject(), statementTest.getSubject());
+            assertEquals(statementRef.getPredicate(), statementTest.getPredicate());
+            assertEquals(statementRef.getObject(), statementTest.getObject());
+            assertEquals(statementRef.getContext(), statementTest.getContext());
+        }
     }
 
     @Test
@@ -403,6 +427,52 @@ class RDFaParserTest {
             assertEquals(statementRef.getObject(), statementTest.getObject());
             assertEquals(statementRef.getContext(), statementTest.getContext());
         }
+        assertTrue(referenceModel.containsAll(testModel));
+    }
+
+    @Test
+    public void multiplePrefixDeclaration() {
+        String testDataString = """
+                <!DOCTYPE html>
+                <html prefix="dc: http://purl.org/dc/elements/1.1/ p2: https://schema.org/">
+                  <head>
+                	<title>Test 0020</title>
+                  </head>
+                  <body>
+                    <div about="photo1.jpg">
+                      <span class="attribution-line">this photo was taken by
+                        <span property="dc:creator">Mark Birbeck</span>
+                        and <span property="p2:creator">John Doe</span>
+                      </span>
+                    </div>
+                  </body>
+                </html>
+                """;
+
+        Model testModel = new CoreseModel();
+        Model referenceModel = new CoreseModel();
+
+        RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
+
+        parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://inria.fr/");
+
+        IRI photo1 = valueFactory.createIRI("http://inria.fr/photo1.jpg");
+        IRI creator1 = valueFactory.createIRI("http://purl.org/dc/elements/1.1/creator");
+        Literal name1 = valueFactory.createLiteral("Mark Birbeck");
+        IRI creator2 = valueFactory.createIRI("https://schema.org/creator");
+        Literal name2 = valueFactory.createLiteral("John Doe");
+
+        Statement stat1 = valueFactory.createStatement(photo1, creator1, name1);
+        Statement stat2 = valueFactory.createStatement(photo1, creator2, name2);
+
+        referenceModel.add(stat1);
+        referenceModel.add(stat2);
+
+        logModelContent(referenceModel);
+        logModelContent(testModel);
+
+        assertEquals(2, testModel.size());
+        assertEquals(referenceModel, testModel);
         assertTrue(referenceModel.containsAll(testModel));
     }
 

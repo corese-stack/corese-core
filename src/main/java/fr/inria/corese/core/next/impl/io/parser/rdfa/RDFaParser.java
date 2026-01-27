@@ -67,7 +67,7 @@ public class RDFaParser extends AbstractRDFParser {
         }
         // Initializing the iri mappings with the default prefixes as defined by https://www.w3.org/TR/rdfa-core/#xmlrdfaconformance
         for (RDFaInitialPrefixes prefixObject : RDFaInitialPrefixes.values()) {
-            this.addIriMapping(prefixObject.getPrefix(), getValueFactory().createIRI(prefixObject.getName()));
+            this.addIriMapping(prefixObject.getPrefix(), getValueFactory().createIRI(prefixObject.getNamespace()));
         }
     }
 
@@ -202,7 +202,7 @@ public class RDFaParser extends AbstractRDFParser {
 
         // 3. The current element is examined for IRI mappings and these are added to the local list of IRI mappings. Note that an IRI mapping will simply overwrite any current mapping in the list that has the same name;
         this.currentProcessingContext().getElementAttributes().forEach((String attribute, String attributeValue) -> {
-            if (attribute.startsWith(XMLNS_PREFIX)) {
+            if (attribute.startsWith(XMLNS_PREFIX + ":")) {
                 String prefixName = attribute.replace(XMLNS_PREFIX + ":", "");
                 IRI prefixNamespace = getValueFactory().createIRI(attributeValue, "");
                 this.addIriMapping(prefixName, prefixNamespace);
@@ -211,9 +211,7 @@ public class RDFaParser extends AbstractRDFParser {
         if (isAttributePresent(RDFaAttributes.PREFIX)
                 && !getAttributeStringValue(RDFaAttributes.PREFIX).isEmpty()) {
             String prefixDeclaration = getAttributeStringValue(RDFaAttributes.PREFIX);
-            String prefixName = getPrefixFromDeclaration(prefixDeclaration);
-            IRI prefixIRI = getPrefixIriFromDeclaration(prefixDeclaration);
-            this.addIriMapping(prefixName, prefixIRI);
+            this.addIriMappings(getPrefixesFromDeclaration(prefixDeclaration));
         }
 
         // 4. The current element is also parsed for any language information, and if present, current language is set accordingly;
@@ -445,7 +443,7 @@ public class RDFaParser extends AbstractRDFParser {
             if (this.currentProcessingContext().getIncompleteStatements() == null) {
                 this.currentProcessingContext().setIncompleteStatements(new HashSet<>());
             }
-            for (RDFaIncompleteStatement incompleteStatement : currentProcessingContext().getEvaluationContext().getIncompleteStatement()) {
+            for (RDFaIncompleteStatement incompleteStatement : currentProcessingContext().getEvaluationContext().getIncompleteStatements()) {
                 if (incompleteStatement.getDirection() == RDFaIncompleteStatement.Direction.NONE) {
                     this.currentProcessingContext().addListMapping(incompleteStatement.getPredicate(), this.currentProcessingContext().getNewSubject());
                 } else if (incompleteStatement.getDirection() == RDFaIncompleteStatement.Direction.FORWARD) {
@@ -640,20 +638,25 @@ public class RDFaParser extends AbstractRDFParser {
         }
     }
 
-    private String getPrefixFromDeclaration(String declaration) {
-        String[] prefixArray = declaration.split(": ");
-        if (prefixArray.length != 2) {
+    private Map<String, IRI> getPrefixesFromDeclaration(String declaration) {
+        String[] prefixArray = declaration.split(" ");
+        HashMap<String, IRI> result = new HashMap<>();
+        // prefix array should contain an even number of elements corresponding to prefix/namespace pairs
+        if (prefixArray.length % 2 != 0) {
             throw new ParsingErrorException("Error during prefix extraction of " + declaration);
         }
-        return prefixArray[0].toLowerCase();
-    }
+        int numberOfPairs = prefixArray.length / 2;
+        for(int pairNumber = 0; pairNumber < numberOfPairs; pairNumber++) {
+            String prefix = prefixArray[pairNumber*2];
+            if(! prefix.endsWith(":")) {
+                throw new ParsingErrorException("Expecting namespace prefix declaration to end with \":\", got " + prefix + " in declaration " + declaration);
+            }
+            prefix = prefix.replaceAll(":$", ""); // Removing trailing :
+            IRI namespace = getValueFactory().createIRI(prefixArray[pairNumber*2 +1]);
 
-    private IRI getPrefixIriFromDeclaration(String declaration) {
-        String[] prefixArray = declaration.split(": ");
-        if (prefixArray.length != 2) {
-            throw new ParsingErrorException("Error during prefix extraction of " + declaration);
+            result.put(prefix, namespace);
         }
-        return getValueFactory().createIRI(prefixArray[1].toLowerCase());
+        return result;
     }
 
     private Resource getAttributeResourceValue(RDFaAttributes attribute) {

@@ -34,7 +34,7 @@ public abstract class AbstractModel extends AbstractSet<Statement> implements Mo
     public Namespace setNamespace(String prefix, String name) {
         Optional<? extends Namespace> existing = getNamespace(prefix);
 
-        if (!existing.isPresent() || !existing.get().getName().equals(name)) {
+        if (!existing.isPresent() || !existing.get().getNamespace().equals(name)) {
             Namespace namespace = new ModelNamespace(prefix, name);
             setNamespace(namespace);
             return namespace;

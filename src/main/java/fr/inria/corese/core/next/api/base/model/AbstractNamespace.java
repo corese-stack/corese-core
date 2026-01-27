@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.api.base.model;
 
 import java.io.Serial;
-import java.util.Comparator;
 import java.util.Objects;
 
 import fr.inria.corese.core.next.api.Namespace;
@@ -32,7 +31,7 @@ public abstract class AbstractNamespace implements Namespace {
         }
         Namespace ns = (Namespace) object;
         return Objects.equals(getPrefix(), ns.getPrefix())
-                && Objects.equals(getName(), ns.getName());
+                && Objects.equals(getNamespace(), ns.getNamespace());
     }
 
     /**
@@ -40,7 +39,7 @@ public abstract class AbstractNamespace implements Namespace {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(getPrefix(), getName());
+        return Objects.hash(getPrefix(), getNamespace());
     }
 
     /**
@@ -48,6 +47,6 @@ public abstract class AbstractNamespace implements Namespace {
      */
     @Override
     public String toString() {
-        return getPrefix() + " :: " + getName();
+        return getPrefix() + " :: " + getNamespace();
     }
 }

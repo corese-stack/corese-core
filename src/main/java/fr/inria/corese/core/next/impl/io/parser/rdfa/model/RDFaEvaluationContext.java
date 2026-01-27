@@ -27,9 +27,9 @@ public class RDFaEvaluationContext  {
     private Resource parentObjectResource = null;
 
     /**
-     * Set of statement in the process of building.
+     * Set of statements in the process of building.
      */
-    private Set<RDFaIncompleteStatement> incompleteStatement = new HashSet<>();
+    private Set<RDFaIncompleteStatement> incompleteStatements = new HashSet<>();
 
     /**
      * The language of the document. Note that there is no default language.
@@ -56,7 +56,7 @@ public class RDFaEvaluationContext  {
     public RDFaEvaluationContext(RDFaEvaluationContext context) {
         this.baseIri = context.baseIri;
         this.defaultVocabulary = context.defaultVocabulary;
-        this.incompleteStatement = new HashSet<>(context.incompleteStatement);
+        this.incompleteStatements = new HashSet<>(context.incompleteStatements);
         this.language = context.language;
         this.listMappings = new HashMap<>(context.listMappings);
         this.parentObjectResource = context.parentObjectResource;
@@ -88,32 +88,32 @@ public class RDFaEvaluationContext  {
         this.parentObjectResource = parentObjectResource;
     }
 
-    public Set<RDFaIncompleteStatement> getIncompleteStatement() {
-        return incompleteStatement;
+    public Set<RDFaIncompleteStatement> getIncompleteStatements() {
+        return incompleteStatements;
     }
 
     public void setIncompleteStatements(Set<RDFaIncompleteStatement> incompleteStatement) {
-        this.incompleteStatement = incompleteStatement;
+        this.incompleteStatements = incompleteStatement;
     }
 
     public Iterator<RDFaIncompleteStatement> getIncompleteStatementIterator() {
-        return this.incompleteStatement.iterator();
+        return this.incompleteStatements.iterator();
     }
 
     public void addStatementWithoutSubject(IRI property, Value object) {
         RDFaIncompleteStatement newStatement = new RDFaIncompleteStatement(property);
         newStatement.setObject(object);
-        this.incompleteStatement.add(newStatement);
+        this.incompleteStatements.add(newStatement);
     }
 
     public void addStatementWithoutObject(Resource subject, IRI property) {
         RDFaIncompleteStatement newStatement = new RDFaIncompleteStatement(property);
         newStatement.setSubject(subject);
-        this.incompleteStatement.add(newStatement);
+        this.incompleteStatements.add(newStatement);
     }
 
     public void clearIncompleteStatements() {
-        this.incompleteStatement.clear();
+        this.incompleteStatements.clear();
     }
 
     public String getLanguage() {
@@ -167,8 +167,8 @@ public class RDFaEvaluationContext  {
         } else {
             sb.append("Object: ").append((Object) null).append(" ");
         }
-        if(! this.getIncompleteStatement().isEmpty()) {
-            sb.append(this.getIncompleteStatement().size()).append(" incomplete statements.");
+        if(! this.getIncompleteStatements().isEmpty()) {
+            sb.append(this.getIncompleteStatements().size()).append(" incomplete statements.");
         }
 
         return sb.toString();

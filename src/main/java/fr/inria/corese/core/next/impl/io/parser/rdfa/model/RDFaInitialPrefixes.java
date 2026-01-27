@@ -12,7 +12,7 @@ public enum RDFaInitialPrefixes implements Namespace {
     //        cc	"http://creativecommons.org/ns#"
     CC("cc", "http://creativecommons.org/ns#"),
     //        csvw	"http://www.w3.org/ns/csvw#"
-    CSVW("cc", "http://www.w3.org/ns/csvw#"),
+    CSVW("csvw", "http://www.w3.org/ns/csvw#"),
     //        ctag	"http://commontag.org/ns#"
     CTAG("ctag", "http://commontag.org/ns#"),
     //        dc	"http://purl.org/dc/terms/"
@@ -102,10 +102,10 @@ public enum RDFaInitialPrefixes implements Namespace {
     ;
 
     private final String prefix;
-    private final String name;
+    private final String namespace;
 
-    RDFaInitialPrefixes(String prefix, String name) {
-        this.name = name;
+    RDFaInitialPrefixes(String prefix, String namespaceString) {
+        this.namespace = namespaceString;
         this.prefix = prefix;
     }
 
@@ -115,7 +115,7 @@ public enum RDFaInitialPrefixes implements Namespace {
     }
 
     @Override
-    public String getName() {
-        return this.name;
+    public String getNamespace() {
+        return this.namespace;
     }
 }

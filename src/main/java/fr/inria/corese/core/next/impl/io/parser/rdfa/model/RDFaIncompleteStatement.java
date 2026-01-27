@@ -125,10 +125,16 @@ public class RDFaIncompleteStatement {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if(! (o instanceof RDFaIncompleteStatement oStat)) {
             return false;
         }
-        return oStat.getSubject() == this.getSubject() && oStat.getPredicate() == this.getPredicate() && oStat.getObject() == this.getObject() && oStat.getDirection() == this.getDirection();
+        return oStat.getSubject().equals(this.getSubject())
+                && oStat.getPredicate().equals(this.getPredicate())
+                && oStat.getObject().equals(this.getObject())
+                && oStat.getDirection().equals(this.getDirection());
     }
 
     @Override
