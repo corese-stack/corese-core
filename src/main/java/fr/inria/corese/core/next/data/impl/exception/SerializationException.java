@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.data.impl.exception;
 
-import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
+import fr.inria.corese.core.next.api.base.exception.CoreseException;
+import fr.inria.corese.core.next.api.base.io.FileFormat;
 
 /**
  * Exception thrown during RDF serialization or deserialization failures.
@@ -20,6 +21,10 @@ public class SerializationException extends CoreseException {
         this(message, formatName, -1, -1, null);
     }
 
+    public SerializationException(String message, FileFormat format) {
+        this(message, format.getName(), -1, -1, null);
+    }
+
     /**
      * Constructs a new {@code SerializationException} with the specified detail
      * message,
@@ -27,7 +32,26 @@ public class SerializationException extends CoreseException {
      *
      * @param message    the detail message (which is saved for later retrieval by
      *                   the {@link #getMessage()} method).
-     * @param formatName the name of the RDF format being processed when the error
+     * @param format    the format being processed when the error occurred.
+     *                   Use DEFAULT_FORMAT if the format is not applicable or cannot be
+     *                   determined.
+     * @param cause      the cause (which is saved for later retrieval by the
+     *                   {@link #getCause()} method).
+     *                   (A {@code null} value is permitted, and indicates that the
+     *                   cause is nonexistent or unknown.)
+     */
+    public SerializationException(String message, FileFormat format, Throwable cause) {
+        this(message, format.getName(), -1, -1, cause);
+    }
+
+    /**
+     * Constructs a new {@code SerializationException} with the specified detail
+     * message,
+     * format , and cause. Line and column numbers are set to -1 (unknown).
+     *
+     * @param message    the detail message (which is saved for later retrieval by
+     *                   the {@link #getMessage()} method).
+     * @param formatName the name of the format being processed when the error
      *                   occurred.
      *                   Use DEFAULT_FORMAT if the format is not applicable or cannot be
      *                   determined.
@@ -46,7 +70,25 @@ public class SerializationException extends CoreseException {
      * format name, line number, column number, and cause.
      *
      * @param message      the detail message.
-     * @param formatName   the name of the RDF format being processed.
+     * @param format       the format being processed.
+     * @param lineNumber   the line number where the error occurred, or -1 if
+     *                     unknown.
+     * @param columnNumber the column number where the error occurred, or -1 if
+     *                     unknown.
+     * @param cause        the cause of the exception.
+     */
+    public SerializationException(String message, FileFormat format, int lineNumber, int columnNumber,
+                                  Throwable cause) {
+        this(message, format.getName(), lineNumber, columnNumber, cause);
+    }
+
+    /**
+     * Constructs a new {@code SerializationException} with the specified detail
+     * message,
+     * format name, line number, column number, and cause.
+     *
+     * @param message      the detail message.
+     * @param formatName   the name of the format being processed.
      * @param lineNumber   the line number where the error occurred, or -1 if
      *                     unknown.
      * @param columnNumber the column number where the error occurred, or -1 if
@@ -86,7 +128,7 @@ public class SerializationException extends CoreseException {
     }
 
     /**
-     * Returns the name of the RDF format that was being processed when the error
+     * Returns the name of the format that was being processed when the error
      * occurred.
      *
      * @return the format name, or "unknown" if not specified.
