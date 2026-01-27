@@ -26,6 +26,7 @@ public class CharacterSeparatedValuesOptions extends AbstractIOOptions implement
 
         Builder setLineEnding(String ln) {
             this.lineEnding = ln;
+            return this;
         }
 
         @Override

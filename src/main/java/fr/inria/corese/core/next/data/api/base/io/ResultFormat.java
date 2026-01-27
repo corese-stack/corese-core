@@ -29,7 +29,7 @@ public class ResultFormat extends FileFormat {
 
     public static final ResultFormat XML = new ResultFormat(
             "XML",
-            List.of("xml"),
+            List.of("xml", "srx"),
             List.of("application/sparql-results+xml")
     );
 
