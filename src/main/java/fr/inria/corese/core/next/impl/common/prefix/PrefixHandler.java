@@ -118,7 +118,7 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         if (namespace == null) {
             throw new IllegalArgumentException("Namespace cannot be null");
         }
-        setPrefix(namespace.getPrefix(), namespace.getName());
+        setPrefix(namespace.getPrefix(), namespace.getNamespace());
     }
 
     /**
@@ -441,14 +441,14 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         }
 
         @Override
-        public String getName() {
+        public String getNamespace() {
             return name;
         }
+
         @SuppressWarnings("NullableProblems")
-        @Override
         public int compareTo(Namespace o) {
             Objects.requireNonNull(o);
-            int cmp = this.name.compareTo(o.getName());
+            int cmp = this.name.compareTo(o.getNamespace());
             if (cmp != 0) {
                 return cmp;
             }

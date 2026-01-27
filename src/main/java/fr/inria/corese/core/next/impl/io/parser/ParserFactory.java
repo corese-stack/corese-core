@@ -53,7 +53,7 @@ public class ParserFactory extends AbstractRDFParserFactory {
              return new TriGParser(model, factory, config);
         } else if(format == RDFFormat.RDFC_1_0) {
             return new NQuadsParser(model, factory, config);
-        } else if (format == RDFFormat.RDFa) {
+        } else if (format == RDFFormat.RDFA) {
             return new RDFaParser(model, factory, config);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);
@@ -80,7 +80,7 @@ public class ParserFactory extends AbstractRDFParserFactory {
             return new RDFXMLParser(model, factory);
         } else if (format == RDFFormat.TRIG) {
             return new TriGParser(model, factory);
-        } else if (format == RDFFormat.RDFa) {
+        } else if (format == RDFFormat.RDFA) {
             return new RDFaParser(model, factory);
         }
         throw new IllegalArgumentException("Unsupported format: " + format);

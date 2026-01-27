@@ -75,16 +75,16 @@ class AbstractModelTest {
         Optional<Namespace> ns = model.getNamespace("ex");
         assertTrue(ns.isPresent());
         assertEquals("ex", ns.get().getPrefix());
-        assertEquals("http://example.org/ns/", ns.get().getName());
+        assertEquals("http://example.org/ns/", ns.get().getNamespace());
 
         Namespace existingNs = model.setNamespace("ex", "http://example.org/ns/");
-        assertEquals("http://example.org/ns/", existingNs.getName());
+        assertEquals("http://example.org/ns/", existingNs.getNamespace());
         assertEquals(1, model.getNamespaces().size());
 
         model.setNamespace("ex", "http://example.com/newns/");
         Optional<Namespace> updatedNs = model.getNamespace("ex");
         assertTrue(updatedNs.isPresent());
-        assertEquals("http://example.com/newns/", updatedNs.get().getName());
+        assertEquals("http://example.com/newns/", updatedNs.get().getNamespace());
         assertEquals(1, model.getNamespaces().size());
     }
 
@@ -99,7 +99,7 @@ class AbstractModelTest {
 
         Optional<Namespace> fetchedNs = model.getNamespace("geosparql");
         assertTrue(fetchedNs.isPresent());
-        assertEquals("http://example.org/ont/geosparql#", fetchedNs.get().getName());
+        assertEquals("http://example.org/ont/geosparql#", fetchedNs.get().getNamespace());
         assertEquals(1, model.getNamespaces().size());
     }
 
@@ -115,8 +115,8 @@ class AbstractModelTest {
         Set<Namespace> namespaces = model.getNamespaces();
         assertEquals(2, namespaces.size());
 
-        assertTrue(namespaces.stream().anyMatch(n -> n.getPrefix().equals("ex1") && n.getName().equals("http://example.org/ns1/")));
-        assertTrue(namespaces.stream().anyMatch(n -> n.getPrefix().equals("ex2") && n.getName().equals("http://example.org/ns2/")));
+        assertTrue(namespaces.stream().anyMatch(n -> n.getPrefix().equals("ex1") && n.getNamespace().equals("http://example.org/ns1/")));
+        assertTrue(namespaces.stream().anyMatch(n -> n.getPrefix().equals("ex2") && n.getNamespace().equals("http://example.org/ns2/")));
     }
 
     /**
@@ -134,7 +134,7 @@ class AbstractModelTest {
 
         // Comparison
         assertEquals(testNs.getPrefix(), removedNs.get().getPrefix());
-        assertEquals(testNs.getName(), removedNs.get().getName());
+        assertEquals(testNs.getNamespace(), removedNs.get().getNamespace());
 
         assertEquals(0, model.getNamespaces().size());
         assertFalse(model.getNamespace("ex").isPresent());
@@ -689,19 +689,8 @@ class AbstractModelTest {
         }
 
         @Override
-        public String getName() {
+        public String getNamespace() {
             return name;
-        }
-
-        @Override
-        public int compareTo(Namespace other) {
-
-            int prefixComparison = this.getPrefix().compareTo(other.getPrefix());
-            if (prefixComparison != 0) {
-                return prefixComparison;
-            }
-
-            return this.getName().compareTo(other.getName());
         }
     }
 }

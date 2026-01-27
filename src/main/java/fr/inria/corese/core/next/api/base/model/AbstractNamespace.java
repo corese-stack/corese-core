@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.api.base.model;
 
 import java.io.Serial;
-import java.util.Comparator;
 import java.util.Objects;
 
 import fr.inria.corese.core.next.api.Namespace;
@@ -20,22 +19,6 @@ public abstract class AbstractNamespace implements Namespace {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Comparator that orders namespaces by prefix, then by URI.
-     * Null values are ordered first.
-     */
-    private static final Comparator<Namespace> ORDERING = Comparator.nullsFirst(
-            Comparator.comparing(Namespace::getPrefix)
-                    .thenComparing(Namespace::getName));
-
-    /**
-     * Compares this namespace to another based on prefix and name.
-     */
-    @Override
-    public int compareTo(Namespace other) {
-        return ORDERING.compare(this, other);
-    }
-
-    /**
      * Checks equality based on prefix and name.
      */
     @Override
@@ -48,7 +31,7 @@ public abstract class AbstractNamespace implements Namespace {
         }
         Namespace ns = (Namespace) object;
         return Objects.equals(getPrefix(), ns.getPrefix())
-                && Objects.equals(getName(), ns.getName());
+                && Objects.equals(getNamespace(), ns.getNamespace());
     }
 
     /**
@@ -56,7 +39,7 @@ public abstract class AbstractNamespace implements Namespace {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(getPrefix(), getName());
+        return Objects.hash(getPrefix(), getNamespace());
     }
 
     /**
@@ -64,6 +47,6 @@ public abstract class AbstractNamespace implements Namespace {
      */
     @Override
     public String toString() {
-        return getPrefix() + " :: " + getName();
+        return getPrefix() + " :: " + getNamespace();
     }
 }

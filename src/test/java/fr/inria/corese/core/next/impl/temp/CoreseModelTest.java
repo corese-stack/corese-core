@@ -163,7 +163,7 @@ class CoreseModelTest {
         Set<Namespace> testNamespaces = new HashSet<>();
         Namespace ns1 = mock(Namespace.class);
         when(ns1.getPrefix()).thenReturn("ex");
-        when(ns1.getName()).thenReturn("http://example.org/");
+        when(ns1.getNamespace()).thenReturn("http://example.org/");
         testNamespaces.add(ns1);
 
         CoreseModel newModel = new CoreseModel(mockCoreseGraph, testNamespaces);
@@ -183,12 +183,12 @@ class CoreseModelTest {
         Set<Namespace> initialNamespaces = new HashSet<>();
         Namespace ns1 = mock(Namespace.class);
         when(ns1.getPrefix()).thenReturn("prefix1");
-        when(ns1.getName()).thenReturn("http://example.org/ns1#");
+        when(ns1.getNamespace()).thenReturn("http://example.org/ns1#");
         initialNamespaces.add(ns1);
 
         Namespace ns2 = mock(Namespace.class);
         when(ns2.getPrefix()).thenReturn("prefix2");
-        when(ns2.getName()).thenReturn("http://example.org/ns2#");
+        when(ns2.getNamespace()).thenReturn("http://example.org/ns2#");
         initialNamespaces.add(ns2);
 
         CoreseModel newModel = new CoreseModel(initialNamespaces);
