@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.api.sparql.io.serializer;
+package fr.inria.corese.core.next.api.query.io.serializer;
 
 import fr.inria.corese.core.next.api.io.serializer.Serializer;
 
