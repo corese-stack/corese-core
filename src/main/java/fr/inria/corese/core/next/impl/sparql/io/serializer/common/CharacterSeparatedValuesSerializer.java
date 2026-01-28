@@ -10,12 +10,9 @@ import fr.inria.corese.core.next.api.sparql.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class CharacterSeparatedValuesSerializer implements ResultSerializer {
 
