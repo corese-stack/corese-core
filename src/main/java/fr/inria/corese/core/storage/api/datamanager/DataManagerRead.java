@@ -1,16 +1,14 @@
-package fr.inria.corese.core.storage.api.dataManager;
-
-import java.util.ArrayList;
-import java.util.List;
+package fr.inria.corese.core.storage.api.datamanager;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Interface to adapt an external storage system to Corese.
- * 
  * {@code DataManagerRead} for {@code select where} SPARQL queries.
- * 
  * This interface is not used by the internal Corese graph, specific DataBroker
  * directly process it.
  * 
@@ -35,6 +33,7 @@ public interface DataManagerRead {
      * @param predicate The predicate to count.
      * @return Number of edges with a specific predicate.
      */
+    @SuppressWarnings("unused")
     default int countEdges(Node predicate) {
         return 0;
     }
@@ -54,15 +53,12 @@ public interface DataManagerRead {
     /**
      * Returns an {@link Iterable} over all {@link Edge}s in the graph that match
      * the supplied criteria.
-     * 
      * If several edges have the same subject, predicate and object then only one is
      * returned.
-     * 
      * If the size of the contexts in parameter is not equal to 1, then the value of
      * Graph of Edges returned does not matter. It can be for example
      * {@code http://ns.inria.fr/corese.core.kgram/default}. Be careful, the value of
      * Graph of Edges cannot be {@code null}.
-     * 
      * All {@code null} in context list are ignored. E.g. If the list contains only
      * null, it is handled as an empty list.
      * 
@@ -85,17 +81,16 @@ public interface DataManagerRead {
     
     // with condition edge.index >= index
     // use case: rule engine transitive closure ClosureDataManager
+    @SuppressWarnings("unused")
     default Iterable<Edge> getEdges(Node subject, Node predicate, Node object, List<Node> contexts, int oper, int index) {
         return getEdges(subject, predicate, object, contexts);
     }
-    
-    // triple exist in any graph
+
+    // triple exists in any graph
     default boolean exist(Node subject, Node predicate, Node object) {
-        for (Edge edge : getEdges(subject, predicate, object, null)) {
-            return true;
-        }
-        return false;
+        return getEdges(subject, predicate, object, null).iterator().hasNext();
     }
+
 
     /**
      * Returns an {@link Iterable} over all predicates of edges that match the
@@ -105,6 +100,7 @@ public interface DataManagerRead {
      * @return An {@link Iterable} over all predicates of edges that match the
      *         context.
      */
+    @SuppressWarnings("unused")
     default Iterable<Node> predicates(Node context) {
         return new ArrayList<>(0);
     }
@@ -116,6 +112,7 @@ public interface DataManagerRead {
      * @param context Context to match, {@code null} to match with any contexts.
      * @return An {@link Iterable} over all node in graph that match the context.
      */
+    @SuppressWarnings("unused")
     default Iterable<Node> getNodes(Node context) {
         return new ArrayList<>(0);
     }

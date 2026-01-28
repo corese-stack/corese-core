@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager;
+package fr.inria.corese.core.storage.api.datamanager;
 
 import java.util.HashSet;
 import java.util.List;
@@ -10,9 +10,7 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  * Interface to adapt an external storage system to Corese.
- * 
  * {@code DataManagerUpdate} for {@code update} and {@code construct} queries.
- * 
  * This interface is also used by the internal Corese graph.
  * 
  * @author Olivier Corby
@@ -62,7 +60,6 @@ public interface DataManagerUpdate {
 
     /**
      * Add an edges to the graph
-     * 
      * In case of rdf star triple :
      * subject (resp object) may be a triple
      * edge.getSubjectNode().isTriple() == true
@@ -73,6 +70,7 @@ public interface DataManagerUpdate {
      * @param edge Edge to add to the graph.
      * @return The edge inserted, null if no inserted.
      */
+    @SuppressWarnings("unused")
     default Edge insert(Edge edge) {
         return null;
     }
@@ -95,6 +93,7 @@ public interface DataManagerUpdate {
      *                  context matching one of these will be removed.
      * @return An {@link Iterable} over all removed edges.
      */
+    @SuppressWarnings("unused")
     default Iterable<Edge> delete(Node subject, Node predicate, Node object, List<Node> contexts) {
         return null;
     }
@@ -130,7 +129,7 @@ public interface DataManagerUpdate {
      */
     default boolean clear(List<Node> contexts, boolean silent) {
         Iterable<Edge> deleted = this.delete(null, null, null, contexts);
-        Boolean succes = deleted.iterator().hasNext();
+        boolean succes = deleted.iterator().hasNext();
 
         if (silent) {
             return true;
@@ -155,6 +154,7 @@ public interface DataManagerUpdate {
      * @return True if the graph has been modified or {@code silent} parameter is
      *         true, else false.
      */
+    @SuppressWarnings("unused")
     default boolean addGraph(Node source_context, Node target_context, boolean silent) {
         return false;
     }
@@ -171,8 +171,7 @@ public interface DataManagerUpdate {
      */
     default boolean copyGraph(Node source_context, Node target_context, boolean silent) {
         this.clear(List.of(target_context), silent);
-        Boolean result = this.addGraph(source_context, target_context, silent);
-        return result;
+        return this.addGraph(source_context, target_context, silent);
     }
 
     /**
@@ -186,7 +185,7 @@ public interface DataManagerUpdate {
      *         true, else false.
      */
     default boolean moveGraph(Node source_context, Node target_context, boolean silent) {
-        Boolean result = this.copyGraph(source_context, target_context, silent);
+        boolean result = this.copyGraph(source_context, target_context, silent);
         this.clear(List.of(source_context), silent);
         return result;
     }
@@ -196,13 +195,13 @@ public interface DataManagerUpdate {
      * 
      * @param context New context to declare.
      */
+    @SuppressWarnings("unused")
     default void declareContext(Node context) {
     }
 
     /**
      * Clear and undeclare a context in graph.
      * 
-     * @param context
      */
     default void unDeclareContext(Node context) {
         this.clear(List.of(context), false);

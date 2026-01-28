@@ -1,11 +1,10 @@
-package fr.inria.corese.core.storage.api.dataManager;
+package fr.inria.corese.core.storage.api.datamanager;
 
 import fr.inria.corese.core.producer.MetadataManager;
 import fr.inria.corese.core.sparql.triple.parser.HashMapList;
 
 /**
  * Interface to adapt an external storage system to Corese.
- * 
  * {@code DataManagerRead} for {@code select where} SPARQL queries.
  * {@code DataManagerUpdate} for {@code update} and {@code construct} queries.
  * 
@@ -14,9 +13,6 @@ import fr.inria.corese.core.sparql.triple.parser.HashMapList;
  */
 public interface DataManager extends DataManagerRead, DataManagerUpdate {
 
-    /*******************
-     * MetaDataManager *
-     *******************/
 
     /**
      * Indicates whether or not this DataManage has a MetaDataManager.
@@ -67,35 +63,14 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
     }
     
     // manage edge index i as named graph kg:rule_i
-    default void setRuleDataManager(boolean b) {    
-    }
-    
-    default boolean isRuleDataManager() {
-        return false;
-    }
-    
-    // manage integer context in edge iterator as a filter on edge index 
-    // where edge.index >= context.intValue
-    default boolean isEdgeIndexContext() {
-        return false;
+    @SuppressWarnings("unused")
+    default void setRuleDataManager(boolean b) {
     }
 
-    /****************
-     * Transactions *
-     ****************/
 
-    /**
-     * Indicates whether or not this DataManage supports transactions.
-     * 
-     * @return true if this DataManage supports transactions, otherwise false.
-     */
-    default boolean transactionSupport() {
-        return false;
-    }
 
     /**
      * Start a read transaction.
-     * 
      * A read transaction can be re-entrant, i.e. several read transactions can be
      * nested within each other.
      * Only if the transactions are supported.
@@ -105,7 +80,6 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
 
     /**
      * End a read transaction.
-     * 
      * If several read transactions are nested within each other, this function
      * terminates only the most recent read transaction.
      * Only if the transactions are supported.
@@ -115,7 +89,6 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
 
     /**
      * Start a write transaction.
-     * 
      * A write transaction can't be re-entrant.
      * Only if the transactions are supported.
      */
@@ -129,42 +102,6 @@ public interface DataManager extends DataManagerRead, DataManagerUpdate {
     default void endWriteTransaction() {
     }
 
-    /**
-     * Abort a transaction and undo the changes.
-     * Only if the transactions are supported.
-     */
-    default void abortTransaction() {
-    }
-
-    /**
-     * Indicates whether this DataManage is in transaction or not.
-     * Only if the transactions are supported.
-     * 
-     * @return true if this DataManage is in transaction, otherwise false.
-     */
-    default boolean isInTransaction() {
-        return this.isInReadTransaction() || this.isInWriteTransaction();
-    }
-
-    /**
-     * Indicates whether this DataManage is in read transaction or not.
-     * Only if the transactions are supported.
-     * 
-     * @return true if this DataManage is in read transaction, otherwise false.
-     */
-    default boolean isInReadTransaction() {
-        return false;
-    }
-
-    /**
-     * Indicates whether this DataManage is in write transaction or not.
-     * Only if the transactions are supported.
-     * 
-     * @return true if this DataManage is in write transaction, otherwise false.
-     */
-    default boolean isInWriteTransaction() {
-        return false;
-    }
 
     default void startRuleEngine() {
     }

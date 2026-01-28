@@ -7,7 +7,7 @@ import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.logic.RDF;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.storage.api.datamanager.DataManager;
 
 import java.util.List;
 

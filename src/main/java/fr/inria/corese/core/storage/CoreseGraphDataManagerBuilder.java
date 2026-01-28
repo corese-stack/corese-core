@@ -1,34 +1,32 @@
 package fr.inria.corese.core.storage;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.storage.api.dataManager.DataManagerBuilder;
+import fr.inria.corese.core.storage.api.datamanager.DataManagerBuilder;
 
 public class CoreseGraphDataManagerBuilder implements DataManagerBuilder {
 
-    //////////////////////////
-    // Mandatory parameters //
-    //////////////////////////
-
-    /////////////////////////
-    // Optional parameters //
-    /////////////////////////
 
     private Graph graph;
     private boolean defGraph = false;
+    private boolean enableTransactions = false;
 
-    //////////////////
-    // Constructors //
-    //////////////////
+
+    /**
+     * Enables transaction support.
+     *
+     * @param enable true to enable transactions
+     * @return this builder
+     */
+    public CoreseGraphDataManagerBuilder withTransactions(boolean enable) {
+        this.enableTransactions = enable;
+        return this;
+    }
 
     /**
      * Create a CoreseGraphDataManagerBuilder.
      */
     public CoreseGraphDataManagerBuilder() {
     }
-
-    ////////////
-    // Setter //
-    ////////////
 
     /**
      * Build the dataManager from an existing Corese Graphn
@@ -42,9 +40,6 @@ public class CoreseGraphDataManagerBuilder implements DataManagerBuilder {
         return this;
     }
 
-    ///////////
-    // Build //
-    ///////////
 
     @Override
     public CoreseGraphDataManager build() {

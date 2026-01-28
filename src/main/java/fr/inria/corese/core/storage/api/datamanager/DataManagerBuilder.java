@@ -1,4 +1,4 @@
-package fr.inria.corese.core.storage.api.dataManager;
+package fr.inria.corese.core.storage.api.datamanager;
 
 /**
  * Builder for DataManager
