@@ -183,19 +183,18 @@ EXPONENT
 // "'''" (("'" | "''")? ([^'\] | ECHAR | UCHAR))* "'''"
 STRING_LITERAL_LONG_SINGLE_QUOTE
     : '\'\'\'' (
-        ( ~['\\] | ECHAR | UCHAR )
-        | '\'' ~['\\]
-        | '\'\'' ~['\\]
-      )* '\'\'\''
+            ( '\'' | '\'\'' )
+            | ( ~['\\] | ECHAR | UCHAR | '"')
+        )+  '\'\'\''
+    | '\'\'\'\'\'\''
     ;
 
-// '"""' (('"' | '""')? ([^"\] | ECHAR | UCHAR))* '"""'
 STRING_LITERAL_LONG_QUOTE
     : '"""' (
-        ( ~["\\] | ECHAR | UCHAR )
-        | '"' ~["\\]
-        | '""' ~["\\]
-      )* '"""'
+            ( '"' | '""' )
+            | ( ~["\\] | ECHAR | UCHAR | '\'')
+        )+  '"""'
+    | '""""""'
     ;
 
 STRING_LITERAL_QUOTE
