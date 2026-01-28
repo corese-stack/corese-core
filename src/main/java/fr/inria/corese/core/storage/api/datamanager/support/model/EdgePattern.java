@@ -68,7 +68,7 @@ public final class EdgePattern {
      *
      * @return true if subject is specified
      */
-    public boolean isSubject() {
+    public boolean hasSubject() {
         return subject == null;
     }
 
@@ -77,7 +77,7 @@ public final class EdgePattern {
      *
      * @return true if predicate is specified
      */
-    public boolean isPredicate() {
+    public boolean hasPredicate() {
         return predicate == null;
     }
 
@@ -86,7 +86,7 @@ public final class EdgePattern {
      *
      * @return true if object is specified
      */
-    public boolean isObject() {
+    public boolean hasObject() {
         return object == null;
     }
 
@@ -95,7 +95,7 @@ public final class EdgePattern {
      *
      * @return true if contexts are specified
      */
-    public boolean isContexts() {
+    public boolean hasContexts() {
         return contexts == null || contexts.isEmpty();
     }
 
@@ -105,7 +105,7 @@ public final class EdgePattern {
      * @return true if no constraints
      */
     public boolean matchesAll() {
-        return isSubject() && isPredicate() && isObject() && isContexts();
+        return hasSubject() && hasPredicate() && hasObject() && hasContexts();
     }
 
     /**

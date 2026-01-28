@@ -2,7 +2,6 @@ package fr.inria.corese.core.storage;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.storage.api.datamanager.support.config.DataManagerConfig;
 import fr.inria.corese.core.storage.api.datamanager.support.exception.DataManagerException;
 import fr.inria.corese.core.storage.api.datamanager.support.model.EdgePattern;
 import fr.inria.corese.core.storage.api.datamanager.support.model.GraphStatistics;
@@ -30,11 +29,6 @@ class CoreseGraphDataManagerIntegrationTest {
     void setUp() {
         dataManager = new CoreseGraphDataManagerBuilder().build();
 
-        // Initialize with transaction support enabled
-        DataManagerConfig config = DataManagerConfig.builder()
-                .storagePath("http://ns.inria.fr/corese/my-dataset")
-                .debug(true)
-                .build();
     }
 
     @Test

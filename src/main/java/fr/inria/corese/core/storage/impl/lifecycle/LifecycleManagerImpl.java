@@ -183,9 +183,6 @@ public class LifecycleManagerImpl implements DataManagerLifecycle {
             logger.debug("Debug mode enabled");
         }
 
-        // Log storage path information
-        logger.info("Storage path: {}", config.getStoragePath());
-
         // Other configurations can be added here
         config.getProperties().forEach((key, value) -> logger.debug("Config property: {} = {}", key, value));
     }

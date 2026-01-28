@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("LifecycleManagerImpl Tests")
 class LifecycleManagerImplTest {
 
-    private static final String TEST_STORAGE_PATH = "http://ns.inria.fr/corese/test-dataset";
 
     private LifecycleManagerImpl lifecycleManager;
 
@@ -31,7 +30,6 @@ class LifecycleManagerImplTest {
      */
     private DataManagerConfig createDefaultConfig() {
         return DataManagerConfig.builder()
-                .storagePath(TEST_STORAGE_PATH)
                 .build();
     }
 
@@ -40,7 +38,6 @@ class LifecycleManagerImplTest {
      */
     private DataManagerConfig createDebugConfig() {
         return DataManagerConfig.builder()
-                .storagePath(TEST_STORAGE_PATH)
                 .debug(true)
                 .build();
     }
@@ -85,7 +82,6 @@ class LifecycleManagerImplTest {
     @DisplayName("Restart should reinitialize successfully")
     void testRestartSuccess() throws DataManagerException {
         DataManagerConfig config1 = DataManagerConfig.builder()
-                .storagePath(TEST_STORAGE_PATH)
                 .debug(false)
                 .build();
         lifecycleManager.initialize(config1);
@@ -128,21 +124,18 @@ class LifecycleManagerImplTest {
     void testInitializeWithCustomStoragePath() throws DataManagerException {
         String customPath = "http://example.org/custom/storage";
         DataManagerConfig config = DataManagerConfig.builder()
-                .storagePath(customPath)
                 .build();
 
         lifecycleManager.initialize(config);
 
         assertTrue(lifecycleManager.isInitialized());
         assertEquals(LifecycleState.RUNNING, lifecycleManager.getState());
-        assertEquals(customPath, config.getStoragePath());
     }
 
     @Test
     @DisplayName("Initialize with transaction support enabled")
     void testInitializeWithTransactionSupport() throws DataManagerException {
         DataManagerConfig config = DataManagerConfig.builder()
-                .storagePath(TEST_STORAGE_PATH)
                 .transactionSupport(true)
                 .build();
 
@@ -155,7 +148,6 @@ class LifecycleManagerImplTest {
     @DisplayName("Initialize with custom properties")
     void testInitializeWithCustomProperties() throws DataManagerException {
         DataManagerConfig config = DataManagerConfig.builder()
-                .storagePath(TEST_STORAGE_PATH)
                 .property("custom.key", "custom.value")
                 .property("another.key", "another.value")
                 .build();
@@ -170,14 +162,12 @@ class LifecycleManagerImplTest {
     @DisplayName("Multiple restarts should work correctly")
     void testMultipleRestarts() throws DataManagerException {
         DataManagerConfig config1 = DataManagerConfig.builder()
-                .storagePath(TEST_STORAGE_PATH)
                 .debug(false)
                 .build();
         lifecycleManager.initialize(config1);
 
         for (int i = 0; i < 3; i++) {
             DataManagerConfig config = DataManagerConfig.builder()
-                    .storagePath(TEST_STORAGE_PATH)
                     .debug(i % 2 == 0)
                     .build();
             lifecycleManager.restart(config);

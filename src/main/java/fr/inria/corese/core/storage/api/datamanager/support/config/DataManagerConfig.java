@@ -11,7 +11,6 @@ public final class DataManagerConfig {
 
     private final Map<String, Object> properties;
     private final boolean transactionSupport;
-    private final String storagePath;
     private final boolean debug;
 
     /**
@@ -20,7 +19,6 @@ public final class DataManagerConfig {
     private DataManagerConfig(Builder builder) {
         this.properties = Map.copyOf(builder.properties);
         this.transactionSupport = builder.transactionSupport;
-        this.storagePath = builder.storagePath;
         this.debug = builder.debug;
     }
 
@@ -60,14 +58,6 @@ public final class DataManagerConfig {
         return properties;
     }
 
-    /**
-     * Returns the storage path.
-     *
-     * @return Storage path (never null)
-     */
-    public String getStoragePath() {
-        return storagePath;
-    }
 
     /**
      * Indicates whether debug mode is enabled.
@@ -90,7 +80,6 @@ public final class DataManagerConfig {
     @Override
     public String toString() {
         return "DataManagerConfig{" +
-                "storagePath='" + storagePath + '\'' +
                 ", transactionSupport=" + transactionSupport +
                 ", debug=" + debug +
                 ", properties=" + properties +
@@ -103,7 +92,6 @@ public final class DataManagerConfig {
     public static final class Builder {
         private final Map<String, Object> properties = new HashMap<>();
         private boolean transactionSupport = false;
-        private String storagePath = null;
         private boolean debug = false;
 
         private Builder() {
@@ -150,22 +138,6 @@ public final class DataManagerConfig {
         }
 
         /**
-         * Sets the storage path for the DataManager.
-         * This is a required configuration parameter.
-         *
-         * @param path Storage path (must not be null, empty, or blank)
-         * @return this builder instance
-         * @throws IllegalArgumentException if path is null, empty, or blank
-         */
-        public Builder storagePath(String path) {
-            if (path == null || path.isBlank()) {
-                throw new IllegalArgumentException("Storage path cannot be null, empty, or blank");
-            }
-            this.storagePath = path;
-            return this;
-        }
-
-        /**
          * Enables or disables debug mode.
          *
          * @param debug true to enable
@@ -183,12 +155,6 @@ public final class DataManagerConfig {
          * @throws IllegalStateException if storagePath has not been set
          */
         public DataManagerConfig build() {
-            if (storagePath == null || storagePath.isBlank()) {
-                throw new IllegalStateException(
-                        "Storage path must be set before building configuration. " +
-                                "Use storagePath(String) to specify the storage location."
-                );
-            }
             return new DataManagerConfig(this);
         }
     }

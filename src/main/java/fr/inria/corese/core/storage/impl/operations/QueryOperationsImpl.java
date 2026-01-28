@@ -99,8 +99,8 @@ public class QueryOperationsImpl implements QueryOperations {
             logger.debug("Counting with pattern: {}", pattern);
 
             // Optimize: if only predicate is specified, use Graph.size(predicate)
-            if (!pattern.isPredicate() && pattern.isSubject() &&
-                    pattern.isObject() && pattern.isContexts()) {
+            if (!pattern.hasPredicate() && pattern.hasSubject() &&
+                    pattern.hasObject() && pattern.hasContexts()) {
 
                 int count = graph.size(pattern.getPredicate());
                 logger.debug("Count (optimized by predicate): {}", count);

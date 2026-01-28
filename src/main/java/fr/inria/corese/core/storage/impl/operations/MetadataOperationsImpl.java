@@ -154,13 +154,14 @@ public class MetadataOperationsImpl implements MetadataOperations {
             long predicateCount = getPredicates(null).size();
             long contextCount = getContexts().size();
 
-            // Build GraphStatistics using the builder pattern
-            GraphStatistics stats = GraphStatistics.builder()
-                    .edgeCount(edgeCount)
-                    .nodeCount(nodeCount)
-                    .predicateCount(predicateCount)
-                    .contextCount(contextCount)
-                    .build();
+            // Create GraphStatistics using constructor with parameters
+            GraphStatistics stats = new GraphStatistics(
+                    edgeCount,
+                    nodeCount,
+                    predicateCount,
+                    contextCount,
+                    0, 0,0
+            );
 
             logger.debug("Statistics collected: {}", stats);
             return stats;
