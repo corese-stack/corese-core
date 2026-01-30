@@ -1,15 +1,17 @@
 package fr.inria.corese.core.next.api.query;
 
+import fr.inria.corese.core.next.api.query.repository.RepositoryConnection;
+
 /**
  * Enumeration of query languages supported by the Corese engine.
  * <p>
  * A {@code QueryLanguage} identifies the syntax and semantics used when
  * preparing queries and updates through
- * {@link fr.inria.corese.core.next.api.repository.RepositoryConnection}.
+ * {@link RepositoryConnection}.
  * </p>
  *
  *
- * @see fr.inria.corese.core.next.api.repository.RepositoryConnection
+ * @see RepositoryConnection
  * @see fr.inria.corese.core.next.api.query.Query
  */
 public enum QueryLanguage {

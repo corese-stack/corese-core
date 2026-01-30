@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.api.query;
 
-import fr.inria.corese.core.next.api.dataset.Dataset;
+import fr.inria.corese.core.next.api.query.dataset.Dataset;
 
 /**
  * A query on a repository that can be formulated in one of the supported query languages (for example SPARQL).
