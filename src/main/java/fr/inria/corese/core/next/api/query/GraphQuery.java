@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.api.query;
 
 import fr.inria.corese.core.next.api.query.result.GraphQueryResult;
 
-public interface GraphQuery extends Query {
+public interface GraphQuery extends Query<GraphQueryResult> {
 
     GraphQueryResult evaluate();
 

@@ -18,21 +18,24 @@ public interface Operation {
      *
      * @param name  the variable name (without '?')
      * @param value the value to bind
+     * @return this
      */
-    void setBinding(String name, Value value);
+    Operation setBinding(String name, Value value);
 
     /**
      * Removes a previously set binding on the supplied variable.
      * Calling this method with an unbound variable has no effect.
      *
      * @param name the variable name (without '?')
+     * @return this
      */
-    void removeBinding(String name);
+    Operation removeBinding(String name);
 
     /**
      * Removes all previously set bindings for this operation.
+     * @return this
      */
-    void clearBindings();
+    Operation clearBindings();
 
     /**
      * Retrieves the bindings that have been set on this operation.
@@ -47,7 +50,7 @@ public interface Operation {
      *
      * @param dataset the dataset to use, or {@code null} to clear
      */
-    void setDataset(Dataset dataset);
+    Operation setDataset(Dataset dataset);
 
     /**
      * Gets the dataset that has been set on this operation, if any.
@@ -62,7 +65,7 @@ public interface Operation {
      *
      * @param includeInferred whether inferred statements should be included
      */
-    void setIncludeInferred(boolean includeInferred);
+    Operation setIncludeInferred(boolean includeInferred);
 
     /**
      * @return {@code true} if inferred statements are included in evaluation, {@code false} otherwise
@@ -75,7 +78,7 @@ public interface Operation {
      *
      * @param maxExecutionTimeSeconds maximum execution time in seconds
      */
-    void setMaxExecutionTime(int maxExecutionTimeSeconds);
+    Operation setMaxExecutionTime(int maxExecutionTimeSeconds);
 
     /**
      * @return the maximum execution time in seconds, or a non-positive value if unlimited

@@ -7,7 +7,8 @@ import fr.inria.corese.core.next.api.query.dataset.Dataset;
  * It should hold kgram.core.Query + ASTQuery
  */
 
-public interface Query {
+public interface Query<T> extends Operation {
+
     /**
      * The different types of queries supported by the engine:
      * boolean, graph, and tuple queries.
@@ -39,19 +40,22 @@ public interface Query {
      */
     QueryLanguage getLanguage();
 
-    Dataset getDataset();
-
-    Query setDataset(Dataset dataset);
-
     // Execution options
-    Query setIncludeInferred(boolean includeInferred);
-
-    Query setTimeout(long timeoutMillis);
+    /**
+     * Set the execution timeout for the query regarding remote operations (i.e. for SERVICE clauses)
+     * @param timeoutMillis time in milliseconds
+     * @return this
+     */
+    Query<T> setTimeout(long timeoutMillis);
 
     /**
      * @return the type of this query (BOOLEAN / GRAPH / TUPLE)
      */
     QueryType getQueryType();
 
-    Query setMaxExecutionTime(int maxExecutionTimeSeconds);
+    /**
+     * Evaluation of the query against the dataset.
+     * @return The result type expected, see {@link fr.inria.corese.core.next.api.query.result.TupleQueryResult}, {@link fr.inria.corese.core.next.api.query.result.GraphQueryResult} or Boolean
+     */
+    T evaluate();
 }
