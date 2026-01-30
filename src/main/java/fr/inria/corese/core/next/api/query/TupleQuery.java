@@ -10,19 +10,5 @@ public interface TupleQuery extends Query<TupleQueryResult> {
     @Override
     TupleQueryResult evaluate();
 
-    /**
-     * Set bindings before execution
-     * @param name variable name
-     * @param value binding value for the variable
-     * @return this
-     */
-    TupleQuery setBinding(String name, Value value);
-
-    /**
-     * Remove all the set bindings
-     * @return this
-     */
-    TupleQuery clearBindings();
-
 
 }
