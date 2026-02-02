@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.ValueFactory;
 import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
@@ -86,9 +87,10 @@ public class TurtleParserTest {
 
     @Test
     public void testTripleQuoteLiteralWithDoubleQuoteIncludedNoText() {
-        String turtle = "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n" +
-                "<#0214> \n" +
-                "    rdfs:comment \"\"\"\"abc\"\"\"\" .";
+        String turtle = """
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                <#0214>\s
+                    rdfs:comment ""\""abc""\"" .""";
 
         Model model = new CoreseModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
@@ -113,14 +115,18 @@ public class TurtleParserTest {
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
 
-        StringWriter writer = new StringWriter();
-        RDFSerializer serial = new SerializerFactory().createSerializer(RDFFormat.TURTLE, model);
-        serial.write(writer);
-        logger.info(writer.toString());
+        Model refModel = new CoreseModel();
+        refModel.add(factory.createIRI("http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest#0006"), RDFS.label.getIRI(), factory.createLiteral("Test 0006: @rel and @rev"));
+        refModel.add(factory.createIRI("http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest#0006"), RDFS.comment.getIRI(), factory.createLiteral("Tests @rev and @rel together, with the object being specified by @href, ignoring content"));
 
-        assertTrue(model.contains(factory.createIRI("http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest/#0006"), RDFS.comment.getIRI(), factory.createLiteral("Tests @rev and @rel together, with the object being specified by @href, ignoring content")));
-        assertTrue(model.contains(factory.createIRI("http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest/#0006"), RDFS.label.getIRI(), factory.createLiteral("Test 0006: @rel and @rev")));
-        assertEquals(18, model.size());
+        for(Statement stat : model) {
+            assertTrue(refModel.contains(stat));
+        }
+        for(Statement stat : refModel) {
+            assertTrue(model.contains(stat));
+        }
+
+        assertEquals(refModel.size(), model.size());
     }
 
 }
