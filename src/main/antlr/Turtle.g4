@@ -180,22 +180,49 @@ EXPONENT
     : ('e' | 'E') ('+' | '-' )? ('0' .. '9')+
     ;
 
-// "'''" (("'" | "''")? ([^'\] | ECHAR | UCHAR))* "'''"
 STRING_LITERAL_LONG_SINGLE_QUOTE
     : '\'\'\'' (
+            ( '\'' | '\'\'' )?
+             SINGLE_QUOTE_LONG_LITERAL_CONTENT
+        )+ '\'\'\''
+    | '\'\'\'' (
+            SINGLE_QUOTE_LONG_LITERAL_CONTENT
+            ( '\'' | '\'\'' )?
+         )+ '\'\'\''
+    | '\'\'\'' (
             ( '\'' | '\'\'' )
-            | ( ~['\\] | ECHAR | UCHAR | '"')
-        )+  '\'\'\''
+            SINGLE_QUOTE_LONG_LITERAL_CONTENT+
+            ( '\'' | '\'\'' )
+         )+ '\'\'\''
     | '\'\'\'\'\'\''
+    | '\'\'\'\'\'\'\''
+    | '\'\'\'\'\'\'\'\''
     ;
 
 STRING_LITERAL_LONG_QUOTE
     : '"""' (
+            ( '"' | '""' )?
+             QUOTE_LONG_LITERAL_CONTENT
+        )+ '"""'
+    | '"""' (
+            QUOTE_LONG_LITERAL_CONTENT
+            ( '"' | '""' )?
+         )+ '"""'
+    | '"""' (
             ( '"' | '""' )
-            | ( ~["\\] | ECHAR | UCHAR | '\'')
-        )+  '"""'
+            QUOTE_LONG_LITERAL_CONTENT+
+            ( '"' | '""' )
+         )+ '"""'
     | '""""""'
+    | '"""""""'
+    | '""""""""'
     ;
+
+QUOTE_LONG_LITERAL_CONTENT
+    : ( ~["\\] | ECHAR | UCHAR ) ;
+
+SINGLE_QUOTE_LONG_LITERAL_CONTENT
+    : ( ~['\\] | ECHAR | UCHAR ) ;
 
 STRING_LITERAL_QUOTE
     : '"'  (~["\\\r\n] | ECHAR | UCHAR)* '"'
