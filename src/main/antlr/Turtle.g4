@@ -180,7 +180,6 @@ EXPONENT
     : ('e' | 'E') ('+' | '-' )? ('0' .. '9')+
     ;
 
-// "'''" (("'" | "''")? ([^'\] | ECHAR | UCHAR))* "'''"
 STRING_LITERAL_LONG_SINGLE_QUOTE
     : '\'\'\'' (
             ( '\'' | '\'\'' )?

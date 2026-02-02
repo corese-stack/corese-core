@@ -3,10 +3,7 @@ package fr.inria.corese.core.next.impl.io.parser.turtle;
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.Statement;
 import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
@@ -15,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 
 import java.io.StringReader;
-import java.io.StringWriter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
