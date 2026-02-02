@@ -2,15 +2,24 @@ package fr.inria.corese.core.next.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.api.Model;
 import fr.inria.corese.core.next.api.ValueFactory;
+import fr.inria.corese.core.next.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
 import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
 
+
+
 import java.io.StringReader;
+import java.io.StringWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the ANTLRTurtle class.
@@ -19,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * and unescaping of IRIs and literals, and named graphs.
  */
 public class TurtleParserTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(TurtleParserTest.class);
 
     private ValueFactory factory = new CoreseAdaptedValueFactory();
 
@@ -84,6 +95,32 @@ public class TurtleParserTest {
         parser.parse(new StringReader(turtle));
         assertEquals(1, model.size());
         model.contains(factory.createIRI("http://inria.fr/#0214"), RDFS.comment.getIRI(), factory.createLiteral("\"abc\""));
+    }
+
+    @Test
+    public void testRdfaManifest() {
+        String turtle = """
+                @base <http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest> .
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                
+                <#0006> rdfs:label \"""Test 0006: @rel and @rev\""";
+                  rdfs:comment \"""Tests @rev and @rel together, with the object being specified by @href, ignoring content\""";
+                  .
+                  """;
+
+        Model model = new CoreseModel();
+        RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
+        parser.parse(new StringReader(turtle));
+
+        StringWriter writer = new StringWriter();
+        RDFSerializer serial = new SerializerFactory().createSerializer(RDFFormat.TURTLE, model);
+        serial.write(writer);
+        logger.info(writer.toString());
+
+        assertTrue(model.contains(factory.createIRI("http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest/#0006"), RDFS.comment.getIRI(), factory.createLiteral("Tests @rev and @rel together, with the object being specified by @href, ignoring content")));
+        assertTrue(model.contains(factory.createIRI("http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest/#0006"), RDFS.label.getIRI(), factory.createLiteral("Test 0006: @rel and @rev")));
+        assertEquals(18, model.size());
     }
 
 }
