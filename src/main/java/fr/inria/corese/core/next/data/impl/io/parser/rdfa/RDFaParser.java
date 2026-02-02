@@ -188,7 +188,7 @@ public class RDFaParser extends AbstractRDFParser {
         // HTML-specific base element
         if (qName.equals(BASE_TAG)
                 && isAttributePresent(RDFaAttributes.HREF)) {
-            Resource resourceBase = getAttributeResourceValue(RDFaAttributes.HREF);
+            Resource resourceBase = getAttributeValueResource(RDFaAttributes.HREF);
             if (resourceBase.isIRI()) {
                 currentProcessingContext().getEvaluationContext().setBaseIri((IRI) resourceBase);
             }
@@ -239,7 +239,7 @@ public class RDFaParser extends AbstractRDFParser {
                 // new subject is set to the resource obtained from the first match from the following rule:
                 // by using the resource from @about, if present, obtained according to the section on CURIE and IRI Processing;
                 if (isAttributePresent(RDFaAttributes.ABOUT)) {
-                    this.currentProcessingContext().setNewSubject(getAttributeResourceValue(RDFaAttributes.ABOUT));
+                    this.currentProcessingContext().setNewSubject(getAttributeValueResource(RDFaAttributes.ABOUT));
                     // otherwise, if the element is the root element of the document, then act as if there is an empty @about present, and process it according to the rule for @about, above;
                 } else if (this.currentProcessingContext().isRootElement()) {
                     this.currentProcessingContext().setNewSubject(currentProcessingContext().getEvaluationContext().getBaseIri());
@@ -264,13 +264,13 @@ public class RDFaParser extends AbstractRDFParser {
                     } else {
                         // by using the resource from @resource, if present, obtained according to the section on CURIE and IRI Processing;
                         if (isAttributePresent(RDFaAttributes.RESOURCE)) {
-                            this.currentProcessingContext().setTypedResource(getAttributeResourceValue(RDFaAttributes.RESOURCE));
+                            this.currentProcessingContext().setTypedResource(getAttributeValueResource(RDFaAttributes.RESOURCE));
                             // otherwise, by using the IRI from @href, if present, obtained according to the section on CURIE and IRI Processing;
                         } else if (isAttributePresent(RDFaAttributes.HREF)) {
-                            this.currentProcessingContext().setTypedResource(getAttributeResourceValue(RDFaAttributes.HREF));
+                            this.currentProcessingContext().setTypedResource(getAttributeValueResource(RDFaAttributes.HREF));
                             // otherwise, by using the IRI from @src, if present, obtained according to the section on CURIE and IRI Processing;
                         } else if (isAttributePresent(RDFaAttributes.SRC)) {
-                            this.currentProcessingContext().setTypedResource(getAttributeResourceValue(RDFaAttributes.SRC));
+                            this.currentProcessingContext().setTypedResource(getAttributeValueResource(RDFaAttributes.SRC));
                             // otherwise, the value of typed resource is set to a newly created bnode.
                         } else {
                             this.currentProcessingContext().setTypedResource(getValueFactory().createBNode());
@@ -288,16 +288,16 @@ public class RDFaParser extends AbstractRDFParser {
                         || isAttributePresent(RDFaAttributes.RESOURCE)) {
                     // by using the resource from @about, if present, obtained according to the section on CURIE and IRI Processing;
                     if (isAttributePresent(RDFaAttributes.ABOUT)) {
-                        this.currentProcessingContext().setNewSubject(getAttributeResourceValue(RDFaAttributes.ABOUT));
+                        this.currentProcessingContext().setNewSubject(getAttributeValueResource(RDFaAttributes.ABOUT));
                         // otherwise, by using the resource from @resource, if present, obtained according to the section on CURIE and IRI Processing;
                     } else if (isAttributePresent(RDFaAttributes.RESOURCE)) {
-                        this.currentProcessingContext().setNewSubject(getAttributeResourceValue(RDFaAttributes.RESOURCE));
+                        this.currentProcessingContext().setNewSubject(getAttributeValueResource(RDFaAttributes.RESOURCE));
                         // otherwise, by using the IRI from @href, if present, obtained according to the section on CURIE and IRI Processing;
                     } else if (isAttributePresent(RDFaAttributes.HREF)) {
-                        this.currentProcessingContext().setNewSubject(getAttributeResourceValue(RDFaAttributes.HREF));
+                        this.currentProcessingContext().setNewSubject(getAttributeValueResource(RDFaAttributes.HREF));
                         // otherwise, by using the IRI from @src, if present, obtained according to the section on CURIE and IRI Processing.
                     } else if (isAttributePresent(RDFaAttributes.SRC)) {
-                        this.currentProcessingContext().setNewSubject(getAttributeResourceValue(RDFaAttributes.SRC));
+                        this.currentProcessingContext().setNewSubject(getAttributeValueResource(RDFaAttributes.SRC));
                     }
                     // otherwise, if no resource is provided by a resource attribute, then the first match from the following rules will apply:
                 } else {
@@ -331,7 +331,7 @@ public class RDFaParser extends AbstractRDFParser {
         if (isAttributePresent(RDFaAttributes.REL)
                 || isAttributePresent(RDFaAttributes.REV)) {
             if (isAttributePresent(RDFaAttributes.ABOUT)) {
-                this.currentProcessingContext().setNewSubject(getAttributeResourceValue(RDFaAttributes.ABOUT));
+                this.currentProcessingContext().setNewSubject(getAttributeValueResource(RDFaAttributes.ABOUT));
             }
             if (isAttributePresent(RDFaAttributes.TYPEOF)) {
                 this.currentProcessingContext().setTypedResource(this.currentProcessingContext().getNewSubject());
@@ -349,11 +349,11 @@ public class RDFaParser extends AbstractRDFParser {
                 }
             }
             if (isAttributePresent(RDFaAttributes.RESOURCE)) {
-                this.currentProcessingContext().setCurrentObjectResource(getAttributeResourceValue(RDFaAttributes.RESOURCE));
+                this.currentProcessingContext().setCurrentObjectResource(getAttributeValueResource(RDFaAttributes.RESOURCE));
             } else if (isAttributePresent(RDFaAttributes.HREF)) {
-                this.currentProcessingContext().setCurrentObjectResource(getAttributeResourceValue(RDFaAttributes.HREF));
+                this.currentProcessingContext().setCurrentObjectResource(getAttributeValueResource(RDFaAttributes.HREF));
             } else if (isAttributePresent(RDFaAttributes.SRC)) {
-                this.currentProcessingContext().setCurrentObjectResource(getAttributeResourceValue(RDFaAttributes.SRC));
+                this.currentProcessingContext().setCurrentObjectResource(getAttributeValueResource(RDFaAttributes.SRC));
             } else if (isAttributePresent(RDFaAttributes.TYPEOF)
                     && !isAttributePresent(RDFaAttributes.ABOUT)) {
                 this.currentProcessingContext().setCurrentObjectResource(this.getValueFactory().createBNode());
@@ -369,8 +369,10 @@ public class RDFaParser extends AbstractRDFParser {
         // 7. If in any of the previous steps a typed resource was set to a non-null value, it is now used to provide a subject for type values;
         if (this.currentProcessingContext().getTypedResource() != null
                 && isAttributePresent(RDFaAttributes.TYPEOF)) {
-            Resource typeIri = getAttributeResourceValue(RDFaAttributes.TYPEOF);
-            this.getModel().add(this.currentProcessingContext().getTypedResource(), RDF.type.getIRI(), typeIri);
+            List<Resource> typeList = getAttributeValueResourceList(RDFaAttributes.TYPEOF);
+            for(Resource typeRes : typeList) {
+                this.getModel().add(this.currentProcessingContext().getTypedResource(), RDF.type.getIRI(), (IRI) typeRes);
+            }
         }
 
         // 8. If in any of the previous steps a new subject was set to a non-null value different from the parent object;
@@ -382,27 +384,33 @@ public class RDFaParser extends AbstractRDFParser {
         if (this.currentProcessingContext().getCurrentObjectResource() != null) {
             if (isAttributePresent(RDFaAttributes.INLIST)
                     && isAttributePresent(RDFaAttributes.REL)) {
-                IRI relResource = (IRI) getAttributeResourceValue(RDFaAttributes.REL);
-                this.currentProcessingContext().addListMapping(relResource, this.currentProcessingContext().getCurrentObjectResource());
+                List<Resource> relResourceList = getAttributeValueResourceList(RDFaAttributes.REL);
+                for(Resource relResource: relResourceList) {
+                    this.currentProcessingContext().addListMapping((IRI) relResource, this.currentProcessingContext().getCurrentObjectResource());
+                }
             }
             if (!isAttributePresent(RDFaAttributes.INLIST)) {
                 if (isAttributePresent(RDFaAttributes.REL)) {
-                    Resource relResource = getAttributeResourceValue(RDFaAttributes.REL);
-                    if (relResource.isIRI()) {
-                        this.getModel().add(this.currentProcessingContext().getNewSubject(), (IRI) relResource, this.currentProcessingContext().getCurrentObjectResource());
-                    } else {
-                        throw new ParsingErrorException("Value of attribute @rel expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REL.getName()));
+                    List<Resource> relResourceList = getAttributeValueResourceList(RDFaAttributes.REL);
+                    for(Resource relResource: relResourceList) {
+                        if (relResource.isIRI()) {
+                            this.getModel().add(this.currentProcessingContext().getNewSubject(), (IRI) relResource, this.currentProcessingContext().getCurrentObjectResource());
+                        } else {
+                            throw new ParsingErrorException("Value of attribute @rel expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REL.getName()));
+                        }
                     }
                 }
                 if (isAttributePresent(RDFaAttributes.REV)) {
-                    Resource revResource = getAttributeResourceValue(RDFaAttributes.REV);
-                    if (!revResource.isIRI()) {
-                        throw new ParsingErrorException("Value of attribute @rev expected to be an IRI but was " + getAttributeStringValue(RDFaAttributes.REV));
+                    List<Resource> revResourceList = getAttributeValueResourceList(RDFaAttributes.REV);
+                    for(Resource revResource: revResourceList) {
+                        if (!revResource.isIRI()) {
+                            throw new ParsingErrorException("Value of attribute @rev expected to be an IRI but was " + getAttributeStringValue(RDFaAttributes.REV));
+                        }
+                        if (!this.currentProcessingContext().getCurrentObjectResource().isResource()) {
+                            throw new ParsingErrorException("object resource expected to be a resource but was " + this.currentProcessingContext().getCurrentObjectResource());
+                        }
+                        this.getModel().add(this.currentProcessingContext().getCurrentObjectResource(), (IRI) revResource, this.currentProcessingContext().getNewSubject());
                     }
-                    if (!this.currentProcessingContext().getCurrentObjectResource().isResource()) {
-                        throw new ParsingErrorException("object resource expected to be a resource but was " + this.currentProcessingContext().getCurrentObjectResource());
-                    }
-                    this.getModel().add(this.currentProcessingContext().getCurrentObjectResource(), (IRI) revResource, this.currentProcessingContext().getNewSubject());
                 }
             }
         }
@@ -416,24 +424,28 @@ public class RDFaParser extends AbstractRDFParser {
             }
             this.currentProcessingContext().setCurrentObjectResource(getValueFactory().createBNode());
             if (isAttributePresent(RDFaAttributes.REL)) {
-                if (!getAttributeResourceValue(RDFaAttributes.REL).isIRI()) {
+                if (!getAttributeValueResource(RDFaAttributes.REL).isIRI()) {
                     throw new ParsingErrorException("Value of attribute @rel expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REL.getName()));
                 }
-                IRI relIRI = (IRI) getAttributeResourceValue(RDFaAttributes.REL);
-                if (isAttributePresent(RDFaAttributes.INLIST)) {
-                    if (!this.currentProcessingContext().getListMappings().containsKey(relIRI)) {
-                        this.currentProcessingContext().addListMappings(relIRI, new HashSet<>());
+                List<Resource> relList = getAttributeValueResourceList(RDFaAttributes.REL);
+                for(Resource relResource : relList) {
+                    if (isAttributePresent(RDFaAttributes.INLIST)) {
+                        if (!this.currentProcessingContext().getListMappings().containsKey((IRI) relResource)) {
+                            this.currentProcessingContext().addListMappings((IRI) relResource, new HashSet<>());
+                        }
+                        this.currentProcessingContext().addIncompleteStatement(new RDFaIncompleteStatement((IRI) relResource, RDFaIncompleteStatement.Direction.NONE));
+                    } else {
+                        this.currentProcessingContext().addIncompleteStatement(new RDFaIncompleteStatement((IRI) relResource, RDFaIncompleteStatement.Direction.FORWARD));
                     }
-                    this.currentProcessingContext().addIncompleteStatement(new RDFaIncompleteStatement(relIRI, RDFaIncompleteStatement.Direction.NONE));
-                } else {
-                    this.currentProcessingContext().addIncompleteStatement(new RDFaIncompleteStatement(relIRI, RDFaIncompleteStatement.Direction.FORWARD));
                 }
             } else if (isAttributePresent(RDFaAttributes.REV)) {
-                if (!getAttributeResourceValue(RDFaAttributes.REV).isIRI()) {
+                if (!getAttributeValueResource(RDFaAttributes.REV).isIRI()) {
                     throw new ParsingErrorException("Value of attribute @rev expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REV.getName()));
                 }
-                IRI revIRI = (IRI) getAttributeResourceValue(RDFaAttributes.REV);
-                this.currentProcessingContext().addIncompleteStatement(new RDFaIncompleteStatement(revIRI, RDFaIncompleteStatement.Direction.BACKWARD));
+                List<Resource> revList = getAttributeValueResourceList(RDFaAttributes.REV);
+                for (Resource revRes : revList) {
+                    this.currentProcessingContext().addIncompleteStatement(new RDFaIncompleteStatement((IRI) revRes, RDFaIncompleteStatement.Direction.BACKWARD));
+                }
             }
         }
 
@@ -498,13 +510,13 @@ public class RDFaParser extends AbstractRDFParser {
 
         // 11. The next step of the iteration is to establish any current property value;
         if (isAttributePresent(RDFaAttributes.PROPERTY)) {
-            IRI propertyIRI = (IRI) getAttributeResourceValue(RDFaAttributes.PROPERTY);
+            List<Resource> propertyIRIList = getAttributeValueResourceList(RDFaAttributes.PROPERTY);
             // as a typed literal if @datatype is present, does not have an empty value according to the section on CURIE and IRI Processing, and is not set to XMLLiteral in the vocabulary http://www.w3.org/1999/02/22-rdf-syntax-ns#.
             // The actual literal is either the value of @content (if present) or a string created by concatenating the value of all descendant text nodes, of the current element in turn. The final string includes the datatype IRI, as described in [RDF-SYNTAX-GRAMMAR], which will have been obtained according to the section on CURIE and IRI Processing.
             if (isAttributePresent(RDFaAttributes.DATATYPE)
-                    && getAttributeResourceValue(RDFaAttributes.DATATYPE).isIRI()
-                    && getAttributeResourceValue(RDFaAttributes.DATATYPE) != RDF.XMLLiteral.getIRI()) {
-                IRI datatypeIRI = (IRI) getAttributeResourceValue(RDFaAttributes.DATATYPE);
+                    && getAttributeValueResource(RDFaAttributes.DATATYPE).isIRI()
+                    && getAttributeValueResource(RDFaAttributes.DATATYPE) != RDF.XMLLiteral.getIRI()) {
+                IRI datatypeIRI = (IRI) getAttributeValueResource(RDFaAttributes.DATATYPE);
                 if (isAttributePresent(RDFaAttributes.CONTENT)) {
                     String contentString = getAttributeStringValue(RDFaAttributes.CONTENT);
                     this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
@@ -519,7 +531,7 @@ public class RDFaParser extends AbstractRDFParser {
                 // The actual literal is either the value of @content (if present) or a string created by concatenating the value of all descendant text nodes, of the current element in turn.
             } else if (isAttributePresent(RDFaAttributes.DATATYPE)
                     && getAttributeStringValue(RDFaAttributes.DATATYPE).isEmpty()) {
-                IRI datatypeIRI = (IRI) getAttributeResourceValue(RDFaAttributes.DATATYPE);
+                IRI datatypeIRI = (IRI) getAttributeValueResource(RDFaAttributes.DATATYPE);
                 if (isAttributePresent(RDFaAttributes.CONTENT)) {
                     String contentString = this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.CONTENT.getName());
                     this.currentProcessingContext().setCurrentPropertyValue(getValueFactory().createLiteral(contentString, datatypeIRI));
@@ -549,11 +561,11 @@ public class RDFaParser extends AbstractRDFParser {
                     || isAttributePresent(RDFaAttributes.SRC)
             )) {
                 if (isAttributePresent(RDFaAttributes.RESOURCE)) {
-                    this.currentProcessingContext().setCurrentPropertyValue(getAttributeResourceValue(RDFaAttributes.RESOURCE));
+                    this.currentProcessingContext().setCurrentPropertyValue(getAttributeValueResource(RDFaAttributes.RESOURCE));
                 } else if (isAttributePresent(RDFaAttributes.HREF)) {
-                    this.currentProcessingContext().setCurrentPropertyValue(getAttributeResourceValue(RDFaAttributes.HREF));
+                    this.currentProcessingContext().setCurrentPropertyValue(getAttributeValueResource(RDFaAttributes.HREF));
                 } else if (isAttributePresent(RDFaAttributes.SRC)) {
-                    this.currentProcessingContext().setCurrentPropertyValue(getAttributeResourceValue(RDFaAttributes.SRC));
+                    this.currentProcessingContext().setCurrentPropertyValue(getAttributeValueResource(RDFaAttributes.SRC));
                 }
                 // otherwise, if @typeof is present and @about is not, the value of typed resource.
             } else if (isAttributePresent(RDFaAttributes.TYPEOF)
@@ -576,21 +588,24 @@ public class RDFaParser extends AbstractRDFParser {
 
             // The current property value is then used with each predicate as follows:
             // If the element also includes the @inlist attribute, the current property value is added to the local list mapping as follows:
-            if(this.currentProcessingContext().getCurrentPropertyValue() != null) {
-                if (isAttributePresent(RDFaAttributes.INLIST)) {
-                    // if the local list mapping does not contain a list associated with the predicate IRI, instantiate a new list and add to local list mappings
-                    if (!this.currentProcessingContext().getListMappings().containsKey(propertyIRI)) {
-                        this.currentProcessingContext().addListMappings(propertyIRI, new HashSet<>());
+            for(Resource propertyIRIResource: propertyIRIList) {
+                IRI propertyIRI = (IRI) propertyIRIResource;
+                if(this.currentProcessingContext().getCurrentPropertyValue() != null) {
+                    if (isAttributePresent(RDFaAttributes.INLIST)) {
+                        // if the local list mapping does not contain a list associated with the predicate IRI, instantiate a new list and add to local list mappings
+                        if (!this.currentProcessingContext().getListMappings().containsKey(propertyIRI)) {
+                            this.currentProcessingContext().addListMappings(propertyIRI, new HashSet<>());
+                        }
+                        // add the current property value to the list associated with the predicate IRI in the local list mapping
+                        this.currentProcessingContext().addListMapping(propertyIRI, this.currentProcessingContext().getCurrentPropertyValue());
+                        // Otherwise the current property value is used to generate a triple as follows:
+                        // subject new subject
+                        // predicate full IRI
+                        // object current property value
+                    } else {
+                        Statement statement = getValueFactory().createStatement(this.currentProcessingContext().getNewSubject(), propertyIRI, this.currentProcessingContext().getCurrentPropertyValue());
+                        this.getModel().add(statement);
                     }
-                    // add the current property value to the list associated with the predicate IRI in the local list mapping
-                    this.currentProcessingContext().addListMapping(propertyIRI, this.currentProcessingContext().getCurrentPropertyValue());
-                    // Otherwise the current property value is used to generate a triple as follows:
-                    // subject new subject
-                    // predicate full IRI
-                    // object current property value
-                } else {
-                    Statement statement = getValueFactory().createStatement(this.currentProcessingContext().getNewSubject(), propertyIRI, this.currentProcessingContext().getCurrentPropertyValue());
-                    this.getModel().add(statement);
                 }
             }
         }
@@ -659,7 +674,18 @@ public class RDFaParser extends AbstractRDFParser {
         return result;
     }
 
-    private Resource getAttributeResourceValue(RDFaAttributes attribute) {
+    private List<Resource> resolveWhitespaceSeparatedList(String rawList) {
+        ArrayList<Resource> result = new ArrayList<>();
+        String[] rawResourceList = rawList.split(" ");
+        for(String rawResource : rawResourceList) {
+            Optional<Resource> resourceOptional = resolveStringResource(rawResource);
+            resourceOptional.ifPresent(result::add);
+        }
+
+        return result;
+    }
+
+    private Resource getAttributeValueResource(RDFaAttributes attribute) {
         String attributeValue = this.currentProcessingContext().getElementAttributes().get(attribute.getName());
         Optional<Resource> resourceResolution = resolveStringResource(attributeValue);
         if (resourceResolution.isPresent()) {
@@ -667,6 +693,11 @@ public class RDFaParser extends AbstractRDFParser {
         } else {
             throw new ParsingErrorException("Could not parse @" + attribute.getName() + " value: " + attributeValue);
         }
+    }
+
+    private List<Resource> getAttributeValueResourceList(RDFaAttributes attribute) {
+        String attributeValue = this.currentProcessingContext().getElementAttributes().get(attribute.getName());
+        return resolveWhitespaceSeparatedList(attributeValue);
     }
 
     private boolean isAttributePresent(RDFaAttributes attribute) {
