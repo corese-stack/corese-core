@@ -11,10 +11,12 @@ import java.time.LocalTime;
 import java.time.Period;
 import java.util.Optional;
 
+import fr.inria.corese.core.next.data.impl.common.literal.BasicDuration;
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
-import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.impl.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 
 public class BasicDurationTest {
 

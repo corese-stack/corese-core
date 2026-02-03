@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.impl.io.serialization.canonical;
 
+import fr.inria.corese.core.next.data.impl.io.serialization.canonical.RDFC10SerializerOptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.impl.common.prefix;
 
+import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

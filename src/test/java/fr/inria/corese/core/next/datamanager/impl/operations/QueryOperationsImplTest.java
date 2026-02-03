@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.datamanager.impl.operations;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
 import fr.inria.corese.core.next.datamanager.api.support.model.StatementPattern;
 import org.junit.jupiter.api.BeforeEach;

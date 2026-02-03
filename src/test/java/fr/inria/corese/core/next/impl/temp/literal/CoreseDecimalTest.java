@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.temp.literal.AbstractCoreseNumber;
+import fr.inria.corese.core.next.data.impl.temp.literal.CoreseDecimal;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 import org.junit.jupiter.api.Test;
 

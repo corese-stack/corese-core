@@ -1,8 +1,10 @@
 package fr.inria.corese.core.next.kgram.core;
 
-import fr.inria.corese.core.next.kgram.api.core.ExpType;
-import fr.inria.corese.core.next.kgram.api.core.Filter;
-import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.ExpType;
+import fr.inria.corese.core.next.query.kgram.api.core.Filter;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.core.Exp;
+import fr.inria.corese.core.next.query.kgram.core.Query;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import org.junit.jupiter.api.BeforeEach;

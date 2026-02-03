@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.impl.temp.literal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import fr.inria.corese.core.next.data.impl.temp.literal.CoreseBNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

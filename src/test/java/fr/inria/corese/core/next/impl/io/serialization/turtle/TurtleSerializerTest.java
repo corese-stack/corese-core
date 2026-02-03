@@ -1,16 +1,16 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.data.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializer;
+import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
-import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -91,7 +91,7 @@ class TurtleSerializerTest {
 
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/person1"),
-                fr.inria.corese.core.next.impl.common.vocabulary.RDF.type.getIRI(),
+                RDF.type.getIRI(),
                 factory.createIRI("http://xmlns.com/foaf/0.1/Person"),
                 null
         );
@@ -434,7 +434,7 @@ class TurtleSerializerTest {
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/s"),
                 factory.createIRI("http://example.org/p"),
-                factory.createLiteral("invalid", RDF.LANGSTRING.getIRI(), null),
+                factory.createLiteral("invalid", fr.inria.corese.core.next.data.impl.common.literal.RDF.LANGSTRING.getIRI(), null),
                 null
         );
 

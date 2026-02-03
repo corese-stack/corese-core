@@ -1,22 +1,21 @@
 package fr.inria.corese.core.next.impl.io.serialization.rdfxml;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.Statement;
+import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.impl.io.serialization.rdfxml.RDFXMLSerializer;
+import fr.inria.corese.core.next.data.impl.io.serialization.rdfxml.RDFXMLSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
-import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.PrefixOrderingEnum;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
 import java.util.stream.Stream;
@@ -187,7 +186,7 @@ class RDFXMLSerializerTest {
         Statement stmt = factory.createStatement(
                 factory.createIRI("http://example.org/data"),
                 factory.createIRI("http://example.org/vocabulary/value"),
-                factory.createLiteral("123", fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdInteger.getIRI(), null)
+                factory.createLiteral("123", XSD.xsdInteger.getIRI(), null)
         );
 
         when(mockModel.stream()).thenReturn(Stream.of(stmt));

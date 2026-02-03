@@ -8,19 +8,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.api.BNode;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
-import fr.inria.corese.core.next.impl.io.serialization.trig.TriGSerializerOptions;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.api.BNode;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Literal;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.serialization.trig.TriGSerializerOptions;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TriGCircularTest {
 
     private ValueFactory valueFactory;
-    private fr.inria.corese.core.next.api.io.serializer.SerializerFactory serializerFactory;
+    private fr.inria.corese.core.next.data.io.serializer.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
     private TriGSerializerOptions defaultConfig;
 

@@ -1,8 +1,10 @@
 package fr.inria.corese.core.next.impl.io.serialization.nquads;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.impl.io.serialization.nquads.NQuadsSerializer;
+import fr.inria.corese.core.next.data.impl.io.serialization.nquads.NQuadsSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

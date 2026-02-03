@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.datamanager.impl.transaction;
 
-import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
 import fr.inria.corese.core.next.datamanager.api.support.exception.ErrorCode;
 import fr.inria.corese.core.next.datamanager.api.transaction.IsolationLevel;

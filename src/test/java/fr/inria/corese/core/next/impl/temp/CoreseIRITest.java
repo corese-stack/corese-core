@@ -3,11 +3,12 @@ package fr.inria.corese.core.next.impl.temp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.IRITest;
-import fr.inria.corese.core.next.impl.exception.IncorrectFormatException;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.IRITest;
+import fr.inria.corese.core.next.data.impl.exception.IncorrectFormatException;
 
 public class CoreseIRITest extends IRITest {
 

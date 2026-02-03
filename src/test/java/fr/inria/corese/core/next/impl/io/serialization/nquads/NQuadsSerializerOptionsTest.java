@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.nquads;
 
-import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.data.impl.io.serialization.nquads.NQuadsSerializerOptions;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

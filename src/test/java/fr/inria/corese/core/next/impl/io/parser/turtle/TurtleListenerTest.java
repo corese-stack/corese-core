@@ -1,11 +1,12 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleListener;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.datamanager.impl.lifecycle;
 
-import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.datamanager.api.lifecycle.LifecycleState;
 import fr.inria.corese.core.next.datamanager.api.support.config.DataManagerConfig;
 import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;

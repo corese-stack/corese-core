@@ -1,7 +1,8 @@
 package fr.inria.corese.core.next.impl.common;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.IRITest;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.IRITest;
+import fr.inria.corese.core.next.data.impl.common.BasicIRI;
 
 public class BasicIRITest extends IRITest {
     @Override

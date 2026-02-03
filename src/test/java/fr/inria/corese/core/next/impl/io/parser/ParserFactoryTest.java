@@ -1,14 +1,15 @@
 package fr.inria.corese.core.next.impl.io.parser;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.impl.io.parser.jsonld.JSONLDParser;
-import fr.inria.corese.core.next.impl.io.parser.nquads.NQuadsParser;
-import fr.inria.corese.core.next.impl.io.parser.ntriples.NTriplesParser;
-import fr.inria.corese.core.next.impl.io.parser.turtle.TurtleParser;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.data.impl.io.parser.jsonld.JSONLDParser;
+import fr.inria.corese.core.next.data.impl.io.parser.nquads.NQuadsParser;
+import fr.inria.corese.core.next.data.impl.io.parser.ntriples.NTriplesParser;
+import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

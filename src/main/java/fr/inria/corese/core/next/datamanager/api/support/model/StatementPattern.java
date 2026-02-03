@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.datamanager.api.support.model;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Resource;
+import fr.inria.corese.core.next.data.api.Value;
 
 import java.util.Arrays;
 import java.util.Objects;

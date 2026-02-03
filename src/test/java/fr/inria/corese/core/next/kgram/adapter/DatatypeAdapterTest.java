@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.kgram.adapter;
 
-import fr.inria.corese.core.next.kgram.api.core.DatatypeValue;
+import fr.inria.corese.core.next.query.kgram.adapter.DatatypeAdapter;
+import fr.inria.corese.core.next.query.kgram.api.core.DatatypeValue;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 import org.junit.jupiter.api.BeforeEach;

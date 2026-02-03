@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.datamanager.api.operations;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
 import fr.inria.corese.core.next.datamanager.api.support.model.StatementPattern;
 

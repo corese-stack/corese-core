@@ -1,13 +1,15 @@
 package fr.inria.corese.core.next.impl.io.serialization.trig;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.Statement;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.impl.io.serialization.trig.TriGSerializer;
+import fr.inria.corese.core.next.data.impl.io.serialization.trig.TriGSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
-import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -88,7 +90,7 @@ class TriGSerializerTest {
 
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/ns/person1"),
-                fr.inria.corese.core.next.impl.common.vocabulary.RDF.type.getIRI(),
+                RDF.type.getIRI(),
                 factory.createIRI("http://xmlns.com/foaf/0.1/Person"),
                 null
         );
@@ -297,7 +299,7 @@ class TriGSerializerTest {
         Statement mockStatement = factory.createStatement(
                 factory.createIRI("http://example.org/s"),
                 factory.createIRI("http://example.org/p"),
-                factory.createLiteral("invalid", RDF.LANGSTRING.getIRI(), null),
+                factory.createLiteral("invalid", fr.inria.corese.core.next.data.impl.common.literal.RDF.LANGSTRING.getIRI(), null),
                 null
         );
 

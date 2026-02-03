@@ -2,17 +2,21 @@ package fr.inria.corese.core.next.impl.temp;
 
 import java.time.Duration;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
+import fr.inria.corese.core.next.data.impl.temp.CoreseNodeAdapter;
+import fr.inria.corese.core.next.data.impl.temp.CoreseStatement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.model.ValueFactoryTest;
-import fr.inria.corese.core.next.impl.common.literal.RDF;
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
-import fr.inria.corese.core.next.impl.temp.literal.CoreseTyped;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Literal;
+import fr.inria.corese.core.next.data.api.Resource;
+import fr.inria.corese.core.next.data.api.model.ValueFactoryTest;
+import fr.inria.corese.core.next.data.impl.common.literal.RDF;
+import fr.inria.corese.core.next.data.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
+import fr.inria.corese.core.next.data.impl.temp.literal.CoreseTyped;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +34,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
     public void setUp() {
         this.valueFactory = new CoreseAdaptedValueFactory();
         stringTestValue = "String value";
-        xsdStringIRI = XSD.STRING.getIRI();
+        xsdStringIRI = fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING.getIRI();
         subject = new CoreseIRI("http://corese.com/subject");
         predicate = new CoreseIRI("http://corese.com/predicate");
     }
@@ -52,7 +56,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(XSD.STRING, literal.getCoreDatatype());
+        assertEquals(fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING, literal.getCoreDatatype());
     }
 
     @Test
@@ -77,34 +81,34 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(XSD.STRING, literal.getCoreDatatype());
+        assertEquals(fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING, literal.getCoreDatatype());
     }
 
     @Test
     public void testCreateLiteralWithCoreDatatype() {
         // Test createLiteral with CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING);
 
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(XSD.STRING, literal.getCoreDatatype());
+        assertEquals(fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING, literal.getCoreDatatype());
     }
 
     @Test
     public void testCreateLiteralWithDatatypeIRIAndCoreDatatype() {
         // Test createLiteral with IRI datatype and CoreDatatype (XSD.STRING)
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING);
 
         assertNotNull(literal);
         assertTrue(literal instanceof CoreseTyped);
         assertEquals(stringTestValue, literal.getLabel());
-        assertEquals(XSD.STRING, literal.getCoreDatatype());
+        assertEquals(fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING, literal.getCoreDatatype());
     }
 
     @Test
     public void testCreateStatementWithoutContext() {
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING);
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal);
         assertNotNull(statement);
         assertEquals(subject, statement.getSubject());
@@ -115,7 +119,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
 
     @Test
     public void testCreateStatementWithContext() {
-        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, XSD.STRING);
+        Literal literal = valueFactory.createLiteral(stringTestValue, xsdStringIRI, fr.inria.corese.core.next.data.impl.common.literal.XSD.STRING);
 
         CoreseStatement statement = (CoreseStatement) valueFactory.createStatement(subject, predicate, literal, context);
 
@@ -140,7 +144,7 @@ public class CoreseAdaptedValueFactoryTest extends ValueFactoryTest {
         Literal date = valueFactory.createLiteral(literalStringValue, xsdDate);
 
         assertNotNull(date);
-        assertEquals(fr.inria.corese.core.next.impl.common.vocabulary.XSD.xsdDate.getIRI().stringValue(), date.getDatatype().stringValue());
+        assertEquals(XSD.xsdDate.getIRI().stringValue(), date.getDatatype().stringValue());
         assertEquals(literalStringValue, date.getLabel());
         assertInstanceOf(fr.inria.corese.core.sparql.datatype.CoreseDate.class, ((CoreseNodeAdapter) date).getCoreseNode());
     }

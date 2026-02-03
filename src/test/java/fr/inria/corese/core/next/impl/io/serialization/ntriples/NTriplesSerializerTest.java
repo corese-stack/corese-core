@@ -1,8 +1,10 @@
 package fr.inria.corese.core.next.impl.io.serialization.ntriples;
 
-import fr.inria.corese.core.next.api.*;
+import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.impl.io.serialization.ntriples.NTriplesSerializer;
+import fr.inria.corese.core.next.data.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.impl.io.serialization.TestStatementFactory;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

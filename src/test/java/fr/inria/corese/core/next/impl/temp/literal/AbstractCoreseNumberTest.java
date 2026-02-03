@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigInteger;
 
+import fr.inria.corese.core.next.data.impl.temp.literal.AbstractCoreseNumber;
 import org.junit.jupiter.api.Test;
 
 public abstract class AbstractCoreseNumberTest {

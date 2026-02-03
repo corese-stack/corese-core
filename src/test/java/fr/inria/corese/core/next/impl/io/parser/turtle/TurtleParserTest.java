@@ -1,12 +1,14 @@
 package fr.inria.corese.core.next.impl.io.parser.turtle;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.Statement;
+import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS;
+import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParser;
+import fr.inria.corese.core.next.data.impl.io.parser.turtle.TurtleParserOptions;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
 
 

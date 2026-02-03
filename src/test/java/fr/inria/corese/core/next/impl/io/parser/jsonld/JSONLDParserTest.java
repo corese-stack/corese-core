@@ -9,21 +9,22 @@ import java.io.ByteArrayInputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
-import fr.inria.corese.core.next.impl.io.common.JSONLDOptions;
+import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.jsonld.JSONLDParser;
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.api.BNode;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.api.BNode;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Literal;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.Resource;
+import fr.inria.corese.core.next.data.api.Statement;
+import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 
 public class JSONLDParserTest {
 

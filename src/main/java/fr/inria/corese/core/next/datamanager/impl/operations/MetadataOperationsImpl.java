@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.datamanager.impl.operations;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.Value;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.Resource;
+import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.datamanager.api.operations.MetadataOperations;
 import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
 import fr.inria.corese.core.next.datamanager.api.support.exception.ErrorCode;

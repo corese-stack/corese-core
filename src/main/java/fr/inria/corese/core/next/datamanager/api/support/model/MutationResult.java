@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.datamanager.api.support.model;
 
-import fr.inria.corese.core.next.api.Statement;
+import fr.inria.corese.core.next.data.api.Statement;
 
 import java.util.ArrayList;
 import java.util.Collections;

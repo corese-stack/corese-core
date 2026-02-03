@@ -1,14 +1,15 @@
 package fr.inria.corese.core.next.impl.io.serialization.turtle;
 
-import fr.inria.corese.core.next.impl.common.prefix.PrefixHandler;
-import fr.inria.corese.core.next.impl.common.vocabulary.OWL;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDFS;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
-import fr.inria.corese.core.next.impl.io.serialization.option.BlankNodeStyleEnum;
-import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.impl.io.serialization.option.PrefixOrderingEnum;
-import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.OWL;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.BlankNodeStyleEnum;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.PrefixOrderingEnum;
+import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializerOptions;
+import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

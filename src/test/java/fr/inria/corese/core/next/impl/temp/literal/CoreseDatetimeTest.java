@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.temp.literal.CoreseDatetime;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.datatype.DatatypeFactory;

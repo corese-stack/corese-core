@@ -1,11 +1,11 @@
 package fr.inria.corese.core.next.impl.io.serialization;
 
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.Statement;
-import fr.inria.corese.core.next.api.Value;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Literal;
+import fr.inria.corese.core.next.data.api.Resource;
+import fr.inria.corese.core.next.data.api.Statement;
+import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 
 import java.util.Optional;
 

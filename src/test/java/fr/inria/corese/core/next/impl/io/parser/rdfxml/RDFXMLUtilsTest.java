@@ -1,12 +1,13 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfxml;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.Resource;
-import fr.inria.corese.core.next.api.ValueFactory;
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.Resource;
+import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLUtils;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
 

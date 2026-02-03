@@ -1,15 +1,16 @@
 package fr.inria.corese.core.next.impl.io.parser.rdfa;
 
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.impl.io.serialization.SerializerFactory;
-import fr.inria.corese.core.next.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.impl.common.vocabulary.XSD;
-import fr.inria.corese.core.next.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.impl.io.parser.rdfa.RDFaParser;
+import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

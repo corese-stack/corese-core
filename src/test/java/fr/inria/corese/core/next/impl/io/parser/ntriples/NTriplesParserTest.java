@@ -1,8 +1,9 @@
 package fr.inria.corese.core.next.impl.io.parser.ntriples;
 
-import fr.inria.corese.core.next.api.*;
-import fr.inria.corese.core.next.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.impl.exception.ParsingErrorException;
+import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
+import fr.inria.corese.core.next.data.impl.io.parser.ntriples.NTriplesParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

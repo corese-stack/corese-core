@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import fr.inria.corese.core.next.data.impl.temp.literal.AbstractCoreseNumber;
+import fr.inria.corese.core.next.data.impl.temp.literal.CoreseInteger;
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 
 public class CoreseIntegerTest extends AbstractCoreseNumberTest {

@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.io.serialization.ntriples;
 
-import fr.inria.corese.core.next.impl.io.serialization.option.LiteralDatatypePolicyEnum;
+import fr.inria.corese.core.next.data.impl.io.serialization.ntriples.NTriplesSerializerOptions;
+import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

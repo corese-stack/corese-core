@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.impl.common.literal.RDF;
+import fr.inria.corese.core.next.data.impl.common.literal.RDF;
+import fr.inria.corese.core.next.data.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseLiteral;
 import org.junit.jupiter.api.BeforeEach;

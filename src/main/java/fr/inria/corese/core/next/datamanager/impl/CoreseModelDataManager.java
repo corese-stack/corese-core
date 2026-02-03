@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.datamanager.impl;
 
-import fr.inria.corese.core.next.api.Model;
+import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.datamanager.api.ModelDataManager;
 import fr.inria.corese.core.next.datamanager.api.lifecycle.DataManagerLifecycle;
 import fr.inria.corese.core.next.datamanager.api.operations.BulkOperations;

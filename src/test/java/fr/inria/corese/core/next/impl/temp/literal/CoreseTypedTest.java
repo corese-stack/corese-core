@@ -1,11 +1,12 @@
 package fr.inria.corese.core.next.impl.temp.literal;
 
-import fr.inria.corese.core.next.impl.common.literal.XSD;
-import fr.inria.corese.core.next.impl.exception.IncorrectOperationException;
-import fr.inria.corese.core.next.api.IRI;
-import fr.inria.corese.core.next.api.Literal;
-import fr.inria.corese.core.next.api.literal.CoreDatatype;
-import fr.inria.corese.core.next.impl.temp.CoreseIRI;
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
+import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Literal;
+import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
+import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
+import fr.inria.corese.core.next.data.impl.temp.literal.CoreseTyped;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.CoreseString;
 import org.junit.jupiter.api.BeforeEach;
