@@ -107,6 +107,8 @@ public class RDFaParser extends AbstractRDFParser {
                 });
             }
             SAXParser saxParser = factory.newSAXParser();
+            XMLReader xmlReader = saxParser.getXMLReader();
+            xmlReader.setEntityResolver((s, s1) -> null); // Fix DTD resolution bug by not resolving any entity
             InputSource inputSource = new InputSource(reader);
             saxParser.parse(inputSource, new XMLSaxHandler());
         } catch (IOException e) {
