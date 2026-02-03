@@ -12,11 +12,10 @@ import fr.inria.corese.core.next.data.impl.io.parser.rdfa.model.*;
 import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
@@ -98,6 +97,15 @@ public class RDFaParser extends AbstractRDFParser {
             factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
             factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             factory.setFeature("http://xml.org/sax/features/validation", false);
+            if(this.getConfig() instanceof RDFaParserOptions rdfaOptions) {
+                rdfaOptions.getSAXFeatures().forEach((featureUri, value) -> {
+                    try {
+                        factory.setFeature(featureUri, value);
+                    } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
+                        throw new ParsingErrorException("Failed setting the SAX feature from the parser's options", e);
+                    }
+                });
+            }
             SAXParser saxParser = factory.newSAXParser();
             InputSource inputSource = new InputSource(reader);
             saxParser.parse(inputSource, new XMLSaxHandler());

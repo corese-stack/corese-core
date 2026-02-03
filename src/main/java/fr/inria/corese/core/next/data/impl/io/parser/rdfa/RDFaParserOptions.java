@@ -4,6 +4,9 @@ import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Configuration class for the parsing of RDFa HTML documents
  */
@@ -22,9 +25,14 @@ public class RDFaParserOptions extends AbstractIOOptions implements BaseIRIOptio
         return this.baseIRI;
     }
 
+    public Map<String, Boolean> getSAXFeatures() {
+        return this.builder.saxFeatures;
+    }
+
     public static class Builder extends AbstractIOOptions.Builder<RDFaParserOptions> {
 
         protected String baseIRI = IOConstants.getDefaultBaseURI();
+        protected Map<String, Boolean> saxFeatures;
 
         @Override
         public RDFaParserOptions build() {
@@ -39,6 +47,12 @@ public class RDFaParserOptions extends AbstractIOOptions implements BaseIRIOptio
          */
         public RDFaParserOptions.Builder baseIRI(String baseIRI) {
             this.baseIRI = baseIRI;
+            this.saxFeatures = new HashMap<>();
+            return this;
+        }
+
+        public RDFaParserOptions.Builder setSAXFeature(String featureuri, boolean value) {
+            this.saxFeatures.put(featureuri, value);
             return this;
         }
 
