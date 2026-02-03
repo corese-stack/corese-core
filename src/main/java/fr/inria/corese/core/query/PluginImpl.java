@@ -44,6 +44,7 @@ import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.transform.TemplateVisitor;
+import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.GraphListen;
 import fr.inria.corese.core.util.MappingsGraph;

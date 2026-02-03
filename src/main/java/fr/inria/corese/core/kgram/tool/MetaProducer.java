@@ -18,7 +18,7 @@ import fr.inria.corese.core.kgram.core.SparqlException;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
- * Meta Producer that manages several Producer Uses a generic MetaIterator that
+ * Meta Producer that manages several Producer Uses
  * iterates over Producer iterators
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010

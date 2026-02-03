@@ -8,7 +8,6 @@ import fr.inria.corese.core.load.LoadFormat;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.SafetyException;
-import fr.inria.corese.core.util.SPINProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,9 +95,7 @@ public class LoadProcess extends WorkflowProcess {
                     isURL = false;
                 }
 
-                if (hasMode() && getModeString().equals(WorkflowParser.SPIN)) {
-                    loadSPARQLasSPIN(path, g);
-                } else if (isURL) {
+                if (isURL) {
                     // dbpedia return HTML by default
                     // if path has no suffix, set header accept format
                     ld.parseWithFormat(path, requiredFormat);
@@ -141,16 +138,6 @@ public class LoadProcess extends WorkflowProcess {
             }
         } else {
             ld.loadString(text, format);
-        }
-    }
-
-
-    void loadSPARQLasSPIN(String uri, Graph g) throws EngineException, LoadException {
-        String str = getText(uri);
-        if (str != null) {
-            SPINProcess sp = SPINProcess.create();
-            sp.setDefaultBase(path);
-            sp.toSpinGraph(str, g);
         }
     }
 

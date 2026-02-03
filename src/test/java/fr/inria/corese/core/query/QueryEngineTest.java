@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -183,14 +183,7 @@ class QueryEngineTest {
     @Test
     @SuppressWarnings("unchecked")
     void testCleanMethod() {
-        ArrayList<Query> internalList = null;
-        try {
-            java.lang.reflect.Field listField = QueryEngine.class.getDeclaredField("list");
-            listField.setAccessible(true);
-            internalList = (ArrayList<Query>) listField.get(queryEngine);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail("Failed to access private 'list' field: " + e.getMessage());
-        }
+        List<Query> internalList = getInternalList();
 
         Query query1 = Mockito.mock(Query.class);
         when(query1.isFail()).thenReturn(false);
@@ -199,6 +192,7 @@ class QueryEngineTest {
         Query query3 = Mockito.mock(Query.class);
         when(query3.isFail()).thenReturn(false);
 
+        assertNotNull(internalList);
         internalList.add(query1);
         internalList.add(query2);
         internalList.add(query3);
@@ -213,5 +207,15 @@ class QueryEngineTest {
         assertTrue(internalList.contains(query3));
     }
 
-
+    @SuppressWarnings("unchecked")
+    private List<Query> getInternalList() {
+        try {
+            java.lang.reflect.Field listField = QueryEngine.class.getDeclaredField("list");
+            listField.setAccessible(true);
+            return (List<Query>) listField.get(queryEngine);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail("Failed to access private 'list' field: " + e.getMessage());
+            return null; // Never reached due to fail()
+        }
+    }
 }

@@ -1,0 +1,80 @@
+package fr.inria.corese.core.next.kgram.core;
+
+import fr.inria.corese.core.next.kgram.api.core.Node;
+import fr.inria.corese.core.next.kgram.api.query.ProcessVisitor;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+
+/**
+ *
+ * @author Olivier Corby, Wimmics INRIA I3S, 2019
+ *
+ */
+public class ProcessVisitorDefault implements ProcessVisitor {
+    
+    public static int SLICE_DEFAULT_VALUE = ProcessVisitor.SLICE_DEFAULT;
+    
+    int slice = SLICE_DEFAULT_VALUE;
+    IDatatype defaultValue;
+
+    @Override
+    public int slice() {
+        return slice;
+    }
+    
+
+    @Override
+    public IDatatype defaultValue() {
+        return defaultValue;
+    }
+    
+    
+    void visit(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        if (eval.getQuery().getGlobalAST().hasMetadata(Metadata.Type.REPORT)) {
+            eval.getBind().visit(e, g, m1, m2);
+        }
+    }
+
+
+    @Override
+    public IDatatype graph(Eval eval, Node g, Exp e, Mappings m1) {
+        visit(eval, g, e, m1, null);
+        return defaultValue(); 
+    } 
+    
+    @Override
+    public IDatatype query(Eval eval, Node g, Exp e, Mappings m1) {
+        visit(eval, g, e, m1, null);
+        return defaultValue(); 
+    } 
+    
+    @Override
+    public IDatatype service(Eval eval, Node g, Exp e, Mappings m1) {
+        visit(eval, g, e, m1, null);
+        return defaultValue(); 
+    } 
+    
+    @Override
+    public IDatatype optional(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        visit(eval, g, e, m1, m2);
+        return defaultValue(); 
+    } 
+
+    @Override
+    public IDatatype minus(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        visit(eval, g, e, m1, m2);
+        return defaultValue(); 
+    } 
+    
+    @Override
+    public IDatatype union(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        visit(eval, g, e, m1, m2);
+        return defaultValue(); 
+    } 
+    
+    @Override
+    public IDatatype join(Eval eval, Node g, Exp e, Mappings m1, Mappings m2) {
+        visit(eval, g, e, m1, m2);
+        return defaultValue(); 
+    } 
+}
