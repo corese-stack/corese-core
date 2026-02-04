@@ -93,10 +93,6 @@ public class RDFaParser extends AbstractRDFParser {
             this.baseIri = baseURI;
 
             SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setFeature("http://xml.org/sax/features/validation", false);
-            factory.setFeature("http://xml.org/sax/features/resolve-dtd-uris", false);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             if(this.getConfig() instanceof RDFaParserOptions rdfaOptions) {
                 rdfaOptions.getSAXFeatures().forEach((featureUri, value) -> {
                     try {
