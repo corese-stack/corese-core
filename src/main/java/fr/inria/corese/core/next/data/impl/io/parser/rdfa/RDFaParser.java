@@ -45,6 +45,7 @@ public class RDFaParser extends AbstractRDFParser {
     private String baseIri = SerializationConstants.getDefaultBaseURI();
 
     private SAXParser saxParser;
+    private SAXParserFactory saxParserFactoryfactory;
 
     /**
      * An index of IRI prefixes
@@ -62,31 +63,44 @@ public class RDFaParser extends AbstractRDFParser {
 
     public RDFaParser(Model model, ValueFactory factory, IOOptions config) {
         super(model, factory, config);
-        if (getConfig() instanceof BaseIRIOptions baseIRIOptions) {
-            this.baseIri = baseIRIOptions.getBaseIRI();
-
-        }
         // Initializing the iri mappings with the default prefixes as defined by https://www.w3.org/TR/rdfa-core/#xmlrdfaconformance
         for (RDFaInitialPrefixes prefixObject : RDFaInitialPrefixes.values()) {
             this.addIriMapping(prefixObject.getPrefix(), getValueFactory().createIRI(prefixObject.getNamespace()));
         }
 
-        SAXParserFactory saxParserFactoryfactory = SAXParserFactory.newInstance();
-        if(this.getConfig() instanceof RDFaParserOptions rdfaOptions) {
-            rdfaOptions.getSAXFeatures().forEach((featureUri, value) -> {
-                try {
-                    saxParserFactoryfactory.setFeature(featureUri, value);
-                } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
-                    throw new ParsingErrorException("Failed setting the SAX feature from the parser's options", e);
-                }
-            });
-        }
+        this.saxParserFactoryfactory = SAXParserFactory.newInstance();
         try {
-            SAXParser saxParser = saxParserFactoryfactory.newSAXParser();
+            this.saxParser = this.saxParserFactoryfactory.newSAXParser();
             XMLReader xmlReader = saxParser.getXMLReader();
             xmlReader.setEntityResolver((s, s1) -> null); // Fix DTD resolution bug by not resolving any entity
         } catch (SAXException | ParserConfigurationException e) {
             throw new ParsingErrorException("Unexpected error during XML+RDFa parser creation: " + e.getMessage(), e);
+        }
+        this.setConfig(config);
+    }
+
+    @Override
+    public void setConfig(IOOptions options) {
+        super.setConfig(options);
+        if (options instanceof BaseIRIOptions baseIRIOptions) {
+            this.baseIri = baseIRIOptions.getBaseIRI();
+        }
+
+        if(options instanceof RDFaParserOptions rdfaOptions) {
+            rdfaOptions.getSAXFeatures().forEach((featureUri, value) -> {
+                try {
+                    this.saxParserFactoryfactory.setFeature(featureUri, value);
+                } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
+                    throw new ParsingErrorException("Failed setting the SAX feature " + featureUri + " from the parser's options", e);
+                }
+            });
+            rdfaOptions.getSAXProperties().forEach((propertyUri, value) -> {
+                try {
+                    this.saxParser.setProperty(propertyUri, value);
+                } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+                    throw new ParsingErrorException("Failed setting the SAX property " + propertyUri + " from the parser's options", e);
+                }
+            });
         }
     }
 

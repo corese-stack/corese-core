@@ -27,17 +27,24 @@ public class RDFaParserOptions extends AbstractIOOptions implements BaseIRIOptio
     }
 
     /**
-     *
-     * @return a Map of URI/boolean features values that will be used to configure the SAXParser
+     * @return a Map of URI/boolean features values that will be used to configure the {@link SAXParserFactory}
      */
     public Map<String, Boolean> getSAXFeatures() {
         return this.builder.saxFeatures;
+    }
+
+    /**
+     * @return a Map of URI/Object properties and handlers used by the {@link javax.xml.parsers.SAXParser}
+     */
+    public Map<String, Object> getSAXProperties() {
+        return this.builder.saxProperties;
     }
 
     public static class Builder extends AbstractIOOptions.Builder<RDFaParserOptions> {
 
         protected String baseIRI = IOConstants.getDefaultBaseURI();
         protected Map<String, Boolean> saxFeatures = new HashMap<>();
+        protected Map<String, Object> saxProperties = new HashMap<>();
 
         @Override
         public RDFaParserOptions build() {
@@ -56,13 +63,24 @@ public class RDFaParserOptions extends AbstractIOOptions implements BaseIRIOptio
         }
 
         /**
-         * Set up the options for the {@link SAXParserFactory}. See <a href="http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html#package_description">the list of SAX features</a>.
+         * Set up the features options for the {@link SAXParserFactory}. See <a href="http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html#package_description">the list of SAX features</a>.
          * @param featureuri the SAX feature URI (e.g. "http://xml.org/sax/features/resolve-dtd-uris")
          * @param value the value desired for the feature
          * @return this
          */
         public RDFaParserOptions.Builder setSAXFeature(String featureuri, boolean value) {
             this.saxFeatures.put(featureuri, value);
+            return this;
+        }
+
+        /**
+         * Set up the properties options for the {@link javax.xml.parsers.SAXParser}. See <a href="http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html#package_description">the list of SAX handlers and properties</a>.
+         * @param propertyUri the SAX property URI (e.g. "http://xml.org/sax/properties/declaration-handler")
+         * @param value the value desired for the property
+         * @return this
+         */
+        public RDFaParserOptions.Builder setSAXProperties(String propertyUri, Object value) {
+            this.saxProperties.put(propertyUri, value);
             return this;
         }
 
