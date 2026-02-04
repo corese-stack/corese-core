@@ -45,7 +45,7 @@ public class RDFaParser extends AbstractRDFParser {
     private String baseIri = SerializationConstants.getDefaultBaseURI();
 
     private SAXParser saxParser;
-    private SAXParserFactory saxParserFactoryfactory;
+    private SAXParserFactory saxParserFactory;
 
     /**
      * An index of IRI prefixes
@@ -68,11 +68,9 @@ public class RDFaParser extends AbstractRDFParser {
             this.addIriMapping(prefixObject.getPrefix(), getValueFactory().createIRI(prefixObject.getNamespace()));
         }
 
-        this.saxParserFactoryfactory = SAXParserFactory.newInstance();
+        this.saxParserFactory = SAXParserFactory.newInstance();
         try {
-            this.saxParser = this.saxParserFactoryfactory.newSAXParser();
-            XMLReader xmlReader = saxParser.getXMLReader();
-            xmlReader.setEntityResolver((s, s1) -> null); // Fix DTD resolution bug by not resolving any entity
+            this.saxParser = this.saxParserFactory.newSAXParser();
         } catch (SAXException | ParserConfigurationException e) {
             throw new ParsingErrorException("Unexpected error during XML+RDFa parser creation: " + e.getMessage(), e);
         }
@@ -89,7 +87,7 @@ public class RDFaParser extends AbstractRDFParser {
         if(options instanceof RDFaParserOptions rdfaOptions) {
             rdfaOptions.getSAXFeatures().forEach((featureUri, value) -> {
                 try {
-                    this.saxParserFactoryfactory.setFeature(featureUri, value);
+                    this.saxParserFactory.setFeature(featureUri, value);
                 } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
                     throw new ParsingErrorException("Failed setting the SAX feature " + featureUri + " from the parser's options", e);
                 }
@@ -101,6 +99,7 @@ public class RDFaParser extends AbstractRDFParser {
                     throw new ParsingErrorException("Failed setting the SAX property " + propertyUri + " from the parser's options", e);
                 }
             });
+            this.saxParserFactory.setSchema(rdfaOptions.getSchema());
         }
     }
 
