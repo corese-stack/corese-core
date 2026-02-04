@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.api.query;
 
-import fr.inria.corese.core.next.api.query.dataset.Dataset;
+import fr.inria.corese.core.next.api.query.exception.QueryEvaluationException;
 
 /**
  * A query on a repository that can be formulated in one of the supported query languages (for example SPARQL).
@@ -54,8 +54,13 @@ public interface Query<T> extends Operation {
     QueryType getQueryType();
 
     /**
-     * Evaluation of the query against the dataset.
-     * @return The result type expected, see {@link fr.inria.corese.core.next.api.query.result.TupleQueryResult}, {@link fr.inria.corese.core.next.api.query.result.GraphQueryResult} or Boolean
+     * Evaluates the query against the dataset.
+     *
+     * @return The result type expected: {@link fr.inria.corese.core.next.api.query.result.TupleQueryResult}
+     *         for SELECT queries, {@link fr.inria.corese.core.next.api.query.result.GraphQueryResult}
+     *         for CONSTRUCT/DESCRIBE queries, or {@link Boolean} for ASK queries
+     * @throws QueryEvaluationException if an error occurs during query evaluation
      */
-    T evaluate();
+    T evaluate() throws QueryEvaluationException;
+
 }

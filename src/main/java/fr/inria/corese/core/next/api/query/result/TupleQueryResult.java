@@ -1,7 +1,9 @@
 package fr.inria.corese.core.next.api.query.result;
 
 import java.io.Closeable;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Represents the result of evaluating a SPARQL {@code SELECT} query.
@@ -15,8 +17,9 @@ import java.util.List;
  * <p>Implementations are not required to be thread-safe.</p>
  *
  * @see fr.inria.corese.core.next.api.query.TupleQuery
+ * @see fr.inria.corese.core.next.api.query.TupleQuery#evaluate()
  */
-public interface TupleQueryResult extends Closeable {
+public interface TupleQueryResult extends Closeable, Iterable<BindingSet> {
 
     /**
      * Returns the ordered list of variable names that appear in the
@@ -30,7 +33,8 @@ public interface TupleQueryResult extends Closeable {
      * Returns {@code true} if the query result contains at least one more
      * solution. Calling this method does not consume the next solution.
      *
-     * @return {@code true} if another binding set is available
+     * @return {@code true} if another binding set is available, {@code false} otherwise
+     * @throws IllegalStateException if this result has been closed
      */
     boolean hasNext();
 
@@ -41,6 +45,54 @@ public interface TupleQueryResult extends Closeable {
      * @return the next {@link BindingSet}
      */
     BindingSet next();
+
+    /**
+     * Returns an iterator over the query results.
+     *
+     * @return an iterator over the binding sets in this result
+     */
+    @Override
+    default Iterator<BindingSet> iterator() {
+        return new Iterator<>() {
+            @Override
+            public boolean hasNext() {
+                return TupleQueryResult.this.hasNext();
+            }
+
+            @Override
+            public BindingSet next() {
+                return TupleQueryResult.this.next();
+            }
+        };
+    }
+
+    /**
+     * Returns all remaining results as a {@link List}.
+     *
+     * @return a list containing all remaining binding sets (never {@code null})
+     * @throws IllegalStateException if this result has been closed
+     */
+    default List<BindingSet> asList() {
+        List<BindingSet> list = new ArrayList<>();
+        this.forEach(list::add);
+        return list;
+    }
+
+    /**
+     * Returns a sequential {@link Stream} over the query results.
+     *
+     * @return a sequential stream over the binding sets in this result
+     * @throws IllegalStateException if this result has been closed
+     */
+    default Stream<BindingSet> stream() {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(
+                        iterator(),
+                        Spliterator.ORDERED | Spliterator.NONNULL
+                ),
+                false
+        );
+    }
 
     /**
      * Closes this result and releases any underlying resources such as
