@@ -44,6 +44,8 @@ public class RDFaParser extends AbstractRDFParser {
 
     private String baseIri = SerializationConstants.getDefaultBaseURI();
 
+    private SAXParser saxParser;
+
     /**
      * An index of IRI prefixes
      */
@@ -68,6 +70,24 @@ public class RDFaParser extends AbstractRDFParser {
         for (RDFaInitialPrefixes prefixObject : RDFaInitialPrefixes.values()) {
             this.addIriMapping(prefixObject.getPrefix(), getValueFactory().createIRI(prefixObject.getNamespace()));
         }
+
+        SAXParserFactory saxParserFactoryfactory = SAXParserFactory.newInstance();
+        if(this.getConfig() instanceof RDFaParserOptions rdfaOptions) {
+            rdfaOptions.getSAXFeatures().forEach((featureUri, value) -> {
+                try {
+                    saxParserFactoryfactory.setFeature(featureUri, value);
+                } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
+                    throw new ParsingErrorException("Failed setting the SAX feature from the parser's options", e);
+                }
+            });
+        }
+        try {
+            SAXParser saxParser = saxParserFactoryfactory.newSAXParser();
+            XMLReader xmlReader = saxParser.getXMLReader();
+            xmlReader.setEntityResolver((s, s1) -> null); // Fix DTD resolution bug by not resolving any entity
+        } catch (SAXException | ParserConfigurationException e) {
+            throw new ParsingErrorException("Unexpected error during XML+RDFa parser creation: " + e.getMessage(), e);
+        }
     }
 
 
@@ -91,20 +111,6 @@ public class RDFaParser extends AbstractRDFParser {
     public void parse(Reader reader, String baseURI) {
         try {
             this.baseIri = baseURI;
-
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            if(this.getConfig() instanceof RDFaParserOptions rdfaOptions) {
-                rdfaOptions.getSAXFeatures().forEach((featureUri, value) -> {
-                    try {
-                        factory.setFeature(featureUri, value);
-                    } catch (ParserConfigurationException | SAXNotRecognizedException | SAXNotSupportedException e) {
-                        throw new ParsingErrorException("Failed setting the SAX feature from the parser's options", e);
-                    }
-                });
-            }
-            SAXParser saxParser = factory.newSAXParser();
-            XMLReader xmlReader = saxParser.getXMLReader();
-            xmlReader.setEntityResolver((s, s1) -> null); // Fix DTD resolution bug by not resolving any entity
             InputSource inputSource = new InputSource(reader);
             saxParser.parse(inputSource, new XMLSaxHandler());
         } catch (IOException e) {
@@ -112,6 +118,14 @@ public class RDFaParser extends AbstractRDFParser {
         } catch (Exception e) {
             throw new ParsingErrorException("Unexpected error during XML+RDFa parsing: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     *
+     * @return the inner SAXParser used by the RDFaParser
+     */
+    public SAXParser getSAXParser() {
+        return this.saxParser;
     }
 
     private void addPrefix(String prefix, String uri) {
