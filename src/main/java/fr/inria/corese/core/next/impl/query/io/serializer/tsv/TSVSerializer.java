@@ -1,9 +1,9 @@
-package fr.inria.corese.core.next.impl.sparql.io.serializer.tsv;
+package fr.inria.corese.core.next.impl.query.io.serializer.tsv;
 
 import fr.inria.corese.core.next.api.base.io.FileFormat;
 import fr.inria.corese.core.next.api.base.io.ResultFormat;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.impl.sparql.io.serializer.common.CharacterSeparatedValuesSerializer;
+import fr.inria.corese.core.next.impl.query.io.serializer.common.CharacterSeparatedValuesSerializer;
 import fr.inria.corese.core.next.kgram.core.Mappings;
 
 public class TSVSerializer  extends CharacterSeparatedValuesSerializer {
