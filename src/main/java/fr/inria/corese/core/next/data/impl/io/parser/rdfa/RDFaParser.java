@@ -124,6 +124,11 @@ public class RDFaParser extends AbstractRDFParser {
     public void parse(Reader reader, String baseURI) {
         try {
             this.baseIri = baseURI;
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            factory.setValidating(false);
+
+            SAXParser saxParser = factory.newSAXParser();
             InputSource inputSource = new InputSource(reader);
             saxParser.parse(inputSource, new XMLSaxHandler());
         } catch (IOException e) {
