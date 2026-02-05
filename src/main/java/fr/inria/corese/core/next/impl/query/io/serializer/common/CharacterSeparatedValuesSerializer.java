@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.sparql.io.serializer.common;
+package fr.inria.corese.core.next.impl.query.io.serializer.common;
 
 import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;
 import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.kgram.api.core.Node;
 import fr.inria.corese.core.next.kgram.core.Mapping;
 import fr.inria.corese.core.next.kgram.core.Mappings;
 import fr.inria.corese.core.next.api.io.IOOptions;
-import fr.inria.corese.core.next.api.sparql.io.serializer.ResultSerializer;
+import fr.inria.corese.core.next.api.query.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.impl.exception.SerializationException;
 
 import java.io.IOException;
@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 
 public abstract class CharacterSeparatedValuesSerializer implements ResultSerializer {
 
-    private String separator;
-    private Mappings results;
-    private IOOptions config;
+    private final String separator;
+    private final Mappings results;
+    private final IOOptions config;
 
     protected CharacterSeparatedValuesSerializer(String separator, Mappings results, IOOptions options) {
         this.separator = separator;

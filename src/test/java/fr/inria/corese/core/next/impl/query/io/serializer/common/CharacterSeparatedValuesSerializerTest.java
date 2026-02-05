@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.sparql.io.serializer.common;
+package fr.inria.corese.core.next.impl.query.io.serializer.common;
 
 import org.junit.jupiter.api.Test;
 
