@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.impl.query.io.serializer.common;
+package fr.inria.corese.core.next.query.sparql.io.serializer.common;
 
 import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;

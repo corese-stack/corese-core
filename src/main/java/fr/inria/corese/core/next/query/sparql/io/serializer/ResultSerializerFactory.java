@@ -1,7 +1,7 @@
-package fr.inria.corese.core.next.api.query.io.serializer;
+package fr.inria.corese.core.next.query.sparql.io.serializer;
 
 import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.next.api.io.IOOptions;
+import fr.inria.corese.core.next.data.io.IOOptions;
 
 /**
  * Factory interface for creating {@link ResultSerializer} instances. This interface defines functions to create serializer based on the given result {@link fr.inria.corese.core.kgram.core.Mappings} and the desired {@link fr.inria.corese.core.next.api.base.io.ResultFormat}

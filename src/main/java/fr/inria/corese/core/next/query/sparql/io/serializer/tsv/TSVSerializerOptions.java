@@ -1,6 +1,6 @@
-package fr.inria.corese.core.next.impl.query.io.serializer.tsv;
+package fr.inria.corese.core.next.query.sparql.io.serializer.tsv;
 
-import fr.inria.corese.core.next.impl.query.io.serializer.common.CharacterSeparatedValuesSerializerOptions;
+import fr.inria.corese.core.next.query.sparql.io.serializer.common.CharacterSeparatedValuesSerializerOptions;
 
 public class TSVSerializerOptions extends CharacterSeparatedValuesSerializerOptions {
     protected TSVSerializerOptions(TSVSerializerOptions.Builder builder) {
