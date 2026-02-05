@@ -77,7 +77,7 @@ public class RDFC10Serializer extends AbstractLineBasedSerializer {
      * @throws IOException if an I/O error occurs.
      */
     @Override
-    public void writeContext(Writer writer, Statement stmt) throws IOException {
+    protected void writeContext(Writer writer, Statement stmt) throws IOException {
         Resource context = stmt.getContext();
         if (context != null) {
             writer.write(SerializationConstants.SPACE);

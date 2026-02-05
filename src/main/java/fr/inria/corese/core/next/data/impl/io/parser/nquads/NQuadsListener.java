@@ -76,7 +76,7 @@ public class NQuadsListener extends NQuadsBaseListener {
     /**
      * Extracts a resource (IRI or Blank Node) from the subject context.
      */
-    public Resource extractSubject(NQuadsParser.SubjectContext ctx) {
+    protected Resource extractSubject(NQuadsParser.SubjectContext ctx) {
         if (ctx.IRIREF() != null) {
             String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
@@ -92,7 +92,7 @@ public class NQuadsListener extends NQuadsBaseListener {
     /**
      * Extracts a predicate (IRI) from the predicate context.
      */
-    public IRI extractPredicate(NQuadsParser.PredicateContext ctx) {
+    protected IRI extractPredicate(NQuadsParser.PredicateContext ctx) {
         if (ctx.IRIREF() != null) {
             String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
@@ -103,7 +103,7 @@ public class NQuadsListener extends NQuadsBaseListener {
     /**
      * Extracts a value (IRI, Blank Node, or Literal) from the object context.
      */
-    public Value extractObject(NQuadsParser.ObjectContext ctx) {
+    protected Value extractObject(NQuadsParser.ObjectContext ctx) {
         if (ctx.IRIREF() != null) {
             String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
@@ -122,7 +122,7 @@ public class NQuadsListener extends NQuadsBaseListener {
     /**
      * Extracts a graph (IRI or Blank Node) from the graph label context.
      */
-    public Resource extractGraph(NQuadsParser.GraphLabelContext ctx) {
+    protected Resource extractGraph(NQuadsParser.GraphLabelContext ctx) {
         if (ctx.IRIREF() != null) {
             String iri = abstractNTriplesQuadsListener.unescapeUri(stripAngles(ctx.IRIREF().getText()));
             return factory.createIRI(iri);
@@ -192,7 +192,7 @@ public class NQuadsListener extends NQuadsBaseListener {
      * @deprecated Use helper.unescapeLiteral instead
      */
     @Deprecated
-    public String unescapeLiteral(String literalText) {
+    protected String unescapeLiteral(String literalText) {
         return abstractNTriplesQuadsListener.unescapeLiteral(literalText);
     }
 
