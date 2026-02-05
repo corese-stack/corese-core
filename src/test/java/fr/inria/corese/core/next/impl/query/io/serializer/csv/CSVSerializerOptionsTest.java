@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.impl.query.io.serializer.csv;
 
+import fr.inria.corese.core.next.query.sparql.io.serializer.csv.CSVSerializerOptions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,7 +9,7 @@ class CSVSerializerOptionsTest {
 
     @Test
     void getLineEnding() {
-        CSVSerializerOptions options = new CSVSerializerOptions.Builder().setLineEnding("tata").build();
+        fr.inria.corese.core.next.query.sparql.io.serializer.csv.CSVSerializerOptions options = new CSVSerializerOptions.Builder().setLineEnding("tata").build();
 
         assertEquals("tata", options.getLineEnding());
     }
