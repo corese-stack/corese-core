@@ -1,0 +1,32 @@
+package fr.inria.corese.core.next.data.impl.common.vocabulary;
+
+import fr.inria.corese.core.next.data.api.IRI;
+
+/**
+ * Common interface for the definition of enum-based vocabularies.
+ */
+public interface Vocabulary {
+
+    /**
+     * @return the IRI of this vocabulary element
+     */
+    IRI getIRI();
+
+    /**
+     * @return the namespace of this vocabulary
+     */
+    String getNamespace();
+
+    /**
+     * @return the preferred prefix of this vocabulary
+     */
+    String getPreferredPrefix();
+
+    static String getVocabularyNamespace() {
+        throw new RuntimeException("Unimplemented function");
+    }
+
+    static String getVocabularyPreferredPrefix() {
+        throw new RuntimeException("Unimplemented function");
+    }
+}

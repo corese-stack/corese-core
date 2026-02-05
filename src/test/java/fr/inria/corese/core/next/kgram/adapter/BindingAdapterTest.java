@@ -1,7 +1,9 @@
 package fr.inria.corese.core.next.kgram.adapter;
 
-import fr.inria.corese.core.next.kgram.api.core.Node;
-import fr.inria.corese.core.next.kgram.core.Mappings;
+import fr.inria.corese.core.next.query.kgram.adapter.BindingAdapter;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.core.Mappings;
+import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import org.junit.jupiter.api.BeforeEach;
@@ -168,8 +170,8 @@ class BindingAdapterTest {
         @Test
         @DisplayName("Should visit with next kgram types")
         void testVisitNextKgramTypes() {
-            fr.inria.corese.core.next.kgram.core.Exp mockExp =
-                    mock(fr.inria.corese.core.next.kgram.core.Exp.class);
+            Exp mockExp =
+                    mock(Exp.class);
             Mappings mockMappings1 = mock(Mappings.class);
             Mappings mockMappings2 = mock(Mappings.class);
 
@@ -197,8 +199,8 @@ class BindingAdapterTest {
         @Test
         @DisplayName("Should handle visit with null parameters")
         void testVisitWithNullParameters() {
-            fr.inria.corese.core.next.kgram.core.Exp mockExp =
-                    mock(fr.inria.corese.core.next.kgram.core.Exp.class);
+            Exp mockExp =
+                    mock(Exp.class);
 
             assertDoesNotThrow(() -> adapter.visit(mockExp, null, null, null),
                     "Should not throw when visiting with null parameters");
