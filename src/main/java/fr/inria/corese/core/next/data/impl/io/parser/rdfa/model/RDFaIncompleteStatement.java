@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfa.model;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
+import java.util.Objects;
 
 /**
  * This utility class represents triples in the process of creation during the chaining of element in an RDFa document.
@@ -128,13 +129,14 @@ public class RDFaIncompleteStatement {
         if (this == o) {
             return true;
         }
-        if(! (o instanceof RDFaIncompleteStatement oStat)) {
+        if (!(o instanceof RDFaIncompleteStatement oStat)) {
             return false;
         }
-        return oStat.getSubject().equals(this.getSubject())
-                && oStat.getPredicate().equals(this.getPredicate())
-                && oStat.getObject().equals(this.getObject())
-                && oStat.getDirection().equals(this.getDirection());
+
+        return java.util.Objects.equals(this.getSubject(), oStat.getSubject())
+                && java.util.Objects.equals(this.getPredicate(), oStat.getPredicate())
+                && java.util.Objects.equals(this.getObject(), oStat.getObject())
+                && java.util.Objects.equals(this.getDirection(), oStat.getDirection());
     }
 
     @Override
