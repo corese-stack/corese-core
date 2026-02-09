@@ -33,6 +33,7 @@ import fr.inria.corese.core.next.data.impl.temp.literal.CoreseInteger;
 import fr.inria.corese.core.next.data.impl.temp.literal.CoreseLanguageTaggedStringLiteral;
 import fr.inria.corese.core.next.data.impl.temp.literal.CoreseTime;
 import fr.inria.corese.core.next.data.impl.temp.literal.CoreseTyped;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 
 /**
  * Factory for all the Corese adapted values.
