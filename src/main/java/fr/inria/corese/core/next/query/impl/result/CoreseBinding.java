@@ -1,4 +1,25 @@
 package fr.inria.corese.core.next.query.impl.result;
 
-public class CoreseBinding {
+import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.query.api.result.Binding;
+
+public class CoreseBinding implements Binding {
+    private final String varName;
+    private final Value bindingValue;
+
+    public CoreseBinding(String variable, Value value) {
+        this.varName = variable;
+        this.bindingValue = value;
+    }
+
+    @Override
+    public String getName() {
+        return this.varName;
+    }
+
+    @Override
+    public Value getValue() {
+        return this.bindingValue;
+    }
+
 }
