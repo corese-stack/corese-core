@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.impl.io.serialization.turtle;
 
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.serializer.LineEndingOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.LineEndingOptions;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.AbstractTFamilyOptions;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.BlankNodeStyleEnum;
 

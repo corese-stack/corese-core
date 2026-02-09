@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfa;
 import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;

@@ -5,7 +5,7 @@ import java.io.Writer;
 import java.util.Objects;
 
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.AbstractSerializerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

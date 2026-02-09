@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
 import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
-import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
 
 /**

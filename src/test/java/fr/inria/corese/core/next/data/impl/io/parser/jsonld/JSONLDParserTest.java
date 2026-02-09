@@ -10,7 +10,6 @@ import java.io.Reader;
 import java.io.StringReader;
 
 import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
-import fr.inria.corese.core.next.data.impl.io.parser.jsonld.JSONLDParser;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.data.api.BNode;
@@ -21,7 +20,7 @@ import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseModel;

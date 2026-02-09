@@ -9,9 +9,9 @@ import java.util.Objects;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.data.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 
 /**
  * Abstract class for RDFParser that set up the inner Model and ValueFactory

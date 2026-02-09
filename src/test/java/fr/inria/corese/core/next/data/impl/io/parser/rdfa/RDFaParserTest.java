@@ -2,8 +2,8 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfa;
 
 import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;

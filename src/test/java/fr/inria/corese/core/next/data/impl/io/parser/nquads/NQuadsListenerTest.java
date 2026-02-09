@@ -1,9 +1,8 @@
 package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
-import fr.inria.corese.core.next.data.impl.io.parser.nquads.NQuadsListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;

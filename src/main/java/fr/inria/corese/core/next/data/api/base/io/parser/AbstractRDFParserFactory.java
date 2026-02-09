@@ -3,8 +3,8 @@ package fr.inria.corese.core.next.data.api.base.io.parser;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.io.parser.RDFParserFactory;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParserFactory;
 
 /**
  * Abstract base class for {@link RDFParserFactory}s.
