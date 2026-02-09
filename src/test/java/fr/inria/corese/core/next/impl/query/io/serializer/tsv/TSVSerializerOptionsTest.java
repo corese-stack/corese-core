@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.impl.query.io.serializer.tsv;
 
-import fr.inria.corese.core.next.query.sparql.io.serializer.tsv.TSVSerializerOptions;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.tsv.TSVSerializerOptions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
