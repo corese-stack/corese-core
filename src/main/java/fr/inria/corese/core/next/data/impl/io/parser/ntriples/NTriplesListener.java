@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.data.impl.io.parser.common.AbstractNTriplesNQuadsListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NTriplesBaseListener;

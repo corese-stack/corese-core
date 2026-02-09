@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.api.base.io;
 
-import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 
 /**
  * Abstract class for parser/serializers that sets up the necessity of implementing a builder pattern.

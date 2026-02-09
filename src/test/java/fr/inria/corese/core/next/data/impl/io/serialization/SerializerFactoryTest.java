@@ -2,9 +2,8 @@ package fr.inria.corese.core.next.data.impl.io.serialization;
 
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
-import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.canonical.RDFC10Serializer;
 import fr.inria.corese.core.next.data.impl.io.serialization.canonical.RDFC10SerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serialization.jsonld.JSONLDSerializer;

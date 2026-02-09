@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.impl.io.parser.nquads;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.data.impl.io.parser.common.AbstractNTriplesNQuadsListener;
 import fr.inria.corese.core.next.impl.parser.antlr.NQuadsBaseListener;

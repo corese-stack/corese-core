@@ -18,7 +18,7 @@ import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.common.literal.RDF;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;

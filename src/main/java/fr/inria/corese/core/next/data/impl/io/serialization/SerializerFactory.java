@@ -3,8 +3,8 @@ package fr.inria.corese.core.next.data.impl.io.serialization;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.serialization.canonical.RDFC10Canonicalizer;
 import fr.inria.corese.core.next.data.impl.io.serialization.canonical.RDFC10Serializer;
@@ -25,7 +25,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * Default implementation of {@link fr.inria.corese.core.next.data.io.serializer.SerializerFactory}.
+ * Default implementation of {@link fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory}.
  * This factory is responsible for creating instances of {@link RDFSerializer}
  * based on the requested {@link RDFFormat}. It uses a registry pattern
  * to map each format to its corresponding serializer constructor,
@@ -38,7 +38,7 @@ import java.util.function.Function;
  * to default configurations if an incompatible type is provided.
  * </p>
  */
-public class SerializerFactory implements fr.inria.corese.core.next.data.io.serializer.SerializerFactory {
+public class SerializerFactory implements fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory {
 
     private final Map<RDFFormat, BiFunction<Model, IOOptions, RDFSerializer>> registry;
     private final Map<RDFFormat, Function<Model, RDFSerializer>> defaultRegistry;

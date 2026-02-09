@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.data.impl.io.serialization.rdfxml;
 
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.serialization.TestStatementFactory;
