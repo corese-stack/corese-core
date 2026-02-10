@@ -138,13 +138,6 @@ public class RDFaParser extends AbstractRDFParser {
         }
     }
 
-    /**
-     *
-     * @return the inner SAXParser used by the RDFaParser
-     */
-    public SAXParser getSAXParser() {
-        return this.saxParser;
-    }
 
     private void addPrefix(String prefix, String uri) {
         IRI prefixIRI = getValueFactory().createIRI(uri);
@@ -175,7 +168,7 @@ public class RDFaParser extends AbstractRDFParser {
     private void startProcessElement(String uri, String localName, String qName, Attributes attrs) {
 
         // 1 First, the local values are initialized
-        RDFaProcessingContext processingContext = null;
+        RDFaProcessingContext processingContext;
         if(this.processingContexts.size() > 1) { // Not a root element
             processingContext = new RDFaProcessingContext(currentProcessingContext().getEvaluationContext());
             processingContext.setRootElement(false);
@@ -246,6 +239,11 @@ public class RDFaParser extends AbstractRDFParser {
         this.currentProcessingContext().getElementAttributes().forEach((String attribute, String attributeValue) -> {
             if (attribute.startsWith(XMLNS_PREFIX + ":")) {
                 String prefixName = attribute.replace(XMLNS_PREFIX + ":", "");
+
+                if (prefixName.contains("_")) {
+                    throw new ParsingErrorException("Prefix '" + prefixName + "' contains underscore character which is not allowed in xmlns declaration");
+                }
+
                 IRI prefixNamespace = getValueFactory().createIRI(attributeValue, "");
                 this.addIriMapping(prefixName, prefixNamespace);
             }
@@ -271,7 +269,7 @@ public class RDFaParser extends AbstractRDFParser {
                 && !isAttributePresent(RDFaAttributes.REV)) {
             // 5.1. If the current element contains the @property attribute, but does not contain either the @content or @datatype attributes, then
             if (isAttributePresent(RDFaAttributes.PROPERTY)
-                    && !getAttributeStringValue(RDFaAttributes.PROPERTY).isEmpty()
+                    && !getAttributeStringValue(RDFaAttributes.PROPERTY).trim().isEmpty()
                     && !isAttributePresent(RDFaAttributes.CONTENT)
                     && !isAttributePresent(RDFaAttributes.DATATYPE)
                     && ((isAttributePresent(RDFaAttributes.ABOUT)
@@ -466,9 +464,6 @@ public class RDFaParser extends AbstractRDFParser {
             }
             this.currentProcessingContext().setCurrentObjectResource(getValueFactory().createBNode());
             if (isAttributePresent(RDFaAttributes.REL)) {
-                if (!getAttributeValueResource(RDFaAttributes.REL).isIRI()) {
-                    throw new ParsingErrorException("Value of attribute @rel expected to be an IRI but was " + this.currentProcessingContext().getElementAttributes().get(RDFaAttributes.REL.getName()));
-                }
                 List<Resource> relList = getAttributeValueResourceList(RDFaAttributes.REL);
                 for(Resource relResource : relList) {
                     if (isAttributePresent(RDFaAttributes.INLIST)) {
@@ -551,7 +546,11 @@ public class RDFaParser extends AbstractRDFParser {
         }
 
         // 11. The next step of the iteration is to establish any current property value;
-        if (isAttributePresent(RDFaAttributes.PROPERTY)) {
+        if (isAttributePresent(RDFaAttributes.PROPERTY) ) {
+            String propertyValue = getAttributeStringValue(RDFaAttributes.PROPERTY);
+            if (propertyValue == null || propertyValue.trim().isEmpty()) {
+                throw new ParsingErrorException("@property attribute cannot be empty");
+            }
             List<Resource> propertyIRIList = getAttributeValueResourceList(RDFaAttributes.PROPERTY);
             // as a typed literal if @datatype is present, does not have an empty value according to the section on CURIE and IRI Processing, and is not set to XMLLiteral in the vocabulary http://www.w3.org/1999/02/22-rdf-syntax-ns#.
             // The actual literal is either the value of @content (if present) or a string created by concatenating the value of all descendant text nodes, of the current element in turn. The final string includes the datatype IRI, as described in [RDF-SYNTAX-GRAMMAR], which will have been obtained according to the section on CURIE and IRI Processing.
@@ -631,6 +630,9 @@ public class RDFaParser extends AbstractRDFParser {
             // The current property value is then used with each predicate as follows:
             // If the element also includes the @inlist attribute, the current property value is added to the local list mapping as follows:
             for(Resource propertyIRIResource: propertyIRIList) {
+                if (!propertyIRIResource.isIRI()) {
+                    throw new ParsingErrorException("Property must be an IRI, got: " + propertyIRIResource + ". Blank nodes are not allowed as predicates.");
+                }
                 IRI propertyIRI = (IRI) propertyIRIResource;
                 if(this.currentProcessingContext().getCurrentPropertyValue() != null) {
                     if (isAttributePresent(RDFaAttributes.INLIST)) {
@@ -696,30 +698,58 @@ public class RDFaParser extends AbstractRDFParser {
     }
 
     private Map<String, IRI> getPrefixesFromDeclaration(String declaration) {
-        String[] prefixArray = declaration.split(" ");
+        String[] prefixArray = declaration.trim().split("\\s+");
         HashMap<String, IRI> result = new HashMap<>();
-        // prefix array should contain an even number of elements corresponding to prefix/namespace pairs
+
         if (prefixArray.length % 2 != 0) {
             throw new ParsingErrorException("Error during prefix extraction of " + declaration);
         }
+
         int numberOfPairs = prefixArray.length / 2;
         for(int pairNumber = 0; pairNumber < numberOfPairs; pairNumber++) {
-            String prefix = prefixArray[pairNumber*2];
-            if(! prefix.endsWith(":")) {
+            String prefix = prefixArray[pairNumber * 2];
+            String namespaceString = prefixArray[pairNumber * 2 + 1];
+
+            if(!prefix.endsWith(":")) {
                 throw new ParsingErrorException("Expecting namespace prefix declaration to end with \":\", got " + prefix + " in declaration " + declaration);
             }
-            prefix = prefix.replaceAll(":$", ""); // Removing trailing :
-            IRI namespace = getValueFactory().createIRI(prefixArray[pairNumber*2 +1]);
+
+            prefix = prefix.replaceAll(":$", "");
+
+            if (prefix.contains("_") && !prefix.equals("_")) {
+                throw new ParsingErrorException("Prefix '" + prefix + "' contains underscore character which is not allowed in declaration: " + declaration);
+            }
+
+            if (namespaceString == null || namespaceString.trim().isEmpty()) {
+                throw new ParsingErrorException("Namespace for prefix '" + prefix + "' cannot be empty in declaration: " + declaration);
+            }
+
+            // AJOUT: Résoudre les IRIs relatives
+            IRI namespace;
+            if (IRIUtils.isStandardIRI(namespaceString)) {
+                // IRI absolue
+                namespace = getValueFactory().createIRI(namespaceString);
+            } else {
+                // IRI relative - résoudre par rapport à la base
+                String baseIriString = currentProcessingContext().getEvaluationContext().getBaseIri().stringValue();
+                String resolvedIRI = baseIriString + namespaceString;
+                namespace = getValueFactory().createIRI(resolvedIRI);
+            }
 
             result.put(prefix, namespace);
         }
+
         return result;
     }
 
     private List<Resource> resolveWhitespaceSeparatedList(String rawList) {
         ArrayList<Resource> result = new ArrayList<>();
-        String[] rawResourceList = rawList.split(" ");
+        String[] rawResourceList = rawList.trim().split("\\s+");
+
         for(String rawResource : rawResourceList) {
+            if (rawResource.isEmpty()) {
+                continue;
+            }
             Optional<Resource> resourceOptional = resolveStringResource(rawResource);
             resourceOptional.ifPresent(result::add);
         }
@@ -814,7 +844,36 @@ public class RDFaParser extends AbstractRDFParser {
      */
     protected boolean stringUriIsCURIE(String stringIri) {
         int colonIndex = stringIri.indexOf(":");
-        return colonIndex > -1 && !stringIri.contains("://") && !stringIri.startsWith("_:") && !stringIri.startsWith("[_:");
+
+        if (colonIndex == -1) {
+            return false;
+        }
+
+        if (stringIri.startsWith("_:") || stringIri.startsWith("[_:")) {
+            return false;
+        }
+
+        if (stringIri.contains("://")) {
+            return false;
+        }
+
+        String potentialScheme = stringIri.substring(0, colonIndex).toLowerCase();
+
+        return !potentialScheme.equals("http") &&
+                !potentialScheme.equals("https") &&
+                !potentialScheme.equals("ftp") &&
+                !potentialScheme.equals("ftps") &&
+                !potentialScheme.equals("mailto") &&
+                !potentialScheme.equals("tel") &&
+                !potentialScheme.equals("urn") &&
+                !potentialScheme.equals("data") &&
+                !potentialScheme.equals("file") &&
+                !potentialScheme.equals("ssh") &&
+                !potentialScheme.equals("git") &&
+                !potentialScheme.equals("news") &&
+                !potentialScheme.equals("nntp") &&
+                !potentialScheme.equals("irc") &&
+                !potentialScheme.equals("ldap");
     }
 
     private RDFaEvaluationContext getNewContext(IRI baseIRI) {
@@ -860,7 +919,4 @@ public class RDFaParser extends AbstractRDFParser {
         }
     }
 
-    private void clearIriMappings() {
-        this.iriMappings.clear();
-    }
 }
