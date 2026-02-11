@@ -38,9 +38,9 @@ public interface Query<T> extends Operation {
     String getQueryString();
 
     /**
-     * @return the query language of this query (typically {@link QueryLanguage})
+     * @return the query language of this query (typically {@link fr.inria.corese.core.next.data.api.query.QueryLanguage})
      */
-    QueryLanguage getLanguage();
+    fr.inria.corese.core.next.data.api.query.QueryLanguage getLanguage();
 
     // Execution options
     /**

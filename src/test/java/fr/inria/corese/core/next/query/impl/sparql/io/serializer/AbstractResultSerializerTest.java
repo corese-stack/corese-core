@@ -1,0 +1,273 @@
+package fr.inria.corese.core.next.query.impl.sparql.io.serializer;
+
+import fr.inria.corese.core.next.data.api.Value;
+import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
+import fr.inria.corese.core.next.query.api.result.Binding;
+import fr.inria.corese.core.next.query.api.result.BindingSet;
+import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.io.StringWriter;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public abstract class AbstractResultSerializerTest {
+
+    private ValueFactory factory = new CoreseAdaptedValueFactory();
+
+    private final class MockQueryResults implements TupleQueryResult {
+        private List<MockBindingSet> innerData;
+        private Iterator<MockBindingSet> innerIterator;
+        private List<String> bindingsNames;
+
+        private MockQueryResults(List<String> bindingsNames, List<Map<String, Value>> bindings) {
+            this.innerData = bindings.stream().map(MockBindingSet::new).toList();
+
+            this.innerIterator = this.innerData.iterator();
+            this.bindingsNames = bindingsNames;
+        }
+
+        @Override
+        public List<String> getBindingNames() {
+            return this.bindingsNames;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return this.innerIterator.hasNext();
+        }
+
+        @Override
+        public BindingSet next() {
+            return this.innerIterator.next();
+        }
+
+        @Override
+        public void close() {
+
+        }
+
+    }
+
+    private static class MockBindingSet implements BindingSet {
+
+        private final Map<String, Value> values;
+
+        public MockBindingSet(Map<String, Value> bindingMap) {
+            this.values = bindingMap;
+        }
+
+        @Override
+        public Set<String> getBindingNames() {
+            return this.values.keySet();
+        }
+
+        @Override
+        public boolean hasBinding(String name) {
+            return this.values.containsKey(name);
+        }
+
+        @Override
+        public Value getValue(String name) {
+            return this.values.get(name);
+        }
+
+        @Override
+        public Iterator<Binding> iterator() {
+            return this.values.entrySet().stream().map(entry -> (Binding) new MockBinding(entry.getKey(), entry.getValue())).iterator();
+        }
+    }
+
+    private record MockBinding(String name, Value value) implements Binding {
+
+    }
+
+    protected String getDataTurtleString() {
+        return """
+                @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+                
+                _:a  foaf:name   "Johnny Lee Outlaw" .
+                _:a  foaf:mbox   <mailto:jlow@example.com> .
+                _:a  foaf:homepage <https://bsky.app/profile/johnnyleeoutlaw> .
+                _:b  foaf:name   "Peter Goodguy" .
+                _:b  foaf:mbox   <mailto:peter@example.org> .
+                _:c  foaf:name   "Carol Patoune" .
+                _:c  foaf:mbox   <mailto:carol@example.org> .
+                _:c  foaf:depiction   '''All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl,
+                All this work and no play makes Carols a dull girl.''' .
+                """;
+    }
+
+    protected abstract ResultSerializer getResultSerializer(TupleQueryResult results);
+
+    protected abstract String getEmptyResultsString();
+
+    protected TupleQueryResult getEmptyResults() {
+        return new TupleQueryResult() {
+            @Override
+            public List<String> getBindingNames() {
+                return List.of("a", "b", "c");
+            }
+
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public BindingSet next() {
+                return null;
+            }
+
+            @Override
+            public void close() {
+
+            }
+        };
+    }
+
+    @Test
+    @DisplayName("Tests the serialization of an empty result")
+    void emptyResult() {
+        ResultSerializer serializer = getResultSerializer(getEmptyResults());
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getEmptyResultsString(), writer.toString());
+    }
+
+    protected abstract String getResultsWithUrisString();
+
+    protected TupleQueryResult getResultsWithUris() {
+        List<String> bindingsNames = List.of("email", "homepage");
+        Map<String, Value> resultWithUrisValuesRow1 = new HashMap<>();
+        resultWithUrisValuesRow1.put("email", factory.createIRI("mailto:jlow@example.com"));
+        resultWithUrisValuesRow1.put("homepage", factory.createIRI("https://bsky.app/profile/johnnyleeoutlaw"));
+        Map<String, Value> resultWithUrisValuesRow2 = new HashMap<>();
+        resultWithUrisValuesRow2.put("email", factory.createIRI("mailto:peter@example.org"));
+        resultWithUrisValuesRow2.put("homepage", factory.createIRI("https://peter.goodguy.com"));
+        return new MockQueryResults(bindingsNames, List.of(resultWithUrisValuesRow1, resultWithUrisValuesRow2));
+    }
+
+    @Test
+    @DisplayName("Tests the serialization of results containing only URIs")
+     void resultsWithUris() {
+        ResultSerializer serializer = getResultSerializer(getResultsWithUris());
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getResultsWithUrisString(), writer.toString());
+    }
+
+    protected abstract String getResultsWithLiteralsString();
+
+    protected TupleQueryResult getResultsWithLiterals() {
+        List<String> bindingsNames = List.of("email", "name");
+        Map<String, Value> resultWithUrisValuesRow1 = new HashMap<>();
+        resultWithUrisValuesRow1.put("name", factory.createLiteral("Johnny Lee Outlaw"));
+        resultWithUrisValuesRow1.put("email", factory.createIRI("mailto:jlow@example.com"));
+        Map<String, Value> resultWithUrisValuesRow2 = new HashMap<>();
+        resultWithUrisValuesRow2.put("name", factory.createLiteral("Peter Goodguy"));
+        resultWithUrisValuesRow2.put("email", factory.createIRI("mailto:peter@example.org"));
+        Map<String, Value> resultWithUrisValuesRow3 = new HashMap<>();
+        resultWithUrisValuesRow3.put("name", factory.createLiteral("Carol Patoune"));
+        resultWithUrisValuesRow3.put("email", factory.createIRI("mailto:carol@example.org"));
+        return new MockQueryResults(bindingsNames, List.of(resultWithUrisValuesRow1, resultWithUrisValuesRow2, resultWithUrisValuesRow3));
+    }
+
+    @Test
+    @DisplayName("Tests the serialization of results containing only literals")
+    void resultsWithLiterals() {
+
+        ResultSerializer serializer = getResultSerializer(getResultsWithLiterals());
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getResultsWithLiteralsString(), writer.toString());
+    }
+
+    protected abstract String getResultsWithBlankNodesString();
+
+    protected TupleQueryResult getResultsWithBlankNodes() {
+        List<String> bindingsNames = List.of("nb");
+        Map<String, Value> resultWithUrisValuesRow1 = new HashMap<>();
+        resultWithUrisValuesRow1.put("nb", factory.createBNode("a"));
+        Map<String, Value> resultWithUrisValuesRow2 = new HashMap<>();
+        resultWithUrisValuesRow2.put("nb", factory.createBNode("b"));
+        Map<String, Value> resultWithUrisValuesRow3 = new HashMap<>();
+        resultWithUrisValuesRow3.put("nb", factory.createBNode("c"));
+        return new MockQueryResults(bindingsNames, List.of(resultWithUrisValuesRow1, resultWithUrisValuesRow2, resultWithUrisValuesRow3));
+    }
+
+    @Test
+    @DisplayName("Tests the serialization of results with blank nodes")
+    void resultsWithBlankNodes() {
+        ResultSerializer serializer = getResultSerializer(getResultsWithBlankNodes());
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getResultsWithBlankNodesString(), writer.toString());
+    }
+
+    protected abstract String getResultsWithMultiLinesLiteralString();
+
+    protected TupleQueryResult getResultsWithMultiLinesLiteral() {
+        List<String> bindingsNames = List.of("mail", "depiction");
+        Map<String, Value> resultsWithMultiLinesLiteralValuesRow1 = new HashMap<>();
+        resultsWithMultiLinesLiteralValuesRow1.put("mail", factory.createIRI("mailto:carol@example.org"));
+        resultsWithMultiLinesLiteralValuesRow1.put("depiction", factory.createLiteral("""
+All this work and no play makes Carols a dull girl,
+All this work and no play makes Carols a dull girl,
+All this work and no play makes Carols a dull girl,
+All this work and no play makes Carols a dull girl."""));
+        return new MockQueryResults(bindingsNames, List.of(resultsWithMultiLinesLiteralValuesRow1));
+    }
+
+    @Test
+    @DisplayName("Tests the serialization of a result containing a literal that contains break lines")
+    void resultsWithMultiLinesLiteral() {
+        ResultSerializer serializer = getResultSerializer(getResultsWithMultiLinesLiteral());
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getResultsWithMultiLinesLiteralString(), writer.toString());
+    }
+
+    protected abstract String getStandardResultsString();
+
+    protected TupleQueryResult getStandardResults() {
+        List<String> bindingsNames = List.of("x", "literal");
+        Map<String, Value> benchmarkResultsValuesRow1 = new HashMap<>();
+        benchmarkResultsValuesRow1.put("x", factory.createIRI("http://example/x"));
+        benchmarkResultsValuesRow1.put("literal", factory.createLiteral("String"));
+        Map<String, Value> benchmarkResultsValuesRow2 = new HashMap<>();
+        benchmarkResultsValuesRow2.put("x", factory.createIRI("http://example/x"));
+        benchmarkResultsValuesRow2.put("literal", factory.createLiteral("String-with-dquote\""));
+        Map<String, Value> benchmarkResultsValuesRow3 = new HashMap<>();
+        benchmarkResultsValuesRow3.put("x", factory.createBNode("blank0"));
+        benchmarkResultsValuesRow3.put("literal", factory.createLiteral("Blank node"));
+        Map<String, Value> benchmarkResultsValuesRow4 = new HashMap<>();
+        benchmarkResultsValuesRow4.put("literal", factory.createLiteral("Missing 'x'"));
+        Map<String, Value> benchmarkResultsValuesRow5 = new HashMap<>();
+        Map<String, Value> benchmarkResultsValuesRow6 = new HashMap<>();
+        benchmarkResultsValuesRow6.put("x", factory.createIRI("http://example/x"));
+        Map<String, Value> benchmarkResultsValuesRow7 = new HashMap<>();
+        benchmarkResultsValuesRow7.put("x", factory.createBNode("blank1"));
+        benchmarkResultsValuesRow7.put("literal", factory.createLiteral("String-with-lang", "en"));
+        Map<String, Value> benchmarkResultsValuesRow8 = new HashMap<>();
+        benchmarkResultsValuesRow8.put("x", factory.createBNode("blank1"));
+        benchmarkResultsValuesRow8.put("literal", factory.createLiteral(123));
+        return new MockQueryResults(bindingsNames, List.of(benchmarkResultsValuesRow1, benchmarkResultsValuesRow2, benchmarkResultsValuesRow3, benchmarkResultsValuesRow4, benchmarkResultsValuesRow5, benchmarkResultsValuesRow6, benchmarkResultsValuesRow7, benchmarkResultsValuesRow8));
+    }
+
+    @Test
+    @DisplayName("Tests the serialization of the result given as example in the standard")
+    void standardResults() {
+
+        ResultSerializer serializer = getResultSerializer(getStandardResults());
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getStandardResultsString(), writer.toString());
+    }
+}

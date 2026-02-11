@@ -235,7 +235,7 @@ public class QuerySolver implements SPARQLEngine {
         return query(query, m);
     }
 
-    public fr.inria.corese.core.next.query.kgram.core.Mappings query(String squery) throws EngineException {
+    public Mappings query(String squery) throws EngineException {
         return query(squery, null, null);
     }
 

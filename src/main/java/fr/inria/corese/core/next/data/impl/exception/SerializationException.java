@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.impl.exception;
 
-import fr.inria.corese.core.next.api.base.exception.CoreseException;
-import fr.inria.corese.core.next.api.base.io.FileFormat;
+import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
+import fr.inria.corese.core.next.data.api.base.io.FileFormat;
 
 /**
  * Exception thrown during RDF serialization or deserialization failures.

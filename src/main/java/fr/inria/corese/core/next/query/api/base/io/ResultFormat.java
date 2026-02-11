@@ -1,4 +1,6 @@
-package fr.inria.corese.core.next.api.base.io;
+package fr.inria.corese.core.next.query.api.base.io;
+
+import fr.inria.corese.core.next.data.api.base.io.FileFormat;
 
 import java.util.List;
 import java.util.Locale;

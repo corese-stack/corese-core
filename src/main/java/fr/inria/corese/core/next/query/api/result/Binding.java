@@ -25,12 +25,12 @@ public interface Binding {
      *
      * @return the variable name, never {@code null}
      */
-    String getName();
+    String name();
 
     /**
      * Returns the RDF value associated with this variable.
      *
      * @return the bound {@link Value}, never {@code null}
      */
-    Value getValue();
+    Value value();
 }

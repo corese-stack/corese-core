@@ -13,12 +13,12 @@ public class CoreseBinding implements Binding {
     }
 
     @Override
-    public String getName() {
+    public String name() {
         return this.varName;
     }
 
     @Override
-    public Value getValue() {
+    public Value value() {
         return this.bindingValue;
     }
 
