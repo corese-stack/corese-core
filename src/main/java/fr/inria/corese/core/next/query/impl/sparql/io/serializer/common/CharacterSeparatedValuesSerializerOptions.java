@@ -1,9 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.common;
 
-import fr.inria.corese.core.next.api.base.io.AbstractIOOptions;
-import fr.inria.corese.core.next.api.io.serializer.LineEndingOptions;
-import fr.inria.corese.core.next.impl.io.serialization.option.AbstractSerializerOptions;
-import fr.inria.corese.core.next.impl.io.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.LineEndingOptions;
+import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
 
 public abstract class CharacterSeparatedValuesSerializerOptions extends AbstractIOOptions implements LineEndingOptions {
 

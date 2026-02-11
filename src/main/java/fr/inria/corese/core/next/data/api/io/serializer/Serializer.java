@@ -1,14 +1,12 @@
 package fr.inria.corese.core.next.data.api.io.serializer;
 
-import fr.inria.corese.core.next.api.Model;
-import fr.inria.corese.core.next.api.base.io.FileFormat;
-import fr.inria.corese.core.next.impl.exception.SerializationException;
+import fr.inria.corese.core.next.data.api.base.io.FileFormat;
+import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 
-import java.io.File;
 import java.io.Writer;
 
 /**
- * Interface for all serializers (RDF models or SPARQL results) to a specified {@link fr.inria.corese.core.next.api.base.io.FileFormat}
+ * Interface for all serializers (RDF models or SPARQL results) to a specified {@link FileFormat}
  */
 public interface Serializer {
 

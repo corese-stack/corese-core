@@ -439,7 +439,7 @@ public class QueryProcess extends QuerySolver {
      */
 
     @Override
-    public fr.inria.corese.core.next.query.kgram.core.Mappings query(String squery) throws EngineException {
+    public Mappings query(String squery) throws EngineException {
         return doQuery(squery, null, null);
     }
 
