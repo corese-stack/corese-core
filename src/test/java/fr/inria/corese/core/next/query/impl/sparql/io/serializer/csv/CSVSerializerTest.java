@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.ResultSerializerFactory;
-import fr.inria.corese.core.next.query.impl.sparql.io.serializer.AbstractResultSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.AbstractResultSerializerTest;
 
 public class CSVSerializerTest extends AbstractResultSerializerTest {
 
@@ -50,6 +50,14 @@ public class CSVSerializerTest extends AbstractResultSerializerTest {
                 "All this work and no play makes Carols a dull girl,\n" +
                 "All this work and no play makes Carols a dull girl,\n" +
                 "All this work and no play makes Carols a dull girl.\"\n";
+    }
+
+    @Override
+    protected String getResultWithLiteralContainingQuotesString() {
+        return "name,desc\n" +
+                "Alice,Literal with a single quote'" +
+                "Bernard,\"Literal with a quote\"\"\"" +
+                "Charles,\"Literal both quotes single ' and double \"\"\"";
     }
 
     @Override
