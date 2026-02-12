@@ -55,13 +55,13 @@ public class CSVSerializerTest extends AbstractResultSerializerTest {
     @Override
     protected String getResultWithLiteralContainingQuotesString() {
         return "name,desc\n" +
-                "Alice,Literal with a single quote'" +
-                "Bernard,\"Literal with a quote\"\"\"" +
-                "Charles,\"Literal both quotes single ' and double \"\"\"";
+                "Alice,Literal with a single quote'\n" +
+                "Bernard,\"Literal with a quote\"\"\"\n" +
+                "Charles,\"Literal both quotes single ' and double \"\"\"\n";
     }
 
     @Override
-    protected String getStandardResultsString() {
+    protected String getSVStandardResultsString() {
         return "x,literal\n" +
                 "http://example/x,String\n" +
                 "http://example/x,\"String-with-dquote\"\"\"\n" +

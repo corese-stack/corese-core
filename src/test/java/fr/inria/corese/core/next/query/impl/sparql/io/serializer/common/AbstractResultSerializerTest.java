@@ -109,7 +109,7 @@ public abstract class AbstractResultSerializerTest {
 
     @Test
     @DisplayName("Tests the serialization of an empty result")
-    void emptyResult() {
+    void emptyResultTest() {
         ResultSerializer serializer = getResultSerializer(getEmptyResults());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
@@ -131,7 +131,7 @@ public abstract class AbstractResultSerializerTest {
 
     @Test
     @DisplayName("Tests the serialization of results containing only URIs")
-     void resultsWithUris() {
+     void resultsWithUrisTest() {
         ResultSerializer serializer = getResultSerializer(getResultsWithUris());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
@@ -156,7 +156,7 @@ public abstract class AbstractResultSerializerTest {
 
     @Test
     @DisplayName("Tests the serialization of results containing only literals")
-    void resultsWithLiterals() {
+    void resultsWithLiteralsTest() {
 
         ResultSerializer serializer = getResultSerializer(getResultsWithLiterals());
         StringWriter writer = new StringWriter();
@@ -179,7 +179,7 @@ public abstract class AbstractResultSerializerTest {
 
     @Test
     @DisplayName("Tests the serialization of results with blank nodes")
-    void resultsWithBlankNodes() {
+    void resultsWithBlankNodesTest() {
         ResultSerializer serializer = getResultSerializer(getResultsWithBlankNodes());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
@@ -202,7 +202,7 @@ All this work and no play makes Carols a dull girl."""));
 
     @Test
     @DisplayName("Tests the serialization of a result containing a literal that contains break lines")
-    void resultsWithMultiLinesLiteral() {
+    void resultsWithMultiLinesLiteralTest() {
         ResultSerializer serializer = getResultSerializer(getResultsWithMultiLinesLiteral());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
@@ -214,21 +214,30 @@ All this work and no play makes Carols a dull girl."""));
     protected TupleQueryResult getResultWithLiteralContainingQuotes() {
         List<String> bindingsNames = List.of("name", "desc");
         Map<String, Value> resultWithLiteralContainingQuotesValuesRow1 = new HashMap<>();
-        resultWithLiteralContainingQuotesValuesRow1.put("mail", factory.createLiteral("Alice"));
+        resultWithLiteralContainingQuotesValuesRow1.put("name", factory.createLiteral("Alice"));
         resultWithLiteralContainingQuotesValuesRow1.put("desc", factory.createLiteral("Literal with a single quote'"));
         Map<String, Value> resultWithLiteralContainingQuotesValuesRow2 = new HashMap<>();
-        resultWithLiteralContainingQuotesValuesRow2.put("mail", factory.createLiteral("Bernard"));
+        resultWithLiteralContainingQuotesValuesRow2.put("name", factory.createLiteral("Bernard"));
         resultWithLiteralContainingQuotesValuesRow2.put("desc", factory.createLiteral("Literal with a quote\""));
         Map<String, Value> resultWithLiteralContainingQuotesValuesRow3 = new HashMap<>();
-        resultWithLiteralContainingQuotesValuesRow3.put("mail", factory.createLiteral("Charles"));
+        resultWithLiteralContainingQuotesValuesRow3.put("name", factory.createLiteral("Charles"));
         resultWithLiteralContainingQuotesValuesRow3.put("desc", factory.createLiteral("Literal both quotes single ' and double \""));
         return new MockQueryResults(bindingsNames, List.of(resultWithLiteralContainingQuotesValuesRow1, resultWithLiteralContainingQuotesValuesRow2, resultWithLiteralContainingQuotesValuesRow3));
 
     }
 
-    protected abstract String getStandardResultsString();
+    @Test
+    @DisplayName("Tests the serialization of the result literals containing either of both types of quotes")
+    void resultWithLiteralContainingQuotesTest() {
+        ResultSerializer serializer = getResultSerializer(getResultWithLiteralContainingQuotes());
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getResultWithLiteralContainingQuotesString(), writer.toString());
+    }
 
-    protected TupleQueryResult getStandardResults() {
+    protected abstract String getSVStandardResultsString();
+
+    protected TupleQueryResult getSVStandardResults() {
         List<String> bindingsNames = List.of("x", "literal");
         Map<String, Value> benchmarkResultsValuesRow1 = new HashMap<>();
         benchmarkResultsValuesRow1.put("x", factory.createIRI("http://example/x"));
@@ -255,11 +264,10 @@ All this work and no play makes Carols a dull girl."""));
 
     @Test
     @DisplayName("Tests the serialization of the result given as example in the standard")
-    void standardResults() {
-
-        ResultSerializer serializer = getResultSerializer(getStandardResults());
+    void svStandardResults() {
+        ResultSerializer serializer = getResultSerializer(getSVStandardResults());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
-        assertEquals(getStandardResultsString(), writer.toString());
+        assertEquals(getSVStandardResultsString(), writer.toString());
     }
 }

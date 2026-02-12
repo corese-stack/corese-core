@@ -53,16 +53,16 @@ public class TSVSerializerTest extends AbstractResultSerializerTest {
     @Override
     protected String getResultWithLiteralContainingQuotesString() {
         return "?name\t?desc\n" +
-                "\"Alice\"\t\"Literal with a single quote'\"" +
-                "\"Bernard\"\t'Literal with a quote\"'" +
-                "\"Charles\"\t\"Literal both quotes single ' and double \\\"\"";
+                "\"Alice\"\t\"Literal with a single quote'\"\n" +
+                "\"Bernard\"\t\"Literal with a quote\\\"\"\n" +
+                "\"Charles\"\t\"Literal both quotes single ' and double \\\"\"\n";
     }
 
     @Override
-    protected String getStandardResultsString() {
+    protected String getSVStandardResultsString() {
         return "?x\t?literal\n" +
                 "<http://example/x>\t\"String\"\n" +
-                "<http://example/x>\t'String-with-dquote\"'\n" +
+                "<http://example/x>\t\"String-with-dquote\\\"\"\n" +
                 "_:blank0\t\"Blank node\"\n" +
                 "\t\"Missing 'x'\"\n" +
                 "\t\n" +

@@ -19,7 +19,7 @@ import java.util.List;
  * TSV serializer for the CSV format of SPARQL results.
  * @see <a href="https://www.w3.org/TR/sparql11-results-csv-tsv/">TSV SPARQL result format recommendation</a>
  */
-public class TSVSerializer  extends CharacterSeparatedValuesSerializer {
+public class TSVSerializer extends CharacterSeparatedValuesSerializer {
 
     public TSVSerializer(TupleQueryResult results, IOOptions options) {
         super(SerializationConstants.TAB, results, options);
@@ -48,13 +48,7 @@ public class TSVSerializer  extends CharacterSeparatedValuesSerializer {
         if(value instanceof Literal literalValue) {
             String delimiter = SerializationConstants.QUOTE;
             String stringValue = literalValue.stringValue();
-            if(literalValue.stringValue().contains(SerializationConstants.QUOTE)) {
-                if(! literalValue.stringValue().contains(SerializationConstants.SINGLE_QUOTE)) {
-                    delimiter = SerializationConstants.SINGLE_QUOTE;
-                } else {
-                    stringValue = value.stringValue().replaceAll("\"", "\\\"");
-                }
-            }
+            stringValue = stringValue.replace("\"", "\\\"");
             if(literalValue.getLanguage().isPresent()) {
                 return delimiter + stringValue + delimiter + SerializationConstants.AT + literalValue.getLanguage().get();
             } else if(literalValue.getDatatype() != null
