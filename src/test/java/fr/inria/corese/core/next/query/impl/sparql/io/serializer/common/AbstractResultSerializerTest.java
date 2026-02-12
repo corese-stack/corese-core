@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.impl.sparql.io.serializer;
+package fr.inria.corese.core.next.query.impl.sparql.io.serializer.common;
 
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
@@ -19,7 +19,7 @@ public abstract class AbstractResultSerializerTest {
 
     private ValueFactory factory = new CoreseAdaptedValueFactory();
 
-    private final class MockQueryResults implements TupleQueryResult {
+    private static final class MockQueryResults implements TupleQueryResult {
         private List<MockBindingSet> innerData;
         private Iterator<MockBindingSet> innerIterator;
         private List<String> bindingsNames;
@@ -53,55 +53,30 @@ public abstract class AbstractResultSerializerTest {
 
     }
 
-    private static class MockBindingSet implements BindingSet {
-
-        private final Map<String, Value> values;
-
-        public MockBindingSet(Map<String, Value> bindingMap) {
-            this.values = bindingMap;
-        }
+    private record MockBindingSet(Map<String, Value> values) implements BindingSet {
 
         @Override
-        public Set<String> getBindingNames() {
-            return this.values.keySet();
-        }
+            public Set<String> getBindingNames() {
+                return this.values.keySet();
+            }
 
-        @Override
-        public boolean hasBinding(String name) {
-            return this.values.containsKey(name);
-        }
+            @Override
+            public boolean hasBinding(String name) {
+                return this.values.containsKey(name);
+            }
 
-        @Override
-        public Value getValue(String name) {
-            return this.values.get(name);
-        }
+            @Override
+            public Value getValue(String name) {
+                return this.values.get(name);
+            }
 
-        @Override
-        public Iterator<Binding> iterator() {
-            return this.values.entrySet().stream().map(entry -> (Binding) new MockBinding(entry.getKey(), entry.getValue())).iterator();
+            @Override
+            public Iterator<Binding> iterator() {
+                return this.values.entrySet().stream().map(entry -> (Binding) new MockBinding(entry.getKey(), entry.getValue())).iterator();
+            }
         }
-    }
 
     private record MockBinding(String name, Value value) implements Binding {
-
-    }
-
-    protected String getDataTurtleString() {
-        return """
-                @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
-                
-                _:a  foaf:name   "Johnny Lee Outlaw" .
-                _:a  foaf:mbox   <mailto:jlow@example.com> .
-                _:a  foaf:homepage <https://bsky.app/profile/johnnyleeoutlaw> .
-                _:b  foaf:name   "Peter Goodguy" .
-                _:b  foaf:mbox   <mailto:peter@example.org> .
-                _:c  foaf:name   "Carol Patoune" .
-                _:c  foaf:mbox   <mailto:carol@example.org> .
-                _:c  foaf:depiction   '''All this work and no play makes Carols a dull girl,
-                All this work and no play makes Carols a dull girl,
-                All this work and no play makes Carols a dull girl,
-                All this work and no play makes Carols a dull girl.''' .
-                """;
     }
 
     protected abstract ResultSerializer getResultSerializer(TupleQueryResult results);
@@ -232,6 +207,23 @@ All this work and no play makes Carols a dull girl."""));
         StringWriter writer = new StringWriter();
         serializer.write(writer);
         assertEquals(getResultsWithMultiLinesLiteralString(), writer.toString());
+    }
+
+    protected abstract String getResultWithLiteralContainingQuotesString();
+
+    protected TupleQueryResult getResultWithLiteralContainingQuotes() {
+        List<String> bindingsNames = List.of("name", "desc");
+        Map<String, Value> resultWithLiteralContainingQuotesValuesRow1 = new HashMap<>();
+        resultWithLiteralContainingQuotesValuesRow1.put("mail", factory.createLiteral("Alice"));
+        resultWithLiteralContainingQuotesValuesRow1.put("desc", factory.createLiteral("Literal with a single quote'"));
+        Map<String, Value> resultWithLiteralContainingQuotesValuesRow2 = new HashMap<>();
+        resultWithLiteralContainingQuotesValuesRow2.put("mail", factory.createLiteral("Bernard"));
+        resultWithLiteralContainingQuotesValuesRow2.put("desc", factory.createLiteral("Literal with a quote\""));
+        Map<String, Value> resultWithLiteralContainingQuotesValuesRow3 = new HashMap<>();
+        resultWithLiteralContainingQuotesValuesRow3.put("mail", factory.createLiteral("Charles"));
+        resultWithLiteralContainingQuotesValuesRow3.put("desc", factory.createLiteral("Literal both quotes single ' and double \""));
+        return new MockQueryResults(bindingsNames, List.of(resultWithLiteralContainingQuotesValuesRow1, resultWithLiteralContainingQuotesValuesRow2, resultWithLiteralContainingQuotesValuesRow3));
+
     }
 
     protected abstract String getStandardResultsString();
