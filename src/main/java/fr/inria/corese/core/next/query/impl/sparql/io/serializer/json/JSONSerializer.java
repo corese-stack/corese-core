@@ -4,26 +4,18 @@ import fr.inria.corese.core.next.data.api.BNode;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
 import fr.inria.corese.core.next.data.api.base.io.FileFormat;
 import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.common.literal.RDF;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
-import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
 import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
-import fr.inria.corese.core.next.query.api.base.io.SerializerUtils;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
-import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import jakarta.json.*;
 
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class JSONSerializer  implements ResultSerializer {
 

@@ -100,4 +100,6 @@ public class FileFormat {
     public int hashCode() {
         return Objects.hash(name.toLowerCase(), extensions, mimeTypes);
     }
+
+    public static FileFormat PLAIN_TEXT = new FileFormat("plain text", List.of("txt"), List.of("text/plain"));
 }
