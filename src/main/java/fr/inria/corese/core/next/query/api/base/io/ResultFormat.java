@@ -25,13 +25,13 @@ public class ResultFormat extends FileFormat {
 
     public static final ResultFormat JSON = new ResultFormat(
             "JSON",
-            List.of("json"),
+            List.of("srj", "json"),
             List.of("application/sparql-results+json")
     );
 
     public static final ResultFormat XML = new ResultFormat(
             "XML",
-            List.of("xml", "srx"),
+            List.of("srx", "xml"),
             List.of("application/sparql-results+xml")
     );
 

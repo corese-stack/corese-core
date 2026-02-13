@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.sparql.io.serializer.common;
 
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.Binding;
@@ -17,14 +18,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class AbstractResultSerializerTest {
 
-    private ValueFactory factory = new CoreseAdaptedValueFactory();
+    private final ValueFactory factory = new CoreseAdaptedValueFactory();
 
-    private static final class MockQueryResults implements TupleQueryResult {
+    protected static final class MockQueryResults implements TupleQueryResult {
         private List<MockBindingSet> innerData;
         private Iterator<MockBindingSet> innerIterator;
         private List<String> bindingsNames;
 
-        private MockQueryResults(List<String> bindingsNames, List<Map<String, Value>> bindings) {
+        public MockQueryResults(List<String> bindingsNames, List<Map<String, Value>> bindings) {
             this.innerData = bindings.stream().map(MockBindingSet::new).toList();
 
             this.innerIterator = this.innerData.iterator();
@@ -53,7 +54,7 @@ public abstract class AbstractResultSerializerTest {
 
     }
 
-    private record MockBindingSet(Map<String, Value> values) implements BindingSet {
+    protected record MockBindingSet(Map<String, Value> values) implements BindingSet {
 
         @Override
             public Set<String> getBindingNames() {
@@ -76,10 +77,15 @@ public abstract class AbstractResultSerializerTest {
             }
         }
 
-    private record MockBinding(String name, Value value) implements Binding {
+    protected record MockBinding(String name, Value value) implements Binding {
     }
 
     protected abstract ResultSerializer getResultSerializer(TupleQueryResult results);
+    protected abstract ResultSerializer getResultSerializer(TupleQueryResult results, IOOptions options);
+
+    protected ValueFactory getFactory() {
+        return this.factory;
+    }
 
     protected abstract String getEmptyResultsString();
 
@@ -263,7 +269,7 @@ All this work and no play makes Carols a dull girl."""));
     }
 
     @Test
-    @DisplayName("Tests the serialization of the result given as example in the standard")
+    @DisplayName("Tests the serialization of the result given as example in the character separated values standard")
     void svStandardResults() {
         ResultSerializer serializer = getResultSerializer(getSVStandardResults());
         StringWriter writer = new StringWriter();

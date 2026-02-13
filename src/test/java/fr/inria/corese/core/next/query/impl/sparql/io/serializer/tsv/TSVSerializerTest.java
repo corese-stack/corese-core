@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.tsv;
 
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
@@ -11,6 +12,11 @@ public class TSVSerializerTest extends AbstractResultSerializerTest {
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {
         return new ResultSerializerFactory().createSerializer(ResultFormat.TSV, results);
+    }
+
+    @Override
+    protected ResultSerializer getResultSerializer(TupleQueryResult results, IOOptions options) {
+        return new ResultSerializerFactory().createSerializer(ResultFormat.TSV, results, options);
     }
 
     @Override

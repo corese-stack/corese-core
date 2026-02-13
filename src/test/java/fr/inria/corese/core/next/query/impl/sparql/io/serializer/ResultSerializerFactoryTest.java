@@ -37,13 +37,9 @@ class ResultSerializerFactoryTest {
 
     @Test
     public void createSerializer() {
-//        ResultFormat.all().forEach(resultFormat -> {
-//            ResultSerializer serializer = factory.createSerializer(resultFormat, dummyResults);
-//            assertEquals(resultFormat, serializer.getFormat());
-//        });
-        ResultSerializer serializer = factory.createSerializer(ResultFormat.TSV, dummyResults);
-        assertEquals(ResultFormat.TSV, serializer.getFormat());
-        serializer = factory.createSerializer(ResultFormat.CSV, dummyResults);
-        assertEquals(ResultFormat.CSV, serializer.getFormat());
+        ResultFormat.all().forEach(resultFormat -> {
+            ResultSerializer serializer = factory.createSerializer(resultFormat, dummyResults);
+            assertEquals(resultFormat, serializer.getFormat());
+        });
     }
 }
