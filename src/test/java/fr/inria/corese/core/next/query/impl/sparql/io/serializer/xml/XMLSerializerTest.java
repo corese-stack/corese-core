@@ -36,7 +36,31 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultsWithUrisString() {
-        return "";
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
+                    "<head>" +
+                        "<variable name=\"email\"/>" +
+                        "<variable name=\"homepage\"/>" +
+                    "</head>" +
+                    "<results>" +
+                        "<result>" +
+                            "<binding name=\"email\">" +
+                                "<uri>mailto:jlow@example.com</uri>" +
+                            "</binding>" +
+                            "<binding name=\"homepage\">" +
+                                "<uri>https://bsky.app/profile/johnnyleeoutlaw</uri>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"email\">" +
+                                "<uri>mailto:peter@example.org</uri>" +
+                            "</binding>" +
+                            "<binding name=\"homepage\">" +
+                                "<uri>https://peter.goodguy.com</uri>" +
+                            "</binding>" +
+                        "</result>" +
+                    "</results>" +
+                "</sparql>";
     }
 
     @Override
@@ -44,8 +68,8 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
-                        "<variable name=\"name\"/>" +
                         "<variable name=\"email\"/>" +
+                        "<variable name=\"name\"/>" +
                     "</head>" +
                     "<results>" +
                         "<result>" +
@@ -78,21 +102,153 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultsWithBlankNodesString() {
-        return "";
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
+                    "<head>" +
+                        "<variable name=\"nb\"/>" +
+                    "</head>" +
+                    "<results>" +
+                        "<result>" +
+                            "<binding name=\"nb\">" +
+                                "<bnode>a</bnode>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"nb\">" +
+                                "<bnode>b</bnode>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"nb\">" +
+                                "<bnode>c</bnode>" +
+                            "</binding>" +
+                        "</result>" +
+                    "</results>" +
+                "</sparql>";
     }
 
     @Override
     protected String getResultsWithMultiLinesLiteralString() {
-        return "";
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
+                    "<head>" +
+                        "<variable name=\"mail\"/>" +
+                        "<variable name=\"depiction\"/>" +
+                    "</head>" +
+                    "<results>" +
+                        "<result>" +
+                            "<binding name=\"mail\">" +
+                                "<uri>mailto:carol@example.org</uri>" +
+                            "</binding>" +
+                            "<binding name=\"depiction\">" +
+                                "<literal>All this work and no play makes Carols a dull girl,\n" +
+                "All this work and no play makes Carols a dull girl,\n" +
+                "All this work and no play makes Carols a dull girl,\n" +
+                "All this work and no play makes Carols a dull girl.</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                    "</results>" +
+                "</sparql>";
     }
 
     @Override
     protected String getResultWithLiteralContainingQuotesString() {
-        return "";
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
+                    "<head>" +
+                        "<variable name=\"name\"/>" +
+                        "<variable name=\"desc\"/>" +
+                    "</head>" +
+                    "<results>" +
+                        "<result>" +
+                            "<binding name=\"name\">" +
+                                "<literal>Alice</literal>" +
+                            "</binding>" +
+                            "<binding name=\"desc\">" +
+                                "<literal>Literal with a single quote'</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"name\">" +
+                                "<literal>Bernard</literal>" +
+                            "</binding>" +
+                            "<binding name=\"desc\">" +
+                                "<literal>Literal with a quote\"</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"name\">" +
+                                "<literal>Charles</literal>" +
+                            "</binding>" +
+                            "<binding name=\"desc\">" +
+                                "<literal>Literal both quotes single ' and double \"</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                    "</results>" +
+                "</sparql>";
     }
 
     @Override
     protected String getSVStandardResultsString() {
-        return "";
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
+                    "<head>" +
+                        "<variable name=\"x\"/>" +
+                        "<variable name=\"literal\"/>" +
+                    "</head>" +
+                    "<results>" +
+                        "<result>" +
+                            "<binding name=\"x\">" +
+                                "<uri>http://example/x</uri>" +
+                            "</binding>" +
+                            "<binding name=\"literal\">" +
+                                "<literal>String</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"x\">" +
+                                "<uri>http://example/x</uri>" +
+                            "</binding>" +
+                            "<binding name=\"literal\">" +
+                                "<literal>String-with-dquote\"</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"x\">" +
+                                "<bnode>blank0</bnode>" +
+                            "</binding>" +
+                            "<binding name=\"literal\">" +
+                                "<literal>Blank node</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"literal\">" +
+                                "<literal>Missing 'x'</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result/>" +
+                        "<result>" +
+                            "<binding name=\"x\">" +
+                                "<uri>http://example/x</uri>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"x\">" +
+                                "<bnode>blank1</bnode>" +
+                            "</binding>" +
+                            "<binding name=\"literal\">" +
+                                "<literal xml:lang=\"en\">String-with-lang</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                        "<result>" +
+                            "<binding name=\"x\">" +
+                                "<bnode>blank1</bnode>" +
+                            "</binding>" +
+                            "<binding name=\"literal\">" +
+                                "<literal datatype=\"http://www.w3.org/2001/XMLSchema#integer\">123</literal>" +
+                            "</binding>" +
+                        "</result>" +
+                    "</results>" +
+                "</sparql>";
     }
 }
