@@ -11,8 +11,6 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Abstract serializer for the two character-separated-values formats for the SPARQL results (CSV and TSV)

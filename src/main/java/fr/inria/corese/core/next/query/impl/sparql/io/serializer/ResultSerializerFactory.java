@@ -11,6 +11,8 @@ import fr.inria.corese.core.next.query.impl.sparql.io.serializer.csv.CSVSerializ
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.json.JSONBooleanSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.json.JSONSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.tsv.TSVSerializer;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLBooleanSerializer;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLSerializer;
 
 public class ResultSerializerFactory implements fr.inria.corese.core.next.query.api.io.serializer.ResultSerializerFactory {
     @Override
@@ -21,6 +23,8 @@ public class ResultSerializerFactory implements fr.inria.corese.core.next.query.
             return new TSVSerializer(results);
         } else if (format == ResultFormat.JSON) {
             return new JSONSerializer(results);
+        } else if(format == ResultFormat.XML) {
+            return new XMLSerializer(results);
         }
         return null;
     }
@@ -33,6 +37,8 @@ public class ResultSerializerFactory implements fr.inria.corese.core.next.query.
             return new BooleanStringSerializer(results);
         } else if (format == ResultFormat.JSON) {
             return new JSONBooleanSerializer(results);
+        } else if(format == ResultFormat.XML) {
+            return new XMLBooleanSerializer(results);
         }
         return null;
     }
@@ -45,6 +51,8 @@ public class ResultSerializerFactory implements fr.inria.corese.core.next.query.
             return new TSVSerializer(results, options);
         } else if (format == ResultFormat.JSON) {
             return new JSONSerializer(results, options);
+        } else if (format == ResultFormat.XML) {
+            return new XMLSerializer(results, options);
         }
         return null;
     }
@@ -57,6 +65,8 @@ public class ResultSerializerFactory implements fr.inria.corese.core.next.query.
             return new BooleanStringSerializer(results);
         } else if (format == ResultFormat.JSON) {
             return new JSONBooleanSerializer(results, options);
+        } else if (format == ResultFormat.XML) {
+            return new XMLBooleanSerializer(results, options);
         }
         return null;
     }

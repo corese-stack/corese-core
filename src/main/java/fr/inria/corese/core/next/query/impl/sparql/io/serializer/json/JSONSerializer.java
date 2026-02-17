@@ -10,6 +10,7 @@ import fr.inria.corese.core.next.data.impl.common.literal.RDF;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
@@ -28,8 +29,7 @@ public class JSONSerializer  implements ResultSerializer {
     }
 
     public JSONSerializer(TupleQueryResult results) {
-        this.config = new JSONSerializerOptions.Builder().build();
-        this.results = results;
+        this(results, new JSONSerializerOptions.Builder().build());
     }
 
     @Override
@@ -39,8 +39,8 @@ public class JSONSerializer  implements ResultSerializer {
         // header
         JsonObjectBuilder headerbuilder = Json.createObjectBuilder()
                 .add(JSONSerializerConstants.VARS, Json.createArrayBuilder(this.results.getBindingNames()));
-        if(this.config instanceof JSONSerializerOptions jsonSerializerOptions && ! jsonSerializerOptions.links().isEmpty() ) {
-            headerbuilder.add(JSONSerializerConstants.LINK, Json.createArrayBuilder(jsonSerializerOptions.links()));
+        if(this.config instanceof LinksOptions linksOptions && ! linksOptions.links().isEmpty() ) {
+            headerbuilder.add(JSONSerializerConstants.LINK, Json.createArrayBuilder(linksOptions.links()));
         }
         resultBuilder.add(JSONSerializerConstants.HEAD, headerbuilder.build());
 

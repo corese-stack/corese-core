@@ -4,12 +4,18 @@ import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.AbstractResultSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.LinksSerializerTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import javax.xml.transform.OutputKeys;
 
-import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLSerializerConstants.YES_PROPERTY_VALUE;
+import java.io.StringWriter;
 
-public class XMLSerializerTest extends AbstractResultSerializerTest {
+import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLSerializerConstants.YES_PROPERTY_VALUE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class XMLSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {
         XMLSerializerOptions options = new XMLSerializerOptions.Builder().setXMLSetting(OutputKeys.STANDALONE, YES_PROPERTY_VALUE).build();
@@ -23,7 +29,7 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getEmptyResultsString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<variable name=\"a\"/>" +
@@ -36,7 +42,7 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultsWithUrisString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<variable name=\"email\"/>" +
@@ -65,7 +71,7 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultsWithLiteralsString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<variable name=\"email\"/>" +
@@ -102,7 +108,7 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultsWithBlankNodesString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<variable name=\"nb\"/>" +
@@ -129,7 +135,7 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultsWithMultiLinesLiteralString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<variable name=\"mail\"/>" +
@@ -153,7 +159,7 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getResultWithLiteralContainingQuotesString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<variable name=\"name\"/>" +
@@ -190,7 +196,7 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
 
     @Override
     protected String getSVStandardResultsString() {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                 "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
                     "<head>" +
                         "<variable name=\"x\"/>" +
@@ -250,5 +256,33 @@ public class XMLSerializerTest extends AbstractResultSerializerTest {
                         "</result>" +
                     "</results>" +
                 "</sparql>";
+    }
+
+    private String getLinksTestResultsString() {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">" +
+                    "<head>" +
+                        "<variable name=\"a\"/>" +
+                        "<variable name=\"b\"/>" +
+                        "<variable name=\"c\"/>" +
+                        "<link href=\"http://google.com\"/>" +
+                        "<link href=\"mailto:bob@corese-test.com\"/>" +
+                    "</head>" +
+                    "<results/>" +
+                "</sparql>";
+    }
+
+    private TupleQueryResult getLinksTestResults() {
+        return getEmptyResults();
+    }
+
+    @Test
+    @DisplayName("Tests the serialization of results including several links")
+    public void linksTest() {
+        IOOptions options = getOptionsWithLinks();
+        ResultSerializer serializer = getResultSerializer(getLinksTestResults(), options);
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getLinksTestResultsString(), writer.toString());
     }
 }

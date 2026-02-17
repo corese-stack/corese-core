@@ -1,12 +1,26 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
+import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.AbstractBooleanResultSerializerTest;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.LinksSerializerTest;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class JSONBooleanSerializerTest extends AbstractBooleanResultSerializerTest {
+import java.io.StringWriter;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class JSONBooleanSerializerTest extends AbstractBooleanResultSerializerTest implements LinksSerializerTest {
     @Override
     protected BooleanResultSerializer getSerializer(boolean result) {
         return new JSONBooleanSerializer(result);
+    }
+
+    @Override
+    protected BooleanResultSerializer getSerializer(boolean result, IOOptions options) {
+        return new JSONBooleanSerializer(result, options);
     }
 
     @Override
@@ -17,5 +31,30 @@ public class JSONBooleanSerializerTest extends AbstractBooleanResultSerializerTe
     @Override
     protected String getFalseResultString() {
         return "{\"boolean\":\"false\"}";
+    }
+    
+    private String getLinksTestResultsString() {
+        return "{" +
+            "\"head\":{" +
+                "\"link\":[" +
+                    "\"http://google.com\"," +
+                    "\"mailto:bob@corese-test.com\"" +
+                "]" +
+            "}," +
+            "\"boolean\":\"true\"" +
+        "}";
+    }
+
+    private boolean getLinksTestResults() {
+        return true;
+    }
+
+    @Test
+    @DisplayName("Tests the serialization of results including several links")
+    public void linksTest() {
+        ResultSerializer serializer = getSerializer(getLinksTestResults(), getOptionsWithLinks());
+        StringWriter writer = new StringWriter();
+        serializer.write(writer);
+        assertEquals(getLinksTestResultsString(), writer.toString());
     }
 }

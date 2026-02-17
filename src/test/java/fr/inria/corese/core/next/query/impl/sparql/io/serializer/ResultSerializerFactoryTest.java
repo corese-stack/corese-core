@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ResultSerializerFactoryTest {
 
-    private ResultSerializerFactory factory = new ResultSerializerFactory();
-    private TupleQueryResult dummyResults = new TupleQueryResult() {
+    private final ResultSerializerFactory factory = new ResultSerializerFactory();
+    private final TupleQueryResult dummyResults = new TupleQueryResult() {
         @Override
         public List<String> getBindingNames() {
             return List.of();

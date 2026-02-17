@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
+import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 import jakarta.json.Json;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonWriter;
@@ -13,12 +14,11 @@ import java.io.Writer;
 
 public class JSONBooleanSerializer implements BooleanResultSerializer {
 
-    private boolean result;
+    private final boolean result;
     private final IOOptions config;
 
     public JSONBooleanSerializer(boolean result) {
-        this.result = result;
-        this.config = new JSONSerializerOptions.Builder().build();
+        this(result, new JSONSerializerOptions.Builder().build());
     }
 
     public JSONBooleanSerializer(boolean result, IOOptions options) {
@@ -29,6 +29,12 @@ public class JSONBooleanSerializer implements BooleanResultSerializer {
     @Override
     public void write(Writer writer) throws SerializationException {
         JsonObjectBuilder resultBuilder = Json.createObjectBuilder();
+
+        if(this.config instanceof LinksOptions linksOptions && ! linksOptions.links().isEmpty() ) {
+            JsonObjectBuilder headerBuilder = Json.createObjectBuilder();
+            headerBuilder.add(JSONSerializerConstants.LINK, Json.createArrayBuilder(linksOptions.links()));
+            resultBuilder.add(JSONSerializerConstants.HEAD, headerBuilder.build());
+        }
 
         resultBuilder.add(JSONSerializerConstants.BOOLEAN, String.valueOf(this.result));
 

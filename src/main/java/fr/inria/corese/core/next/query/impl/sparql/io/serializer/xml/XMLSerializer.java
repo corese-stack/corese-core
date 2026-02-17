@@ -10,6 +10,7 @@ import fr.inria.corese.core.next.data.impl.common.literal.RDF;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
@@ -17,30 +18,28 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.Writer;
 
 public class XMLSerializer implements ResultSerializer {
 
-    private DocumentBuilderFactory xmlDocumentBuilder = DocumentBuilderFactory.newDefaultInstance();
-    private TupleQueryResult results;
-    private IOOptions options;
+    private final DocumentBuilderFactory xmlDocumentBuilder = DocumentBuilderFactory.newDefaultInstance();
+    private final TupleQueryResult results;
+    private final IOOptions options;
 
     public XMLSerializer(TupleQueryResult results) {
-        this.results = results;
-        this.options = new XMLSerializerOptions.Builder().build();
+        this(results, new XMLSerializerOptions.Builder().build());
     }
 
     public XMLSerializer(TupleQueryResult results, IOOptions options) {
         this.results = results;
         this.options = options;
+        xmlDocumentBuilder.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "no");
     }
 
     @Override
@@ -57,20 +56,32 @@ public class XMLSerializer implements ResultSerializer {
                 variableElement.setAttribute(XMLSerializerConstants.NAME_ATTR, bindingName);
                 head.appendChild(variableElement);
             });
+            if(this.options instanceof LinksOptions linksOptions && ! linksOptions.links().isEmpty()) {
+                linksOptions.links().forEach(link -> {
+                    Element linkElement = resultDocument.createElement(XMLSerializerConstants.LINK_QNAME);
+                    linkElement.setAttribute(XMLSerializerConstants.HREF_ATTR, link);
+                    head.appendChild(linkElement);
+                });
+            }
+            root.appendChild(head);
 
             // Results
             this.results.forEach(bindingSet -> {
                 results.appendChild(bindingSetToXML(bindingSet, resultDocument));
             });
 
-            root.appendChild(head);
             root.appendChild(results);
             resultDocument.appendChild(root);
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             if(this.options instanceof XMLSerializerOptions xmlSerializerOptions) {
-                xmlSerializerOptions.getXmlSettings().forEach(transformer::setOutputProperty);
+                xmlSerializerOptions.getXmlSettings().forEach((key, value) -> {
+                    transformer.setOutputProperty(key, value);
+                    if(key.equals(OutputKeys.STANDALONE)) { // Fix for Standalone property being ignored
+                        resultDocument.setXmlStandalone(value.equals("yes"));
+                    }
+                });
             }
             DOMSource source = new DOMSource(resultDocument);
             StreamResult result = new StreamResult(writer);

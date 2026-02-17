@@ -6,21 +6,19 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.AbstractResultSerializerTest;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
+import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.LinksSerializerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.ResultSerializerTestUtils.MockQueryResults;
 
-public class JSONSerializerTest extends AbstractResultSerializerTest {
+public class JSONSerializerTest extends AbstractResultSerializerTest implements LinksSerializerTest {
     @Override
     protected ResultSerializer getResultSerializer(TupleQueryResult results) {
         return new JSONSerializer(results);
@@ -307,8 +305,7 @@ public class JSONSerializerTest extends AbstractResultSerializerTest {
     @Test
     @DisplayName("Tests the serialization of results including several links")
     public void linksTest() {
-        JSONSerializerOptions options = new JSONSerializerOptions.Builder().addLink("http://google.com").addLink("mailto:bob@corese-test.com").build();
-        ResultSerializer serializer = getResultSerializer(getLinksTestResults(), options);
+        ResultSerializer serializer = getResultSerializer(getLinksTestResults(), getOptionsWithLinks());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
         assertEquals(getLinksTestResultsString(), writer.toString());

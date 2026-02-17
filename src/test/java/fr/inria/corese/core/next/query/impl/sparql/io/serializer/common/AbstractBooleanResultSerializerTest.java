@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.common;
 
+import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public abstract class AbstractBooleanResultSerializerTest {
 
     protected abstract BooleanResultSerializer getSerializer(boolean result);
+    protected abstract BooleanResultSerializer getSerializer(boolean result, IOOptions options);
 
     protected abstract String getTrueResultString();
 

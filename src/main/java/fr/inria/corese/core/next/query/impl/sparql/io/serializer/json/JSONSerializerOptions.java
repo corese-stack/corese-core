@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.io.serializer.json;
 
 import fr.inria.corese.core.next.data.api.base.io.AbstractIOOptions;
+import fr.inria.corese.core.next.query.api.io.serializer.LinksOptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,13 +9,14 @@ import java.util.Collection;
 /**
  * Options to configure the SPARQL results JSON serializer
  */
-public class JSONSerializerOptions extends AbstractIOOptions {
+public class JSONSerializerOptions extends AbstractIOOptions implements LinksOptions {
     private final JSONSerializerOptions.Builder builder;
 
     protected JSONSerializerOptions(JSONSerializerOptions.Builder builder) {
         this.builder = builder;
     }
 
+    @Override
     public Collection<String> links() {
         return this.builder.links;
     }

@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
-import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import org.junit.jupiter.api.DisplayName;
@@ -15,70 +14,11 @@ import java.io.StringWriter;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.ResultSerializerTestUtils.MockQueryResults;
 
 public abstract class AbstractResultSerializerTest {
 
     private final ValueFactory factory = new CoreseAdaptedValueFactory();
-
-    protected static final class MockQueryResults implements TupleQueryResult {
-        private List<MockBindingSet> innerData;
-        private Iterator<MockBindingSet> innerIterator;
-        private List<String> bindingsNames;
-
-        public MockQueryResults(List<String> bindingsNames, List<Map<String, Value>> bindings) {
-            this.innerData = bindings.stream().map(MockBindingSet::new).toList();
-
-            this.innerIterator = this.innerData.iterator();
-            this.bindingsNames = bindingsNames;
-        }
-
-        @Override
-        public List<String> getBindingNames() {
-            return this.bindingsNames;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return this.innerIterator.hasNext();
-        }
-
-        @Override
-        public BindingSet next() {
-            return this.innerIterator.next();
-        }
-
-        @Override
-        public void close() {
-
-        }
-
-    }
-
-    protected record MockBindingSet(Map<String, Value> values) implements BindingSet {
-
-        @Override
-            public Set<String> getBindingNames() {
-                return this.values.keySet();
-            }
-
-            @Override
-            public boolean hasBinding(String name) {
-                return this.values.containsKey(name);
-            }
-
-            @Override
-            public Value getValue(String name) {
-                return this.values.get(name);
-            }
-
-            @Override
-            public Iterator<Binding> iterator() {
-                return this.values.entrySet().stream().map(entry -> (Binding) new MockBinding(entry.getKey(), entry.getValue())).iterator();
-            }
-        }
-
-    protected record MockBinding(String name, Value value) implements Binding {
-    }
 
     protected abstract ResultSerializer getResultSerializer(TupleQueryResult results);
     protected abstract ResultSerializer getResultSerializer(TupleQueryResult results, IOOptions options);
