@@ -3,13 +3,13 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfa;
 import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.api.base.io.parser.AbstractRDFParser;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.data.impl.io.parser.rdfa.model.*;
 import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
+import fr.inria.corese.core.next.data.io.IOOptions;
+import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.*;
@@ -853,27 +853,39 @@ public class RDFaParser extends AbstractRDFParser {
             return false;
         }
 
-        if (stringIri.contains("://")) {
+        String potentialPrefix = stringIri.substring(0, colonIndex);
+
+        if (this.hasIriMapping(potentialPrefix) || this.getIriMappings().containsKey(potentialPrefix)) {
+            return true;
+        }
+
+        return !isValidIRIScheme(potentialPrefix);
+    }
+
+    /**
+     * Determines whether the given string is a syntactically valid IRI scheme
+     * as defined by RFC 3986.
+     *
+     * @param potentialScheme the string to evaluate as a potential IRI scheme
+     * @return {@code true} if the string is a valid IRI scheme, {@code false} otherwise
+     */
+    private boolean isValidIRIScheme(String potentialScheme) {
+        if (potentialScheme == null || potentialScheme.isEmpty()) {
             return false;
         }
 
-        String potentialScheme = stringIri.substring(0, colonIndex).toLowerCase();
+        if (!Character.isLetter(potentialScheme.charAt(0))) {
+            return false;
+        }
 
-        return !potentialScheme.equals("http") &&
-                !potentialScheme.equals("https") &&
-                !potentialScheme.equals("ftp") &&
-                !potentialScheme.equals("ftps") &&
-                !potentialScheme.equals("mailto") &&
-                !potentialScheme.equals("tel") &&
-                !potentialScheme.equals("urn") &&
-                !potentialScheme.equals("data") &&
-                !potentialScheme.equals("file") &&
-                !potentialScheme.equals("ssh") &&
-                !potentialScheme.equals("git") &&
-                !potentialScheme.equals("news") &&
-                !potentialScheme.equals("nntp") &&
-                !potentialScheme.equals("irc") &&
-                !potentialScheme.equals("ldap");
+        for (int i = 1; i < potentialScheme.length(); i++) {
+            char c = potentialScheme.charAt(i);
+            if (!Character.isLetterOrDigit(c) && c != '+' && c != '-' && c != '.') {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private RDFaEvaluationContext getNewContext(IRI baseIRI) {
