@@ -128,13 +128,14 @@ public class RDFaIncompleteStatement {
         if (this == o) {
             return true;
         }
-        if(! (o instanceof RDFaIncompleteStatement oStat)) {
+        if (!(o instanceof RDFaIncompleteStatement oStat)) {
             return false;
         }
-        return oStat.getSubject().equals(this.getSubject())
-                && oStat.getPredicate().equals(this.getPredicate())
-                && oStat.getObject().equals(this.getObject())
-                && oStat.getDirection().equals(this.getDirection());
+
+        return java.util.Objects.equals(this.getSubject(), oStat.getSubject())
+                && java.util.Objects.equals(this.getPredicate(), oStat.getPredicate())
+                && java.util.Objects.equals(this.getObject(), oStat.getObject())
+                && java.util.Objects.equals(this.getDirection(), oStat.getDirection());
     }
 
     @Override

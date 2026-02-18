@@ -10,6 +10,7 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +18,7 @@ import java.io.StringWriter;
 import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -143,7 +145,6 @@ class RDFaParserTest {
     public void basicBaseTest() {
         String testDataString = """
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:dc="http://purl.org/dc/elements/1.1/">
     <head>
@@ -474,6 +475,38 @@ class RDFaParserTest {
         assertEquals(2, testModel.size());
         assertEquals(referenceModel, testModel);
         assertTrue(referenceModel.containsAll(testModel));
+    }
+
+    @Test
+    @DisplayName("The XHTML-RDFa DTD has been shown to throw 429 error code if the parser is not configured correctly, as by default.")
+    public void test429ErrorOnDTD() {
+        String testDataString = """
+                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+                <html>
+                  <head>
+                  </head>
+                  <body>
+                    <p xmlns:foaf="http://xmlns.com/foaf/0.1/" about="http://w3id.org/people/pierre-maillot" typeof="foaf:Person">
+                      Hello, I'm Pierre.
+                    </p>
+                  </body>
+                </html>""";
+
+        Model testModel = new CoreseModel();
+
+        RDFaParserOptions.Builder builder = new RDFaParserOptions.Builder();
+        RDFaParserOptions options = builder.build();
+        RDFaParser parser = (RDFaParser) new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory, options);
+
+        parser.parse(new ByteArrayInputStream(testDataString.getBytes()), "http://not.the.right.base.uri");
+
+        IRI subject = valueFactory.createIRI("http://w3id.org/people/pierre-maillot");
+        IRI object = valueFactory.createIRI("http://xmlns.com/foaf/0.1/Person");
+
+        logModelContent(testModel);
+
+        assertEquals(1, testModel.size());
+        assertTrue(testModel.contains(subject, RDF.type.getIRI(), object));
     }
 
     private static void logModelContent(Model model) {
