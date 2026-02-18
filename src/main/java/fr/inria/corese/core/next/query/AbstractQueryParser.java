@@ -10,7 +10,6 @@ package fr.inria.corese.core.next.query;
  *
  * <p>Subclasses are responsible for implementing the actual parsing
  * logic for the supported query language (e.g., SPARQL) and producing
- * a {@link QueryAst}.</p>
  *
  * <p>This class centralizes configuration management so that all
  * parser implementations share consistent option handling behavior.</p>
