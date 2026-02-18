@@ -9,10 +9,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for StorageManagerConfig.
+ * Unit tests for StorageConfig.
  */
 @DisplayName("StorageConfig Tests")
-class StorageManagerConfigTest {
+class StorageConfigTest {
 
     @Test
     @DisplayName("Should build config with all properties set")
