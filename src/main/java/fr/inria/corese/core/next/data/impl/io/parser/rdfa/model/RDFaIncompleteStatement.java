@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfa.model;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
-import java.util.Objects;
 
 /**
  * This utility class represents triples in the process of creation during the chaining of element in an RDFa document.
