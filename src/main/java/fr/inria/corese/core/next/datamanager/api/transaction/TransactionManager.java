@@ -1,18 +1,18 @@
 package fr.inria.corese.core.next.datamanager.api.transaction;
 
 
-import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
+import fr.inria.corese.core.next.datamanager.api.support.exception.StorageException;
 
 import java.util.Optional;
 import java.util.Set;
 
 /**
- * Transaction management for the DataManager.
+ * Transaction management for the StorageManager.
  */
 public interface TransactionManager {
 
     /**
-     * Checks if this DataManager supports transactions.
+     * Checks if this StorageManager supports transactions.
      *
      * @return true if transactions are supported, false otherwise
      */
@@ -22,21 +22,21 @@ public interface TransactionManager {
      * Starts a new transaction with the default isolation level.
      *
      * @return Created transaction handle
-     * @throws DataManagerException          if transaction cannot be started
+     * @throws StorageException          if transaction cannot be started
      * @throws UnsupportedOperationException if transactions are not supported
      */
-    Transaction beginTransaction() throws DataManagerException;
+    Transaction beginTransaction() throws StorageException;
 
     /**
      * Starts a new transaction with a specific isolation level.
      *
      * @param isolationLevel Desired isolation level
      * @return Created transaction handle
-     * @throws DataManagerException          if transaction cannot be started
+     * @throws StorageException          if transaction cannot be started
      * @throws UnsupportedOperationException if transactions are not supported
      * @throws IllegalArgumentException      if isolation level is not supported
      */
-    Transaction beginTransaction(IsolationLevel isolationLevel) throws DataManagerException;
+    Transaction beginTransaction(IsolationLevel isolationLevel) throws StorageException;
 
     /**
      * Gets the current transaction of the current thread.

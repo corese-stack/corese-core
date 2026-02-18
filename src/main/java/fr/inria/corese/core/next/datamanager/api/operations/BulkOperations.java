@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.datamanager.api.operations;
 
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
+import fr.inria.corese.core.next.datamanager.api.support.exception.StorageException;
 import fr.inria.corese.core.next.datamanager.api.support.model.StatementPattern;
 import fr.inria.corese.core.next.datamanager.api.support.model.MutationResult;
 
@@ -18,10 +18,10 @@ public interface BulkOperations {
      *
      * @param statements List of statements to insert
      * @return Bulk mutation result with statistics
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if statements is null or empty
      */
-    MutationResult insertBatch(List<Statement> statements) throws DataManagerException;
+    MutationResult insertBatch(List<Statement> statements) throws StorageException;
 
     /**
      * Deletes multiple statements in a single batch operation.
@@ -29,20 +29,20 @@ public interface BulkOperations {
      *
      * @param statements List of statements to delete
      * @return Bulk mutation result with statistics
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if statements is null or empty
      */
-    MutationResult deleteBatch(List<Statement> statements) throws DataManagerException;
+    MutationResult deleteBatch(List<Statement> statements) throws StorageException;
 
     /**
      * Deletes all statements matching the given pattern.
      *
      * @param pattern Pattern to match statements for deletion
      * @return Bulk mutation result with deleted statements
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if pattern is null
      */
-    MutationResult deleteByPattern(StatementPattern pattern) throws DataManagerException;
+    MutationResult deleteByPattern(StatementPattern pattern) throws StorageException;
 
     /**
      * Clears (deletes all statements from) specific contexts.
@@ -50,17 +50,17 @@ public interface BulkOperations {
      * @param contexts List of contexts to clear (empty or null for all)
      * @param silent   If true, don't fail if context doesn't exist
      * @return Bulk mutation result
-     * @throws DataManagerException if operation fails
+     * @throws StorageException if operation fails
      */
-    MutationResult clearContexts(List<Resource> contexts, boolean silent) throws DataManagerException;
+    MutationResult clearContexts(List<Resource> contexts, boolean silent) throws StorageException;
 
     /**
      * Clears all contexts (deletes entire model).
      *
      * @return Bulk mutation result with all deleted statements
-     * @throws DataManagerException if operation fails
+     * @throws StorageException if operation fails
      */
-    default MutationResult clearAll() throws DataManagerException {
+    default MutationResult clearAll() throws StorageException {
         return clearContexts(null, false);
     }
 
@@ -72,11 +72,11 @@ public interface BulkOperations {
      * @param targetContext Target context
      * @param silent        If true, don't fail if source doesn't exist
      * @return Bulk mutation result
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if contexts are null
      */
     default MutationResult addGraph(Resource sourceContext, Resource targetContext, boolean silent)
-            throws DataManagerException {
+            throws StorageException {
         throw new UnsupportedOperationException("addGraph not implemented - Model API doesn't support this operation natively");
     }
 
@@ -86,10 +86,10 @@ public interface BulkOperations {
      *
      * @param context Context to undeclare
      * @return Bulk mutation result with deleted statements
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if context is null
      */
-    default MutationResult undeclareContext(Resource context) throws DataManagerException {
+    default MutationResult undeclareContext(Resource context) throws StorageException {
         if (context == null) {
             throw new IllegalArgumentException("Context cannot be null");
         }
@@ -102,10 +102,10 @@ public interface BulkOperations {
      *
      * @param contexts List of contexts to undeclare
      * @return Bulk mutation result with all deleted statements
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if contexts is null or empty
      */
-    default MutationResult undeclareContexts(List<Resource> contexts) throws DataManagerException {
+    default MutationResult undeclareContexts(List<Resource> contexts) throws StorageException {
         if (contexts == null || contexts.isEmpty()) {
             throw new IllegalArgumentException("Contexts list cannot be null or empty");
         }

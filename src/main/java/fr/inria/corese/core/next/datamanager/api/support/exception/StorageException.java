@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.datamanager.api.support.exception;
 
 /**
- * Specific exception for DataManager operations.
+ * Specific exception for StorageManager operations.
  */
-public class DataManagerException extends Exception {
+public class StorageException extends Exception {
 
     private final ErrorCode code;
 
@@ -13,7 +13,7 @@ public class DataManagerException extends Exception {
      * @param code    Error code
      * @param message Descriptive message
      */
-    public DataManagerException(ErrorCode code, String message) {
+    public StorageException(ErrorCode code, String message) {
         super(message);
         this.code = code;
     }
@@ -25,7 +25,7 @@ public class DataManagerException extends Exception {
      * @param message Descriptive message
      * @param cause   Original exception
      */
-    public DataManagerException(ErrorCode code, String message, Throwable cause) {
+    public StorageException(ErrorCode code, String message, Throwable cause) {
         super(message, cause);
         this.code = code;
     }
@@ -41,7 +41,7 @@ public class DataManagerException extends Exception {
 
     @Override
     public String toString() {
-        return "DataManagerException{" +
+        return "StorageException{" +
                 "code=" + code +
                 ", message='" + getMessage() + '\'' +
                 '}';

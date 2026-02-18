@@ -1,31 +1,31 @@
 package fr.inria.corese.core.next.datamanager.api.lifecycle;
 
 /**
- * Possible lifecycle states of the DataManager.
+ * Possible lifecycle states of the StorageManager.
  */
 public enum LifecycleState {
     /**
-     * The DataManager is not yet initialized
+     * The StorageManager is not yet initialized
      */
     NOT_INITIALIZED("Not initialized"),
 
     /**
-     * The DataManager is initializing
+     * The StorageManager is initializing
      */
     INITIALIZING("Initializing"),
 
     /**
-     * The DataManager is operational and ready
+     * The StorageManager is operational and ready
      */
     RUNNING("Running"),
 
     /**
-     * The DataManager is shutting down
+     * The StorageManager is shutting down
      */
     SHUTTING_DOWN("Shutting down"),
 
     /**
-     * The DataManager has been shut down
+     * The StorageManager has been shut down
      */
     SHUTDOWN("Shutdown");
 
@@ -40,7 +40,7 @@ public enum LifecycleState {
     }
 
     /**
-     * Checks if the DataManager can be used in this state.
+     * Checks if the StorageManager can be used in this state.
      *
      * @return true if usable (RUNNING)
      */

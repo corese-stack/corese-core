@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
+import fr.inria.corese.core.next.datamanager.api.support.exception.StorageException;
 import fr.inria.corese.core.next.datamanager.api.support.model.MutationResult;
 
 /**
@@ -18,10 +18,10 @@ public interface MutationOperations {
      *
      * @param statement Statement to insert
      * @return Mutation result
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if statement is null
      */
-    MutationResult insertStatement(Statement statement) throws DataManagerException;
+    MutationResult insertStatement(Statement statement) throws StorageException;
 
     /**
      * Inserts a statement with explicit subject, predicate, object, and contexts.
@@ -31,21 +31,21 @@ public interface MutationOperations {
      * @param object    Object value
      * @param contexts  Array of contexts (empty for default graph)
      * @return Mutation result
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if subject, predicate, or object is null
      */
     MutationResult insertStatement(Resource subject, IRI predicate, Value object, Resource... contexts)
-            throws DataManagerException;
+            throws StorageException;
 
     /**
      * Deletes a single statement.
      *
      * @param statement Statement to delete
      * @return Mutation result
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if statement is null
      */
-    MutationResult deleteStatement(Statement statement) throws DataManagerException;
+    MutationResult deleteStatement(Statement statement) throws StorageException;
 
     /**
      * Deletes statements matching the given pattern.
@@ -55,10 +55,10 @@ public interface MutationOperations {
      * @param object    Object value (null for any)
      * @param contexts  Array of contexts (null or empty for all)
      * @return Mutation result (bulk result with all deleted statements)
-     * @throws DataManagerException if operation fails
+     * @throws StorageException if operation fails
      */
     MutationResult deleteStatements(Resource subject, IRI predicate, Value object, Resource... contexts)
-            throws DataManagerException;
+            throws StorageException;
 
     /**
      * Updates a statement (delete + insert in one operation).
@@ -66,11 +66,11 @@ public interface MutationOperations {
      * @param oldStatement Statement to delete
      * @param newStatement Statement to insert
      * @return Mutation result
-     * @throws DataManagerException     if operation fails
+     * @throws StorageException     if operation fails
      * @throws IllegalArgumentException if oldStatement or newStatement is null
      */
     default MutationResult updateStatement(Statement oldStatement, Statement newStatement)
-            throws DataManagerException {
+            throws StorageException {
         if (oldStatement == null || newStatement == null) {
             throw new IllegalArgumentException("Both oldStatement and newStatement must be non-null");
         }
@@ -95,7 +95,7 @@ public interface MutationOperations {
      *
      * @param contexts Array of contexts to clear (empty for all)
      * @return Mutation result with count of deleted statements
-     * @throws DataManagerException if operation fails
+     * @throws StorageException if operation fails
      */
-    MutationResult clear(Resource... contexts) throws DataManagerException;
+    MutationResult clear(Resource... contexts) throws StorageException;
 }
