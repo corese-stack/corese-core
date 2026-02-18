@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.datamanager.impl.transaction;
 
-import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
+import fr.inria.corese.core.next.datamanager.api.support.exception.StorageException;
 import fr.inria.corese.core.next.datamanager.api.support.exception.ErrorCode;
 import fr.inria.corese.core.next.datamanager.api.transaction.IsolationLevel;
 import fr.inria.corese.core.next.datamanager.api.transaction.Transaction;
@@ -38,17 +38,17 @@ public class TransactionImpl implements Transaction {
          * Invoked when the transaction is requested to commit.
          *
          * @param transaction the transaction being committed.
-         * @throws DataManagerException if the commit operation fails.
+         * @throws StorageException if the commit operation fails.
          */
-        void onCommit(TransactionImpl transaction) throws DataManagerException;
+        void onCommit(TransactionImpl transaction) throws StorageException;
 
         /**
          * Invoked when the transaction is requested to rollback.
          *
          * @param transaction the transaction being rolled back.
-         * @throws DataManagerException if the rollback operation fails.
+         * @throws StorageException if the rollback operation fails.
          */
-        void onRollback(TransactionImpl transaction) throws DataManagerException;
+        void onRollback(TransactionImpl transaction) throws StorageException;
     }
 
     /**
@@ -78,7 +78,7 @@ public class TransactionImpl implements Transaction {
      * @throws IllegalStateException if the transaction is not in an ACTIVE state.
      */
     @Override
-    public void commit() throws DataManagerException {
+    public void commit() throws StorageException {
         TransactionState currentState = state.get();
 
         if (!currentState.isActive()) {
@@ -102,7 +102,7 @@ public class TransactionImpl implements Transaction {
 
             logger.info("Transaction {} committed successfully", id);
 
-        } catch (DataManagerException e) {
+        } catch (StorageException e) {
             state.set(TransactionState.FAILED);
             logger.error("Failed to commit transaction {}", id, e);
             throw e;
@@ -110,7 +110,7 @@ public class TransactionImpl implements Transaction {
         } catch (Exception e) {
             state.set(TransactionState.FAILED);
             logger.error("Unexpected error during commit of transaction {}", id, e);
-            throw new DataManagerException(
+            throw new StorageException(
                     ErrorCode.TRANSACTION_ERROR,
                     "Failed to commit transaction: " + e.getMessage(),
                     e
@@ -122,10 +122,10 @@ public class TransactionImpl implements Transaction {
      * Reverts the changes made during this transaction.
      *
      * @throws IllegalStateException if the transaction is not in an ACTIVE state.
-     * @throws DataManagerException  if the rollback operation fails.
+     * @throws StorageException  if the rollback operation fails.
      */
     @Override
-    public void rollback() throws DataManagerException {
+    public void rollback() throws StorageException {
         TransactionState currentState = state.get();
 
         if (!currentState.isActive()) {
@@ -149,7 +149,7 @@ public class TransactionImpl implements Transaction {
 
             logger.info("Transaction {} rolled back successfully", id);
 
-        } catch (DataManagerException e) {
+        } catch (StorageException e) {
             state.set(TransactionState.FAILED);
             logger.error("Failed to rollback transaction {}", id, e);
             throw e;
@@ -157,7 +157,7 @@ public class TransactionImpl implements Transaction {
         } catch (Exception e) {
             state.set(TransactionState.FAILED);
             logger.error("Unexpected error during rollback of transaction {}", id, e);
-            throw new DataManagerException(
+            throw new StorageException(
                     ErrorCode.TRANSACTION_ERROR,
                     "Failed to rollback transaction: " + e.getMessage(),
                     e
@@ -178,17 +178,17 @@ public class TransactionImpl implements Transaction {
     /**
      * Closes the transaction. If the transaction is still active, an automatic rollback is performed.
      *
-     * @throws DataManagerException if an automatic rollback fails.
+     * @throws StorageException if an automatic rollback fails.
      */
     @Override
-    public void close() throws DataManagerException {
+    public void close() throws StorageException {
         TransactionState currentState = state.get();
 
         if (currentState.isActive()) {
             logger.warn("Transaction {} closed while still active; performing automatic rollback", id);
             try {
                 rollback();
-            } catch (DataManagerException e) {
+            } catch (StorageException e) {
                 logger.error("Failed to perform auto-rollback for transaction {}", id, e);
                 throw e;
             }

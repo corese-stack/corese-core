@@ -4,10 +4,10 @@ import fr.inria.corese.core.next.datamanager.api.operations.MetadataOperations;
 import fr.inria.corese.core.next.datamanager.api.operations.QueryOperations;
 
 /**
- * Read operations for Model DataManager.
+ * Read operations for Model Storage Manager.
  * Groups all read-only operations.
  */
-public interface ModelDataManagerRead {
+public interface StorageManagerRead {
 
     /**
      * Returns the query operations handler.

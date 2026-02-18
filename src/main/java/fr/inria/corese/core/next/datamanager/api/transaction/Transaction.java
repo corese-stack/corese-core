@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.datamanager.api.transaction;
 
-import fr.inria.corese.core.next.datamanager.api.support.exception.DataManagerException;
+import fr.inria.corese.core.next.datamanager.api.support.exception.StorageException;
 
 /**
  * Handle representing an active transaction.
@@ -19,19 +19,19 @@ public interface Transaction extends AutoCloseable {
      * Commits (validates) the transaction.
      * All modifications made in this transaction become permanent.
      *
-     * @throws DataManagerException  if commit fails
+     * @throws StorageException  if commit fails
      * @throws IllegalStateException if transaction is no longer active
      */
-    void commit() throws DataManagerException;
+    void commit() throws StorageException;
 
     /**
      * Rolls back (cancels) the transaction.
      * All modifications made in this transaction are cancelled.
      *
-     * @throws DataManagerException  if rollback fails
+     * @throws StorageException  if rollback fails
      * @throws IllegalStateException if transaction is no longer active
      */
-    void rollback() throws DataManagerException;
+    void rollback() throws StorageException;
 
     /**
      * Checks if the transaction is still active.
@@ -53,10 +53,10 @@ public interface Transaction extends AutoCloseable {
      * Closes the transaction.
      * If transaction is still active, performs automatic rollback.
      *
-     * @throws DataManagerException if close fails
+     * @throws StorageException if close fails
      */
     @Override
-    void close() throws DataManagerException;
+    void close() throws StorageException;
 
 
 }

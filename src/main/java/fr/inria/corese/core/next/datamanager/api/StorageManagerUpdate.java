@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.datamanager.api.operations.MutationOperations;
  * Update operations for Model DataManager.
  * Groups all write operations.
  */
-public interface ModelDataManagerUpdate {
+public interface StorageManagerUpdate {
 
     /**
      * Returns the mutation operations handler.
