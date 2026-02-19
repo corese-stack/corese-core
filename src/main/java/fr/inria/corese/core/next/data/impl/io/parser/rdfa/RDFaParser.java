@@ -10,8 +10,6 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.data.impl.io.parser.rdfa.model.*;
 import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.*;
