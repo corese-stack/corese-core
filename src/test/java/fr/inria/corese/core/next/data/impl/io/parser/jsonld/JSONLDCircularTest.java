@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +57,7 @@ class JSONLDCircularTest {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new SerializerFactory();
+        serializerFactory = new DataSerializerFactory();
         parserFactory = new ParserFactory();
         defaultConfig = new JSONLDOptions.Builder()
                 .build();

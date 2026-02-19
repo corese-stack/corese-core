@@ -101,5 +101,5 @@ public class FileFormat {
         return Objects.hash(name.toLowerCase(), extensions, mimeTypes);
     }
 
-    public static FileFormat PLAIN_TEXT = new FileFormat("plain text", List.of("txt"), List.of("text/plain"));
+    public static final FileFormat PLAIN_TEXT = new FileFormat("plain text", List.of("txt"), List.of("text/plain"));
 }

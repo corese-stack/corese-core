@@ -48,7 +48,7 @@ public class XMLSerializer implements ResultSerializer {
             Document resultDocument = this.xmlDocumentBuilder.newDocumentBuilder().newDocument();
             Element root = resultDocument.createElementNS(XMLSerializerConstants.SPARQL_RESULT_NS, XMLSerializerConstants.SPARQL_QNAME);
             Element head = resultDocument.createElement(XMLSerializerConstants.HEAD_QNAME);
-            Element results = resultDocument.createElement(XMLSerializerConstants.RESULTS_QNAME);
+            Element resultsElement = resultDocument.createElement(XMLSerializerConstants.RESULTS_QNAME);
 
             // Head
             this.results.getBindingNames().forEach(bindingName -> {
@@ -67,10 +67,10 @@ public class XMLSerializer implements ResultSerializer {
 
             // Results
             this.results.forEach(bindingSet -> {
-                results.appendChild(bindingSetToXML(bindingSet, resultDocument));
+                resultsElement.appendChild(bindingSetToXML(bindingSet, resultDocument));
             });
 
-            root.appendChild(results);
+            root.appendChild(resultsElement);
             resultDocument.appendChild(root);
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -104,9 +104,7 @@ public class XMLSerializer implements ResultSerializer {
     private Element bindingSetToXML(BindingSet bindings, Document document) {
         Element bindingSetElement = document.createElement(XMLSerializerConstants.RESULT_QNAME);
 
-        bindings.forEach(binding -> {
-            bindingSetElement.appendChild(bindingToXML(binding, document));
-        });
+        bindings.forEach(binding -> bindingSetElement.appendChild(bindingToXML(binding, document)));
 
         return bindingSetElement;
     }
@@ -120,26 +118,30 @@ public class XMLSerializer implements ResultSerializer {
 
     private Element valueToXML(Value value, Document document) {
         Element valueElement;
-        if(value instanceof IRI iriValue) {
-            valueElement = document.createElement(XMLSerializerConstants.URI_QNAME);
-            valueElement.setTextContent(iriValue.stringValue());
-        } else if (value instanceof BNode bnodeValue) {
-            valueElement = document.createElement(XMLSerializerConstants.BNODE_QNAME);
-            valueElement.setTextContent(bnodeValue.getID());
-        } else if (value instanceof Literal literalValue) {
-            valueElement = document.createElement(XMLSerializerConstants.LITERAL_QNAME);
-            if (literalValue.getLanguage().isEmpty()
-                    && literalValue.getDatatype() != null
-                    && literalValue.getDatatype() != XSD.STRING.getIRI()
-                    && literalValue.getDatatype() != RDF.LANGSTRING.getIRI()) {
-                valueElement.setAttribute(XMLSerializerConstants.DATATYPE_ATTR, literalValue.getDatatype().stringValue());
+        switch (value) {
+            case IRI iriValue -> {
+                valueElement = document.createElement(XMLSerializerConstants.URI_QNAME);
+                valueElement.setTextContent(iriValue.stringValue());
             }
-            if(literalValue.getLanguage().isPresent()) {
-                valueElement.setAttribute(XMLSerializerConstants.LANG_ATTR, literalValue.getLanguage().get());
+            case BNode bnodeValue -> {
+                valueElement = document.createElement(XMLSerializerConstants.BNODE_QNAME);
+                valueElement.setTextContent(bnodeValue.getID());
             }
-            valueElement.setTextContent(literalValue.stringValue());
-        } else {
-            throw new SerializationException("Unable to serialize Value " + value.stringValue() +" unknown type", this.getFormat());
+            case Literal literalValue -> {
+                valueElement = document.createElement(XMLSerializerConstants.LITERAL_QNAME);
+                if (literalValue.getLanguage().isEmpty()
+                        && literalValue.getDatatype() != null
+                        && literalValue.getDatatype() != XSD.STRING.getIRI()
+                        && literalValue.getDatatype() != RDF.LANGSTRING.getIRI()) {
+                    valueElement.setAttribute(XMLSerializerConstants.DATATYPE_ATTR, literalValue.getDatatype().stringValue());
+                }
+                if (literalValue.getLanguage().isPresent()) {
+                    valueElement.setAttribute(XMLSerializerConstants.LANG_ATTR, literalValue.getLanguage().get());
+                }
+                valueElement.setTextContent(literalValue.stringValue());
+            }
+            default ->
+                    throw new SerializationException("Unable to serialize Value " + value.stringValue() + " unknown type", this.getFormat());
         }
         return valueElement;
     }

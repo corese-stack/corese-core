@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 /**
  * Factory interface for creating {@link ResultSerializer} instances. This interface defines functions to create serializer based on the given result {@link fr.inria.corese.core.kgram.core.Mappings} and the desired {@link ResultFormat}
  */
-public interface ResultSerializerFactory {
+public interface IResultSerializerFactory {
 
     /**
      * Creates a serializer for the given {@link TupleQueryResult} results in the given {@link ResultFormat format}

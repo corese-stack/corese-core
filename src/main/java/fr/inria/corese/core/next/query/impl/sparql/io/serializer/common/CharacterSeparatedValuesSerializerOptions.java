@@ -16,7 +16,7 @@ public abstract class CharacterSeparatedValuesSerializerOptions extends Abstract
         return this.builder.lineEnding;
     }
 
-    public static abstract class AbstractBuilder<S extends CharacterSeparatedValuesSerializerOptions.AbstractBuilder<S>> {
+    public abstract static class AbstractBuilder<S extends CharacterSeparatedValuesSerializerOptions.AbstractBuilder<S>> {
 
         protected String lineEnding = SerializationConstants.DEFAULT_LINE_ENDING;
 

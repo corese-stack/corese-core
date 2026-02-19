@@ -27,19 +27,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 
 /**
- * Unit tests for the {@link SerializerFactory} class.
+ * Unit tests for the {@link DataSerializerFactory} class.
  * This class verifies that the factory correctly creates instances of
  * various {@link RDFSerializer} implementations based on the provided
  * {@link RDFFormat} and handles null inputs gracefully.
  */
-class SerializerFactoryTest {
+class DataSerializerFactoryTest {
 
-    private SerializerFactory factory;
+    private DataSerializerFactory factory;
     private Model mockModel;
 
     @BeforeEach
     void setUp() {
-        factory = new SerializerFactory();
+        factory = new DataSerializerFactory();
         mockModel = mock(Model.class);
     }
 

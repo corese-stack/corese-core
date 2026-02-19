@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
@@ -511,7 +511,7 @@ class RDFaParserTest {
 
     private static void logModelContent(Model model) {
         StringWriter outWriter = new StringWriter();
-        RDFSerializer serializer = (new SerializerFactory()).createSerializer(RDFFormat.TURTLE, model);
+        RDFSerializer serializer = (new DataSerializerFactory()).createSerializer(RDFFormat.TURTLE, model);
         serializer.write(outWriter);
         logger.info("{}", outWriter.toString());
     }

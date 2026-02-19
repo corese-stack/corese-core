@@ -5,7 +5,6 @@ import fr.inria.corese.core.next.data.api.query.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.RepositoryException;
 import fr.inria.corese.core.next.query.api.*;
-import fr.inria.corese.core.next.data.api.query.QueryLanguage;
 
 /**
  * A connection to a Corese {@link Repository}, providing access to query

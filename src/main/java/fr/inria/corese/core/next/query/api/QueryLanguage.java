@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.data.api.query;
+package fr.inria.corese.core.next.query.api;
 
 import fr.inria.corese.core.next.query.api.repository.RepositoryConnection;
 

@@ -66,8 +66,8 @@ public class XMLBooleanSerializer implements BooleanResultSerializer {
                 });
             }
             DOMSource source = new DOMSource(resultDocument);
-            StreamResult result = new StreamResult(writer);
-            transformer.transform(source, result);
+            StreamResult resultStream = new StreamResult(writer);
+            transformer.transform(source, resultStream);
 
         } catch (ParserConfigurationException e) {
             throw new SerializationException("Error during creation of the XML SPARQL result document.", this.getFormat(), e);

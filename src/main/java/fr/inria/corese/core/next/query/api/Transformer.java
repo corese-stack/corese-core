@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.api;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.data.api.query.QueryLanguage;
 
 /**
  * Compiles SPARQL query and update strings into executable query objects.
@@ -12,11 +11,11 @@ public interface Transformer {
      * Compiles a SPARQL query string into an executable query object.
      *
      * @param queryString the SPARQL query text (SELECT, CONSTRUCT, DESCRIBE, or ASK)
-     * @param queryLanguage the query language (typically {@link fr.inria.corese.core.next.data.api.query.QueryLanguage#SPARQL})
+     * @param queryLanguage the query language (typically {@link QueryLanguage#SPARQL})
      * @return the compiled query (TupleQuery, GraphQuery, or BooleanQuery)
      * @throws QuerySyntaxException if the query string is syntactically invalid
      */
-    Query<?> compileQuery(String queryString, fr.inria.corese.core.next.data.api.query.QueryLanguage queryLanguage)
+    Query<?> compileQuery(String queryString, QueryLanguage queryLanguage)
             throws QuerySyntaxException;
 
     /**

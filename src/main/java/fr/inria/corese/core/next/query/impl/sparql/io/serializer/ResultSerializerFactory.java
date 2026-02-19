@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.data.api.base.io.FileFormat;
 import fr.inria.corese.core.next.data.api.io.IOOptions;
 import fr.inria.corese.core.next.data.api.io.serializer.Serializer;
 import fr.inria.corese.core.next.query.api.base.io.ResultFormat;
+import fr.inria.corese.core.next.query.api.io.serializer.IResultSerializerFactory;
 import fr.inria.corese.core.next.query.api.io.serializer.ResultSerializer;
 import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.BooleanStringSerializer;
@@ -14,7 +15,7 @@ import fr.inria.corese.core.next.query.impl.sparql.io.serializer.tsv.TSVSerializ
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLBooleanSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLSerializer;
 
-public class ResultSerializerFactory implements fr.inria.corese.core.next.query.api.io.serializer.ResultSerializerFactory {
+public class ResultSerializerFactory implements IResultSerializerFactory {
     @Override
     public ResultSerializer createSerializer(ResultFormat format, TupleQueryResult results) {
         if(format == ResultFormat.CSV) {
