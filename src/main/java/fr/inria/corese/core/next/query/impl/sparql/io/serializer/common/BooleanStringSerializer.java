@@ -8,6 +8,9 @@ import fr.inria.corese.core.next.query.api.io.serializer.BooleanResultSerializer
 import java.io.IOException;
 import java.io.Writer;
 
+/**
+ * Serializer class for boolean results (ASK results) for textual formats such as CSV and TSV.
+ */
 public class BooleanStringSerializer implements BooleanResultSerializer {
 
     private final boolean result;

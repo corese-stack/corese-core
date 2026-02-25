@@ -16,6 +16,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.Writer;
 
+/**
+ * Serializer class for boolean results (ASK results) for XML
+ */
 public class XMLBooleanSerializer implements BooleanResultSerializer {
 
     private final DocumentBuilderFactory xmlDocumentBuilder = DocumentBuilderFactory.newDefaultInstance();

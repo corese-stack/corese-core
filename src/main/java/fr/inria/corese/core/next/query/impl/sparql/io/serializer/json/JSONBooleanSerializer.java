@@ -12,6 +12,9 @@ import jakarta.json.JsonWriter;
 
 import java.io.Writer;
 
+/**
+ * Serializer class for boolean results (ASK results) for JSON
+ */
 public class JSONBooleanSerializer implements BooleanResultSerializer {
 
     private final boolean result;

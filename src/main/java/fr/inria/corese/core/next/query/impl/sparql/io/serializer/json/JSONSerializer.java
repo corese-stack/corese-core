@@ -18,6 +18,9 @@ import jakarta.json.*;
 
 import java.io.Writer;
 
+/**
+ * Serializer for SPARQL results in JSON as described in <a href="https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/">the W3C recommendation<a/>
+ */
 public class JSONSerializer  implements ResultSerializer {
 
     private final TupleQueryResult results;

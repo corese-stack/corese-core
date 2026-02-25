@@ -26,6 +26,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.Writer;
 
+/**
+ * Serializer for SPARQL results in XML as described in <a href="https://www.w3.org/TR/2013/REC-rdf-sparql-XMLres-20130321/">the W3C recommendation<a/>
+ */
 public class XMLSerializer implements ResultSerializer {
 
     private final DocumentBuilderFactory xmlDocumentBuilder = DocumentBuilderFactory.newDefaultInstance();

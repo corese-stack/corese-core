@@ -15,6 +15,9 @@ import fr.inria.corese.core.next.query.impl.sparql.io.serializer.tsv.TSVSerializ
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLBooleanSerializer;
 import fr.inria.corese.core.next.query.impl.sparql.io.serializer.xml.XMLSerializer;
 
+/**
+ * Factory class for SPARQL results serializers
+ */
 public class ResultSerializerFactory implements IResultSerializerFactory {
     @Override
     public ResultSerializer createSerializer(ResultFormat format, TupleQueryResult results) {
