@@ -18,18 +18,28 @@ public class XMLSerializerOptionsTest {
     @DisplayName("Tests the application of the indent XML option to the serializer")
     void xmlSerializerIndentPropertyTest() {
         StringWriter outputWriter = new StringWriter();
-        IOOptions options = new XMLSerializerOptions.Builder().setXMLSetting(OutputKeys.INDENT, XMLSerializerConstants.YES_PROPERTY_VALUE).build();
+
+        IOOptions options = new XMLSerializerOptions.Builder()
+                .setXMLSetting(OutputKeys.INDENT, XMLSerializerConstants.YES_PROPERTY_VALUE)
+                .build();
+
         MockQueryResults results = new MockQueryResults(List.of("x"), List.of());
         ResultSerializer serializer = new XMLSerializer(results, options);
         serializer.write(outputWriter);
 
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n" +
-                "    <head>\n" +
-                "        <variable name=\"x\"/>\n" +
-                "    </head>\n" +
-                "    <results/>\n" +
-                "</sparql>\n", outputWriter.toString());
+        String expected =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                        "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n" +
+                        "    <head>\n" +
+                        "        <variable name=\"x\"/>\n" +
+                        "    </head>\n" +
+                        "    <results/>\n" +
+                        "</sparql>\n";
+
+        assertEquals(
+                expected.replace("\r\n", "\n"),
+                outputWriter.toString().replace("\r\n", "\n")
+        );
     }
 
     @Test

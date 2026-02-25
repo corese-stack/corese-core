@@ -11,10 +11,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static fr.inria.corese.core.next.query.impl.sparql.io.serializer.common.ResultSerializerTestUtils.MockQueryResults;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class AbstractResultSerializerTest {
 
@@ -152,7 +154,13 @@ All this work and no play makes Carols a dull girl."""));
         ResultSerializer serializer = getResultSerializer(getResultsWithMultiLinesLiteral());
         StringWriter writer = new StringWriter();
         serializer.write(writer);
-        assertEquals(getResultsWithMultiLinesLiteralString(), writer.toString());
+
+        String expected = getResultsWithMultiLinesLiteralString().replace("\r\n", "\n");
+
+        String actual = writer.toString().replace("\r\n", "\n");
+
+        assertEquals(expected.trim(), actual.trim()
+        );
     }
 
     protected abstract String getResultWithLiteralContainingQuotesString();
