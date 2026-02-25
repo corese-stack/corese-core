@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.io.serialization.option;
 
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.serializer.PrettyPrintOptions;
-import fr.inria.corese.core.next.data.io.serializer.UsesPrefixOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.PrettyPrintOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.UsesPrefixOptions;
 import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.data.impl.io.serialization.util.SerializationConstants;
 

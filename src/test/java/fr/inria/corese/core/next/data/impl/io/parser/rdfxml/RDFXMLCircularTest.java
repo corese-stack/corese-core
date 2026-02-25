@@ -2,10 +2,10 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
 import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.rdfxml.RDFXMLSerializerOptions;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RDFXMLCircularTest {
 
     private ValueFactory valueFactory;
-    private fr.inria.corese.core.next.data.io.serializer.SerializerFactory serializerFactory;
+    private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
     private RDFXMLSerializerOptions defaultConfig;
 
@@ -58,7 +58,7 @@ class RDFXMLCircularTest {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new SerializerFactory();
+        serializerFactory = new DataSerializerFactory();
         parserFactory = new ParserFactory();
         defaultConfig = RDFXMLSerializerOptions.defaultConfig();
     }

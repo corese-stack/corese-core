@@ -2,9 +2,8 @@ package fr.inria.corese.core.next.data.impl.io.serialization.jsonld;
 
 import com.apicatalog.jsonld.json.JsonLdComparison;
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
-import fr.inria.corese.core.next.data.impl.io.serialization.jsonld.JSONLDSerializer;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import jakarta.json.Json;

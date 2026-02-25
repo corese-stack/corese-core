@@ -4,14 +4,11 @@ import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.canonical.RDFC10Canonicalizer;
-import fr.inria.corese.core.next.data.impl.io.serialization.canonical.RDFC10Serializer;
-import fr.inria.corese.core.next.data.impl.io.serialization.canonical.RDFC10SerializerOptions;
+import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
-import fr.inria.corese.core.next.data.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -344,7 +341,7 @@ class RDFC10SerializerTest {
             fail("Failed to parse resource: " + resourcePath + " - " + e.getMessage());
         }
 
-        SerializerFactory serializerFactory = new SerializerFactory();
+        DataSerializerFactory serializerFactory = new DataSerializerFactory();
         RDFSerializer serializer = serializerFactory.createSerializer(
                 RDFFormat.RDFC_1_0,
                 model,

@@ -14,10 +14,10 @@ import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.io.serialization.SerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializerOptions;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TurtleCircularTest {
 
     private ValueFactory valueFactory;
-    private fr.inria.corese.core.next.data.io.serializer.SerializerFactory serializerFactory;
+    private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
     private ParserFactory parserFactory;
     private TurtleSerializerOptions defaultConfig;
 
@@ -57,7 +57,7 @@ class TurtleCircularTest {
     @BeforeEach
     void setUp() {
         valueFactory = new CoreseAdaptedValueFactory();
-        serializerFactory = new SerializerFactory();
+        serializerFactory = new DataSerializerFactory();
         parserFactory = new ParserFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();
     }

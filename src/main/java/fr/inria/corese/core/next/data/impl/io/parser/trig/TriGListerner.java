@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.io.parser.trig;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.data.impl.io.parser.common.AbstractTurtleTriGListener;

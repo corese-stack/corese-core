@@ -2,8 +2,8 @@ package fr.inria.corese.core.next.data.impl.io.serialization.rdfxml;
 
 import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.serializer.*;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.*;
 import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
@@ -100,7 +100,7 @@ public class RDFXMLSerializer implements RDFSerializer {
     }
 
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.RDFXML;
     }
 

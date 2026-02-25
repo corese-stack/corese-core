@@ -41,7 +41,7 @@ public class RDFC10Serializer extends AbstractLineBasedSerializer {
     }
 
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.RDFC_1_0;
     }
 

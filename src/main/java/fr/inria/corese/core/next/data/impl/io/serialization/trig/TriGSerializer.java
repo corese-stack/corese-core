@@ -15,9 +15,9 @@ import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.serializer.LineEndingOptions;
-import fr.inria.corese.core.next.data.io.serializer.PrettyPrintOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.LineEndingOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.PrettyPrintOptions;
 import fr.inria.corese.core.next.data.impl.io.serialization.base.AbstractGraphSerializer;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.AbstractSerializerOptions;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.AbstractTFamilyOptions;
@@ -290,7 +290,7 @@ public class TriGSerializer extends AbstractGraphSerializer {
      * @return {@link RDFFormat#TRIG}.
      */
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.TRIG;
     }
 }

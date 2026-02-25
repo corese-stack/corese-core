@@ -5,10 +5,10 @@ import java.io.Writer;
 import java.util.Objects;
 
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.data.io.serializer.BlankNodeIdGenerationOptions;
-import fr.inria.corese.core.next.data.io.serializer.LineEndingOptions;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.BlankNodeIdGenerationOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.LineEndingOptions;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.AbstractNFamilyOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class NTriplesSerializer extends AbstractLineBasedSerializer {
      * @return {@link RDFFormat#NTRIPLES}.
      */
     @Override
-    public RDFFormat getRDFFormat() {
+    public RDFFormat getFormat() {
         return RDFFormat.NTRIPLES;
     }
 

@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.data.impl.io.serialization.base;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.io.IOOptions;
-import fr.inria.corese.core.next.data.io.common.BaseIRIOptions;
-import fr.inria.corese.core.next.data.io.serializer.*;
+import fr.inria.corese.core.next.data.api.io.IOOptions;
+import fr.inria.corese.core.next.data.api.io.common.BaseIRIOptions;
+import fr.inria.corese.core.next.data.api.io.serializer.*;
 import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
