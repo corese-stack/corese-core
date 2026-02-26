@@ -62,8 +62,6 @@ import static fr.inria.corese.core.util.Property.Value.*;
  */
 public class Property {
 
-    public static final String STAR = "*";
-    public static final String RDF_XML = "rdf+xml";
     public static final String TURTLE = "turtle";
     public static final String TRIG = "trig";
     public static final String JSON = "json";
