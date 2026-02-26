@@ -49,17 +49,17 @@ public class SparqlParserBgpTest {
         GroupGraphPatternAst where = ast.whereClause();
         assertEquals(1, where.patterns().size(), "WHERE should contain 1 pattern (BGP)");
 
-        PatternAst p0 = where.patterns().get(0);
-        assertTrue(p0 instanceof BgpAst, "First pattern should be a BGP");
+        PatternAst p0 = where.patterns().getFirst();
+        assertInstanceOf(BgpAst.class, p0, "First pattern should be a BGP");
 
         BgpAst bgp = (BgpAst) p0;
         assertEquals(1, bgp.triples().size(), "BGP should contain 1 triple");
 
-        TriplePatternAst t = bgp.triples().get(0);
+        TriplePatternAst t = bgp.triples().getFirst();
 
-        assertTrue(t.subject() instanceof VarAst);
-        assertTrue(t.predicate() instanceof VarAst);
-        assertTrue(t.object() instanceof VarAst);
+        assertInstanceOf(VarAst.class, t.subject());
+        assertInstanceOf(VarAst.class, t.predicate());
+        assertInstanceOf(VarAst.class, t.object());
 
         assertEquals("s", ((VarAst) t.subject()).name());
         assertEquals("p", ((VarAst) t.predicate()).name());
@@ -81,7 +81,7 @@ public class SparqlParserBgpTest {
         GroupGraphPatternAst where = ast.whereClause();
         assertEquals(1, where.patterns().size());
 
-        BgpAst bgp = (BgpAst) where.patterns().get(0);
+        BgpAst bgp = (BgpAst) where.patterns().getFirst();
 
         // Expected triples:
         // (?s, a, foaf:Person)
@@ -89,14 +89,14 @@ public class SparqlParserBgpTest {
         // (?s, foaf:name, ?n2)
         assertEquals(3, bgp.triples().size());
 
-        TriplePatternAst t0 = bgp.triples().get(0);
+        TriplePatternAst t0 = bgp.triples().getFirst();
         assertEquals("s", ((VarAst) t0.subject()).name());
-        assertTrue(t0.predicate() instanceof IriAst);
+        assertInstanceOf(IriAst.class, t0.predicate());
         assertEquals("a", ((IriAst) t0.predicate()).raw());
 
         TriplePatternAst t1 = bgp.triples().get(1);
         assertEquals("s", ((VarAst) t1.subject()).name());
-        assertTrue(t1.predicate() instanceof IriAst);
+        assertInstanceOf(IriAst.class, t1.predicate());
         assertEquals("foaf:name", ((IriAst) t1.predicate()).raw());
         assertEquals("n", ((VarAst) t1.object()).name());
 
@@ -119,8 +119,8 @@ public class SparqlParserBgpTest {
         BgpAst bgp = (BgpAst) ast.whereClause().patterns().get(0);
         assertEquals(1, bgp.triples().size());
 
-        TriplePatternAst t = bgp.triples().get(0);
-        assertTrue(t.object() instanceof LiteralAst);
+        TriplePatternAst t = bgp.triples().getFirst();
+        assertInstanceOf(LiteralAst.class, t.object());
 
         LiteralAst lit = (LiteralAst) t.object();
         assertEquals("\"salut\"", lit.lexical()); // tu conserves les guillemets (string_().getText())
@@ -139,10 +139,10 @@ public class SparqlParserBgpTest {
                 }
                 """);
 
-        BgpAst bgp = (BgpAst) ast.whereClause().patterns().get(0);
-        TriplePatternAst t = bgp.triples().get(0);
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst t = bgp.triples().getFirst();
 
-        assertTrue(t.object() instanceof LiteralAst);
+        assertInstanceOf(LiteralAst.class, t.object());
         LiteralAst lit = (LiteralAst) t.object();
 
         assertEquals("\"12\"", lit.lexical());

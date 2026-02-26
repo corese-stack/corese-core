@@ -64,10 +64,10 @@ class SparqlListenerTest {
         assertNotNull(ast);
         assertNotNull(ast.whereClause());
         assertEquals(1, ast.whereClause().patterns().size());
-        assertTrue(ast.whereClause().patterns().get(0) instanceof BgpAst);
-        BgpAst bgp = (BgpAst) ast.whereClause().patterns().get(0);
+        assertInstanceOf(BgpAst.class, ast.whereClause().patterns().getFirst());
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
         assertEquals(1, bgp.triples().size());
-        TriplePatternAst t = bgp.triples().get(0);
+        TriplePatternAst t = bgp.triples().getFirst();
         assertEquals("s", ((VarAst) t.subject()).name());
         assertEquals("p", ((VarAst) t.predicate()).name());
         assertEquals("o", ((VarAst) t.object()).name());

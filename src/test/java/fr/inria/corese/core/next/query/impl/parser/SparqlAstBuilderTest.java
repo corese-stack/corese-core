@@ -99,8 +99,8 @@ class SparqlAstBuilderTest {
         GroupGraphPatternAst where = ast.whereClause();
 
         assertEquals(2, where.patterns().size());
-        assertTrue(where.patterns().get(0) instanceof BgpAst);
-        assertTrue(where.patterns().get(1) instanceof BgpAst);
+        assertInstanceOf(BgpAst.class, where.patterns().get(0));
+        assertInstanceOf(BgpAst.class, where.patterns().get(1));
 
         BgpAst bgp1 = (BgpAst) where.patterns().get(0);
         BgpAst bgp2 = (BgpAst) where.patterns().get(1);
@@ -224,7 +224,7 @@ class SparqlAstBuilderTest {
     private static BgpAst singleBgp(QueryAst ast) {
         GroupGraphPatternAst where = ast.whereClause();
         assertEquals(1, where.patterns().size(), "Expected exactly 1 pattern in WHERE");
-        assertTrue(where.patterns().get(0) instanceof BgpAst, "Expected first pattern to be a BGP");
-        return (BgpAst) where.patterns().get(0);
+        assertInstanceOf(BgpAst.class, where.patterns().getFirst(), "Expected first pattern to be a BGP");
+        return (BgpAst) where.patterns().getFirst();
     }
 }

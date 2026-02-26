@@ -33,8 +33,8 @@ class SparqlParserTest {
         assertNotNull(fromReader);
         assertEquals(fromString.whereClause().patterns().size(),
                 fromReader.whereClause().patterns().size());
-        BgpAst bgp = (BgpAst) fromString.whereClause().patterns().get(0);
-        assertEquals("s", ((VarAst) bgp.triples().get(0).subject()).name());
+        BgpAst bgp = (BgpAst) fromString.whereClause().patterns().getFirst();
+        assertEquals("s", ((VarAst) bgp.triples().getFirst().subject()).name());
     }
 
     @Test
@@ -138,6 +138,6 @@ class SparqlParserTest {
 
         assertNotNull(ast);
         assertNotNull(parser.getConfig());
-        assertTrue(parser.getConfig() instanceof SparqlParserOptions);
+        assertInstanceOf(SparqlParserOptions.class, parser.getConfig());
     }
 }
