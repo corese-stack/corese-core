@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.sparql.ast;
+package fr.inria.corese.core.next.query.api.sparql.ast;
 
 /**
  * RDF literal in a triple pattern (lexical form, optional language tag or datatype).

@@ -1,4 +1,7 @@
-package fr.inria.corese.core.next.query;
+package fr.inria.corese.core.next.query.api.base.io;
+
+import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
+import fr.inria.corese.core.next.query.api.io.parser.QueryParser;
 
 /**
  * Base implementation of the {@link QueryParser} interface.

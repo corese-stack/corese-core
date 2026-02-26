@@ -1,6 +1,6 @@
-package fr.inria.corese.core.next.query.sparql.options;
+package fr.inria.corese.core.next.query.api.sparql.options;
 
-import fr.inria.corese.core.next.query.QueryOptions;
+import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 
 /**
  * Abstract base for SPARQL options using Builder pattern.

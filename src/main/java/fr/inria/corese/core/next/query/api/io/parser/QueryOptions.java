@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query;
+package fr.inria.corese.core.next.query.api.io.parser;
 
 /**
  * Marker interface for configuration objects used by {@link QueryParser}

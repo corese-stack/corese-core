@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.sparql.ast;
+package fr.inria.corese.core.next.query.api.sparql.ast;
 
 /**
  * Minimal SPARQL query AST (e.g. SELECT ... WHERE { ... }).

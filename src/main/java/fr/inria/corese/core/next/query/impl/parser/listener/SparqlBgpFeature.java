@@ -1,8 +1,8 @@
-package fr.inria.corese.core.next.query.sparql.parser.listener;
+package fr.inria.corese.core.next.query.impl.parser.listener;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParserBaseListener;
-import fr.inria.corese.core.next.query.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.sparql.parser.SparqlAstBuilder;
+import fr.inria.corese.core.next.query.api.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,13 +1,13 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.data.api.query.exception.QueryException;
-import fr.inria.corese.core.next.data.api.query.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
-import fr.inria.corese.core.next.query.AbstractQueryParser;
-import fr.inria.corese.core.next.query.QueryOptions;
-import fr.inria.corese.core.next.query.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.sparql.parser.listener.SparqlBgpFeature;
+import fr.inria.corese.core.next.query.api.exception.QueryException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
+import fr.inria.corese.core.next.query.api.base.io.AbstractQueryParser;
+import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
+import fr.inria.corese.core.next.query.api.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.parser.listener.SparqlBgpFeature;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;

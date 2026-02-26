@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.sparql.ast;
+package fr.inria.corese.core.next.query.api.sparql.ast;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

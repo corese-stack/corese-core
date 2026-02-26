@@ -1,10 +1,10 @@
-package fr.inria.corese.core.next.query.sparql.parser;
+package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
-import fr.inria.corese.core.next.query.sparql.options.AbstractSparqlOptions;
-import fr.inria.corese.core.next.query.sparql.options.BaseIRIOptions;
-import fr.inria.corese.core.next.query.sparql.options.ErrorHandlingOptions;
-import fr.inria.corese.core.next.query.sparql.options.StrictModeOptions;
+import fr.inria.corese.core.next.query.api.sparql.options.AbstractSparqlOptions;
+import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
+import fr.inria.corese.core.next.query.api.sparql.options.ErrorHandlingOptions;
+import fr.inria.corese.core.next.query.api.sparql.options.StrictModeOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;

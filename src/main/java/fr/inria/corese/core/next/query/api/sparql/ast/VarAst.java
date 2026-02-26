@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.sparql.ast;
+package fr.inria.corese.core.next.query.api.sparql.ast;
 
 /**
  * Variable in a triple pattern (e.g. ?s, $x).
