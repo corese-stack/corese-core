@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.sparql.parser;
 
-import fr.inria.corese.core.next.data.api.query.exception.QueryException;
 import fr.inria.corese.core.next.query.QueryOptions;
+import fr.inria.corese.core.next.query.api.exception.QueryException;
 import fr.inria.corese.core.next.query.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.sparql.ast.VarAst;
