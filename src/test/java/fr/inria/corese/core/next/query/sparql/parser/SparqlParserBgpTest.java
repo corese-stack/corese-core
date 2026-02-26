@@ -1,7 +1,8 @@
 package fr.inria.corese.core.next.query.sparql.parser;
 
-import fr.inria.corese.core.next.data.api.query.exception.QueryException;
-import fr.inria.corese.core.next.data.api.query.exception.QuerySyntaxException;
+
+import fr.inria.corese.core.next.query.api.exception.QueryException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.sparql.ast.*;
 import org.junit.jupiter.api.Test;
 
