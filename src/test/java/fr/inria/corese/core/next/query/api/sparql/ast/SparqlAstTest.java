@@ -69,7 +69,7 @@ class SparqlAstTest {
         @Test
         @DisplayName("implements TermAst")
         void implementsTermAst() {
-            assertTrue(new VarAst("s") instanceof TermAst);
+            assertInstanceOf(TermAst.class, new VarAst("s"));
         }
     }
 
@@ -119,7 +119,7 @@ class SparqlAstTest {
         @Test
         @DisplayName("implements TermAst")
         void implementsTermAst() {
-            assertTrue(new IriAst("x") instanceof TermAst);
+            assertInstanceOf(TermAst.class, new IriAst("x"));
         }
     }
 
@@ -186,14 +186,14 @@ class SparqlAstTest {
         @DisplayName("not equal when lang or datatype differs")
         void inequality() {
             LiteralAst a = new LiteralAst("x", null, null);
-            assertNotEquals(a, new LiteralAst("x", "fr", null));
-            assertNotEquals(a, new LiteralAst("x", null, "xsd:string"));
+            assertNotEquals(new LiteralAst("x", "fr", null), a);
+            assertNotEquals(new LiteralAst("x", null, "xsd:string"), a);
         }
 
         @Test
         @DisplayName("implements TermAst")
         void implementsTermAst() {
-            assertTrue(new LiteralAst("x", null, null) instanceof TermAst);
+            assertInstanceOf(TermAst.class, new LiteralAst("x", null, null));
         }
     }
 
@@ -222,9 +222,9 @@ class SparqlAstTest {
             IriAst pred = new IriAst("a");
             LiteralAst obj = new LiteralAst("lit", null, null);
             TriplePatternAst t = new TriplePatternAst(s, pred, obj);
-            assertTrue(t.subject() instanceof VarAst);
-            assertTrue(t.predicate() instanceof IriAst);
-            assertTrue(t.object() instanceof LiteralAst);
+            assertInstanceOf(VarAst.class, t.subject());
+            assertInstanceOf(IriAst.class, t.predicate());
+            assertInstanceOf(LiteralAst.class, t.object());
         }
 
         @Test
@@ -316,7 +316,7 @@ class SparqlAstTest {
         @Test
         @DisplayName("implements PatternAst")
         void implementsPatternAst() {
-            assertTrue(new BgpAst(List.of()) instanceof PatternAst);
+            assertInstanceOf(PatternAst.class, new BgpAst(List.of()));
         }
     }
 
@@ -352,7 +352,7 @@ class SparqlAstTest {
             GroupGraphPatternAst g = new GroupGraphPatternAst(mutable);
             mutable.clear();
             assertEquals(1, g.patterns().size());
-            assertSame(bgp, g.patterns().get(0));
+            assertSame(bgp, g.patterns().getFirst());
         }
 
         @Test
@@ -409,7 +409,7 @@ class SparqlAstTest {
         @Test
         @DisplayName("SelectQueryAst implements QueryAst")
         void implementsQueryAst() {
-            assertTrue(new SelectQueryAst(new GroupGraphPatternAst(List.of())) instanceof QueryAst);
+            assertInstanceOf(QueryAst.class, new SelectQueryAst(new GroupGraphPatternAst(List.of())));
         }
     }
 
@@ -422,15 +422,15 @@ class SparqlAstTest {
         @Test
         @DisplayName("VarAst, IriAst, LiteralAst are TermAst")
         void termImplementations() {
-            assertTrue(new VarAst("x") instanceof TermAst);
-            assertTrue(new IriAst("y") instanceof TermAst);
-            assertTrue(new LiteralAst("z", null, null) instanceof TermAst);
+            assertInstanceOf(TermAst.class, new VarAst("x"));
+            assertInstanceOf(TermAst.class, new IriAst("y"));
+            assertInstanceOf(TermAst.class, new LiteralAst("z", null, null));
         }
 
         @Test
         @DisplayName("BgpAst is PatternAst")
         void patternImplementation() {
-            assertTrue(new BgpAst(List.of()) instanceof PatternAst);
+            assertInstanceOf(PatternAst.class, new BgpAst(List.of()));
         }
     }
 
