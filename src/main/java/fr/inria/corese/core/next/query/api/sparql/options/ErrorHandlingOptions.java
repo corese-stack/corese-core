@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.sparql.options;
+package fr.inria.corese.core.next.query.api.sparql.options;
 
 import java.util.List;
 

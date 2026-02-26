@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.sparql.ast;
+package fr.inria.corese.core.next.query.api.sparql.ast;
 
 /**
  * IRI or QName in a triple pattern (e.g. &lt;http://...&gt;, foaf:Person, a).

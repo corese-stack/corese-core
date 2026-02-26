@@ -1,6 +1,6 @@
-package fr.inria.corese.core.next.query;
+package fr.inria.corese.core.next.query.api.io.parser;
 
-import fr.inria.corese.core.next.query.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.api.sparql.ast.QueryAst;
 
 import java.io.InputStream;
 import java.io.Reader;
