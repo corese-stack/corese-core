@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.data.impl.io.common;
 
+import fr.inria.corese.core.next.data.impl.common.DataConfigurationProperties;
+import fr.inria.corese.core.next.util.Properties;
 import fr.inria.corese.core.util.Property;
 
 /**
@@ -63,10 +65,6 @@ public class IOConstants {
      * @return the default base URI from configuration, or null if not set
      */
     public static String getDefaultBaseURI() {
-        String configuredValue = Property.getStringValue(Property.Value.DEFAULT_BASE_URI);
-        if (configuredValue == null || configuredValue.isEmpty()) {
-            return "http://example.org/";
-        }
-        return configuredValue;
+        return Properties.instance().getPropertyValue(DataConfigurationProperties.DEFAULT_BASE_URI).get();
     }
 }
