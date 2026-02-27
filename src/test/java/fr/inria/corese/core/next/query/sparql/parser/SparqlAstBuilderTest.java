@@ -1,6 +1,9 @@
 package fr.inria.corese.core.next.query.sparql.parser;
 
 
+import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
+import fr.inria.corese.core.next.query.impl.parser.SparqlParserOptions;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.sparql.ast.*;
 import org.junit.jupiter.api.Test;
 

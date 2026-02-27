@@ -10,6 +10,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Configuration options for the SPARQL parser.
+ *
+ * <p>This class controls parsing behavior such as base IRI resolution,
+ * strict mode validation, and error handling strategy.</p>
+ *
+ * <h3>Default values</h3>
+ * <ul>
+ *   <li><b>baseIRI</b>: {@link ParserConstants#getDefaultBaseURI()}</li>
+ *   <li><b>strictMode</b>: {@code false}</li>
+ *   <li><b>failFast</b>: {@code true}</li>
+ *   <li><b>collectErrors</b>: {@code true}</li>
+ * </ul>
+ *
+ * <p>Instances are immutable and must be created using the {@link Builder}.</p>
+ */
 public class SparqlParserOptions extends AbstractSparqlOptions
         implements BaseIRIOptions, StrictModeOptions, ErrorHandlingOptions {
 
@@ -32,28 +48,87 @@ public class SparqlParserOptions extends AbstractSparqlOptions
 
     }
 
+    /**
+     * Returns the base IRI used for resolving relative IRIs.
+     *
+     * <p><b>Default:</b> {@link ParserConstants#getDefaultBaseURI()}</p>
+     *
+     * @return the configured base IRI (never null)
+     */
     @Override
     public String getBaseIRI() {
         return this.baseIRI;
     }
 
+    /**
+     * Indicates whether strict parsing mode is enabled.
+     *
+     * <p>In strict mode, additional validation rules may be enforced
+     * (e.g., stricter SPARQL grammar or semantic checks).</p>
+     *
+     * <p><b>Default:</b> {@code false}</p>
+     *
+     * @return true if strict mode is enabled
+     */
     @Override
     public boolean isStrictMode() { return Boolean.TRUE.equals(strictMode); }
 
+    /**
+     * Indicates whether the parser should stop immediately
+     * on the first syntax error.
+     *
+     * <p>If enabled, parsing aborts as soon as an error is encountered.
+     * If disabled, the parser attempts error recovery.</p>
+     *
+     * <p><b>Default:</b> {@code true}</p>
+     *
+     * @return true if parsing stops at first error
+     */
     @Override
     public boolean isFailFast() { return failFast; }
 
+    /**
+     * Indicates whether parsing errors should be collected internally.
+     *
+     * <p>If enabled, errors are stored and accessible via {@link #getErrors()}.</p>
+     *
+     * <p><b>Default:</b> {@code true}</p>
+     *
+     * @return true if errors are collected
+     */
     @Override
     public boolean isCollectErrors() { return collectErrors; }
 
+    /**
+     * Returns the collected parsing errors.
+     *
+     * <p>If {@code collectErrors} is false, this list will always be empty.</p>
+     *
+     * @return an unmodifiable list of parsing error messages
+     */
     @Override
     public List<String> getErrors() { return Collections.unmodifiableList(errors); }
 
-    /** parser can record errors if collectErrors=true */
+    /**
+     * Records a parsing error internally if {@code collectErrors} is enabled.
+     *
+     * @param message error message (ignored if null or collection disabled)
+     */
     void addError(String message) {
         if (collectErrors && message != null) errors.add(message);
     }
 
+    /**
+     * Builder for {@link SparqlParserOptions}.
+     *
+     * <h3>Default values</h3>
+     * <ul>
+     *   <li>baseIRI = {@link ParserConstants#getDefaultBaseURI()}</li>
+     *   <li>strictMode = false</li>
+     *   <li>failFast = true</li>
+     *   <li>collectErrors = true</li>
+     * </ul>
+     */
     public static class Builder extends AbstractSparqlOptions.Builder<SparqlParserOptions> {
 
         protected String baseIRI = ParserConstants.getDefaultBaseURI();
@@ -79,16 +154,34 @@ public class SparqlParserOptions extends AbstractSparqlOptions
             return this;
         }
 
+        /**
+         * Enables or disables strict parsing mode.
+         *
+         * @param strictMode true to enable strict mode
+         * @return this builder
+         */
         public Builder strictMode(boolean strictMode) {
             this.strictMode = strictMode;
             return this;
         }
 
+        /**
+         * Enables or disables fail-fast behavior.
+         *
+         * @param failFast true to stop at first error
+         * @return this builder
+         */
         public Builder failFast(boolean failFast) {
             this.failFast = failFast;
             return this;
         }
 
+        /**
+         * Enables or disables error collection.
+         *
+         * @param collectErrors true to collect parsing errors
+         * @return this builder
+         */
         public Builder collectErrors(boolean collectErrors) {
             this.collectErrors = collectErrors;
             return this;

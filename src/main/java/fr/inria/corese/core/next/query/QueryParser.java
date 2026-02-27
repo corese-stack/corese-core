@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+
 import java.io.InputStream;
 import java.io.Reader;
 

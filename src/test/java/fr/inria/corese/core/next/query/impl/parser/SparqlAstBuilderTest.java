@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 
-import fr.inria.corese.core.next.query.api.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
