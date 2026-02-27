@@ -23,23 +23,27 @@ public class Properties {
     }
 
     public static Properties instance() {
-        if(INSTANCE == null) {
+        if (INSTANCE == null) {
             INSTANCE = new Properties();
         }
         return INSTANCE;
     }
 
     public Optional<String> getPropertyValue(ConfigurationProperty property) {
-        if(this.config.hasPath(property.getName())) {
+        if (propertyValueExists(property)) {
             return Optional.of(this.config.getString(property.getName()));
         } else if (property.isOptional()) {
-            if(property.isOptional() && property.getDefaultValue().isPresent()) {
+            if (property.getDefaultValue().isPresent()) {
                 return property.getDefaultValue();
             } else {
                 return Optional.empty();
             }
-            } else {
-                throw new ConfigurationException("Undefined configuration " + property.getName());
-            }
+        } else {
+            throw new ConfigurationException("Undefined configuration " + property.getName());
+        }
+    }
+
+    public boolean propertyValueExists(ConfigurationProperty property) {
+        return this.config.hasPath(property.getName());
     }
 }
