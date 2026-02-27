@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.api.sparql.ast.GroupGraphPatternAst;
-
 import java.util.List;
 
 /**

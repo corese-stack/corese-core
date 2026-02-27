@@ -1,15 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.api.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.PatternAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.TriplePatternAst;
-import fr.inria.corese.core.next.query.api.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

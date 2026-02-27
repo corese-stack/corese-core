@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser.listener;
 
-import fr.inria.corese.core.next.impl.parser.antlr.SparqlParserBaseListener;
-import fr.inria.corese.core.next.query.api.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 
 import java.util.ArrayList;
@@ -16,11 +15,11 @@ import java.util.List;
  * - TriplesBlock: BGP block      -> builder.enterBgp()/exitBgp()
  * - TriplesSameSubject: produce actual triples -> builder.addTriple(s,p,o)
  */
-public class SparqlBgpFeature extends SparqlParserBaseListener {
+public class BgpFeature extends AbstractSparqlFeature {
 
     private final SparqlAstBuilder builder;
 
-    public SparqlBgpFeature(SparqlAstBuilder builder) {
+    public BgpFeature(SparqlAstBuilder builder) {
         this.builder = builder;
     }
 
