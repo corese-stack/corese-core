@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.sparql.parser;
 
+import fr.inria.corese.core.next.query.impl.parser.SparqlParserOptions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

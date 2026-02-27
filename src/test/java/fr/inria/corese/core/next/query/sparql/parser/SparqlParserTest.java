@@ -1,7 +1,12 @@
 package fr.inria.corese.core.next.query.sparql.parser;
 
-import fr.inria.corese.core.next.query.QueryOptions;
 import fr.inria.corese.core.next.query.api.exception.QueryException;
+import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
+import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
+import fr.inria.corese.core.next.query.impl.parser.SparqlParserOptions;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

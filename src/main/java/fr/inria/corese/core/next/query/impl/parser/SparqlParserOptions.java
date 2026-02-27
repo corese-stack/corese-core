@@ -114,7 +114,7 @@ public class SparqlParserOptions extends AbstractSparqlOptions
      *
      * @param message error message (ignored if null or collection disabled)
      */
-    void addError(String message) {
+    public void addError(String message) {
         if (collectErrors && message != null) errors.add(message);
     }
 
