@@ -1,4 +1,6 @@
-package fr.inria.corese.core.next.query.sparql.ast;
+package fr.inria.corese.core.next.query.impl.sparql.ast;
+
+import fr.inria.corese.core.next.query.api.sparql.ast.TermAst;
 
 /**
  * A single triple pattern (s p o) in a BGP.
