@@ -1,11 +1,6 @@
 package fr.inria.corese.core.next.query.sparql.parser;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
-import fr.inria.corese.core.next.query.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.sparql.ast.TriplePatternAst;
-import fr.inria.corese.core.next.query.sparql.ast.VarAst;
-import fr.inria.corese.core.next.query.sparql.parser.listener.SparqlBgpFeature;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
