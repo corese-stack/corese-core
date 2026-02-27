@@ -1,0 +1,380 @@
+package fr.inria.corese.core.next.data.impl;
+
+import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.api.base.model.AbstractModel;
+import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.impl.temp.FilteredModel;
+import fr.inria.corese.core.next.storagemanager.api.StorageManager;
+import fr.inria.corese.core.next.storagemanager.api.support.exception.StorageException;
+import fr.inria.corese.core.next.storagemanager.api.support.model.StatementPattern;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * Implementation of the {@link Model} interface backed by a {@link StorageManager}.
+ */
+public class StorageManagerBasedModel extends AbstractModel {
+
+    private final StorageManager storage;
+
+    private final ValueFactory valueFactory;
+
+    private final Set<Namespace> namespaces;
+
+    private final boolean unmodifiable;
+
+    /**
+     * Constructs a new StorageManagerBasedModel.
+     *
+     * @param storage      the storage manager (must not be null)
+     * @param valueFactory the value factory (must not be null)
+     * @param namespaces   the initial namespaces (may be null)
+     * @param unmodifiable whether this model is unmodifiable
+     */
+    protected StorageManagerBasedModel(
+            StorageManager storage,
+            ValueFactory valueFactory,
+            Set<Namespace> namespaces,
+            boolean unmodifiable) {
+        this.storage = Objects.requireNonNull(storage, "StorageManager must not be null");
+        this.valueFactory = Objects.requireNonNull(valueFactory, "ValueFactory must not be null");
+        this.namespaces = namespaces != null ? new HashSet<>(namespaces) : new HashSet<>();
+        this.unmodifiable = unmodifiable;
+    }
+
+    /**
+     * Returns a new builder for StorageManagerBasedModel.
+     *
+     * @return a new builder instance
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Builder for {@link StorageManagerBasedModel}.
+     */
+    public static class Builder {
+        private StorageManager storage;
+        private ValueFactory valueFactory;
+        private Set<Namespace> namespaces;
+
+        /**
+         * Sets the storage manager.
+         *
+         * @param storage the storage manager (must not be null)
+         * @return this builder
+         */
+        public Builder storage(StorageManager storage) {
+            this.storage = storage;
+            return this;
+        }
+
+        /**
+         * Sets the value factory.
+         *
+         * @param valueFactory the value factory (must not be null)
+         * @return this builder
+         */
+        public Builder valueFactory(ValueFactory valueFactory) {
+            this.valueFactory = valueFactory;
+            return this;
+        }
+
+        /**
+         * Sets the initial namespaces.
+         *
+         * @param namespaces the initial namespaces (may be null)
+         * @return this builder
+         */
+        public Builder namespaces(Set<Namespace> namespaces) {
+            this.namespaces = namespaces;
+            return this;
+        }
+
+        /**
+         * Builds a new StorageManagerBasedModel instance.
+         *
+         * @return a new model instance
+         * @throws IllegalStateException if storage or valueFactory is null
+         */
+        public StorageManagerBasedModel build() {
+            if (storage == null) {
+                throw new IllegalStateException("StorageManager is required");
+            }
+            if (valueFactory == null) {
+                throw new IllegalStateException("ValueFactory is required");
+            }
+            return new StorageManagerBasedModel(storage, valueFactory, namespaces, false);
+        }
+    }
+
+    @Override
+    public boolean add(Resource subject, IRI predicate, Value object, Resource... contexts) {
+        checkModifiable();
+        Objects.requireNonNull(subject, "Subject must not be null");
+        Objects.requireNonNull(predicate, "Predicate must not be null");
+        Objects.requireNonNull(object, "Object must not be null");
+
+        try {
+            if (contexts == null || contexts.length == 0) {
+                Statement stmt = valueFactory.createStatement(subject, predicate, object);
+                return storage.getMutationOperations()
+                        .insertStatement(stmt)
+                        .isSuccess();
+            }
+
+            // Add once per context
+            boolean changed = false;
+            for (Resource context : contexts) {
+                Statement stmt = valueFactory.createStatement(subject, predicate, object, context);
+                changed |= storage.getMutationOperations()
+                        .insertStatement(stmt)
+                        .isSuccess();
+            }
+            return changed;
+
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to add statement", e);
+        }
+    }
+
+
+    @Override
+    public boolean contains(Resource subject, IRI predicate, Value object, Resource... contexts) {
+        try {
+            StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
+            return storage.getQueryOperations().exists(pattern);
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to check statement existence", e);
+        }
+    }
+
+
+    @Override
+    public boolean remove(Resource subject, IRI predicate, Value object, Resource... contexts) {
+        checkModifiable();
+
+        try {
+            return storage.getMutationOperations()
+                    .deleteStatements(subject, predicate, object, contexts)
+                    .isSuccess();
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to remove statements", e);
+        }
+    }
+
+    @Override
+    public boolean clear(Resource... contexts) {
+        checkModifiable();
+
+        try {
+            return storage.getMutationOperations()
+                    .clear(contexts)
+                    .isSuccess();
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to clear", e);
+        }
+    }
+
+    @Override
+    public Iterable<Statement> getStatements(Resource subject, IRI predicate, Value object, Resource... contexts) {
+        try {
+            StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
+            return storage.getQueryOperations()
+                    .query(pattern)
+                    .collect(Collectors.toList());
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to query statements", e);
+        }
+    }
+
+    @Override
+    public Model filter(Resource subject, IRI predicate, Value object, Resource... contexts) {
+        return new FilteredModel(this, subject, predicate, object, contexts) {
+
+            @Override
+            @SuppressWarnings("NullableProblems")
+            public Iterator<Statement> iterator() {
+                return StorageManagerBasedModel.this.getFilterIterator(subject, predicate, object, contexts);
+            }
+
+            @Override
+            protected void removeFilteredTermIteration(
+                    Iterator<Statement> iterator,
+                    Resource subject,
+                    IRI predicate,
+                    Value object,
+                    Resource... contexts) {
+                StorageManagerBasedModel.this.removeTermIteration(iterator, subject, predicate, object, contexts);
+            }
+        };
+    }
+
+    @Override
+    public Set<Resource> subjects() {
+        try {
+            return storage.getMetadataOperations().getSubjects();
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to get subjects", e);
+        }
+    }
+
+    @Override
+    public Set<IRI> predicates() {
+        try {
+            return storage.getMetadataOperations().getPredicates();
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to get predicates", e);
+        }
+    }
+
+    @Override
+    public Set<Value> objects() {
+        try {
+            return storage.getMetadataOperations().getObjects();
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to get objects", e);
+        }
+    }
+
+    @Override
+    public Set<Resource> contexts() {
+        try {
+            return storage.getMetadataOperations().getContexts();
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to get contexts", e);
+        }
+    }
+
+    @Override
+    public Set<Namespace> getNamespaces() {
+        return Collections.unmodifiableSet(namespaces);
+    }
+
+    @Override
+    public void setNamespace(Namespace namespace) {
+        checkModifiable();
+        Objects.requireNonNull(namespace, "Namespace cannot be null");
+        removeNamespace(namespace.getPrefix());
+        namespaces.add(namespace);
+    }
+
+    @Override
+    public Optional<Namespace> removeNamespace(String prefix) {
+        checkModifiable();
+        return getNamespace(prefix).filter(namespaces::remove);
+    }
+
+    @Override
+    @SuppressWarnings("NullableProblems")
+    public Iterator<Statement> iterator() {
+        return getFilterIterator(null, null, null);
+    }
+
+    @Override
+    public void removeTermIteration(
+            Iterator<Statement> iterator,
+            Resource subject,
+            IRI predicate,
+            Value object,
+            Resource... contexts) {
+        checkModifiable();
+        remove(subject, predicate, object, contexts);
+    }
+
+    @Override
+    public int size() {
+        try {
+            StatementPattern pattern = StatementPattern.of(null, null, null);
+            return (int) storage.getQueryOperations().count(pattern);
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to get size", e);
+        }
+    }
+
+    @Override
+    public Model unmodifiable() {
+        if (unmodifiable) {
+            return this;
+        }
+        return new StorageManagerBasedModel(storage, valueFactory, namespaces, true);
+    }
+
+
+    /**
+     * Returns the value factory.
+     *
+     * @return the value factory
+     */
+    public ValueFactory getValueFactory() {
+        return valueFactory;
+    }
+
+    /**
+     * Checks if this model is modifiable and throws an exception if not.
+     *
+     * @throws IncorrectOperationException if the model is unmodifiable
+     */
+    private void checkModifiable() {
+        if (unmodifiable) {
+            throw new IncorrectOperationException("Model is unmodifiable");
+        }
+    }
+
+    /**
+     * Returns an iterator over statements matching the given pattern.
+     *
+     * @param subject   the subject filter (null = wildcard)
+     * @param predicate the predicate filter (null = wildcard)
+     * @param object    the object filter (null = wildcard)
+     * @param contexts  the context filters (null/empty = wildcard)
+     * @return an iterator over matching statements
+     */
+    private Iterator<Statement> getFilterIterator(
+            Resource subject,
+            IRI predicate,
+            Value object,
+            Resource... contexts) {
+
+
+        class ModelIterator implements Iterator<Statement> {
+            private final Iterator<Statement> delegate;
+            private Statement last;
+
+            ModelIterator(Iterator<Statement> delegate) {
+                this.delegate = delegate;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return delegate.hasNext();
+            }
+
+            @Override
+            public Statement next() {
+                return last = delegate.next();
+            }
+
+            @Override
+            public void remove() {
+                if (last == null) {
+                    throw new IllegalStateException("No current element");
+                }
+                StorageManagerBasedModel.this.remove(last);
+                last = null;
+            }
+        }
+
+        try {
+            StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
+            List<Statement> statements = storage.getQueryOperations()
+                    .query(pattern)
+                    .collect(Collectors.toList());
+            return new ModelIterator(statements.iterator());
+        } catch (StorageException e) {
+            throw new RuntimeException("Failed to create iterator", e);
+        }
+    }
+}
