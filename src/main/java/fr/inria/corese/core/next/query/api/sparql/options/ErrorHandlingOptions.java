@@ -15,5 +15,18 @@ public interface ErrorHandlingOptions {
      * @return
      */
     boolean isCollectErrors();
+
+    /**
+     * Returns collected errors as human-friendly strings.
+     * <p>Prefer {@link #getDiagnostics()} for structured access.</p>
+     * @return
+     */
     List<String> getErrors();
+    /**
+     * Returns collected errors as structured diagnostics.
+     * <p>If {@link #isCollectErrors()} is false, this list is empty.</p>
+     */
+    List<SparqlAstError> getDiagnostics();
+
+
 }

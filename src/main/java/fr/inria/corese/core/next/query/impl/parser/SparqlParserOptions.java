@@ -1,10 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
-import fr.inria.corese.core.next.query.api.sparql.options.AbstractSparqlOptions;
-import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
-import fr.inria.corese.core.next.query.api.sparql.options.ErrorHandlingOptions;
-import fr.inria.corese.core.next.query.api.sparql.options.StrictModeOptions;
+import fr.inria.corese.core.next.query.api.sparql.options.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +33,7 @@ public class SparqlParserOptions extends AbstractSparqlOptions
     private final boolean failFast;
     private final boolean collectErrors;
     private final List<String> errors;
+    private final List<SparqlAstError> diagnostics;
 
 
     protected SparqlParserOptions(SparqlParserOptions.Builder builder) {
@@ -45,6 +43,7 @@ public class SparqlParserOptions extends AbstractSparqlOptions
         this.failFast = this.builder.failFast;
         this.collectErrors = this.builder.collectErrors;
         this.errors = builder.collectErrors ? new ArrayList<>() : Collections.emptyList();
+        this.diagnostics = collectErrors ? new ArrayList<>() : Collections.emptyList();
 
     }
 
@@ -107,15 +106,25 @@ public class SparqlParserOptions extends AbstractSparqlOptions
      * @return an unmodifiable list of parsing error messages
      */
     @Override
-    public List<String> getErrors() { return Collections.unmodifiableList(errors); }
+    public List<String> getErrors() {
+        if (diagnostics.isEmpty()) return List.of();
+        return diagnostics.stream().map(SparqlAstError::format).toList();
+    }
+
+    @Override
+    public List<SparqlAstError> getDiagnostics() {
+        return Collections.unmodifiableList(diagnostics);
+    }
 
     /**
      * Records a parsing error internally if {@code collectErrors} is enabled.
      *
-     * @param message error message (ignored if null or collection disabled)
+     * @param diagnostic error message (ignored if null or collection disabled)
      */
-    public void addError(String message) {
-        if (collectErrors && message != null) errors.add(message);
+    public void addDiagnostic(SparqlAstError diagnostic) {
+        if (collectErrors && diagnostic != null) {
+            diagnostics.add(diagnostic);
+        }
     }
 
     /**
