@@ -17,29 +17,4 @@ public final class CoresePatternBuilder {
     public CoresePatternBuilder() {
     }
 
-    private static Node toNode(TermAst term) {
-        return CoreseTermAdapter.toNode(term);
-    }
-
-    public Edge toEdge(TriplePatternAst triple) {
-        Node sub = toNode(triple.subject());
-        Node pred = toNode(triple.predicate());
-        Node obj = toNode(triple.object());
-        return AstEdge.create(sub, pred, obj);
-    }
-
-    public Exp toBgpExp(BgpAst bgp) {
-        Exp exp = Exp.create(ExpType.Type.BGP);
-        for (TriplePatternAst t : bgp.triples()) {
-            exp.add(toEdge(t));
-        }
-        return exp;
-    }
-
-    public Exp toExp(PatternAst pattern) {
-        if (pattern instanceof BgpAst bgp) {
-            return toBgpExp(bgp);
-        }
-        throw new IllegalArgumentException("Unsupported pattern type: " + pattern.getClass().getName());
-    }
 }

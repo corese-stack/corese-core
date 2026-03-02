@@ -18,30 +18,4 @@ public final class CoreseTermAdapter {
     private CoreseTermAdapter() {
     }
 
-    public static Node toNode(TermAst term) {
-        if (term == null) {
-            throw new IllegalArgumentException("term is null");
-        }
-        return switch (term) {
-            case VarAst varAst -> NodeImpl.createVariable(varAst.name());
-            case IriAst iriAst -> NodeImpl.createResource(iriAst.raw());
-            case LiteralAst literalAst -> toLiteralNode(literalAst);
-            default -> throw new IllegalArgumentException("Unknown term type: " + term.getClass().getName());
-        };
-    }
-
-    private static Node toLiteralNode(LiteralAst literalAst) {
-        String lexical = literalAst.lexical();
-        String datatype = literalAst.datatype();
-        String lang = literalAst.lang();
-        Constant constant;
-        if (lang != null && !lang.isBlank()) {
-            constant = Constant.create(lexical, RDFS.qxsdString, lang);
-        } else if (datatype != null && !datatype.isBlank()) {
-            constant = Constant.create(lexical, datatype);
-        } else {
-            constant = Constant.createString(lexical);
-        }
-        return NodeImpl.createNode(constant);
-    }
 }
