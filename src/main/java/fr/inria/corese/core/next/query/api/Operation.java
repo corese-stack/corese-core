@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.api;
 
 import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.query.dataset.Dataset;
+import fr.inria.corese.core.next.storagemanager.api.dataset.Dataset;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
 
 /**

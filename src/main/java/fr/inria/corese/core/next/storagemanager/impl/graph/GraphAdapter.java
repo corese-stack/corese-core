@@ -124,7 +124,7 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
     public Set<Resource> getSubjects() {
         Set<Resource> subjects = new HashSet<>();
         for (Edge edge : graph.getEdges()) {
-            subjects.add(nodeToResource(edge.getNode(0)));
+            subjects.add(nodeToResource(edge.getSubjectNode()));
         }
         return subjects;
     }
@@ -150,7 +150,7 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
     public Set<Value> getObjects() {
         Set<Value> objects = new HashSet<>();
         for (Edge edge : graph.getEdges()) {
-            objects.add(nodeToValue(edge.getNode(1)));
+            objects.add(nodeToValue(edge.getObjectNode()));
         }
         return objects;
     }
@@ -178,9 +178,9 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
      * @return the corresponding Statement
      */
     private Statement edgeToStatement(Edge edge) {
-        Resource subject = nodeToResource(edge.getNode(0));
+        Resource subject = nodeToResource(edge.getSubjectNode());
         IRI predicate = nodeToIRI(edge.getEdgeNode());
-        Value object = nodeToValue(edge.getNode(1));
+        Value object = nodeToValue(edge.getObjectNode());
 
         // Context (named graph)
         Node graphNode = edge.getGraph();
