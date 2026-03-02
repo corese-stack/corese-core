@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.query.api.sparql.options.SparqlAstError;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,7 +21,8 @@ class SparqlParserOptionsTest {
         assertTrue(opts.isFailFast(), "default failFast should be true");
         assertTrue(opts.isCollectErrors(), "default collectErrors should be true");
         assertFalse(opts.isStrictMode(), "default strictMode should be false");
-        assertNotNull(opts.getErrors());
+        assertNotNull(opts.getDiagnostics());
+        assertTrue(opts.getDiagnostics().isEmpty());
         assertTrue(opts.getErrors().isEmpty());
     }
 
@@ -83,50 +85,73 @@ class SparqlParserOptionsTest {
     }
 
     @Test
-    void getErrorsReturnsUnmodifiableList() {
+    void getDiagnosticsReturnsUnmodifiableList() {
         SparqlParserOptions opts = new SparqlParserOptions.Builder()
                 .collectErrors(true)
                 .build();
-        opts.addError("err1");
+        opts.addDiagnostic(new SparqlAstError(
+                SparqlAstError.Kind.SYNTAX_ERROR,
+                SparqlAstError.Severity.ERROR,
+                "err1", 1, 0, null, null));
+
+        List<SparqlAstError> diagnostics = opts.getDiagnostics();
+        assertThrows(UnsupportedOperationException.class, () -> diagnostics.add(null));
+        assertEquals(1, diagnostics.size());
+    }
+
+    @Test
+    void addDiagnosticWhenCollectErrorsTrueAddsAndGetErrorsFormatsThem() {
+        SparqlParserOptions opts = new SparqlParserOptions.Builder()
+                .collectErrors(true)
+                .build();
+
+        opts.addDiagnostic(new SparqlAstError(
+                SparqlAstError.Kind.LEXER_ERROR,
+                SparqlAstError.Severity.ERROR,
+                "token recognition error", 1, 0, null, null));
+        opts.addDiagnostic(new SparqlAstError(
+                SparqlAstError.Kind.SYNTAX_ERROR,
+                SparqlAstError.Severity.ERROR,
+                "mismatched input", 2, 5, "SELECT", null));
+
+        assertEquals(2, opts.getDiagnostics().size());
+        assertEquals(SparqlAstError.Kind.LEXER_ERROR, opts.getDiagnostics().get(0).kind());
+        assertEquals(1, opts.getDiagnostics().get(0).line());
+        assertEquals(SparqlAstError.Kind.SYNTAX_ERROR, opts.getDiagnostics().get(1).kind());
+        assertEquals(2, opts.getDiagnostics().get(1).line());
+        assertEquals(5, opts.getDiagnostics().get(1).column());
+        assertEquals("SELECT", opts.getDiagnostics().get(1).offendingText());
 
         List<String> errors = opts.getErrors();
-        assertThrows(UnsupportedOperationException.class, () -> errors.add("x"));
-        assertEquals(1, errors.size());
+        assertEquals(2, errors.size());
+        assertTrue(errors.get(0).contains("line 1"));
+        assertTrue(errors.get(1).contains("line 2"));
     }
 
     @Test
-    void addErrorWhenCollectErrorsTrueAddsMessage() {
-        SparqlParserOptions opts = new SparqlParserOptions.Builder()
-                .collectErrors(true)
-                .build();
-
-        opts.addError("line 1:0 token recognition error");
-        opts.addError("line 2:5 mismatched input");
-
-        assertEquals(2, opts.getErrors().size());
-        assertTrue(opts.getErrors().get(0).contains("line 1"));
-        assertTrue(opts.getErrors().get(1).contains("line 2"));
-    }
-
-    @Test
-    void addErrorWhenCollectErrorsFalseDoesNotAdd() {
+    void addDiagnosticWhenCollectErrorsFalseDoesNotAdd() {
         SparqlParserOptions opts = new SparqlParserOptions.Builder()
                 .collectErrors(false)
                 .build();
 
-        opts.addError("some error");
+        opts.addDiagnostic(new SparqlAstError(
+                SparqlAstError.Kind.SYNTAX_ERROR,
+                SparqlAstError.Severity.ERROR,
+                "some error", 1, 0, null, null));
 
+        assertTrue(opts.getDiagnostics().isEmpty());
         assertTrue(opts.getErrors().isEmpty());
     }
 
     @Test
-    void addErrorNullMessageDoesNotAdd() {
+    void addDiagnosticNullDoesNotAdd() {
         SparqlParserOptions opts = new SparqlParserOptions.Builder()
                 .collectErrors(true)
                 .build();
 
-        opts.addError(null);
+        opts.addDiagnostic(null);
 
+        assertTrue(opts.getDiagnostics().isEmpty());
         assertTrue(opts.getErrors().isEmpty());
     }
 
