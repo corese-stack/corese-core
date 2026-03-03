@@ -48,6 +48,10 @@ public final class SparqlAstBuilder {
 
     // --- Construction entry points (called by listener) ---
 
+    public void enterAskQuery() {
+
+    }
+
     /** Enter a { ... } groupGraphPattern. */
     public void enterGroup() {
         groupStack.push(new ArrayList<>());
