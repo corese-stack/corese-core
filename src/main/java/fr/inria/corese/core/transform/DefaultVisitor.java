@@ -126,15 +126,7 @@ public class DefaultVisitor implements TemplateVisitor {
         }
     }
 
-    
-    boolean accept(String name){
-        Boolean b = map.get(name);
-        if (b == null){
-            return defaultAccept;
-        }
-        return b;
-    }
-    
+ 
     boolean accept(IDatatype arg){
         if (arg == null){
             return true;
@@ -204,11 +196,7 @@ public class DefaultVisitor implements TemplateVisitor {
         Transformer t = Transformer.create(visitedGraph, getTransform());
         return t.toString();
     }
-    
-    public IDatatype display(){
-        return DatatypeMap.newStringBuilder(toSB());     
-    }
-    
+
     @Override
     public String toString(){
         return toSB().toString();
@@ -273,27 +261,6 @@ public class DefaultVisitor implements TemplateVisitor {
         return acceptValue;
     }
 
-    /**
-     * @param acceptValue the acceptValue to set
-     */
-    public void setAcceptValue(boolean acceptValue) {
-        this.acceptValue = acceptValue;
-    }
-
-    /**
-     * @return the distinct
-     */
-    public HashMap<IDatatype, IDatatype> getDistinct() {
-        return distinct;
-    }
-
-    /**
-     * @param distinct the distinct to set
-     */
-    public void setDistinct(HashMap<IDatatype, IDatatype> distinct) {
-        this.distinct = distinct;
-    }
-
     @Override
     public IDatatype set(IDatatype obj, IDatatype prop, IDatatype arg) {
           value.put(obj, arg);
@@ -329,7 +296,4 @@ public class DefaultVisitor implements TemplateVisitor {
         return visitedList;
     }
 
-    public void setVisitedList(ArrayList<IDatatype> visitedList) {
-        this.visitedList = visitedList;
-    }
 }

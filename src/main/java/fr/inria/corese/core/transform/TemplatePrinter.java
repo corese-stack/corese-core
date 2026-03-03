@@ -5,11 +5,6 @@ import java.io.IOException;
 
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.kgram.core.Query;
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.query.QueryEngine;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.load.LoadException;
 import java.util.Date;
 
 
@@ -39,37 +34,6 @@ public class TemplatePrinter {
             this.to = to;
 	}
 	
-	public static TemplatePrinter create(String from, String to){
-		return new TemplatePrinter(from, to);
-	}
-	
-	public static TemplatePrinter create(String from){
-		return new TemplatePrinter(from);
-	}
-	public StringBuilder process() throws IOException, LoadException {
-		Graph g = Graph.create();
-		Load ld = Load.create(g);
-		ld.parseDirRec(from);
-		QueryEngine qe = ld.getQueryEngine();
-                if (qe == null){
-                    throw new LoadException(new IOException("No templates"));
-                }
-                else {
-                    header();
-
-                    for (Query q : qe.getNamedTemplates()){
-                            process(q.getAST());
-                    }
-                    for (Query q : qe.getQueries()){
-                            process( q.getAST());
-                    }		
-                    trailer();
-                    result();
-                }
-                
-                return sb;
-	}
-        
         void result() throws IOException{
             if (to != null){
                 fw = new FileWriter(to);

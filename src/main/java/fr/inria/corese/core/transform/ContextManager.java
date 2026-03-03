@@ -1,9 +1,6 @@
 package fr.inria.corese.core.transform;
 
-import fr.inria.corese.core.kgram.api.query.Environment;
-import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.Context;
@@ -23,61 +20,6 @@ public class ContextManager {
         this.transformerMapping = mapping;
         this.context = new Context();
         this.namespaceManager = nsm;
-    }
-
-    /**
-     * Create mapping for template execution
-     */
-    public Mapping createMapping(Query template, IDatatype[] args, IDatatype focus) {
-        return transformerMapping.getMapping(template, args, focus);
-    }
-
-    /**
-     * Share context between mappings and environment
-     */
-    public Mapping shareContext(Mapping mapping, Environment env) {
-        if (env != null && env.getBind() != null) {
-            mapping.setBind(env.getBind());
-        }
-
-        if (mappings != null) {
-            if (mapping.getBind() == null) {
-                mapping.setBind(Binding.create());
-            }
-            mapping.getBind().setMappings(mappings);
-        }
-
-        return mapping;
-    }
-
-    /**
-     * Set context value
-     */
-    public void setContextValue(String key, IDatatype value) {
-        context.set(key, value);
-    }
-
-    /**
-     * Get context value
-     */
-    public IDatatype getContextValue(String key) {
-        return context.get(key);
-    }
-
-    /**
-     * Check if context has value
-     */
-    public boolean hasContextValue(String key) {
-        return context.hasValue(key);
-    }
-
-    /**
-     * Complete context with another context
-     */
-    public void completeContext(Context otherContext) {
-        if (otherContext != null) {
-            context.complete(otherContext);
-        }
     }
 
     // Getters and setters

@@ -5,9 +5,6 @@ import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.parser.Processor;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class TransformerUtils {
 
     public static final String NULL = "";
@@ -72,7 +69,7 @@ public class TransformerUtils {
 
 
     private TransformerUtils() {}
-
+ 
     /**
      * uri#name
      *
@@ -85,17 +82,4 @@ public class TransformerUtils {
         return uri;
     }
 
-    /**
-     * Definition of synonym
-     * st:all -> (st:xml st:json ...)
-     */
-    static public List<String> getFormatList(String name) {
-        switch (name) {
-            case ALL:
-                return Arrays.asList(RESULT_FORMAT);
-            case D3_ALL:
-                return Arrays.asList(GRAPHIC_FORMAT);
-        }
-        return null;
-    }
 }

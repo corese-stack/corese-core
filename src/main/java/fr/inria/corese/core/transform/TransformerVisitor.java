@@ -1,10 +1,8 @@
 package fr.inria.corese.core.transform;
 
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Exp;
 import fr.inria.corese.core.compiler.api.QueryVisitor;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.kgram.core.ExpHandler;
 import fr.inria.corese.core.kgram.core.Query;
 
@@ -19,10 +17,6 @@ public class TransformerVisitor implements QueryVisitor {
     static final String GRAPH = "?shape";
     static final String SHAPE = "?sh";
     boolean optimize = false;
-    
-    public TransformerVisitor(boolean b){
-        optimize = b && ! Eval.NAMED_GRAPH_DEFAULT;
-    }
     
     /**
      * ast is a template
