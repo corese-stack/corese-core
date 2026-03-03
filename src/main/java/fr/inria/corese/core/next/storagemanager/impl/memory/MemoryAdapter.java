@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.Value;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -163,20 +164,20 @@ public class MemoryAdapter {
         }
 
         if (contexts != null && contexts.length > 0) {
-            Resource stmtContext = stmt.getContext();
-            boolean contextMatch = false;
-            for (Resource ctx : contexts) {
-                if (ctx == null && stmtContext == null) {
-                    contextMatch = true;
-                    break;
-                } else if (ctx != null && ctx.equals(stmtContext)) {
-                    contextMatch = true;
-                    break;
-                }
-            }
-            return contextMatch;
+            return matchesContext(stmt.getContext(), contexts);
         }
 
         return true;
+    }
+
+    /**
+     * Checks if a statement context matches any of the given contexts.
+     *
+     * @param stmtContext the statement's context (may be null)
+     * @param contexts    the context filters (must not be null or empty)
+     * @return true if the statement context matches any filter
+     */
+    private boolean matchesContext(Resource stmtContext, Resource[] contexts) {
+        return Arrays.asList(contexts).contains(stmtContext);
     }
 }

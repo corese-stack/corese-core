@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.data.impl;
 import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.model.AbstractModel;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
+import fr.inria.corese.core.next.data.impl.exception.ModelException;
+import fr.inria.corese.core.next.data.impl.exception.ModelException.ModelOperation;
 import fr.inria.corese.core.next.data.impl.temp.FilteredModel;
 import fr.inria.corese.core.next.storagemanager.api.StorageManager;
 import fr.inria.corese.core.next.storagemanager.api.support.exception.StorageException;
@@ -17,15 +19,12 @@ import java.util.stream.Collectors;
 public class StorageModel extends AbstractModel {
 
     private final StorageManager storage;
-
     private final ValueFactory valueFactory;
-
     private final Set<Namespace> namespaces;
-
     private final boolean unmodifiable;
 
     /**
-     * Constructs a new StorageManagerBasedModel.
+     * Constructs a new StorageModel.
      *
      * @param storage      the storage manager (must not be null)
      * @param valueFactory the value factory (must not be null)
@@ -44,7 +43,7 @@ public class StorageModel extends AbstractModel {
     }
 
     /**
-     * Returns a new builder for StorageManagerBasedModel.
+     * Returns a new builder for StorageModel.
      *
      * @return a new builder instance
      */
@@ -94,7 +93,7 @@ public class StorageModel extends AbstractModel {
         }
 
         /**
-         * Builds a new StorageManagerBasedModel instance.
+         * Builds a new StorageModel instance.
          *
          * @return a new model instance
          * @throws IllegalStateException if storage or valueFactory is null
@@ -136,10 +135,10 @@ public class StorageModel extends AbstractModel {
             return changed;
 
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to add statement", e);
+            throw new ModelException(ModelOperation.ADD,
+                    "Failed to add statement [" + subject + ", " + predicate + ", " + object + "]", e);
         }
     }
-
 
     @Override
     public boolean contains(Resource subject, IRI predicate, Value object, Resource... contexts) {
@@ -147,10 +146,10 @@ public class StorageModel extends AbstractModel {
             StatementPattern pattern = StatementPattern.of(subject, predicate, object, contexts);
             return storage.getQueryOperations().exists(pattern);
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to check statement existence", e);
+            throw new ModelException(ModelOperation.CONTAINS,
+                    "Failed to check statement existence", e);
         }
     }
-
 
     @Override
     public boolean remove(Resource subject, IRI predicate, Value object, Resource... contexts) {
@@ -161,7 +160,8 @@ public class StorageModel extends AbstractModel {
                     .deleteStatements(subject, predicate, object, contexts)
                     .isSuccess();
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to remove statements", e);
+            throw new ModelException(ModelOperation.REMOVE,
+                    "Failed to remove statements", e);
         }
     }
 
@@ -174,7 +174,8 @@ public class StorageModel extends AbstractModel {
                     .clear(contexts)
                     .isSuccess();
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to clear", e);
+            throw new ModelException(ModelOperation.CLEAR,
+                    "Failed to clear model" + (contexts.length > 0 ? " (contexts: " + Arrays.toString(contexts) + ")" : ""), e);
         }
     }
 
@@ -186,7 +187,8 @@ public class StorageModel extends AbstractModel {
                     .query(pattern)
                     .collect(Collectors.toList());
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to query statements", e);
+            throw new ModelException(ModelOperation.QUERY,
+                    "Failed to query statements", e);
         }
     }
 
@@ -217,7 +219,8 @@ public class StorageModel extends AbstractModel {
         try {
             return storage.getMetadataOperations().getSubjects();
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to get subjects", e);
+            throw new ModelException(ModelOperation.GET_SUBJECTS,
+                    "Failed to retrieve subjects", e);
         }
     }
 
@@ -226,7 +229,8 @@ public class StorageModel extends AbstractModel {
         try {
             return storage.getMetadataOperations().getPredicates();
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to get predicates", e);
+            throw new ModelException(ModelOperation.GET_PREDICATES,
+                    "Failed to retrieve predicates", e);
         }
     }
 
@@ -235,7 +239,8 @@ public class StorageModel extends AbstractModel {
         try {
             return storage.getMetadataOperations().getObjects();
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to get objects", e);
+            throw new ModelException(ModelOperation.GET_OBJECTS,
+                    "Failed to retrieve objects", e);
         }
     }
 
@@ -244,7 +249,8 @@ public class StorageModel extends AbstractModel {
         try {
             return storage.getMetadataOperations().getContexts();
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to get contexts", e);
+            throw new ModelException(ModelOperation.GET_CONTEXTS,
+                    "Failed to retrieve contexts", e);
         }
     }
 
@@ -290,7 +296,8 @@ public class StorageModel extends AbstractModel {
             StatementPattern pattern = StatementPattern.of(null, null, null);
             return (int) storage.getQueryOperations().count(pattern);
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to get size", e);
+            throw new ModelException(ModelOperation.SIZE,
+                    "Failed to count statements", e);
         }
     }
 
@@ -331,13 +338,13 @@ public class StorageModel extends AbstractModel {
      * @param object    the object filter (null = wildcard)
      * @param contexts  the context filters (null/empty = wildcard)
      * @return an iterator over matching statements
+     * @throws ModelException if iterator creation fails
      */
     private Iterator<Statement> getFilterIterator(
             Resource subject,
             IRI predicate,
             Value object,
             Resource... contexts) {
-
 
         class ModelIterator implements Iterator<Statement> {
             private final Iterator<Statement> delegate;
@@ -354,7 +361,8 @@ public class StorageModel extends AbstractModel {
 
             @Override
             public Statement next() {
-                return last = delegate.next();
+                last = delegate.next();
+                return last;
             }
 
             @Override
@@ -374,7 +382,8 @@ public class StorageModel extends AbstractModel {
                     .collect(Collectors.toList());
             return new ModelIterator(statements.iterator());
         } catch (StorageException e) {
-            throw new RuntimeException("Failed to create iterator", e);
+            throw new ModelException(ModelOperation.ITERATE,
+                    "Failed to create iterator", e);
         }
     }
 }
