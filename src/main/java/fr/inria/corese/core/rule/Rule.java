@@ -53,8 +53,6 @@ public class Rule {
     int rtype = UNDEF;
     private Closure closure;
     private Record ruleRecord;
-    private double time = 0.0;
-    private boolean isGeneric = false;
     private boolean isClosure = false;
     private Node provenance;
     private String type = RULE_TYPE;
@@ -83,12 +81,6 @@ public class Rule {
         return new Rule(n, q, type);
     }
 
-    /* --- dead code removal ---
-public static Rule create(Query q) {
-        return new Rule(UUIDFunction.getUUID(), q);
-    }
- --- dead code removal --- */
-
     void set(List<Node> list) {
         predicates = list;
     }
@@ -116,24 +108,6 @@ public static Rule create(Query q) {
     public void setIndex(int n) {
         num = n;
     }
-
-    /* --- dead code removal ---
-/**
-     * Index of edge with predicate p If there is only one occurrence of p
-     *_/
-    public int getIndex(Node p) {
-
-        return -1;
-    }
-
-    public boolean isGeneric() {
-        return isGeneric;
-    }
-
-    void setGeneric(boolean b) {
-        isGeneric = true;
-    }
- --- dead code removal --- */
 
     public int type() {
         if (rtype == UNDEF) {
@@ -263,22 +237,6 @@ public static Rule create(Query q) {
         ruleRecord = null;
     }
 
-    /* --- dead code removal ---
-/**
-     * @return the time
-     *_/
-    public double getTime() {
-        return time;
-    }
-
-    /**
-     * @param time the time to set
-     *_/
-    public void setTime(double time) {
-        this.time = time;
-    }
- --- dead code removal --- */
-
     /**
      * @return the provenance
      */
@@ -306,12 +264,6 @@ public static Rule create(Query q) {
     public void setRuleRecord(Record ruleRecord) {
         this.ruleRecord = ruleRecord;
     }
-
-    /* --- dead code removal ---
-public String getRuleType() {
-        return type;
-    }
- --- dead code removal --- */
 
     /**
      * @param type the type to set
