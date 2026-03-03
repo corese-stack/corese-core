@@ -19,10 +19,6 @@ public final class StorageConfig {
      */
     private final boolean transactionSupport;
 
-    /**
-     * Whether debug mode is enabled.
-     */
-    private final boolean debug;
 
     /**
      * Private constructor — use {@link #builder()} to create instances.
@@ -32,7 +28,6 @@ public final class StorageConfig {
     private StorageConfig(Builder builder) {
         this.properties = Map.copyOf(builder.properties);
         this.transactionSupport = builder.transactionSupport;
-        this.debug = builder.debug;
     }
 
     /**
@@ -68,14 +63,6 @@ public final class StorageConfig {
         return properties;
     }
 
-    /**
-     * Returns whether debug mode is enabled.
-     *
-     * @return {@code true} if debug mode is enabled
-     */
-    public boolean isDebug() {
-        return debug;
-    }
 
     /**
      * Creates a new {@link Builder} for constructing {@code StorageConfig} instances.
@@ -90,7 +77,6 @@ public final class StorageConfig {
     public String toString() {
         return "StorageConfig{" +
                 "transactionSupport=" + transactionSupport +
-                ", debug=" + debug +
                 ", properties=" + properties +
                 '}';
     }
@@ -103,8 +89,7 @@ public final class StorageConfig {
 
         private final Map<String, Object> properties = new HashMap<>();
 
-        private boolean transactionSupport = false;
-        private boolean debug = false;
+        private final boolean transactionSupport = false;
 
         /**
          * Private constructor — use {@link StorageConfig#builder()}.
@@ -132,27 +117,6 @@ public final class StorageConfig {
             return this;
         }
 
-        /**
-         * Enables or disables transaction support.
-         *
-         * @param enable {@code true} to enable transaction support
-         * @return this builder for method chaining
-         */
-        public Builder transactionSupport(boolean enable) {
-            this.transactionSupport = enable;
-            return this;
-        }
-
-        /**
-         * Enables or disables debug mode.
-         *
-         * @param debug {@code true} to enable debug mode
-         * @return this builder for method chaining
-         */
-        public Builder debug(boolean debug) {
-            this.debug = debug;
-            return this;
-        }
 
         /**
          * Builds the {@link StorageConfig} instance with the current configuration.

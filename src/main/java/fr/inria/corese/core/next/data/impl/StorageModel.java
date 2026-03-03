@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * Implementation of the {@link Model} interface backed by a {@link StorageManager}.
  */
-public class StorageManagerBasedModel extends AbstractModel {
+public class StorageModel extends AbstractModel {
 
     private final StorageManager storage;
 
@@ -32,7 +32,7 @@ public class StorageManagerBasedModel extends AbstractModel {
      * @param namespaces   the initial namespaces (may be null)
      * @param unmodifiable whether this model is unmodifiable
      */
-    protected StorageManagerBasedModel(
+    protected StorageModel(
             StorageManager storage,
             ValueFactory valueFactory,
             Set<Namespace> namespaces,
@@ -53,7 +53,7 @@ public class StorageManagerBasedModel extends AbstractModel {
     }
 
     /**
-     * Builder for {@link StorageManagerBasedModel}.
+     * Builder for {@link StorageModel}.
      */
     public static class Builder {
         private StorageManager storage;
@@ -99,14 +99,14 @@ public class StorageManagerBasedModel extends AbstractModel {
          * @return a new model instance
          * @throws IllegalStateException if storage or valueFactory is null
          */
-        public StorageManagerBasedModel build() {
+        public StorageModel build() {
             if (storage == null) {
                 throw new IllegalStateException("StorageManager is required");
             }
             if (valueFactory == null) {
                 throw new IllegalStateException("ValueFactory is required");
             }
-            return new StorageManagerBasedModel(storage, valueFactory, namespaces, false);
+            return new StorageModel(storage, valueFactory, namespaces, false);
         }
     }
 
@@ -197,7 +197,7 @@ public class StorageManagerBasedModel extends AbstractModel {
             @Override
             @SuppressWarnings("NullableProblems")
             public Iterator<Statement> iterator() {
-                return StorageManagerBasedModel.this.getFilterIterator(subject, predicate, object, contexts);
+                return StorageModel.this.getFilterIterator(subject, predicate, object, contexts);
             }
 
             @Override
@@ -207,7 +207,7 @@ public class StorageManagerBasedModel extends AbstractModel {
                     IRI predicate,
                     Value object,
                     Resource... contexts) {
-                StorageManagerBasedModel.this.removeTermIteration(iterator, subject, predicate, object, contexts);
+                StorageModel.this.removeTermIteration(iterator, subject, predicate, object, contexts);
             }
         };
     }
@@ -299,7 +299,7 @@ public class StorageManagerBasedModel extends AbstractModel {
         if (unmodifiable) {
             return this;
         }
-        return new StorageManagerBasedModel(storage, valueFactory, namespaces, true);
+        return new StorageModel(storage, valueFactory, namespaces, true);
     }
 
 
@@ -362,7 +362,7 @@ public class StorageManagerBasedModel extends AbstractModel {
                 if (last == null) {
                     throw new IllegalStateException("No current element");
                 }
-                StorageManagerBasedModel.this.remove(last);
+                StorageModel.this.remove(last);
                 last = null;
             }
         }

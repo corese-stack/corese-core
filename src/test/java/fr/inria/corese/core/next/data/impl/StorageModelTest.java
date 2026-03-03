@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for StorageManagerBasedModel.
  */
-class StorageManagerBasedModelTest {
+class StorageModelTest {
 
     @Mock
     private StorageManager mockStorage;
@@ -46,7 +46,7 @@ class StorageManagerBasedModelTest {
     @Mock
     private StorageLifecycle mockLifecycle;
 
-    private StorageManagerBasedModel model;
+    private StorageModel model;
 
     @BeforeEach
     void setUp() {
@@ -59,7 +59,7 @@ class StorageManagerBasedModelTest {
         when(mockStorage.getLifecycle()).thenReturn(mockLifecycle);
 
         // Build model
-        model = StorageManagerBasedModel.builder()
+        model = StorageModel.builder()
                 .storage(mockStorage)
                 .valueFactory(mockValueFactory)
                 .build();
@@ -72,7 +72,7 @@ class StorageManagerBasedModelTest {
         @Test
         @DisplayName("Should throw when storage is null")
         void shouldThrowWhenStorageIsNull() {
-            assertThrows(IllegalStateException.class, () -> StorageManagerBasedModel.builder()
+            assertThrows(IllegalStateException.class, () -> StorageModel.builder()
                     .valueFactory(mockValueFactory)
                     .build());
         }
@@ -80,7 +80,7 @@ class StorageManagerBasedModelTest {
         @Test
         @DisplayName("Should throw when valueFactory is null")
         void shouldThrowWhenValueFactoryIsNull() {
-            assertThrows(IllegalStateException.class, () -> StorageManagerBasedModel.builder()
+            assertThrows(IllegalStateException.class, () -> StorageModel.builder()
                     .storage(mockStorage)
                     .build());
         }
@@ -91,7 +91,7 @@ class StorageManagerBasedModelTest {
             Namespace ns = mock(Namespace.class);
             Set<Namespace> namespaces = new HashSet<>(Collections.singletonList(ns));
 
-            StorageManagerBasedModel model = StorageManagerBasedModel.builder()
+            StorageModel model = StorageModel.builder()
                     .storage(mockStorage)
                     .valueFactory(mockValueFactory)
                     .namespaces(namespaces)

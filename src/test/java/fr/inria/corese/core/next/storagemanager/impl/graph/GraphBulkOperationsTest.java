@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.storagemanager.impl.graph;
 
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.storagemanager.api.support.exception.StorageException;
 import fr.inria.corese.core.next.storagemanager.api.support.model.MutationResult;
 import fr.inria.corese.core.next.storagemanager.api.support.model.StatementPattern;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +67,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should insert all statements successfully")
-        void shouldInsertAllStatementsSuccessfully() throws StorageException {
+        void shouldInsertAllStatementsSuccessfully() {
             Statement stmt1 = mock(Statement.class);
             Statement stmt2 = mock(Statement.class);
             Statement stmt3 = mock(Statement.class);
@@ -87,7 +86,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should handle exceptions during insert")
-        void shouldHandleExceptionsDuringInsert() throws StorageException {
+        void shouldHandleExceptionsDuringInsert() {
             Statement stmt1 = mock(Statement.class);
             Statement stmt2 = mock(Statement.class);
             Statement stmt3 = mock(Statement.class);
@@ -106,7 +105,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should handle all failures")
-        void shouldHandleAllFailures() throws StorageException {
+        void shouldHandleAllFailures() {
             Statement stmt1 = mock(Statement.class);
             Statement stmt2 = mock(Statement.class);
             List<Statement> statements = Arrays.asList(stmt1, stmt2);
@@ -141,7 +140,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should delete all statements successfully")
-        void shouldDeleteAllStatementsSuccessfully() throws StorageException {
+        void shouldDeleteAllStatementsSuccessfully() {
             Statement stmt1 = mock(Statement.class);
             Statement stmt2 = mock(Statement.class);
             List<Statement> statements = Arrays.asList(stmt1, stmt2);
@@ -158,7 +157,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should handle exceptions during delete")
-        void shouldHandleExceptionsDuringDelete() throws StorageException {
+        void shouldHandleExceptionsDuringDelete() {
             Statement stmt1 = mock(Statement.class);
             Statement stmt2 = mock(Statement.class);
             List<Statement> statements = Arrays.asList(stmt1, stmt2);
@@ -188,7 +187,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should handle no matching statements")
-        void shouldHandleNoMatchingStatements() throws StorageException {
+        void shouldHandleNoMatchingStatements() {
             StatementPattern pattern = StatementPattern.of(mock(Resource.class), null, null);
 
             when(mockAdapter.find(any(), any(), any(), any())).thenReturn(Collections.emptySet());
@@ -208,7 +207,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should clear entire graph when contexts is null")
-        void shouldClearEntireGraphWhenContextsIsNull() throws StorageException {
+        void shouldClearEntireGraphWhenContextsIsNull() {
             when(mockAdapter.size()).thenReturn(100, 0);
 
             MutationResult result = bulkOps.clearContexts(null, false);
@@ -221,7 +220,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should clear entire graph when contexts is empty")
-        void shouldClearEntireGraphWhenContextsIsEmpty() throws StorageException {
+        void shouldClearEntireGraphWhenContextsIsEmpty() {
             when(mockAdapter.size()).thenReturn(50, 0);
 
             MutationResult result = bulkOps.clearContexts(Collections.emptyList(), false);
@@ -234,7 +233,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should clear specific contexts")
-        void shouldClearSpecificContexts() throws StorageException {
+        void shouldClearSpecificContexts() {
             Resource ctx1 = mock(Resource.class);
             Resource ctx2 = mock(Resource.class);
             Resource ctx3 = mock(Resource.class);
@@ -254,7 +253,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should handle clearing when no statements deleted")
-        void shouldHandleClearingWhenNoStatementsDeleted() throws StorageException {
+        void shouldHandleClearingWhenNoStatementsDeleted() {
             Resource ctx = mock(Resource.class);
             List<Resource> contexts = Collections.singletonList(ctx);
 
@@ -268,7 +267,7 @@ class GraphBulkOperationsTest {
 
         @Test
         @DisplayName("Should ignore silent parameter")
-        void shouldIgnoreSilentParameter() throws StorageException {
+        void shouldIgnoreSilentParameter() {
             when(mockAdapter.size()).thenReturn(5, 0);
 
             // Silent = true should behave the same as false

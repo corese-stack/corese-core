@@ -18,13 +18,10 @@ class StorageConfigTest {
     @DisplayName("Should build config with all properties set")
     void testBuilderWithAllProperties() {
         StorageConfig config = StorageConfig.builder()
-                .debug(true)
-                .transactionSupport(true)
                 .property("timeout", 5000)
                 .property("maxConnections", 100)
                 .build();
 
-        assertTrue(config.isDebug());
         assertEquals(Optional.of(5000), config.getProperty("timeout", Integer.class));
         assertEquals(Optional.of(100), config.getProperty("maxConnections", Integer.class));
     }
@@ -35,7 +32,6 @@ class StorageConfigTest {
         StorageConfig config = StorageConfig.builder()
                 .build();
 
-        assertFalse(config.isDebug());
         assertTrue(config.getProperties().isEmpty());
     }
 
@@ -122,8 +118,6 @@ class StorageConfigTest {
     @DisplayName("Should include debug and transactionSupport in toString() output")
     void testToString() {
         StorageConfig config = StorageConfig.builder()
-                .debug(true)
-                .transactionSupport(false)
                 .property("test", "value")
                 .build();
 
@@ -131,32 +125,16 @@ class StorageConfigTest {
         assertTrue(str.contains("StorageConfig"));
     }
 
-    @Test
-    @DisplayName("Should support builder method chaining with last value winning")
-    void testBuilderChaining() {
-        StorageConfig config = StorageConfig.builder()
-                .debug(true)
-                .transactionSupport(true)
-                .property("key1", "value1")
-                .property("key2", 123)
-                .debug(false)
-                .build();
-
-        assertFalse(config.isDebug());
-    }
 
     @Test
     @DisplayName("Should create independent instances on multiple builds from same builder")
     void testMultipleBuilds() {
         StorageConfig.Builder builder = StorageConfig.builder()
-                .debug(true)
                 .property("key", "value");
 
         StorageConfig config1 = builder.build();
         StorageConfig config2 = builder.build();
 
-        assertTrue(config1.isDebug());
-        assertTrue(config2.isDebug());
         assertNotSame(config1, config2);
     }
 }
