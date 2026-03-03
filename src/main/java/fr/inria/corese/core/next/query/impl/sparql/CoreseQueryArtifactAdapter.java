@@ -20,5 +20,24 @@ public final class CoreseQueryArtifactAdapter {
         this.queryBuilder = queryBuilder;
     }
 
+    /**
+     * Converts the WHERE clause of the given query AST into a KGRAM body expression.
+     *
+     * @param ast query AST (e.g. from {@link fr.inria.corese.core.next.query.impl.parser.SparqlParser}), may be null
+     * @return body Exp for use with {@link Query#setBody(Exp)} (empty BGP if ast is null)
+     */
+    public Exp toBody(QueryAst ast) {
+        return queryBuilder.buildBody(ast);
+    }
 
+    /**
+     * Converts the given query AST into a minimal KGRAM Query with the WHERE
+     * clause as body. Select, FROM, etc. are not set.
+     *
+     * @param ast query AST, may be null
+     * @return Query with body set from ast (empty BGP if ast is null)
+     */
+    public Query toQuery(QueryAst ast) {
+        return queryBuilder.buildQuery(ast);
+    }
 }

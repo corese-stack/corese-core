@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser.listener;
 
+import fr.inria.corese.core.next.query.impl.parser.util.SyntaxUtils;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 
@@ -79,7 +80,7 @@ public class BgpFeature extends AbstractSparqlFeature {
     }
 
     private TermAst termFromGraphTerm(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.GraphTermContext ctx) {
-        if (ctx.iriRef() != null) { return builder.iri(ctx.iriRef().getText()); }
+        if (ctx.iriRef() != null) { return builder.iri(SyntaxUtils.normalizeIri(ctx.iriRef().getText())) ; }
         if (ctx.rdfLiteral() != null) { return termFromRdfLiteral(ctx.rdfLiteral()); }
         if (ctx.numericLiteral() != null) { return builder.literal(ctx.numericLiteral().getText(), null, null); }
         if (ctx.booleanLiteral() != null) { return builder.literal(ctx.booleanLiteral().getText(), null, null); }
