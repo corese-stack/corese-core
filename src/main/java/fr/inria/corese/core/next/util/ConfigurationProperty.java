@@ -6,7 +6,7 @@ import java.util.Optional;
 
 /**
  * Interface to be inherited by all enum classes defining configuration properties.
- * it is recommended that the enum implementing this interface use {@link Properties.propertyValueExists() } in their
+ * it is recommended that the enum implementing this interface use {@link Properties } in their
  * constructor to throw an exception at class loading for any undefined non-optional property.
  */
 public interface ConfigurationProperty {
