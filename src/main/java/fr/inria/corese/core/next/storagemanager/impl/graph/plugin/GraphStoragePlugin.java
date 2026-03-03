@@ -23,15 +23,24 @@ public class GraphStoragePlugin implements StoragePlugin {
         return "Legacy Corese Graph backend (production-ready, indexed, thread-safe)";
     }
 
+    @Override
+    public boolean supports(StorageConfig config) {
+        if (config == null) {
+            return false;
+        }
+        return config.getType()
+                .map("graph"::equalsIgnoreCase)
+                .orElse(false);
+    }
 
     @Override
     public StorageManager create(StorageConfig config) throws PluginException {
         try {
             Graph graph = config.getProperty("graph", Graph.class)
-                    .orElseThrow(() -> new PluginException("Graph instance required"));
+                    .orElseThrow(() -> new PluginException("Graph instance required in config properties"));
 
             ValueFactory factory = config.getProperty("valueFactory", ValueFactory.class)
-                    .orElseThrow(() -> new PluginException("ValueFactory required"));
+                    .orElseThrow(() -> new PluginException("ValueFactory required in config properties"));
 
             GraphStorageManager storage = GraphStorageManager.builder()
                     .graph(graph)

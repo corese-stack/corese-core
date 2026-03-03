@@ -2,6 +2,8 @@ package fr.inria.corese.core.next.storagemanager.api.plugin;
 
 import fr.inria.corese.core.next.storagemanager.api.StorageManager;
 import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,6 +13,8 @@ import java.util.stream.Collectors;
  * Manager for discovering and creating StorageManager plugins.
  */
 public class StoragePluginManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(StoragePluginManager.class);
 
     /**
      * ServiceLoader for discovering plugins
@@ -55,6 +59,7 @@ public class StoragePluginManager {
 
         // Find plugins that support this configuration
         List<StoragePlugin> supportingPlugins = allPlugins.stream()
+                .filter(plugin -> plugin.supports(config))
                 .sorted(Comparator.comparingInt(StoragePlugin::getPriority).reversed())
                 .toList();
 
@@ -65,26 +70,26 @@ public class StoragePluginManager {
 
             throw new PluginNotFoundException(
                     String.format("No plugin found for storage type '%s'. Available types: [%s]",
-                            config.getType(), availableTypes)
+                            config.getType().orElse("not specified"), availableTypes)
             );
         }
 
         // Select plugin with highest priority
         StoragePlugin selectedPlugin = supportingPlugins.getFirst();
 
-        // Log warning if multiple plugins match
         if (supportingPlugins.size() > 1) {
             String otherPlugins = supportingPlugins.stream()
                     .skip(1)
                     .map(p -> p.getName() + " (priority=" + p.getPriority() + ")")
                     .collect(Collectors.joining(", "));
 
-            System.out.println("WARNING: Multiple plugins support this configuration. " +
-                    "Selected '" + selectedPlugin.getName() + "' (priority=" +
-                    selectedPlugin.getPriority() + "). Ignored: " + otherPlugins);
+            logger.warn("Multiple plugins support this configuration. " +
+                            "Selected '{}' (priority={}). Ignored: {}",
+                    selectedPlugin.getName(),
+                    selectedPlugin.getPriority(),
+                    otherPlugins);
         }
 
-        // Create StorageManager
         try {
             return selectedPlugin.create(config);
         } catch (PluginException e) {
@@ -146,7 +151,6 @@ public class StoragePluginManager {
         return Optional.ofNullable(pluginsByName.get(name));
     }
 
-
     /**
      * Returns the names of all available plugins.
      *
@@ -170,6 +174,4 @@ public class StoragePluginManager {
             pluginsByName.clear();
         }
     }
-
-
 }

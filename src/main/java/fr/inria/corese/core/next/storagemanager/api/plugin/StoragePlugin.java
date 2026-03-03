@@ -24,7 +24,15 @@ public interface StoragePlugin {
         return "StorageManager plugin: " + getName();
     }
 
-
+    /**
+     * Checks if this plugin supports the given configuration.
+     *
+     *
+     * @param config the storage configuration to check (never null)
+     * @return {@code true} if this plugin can create a StorageManager for this config
+     * @throws IllegalArgumentException if config is null
+     */
+    boolean supports(StorageConfig config);
 
     /**
      * Creates a StorageManager instance from the given configuration.
@@ -44,5 +52,4 @@ public interface StoragePlugin {
     default int getPriority() {
         return 0;
     }
-
 }

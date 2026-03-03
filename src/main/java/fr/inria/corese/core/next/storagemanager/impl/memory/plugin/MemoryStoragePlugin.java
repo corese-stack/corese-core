@@ -21,6 +21,15 @@ public class MemoryStoragePlugin implements StoragePlugin {
         return "In-memory HashMap backend (testing only, no persistence)";
     }
 
+    @Override
+    public boolean supports(StorageConfig config) {
+        if (config == null) {
+            return false;
+        }
+        return config.getType()
+                .map("memory"::equalsIgnoreCase)
+                .orElse(false);
+    }
 
     @Override
     public StorageManager create(StorageConfig config) throws PluginException {
@@ -30,7 +39,6 @@ public class MemoryStoragePlugin implements StoragePlugin {
 
 
         try {
-            // Build MemoryStorageManager (no dependencies required)
             MemoryStorageManager storage = MemoryStorageManager.builder().build();
 
             // Initialize lifecycle
