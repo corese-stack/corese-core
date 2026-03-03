@@ -19,7 +19,6 @@ public final class StorageConfig {
      */
     private final boolean transactionSupport;
 
-
     /**
      * Private constructor — use {@link #builder()} to create instances.
      *
@@ -63,6 +62,26 @@ public final class StorageConfig {
         return properties;
     }
 
+    /**
+     * Returns whether transaction support is enabled.
+     *
+     * @return {@code true} if transaction support is enabled
+     */
+    public boolean isTransactionSupport() {
+        return transactionSupport;
+    }
+
+    /**
+     * Returns the storage type from properties.
+     *
+     * <p>This is a convenience method for {@code getProperty("type", String.class)}.
+     * The type is used by the plugin system to select the appropriate StorageManager.
+     *
+     * @return the storage type, or empty if not set
+     */
+    public Optional<String> getType() {
+        return getProperty("type", String.class);
+    }
 
     /**
      * Creates a new {@link Builder} for constructing {@code StorageConfig} instances.
@@ -76,7 +95,8 @@ public final class StorageConfig {
     @Override
     public String toString() {
         return "StorageConfig{" +
-                "transactionSupport=" + transactionSupport +
+                "type=" + getType().orElse("not set") +
+                ", transactionSupport=" + transactionSupport +
                 ", properties=" + properties +
                 '}';
     }
@@ -86,10 +106,8 @@ public final class StorageConfig {
      */
     public static final class Builder {
 
-
         private final Map<String, Object> properties = new HashMap<>();
-
-        private final boolean transactionSupport = false;
+        private boolean transactionSupport = false;  // NOT final!
 
         /**
          * Private constructor — use {@link StorageConfig#builder()}.
@@ -117,6 +135,16 @@ public final class StorageConfig {
             return this;
         }
 
+        /**
+         * Enables or disables transaction support.
+         *
+         * @param enable {@code true} to enable transaction support
+         * @return this builder for method chaining
+         */
+        public Builder transactionSupport(boolean enable) {
+            this.transactionSupport = enable;
+            return this;
+        }
 
         /**
          * Builds the {@link StorageConfig} instance with the current configuration.
