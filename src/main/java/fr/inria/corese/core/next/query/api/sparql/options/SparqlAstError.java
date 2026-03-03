@@ -32,13 +32,21 @@ public record SparqlAstError(
 
     /**
      * Constructor
-     * @param kind
-     * @param severity
-     * @param message
-     * @param line
-     * @param column
-     * @param offendingText
-     * @param source
+     * @param kind the high-level category of the error
+     *             (e.g. SYNTAX, SEMANTIC, LEXICAL)
+     * @param severity the severity level of the error
+     *                 (e.g. ERROR, WARNING)
+     * @param message a human-readable description of the problem;
+     *                must not be {@code null}
+     * @param line the line number where the error occurred (1-based, must be ≥ 0)
+     * @param column the column position within the line (0-based, must be ≥ 0)
+     * @param offendingText the fragment of input that caused the error,
+     *                      may be {@code null} if unavailable
+     * @param source an optional source identifier (e.g. file name or query identifier),
+     *               may be {@code null}
+     *
+     * @throws NullPointerException if {@code kind}, {@code severity}, or {@code message} is {@code null}
+     * @throws IllegalArgumentException if {@code line} or {@code column} is negative
      */
     public SparqlAstError {
         Objects.requireNonNull(kind, "kind");
