@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 
 import java.util.ArrayDeque;
@@ -26,8 +27,13 @@ import java.util.List;
  * - enterGroup()/exitGroup() on enter/exitGroupGraphPattern
  * - enterBgp()/exitBgp() on enter/exitTriplesBlock
  * - addTriple(s,p,o) whenever a triple pattern is recognized (usually on exitTriplesSameSubject)
+ * - enterAskQuery at the start of the declaration of an ASK query
  */
 public final class SparqlAstBuilder {
+
+    private static final Logger logger = LoggerFactory.getLogger(SparqlAstBuilder.class);
+
+    private ASTConstants.QUERY_TYPE queryType = ASTConstants.QUERY_TYPE.UNDEFINED;
 
     // --- Internal stacks (scopes) ---
 
@@ -50,6 +56,17 @@ public final class SparqlAstBuilder {
 
     public void enterAskQuery() {
 
+        queryType = ASTConstants.QUERY_TYPE.ASK;
+    }
+
+    public void exitAskQuery() {
+    }
+
+    public void enterSelectQuery() {
+        queryType = ASTConstants.QUERY_TYPE.SELECT;
+    }
+
+    public void exitSelectQuery() {
     }
 
     /** Enter a { ... } groupGraphPattern. */

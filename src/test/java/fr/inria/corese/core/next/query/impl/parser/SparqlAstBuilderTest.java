@@ -41,6 +41,7 @@ class SparqlAstBuilderTest {
     void shouldBuildSingleBgpWithOneTriple() {
         SparqlAstBuilder b = newBuilder();
 
+        b.enterSelectQuery();
         b.enterGroup();
         b.enterBgp();
         b.addTriple(new VarAst("s"), new VarAst("p"), new VarAst("o"));
