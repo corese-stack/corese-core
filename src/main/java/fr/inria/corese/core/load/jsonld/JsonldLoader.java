@@ -1,7 +1,5 @@
 package fr.inria.corese.core.load.jsonld;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -42,26 +40,9 @@ public class JsonldLoader {
         this.base = base;
     }
 
-    public static JsonldLoader create(InputStream read, String base) {
-        JsonldLoader p = new JsonldLoader(read, base);
-        return p;
-    }
-
     public static JsonldLoader create(Reader read, String base) {
         JsonldLoader p = new JsonldLoader(read, base);
         return p;
-    }
-
-    public static JsonldLoader create(String file) {
-        FileReader read;
-        try {
-            read = new FileReader(file);
-            JsonldLoader p = new JsonldLoader(read, file);
-            return p;
-        } catch (FileNotFoundException e) {
-            logger.error("An error has occurred", e);
-        }
-        return null;
     }
 
     /**

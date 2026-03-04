@@ -35,7 +35,7 @@ public class RdfxmlTripleCreator extends TripleCreatorBase
 
     public RdfxmlTripleCreator() {
     }
-
+ 
     RdfxmlTripleCreator(Graph g, Load ld) {
         super(g, ld);
         graph = g;
@@ -98,10 +98,6 @@ public class RdfxmlTripleCreator extends TripleCreatorBase
     @Override
     public void setSource(String src) {
         basicSetSource(src);
-    }
-
-    public String getSource() {
-        return getNamedGraphURI();
     }
 
     void basicSetSource(String src) {
@@ -174,10 +170,6 @@ public class RdfxmlTripleCreator extends TripleCreatorBase
         return id;
     }
 
-    public int nbBlank() {
-        return blank.size();
-    }
-
     public Node getGraphNode() {
         return graphNode;
     }
@@ -196,10 +188,6 @@ public class RdfxmlTripleCreator extends TripleCreatorBase
 
     public Load getLoad() {
         return load;
-    }
-
-    public void setLoad(Load load) {
-        this.load = load;
     }
 
     @Override

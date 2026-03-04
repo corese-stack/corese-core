@@ -70,8 +70,10 @@ public class SPARQLResult extends XMLResult {
     @Override
     public Node edge(Node sub, Node pred, Node obj) {        
          Node ref = getLocal().addTripleReference();
-         Edge edge = fac.create(getLocal().getDefaultGraphNode(), sub, pred, obj, ref, true);
-         return ref;
+/* --- useless code ? ---
+        Edge edge = fac.create(getLocal().getDefaultGraphNode(), sub, pred, obj, ref, true);
+  --- useless code --- */
+        return ref;
     }
 
     /**
@@ -82,24 +84,10 @@ public class SPARQLResult extends XMLResult {
     }
 
     /**
-     * @param graph the graph to set
-     */
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }
-
-    /**
      * @return the local
      */
     public Graph getLocal() {
         return local;
-    }
-
-    /**
-     * @param local the local to set
-     */
-    public void setLocal(Graph local) {
-        this.local = local;
     }
 
 }

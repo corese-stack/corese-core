@@ -164,16 +164,6 @@ public class SPARQLJSONResult extends SPARQLResult {
     
     
     
-    
-    
-    
-
-    
-    public JSONObject getJson() {
-        return json;
-    }
-
-    
     public void setJson(JSONObject json) {
         this.json = json;
     }
@@ -185,12 +175,4 @@ public class SPARQLJSONResult extends SPARQLResult {
         return varList;
     }
 
-    /**
-     * @param varList the varList to set
-     */
-    public void setVarList(List<String> varList) {
-        this.varList = varList;
-    }
-
-   
 }

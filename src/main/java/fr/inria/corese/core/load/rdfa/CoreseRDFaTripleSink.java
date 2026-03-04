@@ -98,10 +98,6 @@ public class CoreseRDFaTripleSink implements TripleSink {
         helper.setLimit(limit);
     }
 
-    public DataManager getDataManager() {
-        return dataManager;
-    }
-
     public void setDataManager(DataManager dataManager) {
         this.dataManager = dataManager;
     }

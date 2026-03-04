@@ -250,10 +250,6 @@ public class ServiceReport implements URLParam {
         return DatatypeMap.newServiceReport(param);
     }
     
-    IDatatype key(String name) {
-        return DatatypeMap.key(name);
-    }
-    
     void set(IDatatype dt, String key, String value) {
         if (hasKey(key) && value!=null) {
             dt.set(key, value);
@@ -272,12 +268,6 @@ public class ServiceReport implements URLParam {
         }
     }
 
-    void set(IDatatype dt, String key, Object value) {
-        if (hasKey(key) && value!=null) {
-            dt.set(key, value);
-        }
-    }
-    
     void set(IDatatype dt, String key, IDatatype value) {
         if (hasKey(key) && value!=null) {
             dt.set(key, value);
@@ -315,10 +305,6 @@ public class ServiceReport implements URLParam {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public String getResult() {
-        return result;
     }
 
     public void setResult(String result) {

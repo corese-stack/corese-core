@@ -97,14 +97,6 @@ public class CoreseJsonTripleCallback implements JsonLdTripleCallback {
         return helper;
     }
 
-    public void setHelper(AddTripleHelper helper) {
-        this.helper = helper;
-    }
-
-    public DataManager getDataManager() {
-        return dataManager;
-    }
-
     public void setDataManager(DataManager dataManager) {
         this.dataManager = dataManager;
     }

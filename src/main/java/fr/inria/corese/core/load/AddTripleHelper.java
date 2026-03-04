@@ -26,17 +26,13 @@ public class AddTripleHelper implements ILoadSerialization {
     private Graph graph;
     private Load load;
     Node source;
-    Stack stack;
+    ArrayList<Node> stack;
     NSManager nsm;
     private String resource = null;
     private Node node = null;
     private boolean renameBlankNode = true;
     private Hashtable<String, String> blank = null;
     private int limit = Integer.MAX_VALUE;
-
-    public void graph(String src) {
-        source = addGraph(src);
-    }
 
     public void setRenameBlankNode(boolean b) {
         this.renameBlankNode = b;
@@ -50,22 +46,12 @@ public class AddTripleHelper implements ILoadSerialization {
         return renameBlankNode;
     }
 
-    class Stack extends ArrayList<Node> {
-
-        Node pop() {
-            if (size() > 0) {
-                return remove(size() - 1);
-            }
-            return null;
-        }
-    }
-
     public AddTripleHelper(Graph graph, Load load) {
         this.load = load;
         this.graph = graph;
         this.blank = new Hashtable<>();
         nsm = NSManager.create();
-        this.stack = new Stack();
+        this.stack = new ArrayList<>();
     }
 
     public static AddTripleHelper create(Graph graph, Load load) {
@@ -252,10 +238,6 @@ public class AddTripleHelper implements ILoadSerialization {
 
     public Graph getGraph() {
         return graph;
-    }
-
-    public void setGraph(Graph graph) {
-        this.graph = graph;
     }
 
 }

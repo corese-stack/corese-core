@@ -20,10 +20,6 @@ import org.slf4j.LoggerFactory;
 public class SPARQLRDFResult {
     private static final Logger logger = LoggerFactory.getLogger(SPARQLRDFResult.class);
     
-    public Mappings parse(String result) throws LoadException {
-        return parse(result, Loader.format.TURTLE_FORMAT);
-    }
-    
     public Mappings parse(String result, Loader.format format) throws LoadException {
         String query
                 = "prefix rs: <http://www.w3.org/2001/sw/DataAccess/tests/result-set#>"

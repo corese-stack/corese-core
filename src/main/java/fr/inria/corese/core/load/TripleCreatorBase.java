@@ -96,10 +96,6 @@ public abstract class TripleCreatorBase {
         return graph.createForInsert(g, s, p, o);
     }
 
-    Edge create(Node g, Node p, List<Node> list) {
-        return graph.create(g, p, list);
-    }
-
     Edge create(Node g, Node p, List<Node> list, boolean nested) {
         return graph.create(g, p, list, nested);
     }
@@ -222,10 +218,6 @@ public abstract class TripleCreatorBase {
 
     public QueryProcess getQueryProcess() {
         return queryProcess;
-    }
-
-    public void setQueryProcess(QueryProcess queryProcess) {
-        this.queryProcess = queryProcess;
     }
 
     public String getPath() {
