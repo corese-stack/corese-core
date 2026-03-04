@@ -43,8 +43,6 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.storage.api.datamanager.DataManager;
-import fr.inria.corese.core.transform.TemplateVisitor;
-import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.GraphListen;
 import fr.inria.corese.core.util.MappingsGraph;
@@ -300,32 +298,6 @@ public class PluginImpl
         MetadataManager meta = dataManager(p).getCreateMetadataManager();
         Distance distance = meta.getCreateDistance();
         double dd = distance.similarity(dt1, dt2);
-        return getValue(dd);
-    }
-
-    // utility
-    IDatatype ancestor(Graph g, IDatatype dt1, IDatatype dt2) {
-        Node n1 = g.getNode(dt1);
-        Node n2 = g.getNode(dt2);
-        if (n1 == null || n2 == null) {
-            return null;
-        }
-
-        Distance distance = g.setClassDistance();
-        Node n = distance.ancestor(n1, n2);
-        return n.getValue();
-    }
-
-    // utility
-    IDatatype pSimilarity(Graph g, IDatatype dt1, IDatatype dt2) {
-        Node n1 = g.getNode(dt1.getLabel());
-        Node n2 = g.getNode(dt2.getLabel());
-        if (n1 == null || n2 == null) {
-            return null;
-        }
-
-        Distance distance = g.setPropertyDistance();
-        double dd = distance.similarity(n1, n2);
         return getValue(dd);
     }
 
@@ -902,12 +874,6 @@ public class PluginImpl
         return g.getNode(dt, false, false);
     }
 
-    IDatatype db(Environment env, Graph g) {
-        ASTQuery ast = env.getQuery().getAST();
-        String name = ast.getMetadataValue(Metadata.Type.DB);
-        return db(name, g);
-    }
-
     IDatatype db(String name, Graph g) {
         Producer p = QueryProcess.getCreateProducer(g, QueryProcess.DB_FACTORY, name);
         return DatatypeMap.createObject(p);
@@ -1102,41 +1068,11 @@ public class PluginImpl
         return null;
     }
 
-    String getLabel(IDatatype dt) {
-        if (dt == null) {
-            return null;
-        }
-        return dt.getLabel();
-    }
-
     Graph getGraph(Producer p) {
         if (p.getGraph() instanceof Graph) {
             return (Graph) p.getGraph();
         }
         return null;
-    }
-
-    public TemplateVisitor getVisitor(Binding b, Environment env, Producer p) {
-        return pt.getVisitor(b, env, p);
-    }
-
-    /**
-     * STTL create intermediate string result (cf Proxy STL_CONCAT) Save string
-     * value to disk using Fuqi StrManager Each STTL Transformation would have
-     * its own StrManager Managed in the Context to be shared between
-     * subtransformation (cf OWL2)
-     */
-    public IDatatype getBufferedValue(StringBuilder sb, Environment env) {
-        if (storageMgr == null) {
-            createManager();
-        }
-        if (storageMgr.check(sb.length())) {
-            IDatatype dt = getValue(sb.toString());
-            dt.setValue(dt.getLabel(), nbBufferedValue++, storageMgr);
-            return dt;
-        } else {
-            return DatatypeMap.newStringBuilder(sb);
-        }
     }
 
     void createManager() {

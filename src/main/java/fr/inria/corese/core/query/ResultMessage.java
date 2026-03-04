@@ -4,7 +4,6 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphDistance;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
-import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
@@ -41,25 +40,6 @@ public class ResultMessage {
         getSystem().put("date", new Date());
     }
 
-    /**
-     * JSON object with param=value sent back to client as Linked Result as
-     * "message" return context as json object
-     */
-    public JSONObject process(Mappings map) {
-        setAst(map.getAST());
-        setJson(getContext().json());
-        // select data from ContextLog
-        if (getLog() != null) {
-            getLog().message(getJson());
-            // service endpoint exception
-            messageException(getLog());
-        }
-        messageSystem();
-        messageCardinality();
-        messageDistance();
-        return getJson();
-    }
-    
     void messageCardinality() {
         JSONObject obj = getGraph().cardinality(getAst());
 
@@ -150,16 +130,8 @@ public class ResultMessage {
         return context;
     }
 
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
     public ContextLog getLog() {
         return log;
-    }
-
-    public void setLog(ContextLog log) {
-        this.log = log;
     }
 
     public JSONObject getJson() {
@@ -172,10 +144,6 @@ public class ResultMessage {
 
     public Graph getGraph() {
         return graph;
-    }
-
-    public void setGraph(Graph graph) {
-        this.graph = graph;
     }
 
     public ASTQuery getAst() {

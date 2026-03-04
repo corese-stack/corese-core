@@ -30,16 +30,6 @@ public class MapperSQL {
         producer = p;
     }
 
-    public Producer getProducer() {
-        return producer;
-    }
-
-    Mappings map(List<Node> lNodes, Object object) {
-        if (object instanceof SQLResult) {
-            return sql(lNodes, (SQLResult) object);
-        } else return new Mappings();
-    }
-
     public Mappings sql(List<Node> lNodes, SQLResult res) {
         ResultSet rs = res.getResultSet();
         if (rs == null) return new Mappings();
@@ -163,24 +153,5 @@ public class MapperSQL {
         }
         return node;
     }
-
-
-    Mappings map(List<Node> nodes, IDatatype dt) {
-        Node[] qNodes = new Node[nodes.size()];
-        int i = 0;
-        for (Node qNode : nodes) {
-            qNodes[i++] = qNode;
-        }
-        Mappings lMap = new Mappings();
-        List<Node> lNode = producer.toNodeList(dt);
-        for (Node node : lNode) {
-            Node[] tNodes = new Node[1];
-            tNodes[0] = node;
-            Mapping map = Mapping.create(qNodes, tNodes);
-            lMap.add(map);
-        }
-        return lMap;
-    }
-
 
 }

@@ -944,10 +944,6 @@ public class ProviderService implements URLParam {
         this.defaut = defaut;
     }
 
-    public ProviderImpl getProvider() {
-        return provider;
-    }
-
     public void setProvider(ProviderImpl provider) {
         this.provider = provider;
     }
@@ -1043,10 +1039,6 @@ public class ProviderService implements URLParam {
 
     boolean hasValue(String key) {
         return getContext() != null && getContext().hasValue(key);
-    }
-
-    public int getDisplayResultMax() {
-        return displayResultMax;
     }
 
 }

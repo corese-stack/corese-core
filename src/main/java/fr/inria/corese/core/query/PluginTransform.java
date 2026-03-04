@@ -13,7 +13,6 @@ import fr.inria.corese.core.sparql.api.GraphProcessor;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
-import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.transform.DefaultVisitor;
@@ -36,9 +35,6 @@ public class PluginTransform implements ComputerProxy {
     static Logger logger = LoggerFactory.getLogger(PluginTransform.class);
 
     PluginImpl plugin;
-
-    public PluginTransform() {
-    }
 
     PluginTransform(PluginImpl p) {
         plugin = p;

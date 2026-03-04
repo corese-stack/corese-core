@@ -1,8 +1,6 @@
 package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.storage.CoreseGraphDataManagerBuilder;
 import fr.inria.corese.core.storage.DataManagerJava;
 import fr.inria.corese.core.storage.api.datamanager.DataManager;
@@ -24,25 +22,6 @@ public class DatasetManager {
 
     private DataManager dataManager;
     private String id;
-
-    public DatasetManager() {
-    }
-
-    public DatasetManager init() {
-        List<List<String>> storages = Property.getStorageparameters();
-
-        if (storages != null && !storages.isEmpty()) {
-            defineDataManager(storages);
-
-            if (isStorage()) {
-                // default mode is db storage
-                setDataManager(StorageFactory.getSingleton().getDataManager(getId()));
-                logger.info("Storage: " + getId());
-            }
-        }
-
-        return this;
-    }
 
     // Create one DataManager in StorageFactory for each db path
     // first db path is default db
@@ -116,27 +95,6 @@ public class DatasetManager {
                 .toArray(new DataManager[StorageFactory.getSingleton().getDataManagerList().size()]);
         return QueryProcess.create(g, dmList);
     }
-
-    public QueryProcess createQueryProcess() {
-        return createQueryProcess(Graph.create());
-    }
-
-    public Load createLoad(Graph g) {
-        Load load = Load.create(g);
-        if (isStorage()) {
-            load.setDataManager(getDataManager());
-        }
-        return load;
-    }
-
-    public RuleEngine createRuleEngine(Graph g) {
-        if (isDataset() || getDataManager() == null) {
-            return RuleEngine.create(g);
-        } else {
-            return RuleEngine.create(g, getDataManager());
-        }
-    }
-
     public boolean isDataset() {
         return Property.isDataset();
     }
@@ -155,10 +113,6 @@ public class DatasetManager {
 
     public void setDataManager(DataManager dataManager) {
         this.dataManager = dataManager;
-    }
-
-    public DataManager getDataManager(String path) {
-        return StorageFactory.getSingleton().getDataManager(path);
     }
 
     public String getId() {

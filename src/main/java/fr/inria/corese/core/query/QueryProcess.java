@@ -99,9 +99,6 @@ public class QueryProcess extends QuerySolver {
     // or a query within rule engine
     private boolean processTransaction = true;
 
-    public QueryProcess() {
-    }
-
     protected QueryProcess(Producer p, Interpreter e, Matcher m) {
         super(p, e, m);
 

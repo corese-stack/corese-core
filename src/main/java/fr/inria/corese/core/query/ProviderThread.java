@@ -29,11 +29,6 @@ public class ProviderThread extends Thread {
         this.timeout = timeout;
     }
 
-    @Override
-    public void run() {
-        process();
-    }
-
     void process() {
         try {
             getProvider().process(service, map, sol, slice, length, timeout);
@@ -42,27 +37,11 @@ public class ProviderThread extends Thread {
         }
     }
 
-    public URLServer getService() {
-        return service;
-    }
-
-    public void setService(URLServer service) {
-        this.service = service;
-    }
-
     /**
      * @return the provider
      */
     public ProviderService getProvider() {
         return provider;
     }
-
-    /**
-     * @param provider the provider to set
-     */
-    public void setProvider(ProviderService provider) {
-        this.provider = provider;
-    }
-
 
 }

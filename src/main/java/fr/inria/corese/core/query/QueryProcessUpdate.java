@@ -303,9 +303,4 @@ public class QueryProcessUpdate {
         return exec;
     }
 
-
-    public void setQueryProcess(QueryProcess exec) {
-        this.exec = exec;
-    }
-
 }

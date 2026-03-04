@@ -61,10 +61,6 @@ public class ProducerImpl
     private boolean speedUp = false;
     private ProducerImplNode pn;
 
-    public ProducerImpl() {
-        this(Graph.create());
-    }
-
     public ProducerImpl(Graph g) {
         graph = g;
         local = Graph.create();
@@ -122,21 +118,9 @@ public class ProducerImpl
         }
     }
 
-    public void set(QueryEngine qe) {
-        qengine = qe;
-    }
-
     @Override
     public Graph getGraph() {
         return graph;
-    }
-
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }
-
-    public Graph getLocalGraph() {
-        return local;
     }
 
     Node getNode(Edge edge, Node gNode, int i) {
@@ -654,10 +638,6 @@ public class ProducerImpl
         return DatatypeMap.getValue(value);
     }
 
-    IDatatype nodeValue(Node n) {
-        return n.getValue();
-    }
-
     // cast IDatatype or Java value into DatatypeValue
     @Override
     public IDatatype getDatatypeValue(Object value) {
@@ -696,10 +676,6 @@ public class ProducerImpl
             return node;
         }
         return dt;
-    }
-
-    public Object getValue(Node node) {
-        return node.getValue();
     }
 
     @Override
@@ -773,34 +749,6 @@ public class ProducerImpl
         return mapper.toNodeList(obj);
     }
 
-    void filter(Environment env) {
-        // KGRAM exp for current edge
-        Exp exp = env.getExp();
-        List<String> lVar = new ArrayList<>();
-        List<Node> lNode = new ArrayList<>();
-
-        for (Filter f : exp.getFilters()) {
-            // filters attached to current edge
-            if (f.getExp().isExist()) {
-                // skip exists { PAT }
-                continue;
-            }
-
-            // function exp.bind(f) tests whether current edge binds all variable of filter
-            // f
-            for (String var : f.getVariables()) {
-                if (!lVar.contains(var)) {
-                    Node node = env.getNode(var);
-                    if (node != null) {
-                        lVar.add(var);
-                        lNode.add(node);
-                    }
-                }
-            }
-        }
-
-    }
-
     /**
      * Overloading of graph ?g { } The value of ?g may an extended graph
      * producer
@@ -836,10 +784,6 @@ public class ProducerImpl
             g = Graph.create();
         }
         return getProducer(g, env.getQuery());
-    }
-
-    public boolean isSpeedUp() {
-        return speedUp;
     }
 
     public void setSpeedUp(boolean speedUp) {

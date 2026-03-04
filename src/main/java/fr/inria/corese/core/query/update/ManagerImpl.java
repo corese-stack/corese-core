@@ -34,10 +34,6 @@ public class ManagerImpl implements Manager {
 
     }
 
-    public static ManagerImpl create(GraphManager g) {
-        return new ManagerImpl(g);
-    }
-
     @Override
     public boolean process(Query q, Basic ope, Dataset ds) throws EngineException {
         getGraphManager().system(ope);
@@ -242,10 +238,6 @@ public class ManagerImpl implements Manager {
 
     public GraphManager getGraphManager() {
         return graphManager;
-    }
-
-    public void setGraphManager(GraphManager graphManager) {
-        this.graphManager = graphManager;
     }
 
     enum mode {

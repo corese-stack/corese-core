@@ -124,19 +124,6 @@ public class CompileService implements URLParam {
         }
     }
 
-    boolean isValues(URLServer serv, Query q) {
-        return serv.hasParameter(BINDING, VALUES) || hasRecMetaData(q, Metadata.Type.BINDING, KG_VALUES);
-    }
-
-    boolean isFilter(URLServer serv, Query q) {
-        return serv.hasParameter(BINDING, FILTER) || hasRecMetaData(q, Metadata.Type.BINDING, KG_FILTER);
-    }
-
-    boolean hasMetaData(Query q, Metadata.Type meta, String type) {
-        ASTQuery ast = getAST(q.getGlobalQuery());
-        return ast.hasMetadata(meta, type);
-    }
-
     boolean hasRecMetaData(Query q, Metadata.Type meta, String type) {
         if (getAST(q).hasMetadata(meta, type)) {
             return true;
@@ -149,19 +136,6 @@ public class CompileService implements URLParam {
 
     ASTQuery getAST(Query q) {
         return q.getAST();
-    }
-
-    public void prepare(Query q) {
-    }
-
-    public int slice(Query q) {
-        Query g = q.getOuterQuery();
-        return g.getSlice();
-    }
-
-    boolean isMap(Query q) {
-        Query g = q.getOuterQuery();
-        return g.isMap();
     }
 
     /**
@@ -257,47 +231,6 @@ public class CompileService implements URLParam {
 
         values.setVariables(lvar);
         return setValues(ast, values);
-    }
-
-    /**
-     * DRAFT for testing
-     * service </sparql?filter=?_tmp_> {
-     * bind (regex(?x, ns:) as ?_tmp_)
-     * }
-     * select candidate variable binding passing for ?x where filter succeed
-     * var=dt is a candidate variable binding
-     * if var is filter variable ?x: eval filter with ?x=dt
-     * manage ?x as a global variable
-     */
-    boolean eval(Expression filter, Environment env, Binding b, Variable variable, IDatatype dt) {
-        if (filter.isTerm() && filter.arity() >= 2 &&
-                filter.getArg(0).isVariable() && filter.getArg(0).equals(variable)) {
-            b.setGlobalVariable(variable.getLabel(), dt);
-            try {
-                IDatatype res = filter.eval(env.getEval().getEvaluator(), b, env, env.getEval().getProducer());
-                if (res == null) {
-                    return false;
-                }
-                return res.booleanValue();
-            } catch (EngineException ex) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    Expression getFilter(ASTQuery ast, URLServer url) {
-        String name = url.getParameter(FILTER);
-        if (name == null) {
-            return null;
-        }
-        Expression exp = getFilter(ast, name);
-        if (exp != null && exp.arity() >= 2 && exp.getArg(0).isVariable()) {
-            Variable nvar = new VariableLocal(exp.getArg(0).getLabel());
-            nvar.setIndex(Binding.UNBOUND);
-            exp.getTerm().setArg(0, nvar);
-        }
-        return exp;
     }
 
     Expression getFilter(ASTQuery ast, String name) {
@@ -505,16 +438,6 @@ public class CompileService implements URLParam {
         }
     }
 
-    /**
-     * Check that two successive filter lists are different
-     */
-    boolean accept(List<Term> lt) {
-        if (termList.isEmpty()) {
-            return true;
-        }
-        return !equal(lt, termList.get(termList.size() - 1));
-    }
-
     boolean equal(List<Term> l1, List<Term> l2) {
         if (l1.size() != l2.size()) {
             return false;
@@ -558,7 +481,4 @@ public class CompileService implements URLParam {
         return provider;
     }
 
-    public void setProvider(ProviderService provider) {
-        this.provider = provider;
-    }
 }

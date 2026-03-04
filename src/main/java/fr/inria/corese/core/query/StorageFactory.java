@@ -1,6 +1,5 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.core.query.DatasetManager.TypeDataBase;
 import fr.inria.corese.core.sparql.triple.parser.URLServer;
 import fr.inria.corese.core.storage.api.datamanager.DataManager;
 
@@ -27,9 +26,6 @@ public class StorageFactory {
             singleton = new StorageFactory();
         }
         return singleton;
-    }
-
-    public static void defineDataManager(TypeDataBase typeDB, String id, String param) {
     }
 
     public void defineDataManager(String id, DataManager man) {

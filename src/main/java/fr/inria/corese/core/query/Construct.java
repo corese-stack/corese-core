@@ -432,11 +432,6 @@ public class Construct
         getLabelMap().clear();
     }
 
-    void init() {
-        clear();
-        count = 0;
-    }
-
     /**
      * Construct target edge from query edge and map
      * Edge ready to be inserted/deleted into/from target graph
@@ -547,14 +542,6 @@ public class Construct
             put(refQueryNode, refNode);
         }
         return refNode;
-    }
-
-    IDatatype tripleReference(Node refQueryNode, Environment map) {
-        return graphManager.createTripleReference();
-    }
-
-    Node tripleReference(Node refQueryNode, Node s, Node p, Node o) {
-        return graphManager.createTripleReference(s, p, o);
     }
 
     Node construct(Node gNode, Node source, Node qNode, Environment map) {
@@ -726,23 +713,6 @@ public class Construct
         return construct(null, null, qNode, map);
     }
 
-    /**
-     * Record value of query node in order to reuse it during solution processing
-     * qNode: variable | bnode | URI | Literal
-     * bnode in construct/insert is not a variable, it means create a new bnode
-     * and reuse the same new bnode in one solution
-     * switch targetNode:
-     * case var bnode URI -> put queryNode.getLabel() -> targetNode
-     * case Literal: TreeNode with sameTerm
-     */
-    void put1(Node queryNode, Node targetNode) {
-        table.put(queryNode, targetNode);
-    }
-
-    Node get1(Node queryNode) {
-        return table.get(queryNode);
-    }
-
     void put(Node queryNode, Node targetNode) {
         if (isLabel(queryNode)) {
             getLabelMap().put(queryNode.getLabel(), targetNode);
@@ -763,10 +733,6 @@ public class Construct
             // queryNode = Literal ; use IDatatype literal value as key
             return getLiteralMap().get(value(queryNode));
         }
-    }
-
-    Node uniqueNode1(Node gNode, IDatatype dt) {
-        return graphManager.getNode(gNode, dt);
     }
 
     /**
@@ -821,39 +787,12 @@ public class Construct
         return n;
     }
 
-    IDatatype getValue(Node node) {
-        return node.getDatatypeValue();
-    }
-
-    String getID(Mapping map) {
-        StringBuilder sb = new StringBuilder();
-        List<Node> list = new ArrayList<>(Arrays.asList(map.getQueryNodes()));
-        list.sort(this);
-        for (Node qNode : list) {
-            IDatatype value = map.getValue(qNode);
-            if (value != null && !qNode.isConstant()) {
-                sb.append(qNode.getLabel()).append(".").append(value.toSparql()).append(".");
-            }
-        }
-        return sb.toString();
-    }
-
     public int compare(Node n1, Node n2) {
         return n1.compare(n2);
     }
 
     public void setLoopIndex(int n) {
         loopIndex = n;
-    }
-
-
-    public boolean isTest() {
-        return test;
-    }
-
-
-    public void setTest(boolean test) {
-        this.test = test;
     }
 
 
@@ -944,32 +883,12 @@ public class Construct
         return literalMap;
     }
 
-    public void setLiteralMap(TreeNode literalMap) {
-        this.literalMap = literalMap;
-    }
-
     public Map<String, Node> getLabelMap() {
         return labelMap;
     }
 
-    public void setLabelMap(Map<String, Node> labelMap) {
-        this.labelMap = (HashMap<String, Node>) labelMap;
-    }
-
-    public ASTQuery getAst() {
-        return ast;
-    }
-
-    public void setAst(ASTQuery ast) {
-        this.ast = ast;
-    }
-
     public Query getQuery() {
         return query;
-    }
-
-    public void setQuery(Query query) {
-        this.query = query;
     }
 
     public class TreeNode extends TreeMap<IDatatype, Node> {
@@ -978,13 +897,6 @@ public class Construct
             super(new CompareNode());
         }
 
-        void put(Node node) {
-            put(node.getDatatypeValue(), node);
-        }
-
-        boolean contains(Node node) {
-            return containsKey(node.getDatatypeValue());
-        }
     }
 
     /**
@@ -1006,46 +918,4 @@ public class Construct
         }
     }
 
-
-//        @Deprecated
-//    Node reference1(Node gNode, Node resultGraphNode, Node queryNode, Node refNode, Environment map, List<Edge> insertEdgeList, 
-//            boolean rec) {
-//        
-//        Edge edge = refNode.getEdge();
-//        trace1(gNode, refNode, edge);
-//        Edge query = construct(gNode, edge, map, insertEdgeList, true);
-//        trace("ref node query edge: %s %s %s", query, 
-//                query.getReferenceNode(), query.getClass().getName());
-//        // when isDelete() search target edge in graph
-//        // @todo otherwise resultNode = query.getReferenceNode()
-//        // because reference node = ref(s p o) and it is unique (no need to search)
-//        Edge target = getGraphManager().find(query);
-//        trace2(query, target);
-//        
-//        Node resultNode;
-//        
-//        if (target != null && target.hasReferenceNode()) {
-//            // target edge exists in graph: return its reference
-//            resultNode = target.getReferenceNode();
-//            trace3(refNode, resultNode);
-//        }         
-//        else {
-//            // there is no such reference in graph: create it
-//            // if edge isCreated() : edge = <<s p o>> in 
-//            // insert { ?t us:wrt ?x } where {bind (<<s p o>> as ?t)}
-//            // insert <<s p o>> as well as triple
-//            // @todo: when isDelete(), do not create reference, return null and skip this delete 
-//            resultNode = tripleReference(refNode, query.getSubjectNode(), query.getPropertyNode(), query.getObjectNode());
-//            trace3(refNode, resultNode);
-//            if (isConstruct() || (edge.isCreated() && !isDelete())) {
-//                // add nested triple <<s p o>> in <<s p o>> q v
-//                // it must not be asserted here
-//                query.setNested(true);
-//                insertEdgeList.add(query);
-//            }
-//        }
-//        
-//        return resultNode;
-//    }
-//    
 }

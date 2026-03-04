@@ -36,10 +36,6 @@ public class MatcherImpl implements Matcher {
         bnode = new MatchBNode(g);
     }
 
-    public static MatcherImpl create() {
-        return new MatcherImpl(Graph.create());
-    }
-
     public static MatcherImpl create(Graph g) {
         return new MatcherImpl(g);
     }
