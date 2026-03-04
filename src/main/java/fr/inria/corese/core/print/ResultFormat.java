@@ -2,9 +2,6 @@ package fr.inria.corese.core.print;
 
 import static fr.inria.corese.core.sparql.triple.parser.URLParam.LINK;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 
 import fr.inria.corese.core.compiler.parser.Pragma;
@@ -21,10 +18,8 @@ import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Context;
-import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.sparql.triple.parser.URLParam;
 
 /**
  * Select Result format according to query form and @display annotation.,
@@ -203,24 +198,6 @@ public class ResultFormat implements ResultFormatDef {
         return new ResultFormat(m, type);
     }
 
-    public static ResultFormat create(Mappings m, String format, String trans) {
-        ResultFormat rf = createFromTrans(m, trans);
-        if (rf != null) {
-            return rf;
-        }
-        return create(m, format).transform(trans);
-    }
-
-    public static ResultFormat create(Mappings m, ResultFormatDef.format type, String trans) {
-        ResultFormat rf = createFromTrans(m, trans);
-        if (rf != null) {
-            // remember the type in case it is html asked by bowser
-            rf.setTransformType(type);
-            return rf;
-        }
-        return create(m, type).transform(trans);
-    }
-
     static ResultFormat createFromTrans(Mappings m, String trans) {
         if (trans == null) {
             return null;
@@ -275,22 +252,10 @@ public class ResultFormat implements ResultFormatDef {
         return new ResultFormat(m, type);
     }
 
-    static public ResultFormat create(Mappings m, ResultFormatDef.format sel, ResultFormatDef.format cons) {
-        return new ResultFormat(m, sel, cons);
-    }
-
-    static public ResultFormat create(Graph g) {
-        return new ResultFormat(g);
-    }
-
     static public ResultFormat create(Graph g, ResultFormatDef.format type) {
         return new ResultFormat(g, type);
     }
     
-    static public ResultFormat create(Graph g, NSManager nsm, ResultFormatDef.format type) {
-        return new ResultFormat(g, nsm, type);
-    }
-
     static public ResultFormat create(Graph g, String type) {
         return new ResultFormat(g, getSyntax(type));
     }
@@ -382,12 +347,6 @@ public class ResultFormat implements ResultFormatDef {
             t.getContextManager().setBinding(getBind());
         }
         return t.toString();
-    }
-
-    public ResultFormat init(Dataset ds) {
-        setContext(ds.getContext());
-        setBind(ds.getBinding());
-        return this;
     }
 
     Graph theGraph() {
@@ -574,16 +533,6 @@ public class ResultFormat implements ResultFormatDef {
         return String.format(HEADER, str.replace("<", "&lt;"));
     }
 
-    public void write(String name) throws IOException {
-        try (final FileWriter fw = new FileWriter(name);
-             final  BufferedWriter bufferedWriter = new BufferedWriter(fw)) {
-
-            String str = toString();
-            bufferedWriter.write(str);
-            bufferedWriter.flush();
-        }
-    }
-
     /**
      * @return the construct_format
      */
@@ -592,33 +541,10 @@ public class ResultFormat implements ResultFormatDef {
     }
 
     /**
-     * @param construct_format the construct_format to set
-     */
-    public void setConstructFormat(ResultFormatDef.format construct_format) {
-        this.construct_format = construct_format;
-    }
-
-    /**
      * @return the select_format
      */
     public ResultFormatDef.format getSelectFormat() {
         return select_format;
-    }
-
-    /**
-     * @param select_format the select_format to set
-     */
-    public void setSelectFormat(ResultFormatDef.format select_format) {
-        this.select_format = select_format;
-    }
-
-    public long getNbResult() {
-        return nbResult;
-    }
-
-    public ResultFormat setNbResult(long nbResult) {
-        this.nbResult = nbResult;
-        return this;
     }
 
     public ResultFormatDef.format type() {
@@ -630,33 +556,11 @@ public class ResultFormat implements ResultFormatDef {
         return t;
     }
 
-    public String getContentType() {
-        String ct = content.get(type());
-        if (ct == null) {
-            ct = content.get(DEFAULT_SELECT_FORMAT);
-        }
-        return ct;
-    }
-
-    /**
-     * @param contentType the contentType to set
-     */
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
     /**
      * @return the selectAll
      */
     public boolean isSelectAll() {
         return selectAll;
-    }
-
-    /**
-     * @param selectAll the selectAll to set
-     */
-    public void setSelectAll(boolean selectAll) {
-        this.selectAll = selectAll;
     }
 
     /**
@@ -695,24 +599,10 @@ public class ResultFormat implements ResultFormatDef {
     }
 
     /**
-     * @param graph the graph to set
-     */
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }
-
-    /**
      * @return the map
      */
     public Mappings getMappings() {
         return map;
-    }
-
-    /**
-     * @param map the map to set
-     */
-    public void setMappings(Mappings map) {
-        this.map = map;
     }
 
     /**
@@ -753,11 +643,6 @@ public class ResultFormat implements ResultFormatDef {
 
     public int getNbTriple() {
         return nbTriple;
-    }
-
-    public ResultFormat setNbTriple(int nbTriple) {
-        this.nbTriple = nbTriple;
-        return this;
     }
 
     public NSManager getNsmanager() {

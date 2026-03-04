@@ -12,22 +12,25 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 public class JSOND3Format extends RDFFormat {
-
+/* --- dead code removal ---
     private static final String PREFIX = "@prefix";
     private static final String PV = " ;";
     private static final String DOT = " .";
     private static final String OPEN = "<";
     private static final String CLOSE = ">";
     private static final String GRAPH = "graph";
+ --- dead code removal --- */
 
     private static final String OOBJ = "{";
     private static final String COBJ = "}";
 
     private static final String SEP = ":";
     private static final String TAB = "\t";
+/* --- dead code removal ---
     private static final String OARRAY = "[";
     private static final String CARRAY = "]";
     private static final String BLANK = "_:";
+--- dead code removal --- */
     private static final String V = ", ";
     private static final String DQUOTE = "\"";
 
@@ -56,24 +59,6 @@ public class JSOND3Format extends RDFFormat {
 
     public static JSOND3Format create(Graph g) {
         return new JSOND3Format(g, NSManager.create());
-    }
-
-    public static JSOND3Format create(Mappings map, boolean isGraph) {
-        Graph g = (Graph) map.getGraph();
-        if (g != null) {
-            Query q = map.getQuery();
-            NSManager nsm = q.getAST().getNSM();
-            JSOND3Format t = new JSOND3Format(g, nsm);
-            t.setGraph(isGraph);
-            return t;
-        }
-        return create(Graph.create());
-    }
-
-    public static JSOND3Format create(Graph g, boolean isGraph) {
-        JSOND3Format t = new JSOND3Format(g, NSManager.create());
-        t.setGraph(isGraph);
-        return t;
     }
 
     public void setGraph(boolean b) {
@@ -194,29 +179,6 @@ public class JSOND3Format extends RDFFormat {
         }
         if (sb.toString().contains(V)) {
             sb.deleteCharAt(sb.lastIndexOf(V));
-        }
-    }
-
-    void nodes() {
-        for (Node node : getNodes()) {
-            print(null, node);
-        }
-    }
-
-    void graphNodes() {
-        for (Node gNode : graph.getGraphNodes()) {
-            if (accept(gNode)) {
-                sdisplay(GRAPH);
-                sdisplay(SPACE);
-                subject(gNode);
-                sdisplay(OOBJ);
-                for (Node node : graph.getNodeGraphIterator(gNode)) {
-                    print(gNode, node.getNode());
-                }
-                display(SPACE);
-                display(COBJ);
-                display(V);
-            }
         }
     }
 

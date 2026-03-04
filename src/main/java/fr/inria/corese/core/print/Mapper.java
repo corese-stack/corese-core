@@ -20,10 +20,6 @@ public class Mapper {
 		add(m);
 	}
 	
-	public static Mapper create(Mapping m){
-		return new Mapper(m);
-	}
-	
 	public static Mapper create(){
 		return new Mapper();
 	}

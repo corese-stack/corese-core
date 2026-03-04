@@ -1,7 +1,5 @@
 package fr.inria.corese.core.print;
 
-import java.io.PrintWriter;
-
 import org.apache.commons.text.StringEscapeUtils;
 
 import fr.inria.corese.core.kgram.api.core.Edge;
@@ -66,11 +64,6 @@ public class XMLFormat extends AbstractNestedResultFormat {
     public void setAST(ASTQuery q) {
         ast = q;
     }
-
-    void setWriter(PrintWriter p) {
-        pw = p;
-    }
-
     enum XMLTitle implements Title {
         XMLDEC, OCOM, CCOM
     }
@@ -104,10 +97,6 @@ public class XMLFormat extends AbstractNestedResultFormat {
             return CCOM;
         }
         return "";
-    }
-
-    boolean isMore() {
-        return ast.isMore();
     }
 
     void error() {
@@ -229,18 +218,6 @@ public class XMLFormat extends AbstractNestedResultFormat {
         print(OBOOLEAN);
         print(res);
         println(CBOOLEAN);
-    }
-
-    public void printEmpty(int clause) {
-        println(OHEADER);
-        println(OHEAD);
-        println(CHEAD);
-        if (ast.isSelect()) {
-            print(ORESULTS);
-            println(">");
-            println(CRESULTS);
-        }
-        println(CHEADER);
     }
 
 }

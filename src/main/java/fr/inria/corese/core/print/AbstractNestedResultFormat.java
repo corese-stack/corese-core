@@ -64,10 +64,6 @@ public abstract class AbstractNestedResultFormat extends QueryResultFormat {
         return lMap;
     }
 
-    public void setMappings(Mappings lMap) {
-        this.lMap = lMap;
-    }
-
     /**
      * @return the nbResult
      */
@@ -87,10 +83,6 @@ public abstract class AbstractNestedResultFormat extends QueryResultFormat {
     }
 
     public abstract <T extends Title> String getTitle(T t);
-
-    ASTQuery getAST() {
-        return ast;
-    }
 
     /**
      * @param selectAll the selectAll to set

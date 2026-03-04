@@ -1,8 +1,5 @@
 package fr.inria.corese.core.print;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
@@ -75,17 +72,6 @@ public class NTriplesFormat extends RDFFormat {
         }
 
         return sb.toString();
-    }
-
-    /**
-     * Writes the graph to an output stream in N-Triples format.
-     * 
-     * @param out the output stream to write to
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    public void write(OutputStream out) throws IOException {
-        out.write(this.toString().getBytes());
     }
 
     /**

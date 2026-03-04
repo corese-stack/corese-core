@@ -12,7 +12,6 @@ import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Mappings;
 
 /**
  * The {@code CanonicalRdf10Format} class extends {@code RDFFormat} to provide
@@ -62,17 +61,6 @@ public class CanonicalRdf10 {
     }
 
     /**
-     * Creates a new {@code CanonicalRdf10Format} instance for the graph associated
-     * with the given mappings.
-     * 
-     * @param map the mappings containing the RDF graph to be canonicalized
-     * @return a new instance of {@code CanonicalRdf10Format}
-     */
-    public static CanonicalRdf10 create(Mappings map) {
-        return new CanonicalRdf10((Graph) map.getGraph());
-    }
-
-    /**
      * Creates a new {@code CanonicalRdf10Format} instance for the given graph with
      * a hash algorithm.
      * 
@@ -85,69 +73,7 @@ public class CanonicalRdf10 {
         canonicalRdf10.setHashAlgorithm(hashAlgorithm);
         return canonicalRdf10;
     }
-
-    /**
-     * Creates a new {@code CanonicalRdf10Format} instance for the graph associated
-     * with the given mappings with a hash algorithm.
-     * 
-     * @param map           the mappings containing the RDF graph to be
-     *                      canonicalized
-     * @param hashAlgorithm the hash algorithm to be used for the canonicalization
-     * @return a new instance of {@code CanonicalRdf10Format}
-     */
-    public static CanonicalRdf10 create(Mappings map, HashAlgorithm hashAlgorithm) {
-        CanonicalRdf10 canonicalRdf10 = new CanonicalRdf10((Graph) map.getGraph());
-        canonicalRdf10.setHashAlgorithm(hashAlgorithm);
-        return canonicalRdf10;
-    }
-
     // Accessors
-
-    /**
-     * Returns the depth factor for the canonicalization algorithm.
-     * 
-     * @return the depth factor for the canonicalization algorithm
-     */
-    public int getDepthFactor() {
-        return depthFactor;
-    }
-
-    /**
-     * Sets the depth factor for the canonicalization algorithm.
-     * 
-     * @param depthFactor the depth factor for the canonicalization algorithm
-     */
-    public void setDepthFactor(int depthFactor) {
-        this.depthFactor = depthFactor;
-    }
-
-    /**
-     * Returns the permutation limit for the canonicalization algorithm.
-     * 
-     * @return the permutation limit for the canonicalization algorithm
-     */
-    public int getPermutationLimit() {
-        return permutationLimit;
-    }
-
-    /**
-     * Sets the permutation limit for the canonicalization algorithm.
-     * 
-     * @param permutationLimit the permutation limit for the canonicalization
-     *                         algorithm
-     */
-    public void setPermutationLimit(int permutationLimit) {
-        this.permutationLimit = permutationLimit;
-    }
-
-    /**
-     * Returns the hash algorithm used for the canonicalization algorithm.
-     * 
-     * @return the hash algorithm used for the canonicalization algorithm
-     */
-    public HashAlgorithm getHashAlgorithm() {
-        return hashAlgorithm;
-    }
 
     /**
      * Sets the hash algorithm used for the canonicalization algorithm.

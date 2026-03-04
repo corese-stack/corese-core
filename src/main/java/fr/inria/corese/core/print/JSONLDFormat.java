@@ -1,8 +1,5 @@
 package fr.inria.corese.core.print;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,17 +68,6 @@ public class JSONLDFormat extends RDFFormat {
     JSONLDFormat(NSManager n) {
         super(n);
         nsm = n;
-    }
-
-    JSONLDFormat(Graph g, Query q) {
-        this(q.getAST().getNSM());
-        if (g != null) {
-            graph = g;
-            // graph.prepare();
-            graph.getEventManager().start(Event.Format);
-        }
-        ast = getAST(q);
-        query = q;
     }
 
     JSONLDFormat(Graph g, NSManager n) {
@@ -395,28 +381,6 @@ public class JSONLDFormat extends RDFFormat {
             return label.replaceAll("<|>", "");
         }
         return label;
-    }
-
-    /**
-     * write Json-ld output to file
-     *
-     * @param name file name
-     * @throws IOException
-     */
-    public void write(String name) throws IOException {
-        StringBuilder sb = this.getJsonLdObject().toStringBuilder();
-
-        try (final FileOutputStream fos = new FileOutputStream(name)) {
-            for (int i = 0; i < sb.length(); i++) {
-                fos.write(sb.charAt(i));
-            }
-
-        }
-    }
-
-    @Override
-    public void write(OutputStream out) throws IOException {
-        out.write(this.toString().getBytes());
     }
 
     // error message
