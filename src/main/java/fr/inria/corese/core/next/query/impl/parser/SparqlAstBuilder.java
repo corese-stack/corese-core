@@ -130,9 +130,11 @@ public final class SparqlAstBuilder {
 
     /**
      * IRI term as raw text:
-     * - "<http://...>"
-     * - "foaf:Person"
-     * - "a" shortcut (you may later normalize to rdf:type in the bridge/algebra step)
+     * <ul>
+     *   <li>{@code <http://...>}</li>
+     *   <li>{@code foaf:Person}</li>
+     *   <li>{@code a}</li>
+     * </ul>
      */
     public TermAst iri(String raw) {
         if (raw == null) throw new IllegalArgumentException("IRI raw is null");
