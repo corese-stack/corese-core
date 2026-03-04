@@ -28,8 +28,10 @@ class SparqlAstBuilderTest {
     void shouldBuildEmptyWhereGroupWhenNoTriples() {
         SparqlAstBuilder b = newBuilder();
 
+        b.enterSelectQuery();
         b.enterGroup();
         b.exitGroup();
+        b.exitSelectQuery();
 
         QueryAst ast = b.getResult();
         assertNotNull(ast);
@@ -47,6 +49,7 @@ class SparqlAstBuilderTest {
         b.addTriple(new VarAst("s"), new VarAst("p"), new VarAst("o"));
         b.exitBgp();
         b.exitGroup();
+        b.exitSelectQuery();
 
         QueryAst actual = b.getResult();
 
@@ -65,12 +68,14 @@ class SparqlAstBuilderTest {
     void shouldBuildSingleBgpWithMultipleTriples() {
         SparqlAstBuilder b = newBuilder();
 
+        b.enterSelectQuery();
         b.enterGroup();
         b.enterBgp();
         b.addTriple(new VarAst("s"), b.iri("a"), b.iri("foaf:Person"));
         b.addTriple(new VarAst("s"), b.iri("foaf:name"), new VarAst("n"));
         b.exitBgp();
         b.exitGroup();
+        b.exitSelectQuery();
 
         QueryAst ast = b.getResult();
         BgpAst bgp = singleBgp(ast);
@@ -84,6 +89,7 @@ class SparqlAstBuilderTest {
     void shouldAllowMultipleBgpsInSameGroup() {
         SparqlAstBuilder b = newBuilder();
 
+        b.enterSelectQuery();
         b.enterGroup();
 
         b.enterBgp();
@@ -95,6 +101,7 @@ class SparqlAstBuilderTest {
         b.exitBgp();
 
         b.exitGroup();
+        b.exitSelectQuery();
 
         QueryAst ast = b.getResult();
         GroupGraphPatternAst where = ast.whereClause();
@@ -114,10 +121,12 @@ class SparqlAstBuilderTest {
     void shouldNotAddEmptyBgpToGroup() {
         SparqlAstBuilder b = newBuilder();
 
+        b.enterSelectQuery();
         b.enterGroup();
         b.enterBgp();
         b.exitBgp(); // no triples
         b.exitGroup();
+        b.exitSelectQuery();
 
         QueryAst ast = b.getResult();
         assertEquals(0, ast.whereClause().patterns().size(), "Empty TriplesBlock should not create a BGP pattern");
@@ -127,6 +136,7 @@ class SparqlAstBuilderTest {
     void shouldBuildLiteralTerms() {
         SparqlAstBuilder b = newBuilder();
 
+        b.enterSelectQuery();
         b.enterGroup();
         b.enterBgp();
         b.addTriple(
@@ -141,6 +151,7 @@ class SparqlAstBuilderTest {
         );
         b.exitBgp();
         b.exitGroup();
+        b.exitSelectQuery();
 
         BgpAst bgp = singleBgp(b.getResult());
         assertEquals(2, bgp.triples().size());
@@ -172,28 +183,22 @@ class SparqlAstBuilderTest {
     void exitGroupWithOpenBgpShouldThrow() {
         SparqlAstBuilder b = newBuilder();
 
+        b.enterSelectQuery();
         b.enterGroup();
         b.enterBgp();
         b.addTriple(new VarAst("s"), new VarAst("p"), new VarAst("o"));
 
         assertThrows(IllegalStateException.class, b::exitGroup, "Should not exit group while BGP is open");
+        b.exitSelectQuery();
     }
 
     @Test
     void exitBgpWithoutEnterBgpShouldThrow() {
         SparqlAstBuilder b = newBuilder();
 
+        b.enterSelectQuery();
         b.enterGroup();
         assertThrows(Exception.class, b::exitBgp); // ArrayDeque pop throws NoSuchElementException
-    }
-
-    @Test
-    void getResultBeforeFinalizingShouldThrow() {
-        SparqlAstBuilder b = newBuilder();
-
-        b.enterGroup();
-        // not exited
-        assertThrows(IllegalStateException.class, b::getResult);
     }
 
     // ---------- Defensive copy / immutability checks ----------

@@ -46,13 +46,13 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("should parse a short form ASK {?s ?p ?o} query")
+    @DisplayName("should parse a short form ASK {uri ?p ?o} query")
     public void shouldParseShortAskQueryTest() {
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse("""
                 ASK {
-                  ?s ?p ?o .
+                  <https://ns.inria.fr/corese> ?p ?o .
                 }
                 """);
 
@@ -71,11 +71,11 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
         TriplePatternAst t = bgp.triples().getFirst();
 
-        assertInstanceOf(VarAst.class, t.subject());
+        assertInstanceOf(IriAst.class, t.subject());
         assertInstanceOf(VarAst.class, t.predicate());
         assertInstanceOf(VarAst.class, t.object());
 
-        assertEquals("s", ((VarAst) t.subject()).name());
+        assertEquals("<https://ns.inria.fr/corese>", ((IriAst)t.subject()).raw());
         assertEquals("p", ((VarAst) t.predicate()).name());
         assertEquals("o", ((VarAst) t.object()).name());
     }

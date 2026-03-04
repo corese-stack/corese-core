@@ -13,6 +13,7 @@ import java.util.List;
  * - Triple patterns (?s ?p ?o)
  * - Basic Graph Patterns (BGP) via TriplesBlock
  * - GroupGraphPattern as a container (can contain multiple TriplesBlock and later OPTIONAL/UNION/etc.)
+ * - ASK query
  *
  * Compatible with the common SPARQL grammar shape:
  *
@@ -30,8 +31,6 @@ import java.util.List;
  * - enterAskQuery at the start of the declaration of an ASK query
  */
 public final class SparqlAstBuilder {
-
-    private static final Logger logger = LoggerFactory.getLogger(SparqlAstBuilder.class);
 
     private ASTConstants.QUERY_TYPE queryType = ASTConstants.QUERY_TYPE.UNDEFINED;
 
@@ -55,7 +54,6 @@ public final class SparqlAstBuilder {
     // --- Construction entry points (called by listener) ---
 
     public void enterAskQuery() {
-
         queryType = ASTConstants.QUERY_TYPE.ASK;
     }
 
@@ -76,25 +74,10 @@ public final class SparqlAstBuilder {
 
     /**
      * Exit a { ... } groupGraphPattern.
-     * It finalizes the group into a GroupGraphPatternAst.
-     *
-     * If this is the top-level group (stack becomes empty), we produce the final QueryAst.
-     * If there is a parent group (nested group), we add it as a pattern (optional, depending on your AST design).
+     * Should not be called if there are still Triple pattern outside a group
      */
     public void exitGroup() {
         ensureNoOpenBgp("exitGroup() called while a TriplesBlock/BGP is still open");
-
-        List<PatternAst> patterns = groupStack.pop();
-        GroupGraphPatternAst groupAst = new GroupGraphPatternAst(List.copyOf(patterns));
-
-        if (groupStack.isEmpty()) {
-            this.result = new SelectQueryAst(groupAst);
-        } else {
-            // If you want nested groups to be representable as patterns:
-            // you can add a GroupPatternAst wrapper, or just flatten.
-            // For now we flatten by adding contained patterns into parent (simple + OK for MVP).
-            groupStack.peek().addAll(groupAst.patterns());
-        }
     }
 
     /** Enter a TriplesBlock -> begin collecting triples for a BGP. */
@@ -129,8 +112,26 @@ public final class SparqlAstBuilder {
 
     // --- Result ---
 
-    /** Returns the final AST. Valid only after top-level exitGroup(). */
+    /** Returns the final AST.
+     * If the group stack contains several elements, they are put inside a single GroupGraphPattern.
+     * any of enterAskQuery, enterSelectQuery must have been called before or this will throw a QueryEvaluationException
+     * @throws QueryEvaluationException if no enter*Query() function have been entered during building
+     * */
     public QueryAst getResult() {
+        List<PatternAst> finalPatternContentList = this.groupStack.stream().map(list -> (PatternAst)new GroupGraphPatternAst(list)).toList();
+        GroupGraphPatternAst consolidatedFinalGroupPattern;
+        if(finalPatternContentList.size() == 1 && finalPatternContentList.getFirst() instanceof GroupGraphPatternAst) {
+            consolidatedFinalGroupPattern = (GroupGraphPatternAst) finalPatternContentList.getFirst();
+        } else {
+            consolidatedFinalGroupPattern = new GroupGraphPatternAst(finalPatternContentList);
+        }
+        switch (this.queryType) {
+            case ASK -> this.result = new AskQueryAst(consolidatedFinalGroupPattern);
+//                case CONSTRUCT -> this.result = new ConstructQueryAst(groupAst, otherGroupAst);
+//                case DESCRIBE -> this.result = new DescribeQueryAst(termAst);
+            case SELECT -> this.result = new SelectQueryAst(consolidatedFinalGroupPattern);
+            case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
+        }
         if (result == null) {
             throw new IllegalStateException("AST not finalized. Did you call exitGroup() for the top-level GroupGraphPattern?");
         }
