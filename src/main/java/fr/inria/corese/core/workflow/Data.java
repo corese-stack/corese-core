@@ -45,19 +45,9 @@ public class Data {
         graph = g;
     }
 
-    public Data(Graph g, DataManager man) {
-        graph = g;
-        setDataManager(man);
-    }
-
     Data(Graph g, IDatatype dt) {
         graph = g;
         datatype = dt;
-    }
-
-    Data(Mappings m, Graph g) {
-        map = m;
-        graph = g;
     }
 
     Data(WorkflowProcess p, Mappings m, Graph g) {
@@ -135,10 +125,6 @@ public class Data {
         return map;
     }
 
-    public void setMappings(Mappings map) {
-        this.map = map;
-    }
-
     public Graph getGraph() {
         return graph;
     }
@@ -152,10 +138,6 @@ public class Data {
             return null;
         }
         return getGraph().getEventManager();
-    }
-
-    public Context getContext() {
-        return context;
     }
 
     public void setContext(Context context) {
@@ -183,10 +165,6 @@ public class Data {
 
     public void setTemplateResult(String templateResult) {
         this.templateResult = templateResult;
-    }
-
-    public Dataset getDataset() {
-        return dataset;
     }
 
     public void setDataset(Dataset dataset) {
@@ -295,13 +273,6 @@ public class Data {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public IDatatype getValue(String var) {
-        if (getMappings() == null) {
-            return null;
-        }
-        return getMappings().getValue(var);
     }
 
     public boolean isSuccess() {

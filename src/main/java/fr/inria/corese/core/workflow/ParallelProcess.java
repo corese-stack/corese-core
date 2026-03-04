@@ -3,7 +3,6 @@ package fr.inria.corese.core.workflow;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Run Processes as in parallel with copy of input Graph
@@ -11,10 +10,6 @@ import java.util.List;
  * @author Olivier Corby, Wimmics INRIA I3S, 2016
  */
 public class ParallelProcess extends SemanticProcess {
-
-    ParallelProcess(List<WorkflowProcess> l) {
-        super(l);
-    }
 
     public ParallelProcess() {
         super();

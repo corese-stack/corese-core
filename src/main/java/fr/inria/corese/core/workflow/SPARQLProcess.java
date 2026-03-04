@@ -199,36 +199,6 @@ public class SPARQLProcess extends WorkflowProcess {
     }
 
     /**
-     * replace $pattern by code that is computed
-     * name : name of param, e.g. st:mode
-     * param: value of param : e.g. db:Algérie
-     * value : list of values for param that match for option[0]
-     * option[0] = code when param match value
-     * option[1] = code when param does not match value
-     * return replace($pattern, if (param.match(value), option[0], option[1])
-     */
-    @Deprecated
-    String pattern(String query) {
-        IDatatype name = getValue(getParam(), Context.STL_PATTERN_PARAM);
-        IDatatype value = getValue(getValue(), Context.STL_PATTERN_VALUE);
-        IDatatype option = getValue(getOption(), Context.STL_PATTERN_OPTION);
-        IDatatype param = (name == null) ? null : getContext().get(name);
-        IDatatype pattern = getContext().get(Context.STL_PATTERN);
-        String pat = (pattern == null) ? PATTERN : pattern.stringValue();
-        if (option == null || value == null || param == null) {
-            return query;
-        }
-        IDatatype target;
-        if (value.getValues().contains(param)) {
-            target = option.getList().get(0);
-        } else {
-            target = option.getList().get(1);
-        }
-        query = query.replace(pat, target.stringValue());
-        return query;
-    }
-
-    /**
      * st:uri may be the uri of the query in the workflow (cf tutorial)
      */
     IDatatype getValue(IDatatype value, String name) {
@@ -345,28 +315,11 @@ public class SPARQLProcess extends WorkflowProcess {
         this.query = query;
     }
 
-    @Override
-    public boolean isQuery() {
-        return true;
-    }
-
-    @Override
-    public SPARQLProcess getQueryProcess() {
-        return this;
-    }
-
     /**
      * @return the param
      */
     public IDatatype getParam() {
         return param;
-    }
-
-    /**
-     * @param param the param to set
-     */
-    public void setParam(IDatatype param) {
-        this.param = param;
     }
 
     /**
@@ -388,13 +341,6 @@ public class SPARQLProcess extends WorkflowProcess {
      */
     public IDatatype getOption() {
         return option;
-    }
-
-    /**
-     * @param option the option to set
-     */
-    public void setOption(IDatatype option) {
-        this.option = option;
     }
 
     /**

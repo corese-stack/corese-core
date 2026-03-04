@@ -17,13 +17,10 @@ import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.transform.ContextBuilder;
-import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -126,14 +123,6 @@ public class WorkflowParser {
         graph = g;
     }
 
-
-    public WorkflowParser(SemanticWorkflow wp, Graph g) {
-        this();
-        graph = g;
-        this.sw = wp;
-        setContext(wp.getContext());
-    }
-
     Context getContext() {
         return context;
     }
@@ -182,10 +171,6 @@ public class WorkflowParser {
         return w;
     }
 
-    public SemanticWorkflow parse(InputStream stream, String path) throws LoadException, SafetyException {
-        return parse(new InputStreamReader(stream), path);
-    }
-
     public SemanticWorkflow parse(Reader stream, String path) throws LoadException, SafetyException {
         setPath(path);
         Graph g = Graph.create();
@@ -210,14 +195,6 @@ public class WorkflowParser {
         parseNode(wf);
         complete(sw, wf.getValue());
         return sw;
-    }
-
-    public SemanticWorkflow parseWE(Node wf) throws LoadException {
-        try {
-            return parse(wf);
-        } catch (SafetyException ex) {
-            throw new LoadException((ex));
-        }
     }
 
     void parseNode(Node wf) throws LoadException, SafetyException {
@@ -543,13 +520,6 @@ public class WorkflowParser {
         return getParam(node, pred, name, false, false);
     }
 
-    /**
-     * Retrieve param from workflow graph pred or from context name
-     */
-    String getParam(IDatatype node, String pred, String name, boolean uri) throws SafetyException {
-        return getParam(node, pred, name, uri, false);
-    }
-
     String getParam(IDatatype node, String pred, String name, boolean uri, boolean check) throws SafetyException {
         // in graph
         IDatatype dt = getValue(pred, node);
@@ -587,12 +557,6 @@ public class WorkflowParser {
             return null;
         }
         return dt.getLabel();
-    }
-
-    String getCheckParam(String name) throws SafetyException {
-        String value = getStringParam(name);
-        check(value);
-        return value;
     }
 
     // TODO: fix it
@@ -832,13 +796,6 @@ public class WorkflowParser {
     }
 
     /**
-     * @param wp the wp to set
-     */
-    public void setWorkflowProcess(SemanticWorkflow wp) {
-        this.sw = wp;
-    }
-
-    /**
      * @return the graph
      */
     public Graph getGraph() {
@@ -885,13 +842,6 @@ public class WorkflowParser {
      */
     public PreProcessor getProcessor() {
         return process;
-    }
-
-    /**
-     * @param process the process to set
-     */
-    public void setProcessor(PreProcessor process) {
-        this.process = process;
     }
 
     /**

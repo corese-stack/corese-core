@@ -1,11 +1,7 @@
 package fr.inria.corese.core.workflow;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.GraphStore;
-import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 
 /**
@@ -54,23 +50,6 @@ public class SemanticWorkflow extends CompositeProcess {
         return this;
     }
 
-    public SemanticWorkflow addQuery(String q) {
-        return add(new SPARQLProcess(q));
-    }
-
-    public SemanticWorkflow addQuery(String q, int n, boolean protect, Access.Level l) {
-        SPARQLProcess wp = getEmptyQuery();
-        if (wp == null) {
-            wp = new SPARQLProcess(q);
-
-            return add(wp, n);
-        }
-        wp.setUserQuery(protect);
-        wp.setLevel(l);
-        wp.setQuery(q);
-        return this;
-    }
-
     SPARQLProcess getEmptyQuery() {
         for (WorkflowProcess wp : getProcessList()) {
             if (wp instanceof SPARQLProcess && wp.isEmpty()) {
@@ -80,69 +59,10 @@ public class SemanticWorkflow extends CompositeProcess {
         return null;
     }
 
-    public SemanticWorkflow addQuery(String q, String path) {
-        return add(new SPARQLProcess(q, path));
-    }
-
-    // return input graph
-    public SemanticWorkflow addQueryProbe(String q) {
-        SPARQLProcess sp = new SPARQLProcess(q);
-        sp.setProbe(true);
-        return add(sp);
-    }
-
-    // select return Graph Mappings
-    public SemanticWorkflow addQueryGraph(String q, boolean protect, Access.Level l) {
-        SPARQLProcess sp = new SPARQLProcess(q);
-        sp.setUserQuery(protect);
-        sp.setLevel(l);
-        sp.setResult(GRAPH);
-        return add(sp);
-    }
-
-    public SemanticWorkflow addQueryMapping(String q, boolean protect, Access.Level l) {
-        SPARQLProcess sp = new SPARQLProcess(q);
-        sp.setUserQuery(protect);
-        sp.setLevel(l);
-        return add(sp);
-    }
-
-    public SemanticWorkflow addTemplate(String q) {
-        return add(new TransformationProcess(q));
-    }
-
-    public SemanticWorkflow addTemplate(String q, boolean isDefault) {
-        return add(new TransformationProcess(q, isDefault));
-    }
-
-    public SemanticWorkflow addRule(String q) {
-        return add(new RuleProcess(q));
-    }
-
-    // RuleBase.OWL_RL
-    public SemanticWorkflow addRule(RuleEngine.Profile type) {
-        return add(new RuleProcess(type));
-    }
-
-    public SemanticWorkflow addResult(ResultFormatDef.format type) {
-        return add(new ResultProcess(type));
-    }
-
-    public SemanticWorkflow addResult() {
-        return add(new ResultProcess());
-    }
-
 
     @Override
     public void initialize() {
         super.initialize();
-    }
-
-    /**
-     * starting point of a Workflow
-     */
-    public Data process() throws EngineException {
-        return process(new Data(GraphStore.create()));
     }
 
     /**
@@ -293,19 +213,6 @@ public class SemanticWorkflow extends CompositeProcess {
             return null;
         } else {
             return wp.getTransformation();
-        }
-    }
-
-    public boolean hasTransformation() {
-        return getTransformation() != null;
-    }
-
-    public boolean hasResult() {
-        WorkflowProcess wp = getProcessLast();
-        if (wp == null) {
-            return false;
-        } else {
-            return (wp instanceof ResultProcess);
         }
     }
 

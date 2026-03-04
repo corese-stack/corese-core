@@ -18,10 +18,6 @@ public class ResultProcess extends WorkflowProcess {
         format = type;
     }
 
-    public ResultProcess(String type) {
-        format = ResultFormat.getFormat(type);
-    }
-
     @Override
     public Data run(Data data) throws EngineException {
         Data res = new Data(this, data.getMappings(), data.getGraph());
