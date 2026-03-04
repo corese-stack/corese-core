@@ -44,9 +44,6 @@ public class Closure {
      * if isConnect() generate a connection matrix for this predicate Transitive
      * edge will not be created in kg:rule for nodes that are already connected
      */
-    public void init(Node p) {
-        init(p, p);
-    }
 
     public void init(Node p1, Node p2) {
         // named graph where entailments are stored

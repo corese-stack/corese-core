@@ -133,14 +133,6 @@ public class Distance {
         return dist;
     }
 
-    public void setExtended(boolean b) {
-        isExtended = b;
-    }
-
-    void setProperty(boolean b) {
-        isProperty = b;
-    }
-
     public void setStep(double f) {
         step = f;
     }
@@ -167,11 +159,6 @@ public class Distance {
         dmax = 0;
         K = 1;
         initDepth();
-    }
-
-    void reinit() {
-        reset();
-        init();
     }
 
     void initDepth() {
@@ -282,14 +269,6 @@ public class Distance {
         K = Math.pow(step, max) / 100.0;
     }
 
-    public double maxDistance() {
-        return dmax;
-    }
-
-    public double similarity(double distance) {
-        return similarity(distance, 1);
-    }
-
     public double similarity(double distance, int num) {
         double dist = distance / (dmax * num);
         double sim = 1 / (1 + (K * dist)); // 1/1+0=1 1/1+1 = 1/2 1/1+2 = 1/3
@@ -330,16 +309,6 @@ public class Distance {
         return getBroker().getNodeList(subEntityOf, node, 1);
     }
 
-    /**
-     * Return ontological distance between two concepts Distance is the sum of
-     * distance (by steps) to the deepest common ancestor Compute the deepest
-     * common ancestor by climbing step by step through ancestors always walk
-     * through deepest ancestors of c1 or c2 (i.e. delay less deep ancestors)
-     * hence the first common ancestor is the deepest
-     */
-    public Double sdistance(Node c1, Node c2) {
-        return distance(c1, c2);
-    }
 
     public double similarity(Node c1, Node c2) {
         if (c1.equals(c2)) {
@@ -348,6 +317,14 @@ public class Distance {
         Double d = distance(c1, c2);
         return similarity(d, 1);
     }
+
+    /**
+     * Return ontological distance between two concepts Distance is the sum of
+     * distance (by steps) to the deepest common ancestor Compute the deepest
+     * common ancestor by climbing step by step through ancestors always walk
+     * through deepest ancestors of c1 or c2 (i.e. delay less deep ancestors)
+     * hence the first common ancestor is the deepest
+     */
 
     public double distance(Node c1, Node c2) {
         return (Double) distance(c1, c2, true);
@@ -365,41 +342,9 @@ public class Distance {
         NodeList() {
         }
 
-        NodeList(Node n) {
-            add(n);
-        }
-
         NodeList(List<Node> l) {
             addAll(l);
         }
-    }
-
-    class MyTable extends Hashtable<Node, Double> {
-
-        boolean hasRoot = false;
-        boolean change = true;
-
-        @Override
-        public Double put(Node n, Double d) {
-            setChange(true);
-            if (isRoot(n)) {
-                hasRoot = true;
-            }
-            return super.put(n, d);
-        }
-
-        public boolean contains(Node n) {
-            return containsKey(n);
-        }
-
-        public void setChange(boolean b) {
-            change = b;
-        }
-
-        public boolean isChange() {
-            return change;
-        }
-
     }
 
     class Table extends Hashtable<String, Double> {
@@ -426,10 +371,6 @@ public class Distance {
 
         public void setChange(boolean b) {
             change = b;
-        }
-
-        public boolean isChange() {
-            return change;
         }
 
     }
@@ -715,13 +656,6 @@ public class Distance {
     }
 
     /**
-     * @param broader the broader to set
-     */
-    public void setBroader(String broader) {
-        this.broader = broader;
-    }
-
-    /**
      * @return the graph
      */
     public Graph getGraph() {
@@ -741,10 +675,6 @@ public class Distance {
 
     public void setBroker(BrokerDistance broker) {
         this.broker = broker;
-    }
-
-    public DataManager getDataManager() {
-        return dataManager;
     }
 
     public void setDataManager(DataManager dataManager) {

@@ -1,7 +1,6 @@
 package fr.inria.corese.core.logic;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.transform.DefaultVisitor;
 import fr.inria.corese.core.transform.TemplateVisitor;
 import fr.inria.corese.core.transform.Transformer;
@@ -26,16 +25,7 @@ public class OWLProfile {
     private Map<IDatatype, IDatatype> error;
     private String message;
 
-              
-    public OWLProfile (Graph g) {
-        setGraph(g);
-    }
-       
-    // default is OWL Checker
-    public boolean process() throws EngineException {
-        return process(OWL_TC);
-    }
-        
+          
     public boolean process(String type) throws EngineException {
         Transformer checker = Transformer.create(getGraph(), type);
         TemplateVisitor vis = new DefaultVisitor();
@@ -65,18 +55,6 @@ public class OWLProfile {
         }
     }
         
-    public IDatatype pretty(IDatatype dt) throws EngineException {
-        if (dt.isBlank()) {
-            Transformer t = Transformer.create(getGraph(), TransformerUtils.TURTLE);
-            return t.process(dt);
-        }
-        else {
-            return dt;
-        }
-    }
-    
-
-    
   
     
 
@@ -94,10 +72,6 @@ public class OWLProfile {
 
     public void setError(Map<IDatatype, IDatatype> error) {
         this.error = error;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     public void setMessage(String message) {
