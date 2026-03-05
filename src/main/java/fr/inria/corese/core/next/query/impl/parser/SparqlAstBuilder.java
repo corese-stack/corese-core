@@ -42,9 +42,10 @@ public final class SparqlAstBuilder {
     /** Stack of current BGP triples (TriplesBlock). Nested blocks are rare but stack keeps it safe. */
     private final Deque<List<TriplePatternAst>> bgpStack = new ArrayDeque<>();
 
-    /** Final result after exitGroupGraphPattern of the top-level WHERE group. */
-    private QueryAst result;
+    /** Top-level WHERE clause, set when the root group is closed in exitGroup(). */
+    private GroupGraphPatternAst whereClause;
 
+    /** Parser options (e.g. for future use: strict mode, base IRI). */
     private final SparqlParserOptions options;
 
     public SparqlAstBuilder(SparqlParserOptions options) {
@@ -74,10 +75,19 @@ public final class SparqlAstBuilder {
 
     /**
      * Exit a { ... } groupGraphPattern.
-     * Should not be called if there are still Triple pattern outside a group
+     * Pops the current group, wraps it in {@link GroupGraphPatternAst}; if there is a parent group,
+     * adds it there; otherwise stores it as the top-level WHERE clause for {@link #getResult()}.
+     * Must not be called while a TriplesBlock is still open (no pending enterBgp without exitBgp).
      */
     public void exitGroup() {
         ensureNoOpenBgp("exitGroup() called while a TriplesBlock/BGP is still open");
+        List<PatternAst> popped = groupStack.pop();
+        GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
+        if (groupStack.isEmpty()) {
+            whereClause = group;
+        } else {
+            currentGroup().add(group);
+        }
     }
 
     /** Enter a TriplesBlock -> begin collecting triples for a BGP. */
@@ -112,30 +122,26 @@ public final class SparqlAstBuilder {
 
     // --- Result ---
 
-    /** Returns the final AST.
-     * If the group stack contains several elements, they are put inside a single GroupGraphPattern.
-     * any of enterAskQuery, enterSelectQuery must have been called before or this will throw a QueryEvaluationException
-     * @throws QueryEvaluationException if no enter*Query() function have been entered during building
-     * */
+    /**
+     * Returns the final AST.
+     * The top-level WHERE clause must have been set by exitGroup() (root group closed).
+     * One of enterAskQuery() or enterSelectQuery() must have been called before, or this throws.
+     *
+     * @return the root QueryAst (AskQueryAst or SelectQueryAst)
+     * @throws QueryEvaluationException if query type could not be determined (no enter*Query() called)
+     * @throws IllegalStateException if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
+     */
     public QueryAst getResult() {
-        List<PatternAst> finalPatternContentList = this.groupStack.stream().map(list -> (PatternAst)new GroupGraphPatternAst(list)).toList();
-        GroupGraphPatternAst consolidatedFinalGroupPattern;
-        if(finalPatternContentList.size() == 1 && finalPatternContentList.getFirst() instanceof GroupGraphPatternAst) {
-            consolidatedFinalGroupPattern = (GroupGraphPatternAst) finalPatternContentList.getFirst();
-        } else {
-            consolidatedFinalGroupPattern = new GroupGraphPatternAst(finalPatternContentList);
+        if (whereClause == null) {
+            throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
-        switch (this.queryType) {
-            case ASK -> this.result = new AskQueryAst(consolidatedFinalGroupPattern);
-//                case CONSTRUCT -> this.result = new ConstructQueryAst(groupAst, otherGroupAst);
-//                case DESCRIBE -> this.result = new DescribeQueryAst(termAst);
-            case SELECT -> this.result = new SelectQueryAst(consolidatedFinalGroupPattern);
+        return switch (this.queryType) {
+            case ASK -> new AskQueryAst(whereClause);
+            case CONSTRUCT -> null; // not yet implemented
+            case DESCRIBE -> null; // not yet implemented
+            case SELECT -> new SelectQueryAst(whereClause);
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
-        }
-        if (result == null) {
-            throw new IllegalStateException("AST not finalized. Did you call exitGroup() for the top-level GroupGraphPattern?");
-        }
-        return result;
+        };
     }
 
     // --- Term helpers (triple pattern building) ---
