@@ -8,8 +8,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -220,6 +218,38 @@ public final class SparqlAstBuilder {
     }
 
     /**
+     * Exits a Filter, builds FilterAst and adds it to the current group
+     */
+    public void exitFilter() {
+        FilterAst filter;
+        if(! this.operatorNameStack.isEmpty() && ! this.operatorArgumentsStack.isEmpty()) { // Filter(Op(...))
+            OperatorAst rootOperatorAst = this.operator(this.operatorNameStack.pop(), this.operatorArgumentsStack.pop());
+            if(rootOperatorAst instanceof BooleanOperatorAst booleanOperatorAst) {
+                filter = new FilterAst(booleanOperatorAst);
+            } else {
+                throw new QueryEvaluationException("Expecting either boolean operator or boolean literal in the filter, got non-boolean operator");
+            }
+        } else if (this.operatorNameStack.isEmpty() && ! this.operatorArgumentsStack.isEmpty() && this.operatorArgumentsStack.peek().size() == 1) { // Filter(Literal)
+            List<TermAst> loneArg = this.operatorArgumentsStack.pop();
+            TermAst loneTerm = loneArg.getFirst();
+            if(loneTerm instanceof LiteralAst literalAst) {
+                if(literalAst.datatype().equals(XSD.xsdString.getIRI().stringValue())) {
+                    filter = new FilterAst(literalAst);
+                } else {
+                    throw new QueryEvaluationException("Expecting literal in the filter to be of type xsd:boolean");
+                }
+            } else {
+                throw new QueryEvaluationException("Expecting boolean literal as argument of the filter, got term " + loneTerm);
+            }
+        } else {
+            throw new QueryEvaluationException("Unexpected state during Filter construction (operators=" + this.operatorNameStack + " arguments=" + this.operatorArgumentsStack);
+        }
+        if(this.hasCurrentGroup()) {
+            this.currentGroup().add(filter);
+        }
+    }
+
+    /**
      * Add a triple pattern (?s ?p ?o) to the current BGP (TriplesBlock).
      * This must be called while inside a TriplesBlock.
      */
@@ -289,6 +319,139 @@ public final class SparqlAstBuilder {
 
     private boolean hasCurrentGroup() {
         return !this.groupStack.isEmpty();
+    }
+
+    /**
+     * IRI term as raw text:
+     * <ul>
+     *   <li>{@code <http://...>}</li>
+     *   <li>{@code foaf:Person}</li>
+     *   <li>{@code a}</li>
+     * </ul>
+     */
+    public TermAst iri(String raw) {
+        if (raw == null) throw new IllegalArgumentException("IRI raw is null");
+        return new IriAst(raw);
+    }
+
+    /**
+     * Literal term.
+     * - lexical should be the literal lexical form (often including quotes at this stage)
+     * - lang without '@' (e.g., "fr"), or null
+     * - datatype as IRI/QName text (e.g., "xsd:integer"), or null
+     */
+    public TermAst literal(String lexical, String lang, String datatype) {
+        if (lexical == null) throw new IllegalArgumentException("Literal lexical is null");
+        return new LiteralAst(lexical, lang, datatype);
+    }
+
+    // --- Internal helpers ---
+
+    /**
+     * Creates the right operator AST according to keyword and argument list
+     * @param operator keyword
+     * @param args arguments list
+     * @return An OperatorAst
+     */
+    private OperatorAst operator(ASTConstants.OPERATOR operator, List<TermAst> args) {
+        switch (args.size()) {
+            case 1 -> {
+                switch (operator) {
+                    case BOOLEAN_NOT -> {
+                        return new BooleanNotAst(args.getFirst());
+                    }
+                    case PLUS -> {
+                        return new UnaryPlusAst(args.getFirst());
+                    }
+                    case MINUS -> {
+                        return new UnaryMinusAst(args.getFirst());
+                    }
+                    case BOUND -> {
+                        return new BoundAst(args.getFirst());
+                    }
+                    case IS_IRI -> {
+                        return new IsIriAst(args.getFirst());
+                    }
+                    case IS_BLANK -> {
+                        return new IsBlankAst(args.getFirst());
+                    }
+                    case IS_LITERAL -> {
+                        return new IsLiteralAst(args.getFirst());
+                    }
+                    case STR -> {
+                        return new StrAst(args.getFirst());
+                    }
+                    case LANG -> {
+                        return new LangAst(args.getFirst());
+                    }
+                    case DATATYPE -> {
+                        return new DatatypeAst(args.getFirst());
+                    }
+                    default -> throw new QueryEvaluationException("Unexpected number of arguments (1) for " + operator.name() + " keyword");
+                }
+            }
+            case 2 -> {
+                switch (operator) {
+                    case OR -> {
+                        return new OrAst(args.getFirst(), args.getLast());
+                    }
+                    case AND -> {
+                        return new AndAst(args.getFirst(), args.getLast());
+                    }
+                    case EQUALS -> {
+                        return new EqualsAst(args.getFirst(), args.getLast());
+                    }
+                    case DIFFERENT -> {
+                        return new DifferentAst(args.getFirst(), args.getLast());
+                    }
+                    case LOWER -> {
+                        return new LowerThanAst(args.getFirst(), args.getLast());
+                    }
+                    case LOWER_EQUAL -> {
+                        return new LowerOrEqualThanAst(args.getFirst(), args.getLast());
+                    }
+                    case GREATER -> {
+                        return new GreaterThanAst(args.getFirst(), args.getLast());
+                    }
+                    case GREATER_EQUAL -> {
+                        return new GreaterOrEqualThanAst(args.getFirst(), args.getLast());
+                    }
+                    case TIMES -> {
+                        return new MultiplyAst(args.getFirst(), args.getLast());
+                    }
+                    case DIVIDE -> {
+                        return new DivideAst(args.getFirst(), args.getLast());
+                    }
+                    case PLUS -> {
+                        return new AddAst(args.getFirst(), args.getLast());
+                    }
+                    case MINUS -> {
+                        return new SubtractAst(args.getFirst(), args.getLast());
+                    }
+                    case SAMETERM -> {
+                        return new SameTermAst(args.getFirst(), args.getLast());
+                    }
+                    case LANGMATCHES -> {
+                        return new LangMatchesAst(args.getFirst(), args.getLast());
+                    }
+                    case REGEX -> {
+                        return new BinaryRegexAst(args.getFirst(), args.getLast());
+                    }
+                    default -> throw new QueryEvaluationException("Unexpected number of arguments (2) for " + operator.name() + " keyword");
+                }
+            }
+            case 3 -> {
+                if (Objects.requireNonNull(operator) == ASTConstants.OPERATOR.REGEX) {
+                    return new TrinaryRegexAst(args.getFirst(), args.get(1), args.getLast());
+                }
+                throw new QueryEvaluationException("Unexpected number of arguments (3) for " + operator.name() + " keyword");
+            }
+            default -> throw new QueryEvaluationException("Unexpected number of arguments (" + args.size() + ") for " + operator.name());
+        }
+    }
+
+    private boolean hasCurrentGroup() {
+        return ! this.groupStack.isEmpty();
     }
 
     private List<PatternAst> currentGroup() {
