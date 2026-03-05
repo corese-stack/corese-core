@@ -1,6 +1,5 @@
 package fr.inria.corese.core.query;
 
-import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.kgram.api.query.Provider;
@@ -45,24 +44,6 @@ public class ProviderImpl implements Provider, URLParam {
         ProviderImpl pi = ProviderImpl.create();
         pi.setDefault(exec);
         return pi;
-    }
-
-    /**
-     * Define a QueryProcess for this URI
-     */
-    public void add(String uri, Graph g) {
-        QueryProcess exec = QueryProcess.create(g);
-        exec.set(this);
-        table.put(uri, exec);
-    }
-
-    /**
-     * Define a default QueryProcess
-     */
-    public void add(Graph g) {
-        QueryProcess exec = QueryProcess.create(g);
-        exec.set(this);
-        setDefault(exec);
     }
 
     /**

@@ -46,14 +46,6 @@ public class Mapper {
 
     }
 
-    public Mappings map(List<Node> nodes, Object object, int n) {
-        if (object instanceof IDatatype) {
-            return map(nodes, (IDatatype) object, n);
-        } else {
-            return map(nodes, object);
-        }
-    }
-
     public Mappings map(List<Node> nodes, IDatatype list, int n) {
         if (n <= 1) {
             return map(nodes, list);
@@ -284,15 +276,6 @@ public class Mapper {
         return map;
     }
 
-    Mappings map(List<Node> lNodes, IDatatype[] list) {
-        Mappings map = new Mappings();
-        for (IDatatype dt : list) {
-            Mapping m = Mapping.create(lNodes.get(0), dt);
-            map.add(m);
-        }
-        return map;
-    }
-
     /**
      * Binding by name Eval extBind() bind list of Node on this Mappings by name
      */
@@ -325,10 +308,6 @@ public class Mapper {
             lMap.add(map);
         }
         return lMap;
-    }
-
-    public List<Node> toNodeList(Object obj) {
-        return toNodeList((IDatatype) obj);
     }
 
     public List<Node> toNodeList(IDatatype dt) {

@@ -142,13 +142,6 @@ public class WorkflowProcess implements AbstractProcess {
         return "Data";
     }
 
-    String getService() {
-        if (getContext() == null || getContext().getService() == null) {
-            return "undefined service";
-        }
-        return getContext().getService();
-    }
-
     /**
      * @return the context
      */
@@ -198,13 +191,6 @@ public class WorkflowProcess implements AbstractProcess {
 
 
     /**
-     * @return the data
-     */
-    public Data getData() {
-        return data;
-    }
-
-    /**
      * @param data the data to set
      */
     public void setData(Data data) {
@@ -228,14 +214,6 @@ public class WorkflowProcess implements AbstractProcess {
     boolean hasVisitor() {
         return recVisitor() != null;
     }
-
-    boolean isVerbose() {
-        boolean b1 = getMode() == null || !getModeString().equals(WorkflowParser.SILENT);
-        boolean b2 = getContext().get(WorkflowParser.MODE) == null ||
-                !getContext().get(WorkflowParser.MODE).stringValue().equals(WorkflowParser.SILENT);
-        return b1 && b2;
-    }
-
 
     WorkflowProcess pgetWorkflow() {
         if (workflow != null) {
@@ -278,10 +256,6 @@ public class WorkflowProcess implements AbstractProcess {
         return false;
     }
 
-    boolean isTemplate() {
-        return false;
-    }
-
     boolean isShape() {
         return true;
     }
@@ -315,13 +289,6 @@ public class WorkflowProcess implements AbstractProcess {
     @Override
     public void setResult(String r) {
         result = r;
-    }
-
-    /**
-     * @return the uri
-     */
-    public String getURI() {
-        return uri;
     }
 
     /**
@@ -434,13 +401,6 @@ public class WorkflowProcess implements AbstractProcess {
     }
 
     /**
-     * @param visitor the visitor to set
-     */
-    public void setVisitor(WorkflowVisitor visitor) {
-        this.visitor = visitor;
-    }
-
-    /**
      * @return the path
      */
     public String getPath() {
@@ -463,13 +423,6 @@ public class WorkflowProcess implements AbstractProcess {
      */
     public boolean isLog() {
         return log;
-    }
-
-    /**
-     * @param log the log to set
-     */
-    public void setLog(boolean log) {
-        this.log = log;
     }
 
     /**

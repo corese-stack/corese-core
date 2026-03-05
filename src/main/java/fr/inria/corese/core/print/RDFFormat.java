@@ -1,10 +1,7 @@
 package fr.inria.corese.core.print;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -136,13 +133,6 @@ public class RDFFormat {
         return new RDFFormat(m, nsm());
     }
 
-    public static RDFFormat create(Mapping m, NSManager n) {
-        if (n == null) {
-            return create(m);
-        }
-        return new RDFFormat(m, n);
-    }
-
     public static RDFFormat create(NSManager n) {
         return new RDFFormat(n);
     }
@@ -152,14 +142,6 @@ public class RDFFormat {
             map = Mapper.create();
         }
         map.add(m);
-    }
-
-    public void with(String name) {
-        with.add(name);
-    }
-
-    public void without(String name) {
-        without.add(name);
     }
 
     Iterable<Node> getNodes() {
@@ -202,15 +184,6 @@ public class RDFFormat {
     public String toString() {
         StringBuilder bb = getStringBuilder();
         return bb.toString();
-    }
-
-    public void write(String name) throws IOException {
-
-        StringBuilder sb = getStringBuilder();
-        try (final FileOutputStream fos = new FileOutputStream(name);
-             final Writer out = new OutputStreamWriter(fos)) {
-            out.write(sb.toString());
-        }
     }
 
     public void write(OutputStream out) throws IOException {
@@ -401,12 +374,6 @@ public class RDFFormat {
 
     IDatatype getValue(Node node) {
         return node.getValue();
-    }
-
-    void display(String mes, Object obj) {
-        sb.append(mes);
-        sb.append(obj);
-        sb.append(NL);
     }
 
     void display(Object obj) {

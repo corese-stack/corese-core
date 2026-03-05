@@ -3,13 +3,9 @@ package fr.inria.corese.core.transform;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.Context;
@@ -33,28 +29,6 @@ public class ContextBuilder {
         this.graph = g;
         done = new HashMap<String, Node>();
         context = new Context();
-    }
-
-    public ContextBuilder(String path) {
-        this(Graph.create());
-        Load ld = Load.create(graph);
-        try {
-            ld.parse(path);
-        } catch (LoadException ex) {
-            LoggerFactory.getLogger(ContextBuilder.class.getName()).error("", ex);
-        }
-    }
-
-    /**
-     * 
-     * Create a Context from content of st:param
-     */
-    public Context process() {
-        Edge ent = graph.getEdge(Context.STL_PARAM);
-        if (ent == null) {
-            return context;
-        }
-        return process(ent.getNode(1));
     }
 
     public Context process(Node ctx) {

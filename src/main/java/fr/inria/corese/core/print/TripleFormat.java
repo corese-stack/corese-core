@@ -8,7 +8,6 @@ import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import java.util.List;
 
 /**
  * Turtle &amp; Trig Format
@@ -48,14 +47,6 @@ public class TripleFormat extends RDFFormat {
         super(g, n);
     }
 
-    public void enableCompactBlankNodeSyntax() {
-        this.useCompactBlankNodeSyntax = true;
-    }
-
-    public void disableCompactBlankNodeSyntax() {
-        this.useCompactBlankNodeSyntax = false;
-    }
-
     public static TripleFormat create(Graph g, NSManager n) {
         if (n == null) {
             return new TripleFormat(g, nsm());
@@ -93,13 +84,6 @@ public class TripleFormat extends RDFFormat {
         return q.getAST().getNSM();
     }
 
-    // isGraph = true -> Trig
-    public static TripleFormat create(Graph g, boolean isGraph) {
-        TripleFormat t = new TripleFormat(g, nsm());
-        t.setGraph(isGraph);
-        return t;
-    }
-    
     public static TripleFormat create(Graph g, NSManager nsm, boolean isGraph) {
         TripleFormat t = TripleFormat.create(g, nsm);
         t.setGraph(isGraph);
@@ -184,22 +168,6 @@ public class TripleFormat extends RDFFormat {
         }
     }
 
-    void graphNodes2() {
-        for (Node gNode : graph.getGraphNodes()) {
-            if (tripleCounter > getNbTriple()) {
-                break;
-            }
-            if (accept(gNode)) {
-                if (graph.isDefaultGraphNode(gNode) && !isDisplayDefaultGraphURI()) {
-                    basicGraphNode(gNode);
-
-                } else {
-                    graphNode(gNode);
-                }
-            }
-        }
-    }
-
     // pprint content of named graph with trig syntax: uri { }
     void graphNode(Node gNode) {
         if (DISPLAY_GRAPH_KEYWORD || isGraphQuery()) {
@@ -223,16 +191,6 @@ public class TripleFormat extends RDFFormat {
         for (Node node : graph.getNodeGraphIterator(gNode)) {
             print(gNode, node.getNode());
         }
-    }
-
-    private boolean isRdfPrefixNeeded() {
-        for (Edge edge : graph.getEdges()) {
-            String pred = nsm.toPrefix(edge.getEdgeNode().getLabel(), !addPrefix);
-            if (pred.startsWith("rdf:") && !pred.equals(RDF_TYPE)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -334,16 +292,6 @@ public class TripleFormat extends RDFFormat {
         }
     }
     
-    void blank(Node node) {
-        List<Node> list = graph.getList(node);
-    }
-
-    // node is triple reference of edge
-    // node is subject/object
-    void triple(Node node, Edge edge) {
-        triple(node, edge, false);
-    }
-
     void triple(Node node, Edge edge, boolean rec) {
         nestedTriple(node, edge, rec);
     }
@@ -368,29 +316,12 @@ public class TripleFormat extends RDFFormat {
         return edge.getSubjectValue().isTripleWithEdge() || edge.getObjectValue().isTripleWithEdge();
     }
 
-    void uri(String label) {
-        String prefixedLabel = nsm.toPrefix(label, !addPrefix);
-        if (prefixedLabel.equals(label)) { // Si l'URI n'est pas abrégée
-            if (!label.startsWith("<")) {
-                sdisplay("<" + label + ">");
-            } else {
-                sdisplay(label);
-            }
-        } else { // Si l'URI est abrégée
-            sdisplay(prefixedLabel);
-        }
-    }
-
     @Override
     void edge(Edge edge) {
         predicate(edge.getEdgeNode());
         sdisplay(SPACE);
         // object triple node displayed with << >>
         node(edge.getObjectNode(), true);
-    }
-
-    boolean annotation(Edge edge) {
-        return annotation(edge.getSubjectNode());
     }
 
     boolean annotation(Node node) {
@@ -418,18 +349,8 @@ public class TripleFormat extends RDFFormat {
         return displayDefaultGraphURI;
     }
 
-    public TripleFormat setDisplayDefaultGraphURI(boolean displayDefaultGraphURI) {
-        this.displayDefaultGraphURI = displayDefaultGraphURI;
-        return this;
-    }
-
     public boolean isGraphQuery() {
         return graphQuery;
-    }
-
-    public TripleFormat setGraphQuery(boolean graphQuery) {
-        this.graphQuery = graphQuery;
-        return this;
     }
 
 }

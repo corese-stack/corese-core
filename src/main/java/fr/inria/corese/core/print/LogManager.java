@@ -7,12 +7,10 @@ import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.cst.LogKey;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
-import fr.inria.corese.core.sparql.triple.parser.URLServer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.ws.rs.client.ResponseProcessingException;
-import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,13 +75,6 @@ public class LogManager implements LogKey {
         return g;
     }
 
-    /**
-     * Return list of endpoint URL that generate exception
-     */
-    public List<String> getEndpointURL(Graph g) {
-        return getProperty(g, "url");
-    }
-
     public List<String> getProperty(Graph g, String name) {
         ArrayList<String> list = new ArrayList<>();
         for (Edge e : g.getEdges(NS + name)) {
@@ -92,16 +82,6 @@ public class LogManager implements LogKey {
             if (!list.contains(n.getLabel())) {
                 list.add(n.getLabel());
             }
-        }
-        return list;
-    }
-
-    public List<IDatatype> getPropertyList(Graph g, String name) {
-        ArrayList<IDatatype> list = new ArrayList<>();
-        for (Edge e : g.getEdges(NS + name)) {
-            Node n = e.getNode(1);
-            IDatatype dt = g.list(n);
-            list.add(dt);
         }
         return list;
     }
@@ -148,20 +128,6 @@ public class LogManager implements LogKey {
         }
     }
 
-    String pretty(List<String> list) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("(");
-        for (String str : list) {
-            if (str.startsWith("http://") || str.startsWith("https://")) {
-                sb.append(String.format("<%s> ", str));
-            } else {
-                sb.append(String.format("\"%s\" ", str));
-            }
-        }
-        sb.append(")");
-        return sb.toString();
-    }
-
     // local exception list
     void processLocal() {
         for (EngineException e : log.getExceptionList()) {
@@ -199,12 +165,6 @@ public class LogManager implements LogKey {
         }
     }
 
-    public String display() {
-        sb = new StringBuilder();
-        processMap();
-        return sb.toString();
-    }
-    
     
     void processMap() {
         getLog().getSubjectMap().display(sb);
@@ -259,20 +219,6 @@ public class LogManager implements LogKey {
 
     StringBuilder sb() {
         return sb;
-    }
-
-    /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * @param debug the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     public ContextLog getLog() {

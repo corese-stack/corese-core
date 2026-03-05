@@ -2,10 +2,8 @@ package fr.inria.corese.core.query;
 
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.api.Engine;
-import fr.inria.corese.core.compiler.api.QueryVisitor;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -76,10 +74,6 @@ public class QueryEngine implements Engine {
 
     public static QueryEngine create(Graph g) {
         return new QueryEngine(g);
-    }
-
-    public static QueryEngine create(Graph g, int cacheSize) {
-        return new QueryEngine(g, cacheSize);
     }
 
     public void addQuery(String q) {
@@ -368,10 +362,6 @@ public class QueryEngine implements Engine {
         return null;
     }
 
-    public boolean isEmpty() {
-        return list.isEmpty() && table.isEmpty();
-    }
-
     public boolean contains(Query q) {
         if (q.getName() == null) {
             return list.contains(q);
@@ -401,15 +391,6 @@ public class QueryEngine implements Engine {
             b = map.nbUpdate() > 0 || b;
         }
         return b;
-    }
-
-    public Mappings process(Query q, Mapping m) {
-        try {
-            return getQueryProcess().query(null, q, m, null);
-        } catch (EngineException e) {
-            logger.error("Failed to process query: {}", q.toString().substring(0, Math.min(100, q.toString().length())), e);
-        }
-        return Mappings.create(q);
     }
 
     @Override
@@ -485,10 +466,6 @@ public class QueryEngine implements Engine {
 
     public void setTransformation(boolean transformation) {
         this.transformation = transformation;
-    }
-
-    public void setVisitor(QueryVisitor vis) {
-        getQueryProcess().setVisitor(vis);
     }
 
     public QueryProcess getQueryProcess() {
@@ -575,7 +552,6 @@ public class QueryEngine implements Engine {
         public long getHits() { return hits; }
         public long getMisses() { return misses; }
         public int getCurrentSize() { return currentSize; }
-        public int getMaxSize() { return maxSize; }
 
         @Override
         public String toString() {

@@ -206,10 +206,6 @@ public class Entailment implements Engine {
         return isSubClassOf;
     }
 
-    public void setDebug(boolean b) {
-        isDebug = b;
-    }
-
     /**
      * clear tables of meta statements (domain, range, etc.) fill these tables
      * with current graph
@@ -340,18 +336,6 @@ public class Entailment implements Engine {
     }
 
     /**
-     * Add RDFS entailment to the graph, given edge and RDFS Schema
-     *
-     * Entail domain, range, subPropertyOf, symmetric, inverse
-     *
-     */
-    public void entail(Node gNode, Edge edge) {
-        property(gNode, edge);
-        signature(gNode, edge);
-        subsume(gNode, edge);
-    }
-
-    /**
      * graph creates new property pNode infer: pNode rdf:type rdf:Property TODO:
      * BUG: concurrent modification while entailment TODO: move at entailment
      * time
@@ -413,22 +397,6 @@ public class Entailment implements Engine {
         }
     }
 
-    /**
-     * Man intersectionOf (Human Male) Human unionOf (Man Woman) edge: Man
-     * intersectionOf _:b
-     */
-    void interunion(Node gNode, Edge edge) {
-        if (edge.getNode(0).isBlank()) {
-            return;
-        }
-
-        if (hasLabel(edge, OWL.INTERSECTIONOF)) {
-            interunion(gNode, edge, false);
-        } else if (hasLabel(edge, OWL.UNIONOF)) {
-            interunion(gNode, edge, true);
-        }
-    }
-
     void interunion(Node gNode, Edge edge, boolean union) {
         Node node = edge.getNode(0);
         Node bnode = edge.getNode(1);
@@ -473,14 +441,6 @@ public class Entailment implements Engine {
         }
     }
 
-    boolean differ(Edge edge, Edge last) {
-        if (last == null) {
-            return true;
-        }
-        return !(edge.getNode(0).same(last.getNode(0))
-                && edge.getEdgeNode().same(last.getEdgeNode()));
-    }
-
     /**
      * signature
      */
@@ -517,18 +477,6 @@ public class Entailment implements Engine {
                 recordWithoutEntailment(gNode, edge, ee);
             }
         }
-    }
-
-    public List<Node> getSubClass(Node node) {
-        ArrayList<Node> list = new ArrayList<Node>();
-        getClasses(node, list, true);
-        return list;
-    }
-
-    public List<Node> getSuperClass(Node node) {
-        ArrayList<Node> list = new ArrayList<Node>();
-        getClasses(node, list, false);
-        return list;
     }
 
     /**
@@ -649,20 +597,12 @@ public class Entailment implements Engine {
         return getType(pred.getLabel()) == SUBCLASSOF;
     }
 
-    public boolean isSubClassOf(Edge edge) {
-        return getType(edge.getEdgeNode().getLabel()) == SUBCLASSOF;
-    }
-
     boolean hasLabel(Edge edge, String type) {
         return edge.getEdgeLabel().equals(type);
     }
 
     boolean hasLabel(Node node, String type) {
         return node.getLabel().equals(type);
-    }
-
-    public boolean isSymmetric(Edge edge) {
-        return symetric.containsKey(edge.getEdgeNode());
     }
 
     public boolean isTopClass(Node node) {
@@ -695,14 +635,6 @@ public class Entailment implements Engine {
         count += loop();
 
         return count;
-    }
-
-    /**
-     * Complementary entailment from rules on new edge list
-     */
-    public int entail(List<Edge> list) {
-        inference(list);
-        return loop();
     }
 
     /**
@@ -926,22 +858,6 @@ public class Entailment implements Engine {
         } else return !dt.isLiteral();
 
         return true;
-    }
-
-    void reject(Edge edge) {
-        Integer val = count.get(edge.getEdgeNode());
-        if (val == null) {
-            val = 0;
-        }
-        count.put(edge.getEdgeNode(), ++val);
-    }
-
-    public String display() {
-        String str = "";
-        for (Node pred : count.keySet()) {
-            str += pred + ": " + count.get(pred) + "\n";
-        }
-        return str;
     }
 
     @Override

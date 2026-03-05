@@ -52,20 +52,6 @@ public class FunctionProcess extends WorkflowProcess {
         return DatatypeMap.TRUE;
     }
 
-    /**
-     * @return the query
-     */
-    public String getQuery() {
-        return query;
-    }
-
-    /**
-     * @param query the query to set
-     */
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
     @Override
     public String stringValue(Data data) {
         if (data.getDatatypeValue() != null) {

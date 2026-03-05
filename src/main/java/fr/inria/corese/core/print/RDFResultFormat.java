@@ -123,8 +123,4 @@ public class RDFResultFormat extends QueryResultFormat
         return map;
     }
 
-    public void setMappings(Mappings map) {
-        this.map = map;
-    }
-    
 }

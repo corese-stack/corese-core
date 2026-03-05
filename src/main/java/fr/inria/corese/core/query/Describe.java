@@ -5,7 +5,6 @@ import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.tool.MetaProducer;
-import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 /**
@@ -150,12 +149,6 @@ public class Describe {
         }
     }
 
-
-    int getValue(Mappings m, String n) {
-        IDatatype dt = m.getValue(n);
-        if (dt == null) return 0;
-        return dt.intValue();
-    }
 
     void info(String str, Object obj) {
         query.addInfo(str, obj);

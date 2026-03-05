@@ -39,24 +39,8 @@ public class HTMLFormat {
     
     
     
-    public static HTMLFormat create(Graph g, Mappings m, Context c){
-        return new HTMLFormat(g, m, c);
-    }
-    
-//    public static HTMLFormat create(Mappings m){
-//        return new HTMLFormat(null, m);
-//    }
-//    
-    public static HTMLFormat create(Graph g, Context c){
-        return new HTMLFormat(g, null, c);
-    }
-    
     public String toString(){
         return process();
-    }
-    
-    public void setContext(Context c){
-        context = c;
     }
     
     String process(){
@@ -145,20 +129,6 @@ public class HTMLFormat {
         //MappingsProcess mp = MappingsProcess.create(map);
         MappingsGraph mg = MappingsGraph.create(map);
         return mg.getGraph(); 
-    }
-
-    /**
-     * @return the transformation
-     */
-    public String getTransformation() {
-        return transformation;
-    }
-
-    /**
-     * @param transformation the transformation to set
-     */
-    public void setTransformation(String transformation) {
-        this.transformation = transformation;
     }
 
 

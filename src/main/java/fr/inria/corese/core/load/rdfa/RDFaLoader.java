@@ -1,7 +1,5 @@
 package fr.inria.corese.core.load.rdfa;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.Reader;
 
@@ -39,26 +37,9 @@ public class RDFaLoader {
         this.base = base;
     }
 
-    public static RDFaLoader create(InputStream read, String base) {
-        RDFaLoader p = new RDFaLoader(read, base);
-        return p;
-    }
-
     public static RDFaLoader create(Reader read, String base) {
         RDFaLoader p = new RDFaLoader(read, base);
         return p;
-    }
-
-    public static RDFaLoader create(String file) {
-        FileReader read;
-        try {
-            read = new FileReader(file);
-            RDFaLoader p = new RDFaLoader(read, file);
-            return p;
-        } catch (FileNotFoundException e) {
-            logger.error("An error has occurred", e);
-        }
-        return null;
     }
 
 

@@ -36,11 +36,6 @@ class JSONLDObject {
 
     private List listOfObjects;
 
-    public JSONLDObject(String key, Object object, int type) {
-        this(key, object);
-        this.modularType = type;
-    }
-
     public JSONLDObject(String key, Object object) {
         this(key);
         this.object = object;
@@ -63,24 +58,8 @@ class JSONLDObject {
         this("");
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public Object getObject() {
-        return object;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public void setObject(Object object) {
         this.object = object;
-    }
-
-    public int getModularType() {
-        return modularType;
     }
 
     public void setModularType(int modularType) {

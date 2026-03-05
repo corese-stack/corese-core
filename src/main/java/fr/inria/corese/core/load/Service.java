@@ -24,7 +24,6 @@ import fr.inria.corese.core.sparql.triple.parser.URLServer;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import java.io.InputStream;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -43,7 +42,6 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Cookie;
 import java.util.HashMap;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,11 +113,6 @@ public class Service implements URLParam {
         return getCreateParser().parseMapping(q, query, process(query), ENCODING);
     }
 
-    public Graph construct(String query) throws LoadException, EngineException {
-        Query q = QueryProcess.create().compile(query);
-        return getCreateParser().parseGraph(q, process(query));
-    }
-
     public Mappings query(Query query, Mapping m) throws LoadException {
         return query(query, query.getAST(), m);
 
@@ -189,10 +182,6 @@ public class Service implements URLParam {
         }
     }
     
-    void log(ServiceReport report) {
-        log(report.getResponse());
-    }
-    
     void log(Response res) {
         if (res != null) {
             if (res.getHeaderString(NB_RESULT_MAX) != null) {
@@ -205,10 +194,6 @@ public class Service implements URLParam {
         return getCreateReport(query).isReport();
     }
    
-    public String process(ASTQuery ast, String query) {
-        return process(query, accept(ast));
-    }
-       
     public String process(String query) {
         return process(query, getAccept());
     }
@@ -322,20 +307,6 @@ public class Service implements URLParam {
     void redirect(String url1, String url2) {
         logger.info(String.format("Record %s redirect to %s", url1, url2));
         redirect.put(url1, url2);
-    }
-    
-    @Deprecated
-    Builder setHeader(Builder rb) {
-        if (getURL().hasParameter(HEADER)) {
-            for (String header : getURL().getParameterList(HEADER)) {
-                String[] pair = header.split(":");
-                if (pair.length >= 2) {
-                    logger.info("header: " +pair[0] + " = " + pair[1]); 
-                    rb.header(pair[0], pair[1]);
-                }
-            }
-        }
-        return rb;
     }
     
     // URL header Accept if any else mime 
@@ -602,14 +573,6 @@ public class Service implements URLParam {
         return get(uri).readEntity(String.class);
     }
     
-    public JSONObject getJson(String uri) {
-        String text = getString(uri);
-        if (text != null && ! text.isEmpty()) {
-            return new JSONObject(text);
-        }
-        return null;
-    }
-
     String encoding(ASTQuery ast) {
         if (ast.hasMetadata(Metadata.Type.ENCODING)) {
             return ast.getMetadata().getStringValue(Metadata.Type.ENCODING);
@@ -618,12 +581,6 @@ public class Service implements URLParam {
     }
 
 
-   
-    public Access.Level getLevel() {
-        return level;
-    }
-
-    
     public void setLevel(Access.Level level) {
         this.level = level;
     }
@@ -649,16 +606,6 @@ public class Service implements URLParam {
     }
 
     
-    public boolean isTrap() {
-        return trap;
-    }
-
-   
-    public void setTrap(boolean trap) {
-        this.trap = trap;
-    }
-
-    
     public URLServer getURL() {
         return url;
     }
@@ -672,10 +619,6 @@ public class Service implements URLParam {
         return format;
     }
 
-    public String getFormatText() {
-        return (getFormat()==null)?"undefined":getFormat();
-    }
-    
     public void setFormat(String format) {
         this.format = format; 
     }
@@ -704,10 +647,6 @@ public class Service implements URLParam {
     }
 
     
-    public int getTimeout() {
-        return timeout;
-    }
-
     
     public void setTimeout(int timeout) {
         this.timeout = timeout;
@@ -721,10 +660,6 @@ public class Service implements URLParam {
     
     public void setCount(int count) {
         this.count = count;
-    }
-    
-    ASTQuery getAST(Query q) {
-        return  q.getAST();
     }
     
     void metadata(ASTQuery ast) {
@@ -794,10 +729,6 @@ public class Service implements URLParam {
 
     public boolean isDebug() {
         return isDebug;
-    }
-
-    public void setDebug(boolean isDebug) {
-        this.isDebug = isDebug;
     }
 
     // @todo: synchronized wrt ProviderService & ServiceParser

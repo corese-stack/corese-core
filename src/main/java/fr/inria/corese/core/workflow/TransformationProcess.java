@@ -96,13 +96,6 @@ public class TransformationProcess extends WorkflowProcess {
     }
 
     /**
-     * @return the transfomer
-     */
-    public Transformer getTransfomer() {
-        return transfomer;
-    }
-
-    /**
      * @param transfomer the transfomer to set
      */
     public void setTransfomer(Transformer transfomer) {

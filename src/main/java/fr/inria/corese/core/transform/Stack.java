@@ -35,11 +35,6 @@ public static int count = 0;
         return list.size();
     }
 
-    @Deprecated
-    void push(IDatatype dt) {
-        list.add(dt);
-    }
-
     /**
      * dt is the focus node (the first argument)
      * push template q    in dt  template stack 
@@ -136,26 +131,6 @@ public static int count = 0;
    
    
    
-
-    /**
-     * Check whether template q already applied on dt focus and possibly args
-     */
-   @Deprecated
-   boolean contains2(IDatatype dt, IDatatype[] args, Query q) {
-        ArrayList<Query> qlist = map.get(dt);
-        if (qlist == null || ! qlist.contains(q)){
-            return false;
-        }
-        // q is in dt stack
-        if (q.getArgList().size() <= 1){
-            // 0 or 1 argument: ?in or (?x)
-            return true;
-        }
-        // template q has several arguments
-        ArrayList<IDatatype[]> alist = arg.get(dt);
-        return contains(alist, args, qlist, q);
-    }
-   
    /**
     * Check whether q(args) already happened in alist arguments stack of dt focus node 
     */
@@ -169,12 +144,6 @@ public static int count = 0;
        return false;
    }
    
-   
-   @Deprecated
-   boolean contains(IDatatype dt) {
-        return list.contains(dt);
-    }
-
     boolean isVisited(IDatatype dt) {
         if (visit.containsKey(dt)) {
             return true;
@@ -190,7 +159,7 @@ public static int count = 0;
         visit.put(dt, dt);
     }
 
-@Override
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         int i = 0;

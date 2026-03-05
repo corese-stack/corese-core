@@ -62,10 +62,6 @@ public class GraphManager {
         return graph;
     }
 
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }
-
 
     //***********************************************************
     // Construct Graph Manager
@@ -162,10 +158,6 @@ public class GraphManager {
         return getGraph().reference(n);
     }
 
-    public Edge beforeInsert(Edge edge) {
-        return getGraph().beforeInsert(edge);
-    }
-
     /**
      * Return null if edge already exists in graph
      * and in its named graph
@@ -258,10 +250,6 @@ public class GraphManager {
 
     public IDatatype createBlank(String str) {
         return getGraph().createBlank(str);
-    }
-
-    public IDatatype createBlank() {
-        return getGraph().createBlank(newBlankID());
     }
 
     public IDatatype createTripleReference() {

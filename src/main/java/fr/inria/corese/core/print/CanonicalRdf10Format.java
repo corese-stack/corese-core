@@ -1,7 +1,5 @@
 package fr.inria.corese.core.print;
 
-import java.util.Map;
-
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.print.rdfc10.CanonicalRdf10;
 import fr.inria.corese.core.print.rdfc10.CanonicalizedDataset;
@@ -74,15 +72,6 @@ public class CanonicalRdf10Format extends NQuadsFormat {
     protected String printBlank(Node node) {
         String identifier = this.canonicalizedDataset.getIdentifierForBlankNode(node);
         return "_:" + this.canonicalizedDataset.getIssuedIdentifier(identifier);
-    }
-
-    /**
-     * Retrieves the mapping of blank nodes to their identifiers.
-     * 
-     * @return a map of blank nodes to their identifiers
-     */
-    public Map<String, String> getIssuedIdentifiersMap() {
-        return this.canonicalizedDataset.getIssuedIdentifiersMap();
     }
 
 }

@@ -75,29 +75,12 @@ public class RuleLoad {
         load(doc);
     }
 
-    public void parse(InputStream stream) throws LoadException, EngineException {
-        Document doc = parsing(stream);
-        load(doc);
-    }
-
     public void parse(Reader stream) throws LoadException, EngineException {
         Document doc = parsing(stream);
         load(doc);
     }
     
         
-
-    @Deprecated
-    public void load(String file) {
-        try {
-            loadWE(file);
-        } catch (LoadException e) {
-            logger.error(e.getMessage());
-        } catch (EngineException ex) {
-            logger.error(ex.getMessage());
-        }
-    }
-
     @Deprecated
     public void loadWE(String file) throws LoadException, EngineException {
         Document doc = parsing(file);
@@ -109,36 +92,6 @@ public class RuleLoad {
         Document doc = parsing(stream);
         load(doc);
     }
-
-    @Deprecated
-    public void load(InputStream stream) {
-        try {
-            loadWE(stream);
-        } catch (LoadException e) {
-            logger.error(e.getMessage());
-        } catch (EngineException ex) {
-            logger.error(ex.getMessage());
-        }
-    }
-
-    @Deprecated
-    public void loadWE(Reader stream) throws LoadException, EngineException {
-        Document doc = parsing(stream);
-        load(doc);
-    }
-
-    @Deprecated
-    public void load(Reader stream) {
-        try {
-            Document doc = parsing(stream);
-            load(doc);
-        } catch (LoadException e) {
-            logger.error(e.getMessage());
-        } catch (EngineException ex) {
-            logger.error(ex.getMessage());
-        }
-    }
-    
     
 
     void load(Document doc) throws EngineException {
@@ -227,60 +180,10 @@ public class RuleLoad {
         return (Element) list.item(0);
     }
     
-    void load1(Document doc) {
-
-        NodeList list = null;
-        
-        for (String ns : NAMESPACE) {
-            list = doc.getElementsByTagNameNS(ns, BODY);           
-            if (list.getLength() != 0) {
-                break;
-            }
-        }
-
-        if (list == null || list.getLength() == 0) {
-            list = doc.getElementsByTagNameNS(NS1, VALUE);
-        }
-        
-
-        if (list.getLength() == 0) {
-            error();
-            return;
-        }
-
-        for (int i = 0; i < list.getLength(); i++) {
-            Node node = list.item(i);
-            
-            String rule = node.getTextContent();
-            try {
-                engine.defRule(rule);
-            } catch (EngineException e) {
-                logger.error("An error has occurred", e);
-            }
-        }
-    }
-  
     void error() {
         logger.error("Rule Namespace should be one of:");
         logger.error(NS);
         logger.error(STL);
-    }
-
-    String getRule(Element econst, Element ewhere) {
-        String sconst = econst.getTextContent().trim();
-        String swhere = ewhere.getTextContent().trim();
-        String pref = "";
-
-        if (swhere.startsWith(PREFIX1) || swhere.startsWith(PREFIX2)) {
-            int ind = swhere.indexOf("{");
-            pref = swhere.substring(0, ind);
-            swhere = swhere.substring(ind);
-        }
-
-        String rule = pref + CONST + sconst + "\n" + WHERE + swhere;
-
-        return rule;
-
     }
 
     private Document parsing(InputStream stream) throws LoadException {
@@ -323,20 +226,6 @@ public class RuleLoad {
         } catch (IOException e) {
             throw LoadException.create(e);
         }
-    }
-
-    /**
-     * @return the base
-     */
-    public String getBase() {
-        return base;
-    }
-
-    /**
-     * @param base the base to set
-     */
-    public void setBase(String base) {
-        this.base = base;
     }
 
     /**

@@ -7,7 +7,6 @@ package fr.inria.corese.core.query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.query.Environment;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.Comparator;
@@ -34,48 +33,6 @@ public class MatchBNode {
         ttrue = new TreeNode();
         tfalse = new TreeNode();
         graph = g;
-    }
-
-    /**
-     * Store the result in a table
-     */
-    boolean same(Node n1, Node n2, Environment env, int n) {
-        IDatatype dt1 = getValue(n1);
-        IDatatype dt2 = getValue(n2);
-
-        IDatatype dt = ttrue.get(dt1);
-        if (dt != null && dt.same(dt2)) {
-            return true;
-        }
-
-        dt = tfalse.get(dt1);
-        if (dt != null && dt.same(dt2)) {
-            return false;
-        }
-
-        boolean b = match(n1, n2, new TreeNode(), n);
-        count++;
-
-        if (b) {
-            ttrue.put(dt1, dt2);
-            ttrue.put(dt2, dt1);
-        } else {
-            tfalse.put(dt1, dt2);
-            tfalse.put(dt2, dt1);
-        }
-        return b;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public TreeNode getTree(boolean b) {
-        if (b) {
-            return ttrue;
-        } else {
-            return tfalse;
-        }
     }
 
     /**

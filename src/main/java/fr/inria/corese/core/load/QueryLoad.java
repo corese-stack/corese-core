@@ -5,8 +5,6 @@ import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.triple.function.term.TermEval;
-import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,12 +45,6 @@ public class QueryLoad extends Load {
     }
 
     @Override
-    @Deprecated
-    public void loadWE(String name) throws LoadException {
-        parse(name);
-    }
-
-    @Override
     public void parse(String name) throws LoadException {
         String q = readWE(name);
         if (q != null) {
@@ -66,10 +58,6 @@ public class QueryLoad extends Load {
                 qq.setPragma(Pragma.FILE, name);
             }
         }
-    }
-
-    public void load(Reader read) throws LoadException {
-        parse(read);
     }
 
     public void parse(Reader read) throws LoadException {
@@ -91,10 +79,6 @@ public class QueryLoad extends Load {
             return false;
         }
         return true;
-    }
-
-    public String read(InputStream stream) throws IOException {
-        return read(new InputStreamReader(stream));
     }
 
     public String readWE(InputStream stream) throws LoadException {
@@ -130,11 +114,6 @@ public class QueryLoad extends Load {
         return readWE(name);
     }
 
-
-    public String readWithAccess(String name) throws LoadException {
-        check(Access.Feature.READ_WRITE, name, TermEval.READ_MESS);
-        return readWE(name);
-    }
 
     public String readWE(String name) throws LoadException {
         String query = "";

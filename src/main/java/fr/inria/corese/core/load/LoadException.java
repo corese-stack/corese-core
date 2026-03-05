@@ -17,10 +17,6 @@ public class LoadException extends Exception {
         super(message);
     }
 
-    public LoadException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     private void set(Exception ee) {
         ex = ee;
     }
@@ -43,10 +39,6 @@ public class LoadException extends Exception {
         LoadException ee = new LoadException(e);
         ee.setPath(p);
         return ee;
-    }
-
-    public static LoadException create(Exception e, Object o) {
-        return new LoadException(e, o);
     }
 
     public static LoadException create(Exception e, Object o, String p) {

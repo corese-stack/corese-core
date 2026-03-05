@@ -1,7 +1,6 @@
 package fr.inria.corese.core.transform;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.kgram.api.core.Expr;
 import fr.inria.corese.core.kgram.api.core.ExprType;
 import fr.inria.corese.core.kgram.api.core.Node;
@@ -25,7 +24,6 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
-import fr.inria.corese.core.storage.api.datamanager.DataManager;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,10 +183,6 @@ public class Transformer implements TransformProcessor {
         return createWE(QueryProcess.create(g), p);
     }
 
-    public static Transformer createWE(DataManager man, String p) throws LoadException {
-        return createWE(QueryProcess.create(man), p);
-    }
-
     public static Transformer createWE(Graph g, String p, Level level) throws LoadException {
         Transformer t = new Transformer();
         t.init(QueryProcess.create(g), p, level);
@@ -227,26 +221,6 @@ public class Transformer implements TransformProcessor {
 
     public static Transformer create(Graph g, String p) {
         return create(QueryProcess.create(g), p);
-    }
-
-    public static Transformer create(Producer prod, String p) {
-        return create(QueryProcess.create(prod), p);
-    }
-
-    public static Transformer create(String p) {
-        return create(Graph.create(), p);
-    }
-
-    public static String turtle(Graph g) throws EngineException {
-        return create(g, TransformerUtils.TURTLE).transform();
-    }
-
-    public static String rdfxml(Graph g) throws EngineException {
-        return create(g, TransformerUtils.RDFXML).transform();
-    }
-
-    public static String json(Graph g) throws EngineException {
-        return create(g, TransformerUtils.JSON).transform();
     }
 
     /**
@@ -299,29 +273,6 @@ public class Transformer implements TransformProcessor {
         return dt.getLabel();
     }
 
-    public String stransform() throws EngineException {
-        String s = transform();
-        if (s == null) {
-            return "";
-        }
-        return s;
-    }
-
-    /**
-     * URI of the RDF graph to transform
-     */
-    public String transform(String uri) throws LoadException, EngineException {
-        Graph g = Graph.create();
-        Load ld = Load.create(g);
-        ld.parse(uri);
-        set(g);
-        return transform();
-    }
-
-    public void transform(InputStream in, OutputStream out) throws LoadException, IOException, EngineException {
-        transform(in, out, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-    }
-
     public void transform(InputStream in, OutputStream out, fr.inria.corese.core.api.Loader.format format)
             throws LoadException, IOException, EngineException {
         Graph g = Graph.create();
@@ -341,15 +292,6 @@ public class Transformer implements TransformProcessor {
             bufferedWriter.write(str);
             bufferedWriter.flush();
         }
-    }
-
-    public void write(OutputStream out) throws IOException {
-        String str = toString();
-        out.write(str.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public void definePrefix(String p, String ns) {
-        nsm.definePrefix(p, ns);
     }
 
     public void setNSM(NSManager n) {
@@ -386,44 +328,8 @@ public class Transformer implements TransformProcessor {
         return isCheck;
     }
 
-    public void setCheck(boolean isCheck) {
-        this.isCheck = isCheck;
-    }
-
-    public boolean isDetail() {
-        return isDetail;
-    }
-
-    public void setDetail(boolean isDetail) {
-        this.isDetail = isDetail;
-    }
-
-    public static boolean isOptimizeDefault() {
-        return isOptimizeDefault;
-    }
-
-    public static void setOptimizeDefault(boolean aIsOptimizeDefault) {
-        isOptimizeDefault = aIsOptimizeDefault;
-    }
-
-    public static boolean isExplainDefault() {
-        return isExplainDefault;
-    }
-
-    public static void setExplainDefault(boolean aIsExplainDefault) {
-        isExplainDefault = aIsExplainDefault;
-    }
-
-    public boolean isOptimize() {
-        return isOptimize;
-    }
-
     public void setOptimize(boolean isOptimize) {
         this.isOptimize = isOptimize;
-    }
-
-    public void setTemplates(String p) throws LoadException {
-        setTemplates(p, Level.USER_DEFAULT);
     }
 
     public void setTemplates(String p, Level level) throws LoadException {
@@ -459,64 +365,17 @@ public class Transformer implements TransformProcessor {
         return null;
     }
 
-    public static String getStartName(String uri) {
-        String name = getName(uri);
-        if (name == null) {
-            return null;
-        }
-        return TransformerUtils.STL + name;
-    }
-
-
 
     private void tune(QueryProcess exec) {
         exec.setListPath(true);
-    }
-
-    /**
-     *
-     * @deprecated
-     */
-    public static void define(String type, String pp) {
-        table.put(type, pp);
-    }
-
-    public static void define(String ns, boolean isOptimize) {
-        table.setOptimize(ns, isOptimize);
-    }
-
-    void setLevelMax(int n) {
-        levelMax = n;
-    }
-
-    public void setProcess(int type) {
-        process = type;
-    }
-
-    public void setDefault(int type) {
-        defaut = type;
     }
 
     public void setTurtle(boolean b) {
         isTurtle = b;
     }
 
-    // when several templates st:apply-all-templates()
-    public void setTemplateSeparator(String s) {
-        sepTemplate = s;
-    }
-
-    // when several results for one template
-    public void setResultSeparator(String s) {
-        sepResult = s;
-    }
-
     public void setStart(String s) {
         start = s;
-    }
-
-    public int nbTemplates() {
-        return nbt;
     }
 
     @Override
@@ -543,26 +402,6 @@ public class Transformer implements TransformProcessor {
         return dt.getStringBuilder();
     }
 
-    public void defTemplate(String t) {
-        try {
-            qe.defQuery(t);
-        } catch (EngineException e) {
-            logger.error("Operation failure", e);
-        }
-    }
-
-    public boolean isVisited(IDatatype dt) {
-        return stack.isVisited(dt);
-    }
-
-    public int getProcess() {
-        return process;
-    }
-
-    public int getAggregate() {
-        return aggregate;
-    }
-
     /**
      * Transform the whole graph (no focus node) Apply template st:start, if any
      * Otherwise, apply the first template that matches without bindings.
@@ -579,10 +418,6 @@ public class Transformer implements TransformProcessor {
             contextManager.setBinding(b);
         }
         return process(null, false, null, null, (b == null) ? null : Mapping.create(b));
-    }
-
-    public IDatatype process(String temp) throws EngineException {
-        return process(temp, false, null, null, null);
     }
 
     /**
@@ -706,10 +541,6 @@ public class Transformer implements TransformProcessor {
         return stack.size();
     }
 
-    public int maxLevel() {
-        return max;
-    }
-
     @Override
     public int getLevel() {
         return level;
@@ -725,20 +556,8 @@ public class Transformer implements TransformProcessor {
         return query != null && query.getName() != null && query.getName().equals(TransformerUtils.STL_START);
     }
 
-    public IDatatype process(Node node) throws EngineException {
-        return process(node.getValue());
-    }
-
     public IDatatype process(IDatatype dt) throws EngineException {
         return process(dt, null, null, false, null, null);
-    }
-
-    public IDatatype process(IDatatype[] a) throws EngineException {
-        return process((a.length > 0) ? a[0] : null, a, null, false, null, null);
-    }
-
-    public IDatatype template(String temp, IDatatype dt) throws EngineException {
-        return process(dt, null, temp, false, null, null);
     }
 
     public IDatatype process(String temp, IDatatype... ldt) throws EngineException {
@@ -747,10 +566,6 @@ public class Transformer implements TransformProcessor {
 
     public IDatatype process(String temp, Binding b, IDatatype... ldt) throws EngineException {
         return process(temp, false, null, null, Mapping.create(b), ldt[0], (ldt.length == 1) ? null : ldt);
-    }
-
-    public int getCount() {
-        return count;
     }
 
     /**
@@ -932,23 +747,12 @@ public class Transformer implements TransformProcessor {
         return m;
     }
 
-    IDatatype result(IDatatype dt1, IDatatype dt2) {
-        return dt2;
-    }
-
     public IDatatype getResult(Mappings map) {
         Node node = map.getTemplateResult();
         if (node == null) {
             return null;
         }
         return datatype(node);
-    }
-
-    String separator(String sep) {
-        if (sep == null) {
-            return sepTemplate;
-        }
-        return sep;
     }
 
     IDatatype datatype(Node n) {
@@ -1021,18 +825,6 @@ public class Transformer implements TransformProcessor {
 
     boolean contains(Query q) {
         return qe.contains(q);
-    }
-
-    /**
-     * Concat results of several templates executed on same focus node
-     * st:apply-all-templates(?x ; separator = sep)
-     */
-    IDatatype result(List<IDatatype> result, String sep) {
-        if (isBoolean()) {
-            return booleanResult(result);
-        } else {
-            return stringResult(result, sep);
-        }
     }
 
     boolean isBoolean() {
@@ -1171,45 +963,6 @@ public class Transformer implements TransformProcessor {
         return contextManager.getNSM().turtle(dt, false);
     }
 
-    /**
-     * force = true: if no prefix generate prefix
-     */
-    public IDatatype turtle(IDatatype dt, boolean force) {
-        return contextManager.getNSM().turtle(dt, force);
-    }
-
-    /**
-     * if prefix exists, return qname, else return URI as is (without &lt;>)
-     */
-    public IDatatype qnameURI(IDatatype dt) {
-        String uri = contextManager.getNSM().toPrefix(dt.getLabel(), true);
-        return DatatypeMap.newStringBuilder(uri);
-    }
-
-    /**
-     * Display a Literal with its ^^xsd:datatype Use case: OWL 2 functional
-     * syntax
-     */
-    public IDatatype xsdLiteral(IDatatype dt) {
-        return DatatypeMap.newStringBuilder(dt.toSparql(true, true));
-    }
-
-    public static String getPP(String type) {
-        String ns = NSManager.namespace(type);
-        return table.get(ns);
-    }
-
-    public static Table getTable() {
-        return table;
-    }
-
-    /**
-     * Load templates from directory (.rq) or from a file (.rul)
-     */
-    void init() throws LoadException {
-        init(Level.USER_DEFAULT);
-    }
-
     void init(Level level) throws LoadException {
         setOptimize(table.isOptimize(pp));
         qe = QueryEngine.create(graph);
@@ -1269,36 +1022,8 @@ public class Transformer implements TransformProcessor {
         qe.clean();
     }
 
-    String name(Query qq) {
-        String f = qq.getStringPragma(Pragma.FILE);
-        if (f != null) {
-            int index = f.lastIndexOf("/");
-            if (index != -1) {
-                f = f.substring(index + 1);
-            }
-        }
-        return f;
-    }
-
-    private void succ(Query q) {
-        Integer c = tcount.get(q);
-        if (c == null) {
-            tcount.put(q, 1);
-        } else {
-            tcount.put(q, c + 1);
-        }
-    }
-
     private void incr(Query qq) {
         qq.setNumber(qq.getNumber() + 1);
-    }
-
-    public boolean isHide() {
-        return isHide;
-    }
-
-    public void setHide(boolean isHide) {
-        this.isHide = isHide;
     }
 
     public Graph getGraph() {
@@ -1434,10 +1159,6 @@ public class Transformer implements TransformProcessor {
 
     public void setStarting(boolean starting) {
         this.starting = starting;
-    }
-
-    public Level getAccessLevel() {
-        return AccessLevel;
     }
 
     public void setAccessLevel(Level AccessLevel) {

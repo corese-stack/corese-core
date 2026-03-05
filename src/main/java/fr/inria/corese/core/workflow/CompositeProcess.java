@@ -42,13 +42,6 @@ public class CompositeProcess extends WorkflowProcess {
         return processList;
     }
 
-    /**
-     * @param processList the processList to set
-     */
-    public void setProcessList(List<WorkflowProcess> processList) {
-        this.processList = processList;
-    }
-
     @Override
     public void init(boolean b) {
         if (isVisitable(b)) {

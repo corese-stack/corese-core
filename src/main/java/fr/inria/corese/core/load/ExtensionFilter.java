@@ -3,7 +3,6 @@ package fr.inria.corese.core.load;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,15 +15,6 @@ public class ExtensionFilter implements FileFilter {
         
         public ExtensionFilter(List<String> l){
             list = l;
-        }
-        
-        public ExtensionFilter(){
-            list = new ArrayList<String>();
-        }
-        
-        public ExtensionFilter add(String ext){
-            list.add(ext);
-            return this;
         }
 
         @Override

@@ -56,30 +56,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
     public ShapeWorkflow(String shape, String data){
         create(shape, data, resultFormat, false, Loader.format.UNDEF_FORMAT, false);
     }
-    
-    public ShapeWorkflow(String shape, String data, String trans){
-        create(shape, data, trans, false, Loader.format.UNDEF_FORMAT, false);
-    }
-    
-    public ShapeWorkflow(String shape, String data, boolean test){
-        create(shape, data, resultFormat, false, Loader.format.UNDEF_FORMAT, test);
-    }
-    
-    public ShapeWorkflow(String shape, String data, boolean test, boolean lds){
-        create(shape, data, resultFormat, false, Loader.format.UNDEF_FORMAT, test, lds);
-    }
-    
-    public ShapeWorkflow(String shape, String data, String trans, boolean text, Loader.format format, boolean test){
-        create(shape, data, trans, text, format, test);
-    }
-    
-    
-    
-    @Override
-    boolean isShape(){
-        return true;
-    }
-    
     @Override
     public void start(Data data){
         try {
@@ -176,42 +152,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
         return Graph.create();
     }
     
-    public IDatatype process(IDatatype g, IDatatype s, IDatatype... ldt) {
-        Graph res = process(graph(g), graph(s), true,  ldt);
-        return DatatypeMap.createObject(res);
-    }
-    
-    public IDatatype processGraph(Graph g, IDatatype s, IDatatype... ldt) {
-        Graph res = process(g, graph(s), true, ldt);
-        return DatatypeMap.createObject(res);
-    }
-    
-    public IDatatype processNode(Graph g, IDatatype s, IDatatype... ldt) {
-        Graph res = process(g, graph(s), false, ldt);
-        return DatatypeMap.createObject(res);
-    }
-    
-    public Graph process(String g, String s) {
-        return process(parse(g), parse(s), true);
-    }
-    
-    public Graph process(Graph g, String shape) {
-        Graph s = parse(shape);
-        return process(g, s, true);
-    }
-    
-    IDatatype[] array(IDatatype... ldt) {
-        return ldt;
-    }
-    
-    /**
-     * graph = true means check whole graph, false means check uri
-     * param = shape | uri | uri, shape
-     */
-    public Graph process(Graph g) {
-        return process(g, g, true);
-    }
-    
     public Graph process(Graph g, Graph s, boolean graph, IDatatype... param) {
         Transformer t = Transformer.create(g, SHAPE_TRANS);
         t.getContextManager().getContext().export(SHAPE_NAME, DatatypeMap.createObject(s));
@@ -263,15 +203,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
         }
     }
     
-    public TransformationProcess getTransformer(){
-        return transformer;
-    }
-    
-    @Override
-    public long getMainTime(){
-        return transformer.getTime();
-    }
-    
     
     @Override
     public void finish(Data data) {
@@ -312,13 +243,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
    }
 
     /**
-     * @return the shape
-     */
-    public String getShape() {
-        return shape;
-    }
-
-    /**
      * @param shape the shape to set
      */
     public void setShape(String shape) {
@@ -337,13 +261,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
      */
     public void setValidate(boolean validate) {
         this.validate = validate;
-    }
-
-    /**
-     * @return the shex
-     */
-    public boolean isShex() {
-        return shex;
     }
 
     /**

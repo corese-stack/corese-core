@@ -1,21 +1,12 @@
 package fr.inria.corese.core.print;
 
 import java.io.StringReader;
-import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 import fr.inria.corese.core.sparql.exceptions.EngineException;
@@ -53,57 +44,6 @@ public class XSLTQuery {
 	XSLTQuery(String x, QuerySolver e){
 		xsl = x;
 		exec = e;
-	}
-	
-	public static XSLTQuery create(String x, QuerySolver e){
-		return new XSLTQuery(x, e);
-	}
-	
-	
-	QuerySolver getQuerySolver(){
-		return exec;
-	}
-	
-	/**
-	 * Call XSLT with sparql query inside
-	 */
-	public String xslt(String doc){
-		TransformerFactory fac = TransformerFactory.newInstance();
-		try {
-			DOMResult dres = new DOMResult();
-			// default string result is xsl name
-			Transformer trans = fac.newTransformer(new StreamSource(xsl));
-			// transmit the engine as XSL parameter to enable sparql() query
-			trans.setParameter("engine", this);
-			// result as a DOM object
-			//trans.transform(new StreamSource(doc), dres);
-			// result as a string in addition to DOM (for trace)
-			// use case: xslt(?d, ?xsl, 's')
-			StringWriter wrt = new StringWriter();
-			trans.transform(new StreamSource(doc), new StreamResult(wrt));
-			String str = wrt.toString();
-			return str;
-		} 
-		catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			logger.error("Operation failure", e);
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			logger.error("Operation failure", e);
-		}
-		return null;
-	}
-	
-	/**
-	 * SPARQL Query called by XSLT
-	 * return a DOM Element
-	 */
-	public static Node sparql(Object server, String query) {
-		XSLTQuery xslt = (XSLTQuery) server;
-		String str = xslt.query(query);
-		if (str == null) return null;
-		Document doc =  xslt.parseXML(str);
-		return doc.getDocumentElement() ;
 	}
 	
 	String query(String query){

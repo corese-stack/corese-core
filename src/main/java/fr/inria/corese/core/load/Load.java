@@ -124,10 +124,6 @@ public class Load
         setAccessRight(new AccessRight());
     }
 
-    public static boolean isDefaultGraphValue() {
-        return DEFAULT_GRAPH;
-    }
-
     /**
      * true means load in default graph when no named graph is given
      */
@@ -139,18 +135,8 @@ public class Load
         return new Load(g);
     }
 
-    public static Load create(Graph g, DataManager man) {
-        Load ld = new Load(g);
-        ld.setDataManager(man);
-        return ld;
-    }
-
     public static Load create() {
         return new Load(new Graph());
-    }
-
-    public static void setDefaultFormat(Loader.format f) {
-        DEFAULT_FORMAT = f;
     }
 
     public static void setLimitDefault(int max) {
@@ -168,10 +154,6 @@ public class Load
         importedURIs = new HashMap<>();
     }
 
-    public void exclude(String ns) {
-        getExclude().add(ns);
-    }
-
     ArrayList<String> getExclude() {
         return exclude;
     }
@@ -187,18 +169,6 @@ public class Load
 
     public void setEngine(QueryEngine eng) {
         qengine = eng;
-    }
-
-    public void setMax(int n) {
-        maxFile = n;
-    }
-
-    Build getBuild() {
-        return build;
-    }
-
-    public QueryEngine getQueryEngine() {
-        return qengine;
     }
 
     String uri(String name) {
@@ -272,14 +242,6 @@ public class Load
         parseDir(path, name, false);
     }
 
-    public void parseDirRec(String path) throws LoadException {
-        parseDir(path, null, true);
-    }
-
-    public void parseDirRec(String path, String name) throws LoadException {
-        parseDir(path, name, true);
-    }
-
     public void parseDir(String path, String name, boolean rec) throws LoadException {
         parseDir(path, name, rec, Loader.format.UNDEF_FORMAT);
     }
@@ -340,13 +302,6 @@ public class Load
         }
     }
 
-    boolean match(String path, Loader.format format) {
-        if (format == Loader.format.UNDEF_FORMAT) {
-            return true;
-        }
-        return getFormat(path) == format;
-    }
-
     void parseDoc(String path, String name) throws LoadException {
         parse(path, name, path, Loader.format.UNDEF_FORMAT);
     }
@@ -367,10 +322,6 @@ public class Load
     @Override
     public void parse(String path, String name) throws LoadException {
         parse(path, name, null, Loader.format.UNDEF_FORMAT);
-    }
-
-    public void parse(String path, String name, Loader.format format) throws LoadException {
-        parse(path, name, null, format);
     }
 
     public void parseWithFormat(String path, Loader.format format) throws LoadException {
@@ -511,40 +462,6 @@ public class Load
         close(stream);
     }
 
-    @Deprecated
-    public InputStream getStream(String path, String... formats)
-            throws LoadException, IOException {
-        String format = "*";
-        if (formats.length > 0) {
-            format = formats[0];
-        }
-        InputStream stream;
-
-        if (NSManager.isResource(path)) {
-            stream = getResourceStream(path);
-        } else if (isURL(path)) {
-            URL url = new URL(path);
-            String contentType = null;
-
-            if (url.getProtocol().equals(FILE)) {
-                URLConnection c = url.openConnection();
-                stream = c.getInputStream();
-                contentType = c.getContentType();
-            } else {
-                Service srv = new Service(path);
-                stream = srv.load(path, format);
-                contentType = srv.getFormat();
-            }
-            if (contentType != null) {
-                Loader.format myFormat = getTypeFormat(contentType, Loader.format.UNDEF_FORMAT);
-            }
-
-        } else {
-            stream = new FileInputStream(path);
-        }
-        return stream;
-    }
-
     String getActualFormat(Loader.format myFormat) {
         if (myFormat != Loader.format.UNDEF_FORMAT) {
             String testFormat = LoadFormat.getFormat(myFormat);
@@ -592,10 +509,6 @@ public class Load
     public void loadString(String str, String path, String name, String base, Loader.format format)
             throws LoadException {
         parse(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), path, name, base, format);
-    }
-
-    public void loadResource(String path, Loader.format format) throws LoadException {
-        loadResource(path, defaultGraph(), format);
     }
 
     public void loadResource(String path, String name, Loader.format format) throws LoadException {
@@ -1006,14 +919,6 @@ public class Load
         }
     }
 
-    public boolean isRenameBlankNode() {
-        return renameBlankNode;
-    }
-
-    public void setRenameBlankNode(boolean renameBlankNode) {
-        this.renameBlankNode = renameBlankNode;
-    }
-
     /*
      * *******************************************************
      */
@@ -1051,11 +956,6 @@ public class Load
     @Deprecated
     public void loadWE(String path) throws LoadException {
         loadWE(path, (String) null);
-    }
-
-    @Deprecated
-    public void loadWE(String path, Loader.format format) throws LoadException {
-        loadWE(path, null, format);
     }
 
     @Override
@@ -1112,11 +1012,6 @@ public class Load
     }
 
     @Deprecated
-    public void load(String path, Loader.format format) throws LoadException {
-        basicParse(path, path, path, getDefaultOrPathFormat(path, format));
-    }
-
-    @Deprecated
     public void load(String path, String base, String source) throws LoadException {
         basicParse(path, base, source, getFormat(path));
     }
@@ -1124,11 +1019,6 @@ public class Load
     @Deprecated
     public void load(String path, String base, String source, Loader.format format) throws LoadException {
         basicParse(path, base, source, getDefaultOrPathFormat(path, format));
-    }
-
-    @Deprecated
-    public void load(InputStream stream) throws LoadException {
-        load(stream, Loader.format.UNDEF_FORMAT);
     }
 
     @Deprecated
@@ -1145,10 +1035,6 @@ public class Load
     public void load(InputStream stream, String path, String source, String base, Loader.format format)
             throws LoadException {
         parse(stream, path, source, base, format);
-    }
-
-    public SemanticWorkflow getWorkflow() {
-        return workflow;
     }
 
     public void setWorkflow(SemanticWorkflow workflow) {
@@ -1228,10 +1114,6 @@ public class Load
 
     public int getLimit() {
         return limit;
-    }
-
-    public void setLimit(int max) {
-        limit = max;
     }
 
     public String getNamedGraphURI() {

@@ -76,12 +76,6 @@ public class ClassHierarchy extends DatatypeHierarchy {
     }
 
 
-    void defSuperTypes(String name, List<String> list) {
-        for (String sup : list) {
-            defSuperType(name, sup);
-        }
-    }
-
     /**
      * Compute class list with a query
      * more precise class first

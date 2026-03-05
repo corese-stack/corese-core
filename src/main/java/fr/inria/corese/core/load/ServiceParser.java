@@ -41,10 +41,6 @@ public class ServiceParser implements URLParam {
          setURL(url);
     }
     
-    public ServiceParser(String url) {
-        this(new URLServer(url));
-    }
-
     public Mappings parseMapping(Query q, String query, String str, String encoding) 
             throws LoadException {
         Mappings map = null;
@@ -110,10 +106,6 @@ public class ServiceParser implements URLParam {
         return map;
     }
 
-    
-    public Graph parseGraph(String str) throws LoadException {
-        return parseGraph(null, str, ENCODING);
-    }
     
     public Graph parseGraph(Query q, String str) throws LoadException {
         return parseGraph(q, str, ENCODING);
@@ -244,10 +236,6 @@ public class ServiceParser implements URLParam {
     
     public String getFormat() {
         return format;
-    }
-    
-    String getFormatText() {
-        return (getFormat()==null)?"undefined":getFormat();
     }
     
     public void setFormat(String format) {

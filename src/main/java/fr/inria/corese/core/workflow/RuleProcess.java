@@ -102,13 +102,6 @@ public class RuleProcess extends WorkflowProcess {
     }
 
     /**
-     * @return the engine
-     */
-    public RuleEngine getEngine() {
-        return engine;
-    }
-
-    /**
      * @param engine the engine to set
      */
     public void setEngine(RuleEngine engine) {

@@ -47,15 +47,6 @@ public class LoadProcess extends WorkflowProcess {
         this.name = name;
     }
 
-    public LoadProcess(String path, String name, boolean rec, boolean named) {
-        this(path, name, rec);
-        this.named = named;
-    }
-
-    public static LoadProcess createStringLoader(String str) {
-        return new LoadProcess(str, Loader.format.UNDEF_FORMAT);
-    }
-
     public static LoadProcess createStringLoader(String str, Loader.format format) {
         return new LoadProcess(str, format);
     }
@@ -141,13 +132,6 @@ public class LoadProcess extends WorkflowProcess {
         }
     }
 
-    String getText(String uri) throws LoadException, SafetyException {
-        if (text != null) {
-            return text;
-        }
-        return read(uri);
-    }
-
     String read(String path) throws LoadException {
         return QueryLoad.create().readWE(path);
     }
@@ -155,20 +139,6 @@ public class LoadProcess extends WorkflowProcess {
     @Override
     public String stringValue(Data data) {
         return data.getGraph().toString();
-    }
-
-    /**
-     * @return the named
-     */
-    public boolean isNamed() {
-        return named;
-    }
-
-    /**
-     * @param named the named to set
-     */
-    public void setNamed(boolean named) {
-        this.named = named;
     }
 
     /**
@@ -183,13 +153,6 @@ public class LoadProcess extends WorkflowProcess {
      */
     public void setProcessor(PreProcessor processor) {
         this.processor = processor;
-    }
-
-    /**
-     * @return the serverMode
-     */
-    public boolean isServerMode() {
-        return getWorkflow().isServerMode();
     }
 
 }

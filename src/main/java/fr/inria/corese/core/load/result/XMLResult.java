@@ -92,14 +92,6 @@ public class XMLResult {
         producer = p;
     }
 
-    /**
-     * Producer in order to create Node using p.getNode() method Use case:
-     * ProducerImpl.create(Graph.create());
-     */
-    public static XMLResult create(Producer p) {
-        return new XMLResult(p);
-    }
-
     public class VTable extends HashMap<String, Variable> {
 
         public Variable get(String name) {
@@ -145,10 +137,6 @@ public class XMLResult {
                 throw e;
             }
         }
-    }
-
-    public Collection<Node> getVariables() {
-        return getCompiler().getVariables();
     }
 
     public void complete(Mappings map) {
@@ -237,12 +225,6 @@ public class XMLResult {
         return null;
     }
     
-    Node list(List<IDatatype> list) {
-        IDatatype dt = DatatypeMap.newList(list);
-        Node node = NodeImpl.create(dt);
-        return node;
-    } 
-
     public void defineVariable(Node var) {
         varList.add(var);
     }
@@ -586,10 +568,6 @@ public class XMLResult {
 
     public List<String> getLink() {
         return link;
-    }
-
-    public void setLink(List<String> link) {
-        this.link = link;
     }
 
     public void addLink(String link) {

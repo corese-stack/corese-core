@@ -103,10 +103,6 @@ public class UpdateProcess {
         return map;
     }
 
-    Level getLevel(Mapping m) {
-        return Access.getLevel(m, Level.USER_DEFAULT);
-    }
-
     Level getLevel(Binding b) {
         if (b == null) {
             return Level.USER_DEFAULT;
@@ -420,24 +416,12 @@ public class UpdateProcess {
         return exec;
     }
 
-    public void setQueryProcess(QueryProcess exec) {
-        this.exec = exec;
-    }
-
     public Dataset getDataset() {
         return dataset;
     }
 
-    public void setDataset(Dataset dataset) {
-        this.dataset = dataset;
-    }
-
     public ManagerImpl getManager() {
         return manager;
-    }
-
-    public void setManager(ManagerImpl manager) {
-        this.manager = manager;
     }
 
 }
