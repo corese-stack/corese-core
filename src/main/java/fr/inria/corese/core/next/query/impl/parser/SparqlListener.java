@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParserBaseListener;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParserListener;
 
@@ -19,6 +20,18 @@ public final class SparqlListener extends SparqlParserBaseListener {
         this.delegates = delegates != null && !delegates.isEmpty()
                 ? List.copyOf(delegates)
                 : Collections.emptyList();
+    }
+
+    // ---------- QUERY ROOT ------------------
+
+    @Override
+    public void enterSelectQuery(SparqlParser.SelectQueryContext ctx) {
+        for(var d : delegates) d.enterSelectQuery(ctx);
+    }
+
+    @Override
+    public void enterAskQuery(SparqlParser.AskQueryContext ctx) {
+        for(var d : delegates) d.enterAskQuery(ctx);
     }
 
     // ---------- GROUP GRAPH PATTERN ----------

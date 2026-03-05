@@ -20,14 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class SparqlParserTest {
 
-    private static final String VALID_QUERY = "SELECT * WHERE { ?s ?p ?o }";
+    private static final String VALID_SELECT_QUERY = "SELECT * WHERE { ?s ?p ?o }";
 
     @Test
     void parseStringReturnsSameResultAsParseReader() {
         SparqlParser parser = new SparqlParser(new SparqlParserOptions.Builder().build());
 
-        QueryAst fromString = parser.parse(VALID_QUERY);
-        QueryAst fromReader = parser.parse(new StringReader(VALID_QUERY));
+        QueryAst fromString = parser.parse(VALID_SELECT_QUERY);
+        QueryAst fromReader = parser.parse(new StringReader(VALID_SELECT_QUERY));
 
         assertNotNull(fromString);
         assertNotNull(fromReader);
@@ -40,7 +40,7 @@ class SparqlParserTest {
     @Test
     void parseInputStreamUsesUtf8() {
         SparqlParser parser = new SparqlParser(new SparqlParserOptions.Builder().build());
-        byte[] bytes = VALID_QUERY.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = VALID_SELECT_QUERY.getBytes(StandardCharsets.UTF_8);
 
         QueryAst ast = parser.parse(new ByteArrayInputStream(bytes));
 
@@ -51,7 +51,7 @@ class SparqlParserTest {
     @Test
     void parseInputStreamWithBaseIriAcceptsBaseIri() {
         SparqlParser parser = new SparqlParser(new SparqlParserOptions.Builder().build());
-        byte[] bytes = VALID_QUERY.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = VALID_SELECT_QUERY.getBytes(StandardCharsets.UTF_8);
 
         QueryAst ast = parser.parse(new ByteArrayInputStream(bytes), "http://example.org/");
 
@@ -65,7 +65,7 @@ class SparqlParserTest {
                 .build();
         SparqlParser parser = new SparqlParser(opts);
 
-        QueryAst ast = parser.parse(new StringReader(VALID_QUERY));
+        QueryAst ast = parser.parse(new StringReader(VALID_SELECT_QUERY));
 
         assertNotNull(ast);
     }
@@ -97,7 +97,7 @@ class SparqlParserTest {
     void parserWithNullConfigParseStillWorks() {
         SparqlParser parser = new SparqlParser((QueryOptions) null);
 
-        QueryAst ast = parser.parse(VALID_QUERY);
+        QueryAst ast = parser.parse(VALID_SELECT_QUERY);
 
         assertNotNull(ast);
         assertNotNull(ast.whereClause());
@@ -107,7 +107,7 @@ class SparqlParserTest {
     void parserWithWrongConfigTypeParseUsesDefaultOptions() {
         SparqlParser parser = new SparqlParser(new QueryOptions() {});
 
-        QueryAst ast = parser.parse(VALID_QUERY);
+        QueryAst ast = parser.parse(VALID_SELECT_QUERY);
 
         assertNotNull(ast);
     }
@@ -134,7 +134,7 @@ class SparqlParserTest {
     void defaultConstructorUsesDefaultOptions() {
         SparqlParser parser = new SparqlParser();
 
-        QueryAst ast = parser.parse(VALID_QUERY);
+        QueryAst ast = parser.parse(VALID_SELECT_QUERY);
 
         assertNotNull(ast);
         assertNotNull(parser.getConfig());

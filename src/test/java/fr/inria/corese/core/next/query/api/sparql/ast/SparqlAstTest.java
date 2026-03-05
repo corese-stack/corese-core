@@ -377,7 +377,7 @@ class SparqlAstTest {
 
     @Nested
     @DisplayName("QueryAst / SelectQueryAst")
-    class QueryAstTest {
+    class QuerySelectAstTest {
 
         @Test
         @DisplayName("SelectQueryAst stores and returns whereClause via whereClause()")
@@ -411,6 +411,47 @@ class SparqlAstTest {
         @DisplayName("SelectQueryAst implements QueryAst")
         void implementsQueryAst() {
             assertInstanceOf(QueryAst.class, new SelectQueryAst(new GroupGraphPatternAst(List.of())));
+        }
+    }
+
+    // ---------- QueryAst / AskQueryAst ----------
+
+    @Nested
+    @DisplayName("QueryAst / AskQueryAst")
+    class QueryAskAstTest {
+
+        @Test
+        @DisplayName("AskQueryAst stores and returns whereClause via whereClause()")
+        void whereClauseAccessor() {
+            GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
+                    new BgpAst(List.of(new TriplePatternAst(
+                            new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
+            QueryAst q = new AskQueryAst(where);
+            assertSame(where, q.whereClause());
+        }
+
+        @Test
+        @DisplayName("AskQueryAst record equality when same whereClause")
+        void askQueryAstEquality() {
+            GroupGraphPatternAst where = new GroupGraphPatternAst(List.of());
+            AskQueryAst a = new AskQueryAst(where);
+            AskQueryAst b = new AskQueryAst(where);
+            assertEquals(a, b);
+            assertEquals(a.hashCode(), b.hashCode());
+        }
+
+        @Test
+        @DisplayName("AskQueryAst with null whereClause uses empty group")
+        void nullWhereClauseDefaultsToEmpty() {
+            AskQueryAst q = new AskQueryAst(null);
+            assertNotNull(q.whereClause());
+            assertTrue(q.whereClause().patterns().isEmpty());
+        }
+
+        @Test
+        @DisplayName("AskQueryAst implements QueryAst")
+        void implementsQueryAst() {
+            assertInstanceOf(QueryAst.class, new AskQueryAst(new GroupGraphPatternAst(List.of())));
         }
     }
 

@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
+import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
@@ -55,7 +56,7 @@ class SparqlListenerTest {
     void withSingleBgpDelegateWalkProducesAst() {
         SparqlParserOptions opts = new SparqlParserOptions.Builder().build();
         SparqlAstBuilder builder = new SparqlAstBuilder(opts);
-        SparqlListener listener = new SparqlListener(List.of(new BgpFeature(builder)));
+        SparqlListener listener = new SparqlListener(List.of(new BgpFeature(builder), new SelectQueryFeature(builder)));
 
         fr.inria.corese.core.next.impl.parser.antlr.SparqlParser antlrParser = createAntlrParser("SELECT * WHERE { ?s ?p ?o }");
         new ParseTreeWalker().walk(listener, antlrParser.query());

@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 
 import java.util.ArrayDeque;
@@ -12,6 +13,7 @@ import java.util.List;
  * - Triple patterns (?s ?p ?o)
  * - Basic Graph Patterns (BGP) via TriplesBlock
  * - GroupGraphPattern as a container (can contain multiple TriplesBlock and later OPTIONAL/UNION/etc.)
+ * - ASK query
  *
  * Compatible with the common SPARQL grammar shape:
  *
@@ -26,8 +28,11 @@ import java.util.List;
  * - enterGroup()/exitGroup() on enter/exitGroupGraphPattern
  * - enterBgp()/exitBgp() on enter/exitTriplesBlock
  * - addTriple(s,p,o) whenever a triple pattern is recognized (usually on exitTriplesSameSubject)
+ * - enterAskQuery at the start of the declaration of an ASK query
  */
 public final class SparqlAstBuilder {
+
+    private ASTConstants.QUERY_TYPE queryType = ASTConstants.QUERY_TYPE.UNDEFINED;
 
     // --- Internal stacks (scopes) ---
 
@@ -37,9 +42,10 @@ public final class SparqlAstBuilder {
     /** Stack of current BGP triples (TriplesBlock). Nested blocks are rare but stack keeps it safe. */
     private final Deque<List<TriplePatternAst>> bgpStack = new ArrayDeque<>();
 
-    /** Final result after exitGroupGraphPattern of the top-level WHERE group. */
-    private QueryAst result;
+    /** Top-level WHERE clause, set when the root group is closed in exitGroup(). */
+    private GroupGraphPatternAst whereClause;
 
+    /** Parser options (e.g. for future use: strict mode, base IRI). */
     private final SparqlParserOptions options;
 
     public SparqlAstBuilder(SparqlParserOptions options) {
@@ -48,6 +54,20 @@ public final class SparqlAstBuilder {
 
     // --- Construction entry points (called by listener) ---
 
+    public void enterAskQuery() {
+        queryType = ASTConstants.QUERY_TYPE.ASK;
+    }
+
+    public void exitAskQuery() {
+    }
+
+    public void enterSelectQuery() {
+        queryType = ASTConstants.QUERY_TYPE.SELECT;
+    }
+
+    public void exitSelectQuery() {
+    }
+
     /** Enter a { ... } groupGraphPattern. */
     public void enterGroup() {
         groupStack.push(new ArrayList<>());
@@ -55,24 +75,18 @@ public final class SparqlAstBuilder {
 
     /**
      * Exit a { ... } groupGraphPattern.
-     * It finalizes the group into a GroupGraphPatternAst.
-     *
-     * If this is the top-level group (stack becomes empty), we produce the final QueryAst.
-     * If there is a parent group (nested group), we add it as a pattern (optional, depending on your AST design).
+     * Pops the current group, wraps it in {@link GroupGraphPatternAst}; if there is a parent group,
+     * adds it there; otherwise stores it as the top-level WHERE clause for {@link #getResult()}.
+     * Must not be called while a TriplesBlock is still open (no pending enterBgp without exitBgp).
      */
     public void exitGroup() {
         ensureNoOpenBgp("exitGroup() called while a TriplesBlock/BGP is still open");
-
-        List<PatternAst> patterns = groupStack.pop();
-        GroupGraphPatternAst groupAst = new GroupGraphPatternAst(List.copyOf(patterns));
-
+        List<PatternAst> popped = groupStack.pop();
+        GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
         if (groupStack.isEmpty()) {
-            this.result = new SelectQueryAst(groupAst);
+            whereClause = group;
         } else {
-            // If you want nested groups to be representable as patterns:
-            // you can add a GroupPatternAst wrapper, or just flatten.
-            // For now we flatten by adding contained patterns into parent (simple + OK for MVP).
-            groupStack.peek().addAll(groupAst.patterns());
+            currentGroup().add(group);
         }
     }
 
@@ -108,12 +122,26 @@ public final class SparqlAstBuilder {
 
     // --- Result ---
 
-    /** Returns the final AST. Valid only after top-level exitGroup(). */
+    /**
+     * Returns the final AST.
+     * The top-level WHERE clause must have been set by exitGroup() (root group closed).
+     * One of enterAskQuery() or enterSelectQuery() must have been called before, or this throws.
+     *
+     * @return the root QueryAst (AskQueryAst or SelectQueryAst)
+     * @throws QueryEvaluationException if query type could not be determined (no enter*Query() called)
+     * @throws IllegalStateException if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
+     */
     public QueryAst getResult() {
-        if (result == null) {
-            throw new IllegalStateException("AST not finalized. Did you call exitGroup() for the top-level GroupGraphPattern?");
+        if (whereClause == null) {
+            throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
-        return result;
+        return switch (this.queryType) {
+            case ASK -> new AskQueryAst(whereClause);
+            case CONSTRUCT -> null; // not yet implemented
+            case DESCRIBE -> null; // not yet implemented
+            case SELECT -> new SelectQueryAst(whereClause);
+            case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
+        };
     }
 
     // --- Term helpers (triple pattern building) ---
