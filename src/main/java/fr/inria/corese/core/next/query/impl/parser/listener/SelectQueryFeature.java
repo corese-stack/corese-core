@@ -20,10 +20,8 @@ import java.util.List;
  */
 public class SelectQueryFeature extends AbstractSparqlFeature {
 
-    private final SparqlAstBuilder builder;
-
     public SelectQueryFeature(SparqlAstBuilder builder) {
-        this.builder = builder;
+        super(builder);
     }
 
     @Override
@@ -38,7 +36,7 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
 
     @Override
     public void exitSelectQuery(SparqlParser.SelectQueryContext ctx) {
-        builder.exitSelectQuery();
+        builder().exitSelectQuery();
     }
 
     /**

@@ -9,20 +9,18 @@ import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
  */
 public class AskQueryFeature extends AbstractSparqlFeature {
 
-    private final SparqlAstBuilder builder;
-
     public AskQueryFeature(SparqlAstBuilder builder) {
-        this.builder = builder;
+        super(builder);
     }
 
     @Override
     public void enterAskQuery(SparqlParser.AskQueryContext ctx) {
-        builder.enterAskQuery();
+        builder().enterAskQuery();
     }
 
     @Override
     public void exitAskQuery(SparqlParser.AskQueryContext ctx) {
-        builder.exitAskQuery();
+        builder().exitAskQuery();
     }
 
 

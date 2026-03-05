@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  * Operator {@code datatype(A)}
  */
 public class DatatypeAst extends AbstractUnaryOperatorAst implements SimpleLiteralOperatorAst {
-    protected DatatypeAst(TermAst arg) {
+    public DatatypeAst(TermAst arg) {
         super(arg);
     }
 }

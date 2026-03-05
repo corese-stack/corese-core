@@ -13,4 +13,30 @@ public class ASTConstants {
 
         UNDEFINED
     }
+
+    public enum OPERATOR {
+        BOOLEAN_NOT,
+        PLUS,
+        MINUS,
+        BOUND,
+        IS_IRI,
+        IS_BLANK,
+        IS_LITERAL,
+        STR,
+        LANG,
+        DATATYPE,
+        OR,
+        AND,
+        EQUALS,
+        DIFFERENT,
+        LOWER,
+        LOWER_EQUAL,
+        GREATER,
+        GREATER_EQUAL,
+        TIMES,
+        DIVIDE,
+        SAMETERM,
+        LANGMATCHES,
+        REGEX
+    }
 }

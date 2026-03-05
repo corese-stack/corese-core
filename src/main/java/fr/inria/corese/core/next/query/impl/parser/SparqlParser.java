@@ -10,6 +10,7 @@ import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
 import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.FilterFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
@@ -108,8 +109,8 @@ public class SparqlParser extends AbstractQueryParser {
                     new AskQueryFeature(builder),
                     new SelectQueryFeature(builder),
                     new SolutionModifierFeature(builder),
+                    new FilterFeature(builder),
                     new UnionFeature(builder),
-                    new SelectQueryFeature(builder),
                     new DescribeQueryFeature(builder)
             ));
 
@@ -117,12 +118,9 @@ public class SparqlParser extends AbstractQueryParser {
 
             return builder.getResult();
 
-        } catch (QueryException e) {
-            throw e;
         }
         catch (IOException e) {
             throw new QueryException("Failed to parse SPARQL query: " + e.getMessage(), e);
-
         }
         catch (Exception e) {
             throw new QueryException("Unexpected error during SPARQL parsing: " + e.getMessage(), e);

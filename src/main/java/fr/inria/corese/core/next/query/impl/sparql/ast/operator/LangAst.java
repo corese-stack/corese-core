@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  * Operator {@code lang(A)}
  */
 public class LangAst extends AbstractUnaryOperatorAst implements SimpleLiteralOperatorAst {
-    protected LangAst(TermAst arg) {
+    public LangAst(TermAst arg) {
         super(arg);
     }
 }
