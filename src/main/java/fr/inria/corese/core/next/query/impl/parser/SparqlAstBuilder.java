@@ -29,6 +29,7 @@ import java.util.List;
  * - enterBgp()/exitBgp() on enter/exitTriplesBlock
  * - addTriple(s,p,o) whenever a triple pattern is recognized (usually on exitTriplesSameSubject)
  * - enterAskQuery at the start of the declaration of an ASK query
+ * - enterSelectQuery at the start of the declaration of a Select query
  */
 public final class SparqlAstBuilder {
 
@@ -44,6 +45,9 @@ public final class SparqlAstBuilder {
 
     /** Top-level WHERE clause, set when the root group is closed in exitGroup(). */
     private GroupGraphPatternAst whereClause;
+
+    /** SELECT projection (* or explicit variables). Set by SelectQueryFeature in enterSelectQuery. */
+    private ProjectionAst projection = ProjectionAsts.selectAll();
 
     /** Parser options (e.g. for future use: strict mode, base IRI). */
     private final SparqlParserOptions options;
@@ -66,6 +70,30 @@ public final class SparqlAstBuilder {
     }
 
     public void exitSelectQuery() {
+    }
+
+    /** Sets SELECT * (project all variables from the body). */
+    public void setProjectionAll() {
+        this.projection = ProjectionAsts.selectAll();
+    }
+
+    /** Sets explicit SELECT variables (e.g. SELECT ?s ?p). Variable names may include ? or $ prefix. */
+    public void setProjectionVariables(List<String> variableNames) {
+        if (variableNames == null || variableNames.isEmpty()) {
+            setProjectionAll();
+            return;
+        }
+        List<VarAst> vars = variableNames.stream()
+                .map(s -> s == null ? "" : (s.startsWith("?") || s.startsWith("$") ? s.substring(1).trim() : s.trim()))
+                .filter(s -> !s.isBlank())
+                .map(VarAst::new)
+                .toList();
+        this.projection = vars.isEmpty() ? ProjectionAsts.selectAll() : ProjectionAsts.of(vars);
+    }
+
+    /** Sets the projection from an existing AST. */
+    public void setProjection(ProjectionAst projection) {
+        this.projection = projection != null ? projection : ProjectionAsts.selectAll();
     }
 
     /** Enter a { ... } groupGraphPattern. */
@@ -139,7 +167,7 @@ public final class SparqlAstBuilder {
             case ASK -> new AskQueryAst(whereClause);
             case CONSTRUCT -> null; // not yet implemented
             case DESCRIBE -> null; // not yet implemented
-            case SELECT -> new SelectQueryAst(whereClause);
+            case SELECT -> new SelectQueryAst(projection, whereClause);
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
