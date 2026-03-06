@@ -113,4 +113,53 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         assertTrue(projection.selectAll(), "Projection should be SELECT *");
         assertTrue(projection.variables().isEmpty(), "SELECT * projection should not contain explicit variables");
     }
+
+    @Test
+    @DisplayName("Should parse a short form SELECT ?s ?o { ?s ?p ?o } query")
+    public void shouldParseBasicSelectShortQueryTest() {
+
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+            SELECT ?s ?o {
+                ?s ?p ?o
+            }
+            """);
+
+        assertNotNull(ast);
+        assertInstanceOf(QueryAst.class, ast);
+
+        SelectQueryAst selectQueryAst = (SelectQueryAst) ast;
+
+        assertNotNull(selectQueryAst.whereClause());
+        assertNotNull(selectQueryAst.projection());
+
+        // --- WHERE ---
+        GroupGraphPatternAst where = selectQueryAst.whereClause();
+
+        assertEquals(1, where.patterns().size(), "WHERE should contain 1 pattern (BGP)");
+
+        PatternAst p0 = where.patterns().getFirst();
+        assertInstanceOf(BgpAst.class, p0, "First pattern should be a BGP");
+
+        BgpAst bgp = (BgpAst) p0;
+
+        assertEquals(1, bgp.triples().size(), "BGP should contain 1 triple");
+
+        TriplePatternAst t = bgp.triples().getFirst();
+
+        assertInstanceOf(VarAst.class, t.subject());
+        assertInstanceOf(VarAst.class, t.predicate());
+        assertInstanceOf(VarAst.class, t.object());
+
+        assertEquals("s", ((VarAst) t.subject()).name());
+        assertEquals("o", ((VarAst) t.object()).name());
+
+        // --- PROJECTION ---
+        ProjectionAst projection = selectQueryAst.projection();
+
+        assertEquals(2, projection.variables().size(), "Projection should contains 2 variables");
+        assertEquals("s", projection.variables().get(0).name());
+        assertEquals("o", projection.variables().get(1).name());
+    }
 }
