@@ -5,8 +5,10 @@ import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +36,17 @@ class TriGParserTest {
      */
 
     private Model parseFromString(String trigData, String baseURI) {
-        Model model = new CoreseModel();
         ValueFactory factory = new CoreseAdaptedValueFactory();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(factory)
+                .build();
+
+
         RDFParser parser = new TriGParser(model, factory);
         parser.parse(new StringReader(trigData), baseURI);
         return model;
@@ -119,7 +130,7 @@ class TriGParserTest {
     }
 
     @Test
-    void testDocumentThatContainsTwoGraphExample()  {
+    void testDocumentThatContainsTwoGraphExample() {
         String trig = """
                 # This document contains a same data as the
                 # previous example.
@@ -155,7 +166,7 @@ class TriGParserTest {
 
         assertEquals(3, model.getNamespaces().size());
 
-        assertEquals(3, model.contexts().size());
+        assertEquals(2, model.contexts().size());
     }
 
     @Test

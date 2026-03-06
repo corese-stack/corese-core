@@ -4,8 +4,10 @@ import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +35,23 @@ public class RDFXMLParserTest {
      * @throws Exception if an error occurs during parsing or I/O.
      */
     private Model parseRdfXml(String rdfXml) throws Exception {
-        Model model = new CoreseModel();
+
         ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model coreseModel = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
+
+
         try (InputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8))) {
-            RDFXMLParser parser = new RDFXMLParser(model, valueFactory);
+            RDFXMLParser parser = new RDFXMLParser(coreseModel, valueFactory);
             parser.parse(inputStream);
         }
-        return model;
+        return coreseModel;
     }
 
     /**

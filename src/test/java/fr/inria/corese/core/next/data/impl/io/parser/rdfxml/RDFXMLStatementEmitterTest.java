@@ -1,11 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
 import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLStatementEmitter;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
@@ -33,8 +34,17 @@ public class RDFXMLStatementEmitterTest {
 
     @BeforeEach
     public void setUp() {
-        model = new CoreseModel();
         factory = new CoreseAdaptedValueFactory();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(factory)
+                .build();
+
+
         emitter = new RDFXMLStatementEmitter(model, factory);
     }
 

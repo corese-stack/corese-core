@@ -2,10 +2,12 @@ package fr.inria.corese.core.next.data.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.impl.StorageModel;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -42,7 +44,16 @@ class TurtleListenerTest {
         TurtleParser parser = new TurtleParser(tokens);
         ParseTree tree = parser.turtleDoc();
 
-        Model model = new CoreseModel();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(factory)
+                .build();
+
+
         TurtleListener listener = new TurtleListener(model, factory, null);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(listener, tree);

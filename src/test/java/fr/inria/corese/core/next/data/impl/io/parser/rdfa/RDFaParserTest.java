@@ -4,12 +4,14 @@ import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -44,10 +46,22 @@ class RDFaParserTest {
             @prefix xhv: 	<http://www.w3.org/1999/xhtml/vocab#> .
             @prefix xsd: 	<http://www.w3.org/2001/XMLSchema#> .
             """;
+    /**
+     * Helper method to create a test model.
+     */
+    private Model createTestModel() {
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
 
+        return StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
+    }
     @Test
     void getRDFFormat() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         ValueFactory factory = new CoreseAdaptedValueFactory();
         RDFParser parser = new RDFaParser(model, factory);
         assertEquals(RDFFormat.RDFA, parser.getRDFFormat());
@@ -72,8 +86,8 @@ class RDFaParserTest {
                 <http://example.org/> dc:creator "Jo" .
                 """;
 
-        Model parsedModel = new CoreseModel();
-        Model resultModel = new CoreseModel();
+        Model parsedModel = createTestModel();
+        Model resultModel = createTestModel();
         ValueFactory factory = new CoreseAdaptedValueFactory();
         RDFParser testedParser = new RDFaParser(parsedModel, factory);
         RDFParser resultParser = parserFactory.createRDFParser(RDFFormat.TURTLE, resultModel, valueFactory);
@@ -116,8 +130,8 @@ class RDFaParserTest {
                 <> dc:creator "Jo" .
                 """;
 
-        Model parsedModel = new CoreseModel();
-        Model resultModel = new CoreseModel();
+        Model parsedModel = createTestModel();
+        Model resultModel = createTestModel();
         ValueFactory factory = new CoreseAdaptedValueFactory();
         RDFParser testedParser = new RDFaParser(parsedModel, factory);
         RDFParser resultParser = parserFactory.createRDFParser(RDFFormat.TURTLE, resultModel, valueFactory);
@@ -156,8 +170,8 @@ class RDFaParserTest {
     </body>
 </html>""";
 
-        Model testModel = new CoreseModel();
-        Model referenceModel = new CoreseModel();
+        Model testModel = createTestModel();
+        Model referenceModel = createTestModel();
 
         IRI subject = valueFactory.createIRI("http://www.w3.org/2006/07/SWD/RDFa/testsuite/xhtml1-testcases/photo1.jpg");
         IRI predicate = valueFactory.createIRI("http://purl.org/dc/elements/1.1/creator");
@@ -199,7 +213,7 @@ class RDFaParserTest {
                   </body>
                 </html>""";
 
-        Model testModel = new CoreseModel();
+        Model testModel = createTestModel();
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
@@ -230,8 +244,8 @@ class RDFaParserTest {
                 </html>
                 """;
 
-        Model testModel = new CoreseModel();
-        Model referenceModel = new CoreseModel();
+        Model testModel = createTestModel();
+        Model referenceModel = createTestModel();
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
@@ -268,8 +282,8 @@ class RDFaParserTest {
                 </html>
                 """;
 
-        Model testModel = new CoreseModel();
-        Model referenceModel = new CoreseModel();
+        Model testModel = createTestModel();
+        Model referenceModel = createTestModel();
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
@@ -304,8 +318,8 @@ class RDFaParserTest {
                 </html>
                 """;
 
-        Model testModel = new CoreseModel();
-        Model referenceModel = new CoreseModel();
+        Model testModel = createTestModel();
+        Model referenceModel = createTestModel();
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
@@ -355,8 +369,8 @@ class RDFaParserTest {
                 </html>
                 """;
 
-        Model testModel = new CoreseModel();
-        Model referenceModel = new CoreseModel();
+        Model testModel = createTestModel();
+        Model referenceModel = createTestModel();
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
@@ -398,8 +412,8 @@ class RDFaParserTest {
                 </html>
                 """;
 
-        Model testModel = new CoreseModel();
-        Model referenceModel = new CoreseModel();
+        Model testModel = createTestModel();
+        Model referenceModel = createTestModel();
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
@@ -450,8 +464,8 @@ class RDFaParserTest {
                 </html>
                 """;
 
-        Model testModel = new CoreseModel();
-        Model referenceModel = new CoreseModel();
+        Model testModel = createTestModel();
+        Model referenceModel = createTestModel();
 
         RDFParser parser = new ParserFactory().createRDFParser(RDFFormat.RDFA, testModel, valueFactory);
 
@@ -492,7 +506,7 @@ class RDFaParserTest {
                   </body>
                 </html>""";
 
-        Model testModel = new CoreseModel();
+        Model testModel = createTestModel();
 
         RDFaParserOptions.Builder builder = new RDFaParserOptions.Builder();
         RDFaParserOptions options = builder.build();

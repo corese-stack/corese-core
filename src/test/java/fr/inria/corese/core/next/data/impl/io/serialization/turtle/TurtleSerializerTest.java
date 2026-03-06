@@ -1,14 +1,16 @@
 package fr.inria.corese.core.next.data.impl.io.serialization.turtle;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -301,14 +303,20 @@ class TurtleSerializerTest {
         valueFactory = new CoreseAdaptedValueFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();
 
-        Model model = new CoreseModel();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
 
         BNode blankSubject = valueFactory.createBNode();
         BNode blankObject = valueFactory.createBNode();
         IRI predicate = valueFactory.createIRI(PREDICATE_KNOWS);
 
         model.add(blankSubject, predicate, blankObject);
-
 
         for (Statement stmt : model) {
             Value obj = stmt.getObject();
@@ -345,9 +353,7 @@ class TurtleSerializerTest {
         turtleSerializer.write(writer);
         String actual = writer.toString().replace("\r\n", "\n");
         logger.debug("Serialized Turtle output:\n{}", actual);
-
     }
-
     /**
      * Tests serialization with a base IRI defined.
      * Verifies that the `@base` directive is included in the output.
@@ -534,11 +540,9 @@ class TurtleSerializerTest {
 
     /**
      * Tests serialization of a literal containing escaped characters.
-     *
-     * @throws SerializationException if a serialization error occurs.
      */
     @Test
-    void testEscapedCharacterLiteralSerialization() throws SerializationException {
+    void testEscapedCharacterLiteralSerialization() {
         ValueFactory coreseFactory = new CoreseAdaptedValueFactory();
         Statement statement = coreseFactory.createStatement(
                 coreseFactory.createIRI("http://example.org/book/1"),
@@ -546,17 +550,25 @@ class TurtleSerializerTest {
                 coreseFactory.createLiteral("\\ \t \b \n \r \f")
         );
 
-        Model coreseModel = new CoreseModel();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model coreseModel = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(coreseFactory)
+                .build();
+
         coreseModel.add(statement);
 
         StringWriter writer = new StringWriter();
-        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
+        TurtleSerializerOptions serializerConfig = new TurtleSerializerOptions.Builder()
                 .autoDeclarePrefixes(false)
                 .includeContext(false)
                 .prettyPrint(false)
                 .usePrefixes(false)
                 .build();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(coreseModel, config);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(coreseModel, serializerConfig);
 
         turtleSerializer.write(writer);
 

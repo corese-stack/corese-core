@@ -3,11 +3,12 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLUtils;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -111,7 +112,16 @@ public class RDFXMLUtilsTest {
      */
     @Test
     public void testCreateRdfCollection() {
-        Model model = new CoreseModel();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(new CoreseAdaptedValueFactory())
+                .build();
+
+
         Resource r1 = factory.createIRI("http://example.org/A");
         Resource r2 = factory.createIRI("http://example.org/B");
         Resource head = RDFXMLUtils.createRdfCollection(List.of(r1, r2), model, factory);

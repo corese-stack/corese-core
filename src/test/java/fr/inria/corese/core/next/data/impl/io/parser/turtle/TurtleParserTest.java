@@ -4,9 +4,11 @@ import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.Test;
 
 
@@ -30,13 +32,25 @@ public class TurtleParserTest {
     private static final Logger logger = LoggerFactory.getLogger(TurtleParserTest.class);
 
     private ValueFactory factory = new CoreseAdaptedValueFactory();
+    /**
+     * Helper method to create a test model.
+     */
+    private Model createTestModel() {
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
 
+        return StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(factory)
+                .build();
+    }
     @Test
     public void testParseWithPrefixAndTriple() {
         String turtle = " @prefix ex: <http://example.org/> . " +
             "ex:Alice ex:knows ex:Bob .";
 
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
         assertEquals(1, model.size());
@@ -49,7 +63,7 @@ public class TurtleParserTest {
                 "<#0214> \n" +
                 "    rdfs:comment \"\"\"blabla\"abc\"\"\"\" .";
 
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
         assertEquals(1, model.size());
@@ -62,7 +76,7 @@ public class TurtleParserTest {
                 "<#0214> \n" +
                 "    rdfs:comment \"\"\"\"abc\"blabla\"\"\" .";
 
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
         assertEquals(1, model.size());
@@ -75,7 +89,7 @@ public class TurtleParserTest {
                 "<#0214> \n" +
                 "    rdfs:comment \"\"\"blabla\"abc\"blabla\"\"\" .";
 
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
         assertEquals(1, model.size());
@@ -89,7 +103,7 @@ public class TurtleParserTest {
                 <#0214>\s
                     rdfs:comment ""\""abc""\"" .""";
 
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
         assertEquals(1, model.size());
@@ -108,11 +122,11 @@ public class TurtleParserTest {
                   .
                   """;
 
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = new TurtleParser(model, factory, new TurtleParserOptions.Builder().baseIRI("http://inria.fr/").build());
         parser.parse(new StringReader(turtle));
 
-        Model refModel = new CoreseModel();
+        Model refModel = createTestModel();
         refModel.add(factory.createIRI("http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest#0006"), RDFS.label.getIRI(), factory.createLiteral("Test 0006: @rel and @rev"));
         refModel.add(factory.createIRI("http://rdfa.info/test-suite/test-cases/rdfa1.1/xml/manifest#0006"), RDFS.comment.getIRI(), factory.createLiteral("Tests @rev and @rel together, with the object being specified by @href, ignoring content"));
 

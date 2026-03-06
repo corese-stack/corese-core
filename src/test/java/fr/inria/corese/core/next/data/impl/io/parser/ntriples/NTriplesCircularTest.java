@@ -4,11 +4,13 @@ import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.ntriples.NTriplesSerializerOptions;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,13 +60,26 @@ class NTriplesCircularTest {
     }
 
     /**
+     * Helper method to create a test model.
+     */
+    private Model createTestModel() {
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        return StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
+    }
+    /**
      * Creates a simple model with basic triples containing IRIs and string
      * literals.
      * 
      * @return A model with two simple triples
      */
     private Model createSimpleTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
         IRI predicateName = valueFactory.createIRI(PREDICATE_NAME);
@@ -86,7 +101,7 @@ class NTriplesCircularTest {
      * @return A model with diverse triple patterns
      */
     private Model createComplexTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         // Basic IRI and string literal triple
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
@@ -129,7 +144,7 @@ class NTriplesCircularTest {
      * @return A model with integer and string typed literals
      */
     private Model createTypedLiteralsTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateAge = valueFactory.createIRI(PREDICATE_AGE);
@@ -154,7 +169,7 @@ class NTriplesCircularTest {
      * @return A model with English and French language-tagged literals
      */
     private Model createLanguageTaggedLiteralsTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateGreeting = valueFactory.createIRI(EXAMPLE_NS + "greeting");
@@ -176,7 +191,7 @@ class NTriplesCircularTest {
      * @return A model with blank nodes as subject and object
      */
     private Model createBlankNodesTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         BNode blankSubject = valueFactory.createBNode();
         BNode blankObject = valueFactory.createBNode();
@@ -193,7 +208,7 @@ class NTriplesCircularTest {
      * @return A model with literals containing newlines, quotes, and Unicode
      */
     private Model createSpecialCharactersTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateDescription = valueFactory.createIRI(EXAMPLE_NS + "description");
@@ -230,9 +245,8 @@ class NTriplesCircularTest {
         if (originalModel.size() > 0) {
             assertTrue(serializedContent.length() > 0, "Serialized content should not be empty for non-empty models");
         }
-
         // Parse back from N-Triples
-        Model deserializedModel = new CoreseModel();
+        Model deserializedModel = createTestModel();
         RDFParser parser = parserFactory.createRDFParser(
                 RDFFormat.NTRIPLES, deserializedModel, valueFactory);
 
@@ -279,7 +293,7 @@ class NTriplesCircularTest {
     @DisplayName("Round-trip test with empty model")
     void testRoundTripWithEmptyModel() {
         // Given: An empty model
-        Model originalModel = new CoreseModel();
+        Model originalModel = createTestModel();
 
         // When: Performing round-trip serialization and parsing
         Model deserializedModel = performRoundTrip(originalModel);

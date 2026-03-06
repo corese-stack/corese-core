@@ -179,7 +179,7 @@ class MemoryAdapterTest {
             assertEquals(1, results.size());
             assertTrue(results.contains(stmt1));
         }
-        
+
         @Test
         @DisplayName("Should find statements by context")
         void shouldFindStatementsByContext() {
@@ -188,7 +188,10 @@ class MemoryAdapterTest {
             Value object = mock(Value.class);
             Resource context1 = mock(Resource.class);
             Resource context2 = mock(Resource.class);
-            
+
+            when(context1.stringValue()).thenReturn("http://example.org/graph1");
+            when(context2.stringValue()).thenReturn("http://example.org/graph2");
+
             Statement stmt1 = mock(Statement.class);
             when(stmt1.getSubject()).thenReturn(subject);
             when(stmt1.getPredicate()).thenReturn(predicate);
