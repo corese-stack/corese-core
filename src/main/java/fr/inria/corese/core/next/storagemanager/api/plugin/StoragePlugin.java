@@ -47,7 +47,32 @@ public interface StoragePlugin {
     /**
      * Returns the priority of this plugin.
      *
-     * @return the plugin priority
+     * <p>When multiple plugins support the same configuration (i.e., their
+     * {@link #supports(StorageConfig)} method returns {@code true}), the plugin
+     * with the <b>highest priority</b> is selected.
+     *
+     * <p><b>Priority Semantics:</b>
+     * <ul>
+     *   <li><b>Higher values = Higher priority:</b> A plugin with priority 100 will be
+     *       selected over one with priority 50</li>
+     *   <li><b>Default is 0:</b> If this method is not overridden, the plugin has priority 0</li>
+     *   <li><b>Negative values are allowed:</b> Use negative priorities for fallback plugins
+     *       that should only be used when no other plugin is available</li>
+     * </ul>
+     *
+     *
+     * <p><b>Built-in Priorities:</b>
+     * <ul>
+     *   <li>GraphStoragePlugin: 100</li>
+     *   <li>MemoryStoragePlugin: 50</li>
+     * </ul>
+     *
+     *
+     * <p><b>Tie-Breaking:</b> If multiple plugins have the same priority and support
+     * the same configuration, the selection is non-deterministic. Avoid this by ensuring
+     * each plugin has a unique priority for overlapping configurations.
+     *
+     * @return the plugin priority (higher values = higher priority, default is 0)
      */
     default int getPriority() {
         return 0;

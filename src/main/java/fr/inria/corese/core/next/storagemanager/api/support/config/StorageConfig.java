@@ -67,7 +67,7 @@ public final class StorageConfig {
      *
      * @return {@code true} if transaction support is enabled
      */
-    public boolean isTransactionSupport() {
+    public boolean hasTransactionSupport() {
         return transactionSupport;
     }
 
