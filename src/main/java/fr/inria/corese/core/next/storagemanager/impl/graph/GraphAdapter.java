@@ -4,6 +4,7 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.storagemanager.api.plugin.PluginException;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.Arrays;
@@ -32,8 +33,24 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
      * @return true if the statement was added, false if it already existed
      */
     public boolean add(Statement stmt) {
-        Edge edge = statementToEdge(stmt);
-        return graph.addEdge(edge) != null;
+        // Convert statement components to nodes
+        Node subject = resourceToNode(stmt.getSubject());
+        Node predicate = iriToNode(stmt.getPredicate());
+        Node object = valueToNode(stmt.getObject());
+
+        Resource ctxResource = stmt.getContext();
+        Node context = (ctxResource != null) ? resourceToNode(ctxResource) : null;
+
+        // Use Graph.addTriple() or Graph.add() instead of create() + addEdge()
+        // This bypasses the Edge creation issue
+        Edge edge;
+        if (context == null) {
+            edge = graph.addEdge(subject, predicate, object);
+        } else {
+            edge = graph.addEdge(subject, predicate, object, context);
+        }
+
+        return edge != null;
     }
 
     /**
@@ -78,14 +95,20 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
             edges = graph.getEdgesRDF4J(subject, predicate, object);
         } else {
             Node[] ctxNodes = Arrays.stream(contexts)
-                    .map(this::resourceToNode)
+                    .map(ctx -> ctx != null ? resourceToNode(ctx) : null)
                     .toArray(Node[]::new);
             edges = graph.getEdgesRDF4J(subject, predicate, object, ctxNodes);
         }
 
         Set<Statement> results = new HashSet<>();
         for (Edge edge : edges) {
-            results.add(edgeToStatement(edge));
+            if (edge != null) {
+                try {
+                    results.add(edgeToStatement(edge));
+                } catch (IllegalArgumentException e) {
+                    // Skip edges that cannot be converted
+                }
+            }
         }
         return results;
     }
@@ -124,7 +147,13 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
     public Set<Resource> getSubjects() {
         Set<Resource> subjects = new HashSet<>();
         for (Edge edge : graph.getEdges()) {
-            subjects.add(nodeToResource(edge.getSubjectNode()));
+            if (edge != null && edge.getSubjectNode() != null) {
+                try {
+                    subjects.add(nodeToResource(edge.getSubjectNode()));
+                } catch (IllegalArgumentException e) {
+                    // Skip invalid nodes
+                }
+            }
         }
         return subjects;
     }
@@ -137,7 +166,13 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
     public Set<IRI> getPredicates() {
         Set<IRI> predicates = new HashSet<>();
         for (Edge edge : graph.getEdges()) {
-            predicates.add(nodeToIRI(edge.getEdgeNode()));
+            if (edge != null && edge.getEdgeNode() != null) {
+                try {
+                    predicates.add(nodeToIRI(edge.getEdgeNode()));
+                } catch (IllegalArgumentException e) {
+                    // Skip invalid nodes
+                }
+            }
         }
         return predicates;
     }
@@ -150,7 +185,13 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
     public Set<Value> getObjects() {
         Set<Value> objects = new HashSet<>();
         for (Edge edge : graph.getEdges()) {
-            objects.add(nodeToValue(edge.getObjectNode()));
+            if (edge != null && edge.getObjectNode() != null) {
+                try {
+                    objects.add(nodeToValue(edge.getObjectNode()));
+                } catch (IllegalArgumentException e) {
+                    // Skip invalid nodes
+                }
+            }
         }
         return objects;
     }
@@ -163,7 +204,13 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
     public Set<Resource> getContexts() {
         Set<Resource> contexts = new HashSet<>();
         for (Node ctx : graph.getGraphNodes()) {
-            contexts.add(nodeToResource(ctx));
+            if (ctx != null) {
+                try {
+                    contexts.add(nodeToResource(ctx));
+                } catch (IllegalArgumentException e) {
+                    // Skip invalid nodes
+                }
+            }
         }
         return contexts;
     }
@@ -171,16 +218,32 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
     /**
      * Converts a Graph {@link Edge} to a Storage {@link Statement}.
      *
-     * <p>Extracts subject, predicate, object and optional context from the Edge
-     * and creates the corresponding Statement using the ValueFactory.</p>
-     *
      * @param edge the Graph edge to convert
      * @return the corresponding Statement
+     * @throws IllegalArgumentException if edge or any of its required nodes is null
      */
     private Statement edgeToStatement(Edge edge) {
-        Resource subject = nodeToResource(edge.getSubjectNode());
-        IRI predicate = nodeToIRI(edge.getEdgeNode());
-        Value object = nodeToValue(edge.getObjectNode());
+        if (edge == null) {
+            throw new IllegalArgumentException("Edge cannot be null");
+        }
+
+        Node subjectNode = edge.getSubjectNode();
+        Node predicateNode = edge.getEdgeNode();
+        Node objectNode = edge.getObjectNode();
+
+        if (subjectNode == null) {
+            throw new IllegalArgumentException("Edge subject node is null");
+        }
+        if (predicateNode == null) {
+            throw new IllegalArgumentException("Edge predicate node is null");
+        }
+        if (objectNode == null) {
+            throw new IllegalArgumentException("Edge object node is null");
+        }
+
+        Resource subject = nodeToResource(subjectNode);
+        IRI predicate = nodeToIRI(predicateNode);
+        Value object = nodeToValue(objectNode);
 
         // Context (named graph)
         Node graphNode = edge.getGraph();
@@ -195,21 +258,22 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
 
     /**
      * Converts a Graph {@link Node} to a Storage {@link Resource} (IRI or BNode).
-     *
-     * @param node the Graph node to convert
-     * @return the corresponding Resource (IRI or BNode)
-     * @throws IllegalArgumentException if the node is not a URI, blank, or triple reference
      */
     private Resource nodeToResource(Node node) {
+        if (node == null) {
+            throw new IllegalArgumentException("Node cannot be null");
+        }
+
         IDatatype dt = node.getDatatypeValue();
+        if (dt == null) {
+            throw new IllegalArgumentException("Node datatype is null: " + node);
+        }
 
         if (dt.isURI()) {
             return valueFactory.createIRI(dt.getLabel());
         } else if (dt.isBlank()) {
             return valueFactory.createBNode(dt.getLabel());
         } else if (dt.isTriple()) {
-            // RDF-star: triple reference node
-            // For now, treat as blank node
             return valueFactory.createBNode(dt.getLabel());
         } else {
             throw new IllegalArgumentException("Node is not a Resource: " + node);
@@ -218,13 +282,16 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
 
     /**
      * Converts a Graph {@link Node} (predicate) to a Storage {@link IRI}.
-     *
-     * @param node the Graph predicate node to convert
-     * @return the corresponding IRI
-     * @throws IllegalArgumentException if the node is not a URI
      */
     private IRI nodeToIRI(Node node) {
+        if (node == null) {
+            throw new IllegalArgumentException("Node cannot be null");
+        }
+
         IDatatype dt = node.getDatatypeValue();
+        if (dt == null) {
+            throw new IllegalArgumentException("Node datatype is null: " + node);
+        }
 
         if (!dt.isURI()) {
             throw new IllegalArgumentException("Node is not an IRI: " + node);
@@ -235,32 +302,30 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
 
     /**
      * Converts a Graph {@link Node} to a Storage {@link Value} (Resource or Literal).
-     *
-     * @param node the Graph node to convert
-     * @return the corresponding Value (Resource or Literal)
-     * @throws IllegalArgumentException if the node type is unknown
      */
     private Value nodeToValue(Node node) {
+        if (node == null) {
+            throw new IllegalArgumentException("Node cannot be null");
+        }
+
         IDatatype dt = node.getDatatypeValue();
+        if (dt == null) {
+            throw new IllegalArgumentException("Node datatype is null: " + node);
+        }
 
         if (dt.isURI() || dt.isBlank() || dt.isTriple()) {
-            // It's a Resource
             return nodeToResource(node);
         } else if (dt.isLiteral()) {
-            // It's a Literal
             String label = dt.getLabel();
             String lang = dt.getLang();
             String datatypeIRI = dt.getDatatypeURI();
 
             if (lang != null && !lang.isEmpty()) {
-                // Language-tagged string
                 return valueFactory.createLiteral(label, lang);
             } else if (datatypeIRI != null && !datatypeIRI.isEmpty()) {
-                // Typed literal
                 IRI datatype = valueFactory.createIRI(datatypeIRI);
                 return valueFactory.createLiteral(label, datatype);
             } else {
-                // Plain string (xsd:string)
                 return valueFactory.createLiteral(label);
             }
         } else {
@@ -287,10 +352,6 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
 
     /**
      * Converts a Storage {@link Resource} to a Graph {@link Node}.
-     *
-     * @param resource the Resource to convert (IRI or BNode)
-     * @return the corresponding Graph Node
-     * @throws IllegalArgumentException if the resource type is unknown
      */
     private Node resourceToNode(Resource resource) {
         if (resource.isIRI()) {
@@ -306,9 +367,6 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
 
     /**
      * Converts a Storage {@link IRI} to a Graph {@link Node} (property).
-     *
-     * @param iri the IRI to convert (predicate)
-     * @return the corresponding Graph Node
      */
     private Node iriToNode(IRI iri) {
         return graph.addProperty(iri.stringValue());
@@ -316,30 +374,21 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
 
     /**
      * Converts a Storage {@link Value} to a Graph {@link Node}.
-     *
-     * @param value the Value to convert (Resource or Literal)
-     * @return the corresponding Graph Node
-     * @throws IllegalArgumentException if the value type is unknown
      */
     private Node valueToNode(Value value) {
         if (value.isResource()) {
-            // It's a Resource (IRI or BNode)
             return resourceToNode((Resource) value);
         } else if (value.isLiteral()) {
-            // It's a Literal
             Literal literal = (Literal) value;
             String label = literal.getLabel();
 
             if (literal.getLanguage().isPresent()) {
-                // Language-tagged string
                 String lang = literal.getLanguage().get();
                 return graph.addLiteral(label, null, lang);
             } else if (literal.getDatatype() != null) {
-                // Typed literal
                 String datatypeIRI = literal.getDatatype().stringValue();
                 return graph.addLiteral(label, datatypeIRI);
             } else {
-                // Plain string
                 return graph.addLiteral(label);
             }
         } else {
