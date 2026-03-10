@@ -13,7 +13,6 @@ import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.api.GraphListener;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Edge;
 
 
 /**
@@ -42,12 +41,6 @@ public class GraphListenerImpl implements GraphListener {
 		return new GraphListenerImpl();
 	}
 
-	
-	public static GraphListenerImpl create(int n){
-		GraphListenerImpl gl = new GraphListenerImpl();
-		gl.setMax(n);
-		return gl;
-	}
 	
 	public void setMax(int n){
 		max = n;
@@ -100,21 +93,6 @@ public class GraphListenerImpl implements GraphListener {
 	private void linsert(Graph g, Edge ent) {
 	}
 	
-	
-	/**
-	 * Test if edge matches triple pattern 
-	 */
-	boolean match(Triple t, Edge edge){
-		boolean b = 
-			match(t.getSubject(), edge.getNode(0)) &&
-			match(t.getObject(), edge.getNode(1)) ;
-		
-		if (t.getVariable() == null){
-			b = b && match(t.getProperty(), edge.getEdgeNode());
-		}
-		
-		return b;   
-	}
 	
 	
 	boolean match(Atom at, Node n){

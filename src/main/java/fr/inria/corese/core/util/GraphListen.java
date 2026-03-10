@@ -45,19 +45,6 @@ public class GraphListen implements GraphListener {
     GraphListen() {
     }
 
-    /**
-     * str is a query with callback function definitions
-     *
-     * @param str
-     */
-    public GraphListen(String str) {
-        init = str;
-    }
-    
-     public GraphListen(Query q) {
-        query = q;
-    }
-     
     public GraphListen(Eval ev) {
         eval = ev;
     }
@@ -130,10 +117,6 @@ public class GraphListen implements GraphListener {
             return (IDatatype) obj;
         }
         return  eval.getProducer().getValue(obj);
-    }
-
-    IDatatype[] param() {
-        return new IDatatype[0];
     }
 
     IDatatype[] param(Object dt) {

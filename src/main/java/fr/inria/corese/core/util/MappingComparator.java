@@ -6,7 +6,6 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
 
 /**
  *
@@ -16,10 +15,6 @@ import fr.inria.corese.core.kgram.core.Mappings;
  *
  */
 public class MappingComparator {
-
-    public static MappingComparator create() {
-        return new MappingComparator();
-    }
 
     /**
      * Blanks may have different ID in test case and in kgram but same ID should
@@ -41,55 +36,6 @@ public class MappingComparator {
     // target value of a Node
     IDatatype datatype(Node n) {
         return n.getValue();
-    }
-
-    public boolean validate(Mappings kgram, Mappings w3c) {
-        boolean result = true, printed = false;
-        Hashtable<Mapping, Mapping> table = new Hashtable<Mapping, Mapping>();
-
-        for (Mapping w3cres : w3c) {
-            // for each w3c result
-            boolean ok = false;
-
-            for (Mapping kres : kgram) {
-                // find a new kgram result that is equal to w3c
-                if (table.contains(kres)) {
-                    continue;
-                }
-
-                ok = compare(kres, w3cres);
-
-                if (ok) {
-                    for (Node qNode : kgram.getSelect()) {
-                        // check that kgram has no additional binding 
-                        if (kres.getNode(qNode) != null) {
-                            if (w3cres.getNode(qNode) == null) {
-                                ok = false;
-                            }
-                        }
-                    }
-                }
-
-                if (ok) {
-                    table.put(kres, w3cres);
-                    break;
-                }
-            }
-
-            if (!ok) {
-                result = false;
-
-                if (printed == false) {
-                    printed = true;
-                }
-                for (Node var : w3cres.getQueryNodes()) {
-                    // for each w3c variable/value
-                    Node val = w3cres.getNode(var);
-                }
-            }
-
-        }
-        return result;
     }
 
     // compare two results
