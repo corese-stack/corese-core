@@ -1,7 +1,6 @@
 package fr.inria.corese.core.visitor.solver;
 
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitorBasic;
-import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.core.Eval;
@@ -30,10 +29,6 @@ public class QuerySolverVisitorRule extends QuerySolverVisitorBasic {
     public QuerySolverVisitorRule() {
     }
 
-    public QuerySolverVisitorRule(Eval e) {
-        super(e);
-    }
-    
     public QuerySolverVisitorRule(RuleEngine re, Eval e) {
         super(e);
         this.re = re;
@@ -178,13 +173,6 @@ public class QuerySolverVisitorRule extends QuerySolverVisitorBasic {
      */
     public RuleEngine getRuleEngine() {
         return re;
-    }
-
-    /**
-     * @param re the re to set
-     */
-    public void setRuleEngine(RuleEngine re) {
-        this.re = re;
     }
 
 
