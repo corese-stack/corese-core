@@ -1,6 +1,5 @@
 package fr.inria.corese.core.visitor.ldpath;
 
-import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.script.Function;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
@@ -429,20 +428,5 @@ public class AST {
         }
         return i;
     }
-    
-    // modify ast
-    ASTQuery complete(ASTQuery ast, List<IDatatype> list, int i) {
-        ast.where(copyBody(ast));
-        for (IDatatype dt : list) {
-            Constant p = Constant.create(dt);
-            Variable s = variable(i++);
-            Variable o = variable(i);
-            Triple t = ast.createTriple(s, p, o);
-            Expression f = AST.this.filter(1, i);
-            Expression isuri = Term.function("isURI", o);
-            ast.where().add(isuri).add(f).add(t);
-        }
-        return ast;
-    }   
     
 }

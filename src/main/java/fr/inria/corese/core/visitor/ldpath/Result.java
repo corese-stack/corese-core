@@ -77,14 +77,6 @@ public class Result {
         varList.add(var);
     }
     
-    public HashMap<ASTQuery, Mappings> getResult() {
-        return table;
-    }
-    
-    public void setOutputFile(String path) {
-        this.file = path;
-    }
-    
     void setLinkedDataPath(LinkedDataPath ldp) {
         this.ldp = ldp;
     }
@@ -302,14 +294,6 @@ public class Result {
         sb.append(")");
     }
     
-    // remote endpoint uri
-    Constant getEndpoint(Mappings map) {
-        if (map.size() > 0) {
-            return getVariable(map.get(0), AST.SERVICE_VAR);
-        }
-        return null;
-    }
-
     Constant getVariable(Mapping map, String name) {
         IDatatype dt =  map.getValue(name);
         if (dt != null) {
