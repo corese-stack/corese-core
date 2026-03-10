@@ -26,9 +26,7 @@ import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig
  * @see StoragePluginManager
  * @see ValueFactory
  */
-public class ModelFactory {
-
-    private final ValueFactory valueFactory;
+public record ModelFactory(ValueFactory valueFactory) {
 
     /**
      * Constructs a new ModelFactory with the specified ValueFactory.
@@ -36,11 +34,10 @@ public class ModelFactory {
      * @param valueFactory the ValueFactory to use for creating RDF values
      * @throws NullPointerException if valueFactory is null
      */
-    public ModelFactory(ValueFactory valueFactory) {
+    public ModelFactory {
         if (valueFactory == null) {
             throw new NullPointerException("ValueFactory cannot be null");
         }
-        this.valueFactory = valueFactory;
     }
 
     /**
@@ -118,8 +115,8 @@ public class ModelFactory {
      *
      * @param graph the Graph instance to wrap with the Model API
      * @return a new Model instance backed by the specified Graph
-     * @throws NullPointerException                                                if graph is null
-     * @throws PluginException if the graph storage fails to initialize
+     * @throws NullPointerException if graph is null
+     * @throws PluginException      if the graph storage fails to initialize
      * @see #createGraphModel()
      */
     public Model createGraphModel(Graph graph) throws PluginException {
@@ -130,6 +127,7 @@ public class ModelFactory {
         StorageConfig config = StorageConfig.builder()
                 .property("type", "graph")
                 .property("graph", graph)
+                .property("valueFactory", valueFactory)
                 .build();
 
         return StorageModel.builder()
@@ -146,7 +144,8 @@ public class ModelFactory {
      *
      * @return the ValueFactory instance
      */
-    public ValueFactory getValueFactory() {
+    @Override
+    public ValueFactory valueFactory() {
         return valueFactory;
     }
 

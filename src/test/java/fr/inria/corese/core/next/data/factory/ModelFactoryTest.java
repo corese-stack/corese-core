@@ -48,7 +48,7 @@ class ModelFactoryTest {
             ModelFactory factory = new ModelFactory(valueFactory);
 
             assertNotNull(factory);
-            assertEquals(valueFactory, factory.getValueFactory());
+            assertEquals(valueFactory, factory.valueFactory());
         }
 
         @Test
