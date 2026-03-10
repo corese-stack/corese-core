@@ -99,33 +99,19 @@ public class Result {
     
    public void process() throws IOException, LoadException {
        turtle();
-       if (file != null) {
-           json();
-       }
-   }
+    }
    
    public void turtle() throws IOException {
         if (file != null) {
             open(turtle(file));
         }
-        int log = (int) Math.log10(alist.size());
-        //    %[argument_index$][flags][width][.precision]conversion
-        String format = "%1$0" + (log + 2) + "d: %2$s %3$s %4$s";
-        int i = 1;
+          int i = 1;
         for (ASTQuery ast : alist) {
             Mappings map = table.get(ast);
             i = process(ast, map, i);
         }
         close(fw);
     }
-   
-   void json() throws LoadException, IOException {
-       Graph g = Graph.create();
-       Load ld = Load.create(g);
-       ld.parse(turtle(file));
-       Transformer t = Transformer.create(g, TransformerUtils.JSON);
-       t.write(json(file));
-   }
    
    String json(String file) {
        if (file.endsWith(JSON)) {
