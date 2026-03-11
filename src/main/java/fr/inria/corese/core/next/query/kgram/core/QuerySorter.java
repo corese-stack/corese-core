@@ -348,11 +348,6 @@ public class QuerySorter implements ExpType {
     }
 
     
-    public Sorter getSorter() {
-        return sort;
-    }
-
-    
     public void setSorter(Sorter sort) {
         this.sort = sort;
     }
@@ -447,10 +442,6 @@ public class QuerySorter implements ExpType {
 
     public Query getQuery() {
         return query;
-    }
-
-    public void setQuery(Query query) {
-        this.query = query;
     }
 
     public Producer getProducer() {

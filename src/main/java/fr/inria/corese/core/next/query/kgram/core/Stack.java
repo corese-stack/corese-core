@@ -21,10 +21,6 @@ public class Stack extends ArrayList<Exp> implements ExpType {
 	}
 
 	
-	public int getLevel(){
-		return level;
-	}
-	
 	Stack copy(){
 		Stack st = new Stack();
 		st.addAll(this);

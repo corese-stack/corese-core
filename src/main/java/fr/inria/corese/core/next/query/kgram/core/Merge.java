@@ -1,8 +1,6 @@
 package fr.inria.corese.core.next.query.kgram.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 
 /***********************************************
@@ -30,13 +28,6 @@ public class Merge extends Group {
 
 }
 
-	
-	public Collection<ListMappings> values(){
-		List<ListMappings> ll = new ArrayList<>();
-		ll.add(list);
-		return ll;
-	}
-	
 	public Iterable<Mappings> getValues(){
 		return list;
 	}

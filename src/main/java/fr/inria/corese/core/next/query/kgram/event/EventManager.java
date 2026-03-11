@@ -16,25 +16,6 @@ public class EventManager implements Iterable<EventListener> {
 
     List<EventListener> observers = new ArrayList<>();
 
-    public static EventManager create() {
-        return new EventManager();
-    }
-
-
-
-    public void setObject(Object obj) {
-        for (EventListener el : observers) {
-            el.setObject(obj);
-        }
-    }
-
-    public boolean handle(int sort) {
-        if (sort == Event.START) {
-            return isEval;
-        }
-        return true;
-    }
-
     @Override
     @SuppressWarnings("NullableProblems")
     public Iterator<EventListener> iterator() {

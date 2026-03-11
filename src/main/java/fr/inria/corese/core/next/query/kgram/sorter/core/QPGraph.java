@@ -233,11 +233,4 @@ public class QPGraph {
         return l;
     }
 
-    /**
-     * Get the list of vairable bound to constants
-     *
-     */
-    public List<Exp> getBindings() {
-        return this.bindings;
-    }
 }
