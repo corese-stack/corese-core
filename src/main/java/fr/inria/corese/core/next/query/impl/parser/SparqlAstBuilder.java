@@ -43,6 +43,9 @@ public final class SparqlAstBuilder {
     /** Stack of current BGP triples (TriplesBlock). Nested blocks are rare but stack keeps it safe. */
     private final Deque<List<TriplePatternAst>> bgpStack = new ArrayDeque<>();
 
+    /** At enterOptional(), we push groupStack.size(). At exitGroup(), if groupStack.size() equals peek, we wrap in OptionalAst. */
+    private final Deque<Integer> optionalGroupDepths = new ArrayDeque<>();
+
     /** Top-level WHERE clause, set when the root group is closed in exitGroup(). */
     private GroupGraphPatternAst whereClause;
 
@@ -103,15 +106,19 @@ public final class SparqlAstBuilder {
 
     /**
      * Exit a { ... } groupGraphPattern.
-     * Pops the current group, wraps it in {@link GroupGraphPatternAst}; if there is a parent group,
-     * adds it there; otherwise stores it as the top-level WHERE clause for {@link #getResult()}.
+     * Pops the current group, wraps it in {@link GroupGraphPatternAst}. If we had entered OPTIONAL
+     * and the parent group depth matches {@link #optionalGroupDepths}, wraps in {@link OptionalAst} and adds to parent;
+     * otherwise adds the group to parent or sets as top-level WHERE.
      * Must not be called while a TriplesBlock is still open (no pending enterBgp without exitBgp).
      */
     public void exitGroup() {
         ensureNoOpenBgp("exitGroup() called while a TriplesBlock/BGP is still open");
         List<PatternAst> popped = groupStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
-        if (groupStack.isEmpty()) {
+        if (!optionalGroupDepths.isEmpty() && groupStack.size() == optionalGroupDepths.peek()) {
+            optionalGroupDepths.pop();
+            currentGroup().add(new OptionalAst(group));
+        } else if (groupStack.isEmpty()) {
             whereClause = group;
         } else {
             currentGroup().add(group);
@@ -147,6 +154,19 @@ public final class SparqlAstBuilder {
         }
         bgpStack.peek().add(new TriplePatternAst(s, p, o));
     }
+
+    /**
+     * Enter OPTIONAL scope. Records current group stack size so that when we exitGroup() and the stack
+     * is back to that size, we wrap the popped group in {@link OptionalAst}.
+     */
+    public void enterOptional() {
+        optionalGroupDepths.push(groupStack.size());
+    }
+
+    /**
+     * Exit OPTIONAL scope. No-op: the optional content was already wrapped in {@link OptionalAst} in {@link #exitGroup()}.
+     */
+    public void exitOptional() {}
 
     // --- Result ---
 
