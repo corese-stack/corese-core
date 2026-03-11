@@ -81,13 +81,6 @@ public class EventImpl implements Event {
 		return titles.get(type);
 	}
 	
-	public static String getTitle(int type){
-		if (titles == null){
-			init();
-		}
-		return titles.get(type);
-	}
-	
 	static void init(){
 		titles = new Hashtable<>();
 		deftitle(BEGIN, "begin");
@@ -124,13 +117,7 @@ public class EventImpl implements Event {
 	}
 	
 	
-	
-	
-	
-	public static EventImpl create(int type){
-        return new EventImpl(type);
-	}
-	
+
 	public static EventImpl create(int type, Object obj){
         return new EventImpl(type, obj);
 	}

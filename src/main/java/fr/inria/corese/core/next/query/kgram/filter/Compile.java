@@ -44,18 +44,6 @@ public class Compile implements ExprType {
 		checker = new Checker(query);
 	}
 	
-	public boolean check(String v1, String v2, Exp exp){
-		return checker.check(v1, v2, exp.getFilter().getExp());
-	}
-	
-	public boolean check(Exp exp){
-		return checker.check(exp.getFilter().getExp());
-	}
-	
-	public boolean check(Exp exp1, Exp exp2){
-		return checker.check(exp1.getFilter().getExp(), exp2.getFilter().getExp());
-	}
-
 	/**
 	 * exp is a FILTER Exp
 	 * when !bound(?x) : get Node ?x for optimizing backjump with optional
@@ -230,36 +218,6 @@ public class Compile implements ExprType {
         }
     }
 
-    /*
-    /*
-     * values ?x (2 4)
-     * only consider the case with one variable (for the moment)
-     
-    public void values(Exp exp) {
-
-        Mappings mm = exp.getMappings();
-        List<Node> nodes = exp.getNodeList();
-
-        if (nodes == null || nodes.size() != 1) {
-            return;
-        }
-        
-        Node var = nodes.get(0);
-        List values = new ArrayList();
-
-        for (Mapping m : mm) {
-            if (m.isBound(nodes.get(0))) {
-                values.add(m.getValue(nodes.get(0)).toString());
-            }
-        }
-
-        //ATTENTIONS!!
-        //The type of list "values" are not same with the others as "List<Expr>"
-        Exp bind = Exp.create(Exp.OPT_BIND, Exp.create(Exp.NODE, var));
-        bind.setObject(values);
-        exp.add(bind);
-    }
-    */
 	List<Expr> getConstants(Expr exp){
 		List<Expr> list = new ArrayList<>();
 		return getConstants(exp, list);

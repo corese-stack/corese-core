@@ -103,10 +103,6 @@ public class ExpHandler {
         return nodeList;
     }
 
-    public void setNodeList(List<Node> nodeList) {
-        this.nodeList = nodeList;
-    }
-
     public List<Node> getSelectNodeList() {
         return selectNodeList;
     }

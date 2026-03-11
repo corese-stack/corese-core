@@ -9,8 +9,6 @@ import fr.inria.corese.core.next.query.kgram.event.EventImpl;
 import fr.inria.corese.core.next.query.kgram.event.EventManager;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.core.sparql.triple.parser.Context;
-import fr.inria.corese.core.sparql.triple.parser.Metadata;
 
 import java.util.*;
 
@@ -203,13 +201,6 @@ public class Mappings extends PointerObject
         return this;
     }
 
-    public void reject(Mapping m) {
-        if (reject == null) {
-            reject = new ArrayList<>();
-        }
-        reject.add(m);
-    }
-
     List<Mapping> getList() {
         return getMappingList();
     }
@@ -265,13 +256,6 @@ public class Mappings extends PointerObject
             return null;
         }
         return getQuery().getAST();
-    }
-
-    public Context getContext() {
-        if (getQuery() == null) {
-            return null;
-        }
-        return getQuery().getContext();
     }
 
     @Override
@@ -342,44 +326,12 @@ public class Mappings extends PointerObject
         select.add(node);
     }
 
-    public IDatatype getValue(Node qNode) {
-        if (size() == 0) {
-            return null;
-        }
-        Mapping map = get(0);
-        return map.getValue(qNode);
-    }
-
-
     public Node getNode(String varString) {
         if (size() == 0) {
             return null;
         }
         Mapping map = get(0);
         return map.getNode(varString);
-    }
-
-    public Object getNodeObject(String varString) {
-        if (size() == 0) {
-            return null;
-        }
-        return get(0).getNodeObject(varString);
-    }
-
-    public Node getNode(Node varString) {
-        if (size() == 0) {
-            return null;
-        }
-        Mapping map = get(0);
-        return map.getNode(varString);
-    }
-
-    public Node getQueryNode(String varString) {
-        if (size() == 0) {
-            return null;
-        }
-        Mapping map = get(0);
-        return map.getQueryNode(varString);
     }
 
     public IDatatype getValue(String varString) {
@@ -399,23 +351,6 @@ public class Mappings extends PointerObject
         return get(n);
     }
 
-
-    /**
-     * use case: bind(sparql('select ?x ?y where { ... }') as (?z, ?t)) rename
-     * ?x as ?z and ?y as ?t in all Mapping as well as in Mappings select
-     */
-    public void setNodes(List<Node> nodes) {
-        if (getSelect() != null) {
-            for (Mapping map : this) {
-                map.rename(getSelect(), nodes);
-            }
-            setSelect(nodes);
-        } else {
-            for (Mapping map : this) {
-                map.setNodes(nodes);
-            }
-        }
-    }
 
 
     /**
@@ -470,34 +405,6 @@ public class Mappings extends PointerObject
 
     void setValid(boolean b) {
         isValid = b;
-    }
-
-    @Deprecated
-    boolean same(Node n1, Node n2) {
-        if (n1 == null) {
-            return n2 == null;
-        } else if (n2 == null) {
-            return false;
-        } else {
-            return n1.same(n2);
-        }
-    }
-
-    /**
-     * Query with new modifier
-     * Prepare Mappings:
-     * Mapping orderBy groupBy
-     */
-    public void modify(Query q) {
-        setGroup(null);
-        setDistinct(null);
-        init(q);
-
-        if (!q.getOrderBy().isEmpty() || !q.getGroupBy().isEmpty()) {
-            for (Mapping m : this) {
-                m.prepareModify(q);
-            }
-        }
     }
 
 
@@ -728,18 +635,6 @@ public class Mappings extends PointerObject
      * hold the result of the aggregate
      *
      */
-
-    /**
-     * select count(?doc) as ?count group by ?person ?date order by ?count
-     * having(?count > 100) TODO: optimize this because we enumerate all
-     * Mappings for each kind of aggregate we could enumerate Mappings once and
-     * compute all aggregates for each map
-     */
-    public void aggregate(Query q, Evaluator evaluator, Environment env, Producer p) throws SparqlException {
-        if (env instanceof Memory) {
-            aggregate(q, evaluator, (Memory) env, p);
-        }
-    }
 
     public void aggregate(Evaluator evaluator, Memory memory, Producer p) throws SparqlException {
         aggregate(getQuery(), evaluator, memory, p);
@@ -998,12 +893,6 @@ public class Mappings extends PointerObject
     public void groupBy() {
         // clear the current list
         groupBy(getCreateGroup());
-    }
-
-    public Mappings groupBy(List<Exp> list) {
-        Group group = createGroup(list);
-        groupBy(group);
-        return this;
     }
 
     /**
@@ -1291,10 +1180,6 @@ public class Mappings extends PointerObject
         return res;
     }
 
-    public Mappings project(List<Exp> lExp) {
-        return new Mappings();
-    }
-
     /**
      * Join (var = val) to each Mapping, remove those where var = something else
      * Use case: service ?s { BGP }
@@ -1345,53 +1230,9 @@ public class Mappings extends PointerObject
         return this;
     }
 
-    public Mappings getMappings(Query q, Node varNode, Node val) {
-        Mappings map = create(q);
-        for (Mapping m : this) {
-            Node node = m.getNodeValue(varNode);
-            if (node != null && node.equals(val)) {
-                map.add(m);
-            }
-        }
-        return map.distinct();
-    }
-
-    public Mappings getMappings(Query q) {
-        Mappings map = create(q);
-        for (Mapping m : this) {
-            map.add(m);
-        }
-        return map.distinct();
-    }
-
-    /**
-     * Assign select nodes to all Mapping
-     */
-    public void finish() {
-        if (getSelect() != null) {
-            Node[] nodes = new Node[getSelect().size()];
-            int i = 0;
-            for (Node node : getSelect()) {
-                nodes[i++] = node;
-            }
-
-            for (Mapping map : this) {
-                map.setSelect(nodes);
-            }
-        }
-    }
-
     @Override
     public TripleStore getTripleStore() {
         return graph;
-    }
-
-    public TripleStore getGraph() {
-        return graph;
-    }
-
-    public void setGraph(TripleStore graph) {
-        this.graph = graph;
     }
 
     public List<Edge> getInsert() {
@@ -1461,10 +1302,6 @@ public class Mappings extends PointerObject
         this.nodeList = nodeList;
     }
 
-    public BindingContext getBindingContext() {
-        return bindingContext;
-    }
-
     public void setBindingContext(BindingContext ctx) {
         bindingContext = ctx;
     }
@@ -1496,10 +1333,6 @@ public class Mappings extends PointerObject
             return null;
         }
         return getLinkList().getFirst();
-    }
-
-    public void setLink(String link) {
-        addLink(link);
     }
 
     public void addLink(String link) {
@@ -1544,37 +1377,6 @@ public class Mappings extends PointerObject
 
     public List<Mapping> getMappingList() {
         return list;
-    }
-
-    public IDatatype getReport() {
-        return detail;
-    }
-
-    public void setReport(IDatatype detail) {
-        this.detail = detail;
-    }
-
-    public boolean contains(IDatatype value) {
-        for (Mapping m : this) {
-            for (Node node : m.getNodes()) {
-                if (value.equals(node.getDatatypeValue())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public Mappings getResult() {
-        Query q = getQuery();
-        ASTQuery ast = getAST();
-        if (ast.hasMetadata(Metadata.SELECTION) && q.getSelection() != null) {
-            return q.getSelection();
-        }
-        if (ast.hasMetadata(Metadata.DISCOVERY) && q.getDiscorevy() != null) {
-            return q.getDiscorevy();
-        }
-        return this;
     }
 
     class VariableSorter implements Comparator<Mapping> {

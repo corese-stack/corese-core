@@ -53,13 +53,6 @@ public class Query extends Exp  {
         return factory;
     }
 
-    /**
-     * @param aFactory the factory to set
-     */
-    public static void setFactory(DQPFactory aFactory) {
-        factory = aFactory;
-    }
-
     int limit = Integer.MAX_VALUE, offset = 0,
             // if slice > 0 : service gets mappings from previous pattern by slices
             slice = 20;
@@ -304,15 +297,6 @@ public class Query extends Exp  {
     }
     
     
-
-    public void set(Sorter s) {
-        querySorter.setSorter(s);
-    }
-
-    public void set(Edge e, Query q) {
-        table.put(e, q);
-    }
-
     Query get(Edge e) {
         return table.get(e);
     }
@@ -341,14 +325,6 @@ public class Query extends Exp  {
 
     public void setAST(ASTQuery o) {
         ast = o;
-    }
-
-    public int getMode() {
-        return mode;
-    }
-
-    public void setMode(int m) {
-        mode = m;
     }
 
     public int getPlanProfile() {
@@ -387,10 +363,6 @@ public class Query extends Exp  {
         }
     }
 
-    public List<String> getErrors() {
-        return errors;
-    }
-
 
     public void addInfo(String mes, Object obj) {
         if (info == null) {
@@ -402,10 +374,6 @@ public class Query extends Exp  {
         if (!info.contains(mes)) {
             info.add(mes);
         }
-    }
-
-    public List<String> getInfo() {
-        return info;
     }
 
     public Exp getBody() {
@@ -493,34 +461,8 @@ public class Query extends Exp  {
         return pathFilter;
     }
     
-    public void defineFunction(Filter f){
-        funList.add(f);
-    }
-    
     List<Filter> getFunList(){
         return funList;
-    }
-
-    /**
-     * Return equivalent local node for graph node it may be a local node with
-     * same variable name it may be a fake node
-     */
-    public Node getGraphNode(Node g) {
-        Node node = getSelectNode(g.getLabel());
-        if (node != null) {
-            return node;
-        } else {
-            return getGraphNode();
-        }
-    }
-
-    public Exp getFunction() {
-        for (Exp exp : getSelectFun()) {
-            if (exp.getFilter() != null && exp.getFilter().isFunctional()) {
-                return exp;
-            }
-        }
-        return null;
     }
 
 
@@ -688,14 +630,6 @@ public class Query extends Exp  {
 
     public boolean isCheck() {
         return isCheck;
-    }
-
-    public void setCheck(boolean b) {
-        isCheck = b;
-    }
-
-    public void setSort(boolean b) {
-        isSort = b;
     }
 
     public boolean isAggregate() {
@@ -885,28 +819,6 @@ public class Query extends Exp  {
 
     public Exp getDelete() {
         return delete;
-    }
-
-    /**
-     * Check that select variables and expressions are compatible with group by
-     * &amp; aggregates use case:
-     * SELECT ?P (COUNT(?O) AS ?C) WHERE { ?S ?P ?O }
-     * SELECT ((?O1 + ?O2) AS ?O12) (COUNT(?O1) AS ?C) WHERE { ?S :p ?O1; :q ?O2
-     * } GROUP BY (?S)
-     *
-     *
-     */
-    public boolean check() {
-        if (getGroupBy().size() > 0) {
-            for (Exp exp : getSelectFun()) {
-                if (!checkGroupBy(exp)) {
-                    return false;
-                }
-            }
-        } else {
-            return checkAggregate();
-        }
-        return true;
     }
 
     /**
@@ -1508,67 +1420,10 @@ public class Query extends Exp  {
         return lExp;
     }
 
-    /**
-     * use case: select distinct ?x where add an ACCEPT ?x statement to check
-     * that ?x is new
-     * called by compiler transformer
-     */
-    public void distinct() {
-        if (testJoin) {
-                // in case of JOIN() the ACCEPT(?x) cannot be set
-            // because evaluation occurs in kgram subEval
-            // where there is no Group to compute accept()
-            return;
-        }
-        if (isDistinct() && getSelectFun().size() == 1) {
-            Node qNode = getSelectFun().getFirst().getNode();
-            for (Exp exp : this) {
-                if (exp.distinct(qNode)) {
-                    return;
-                }
-            }
-        }
-    }
-  
 
    
     public List<Node> getArgList() {
         return argList;
-    }
-
-    public void defArg(Node n) {
-        argList.add(n);
-    }
-
-    
-    public List<Edge> getEdgeList() {
-        return edgeList;
-    }
-
-
-    public int getEdgeIndex() {
-        return edgeIndex;
-    }
-
-    
-    public void setEdgeIndex(int edgeIndex) {
-        this.edgeIndex = edgeIndex;
-    }
-
-    public void setName(String n) {
-        name = n;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setProfile(String uri) {
-        profile = uri;
-    }
-
-    public String getProfile() {
-        return profile;
     }
 
     /**
@@ -1616,46 +1471,11 @@ public class Query extends Exp  {
         return b;
     }
 
-    /**
-     * ********************************************************************
-     * Pipeline using operators on queries: union/and/optional/minus
-     * q1.union(q2).and(q3).optional(q4).minus(q5)
-     *
-     *********************************************************************
-     */
-    public Query union(Query q2) {
-        Query q1 = this;
-        Exp exp = Exp.create(Type.UNION, q1, q2);
-        return Query.create(exp).complete(q1, q2);
-    }
-
-    public Query and(Query q2) {
-        Query q1 = this;
-        Exp exp = Exp.create(Type.AND, q1, q2);
-        return Query.create(exp).complete(q1, q2);
-    }
-
-    public Query minus(Query q2) {
-        Query q1 = this;
-        Exp exp = Exp.create(Type.MINUS, q1, Exp.create(Type.AND, q2));
-        return Query.create(exp).complete(q1, q2);
-    }
-
-    public Query optional(Query q2) {
-        Query q1 = this;
-        Exp exp = Exp.create(Type.AND, q1, Exp.create(Type.OPTION, Exp.create(Type.AND, q2)));
-        return Query.create(exp).complete(q1, q2);
-    }
-
     public Query orderBy(Node node) {
         if (node != null && doesNotContain(getOrderBy(), node)) {
             addOrderBy(node);
         }
         return this;
-    }
-
-    public Query orderBy(String n) {
-        return orderBy(getNode(n));
     }
 
     public Query groupBy(Node node) {
@@ -1665,19 +1485,11 @@ public class Query extends Exp  {
         return this;
     }
 
-    public Query groupBy(String n) {
-        return groupBy(getNode(n));
-    }
-
     public Query select(Node node) {
         if (node != null && doesNotContain(getSelectFun(), node)) {
             addSelect(node);
         }
         return this;
-    }
-
-    public Query select(String n) {
-        return select(getNode(n));
     }
 
     Query complete(Query q1, Query q2) {
@@ -1744,19 +1556,6 @@ public class Query extends Exp  {
         return getGlobalQuery().getFilter(name);
     }
 
-    public void setFilter(String name, Filter filter) {
-        ftable.put(name, filter);
-    }
-
-
-    public Object getPragma(String name) {
-        return pragma.get(name);
-    }
-
-    public void setPragma(String name, Object value) {
-        pragma.put(name, value);
-    }
-
     public void setRule(boolean rule) {
         isRule = rule;
     }
@@ -1781,10 +1580,6 @@ public class Query extends Exp  {
         return isSynchronized;
     }
     
-    public Object getTransformer(String p) {
-        return getGlobalQuery().getPPrinter(p);
-    }
-
     public Object getTransformer() {
         return getGlobalQuery().getPPrinter(null);
     }
@@ -1841,12 +1636,6 @@ public class Query extends Exp  {
     }
 
 
-
-    public Edge getEdge(Node p) {
-        return etable.get(p.getLabel());
-    }
-
-    
     public int getQueryProfile() {
         return queryProfile;
     }
@@ -1859,25 +1648,6 @@ public class Query extends Exp  {
 
     public boolean isCachePath() {
         return isCachePath;
-    }
-
-    public int getID() {
-        return id;
-    }
-
-   
-    public void setID(int id) {
-        this.id = id;
-    }
-
-   
-    public Node getProvenance() {
-        return provenance;
-    }
-
-   
-    public void setProvenance(Node provenance) {
-        this.provenance = provenance;
     }
 
     public void setExtension(boolean b) {
@@ -1901,12 +1671,6 @@ public class Query extends Exp  {
         this.extension = ext;
     }
 
-
-    // API for Eval event-driven function call 
-    public Expr getExpression(String name){
-        return getExpression(name, false);
-    }
-    
     public Expr getExpression(String name, boolean inherit){
         Expr ee = getLocalExpression(name);
         if (ee == null && inherit){
@@ -1940,26 +1704,12 @@ public class Query extends Exp  {
         return getEdges();
     }
     
-     @Override
-    public Object getValue(String variable, int n) {
-         List<Edge> list = getEdges();
-         if (n >= list.size()) {
-             return null;
-         }
-        return list.get(n);
-    }
-    
     public List<Edge> getEdges(){
         ArrayList<Edge> list = new ArrayList<>();
         getBody().getEdgeList(list);
         return list;
     }
     
-    @Override
-    public PointerType pointerType(){
-        return PointerType.QUERY;
-    }
-
     @Override
     public String getDatatypeLabel() {
         return "[Query]";
@@ -1977,16 +1727,6 @@ public class Query extends Exp  {
     
     public void setBgpGenerator(BgpGenerator bgpGenerator) {
         this.bgpGenerator = bgpGenerator;
-    }
-
-
-    public boolean isFun() {
-        return isFun;
-    }
-
-   
-    public void setFun(boolean isFun) {
-        this.isFun = isFun;
     }
 
 
@@ -2021,35 +1761,10 @@ public class Query extends Exp  {
         tprinter = map;
     }
     
-    /**
-     * Use case: PluginImpl kgram()
-     * Query inherits q transformer information
-     */
-    public void complete(Query q, Context context){
-        setEnvironment(q.getEnvironment());
-        setTransformer(q.getTransformer());
-        setContext(context);
-    }
-
    
     @Override
     public Mapping getMapping() {
         return mapping;
-    }
-
-    
-    public void setMapping(Mapping mapping) {
-        this.mapping = mapping;
-    }
-
-    
-    public int getPriority() {
-        return priority;
-    }
-
-   
-    public void setPriority(int priority) {
-        this.priority = priority;
     }
 
 
@@ -2110,22 +1825,8 @@ public class Query extends Exp  {
         this.algebra = algebra;
     }
 
-   
-    public String getURI() {
-        return uri;
-    }
-
-    
-    public void setURI(String uri) {
-        this.uri = uri;
-    }
-
     public Mappings getSelection() {
         return selection;
-    }
-
-    public void setSelection(Mappings selection) {
-        this.selection = selection;
     }
 
     public Mappings getDiscorevy() {

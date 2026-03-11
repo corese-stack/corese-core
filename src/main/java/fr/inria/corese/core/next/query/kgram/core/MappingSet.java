@@ -228,10 +228,6 @@ public class MappingSet {
         return getMappings(); // return null
     }
 
-    public Query getQuery() {
-        return query;
-    }
-
     public void setQuery(Query query) {
         this.query = query;
     }

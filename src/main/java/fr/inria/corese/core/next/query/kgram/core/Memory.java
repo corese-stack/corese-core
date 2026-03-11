@@ -939,10 +939,6 @@ public class Memory extends PointerObject implements Environment {
         return result[qEdge.getEdgeIndex()];
     }
 
-    public Edge getEdge(int n) {
-        return result[n];
-    }
-
     public Edge[] getQueryEdges() {
         return qEdges;
     }
@@ -950,26 +946,6 @@ public class Memory extends PointerObject implements Environment {
     @Override
     public Edge[] getEdges() {
         return result;
-    }
-
-    public Edge getEdge(Node qnode) {
-        for (Edge e : getQueryEdges()) {
-            if (e.getEdgeVariable() != null
-                    && e.getEdgeVariable().equals(qnode)) {
-                return getEdge(e);
-            }
-        }
-        return null;
-    }
-
-    public Edge getEdge(String varString) {
-        for (Edge e : getQueryEdges()) {
-            if (e != null && e.getEdgeVariable() != null
-                    && e.getEdgeVariable().getLabel().equals(varString)) {
-                return getEdge(e);
-            }
-        }
-        return null;
     }
 
     @Override
@@ -1066,18 +1042,6 @@ public class Memory extends PointerObject implements Environment {
     @Override
     public int count() {
         return current().size();
-    }
-
-    public int sum(Node qNode) {
-        return -1;
-    }
-
-    public Node max(Node qNode) {
-        return current().max(qNode);
-    }
-
-    public Node min(Node qNode) {
-        return current().min(qNode);
     }
 
     /**

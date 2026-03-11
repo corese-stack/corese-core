@@ -1,15 +1,10 @@
 package fr.inria.corese.core.next.query.kgram.core;
 
-import fr.inria.corese.core.next.query.kgram.adapter.BindingAdapter;
 import fr.inria.corese.core.next.query.kgram.api.core.*;
-import fr.inria.corese.core.next.query.kgram.api.query.Environment;
-import fr.inria.corese.core.next.query.kgram.api.query.ProcessVisitor;
 import fr.inria.corese.core.next.query.kgram.api.query.Result;
 import fr.inria.corese.core.next.query.kgram.path.Path;
-import fr.inria.corese.core.next.query.kgram.tool.ApproximateSearchEnv;
 import fr.inria.corese.core.next.query.kgram.tool.EnvironmentImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 import java.util.*;
 
@@ -28,7 +23,7 @@ import static fr.inria.corese.core.next.query.kgram.api.core.PointerType.MAPPING
  */
 public class Mapping
         extends EnvironmentImpl
-        implements Result, Environment, Pointerable<List<IDatatype>> {
+        implements Result, Pointerable<List<IDatatype>> {
 
 
     static final Edge[] emptyEdge = new Edge[0];
@@ -91,12 +86,6 @@ public class Mapping
         return new Mapping();
     }
 
-    public static Mapping create(BindingContext b) {
-        Mapping m = new Mapping();
-        m.setBind(b);
-        return m;
-    }
-
     public static Mapping create(Node[] qnodes, Node[] nodes) {
         return simpleCreate(qnodes, nodes);
     }
@@ -112,45 +101,6 @@ public class Mapping
         qnodes[0] = qnode;
         nodes[0] = node;
         return new Mapping(qnodes, nodes);
-    }
-
-
-    /**
-     * TODO: remove duplicates in getVariables()
-     * use case:
-     * function us:fun(?x){let (select ?x where {}) {}}
-     * variable ?x appears twice in the stack because it is redefined in the let clause
-     */
-    public static Mapping create(Query q, BindingContext b) {
-        if (b instanceof BindingAdapter) {
-            fr.inria.corese.core.sparql.triple.function.term.Binding binding =
-                    ((BindingAdapter) b).delegate();
-
-            ArrayList<Node> lvar = new ArrayList<>();
-            ArrayList<Node> lval = new ArrayList<>();
-            for (fr.inria.corese.core.kgram.api.core.Expr varExpr : binding.getVariables()) {
-                Node node = q.getProperAndSubSelectNode(varExpr.getLabel());
-                if (node != null && !lvar.contains(node)) {
-                    lvar.add(node);
-                    lval.add((Node) binding.get(varExpr));
-                }
-            }
-            return Mapping.create(lvar, lval);
-        }
-
-        ArrayList<Node> lvar = new ArrayList<>();
-        ArrayList<Node> lval = new ArrayList<>();
-
-        for (Map.Entry<String, Node> entry : b.getBindings().entrySet()) {
-            String varLabel = entry.getKey();
-            Node node = q.getProperAndSubSelectNode(varLabel);
-            if (node != null && !lvar.contains(node)) {
-                lvar.add(node);
-                lval.add(entry.getValue());
-            }
-        }
-
-        return Mapping.create(lvar, lval);
     }
 
 
@@ -203,30 +153,6 @@ public class Mapping
             }
             i++;
         }
-    }
-
-    @Deprecated
-    public void bind(Node qNode, Node tNode) {
-        Node[] qq = new Node[getQueryNodes().length + 1];
-        Node[] tt = new Node[getTargetNodes().length + 1];
-        int i = 0;
-        for (Node q : getQueryNodes()) {
-            qq[i] = q;
-            tt[i] = getTargetNodes()[i];
-            i++;
-        }
-        qq[i] = qNode;
-        tt[i] = tNode;
-        setQueryNodes(qq);
-        setTargetNodes(tt);
-    }
-
-    @Override
-    public int count() {
-        if (lMap == null) {
-            return 0;
-        }
-        return lMap.count();
     }
 
     @Override
@@ -292,10 +218,6 @@ public class Mapping
         getOrderByNodes()[0] = node;
     }
 
-    public Node[] getGroupBy() {
-        return getGroupByNodes();
-    }
-
     void setGroupBy(Node[] nodes) {
         setGroupByNodes(nodes);
     }
@@ -308,18 +230,6 @@ public class Mapping
         setSelectNodes(nodes);
     }
 
-    @Deprecated
-    public void rename(Node oName, Node nName) {
-        int i = 0;
-        for (Node qn : getQueryNodes()) {
-            if (qn != null && qn.getLabel().equals(oName.getLabel())) {
-                getQueryNodes()[i] = nName;
-                return;
-            }
-            i++;
-        }
-    }
-
     @Override
     public Path getPath(Node qNode) {
         Node node = getNode(qNode);
@@ -327,14 +237,6 @@ public class Mapping
             return null;
         }
         return node.getPath();
-    }
-
-    public Path getPath(String name) {
-        Node qNode = getQueryNode(name);
-        if (qNode == null) {
-            return null;
-        }
-        return getPath(qNode);
     }
 
     /**
@@ -351,15 +253,6 @@ public class Mapping
         return i;
     }
 
-    @Override
-    public int pathLength(Node qNode) {
-        Path path = getPath(qNode);
-        if (path == null) {
-            return -1;
-        }
-        return path.length();
-    }
-
 
     boolean isPath(int n) {
         return getPath(n) != null;
@@ -372,10 +265,6 @@ public class Mapping
         return getTargetNodes()[n].getPath();
     }
 
-    boolean isPath(Node qNode) {
-        return isPath(getIndex(qNode));
-    }
-
     @Override
     public String getDatatypeLabel() {
         return toString(" ");
@@ -384,11 +273,6 @@ public class Mapping
     @Override
     public String toString() {
         return toString("\n");
-    }
-
-    @Override
-    public Object getObject() {
-        return this;
     }
 
     String toString(String sep) {
@@ -405,10 +289,6 @@ public class Mapping
             i++;
         }
         return sb.toString();
-    }
-
-    public List<Node> getNodes(Node varNode) {
-        return getNodes(varNode.getLabel());
     }
 
     public List<Node> getNodes(String varString) {
@@ -470,14 +350,6 @@ public class Mapping
         return getDistinctNodes()[n];
     }
 
-    public Node[] getDistinct() {
-        return getDistinctNodes();
-    }
-
-    public Node getGroupBy(int n) {
-        return getGroupByNodes()[n];
-    }
-
     public Node getGroupBy(Node qNode, int n) {
         if (getGroupByNodes().length == 0) {
             return getNode(qNode);
@@ -503,10 +375,6 @@ public class Mapping
         if (qNode.isVariable()) {
             setNodeValue(qNode, node);
         }
-    }
-
-    public void setNode(Node node, int n) {
-        setNode(getQueryNode(n), node, n);
     }
 
     public Mapping project(Node q) {
@@ -737,11 +605,6 @@ public class Mapping
 
     public void setQueryEdges(Edge[] qEdges) {
         this.queryEdges = qEdges;
-    }
-
-    @Override
-    public Edge[] getEdges() {
-        return getTargetEdges();
     }
 
     Edge getEdge(int n) {
@@ -1021,32 +884,11 @@ public class Mapping
         return false;
     }
 
-    @Override
-    public Iterable<Mapping> getAggregate() {
-        if (getMappings() == null) {
-            return List.of(this);
-        }
-        if (getMappings().isFake()) {
-            return new ArrayList<>(0);
-        }
-        return getMappings();
-    }
-
-    @Override
-    public void aggregate(Mapping map, int n) {
-        getAggregateMappings().prepareAggregate(map, getQuery(), getMap(), n);
-    }
-
     Mappings getAggregateMappings() {
         if (getMappings() == null) {
             return new Mappings().add(this);
         }
         return getMappings();
-    }
-
-    @Override
-    public ASTExtension getExtension() {
-        return query.getActualExtension();
     }
 
     @Override
@@ -1079,17 +921,7 @@ public class Mapping
     }
 
     @Override
-    public Mapping getMapping() {
-        return this;
-    }
-
-    @Override
     public Edge getEdge() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public ApproximateSearchEnv getAppxSearchEnv() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -1124,24 +956,6 @@ public class Mapping
     @Override
     public void setEval(Eval eval) {
         this.eval = eval;
-    }
-
-    @Override
-    public ProcessVisitor getVisitor() {
-        if (getEval() == null) {
-            return null;
-        }
-        return getEval().getVisitor();
-    }
-
-    @Override
-    public IDatatype getReport() {
-        return report;
-    }
-
-    @Override
-    public void setReport(IDatatype report) {
-        this.report = report;
     }
 
     public Node[] getTargetNodes() {
