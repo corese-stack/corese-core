@@ -1,14 +1,20 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.operator.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(SparqlParserFilterTest.class);
 
     @Test
     void shouldParseTrueFilter() {
@@ -53,6 +59,7 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast.whereClause());
 
         GroupGraphPatternAst where = ast.whereClause();
+        logger.info("{}", where);
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();
@@ -848,5 +855,41 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals("s", ((VarAst) t.string()).name());
         assertEquals("test", ((LiteralAst) t.pattern()).lexical());
         assertEquals("i", ((LiteralAst) t.flags()).lexical());
+    }
+
+    @Test
+    void shouldParseFunCallFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(<http://example.org/function>(?s, "test"))
+                }
+                """);
+
+        assertNotNull(ast);
+        assertNotNull(ast.whereClause());
+
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
+
+        PatternAst p2 = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+
+        FilterAst filterAst = (FilterAst) p2;
+        assertInstanceOf(FunctionCallAst.class, filterAst.operator(), "Filter content should be afunction call operator");
+
+        FunctionCallAst t = (FunctionCallAst) filterAst.operator();
+
+        assertInstanceOf(IriAst.class, t.functionName());
+        assertInstanceOf(List.class, t.arguments());
+        assertEquals(2, t.arguments().size());
+        assertInstanceOf(VarAst.class, t.arguments().getFirst());
+        assertInstanceOf(LiteralAst.class, t.arguments().getLast());
+
+        assertEquals("<http://example.org/function>", ((IriAst) t.functionName()).raw());
+        assertEquals("s", ((VarAst) t.arguments().getFirst()).name());
+        assertEquals("test", ((LiteralAst) t.arguments().getLast()).lexical());
     }
 }

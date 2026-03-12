@@ -45,13 +45,13 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
      */
     private void extractProjection(SparqlParser.SelectQueryContext ctx) {
         if (ctx.STAR() != null) {
-            builder.setProjectionAll();
+            builder().setProjectionAll();
             return;
         }
         List<String> vars = new ArrayList<>();
         for (SparqlParser.Var_Context varCtx : ctx.var_()) {
             vars.add(varCtx.getText());
         }
-        builder.setProjectionVariables(vars);
+        builder().setProjectionVariables(vars);
     }
 }

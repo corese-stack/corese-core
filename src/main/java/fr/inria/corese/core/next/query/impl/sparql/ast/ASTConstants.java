@@ -14,29 +14,41 @@ public class ASTConstants {
         UNDEFINED
     }
 
-    public enum OPERATOR {
+    public interface Constraint {
+    }
+
+    public enum OPERATOR implements Constraint {
         BOOLEAN_NOT,
         PLUS,
         MINUS,
-        BOUND,
-        IS_IRI,
-        IS_BLANK,
-        IS_LITERAL,
-        STR,
-        LANG,
-        DATATYPE,
-        OR,
-        AND,
         EQUALS,
         DIFFERENT,
+        OR,
+        AND,
         LOWER,
         LOWER_EQUAL,
         GREATER,
         GREATER_EQUAL,
         TIMES,
-        DIVIDE,
-        SAMETERM,
+        DIVIDE
+    }
+
+    public enum FUNCTION_CALL implements Constraint {
+        BOUND,
+        DATATYPE,
+        ISBLANK,
+        ISLITERAL,
+        ISIRI,
+        LANG,
         LANGMATCHES,
-        REGEX
+        SAMETERM,
+        STR,
+        REGEX,
+        FUNCTION
+    }
+
+    public enum OrderDirection {
+        ASC,
+        DESC
     }
 }

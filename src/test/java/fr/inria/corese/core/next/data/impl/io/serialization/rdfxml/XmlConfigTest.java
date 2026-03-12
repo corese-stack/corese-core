@@ -50,7 +50,7 @@ class XmlConfigTest {
 
         assertTrue(config.prettyPrint(), "Default prettyPrint should be true for XML");
         assertEquals(SerializationConstants.DEFAULT_INDENTATION, config.getIndent(), "Default indent should be " + SerializationConstants.DEFAULT_INDENTATION);
-        assertEquals(0, config.getMaxLineLength(), "Default maxLineLength should be 0 (no line length constraint) for XML");
+        assertEquals(0, config.getMaxLineLength(), "Default maxLineLength should be 0 (no line length createFunCall) for XML");
         assertFalse(config.sortSubjects(), "Default sortSubjects should be false for XML");
         assertFalse(config.sortPredicates(), "Default sortPredicates should be false for XML");
         assertTrue(config.useMultilineLiterals(), "Default useMultilineLiterals should be true for XML");

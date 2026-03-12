@@ -4,7 +4,7 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
  * One ORDER BY condition.
  */
 public record OrderConditionAst(
-        OrderDirection orderDirection,
+        ASTConstants.OrderDirection orderDirection,
         ExprAst expression
 ) {
     public OrderConditionAst {

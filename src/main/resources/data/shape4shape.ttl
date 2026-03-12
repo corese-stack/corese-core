@@ -91,7 +91,7 @@ sh:property [
     sh:node ds:shape
 ] ;
 
-# node constraint
+# node createFunCall
 
 sh:property [
     sh:path sh:node ;

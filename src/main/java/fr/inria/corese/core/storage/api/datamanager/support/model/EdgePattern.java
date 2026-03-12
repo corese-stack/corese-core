@@ -64,7 +64,7 @@ public final class EdgePattern {
     }
 
     /**
-     * Checks if this pattern has a subject constraint.
+     * Checks if this pattern has a subject createFunCall.
      *
      * @return true if subject is specified
      */
@@ -73,7 +73,7 @@ public final class EdgePattern {
     }
 
     /**
-     * Checks if this pattern has a predicate constraint.
+     * Checks if this pattern has a predicate createFunCall.
      *
      * @return true if predicate is specified
      */
@@ -82,7 +82,7 @@ public final class EdgePattern {
     }
 
     /**
-     * Checks if this pattern has an object constraint.
+     * Checks if this pattern has an object createFunCall.
      *
      * @return true if object is specified
      */
@@ -157,7 +157,7 @@ public final class EdgePattern {
         }
 
         /**
-         * Sets the subject constraint.
+         * Sets the subject createFunCall.
          *
          * @param subject Subject node (null for any)
          * @return This builder (for chaining)
@@ -168,7 +168,7 @@ public final class EdgePattern {
         }
 
         /**
-         * Sets the predicate constraint.
+         * Sets the predicate createFunCall.
          *
          * @param predicate Predicate node (null for any)
          * @return This builder (for chaining)
@@ -179,7 +179,7 @@ public final class EdgePattern {
         }
 
         /**
-         * Sets the object constraint.
+         * Sets the object createFunCall.
          *
          * @param object Object node (null for any)
          * @return This builder (for chaining)
@@ -190,7 +190,7 @@ public final class EdgePattern {
         }
 
         /**
-         * Sets the contexts constraint.
+         * Sets the contexts createFunCall.
          *
          * @param contexts List of contexts (null or empty for all)
          * @return This builder (for chaining)
@@ -201,7 +201,7 @@ public final class EdgePattern {
         }
 
         /**
-         * Sets a single context constraint.
+         * Sets a single context createFunCall.
          *
          * @param context Single context
          * @return This builder (for chaining)
