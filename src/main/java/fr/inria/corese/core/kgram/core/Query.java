@@ -579,7 +579,7 @@ public class Query extends Exp  {
     }
 
     /**
-     * createFunCall in property path: ?x ex:prop @[?this != <John>] ?y
+     * constraint in property path: ?x ex:prop @[?this != <John>] ?y
      */
     List<Filter> getPathFilter() {
         return pathFilter;

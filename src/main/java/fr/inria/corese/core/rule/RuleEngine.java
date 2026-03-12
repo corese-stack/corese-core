@@ -491,7 +491,7 @@ public class RuleEngine implements Engine, Graphable {
 
     public String getConstraintViolation() {
         try {
-            String q = QueryLoad.create().getResource("/query/createFunCall.rq");
+            String q = QueryLoad.create().getResource("/query/constraint.rq");
             QueryProcess ex = QueryProcess.create(graph);
             Mappings map = ex.query(q);
             return map.getTemplateStringResult();
@@ -827,7 +827,7 @@ public class RuleEngine implements Engine, Graphable {
         Query qq = rule.getQuery();
         GraphManager mgr = getGraphManager().getGraphManager(rule.isConstraint());
         Construct cons = Construct.createRule(qq, mgr);
-        // named graph to store inference rule entailment OR createFunCall rule error
+        // named graph to store inference rule entailment OR constraint rule error
         cons.setDefaultGraph(mgr.getRuleGraphName(rule.isConstraint()));
         cons.setAccessRight(bind.getAccessRight());
         cons.setRule(rule, rule.getIndex(), rule.getProvenance());
@@ -937,7 +937,7 @@ public class RuleEngine implements Engine, Graphable {
         getGraphManager().endRule();
 
         if (r.isConstraint()) {
-            // createFunCall succeed when there is no solution (cf owlrl.rul)
+            // constraint succeed when there is no solution (cf owlrl.rul)
             boolean success = (cons.isBuffer()) ? cons.getInsertList().isEmpty() : map.isEmpty();
             if (!success) {
                 logger.error("Constraint error: " + r.getName());

@@ -88,7 +88,7 @@ public class Graph extends GraphObject implements
     public static boolean SKOLEM_DEFAULT = false;
     // graph ?g { } iterate std and external named graph when true
     public static boolean EXTERNAL_NAMED_GRAPH = false;
-    // specific graph name for rule createFunCall error
+    // specific graph name for rule constraint error
     public static boolean CONSTRAINT_NAMED_GRAPH = true;
     public static boolean CONSTRAINT_GRAPH = false;
     // Prototype for additional Node e.g. fuzzy edge

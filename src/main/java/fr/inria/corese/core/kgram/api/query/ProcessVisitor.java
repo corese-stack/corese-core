@@ -120,7 +120,7 @@ public interface ProcessVisitor extends Pointerable {
     }
 
     // success = true when there is no solution 
-    // because rule where part test condition where createFunCall fails
+    // because rule where part test condition where constraint fails
     // res = Mappings or List<Edge>
     default IDatatype constraintRule(Query q, Object res, IDatatype success) {
         return success;

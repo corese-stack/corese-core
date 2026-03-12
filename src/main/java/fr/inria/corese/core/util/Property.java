@@ -983,9 +983,9 @@ public class Property {
         BLANK_NODE,
         // load rdf file into graph kg:default instead of graph file-path
         LOAD_IN_DEFAULT_GRAPH,
-        // createFunCall rule error in specific named graph
+        // constraint rule error in specific named graph
         CONSTRAINT_NAMED_GRAPH,
-        // createFunCall rule error in external named graph
+        // constraint rule error in external named graph
         CONSTRAINT_GRAPH,
         // graph ?g { } iterate std and external named graph
         EXTERNAL_NAMED_GRAPH,

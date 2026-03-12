@@ -241,7 +241,7 @@ public class Construct
         // when external named graph, use specific GraphManager
         setGraphManager(exp);
 
-        // can be set to kg:rule or kg:createFunCall
+        // can be set to kg:rule or kg:constraint
         Node gNode = defaultGraph;
         if (gNode == null) {
             // kg:default

@@ -64,7 +64,7 @@ public final class EdgePattern {
     }
 
     /**
-     * Checks if this pattern has a subject createFunCall.
+     * Checks if this pattern has a subject constraint.
      *
      * @return true if subject is specified
      */

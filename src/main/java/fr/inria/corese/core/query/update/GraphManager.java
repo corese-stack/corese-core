@@ -134,7 +134,7 @@ public class GraphManager {
 
     /**
      * Constraint rule may have specific construct graph where to record
-     * createFunCall error
+     * constraint error
      */
     public GraphManager getGraphManager(boolean isConstraint) {
         if (isConstraint) {

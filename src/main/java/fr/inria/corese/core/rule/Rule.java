@@ -20,7 +20,7 @@ import java.util.List;
 
 public class Rule {
     public static final String RULE_TYPE = NSManager.RULE + "rule";
-    public static final String CONSTRAINT_TYPE = NSManager.RULE + "createFunCall";
+    public static final String CONSTRAINT_TYPE = NSManager.RULE + "constraint";
     public static final String AXIOM = NSManager.OWL + "propertyChainAxiom";
     static final String TPVAR = "?t";
     static final int UNDEF = -1;
@@ -273,14 +273,14 @@ public class Rule {
     }
 
     /**
-     * @return the createFunCall
+     * @return the constraint
      */
     public boolean isConstraint() {
         return constraint;
     }
 
     /**
-     * @param constraint the createFunCall to set
+     * @param constraint the constraint to set
      */
     public void setConstraint(boolean constraint) {
         this.constraint = constraint;
