@@ -14,16 +14,13 @@ import java.util.List;
  * - Basic Graph Patterns (BGP) via TriplesBlock
  * - GroupGraphPattern as a container (can contain multiple TriplesBlock and later OPTIONAL/UNION/etc.)
  * - ASK query
- *
  * Compatible with the common SPARQL grammar shape:
- *
  * GroupGraphPattern
  *   : '{'
  *       ( TriplesBlock?
  *         ( GraphPatternNotTriples '.'? TriplesBlock? )*
  *       )?
  *     '}'
- *
  * This builder expects the listener to call:
  * - enterGroup()/exitGroup() on enter/exitGroupGraphPattern
  * - enterBgp()/exitBgp() on enter/exitTriplesBlock
@@ -122,7 +119,7 @@ public final class SparqlAstBuilder {
      * Must not be called while a TriplesBlock is still open (no pending enterBgp without exitBgp).
      */
     public void exitGroup() {
-        ensureNoOpenBgp("exitGroup() called while a TriplesBlock/BGP is still open");
+        ensureNoOpenBgp();
         List<PatternAst> popped = groupStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
         if (groupStack.isEmpty()) {
@@ -179,8 +176,7 @@ public final class SparqlAstBuilder {
         }
         return switch (this.queryType) {
             case ASK -> new AskQueryAst(whereClause);
-            case CONSTRUCT -> null; // not yet implemented
-            case DESCRIBE -> null; // not yet implemented
+            case CONSTRUCT, DESCRIBE -> null; // not yet implemented
             case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
@@ -231,9 +227,16 @@ public final class SparqlAstBuilder {
         return groupStack.peek();
     }
 
-    private void ensureNoOpenBgp(String message) {
+    /**
+     * Asserts that no {@code TriplesBlock} (BGP) is currently open.
+     *
+     * @throws IllegalStateException if the BGP stack is not empty
+     */
+    private void ensureNoOpenBgp() {
         if (!bgpStack.isEmpty()) {
-            throw new IllegalStateException(message + " (open bgpStack depth=" + bgpStack.size() + ")");
+            throw new IllegalStateException(
+                    "exitGroup() called while a TriplesBlock/BGP is still open" +
+                            " (open bgpStack depth=" + bgpStack.size() + ")");
         }
     }
 
