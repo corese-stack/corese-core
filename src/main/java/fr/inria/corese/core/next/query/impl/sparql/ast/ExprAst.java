@@ -7,10 +7,16 @@ public sealed interface ExprAst
 }
 
 /**
- * ?s
- * "hello"
- * <http://example.org/person>
- * @param term
+ * A SPARQL filter expression that wraps a single RDF term.
+ *
+ * <p>Examples of terms that can appear directly as expressions:
+ * <ul>
+ *   <li>Variable: {@code ?s}</li>
+ *   <li>Literal: {@code "hello"}</li>
+ *   <li>IRI: {@code <http://example.org/person>}</li>
+ * </ul>
+ *
+ * @param term the RDF term wrapped by this expression; must not be {@code null}
  */
 record TermExprAst(TermAst term) implements ExprAst {
     public TermExprAst {
