@@ -43,10 +43,6 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
         path = new ArrayList<>(n);
     }
 
-    public ArrayList<Edge> getEdges() {
-        return path;
-    }
-
     @Override
     public String getDatatypeLabel() {
         if (path.size() == 1) {
@@ -75,10 +71,6 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
         return max;
     }
 
-    public void clear() {
-        path.clear();
-    }
-
     public void add(Edge ent) {
         path.add(ent);
     }
@@ -91,19 +83,6 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
     public void remove(int w) {
         path.removeLast();
         weight -= w;
-    }
-
-    public void remove() {
-        path.removeLast();
-    }
-
-    // after reverse path
-    public Node getSource() {
-        return getEdge(0).getNode(0);
-    }
-
-    public Node getTarget() {
-        return getEdge(size() - 1).getNode(1);
     }
 
     // before reverse path
@@ -131,28 +110,6 @@ public class Path extends ProducerDefault implements Pointerable<Edge> {
             return ent;
         }
         return ent.getEdge();
-    }
-
-    public Edge last() {
-        if (size() > 0) {
-            return get(size() - 1);
-        } else {
-            return null;
-        }
-    }
-
-    public Path copy() {
-        Path path = new Path(size());
-        for (Edge ent : this.path) {
-            // when r is reverse, add real target relation
-            if (ent instanceof EdgeInv ee) {
-                path.add(ee.getEdgeEntity());
-            } else {
-                path.add(ent);
-            }
-        }
-        path.setWeight(weight);
-        return path;
     }
 
     public Path copy(Producer p) {

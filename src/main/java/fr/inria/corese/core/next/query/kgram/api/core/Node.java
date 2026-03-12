@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.query.kgram.api.core;
 import fr.inria.corese.core.next.query.kgram.path.Path;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
-import static fr.inria.corese.core.next.query.kgram.api.core.PointerType.NODE;
 
 /**
  * Interface of Node provided by graph implementation
@@ -18,11 +17,6 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
     int OBJECT = 3;
 
 
-
-    @Override
-    default PointerType pointerType() {
-        return NODE;
-    }
 
     /**
      * Query nodes have an index computed by KGRAM
@@ -93,9 +87,6 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
     void setObject(Object o);
 
     Path getPath();
-
-    @Override
-    TripleStore getTripleStore();
 
     // tagged as triple reference
     default boolean isTriple() {

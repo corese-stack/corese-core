@@ -8,7 +8,6 @@ import fr.inria.corese.core.next.query.kgram.event.EventImpl;
 import fr.inria.corese.core.next.query.kgram.event.EventManager;
 import fr.inria.corese.core.next.query.kgram.event.ResultListener;
 import fr.inria.corese.core.next.query.kgram.path.PathFinder;
-import fr.inria.corese.core.next.query.kgram.tool.ResultsImpl;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import org.slf4j.Logger;
@@ -177,12 +176,6 @@ public class Eval implements ExpType, Plugin {
         evaluator = e;
     }
 
-    @Deprecated
-    public Results exec(Query q) throws SparqlException {
-        Mappings maps = query(q, null);
-        return ResultsImpl.create(maps);
-    }
-
     /**
      * Main eval function
      */
@@ -243,13 +236,7 @@ public class Eval implements ExpType, Plugin {
             getBind().setVisitor((fr.inria.corese.core.kgram.api.query.ProcessVisitor) vis);
         }
     }
-    @SuppressWarnings("unused")
-    public void finish(Query q, Mappings map) {
-    }
 
-    public Mappings eval(Node gNode, Query q, Mapping map) throws SparqlException {
-        return eval(gNode, q, map, null);
-    }
 
     /**
      * Mapping m is binding parameter, possibly null
@@ -377,14 +364,6 @@ public class Eval implements ExpType, Plugin {
 
     public void setMappings(Mappings lMap) {
         initialResults = lMap;
-    }
-
-    /**
-     * this eval is a fresh copy
-     * use by compiler interpreter for exists {}
-     */
-    public Mappings subEval(Query q, Node gNode, Stack stack, int n) throws SparqlException {
-        return subEval(q, gNode, stack, null, n);
     }
 
     /**
@@ -559,40 +538,6 @@ public class Eval implements ExpType, Plugin {
             ev.setEventManager(manager);
         }
         return ev;
-    }
-
-    /**
-     * copy of Memory may be stored in exp. Reuse data structure after cleaning
-     * and init copy current memory content into target memory Use case: exists
-     * {}
-     */
-    public Memory getMemory(Memory memory, Exp exp) {
-        Memory mem;
-        if (memory.isFake()) {
-            // Temporary memory created by PathFinder
-            mem = memory;
-        } else if (!memory.hasBind() && exp.getObject() != null) {
-            mem = (Memory) exp.getObject();
-            mem.start();
-            memory.copyInto(null, mem, exp);
-        } else {
-            mem = copyMemory(memory, memory.getQuery(), null, exp);
-            exp.setObject(mem);
-        }
-        return mem;
-    }
-
-    /**
-     * use case: exists {} in aggregate select (count(if (exists { BGP }, ?x,
-     * ?y)) as ?c) Env is a Mapping Copy Mapping into fresh Memory in order to
-     * evaluate exists {} in Memory TODO: optimize by storing mem
-     */
-    public Memory getMemory(Mapping map, Exp exp) {
-        Memory mem = new Memory(match, evaluator);
-        getEvaluator().init(mem);
-        mem.init(query);
-        mem.copy(map, exp);
-        return mem;
     }
 
     /**

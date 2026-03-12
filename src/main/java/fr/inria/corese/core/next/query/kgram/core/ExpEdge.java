@@ -35,10 +35,6 @@ public class ExpEdge extends Exp {
 
      */
     
-    public Filter getFilter(int node) {
-        return getFilter(node, ExprType.JOKER);
-    }
-
     public Filter getFilter(int node, int type) {
         List<Filter> list = getFilters(node, type);
         if (list.isEmpty()) {

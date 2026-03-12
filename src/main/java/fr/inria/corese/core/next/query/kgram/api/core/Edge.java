@@ -82,9 +82,6 @@ public interface Edge extends Pointerable<Object> {
         return nbNode() == 2 && !isTripleNode();
     }
 
-    @Override
-    Node getNode();
-
     Node getGraph();
     @SuppressWarnings("unused")
     default void setGraph(Node n) {

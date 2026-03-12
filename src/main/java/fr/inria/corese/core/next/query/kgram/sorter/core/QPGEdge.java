@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.kgram.sorter.core;
 
 import fr.inria.corese.core.next.query.kgram.sorter.impl.qpv1.QPGEdgeCostModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,17 +69,6 @@ public class QPGEdge {
      */
     public QPGNode get(QPGNode n) {
         return n1.equals(n) ? n2 : n1;
-    }
-
-    /**
-     * Get the two nodes in a list
-     *
-     */
-    public List<QPGNode> getNodes() {
-        List<QPGNode> nodes = new ArrayList<>(2);
-        nodes.add(n1);
-        nodes.add(n2);
-        return nodes;
     }
 
     @Override
