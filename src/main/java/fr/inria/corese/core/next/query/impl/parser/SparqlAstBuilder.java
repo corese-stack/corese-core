@@ -49,6 +49,10 @@ public final class SparqlAstBuilder {
     /** SELECT projection (* or explicit variables). Set by SelectQueryFeature in enterSelectQuery. */
     private ProjectionAst projection = ProjectionAsts.selectAll();
 
+    /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
+    private boolean distinct;
+    private boolean reduced;
+
     /** Parser options (e.g. for future use: strict mode, base IRI). */
     private final SparqlParserOptions options;
 
@@ -94,6 +98,16 @@ public final class SparqlAstBuilder {
     /** Sets the projection from an existing AST. */
     public void setProjection(ProjectionAst projection) {
         this.projection = projection != null ? projection : ProjectionAsts.selectAll();
+    }
+
+    /** Sets SELECT DISTINCT. Called by SelectQueryFeature when {@code DISTINCT} is present. */
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
+    }
+
+    /** Sets SELECT REDUCED. Called by SelectQueryFeature when {@code REDUCED} is present. */
+    public void setReduced(boolean reduced) {
+        this.reduced = reduced;
     }
 
     /** Enter a { ... } groupGraphPattern. */
@@ -167,7 +181,7 @@ public final class SparqlAstBuilder {
             case ASK -> new AskQueryAst(whereClause);
             case CONSTRUCT -> null; // not yet implemented
             case DESCRIBE -> null; // not yet implemented
-            case SELECT -> new SelectQueryAst(projection, whereClause);
+            case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
@@ -221,5 +235,10 @@ public final class SparqlAstBuilder {
         if (!bgpStack.isEmpty()) {
             throw new IllegalStateException(message + " (open bgpStack depth=" + bgpStack.size() + ")");
         }
+    }
+
+    /** Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT. */
+    private SolutionModifierAst buildSolutionModifier() {
+        return new SolutionModifierAst(distinct, reduced, List.of(), null, null);
     }
 }
