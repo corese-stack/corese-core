@@ -72,4 +72,24 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
         for (var d : delegates) d.exitOptionalGraphPattern(ctx);
     }
+
+    /**
+     * Forwards {@code enterGroupOrUnionGraphPattern} events to all registered delegates.
+     *
+     * @param ctx the ANTLR parse context for {@code groupOrUnionGraphPattern}
+     */
+    @Override
+    public void enterGroupOrUnionGraphPattern(SparqlParser.GroupOrUnionGraphPatternContext ctx) {
+        for (var d : delegates) d.enterGroupOrUnionGraphPattern(ctx);
+    }
+
+    /**
+     * Forwards {@code exitGroupOrUnionGraphPattern} events to all registered delegates.
+     *
+     * @param ctx the ANTLR parse context for {@code groupOrUnionGraphPattern}
+     */
+    @Override
+    public void exitGroupOrUnionGraphPattern(SparqlParser.GroupOrUnionGraphPatternContext ctx) {
+        for (var d : delegates) d.exitGroupOrUnionGraphPattern(ctx);
+    }
 }

@@ -56,6 +56,11 @@ public final class SparqlAstBuilder {
     /** Parser options (e.g. for future use: strict mode, base IRI). */
     private final SparqlParserOptions options;
 
+    /**
+     * Stack of UNION branch lists currently being collected.
+     */
+    private final Deque<List<GroupGraphPatternAst>> unionStack = new ArrayDeque<>();
+
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
     }
@@ -258,6 +263,61 @@ public final class SparqlAstBuilder {
                     "exitGroup() called while a TriplesBlock/BGP is still open" +
                             " (open bgpStack depth=" + bgpStack.size() + ")");
         }
+    }
+
+    /**
+     * Signals the start of a {@code GroupOrUnionGraphPattern}.
+     */
+    public void enterUnion() {
+        unionStack.push(new ArrayList<>());
+    }
+
+    /**
+     * Collects the most recently closed {@link GroupGraphPatternAst} as the next
+     * branch of the current {@code UNION}.
+     */
+    public void collectUnionBranch() {
+        List<GroupGraphPatternAst> currentUnion = unionStack.peek();
+        if (currentUnion == null) {
+            return;
+        }
+        if (groupStack.isEmpty()) {
+            return;
+        }
+        List<PatternAst> current = currentGroup();
+        if (!current.isEmpty() && current.getLast() instanceof GroupGraphPatternAst g) {
+            current.removeLast();
+            currentUnion.add(g);
+        }
+    }
+
+    /**
+     * Finalises the current {@code GroupOrUnionGraphPattern} and adds its result
+     * to the enclosing group.
+     */
+    public void exitUnion() {
+        List<GroupGraphPatternAst> branches = unionStack.pop();
+
+        if (branches.isEmpty()) {
+            return;
+        }
+
+        if (branches.size() == 1) {
+            // Single branch: no UNION keyword was present, add the group directly
+            currentGroup().add(branches.getFirst());
+            return;
+        }
+
+        // Two or more branches: fold left-associatively into binary UnionAst nodes
+        PatternAst result = new UnionAst(branches.get(0), branches.get(1));
+        for (int i = 2; i < branches.size(); i++) {
+            result = new UnionAst(
+                    new GroupGraphPatternAst(List.of(result)),
+                    branches.get(i)
+            );
+        }
+
+        currentGroup().add(result);
     }
 
     /** Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT. */
