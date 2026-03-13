@@ -28,4 +28,12 @@ public record DescribeQueryAst(List<TermAst> described, GroupGraphPatternAst whe
             whereClause = new GroupGraphPatternAst(List.of());
         }
     }
+
+    /**
+     * Returns {@code true} if this is a {@code DESCRIBE *} query
+     * (no explicit resources specified).
+     */
+    public boolean isDescribeAll() {
+        return described.isEmpty();
+    }
 }

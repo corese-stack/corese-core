@@ -122,4 +122,14 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitGroupOrUnionGraphPattern(SparqlParser.GroupOrUnionGraphPatternContext ctx) {
         for (var d : delegates) d.exitGroupOrUnionGraphPattern(ctx);
     }
+
+    @Override
+    public void enterDescribeQuery(SparqlParser.DescribeQueryContext ctx) {
+        for (var d : delegates) d.enterDescribeQuery(ctx);
+    }
+
+    @Override
+    public void exitDescribeQuery(SparqlParser.DescribeQueryContext ctx) {
+        for (var d : delegates) d.exitDescribeQuery(ctx);
+    }
 }
