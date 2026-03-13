@@ -162,4 +162,50 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         assertEquals("s", projection.variables().get(0).name());
         assertEquals("o", projection.variables().get(1).name());
     }
+
+    @Test
+    @DisplayName("Should parse SELECT DISTINCT without ORDER BY, LIMIT or OFFSET")
+    void shouldParseDistinctOnly() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+            SELECT DISTINCT ?s WHERE {
+                ?s ?p ?o
+            }
+            """);
+
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        SolutionModifierAst solutionModifier = select.solutionModifier();
+
+        assertTrue(solutionModifier.distinct());
+        assertFalse(solutionModifier.reduced());
+        assertTrue(solutionModifier.orderBy().isEmpty());
+        assertNull(solutionModifier.limit());
+        assertNull(solutionModifier.offset());
+    }
+
+    @Test
+    @DisplayName("Should parse SELECT REDUCED without ORDER BY, LIMIT or OFFSET")
+    void shouldParseReducedOnly() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+            SELECT REDUCED ?s WHERE {
+                ?s ?p ?o
+            }
+            """);
+
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        SolutionModifierAst solutionModifier = select.solutionModifier();
+
+        assertFalse(solutionModifier.distinct());
+        assertTrue(solutionModifier.reduced());
+        assertTrue(solutionModifier.orderBy().isEmpty());
+        assertNull(solutionModifier.limit());
+        assertNull(solutionModifier.offset());
+    }
 }

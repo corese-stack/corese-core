@@ -14,16 +14,13 @@ import java.util.List;
  * - Basic Graph Patterns (BGP) via TriplesBlock
  * - GroupGraphPattern as a container (can contain multiple TriplesBlock and later OPTIONAL/UNION/etc.)
  * - ASK query
- *
  * Compatible with the common SPARQL grammar shape:
- *
  * GroupGraphPattern
  *   : '{'
  *       ( TriplesBlock?
  *         ( GraphPatternNotTriples '.'? TriplesBlock? )*
  *       )?
  *     '}'
- *
  * This builder expects the listener to call:
  * - enterGroup()/exitGroup() on enter/exitGroupGraphPattern
  * - enterBgp()/exitBgp() on enter/exitTriplesBlock
@@ -51,6 +48,10 @@ public final class SparqlAstBuilder {
 
     /** SELECT projection (* or explicit variables). Set by SelectQueryFeature in enterSelectQuery. */
     private ProjectionAst projection = ProjectionAsts.selectAll();
+
+    /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
+    private boolean distinct;
+    private boolean reduced;
 
     /** Parser options (e.g. for future use: strict mode, base IRI). */
     private final SparqlParserOptions options;
@@ -99,6 +100,16 @@ public final class SparqlAstBuilder {
         this.projection = projection != null ? projection : ProjectionAsts.selectAll();
     }
 
+    /** Sets SELECT DISTINCT. Called by SelectQueryFeature when {@code DISTINCT} is present. */
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
+    }
+
+    /** Sets SELECT REDUCED. Called by SelectQueryFeature when {@code REDUCED} is present. */
+    public void setReduced(boolean reduced) {
+        this.reduced = reduced;
+    }
+
     /** Enter a { ... } groupGraphPattern. */
     public void enterGroup() {
         groupStack.push(new ArrayList<>());
@@ -112,7 +123,7 @@ public final class SparqlAstBuilder {
      * Must not be called while a TriplesBlock is still open (no pending enterBgp without exitBgp).
      */
     public void exitGroup() {
-        ensureNoOpenBgp("exitGroup() called while a TriplesBlock/BGP is still open");
+        ensureNoOpenBgp();
         List<PatternAst> popped = groupStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
         if (!optionalGroupDepths.isEmpty() && groupStack.size() == optionalGroupDepths.peek()) {
@@ -185,9 +196,8 @@ public final class SparqlAstBuilder {
         }
         return switch (this.queryType) {
             case ASK -> new AskQueryAst(whereClause);
-            case CONSTRUCT -> null; // not yet implemented
-            case DESCRIBE -> null; // not yet implemented
-            case SELECT -> new SelectQueryAst(projection, whereClause);
+            case CONSTRUCT, DESCRIBE -> null; // not yet implemented
+            case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
@@ -237,9 +247,21 @@ public final class SparqlAstBuilder {
         return groupStack.peek();
     }
 
-    private void ensureNoOpenBgp(String message) {
+    /**
+     * Asserts that no {@code TriplesBlock} (BGP) is currently open.
+     *
+     * @throws IllegalStateException if the BGP stack is not empty
+     */
+    private void ensureNoOpenBgp() {
         if (!bgpStack.isEmpty()) {
-            throw new IllegalStateException(message + " (open bgpStack depth=" + bgpStack.size() + ")");
+            throw new IllegalStateException(
+                    "exitGroup() called while a TriplesBlock/BGP is still open" +
+                            " (open bgpStack depth=" + bgpStack.size() + ")");
         }
+    }
+
+    /** Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT. */
+    private SolutionModifierAst buildSolutionModifier() {
+        return new SolutionModifierAst(distinct, reduced, List.of(), null, null);
     }
 }

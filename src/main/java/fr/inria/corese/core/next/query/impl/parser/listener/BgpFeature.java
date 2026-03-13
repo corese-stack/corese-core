@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * SPARQL 1.0 feature: build Triple patterns + BGPs + OPTIONAL
- *
+ 
  * Grammar hooks used:
  * - GroupGraphPattern: { ... }  -> builder.enterGroup()/exitGroup()
  * - TriplesBlock: BGP block      -> builder.enterBgp()/exitBgp()
