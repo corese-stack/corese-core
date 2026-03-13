@@ -72,4 +72,15 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
         for (var d : delegates) d.exitOptionalGraphPattern(ctx);
     }
+
+    // ---------- SOLUTION MODIFIER (LIMIT / OFFSET) ----------
+    @Override
+    public void exitLimitClause(SparqlParser.LimitClauseContext ctx) {
+        for (var d : delegates) d.exitLimitClause(ctx);
+    }
+
+    @Override
+    public void exitOffsetClause(SparqlParser.OffsetClauseContext ctx) {
+        for (var d : delegates) d.exitOffsetClause(ctx);
+    }
 }

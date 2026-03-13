@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
 import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
 import org.antlr.v4.runtime.*;
@@ -103,7 +104,8 @@ public class SparqlParser extends AbstractQueryParser {
             SparqlListener listener = new SparqlListener(List.of(
                     new BgpFeature(builder),
                     new AskQueryFeature(builder),
-                    new SelectQueryFeature(builder)
+                    new SelectQueryFeature(builder),
+                    new SolutionModifierFeature(builder)
             ));
 
             walker.walk(listener, tree);
