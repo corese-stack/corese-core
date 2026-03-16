@@ -210,6 +210,57 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
     }
 
     @Test
+    @DisplayName("Should parse LIMIT")
+    void shouldParseLimit() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+        SELECT ?s WHERE {
+            ?s ?p ?o
+        }
+        LIMIT 10
+    """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(10L, select.solutionModifier().limit());
+        assertNull(select.solutionModifier().offset());
+    }
+
+    @Test
+    @DisplayName("Should parse OFFSET")
+    void shouldParseOffset() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+        SELECT ?s WHERE {
+            ?s ?p ?o
+        }
+        OFFSET 5
+    """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(5L, select.solutionModifier().offset());
+    }
+
+    @Test
+    @DisplayName("Should parse LIMIT OFFSET")
+    void shouldParseLimitOffset() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+        SELECT ?s WHERE {
+            ?s ?p ?o
+        }
+        LIMIT 10
+        OFFSET 20
+    """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(10L, select.solutionModifier().limit());
+        assertEquals(20L, select.solutionModifier().offset());
     @DisplayName("Should parse SELECT DISTINCT ?city ?cityLabel WHERE with BGP and UNION")
     public void shouldParseSelectDistinctWithUnionQueryTest() {
         SparqlParser parser = newParserDefault();

@@ -53,6 +53,10 @@ public final class SparqlAstBuilder {
     private boolean distinct;
     private boolean reduced;
 
+    /**  Variable to hold the value of LIMIT and OFFSET. */
+    private Long limit;
+    private Long offset;
+
     /** Parser options (e.g. for future use: strict mode, base IRI). */
     private final SparqlParserOptions options;
 
@@ -114,6 +118,18 @@ public final class SparqlAstBuilder {
     public void setReduced(boolean reduced) {
         this.reduced = reduced;
     }
+
+    /**
+     * Sets the LIMIT for pagination
+     * @param limit
+     */
+    public void setLimit(long limit) { this.limit = limit; }
+
+    /**
+     * Sets the OFFSET for pagination
+     * @param offset
+     */
+    public void setOffset(long offset) { this.offset = offset; }
 
     /** Enter a { ... } groupGraphPattern. */
     public void enterGroup() {
@@ -322,6 +338,6 @@ public final class SparqlAstBuilder {
 
     /** Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT. */
     private SolutionModifierAst buildSolutionModifier() {
-        return new SolutionModifierAst(distinct, reduced, List.of(), null, null);
+        return new SolutionModifierAst(distinct, reduced, List.of(), limit, offset);
     }
 }
