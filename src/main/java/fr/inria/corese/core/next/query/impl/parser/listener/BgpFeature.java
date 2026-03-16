@@ -55,6 +55,8 @@ public class BgpFeature extends AbstractTripleEmitterFeature {
     }
 
     @Override
+    public void enterTriplesBlock(SparqlParser.TriplesBlockContext ctx) {
+        builder.enterBgp();
     protected boolean shouldHandleTriplesSameSubject(SparqlParser.TriplesSameSubjectContext ctx) {
         return !(ctx.getParent() instanceof SparqlParser.ConstructTriplesContext);
     }
@@ -114,4 +116,21 @@ public class BgpFeature extends AbstractTripleEmitterFeature {
     @Override
     protected void emitTriple(TermAst subject, TermAst predicate, TermAst object) {
         builder.addTriple(subject, predicate, object);
+    private List<TermAst> termListFromObjectList(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ObjectListContext ctx) {
+        List<TermAst> out = new ArrayList<>();
+        for (var obj : ctx.object_()) {
+            out.add(termFromObject(obj));
+        }
+        return out;
+    }
+
+    private TermAst termFromObject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.Object_Context ctx) {
+        // object_ : graphNode
+        return termFromGraphNode(ctx.graphNode());
+    }
+
+    @Override
+    protected void emitTriple(TermAst subject, TermAst predicate, TermAst object) {
+        builder.addTriple(subject, predicate, object);
+    }
 }

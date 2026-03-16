@@ -13,6 +13,8 @@ import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeatur
 import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import org.antlr.v4.runtime.*;
@@ -111,9 +113,7 @@ public class SparqlParser extends AbstractQueryParser {
                     new ConstructQueryFeature(builder),
                     new SolutionModifierFeature(builder),
                     new UnionFeature(builder),
-                    new SelectQueryFeature(builder),
-                    new DescribeQueryFeature(builder),
-                    new ConstructQueryFeature(builder)
+                    new DescribeQueryFeature(builder)
             ));
 
             walker.walk(listener, tree);
