@@ -5,6 +5,8 @@ import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -13,24 +15,23 @@ import java.util.List;
  */
 public class FilterFeature extends AbstractSparqlFeature {
 
+    private static final Logger logger = LoggerFactory.getLogger(FilterFeature.class);
+
     public FilterFeature(SparqlAstBuilder builder) {
         super(builder);
     }
 
     @Override
-    public void enterFilter_(SparqlParser.Filter_Context ctx) {
-    }
-
-    @Override
     public void exitFilter_(SparqlParser.Filter_Context ctx) {
+        logger.debug("exit {}", ctx);
         FilterAst filter;
 
         if(ctx.constraint() != null) {
-            filter = new FilterAst(this.expressionFromConstraint(ctx.constraint()));
+            filter = new FilterAst(this.builder().expressionFromConstraint(ctx.constraint()));
         } else {
             throw new QueryEvaluationException("Empty filter " + ctx.getText() + ", no createFunCall found");
         }
 
-        this.builder().exitFilter(filter);
+        this.builder().addFilter(filter);
     }
 }

@@ -59,7 +59,7 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast.whereClause());
 
         GroupGraphPatternAst where = ast.whereClause();
-        logger.info("{}", where);
+        logger.info("{}", ast);
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();
@@ -82,7 +82,7 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse("""
-                SELECT * WHERE {
+                SELECT ?s WHERE {
                   ?s ?p ?o .
                   FILTER(?s || true)
                 }

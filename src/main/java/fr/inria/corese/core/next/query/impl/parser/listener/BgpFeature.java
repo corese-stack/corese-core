@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.query.impl.parser.listener;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -60,12 +59,12 @@ public class BgpFeature extends AbstractSparqlFeature {
     @Override
     public void exitTriplesSameSubject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesSameSubjectContext ctx) {
         // subject + propertyListNotEmpty
-        TermAst s = termFromVarOrTerm(ctx.varOrTerm());
+        TermAst s = builder().termFromVarOrTerm(ctx.varOrTerm());
         var pl = ctx.propertyListNotEmpty();
         if (pl == null) return;
         for (int i = 0; i < pl.verb().size(); i++) {
-            TermAst p = termFromVerb(pl.verb(i));
-            List<TermAst> objects = termListFromObjectList(pl.objectList(i));
+            TermAst p = builder().termFromVerb(pl.verb(i));
+            List<TermAst> objects = builder().termListFromObjectList(pl.objectList(i));
             for (TermAst o : objects) { builder().addTriple(s, p, o); }
         }
     }
