@@ -2,9 +2,12 @@ package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
+/**
+ * Call to the REGEX function with a tested string and a pattern
+ */
 public class BinaryRegexAst extends AbstractBinaryConstraintAst implements BooleanExpressionAst {
-    public BinaryRegexAst(TermAst left, TermAst right) {
-        super(left, right);
+    public BinaryRegexAst(TermAst string, TermAst pattern) {
+        super(string, pattern);
     }
 
     public TermAst getString() {

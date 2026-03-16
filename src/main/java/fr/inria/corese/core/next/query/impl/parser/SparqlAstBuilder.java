@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,34 +35,49 @@ import java.util.*;
 public final class SparqlAstBuilder {
 
     private ASTConstants.QUERY_TYPE queryType = ASTConstants.QUERY_TYPE.UNDEFINED;
-    private static final Logger logger = LoggerFactory.getLogger(SparqlAstBuilder.class);
 
     // --- Internal stacks (scopes) ---
 
-    /** Stack of groups; each group is a list of patterns (BgpAst now, later OptionalAst/UnionAst/...) */
+    /**
+     * Stack of groups; each group is a list of patterns (BgpAst now, later OptionalAst/UnionAst/...)
+     */
     private final Deque<List<PatternAst>> groupStack = new ArrayDeque<>();
 
-    /** Stack of current BGP triples (TriplesBlock). Nested blocks are rare but stack keeps it safe. */
+    /**
+     * Stack of current BGP triples (TriplesBlock). Nested blocks are rare but stack keeps it safe.
+     */
     private final Deque<List<TriplePatternAst>> bgpStack = new ArrayDeque<>();
 
-    /** At enterOptional(), we push groupStack.size(). At exitGroup(), if groupStack.size() equals peek, we wrap in OptionalAst. */
+    /**
+     * At enterOptional(), we push groupStack.size(). At exitGroup(), if groupStack.size() equals peek, we wrap in OptionalAst.
+     */
     private final Deque<Integer> optionalGroupDepths = new ArrayDeque<>();
 
-    /** Top-level WHERE clause, set when the root group is closed in exitGroup(). */
+    /**
+     * Top-level WHERE clause, set when the root group is closed in exitGroup().
+     */
     private GroupGraphPatternAst whereClause;
 
-    /** SELECT projection (* or explicit variables). Set by SelectQueryFeature in enterSelectQuery. */
+    /**
+     * SELECT projection (* or explicit variables). Set by SelectQueryFeature in enterSelectQuery.
+     */
     private ProjectionAst projection = ProjectionAsts.selectAll();
 
-    /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
+    /**
+     * SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ...
+     */
     private boolean distinct;
     private boolean reduced;
 
-    /**  Variable to hold the value of LIMIT and OFFSET. */
+    /**
+     * Variable to hold the value of LIMIT and OFFSET.
+     */
     private Long limit;
     private Long offset;
 
-    /** Parser options (e.g. for future use: strict mode, base IRI). */
+    /**
+     * Parser options (e.g. for future use: strict mode, base IRI).
+     */
     private final SparqlParserOptions options;
 
     /**
@@ -92,12 +108,16 @@ public final class SparqlAstBuilder {
     public void exitSelectQuery() {
     }
 
-    /** Sets SELECT * (project all variables from the body). */
+    /**
+     * Sets SELECT * (project all variables from the body).
+     */
     public void setProjectionAll() {
         this.projection = ProjectionAsts.selectAll();
     }
 
-    /** Sets explicit SELECT variables (e.g. SELECT ?s ?p). Variable names may include ? or $ prefix. */
+    /**
+     * Sets explicit SELECT variables (e.g. SELECT ?s ?p). Variable names may include ? or $ prefix.
+     */
     public void setProjectionVariables(List<String> variableNames) {
         if (variableNames == null || variableNames.isEmpty()) {
             setProjectionAll();
@@ -111,34 +131,48 @@ public final class SparqlAstBuilder {
         this.projection = vars.isEmpty() ? ProjectionAsts.selectAll() : ProjectionAsts.of(vars);
     }
 
-    /** Sets the projection from an existing AST. */
+    /**
+     * Sets the projection from an existing AST.
+     */
     public void setProjection(ProjectionAst projection) {
         this.projection = projection != null ? projection : ProjectionAsts.selectAll();
     }
 
-    /** Sets SELECT DISTINCT. Called by SelectQueryFeature when {@code DISTINCT} is present. */
+    /**
+     * Sets SELECT DISTINCT. Called by SelectQueryFeature when {@code DISTINCT} is present.
+     */
     public void setDistinct(boolean distinct) {
         this.distinct = distinct;
     }
 
-    /** Sets SELECT REDUCED. Called by SelectQueryFeature when {@code REDUCED} is present. */
+    /**
+     * Sets SELECT REDUCED. Called by SelectQueryFeature when {@code REDUCED} is present.
+     */
     public void setReduced(boolean reduced) {
         this.reduced = reduced;
     }
 
     /**
      * Sets the LIMIT for pagination
+     *
      * @param limit
      */
-    public void setLimit(long limit) { this.limit = limit; }
+    public void setLimit(long limit) {
+        this.limit = limit;
+    }
 
     /**
      * Sets the OFFSET for pagination
+     *
      * @param offset
      */
-    public void setOffset(long offset) { this.offset = offset; }
+    public void setOffset(long offset) {
+        this.offset = offset;
+    }
 
-    /** Enter a { ... } groupGraphPattern. */
+    /**
+     * Enter a { ... } groupGraphPattern.
+     */
     public void enterGroup() {
         groupStack.push(new ArrayList<>());
     }
@@ -164,7 +198,9 @@ public final class SparqlAstBuilder {
         }
     }
 
-    /** Enter a TriplesBlock -> begin collecting triples for a BGP. */
+    /**
+     * Enter a TriplesBlock -> begin collecting triples for a BGP.
+     */
     public void enterBgp() {
         bgpStack.push(new ArrayList<>());
     }
@@ -200,8 +236,7 @@ public final class SparqlAstBuilder {
      * Exits a Filter, builds FilterAst and adds it to the current group
      */
     public void addFilter(FilterAst filter) {
-        logger.info("FILTER {}", filter);
-        if(this.hasCurrentGroup()) {
+        if (this.hasCurrentGroup()) {
             this.currentGroup().add(filter);
         }
     }
@@ -219,7 +254,8 @@ public final class SparqlAstBuilder {
     /**
      * Exit OPTIONAL scope. No-op: the optional content was already wrapped in {@link OptionalAst} in {@link #exitGroup()}.
      */
-    public void exitOptional() {}
+    public void exitOptional() {
+    }
 
     // --- Result ---
 
@@ -230,7 +266,7 @@ public final class SparqlAstBuilder {
      *
      * @return the root QueryAst (AskQueryAst or SelectQueryAst)
      * @throws QueryEvaluationException if query type could not be determined (no enter*Query() called)
-     * @throws IllegalStateException if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
+     * @throws IllegalStateException    if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
      */
     public QueryAst getResult() {
         if (whereClause == null) {
@@ -241,14 +277,15 @@ public final class SparqlAstBuilder {
             case CONSTRUCT -> null;
             case DESCRIBE -> new DescribeQueryAst(describeResources, whereClause);
             case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
-            case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
+            case UNDEFINED ->
+                    throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
 
     // --- Internal helpers ---
 
     private boolean hasCurrentGroup() {
-        return ! this.groupStack.isEmpty();
+        return !this.groupStack.isEmpty();
     }
 
     private List<PatternAst> currentGroup() {
@@ -326,7 +363,9 @@ public final class SparqlAstBuilder {
         currentGroup().add(result);
     }
 
-    /** Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT. */
+    /**
+     * Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT.
+     */
     private SolutionModifierAst buildSolutionModifier() {
         return new SolutionModifierAst(distinct, reduced, List.of(), limit, offset);
     }
@@ -353,7 +392,9 @@ public final class SparqlAstBuilder {
 
     // --- Creation Term helpers ---
 
-    /** Variable token text can be "?s" or "$s" depending on grammar. */
+    /**
+     * Variable token text can be "?s" or "$s" depending on grammar.
+     */
     public TermAst var(String tokenText) {
         if (tokenText == null || tokenText.isBlank()) {
             throw new IllegalArgumentException("Variable token text is null/blank");
@@ -512,7 +553,7 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromVarOrIriRef(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VarOrIRIrefContext ctx) {
-        if(ctx.var_() != null) {
+        if (ctx.var_() != null) {
             return termFromVar(ctx.var_());
         }
         return termFromIriRef(ctx.iriRef());
@@ -580,22 +621,22 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromPrimary(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.PrimaryExpressionContext ctx) {
-        if(ctx.brackettedExpression() != null) {
-            return expressionFromBrackettedExpression(ctx.brackettedExpression());
+        if (ctx.brackettedExpression() != null) {
+            return termFromBrackettedExpression(ctx.brackettedExpression());
         } else if (ctx.builtInCall() != null) {
-            return expressionFromBuiltInCall(ctx.builtInCall());
-        } else if(ctx.iriRefOrFunction() != null) {
+            return termFromBuiltInCall(ctx.builtInCall());
+        } else if (ctx.iriRefOrFunction() != null) {
             return termFromIriRefOrFunction(ctx.iriRefOrFunction());
-        } else if(ctx.rdfLiteral() != null) {
+        } else if (ctx.rdfLiteral() != null) {
             return termFromRdfLiteral(ctx.rdfLiteral());
-        } else if(ctx.numericLiteral() != null) {
+        } else if (ctx.numericLiteral() != null) {
             return termFromNumericLiteral(ctx.numericLiteral());
-        } else if(ctx.booleanLiteral() != null) {
+        } else if (ctx.booleanLiteral() != null) {
             return termFromBooleanLiteral(ctx.booleanLiteral());
-        } else if(ctx.var_() != null) {
+        } else if (ctx.var_() != null) {
             return termFromVar(ctx.var_());
         } else {
-            throw new QueryEvaluationException("Unexpected content of bracketed expression");
+            throw new QueryEvaluationException("Unexpected content of bracketed termFromExpression");
         }
     }
 
@@ -604,9 +645,9 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromBooleanLiteral(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BooleanLiteralContext ctx) {
-        if(ctx.FALSE() != null) {
+        if (ctx.FALSE() != null) {
             return new LiteralAst("false", null, XSD.xsdBoolean.getIRI().stringValue());
-        } else if(ctx.TRUE() != null) {
+        } else if (ctx.TRUE() != null) {
             return new LiteralAst("true", null, XSD.xsdBoolean.getIRI().stringValue());
         } else {
             throw new QueryEvaluationException("Unexpected value for boolean literal");
@@ -614,19 +655,19 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromIriRefOrFunction(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.IriRefOrFunctionContext ctx) {
-        if(ctx.iriRef() != null && ctx.argList() == null) {
+        if (ctx.iriRef() != null && ctx.argList() == null) {
             return termFromIriRef(ctx.iriRef());
-        } else if(ctx.iriRef() != null && ctx.argList() != null) {
+        } else if (ctx.iriRef() != null && ctx.argList() != null) {
             List<TermAst> args = termListFromArgList(ctx.argList());
             IriAst iriRef = (IriAst) termFromIriRef(ctx.iriRef());
-            return new FunctionCallAst(iriRef, args);
+            return createFunCall(iriRef, args);
         } else {
             throw new QueryEvaluationException("Unexpected element in IRI ref or function");
         }
     }
 
     public List<TermAst> termListFromArgList(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ArgListContext ctx) {
-        return ctx.expression().stream().map(arg -> (TermAst) expression(arg)).toList();
+        return ctx.expression().stream().map(arg -> (TermAst) termFromExpression(arg)).toList();
     }
 
     public TermAst termFromIriRef(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.IriRefContext ctx) {
@@ -634,11 +675,11 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromNumericLiteral(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralContext ctx) {
-        if(ctx.numericLiteralUnsigned() != null) {
+        if (ctx.numericLiteralUnsigned() != null) {
             return termFromNumericLiteralUnsigned(ctx.numericLiteralUnsigned());
-        } else if(ctx.numericLiteralPositive() != null) {
+        } else if (ctx.numericLiteralPositive() != null) {
             return termFromNumericLiteralPositive(ctx.numericLiteralPositive());
-        } else if(ctx.numericLiteralNegative() != null) {
+        } else if (ctx.numericLiteralNegative() != null) {
             return termFromNumericLiteralNegative(ctx.numericLiteralNegative());
         } else {
             throw new QueryEvaluationException("Unexpected content for numeric literal");
@@ -646,9 +687,9 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromNumericLiteralNegative(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralNegativeContext ctx) {
-        if(ctx.INTEGER_NEGATIVE() != null) {
+        if (ctx.INTEGER_NEGATIVE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdNegativeInteger.getIRI().stringValue());
-        } else if(ctx.DECIMAL_NEGATIVE() != null) {
+        } else if (ctx.DECIMAL_NEGATIVE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdDecimal.getIRI().stringValue());
         } else if (ctx.DOUBLE_NEGATIVE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdDouble.getIRI().stringValue());
@@ -658,9 +699,9 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromNumericLiteralPositive(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralPositiveContext ctx) {
-        if(ctx.INTEGER_POSITIVE() != null) {
+        if (ctx.INTEGER_POSITIVE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdPositiveInteger.getIRI().stringValue());
-        } else if(ctx.DECIMAL_POSITIVE() != null) {
+        } else if (ctx.DECIMAL_POSITIVE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdDecimal.getIRI().stringValue());
         } else if (ctx.DOUBLE_POSITIVE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdDouble.getIRI().stringValue());
@@ -670,9 +711,9 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromNumericLiteralUnsigned(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralUnsignedContext ctx) {
-        if(ctx.INTEGER() != null) {
+        if (ctx.INTEGER() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdUnsignedInt.getIRI().stringValue());
-        } else if(ctx.DECIMAL() != null) {
+        } else if (ctx.DECIMAL() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdDecimal.getIRI().stringValue());
         } else if (ctx.DOUBLE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdDouble.getIRI().stringValue());
@@ -685,94 +726,94 @@ public final class SparqlAstBuilder {
         return this.iri(ctx.getText());
     }
 
-    public ExprAst expressionFromConstraint(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConstraintContext ctx) {
+    public TermAst termFromConstraint(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConstraintContext ctx) {
         if (ctx.builtInCall() != null) {
-            return expressionFromBuiltInCall(ctx.builtInCall());
+            return termFromBuiltInCall(ctx.builtInCall());
         } else if (ctx.functionCall() != null) {
             IriAst functionTermAst = new IriAst(ctx.functionCall().iriRef().getText());
-            List<TermAst> args = ctx.functionCall().argList().expression().stream().map(arg -> (TermAst) expression(arg)).toList();
+            List<TermAst> args = ctx.functionCall().argList().expression().stream().map(this::termFromExpression).toList();
             return new FunctionCallAst(functionTermAst, args);
         } else if (ctx.brackettedExpression() != null && ctx.brackettedExpression().expression() != null) {
-            return expressionFromBrackettedExpression(ctx.brackettedExpression());
+            return termFromBrackettedExpression(ctx.brackettedExpression());
         } else {
             throw new QueryEvaluationException("No createFunCall found in filter");
         }
     }
 
-    public ExprAst expressionFromBuiltInCall(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BuiltInCallContext ctx) {
+    public TermAst termFromBuiltInCall(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BuiltInCallContext ctx) {
         if (ctx.expression() != null) {
-            List<TermAst> args = ctx.expression().stream().map(arg -> (TermAst) expression(arg)).toList();
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
-                return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
             } else if (ctx.LANG() != null) {
-                return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.LANG, args);
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.LANG, args);
             } else if (ctx.LANGMATCHES() != null) {
-                return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.LANGMATCHES, args);
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.LANGMATCHES, args);
             } else if (ctx.DATATYPE() != null) {
-                return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
             } else if (ctx.SAME_TERM() != null) {
-                return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.SAMETERM, args);
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.SAMETERM, args);
             } else if (ctx.IS_URI() != null || ctx.IS_IRI() != null) {
-                return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.IS_IRI, args);
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_IRI, args);
             } else if (ctx.IS_BLANK() != null) {
-                return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.IS_BLANK, args);
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_BLANK, args);
             } else if (ctx.IS_LITERAL() != null) {
-                return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.IS_LITERAL, args);
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_LITERAL, args);
+            } else if (ctx.BOUND() != null) {
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
+            } else if (ctx.regexExpression() != null) {
+                return termFromRegex(ctx.regexExpression());
             } else {
                 throw new QueryEvaluationException("Unexpected function for a  BuiltInCall for token " + ctx.getText());
             }
-        } else if (ctx.BOUND() != null) {
-            return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
-        } else if (ctx.regexExpression() != null) {
-            return expressionFromRegex(ctx.regexExpression());
         } else {
             throw new QueryEvaluationException("Unable to resolve BuiltInCall for token " + ctx.getText());
         }
     }
 
-    public ExprAst expression(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ExpressionContext ctx) {
+    public TermAst termFromExpression(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ExpressionContext ctx) {
         if (ctx.conditionalOrExpression() != null) {
-            return this.expressionFromConditionalOr(ctx.conditionalOrExpression());
+            return this.termFromConditionalOr(ctx.conditionalOrExpression());
         } else {
             throw new QueryEvaluationException("No conditional OR found");
         }
     }
 
-    public ExprAst expressionFromConditionalOr(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConditionalOrExpressionContext ctx) {
+    public TermAst termFromConditionalOr(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConditionalOrExpressionContext ctx) {
         if (ctx.conditionalAndExpression() != null && !ctx.conditionalAndExpression().isEmpty()) {
             if (ctx.conditionalAndExpression().size() > 1) {
-                List<TermAst> args = ctx.conditionalAndExpression().stream().map(arg -> (TermAst) expressionFromConditionalAnd(arg)).toList();
-                return (ExprAst) createConstraint(ASTConstants.OPERATOR.OR, args);
+                List<TermAst> args = ctx.conditionalAndExpression().stream().map(this::termFromConditionalAnd).toList();
+                return createConstraint(ASTConstants.OPERATOR.OR, args);
             } else {
-                return expressionFromConditionalAnd(ctx.conditionalAndExpression().getFirst());
+                return termFromConditionalAnd(ctx.conditionalAndExpression().getFirst());
             }
         } else {
             throw new QueryEvaluationException("No conditional AND  found");
         }
     }
 
-    public ExprAst expressionFromConditionalAnd(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConditionalAndExpressionContext ctx) {
+    public TermAst termFromConditionalAnd(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConditionalAndExpressionContext ctx) {
         if (ctx.valueLogical() != null && !ctx.valueLogical().isEmpty()) {
             if (ctx.valueLogical().size() > 1) {
-                List<TermAst> args = ctx.valueLogical().stream().map(arg -> (TermAst) expressionFromValueLogical(arg)).toList();
-                return (ExprAst) createConstraint(ASTConstants.OPERATOR.AND, args);
+                List<TermAst> args = ctx.valueLogical().stream().map(this::termFromValueLogical).toList();
+                return createConstraint(ASTConstants.OPERATOR.AND, args);
             } else {
-                return expressionFromValueLogical(ctx.valueLogical().getFirst());
+                return termFromValueLogical(ctx.valueLogical().getFirst());
             }
         } else {
             throw new QueryEvaluationException("No logical value found");
         }
     }
 
-    public ExprAst expressionFromValueLogical(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ValueLogicalContext ctx) {
+    public TermAst termFromValueLogical(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ValueLogicalContext ctx) {
         if (ctx.relationalExpression() != null) {
-            return this.expressionFromRelational(ctx.relationalExpression());
+            return this.termFromRelational(ctx.relationalExpression());
         } else {
-            throw new QueryEvaluationException("No relational expression found");
+            throw new QueryEvaluationException("No relational termFromExpression found");
         }
     }
 
-    public ExprAst expressionFromRelational(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.RelationalExpressionContext ctx) {
+    public TermAst termFromRelational(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.RelationalExpressionContext ctx) {
         if (ctx.numericExpression() != null && !ctx.numericExpression().isEmpty()) {
             if (ctx.numericExpression().size() > 1) {
                 ASTConstants.OPERATOR op;
@@ -789,113 +830,118 @@ public final class SparqlAstBuilder {
                 } else if (ctx.GREATER_OR_EQUAL() != null) {
                     op = ASTConstants.OPERATOR.GE;
                 } else {
-                    throw new QueryEvaluationException("Unexpected operator in relational expression");
+                    throw new QueryEvaluationException("Unexpected operator in relational termFromExpression");
                 }
-                List<TermAst> args = ctx.numericExpression().stream().map(arg -> (TermAst) expressionFromNumeric(arg)).toList();
-                return (ExprAst) createConstraint(op, args);
+                List<TermAst> args = ctx.numericExpression().stream().map(this::termFromNumeric).toList();
+                return createConstraint(op, args);
             } else {
-                return expressionFromNumeric(ctx.numericExpression().getFirst());
+                return termFromNumeric(ctx.numericExpression().getFirst());
             }
         } else {
-            throw new QueryEvaluationException("No numeric expression found");
+            throw new QueryEvaluationException("No numeric termFromExpression found");
         }
     }
 
-    public ExprAst expressionFromNumeric(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericExpressionContext ctx) {
+    public TermAst termFromNumeric(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericExpressionContext ctx) {
         if (ctx.additiveExpression() != null) {
-            return this.expressionFromAdditive(ctx.additiveExpression());
+            return this.termFromAdditive(ctx.additiveExpression());
         } else {
-            throw new QueryEvaluationException("No additive expression found");
+            throw new QueryEvaluationException("No additive termFromExpression found");
         }
     }
 
-    public ExprAst expressionFromAdditive(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.AdditiveExpressionContext ctx) {
-        if(ctx.multiplicativeExpression() != null && ! ctx.multiplicativeExpression().isEmpty()) {
+    public TermAst termFromAdditive(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.AdditiveExpressionContext ctx) {
+        if (ctx.multiplicativeExpression() != null && !ctx.multiplicativeExpression().isEmpty()) {
             if (ctx.multiplicativeExpression().size() > 1
-                    || ! ctx.numericLiteralNegative().isEmpty()
-                    || ! ctx.numericLiteralPositive().isEmpty()) {
-                ExprAst leftHand = expressionFromMultiplicative(ctx.multiplicativeExpression().getFirst());
-                for(int i = 1; i < ctx.getChildCount() ; i++) {
-                    ParseTree numericChild = ctx.getChild(i);
-                    ExprAst rightHand = switch (numericChild) {
-                        case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.MultiplicativeExpressionContext multiplicativeExpressionContext ->
-                                expressionFromMultiplicative(multiplicativeExpressionContext);
-                        case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralPositiveContext numericLiteralPositiveContext ->
-                                (ExprAst) termFromNumericLiteralPositive(numericLiteralPositiveContext);
-                        case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralNegativeContext numericLiteralNegativeContext ->
-                                (ExprAst) termFromNumericLiteralNegative(numericLiteralNegativeContext);
-                        case null, default ->
-                                throw new QueryEvaluationException("Unexpected left hand expression in additive expression");
-                    };
-                    ASTConstants.OPERATOR op;
-                    if (ctx.getToken(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.PLUS, i) != null) {
-                        op = ASTConstants.OPERATOR.PLUS;
-                    } else if (ctx.getToken(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.MINUS, i) != null) {
-                        op = ASTConstants.OPERATOR.MINUS;
+                    || !ctx.numericLiteralNegative().isEmpty()
+                    || !ctx.numericLiteralPositive().isEmpty()) {
+                TermAst leftHand = termFromMultiplicative(ctx.multiplicativeExpression().getFirst());
+                ASTConstants.OPERATOR op = ASTConstants.OPERATOR.ADD;
+                for (int i = 1; i < ctx.getChildCount(); i++) {
+                    ParseTree child = ctx.getChild(i);
+                    if(child instanceof TerminalNode) {
+                        if (Objects.equals(child.getText(), "+")) {
+                            op = ASTConstants.OPERATOR.ADD;
+                        } else if (Objects.equals(child.getText(), "-")) {
+                            op = ASTConstants.OPERATOR.SUB;
+                        } else {
+                            throw new QueryEvaluationException("Unexpected operator in additive termFromExpression " + child.getText());
+                        }
                     } else {
-                        throw new QueryEvaluationException("Unexpected operator in additive expression");
+                        TermAst rightHand = switch (child) {
+                            case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.MultiplicativeExpressionContext multiplicativeExpressionContext ->
+                                    termFromMultiplicative(multiplicativeExpressionContext);
+                            case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralPositiveContext numericLiteralPositiveContext ->
+                                    (ExprAst) termFromNumericLiteralPositive(numericLiteralPositiveContext);
+                            case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralNegativeContext numericLiteralNegativeContext ->
+                                    (ExprAst) termFromNumericLiteralNegative(numericLiteralNegativeContext);
+                            case null, default ->
+                                    throw new QueryEvaluationException("Unexpected left hand termFromExpression in additive termFromExpression " + ctx.getText() + " " + child.getText());
+                        };
+                        leftHand = createConstraint(op, List.of(leftHand, rightHand));
                     }
-                    leftHand = (ExprAst) createConstraint(op, List.of(leftHand, rightHand));
                 }
                 return leftHand;
             } else {
-                return expressionFromMultiplicative(ctx.multiplicativeExpression().getFirst());
+                return termFromMultiplicative(ctx.multiplicativeExpression().getFirst());
             }
         } else {
-            throw new QueryEvaluationException("No multiplicative expression found");
+            throw new QueryEvaluationException("No multiplicative termFromExpression found");
         }
     }
 
-    public ExprAst expressionFromMultiplicative(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.MultiplicativeExpressionContext ctx) {
-        if(ctx.unaryExpression() != null && ! ctx.unaryExpression().isEmpty()) {
+    public TermAst termFromMultiplicative(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.MultiplicativeExpressionContext ctx) {
+        if (ctx.unaryExpression() != null && !ctx.unaryExpression().isEmpty()) {
             if (ctx.unaryExpression().size() > 1) {
-                ExprAst head = expressionFromUnary(ctx.unaryExpression().getFirst());
-                for(int i = 1; i < ctx.getChildCount() ; i++) {
+                TermAst head = termFromUnary(ctx.unaryExpression().getFirst());
+                for (int i = 1; i < ctx.getChildCount(); i++) {
                     ParseTree numericChild = ctx.getChild(i);
-                    ExprAst leftHand = expressionFromUnary((fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.UnaryExpressionContext) numericChild);
-                    ASTConstants.OPERATOR op;
-                    if (ctx.getToken(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.STAR, i) != null) {
-                        op = ASTConstants.OPERATOR.MUL;
-                    } else if (ctx.getToken(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.SLASH, i) != null) {
-                        op = ASTConstants.OPERATOR.DIV;
-                    } else {
-                        throw new QueryEvaluationException("Unexpected operator in multiplicative expression");
+                    if (!(numericChild instanceof TerminalNode)) {
+                        TermAst leftHand = termFromUnary((fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.UnaryExpressionContext) numericChild);
+                        ASTConstants.OPERATOR op;
+                        if (!ctx.getTokens(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.STAR).isEmpty()) {
+                            op = ASTConstants.OPERATOR.MUL;
+                        } else if (!ctx.getTokens(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.SLASH).isEmpty()) {
+                            op = ASTConstants.OPERATOR.DIV;
+                        } else {
+                            throw new QueryEvaluationException("Unexpected operator in multiplicative termFromExpression " + ctx.getText());
+                        }
+                        head = createConstraint(op, List.of(head, leftHand));
                     }
-                    head = (ExprAst) createConstraint(op, List.of(head, leftHand));
                 }
                 return head;
             } else {
-                return expressionFromUnary(ctx.unaryExpression().getFirst());
+                return termFromUnary(ctx.unaryExpression().getFirst());
             }
         } else {
-            throw new QueryEvaluationException("No unary expression found");
+            throw new QueryEvaluationException("No unary termFromExpression found");
         }
     }
 
-    public ExprAst expressionFromUnary(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.UnaryExpressionContext ctx) {
+    public TermAst termFromUnary(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.UnaryExpressionContext ctx) {
         ASTConstants.Constraint op = null;
-        if(ctx.PLUS() != null) {
+        if (ctx.PLUS() != null) {
             op = ASTConstants.OPERATOR.PLUS;
         } else if (ctx.MINUS() != null) {
             op = ASTConstants.OPERATOR.MINUS;
-        } else if(ctx.EXCLAMATION() != null) {
+        } else if (ctx.EXCLAMATION() != null) {
             op = ASTConstants.OPERATOR.NOT;
         }
-        if(op != null) {
-            return (ExprAst) createConstraint(op, List.of(termFromPrimary(ctx.primaryExpression())));
+        if (op != null) {
+            return createConstraint(op, List.of(termFromPrimary(ctx.primaryExpression())));
         } else {
-            return (ExprAst) termFromPrimary(ctx.primaryExpression());
+            return termFromPrimary(ctx.primaryExpression());
         }
     }
 
-    public ExprAst expressionFromBrackettedExpression(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BrackettedExpressionContext ctx) {
-        return expression(ctx.expression());
+    public TermAst termFromBrackettedExpression(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BrackettedExpressionContext ctx) {
+        return termFromExpression(ctx.expression());
     }
 
-    public ExprAst expressionFromRegex(SparqlParser.RegexExpressionContext ctx) {
+    public TermAst termFromRegex(SparqlParser.RegexExpressionContext ctx) {
         if (ctx.expression() != null) {
-            List<TermAst> args = ctx.expression().stream().map(arg -> (TermAst) expression(arg)).toList();
-            return (ExprAst) this.createConstraint(ASTConstants.FUNCTION_CALL.REGEX, args);
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            return this.createConstraint(ASTConstants.FUNCTION_CALL.REGEX, args);
         } else {
             throw new QueryEvaluationException("Unexpected arguments for REGEX call");
         }

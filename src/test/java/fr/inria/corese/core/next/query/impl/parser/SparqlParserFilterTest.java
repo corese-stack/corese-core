@@ -611,12 +611,12 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(DivideAst.class, t.getLeftArgument(), "Equals left argument should be a divide operator");
         assertInstanceOf(LiteralAst.class, t.getRightArgument(), "Equals right argument should be a literal");
 
-        DivideAst strAst = (DivideAst) t.getLeftArgument();
+        DivideAst divAst = (DivideAst) t.getLeftArgument();
 
-        assertInstanceOf(VarAst.class, strAst.getLeftArgument());
-        assertEquals("s", ((VarAst) strAst.getLeftArgument()).name());
-        assertInstanceOf(LiteralAst.class, strAst.getLeftArgument());
-        assertEquals("2", ((LiteralAst) strAst.getLeftArgument()).lexical());
+        assertInstanceOf(VarAst.class, divAst.getLeftArgument());
+        assertEquals("s", ((VarAst) divAst.getLeftArgument()).name());
+        assertInstanceOf(LiteralAst.class, divAst.getRightArgument());
+        assertEquals("2", ((LiteralAst) divAst.getRightArgument()).lexical());
     }
 
     @Test
@@ -651,8 +651,8 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         assertInstanceOf(VarAst.class, strAst.getLeftArgument());
         assertEquals("s", ((VarAst) strAst.getLeftArgument()).name());
-        assertInstanceOf(LiteralAst.class, strAst.getLeftArgument());
-        assertEquals("2", ((LiteralAst) strAst.getLeftArgument()).lexical());
+        assertInstanceOf(LiteralAst.class, strAst.getRightArgument());
+        assertEquals("2", ((LiteralAst) strAst.getRightArgument()).lexical());
     }
 
     @Test
@@ -687,8 +687,8 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         assertInstanceOf(VarAst.class, strAst.getLeftArgument());
         assertEquals("s", ((VarAst) strAst.getLeftArgument()).name());
-        assertInstanceOf(LiteralAst.class, strAst.getLeftArgument());
-        assertEquals("2", ((LiteralAst) strAst.getLeftArgument()).lexical());
+        assertInstanceOf(LiteralAst.class, strAst.getRightArgument());
+        assertEquals("2", ((LiteralAst) strAst.getRightArgument()).lexical());
     }
 
     @Test
@@ -723,8 +723,8 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         assertInstanceOf(VarAst.class, strAst.getLeftArgument());
         assertEquals("s", ((VarAst) strAst.getLeftArgument()).name());
-        assertInstanceOf(LiteralAst.class, strAst.getLeftArgument());
-        assertEquals("2", ((LiteralAst) strAst.getLeftArgument()).lexical());
+        assertInstanceOf(LiteralAst.class, strAst.getRightArgument());
+        assertEquals("2", ((LiteralAst) strAst.getRightArgument()).lexical());
     }
 
     @Test
@@ -780,15 +780,15 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
 
         FilterAst filterAst = (FilterAst) p2;
-        assertInstanceOf(SameTermAst.class, filterAst.operator(), "Filter content should be an langMatches (=) operator");
+        assertInstanceOf(LangMatchesAst.class, filterAst.operator(), "Filter content should be an langMatches (=) operator");
 
-        SameTermAst t = (SameTermAst) filterAst.operator();
+        LangMatchesAst t = (LangMatchesAst) filterAst.operator();
 
         assertInstanceOf(VarAst.class, t.getLeftArgument());
         assertInstanceOf(LiteralAst.class, t.getRightArgument());
 
         assertEquals("s", ((VarAst) t.getLeftArgument()).name());
-        assertEquals("test", ((LiteralAst) t.getRightArgument()).lexical());
+        assertEquals("\"test\"", ((LiteralAst) t.getRightArgument()).lexical());
     }
 
     @Test
@@ -820,7 +820,7 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(LiteralAst.class, t.getRightArgument());
 
         assertEquals("s", ((VarAst) t.getLeftArgument()).name());
-        assertEquals("test", ((LiteralAst) t.getRightArgument()).lexical());
+        assertEquals("\"test\"", ((LiteralAst) t.getRightArgument()).lexical());
     }
 
     @Test
@@ -853,8 +853,8 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(LiteralAst.class, t.flags());
 
         assertEquals("s", ((VarAst) t.string()).name());
-        assertEquals("test", ((LiteralAst) t.pattern()).lexical());
-        assertEquals("i", ((LiteralAst) t.flags()).lexical());
+        assertEquals("\"test\"", ((LiteralAst) t.pattern()).lexical());
+        assertEquals("\"i\"", ((LiteralAst) t.flags()).lexical());
     }
 
     @Test
@@ -890,6 +890,6 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         assertEquals("<http://example.org/function>", ((IriAst) t.functionName()).raw());
         assertEquals("s", ((VarAst) t.arguments().getFirst()).name());
-        assertEquals("test", ((LiteralAst) t.arguments().getLast()).lexical());
+        assertEquals("\"test\"", ((LiteralAst) t.arguments().getLast()).lexical());
     }
 }

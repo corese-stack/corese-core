@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriOperatorAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
@@ -8,7 +7,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
  * For a plain literal with no language tag, returns {@code xsd:string}.
  */
-public class DatatypeAst extends AbstractUnaryConstraintAst implements IriOperatorAst {
+public class DatatypeAst extends AbstractUnaryConstraintAst implements IriExpressionAst {
     public DatatypeAst(TermAst arg) {
         super(arg);
     }
