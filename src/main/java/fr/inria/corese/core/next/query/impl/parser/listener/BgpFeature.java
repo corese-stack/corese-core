@@ -48,6 +48,8 @@ public class BgpFeature extends AbstractTripleEmitterFeature {
     }
 
     @Override
+    public void enterTriplesBlock(SparqlParser.TriplesBlockContext ctx) {
+        builder.enterBgp();
     public void exitOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
         builder.exitOptional();
     }
@@ -58,7 +60,16 @@ public class BgpFeature extends AbstractTripleEmitterFeature {
     }
 
     @Override
+    public void exitTriplesBlock(SparqlParser.TriplesBlockContext ctx) {
+        builder.exitBgp();
+    }
+
+    @Override
+    protected boolean shouldHandleTriplesSameSubject(SparqlParser.TriplesSameSubjectContext ctx) {
+        return !(ctx.getParent() instanceof SparqlParser.ConstructTriplesContext);
+    }
+
+    @Override
     protected void emitTriple(TermAst subject, TermAst predicate, TermAst object) {
         builder.addTriple(subject, predicate, object);
-    }
 }
