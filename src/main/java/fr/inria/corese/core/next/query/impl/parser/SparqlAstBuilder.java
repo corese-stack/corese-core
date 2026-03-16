@@ -43,6 +43,12 @@ public final class SparqlAstBuilder {
     /** At enterOptional(), we push groupStack.size(). At exitGroup(), if groupStack.size() equals peek, we wrap in OptionalAst. */
     private final Deque<Integer> optionalGroupDepths = new ArrayDeque<>();
 
+    /** Current CONSTRUCT template triples being collected. */
+    private final Deque<List<TriplePatternAst>> constructTemplateStack = new ArrayDeque<>();
+
+    /** Final CONSTRUCT template */
+    private ConstructTemplateAst constructTemplate;
+
     /** Top-level WHERE clause, set when the root group is closed in exitGroup(). */
     private GroupGraphPatternAst whereClause;
 
@@ -77,6 +83,10 @@ public final class SparqlAstBuilder {
 
     public void exitAskQuery() {
     }
+
+    public void enterConstructQuery() { queryType = ASTConstants.QUERY_TYPE.CONSTRUCT; }
+
+    public void exitConstructQuery() {}
 
     public void enterSelectQuery() {
         queryType = ASTConstants.QUERY_TYPE.SELECT;
@@ -217,7 +227,8 @@ public final class SparqlAstBuilder {
         }
         return switch (this.queryType) {
             case ASK -> new AskQueryAst(whereClause);
-            case CONSTRUCT, DESCRIBE -> null; // not yet implemented
+            case CONSTRUCT -> new ConstructQueryAst(constructTemplate, whereClause, buildSolutionModifier());
+            case DESCRIBE -> null; // not yet implemented
             case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
@@ -257,6 +268,33 @@ public final class SparqlAstBuilder {
     public TermAst literal(String lexical, String lang, String datatype) {
         if (lexical == null) throw new IllegalArgumentException("Literal lexical is null");
         return new LiteralAst(lexical, lang, datatype);
+    }
+
+    // --- Internal helpers for CONSTRUCT Template
+
+    /**
+     * Enter CONSTRUCT template scope.
+     */
+    public void enterConstructTemplate() {
+        constructTemplateStack.push(new ArrayList<>());
+    }
+
+    /**
+     * Exit CONSTRUCT template scope and finalize the template.
+     */
+    public void exitConstructTemplate() {
+        List<TriplePatternAst> triples = constructTemplateStack.pop();
+        this.constructTemplate = new ConstructTemplateAst(triples);
+    }
+
+    /**
+     * Add a triple to the current CONSTRUCT template.
+     */
+    public void addConstructTriple(TermAst s, TermAst p, TermAst o) {
+        if (constructTemplateStack.isEmpty()) {
+            throw new IllegalStateException("addConstructTriple() called outside of CONSTRUCT template");
+        }
+        constructTemplateStack.peek().add(new TriplePatternAst(s, p, o));
     }
 
     // --- Internal helpers ---

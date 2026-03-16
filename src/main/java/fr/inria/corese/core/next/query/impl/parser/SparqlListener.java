@@ -34,6 +34,26 @@ public final class SparqlListener extends SparqlParserBaseListener {
         for(var d : delegates) d.enterAskQuery(ctx);
     }
 
+    @Override
+    public void enterConstructQuery(SparqlParser.ConstructQueryContext ctx) {
+        for (var d : delegates) d.enterConstructQuery(ctx);
+    }
+
+    @Override
+    public void exitConstructQuery(SparqlParser.ConstructQueryContext ctx) {
+        for (var d : delegates) d.exitConstructQuery(ctx);
+    }
+
+    @Override
+    public void enterConstructTemplate(SparqlParser.ConstructTemplateContext ctx) {
+        for (var d : delegates) d.enterConstructTemplate(ctx);
+    }
+
+    @Override
+    public void exitConstructTemplate(SparqlParser.ConstructTemplateContext ctx) {
+        for (var d : delegates) d.exitConstructTemplate(ctx);
+    }
+
     // ---------- GROUP GRAPH PATTERN ----------
     @Override
     public void enterGroupGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.GroupGraphPatternContext ctx) {
