@@ -250,17 +250,19 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse("""
-        SELECT ?s WHERE {
-            ?s ?p ?o
-        }
-        LIMIT 10
-        OFFSET 20
-    """);
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    LIMIT 10
+                    OFFSET 20
+                """);
 
         SelectQueryAst select = (SelectQueryAst) ast;
 
         assertEquals(10L, select.solutionModifier().limit());
         assertEquals(20L, select.solutionModifier().offset());
+
+    }
     @DisplayName("Should parse SELECT DISTINCT ?city ?cityLabel WHERE with BGP and UNION")
     public void shouldParseSelectDistinctWithUnionQueryTest() {
         SparqlParser parser = newParserDefault();

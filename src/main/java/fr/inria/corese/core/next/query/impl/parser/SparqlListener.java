@@ -82,6 +82,7 @@ public final class SparqlListener extends SparqlParserBaseListener {
     @Override
     public void exitOffsetClause(SparqlParser.OffsetClauseContext ctx) {
         for (var d : delegates) d.exitOffsetClause(ctx);
+    }
     /**
      * Forwards {@code enterGroupOrUnionGraphPattern} events to all registered delegates.
      *
