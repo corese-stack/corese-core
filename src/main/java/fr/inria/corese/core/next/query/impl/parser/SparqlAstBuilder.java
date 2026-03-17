@@ -73,6 +73,10 @@ public final class SparqlAstBuilder {
      */
     private Long limit;
     private Long offset;
+    /**
+     * Order expression
+     */
+    private final List<OrderConditionAst> orderConditions = new ArrayList<>();
 
     /**
      * Parser options (e.g. for future use: strict mode, base IRI).
@@ -533,7 +537,19 @@ public final class SparqlAstBuilder {
      * Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT.
      */
     private SolutionModifierAst buildSolutionModifier() {
-        return new SolutionModifierAst(distinct, reduced, List.of(), limit, offset);
+        return new SolutionModifierAst(distinct, reduced, this.orderConditions, limit, offset);
+    }
+
+    public boolean isOrdered() {
+        return ! this.orderConditions.isEmpty();
+    }
+
+    /**
+     * Set the order condition
+     * @param expr either a variable or a contraint
+     */
+    public void addOrderExpression(ASTConstants.OrderDirection direction, TermAst expr) {
+        this.orderConditions.add(new OrderConditionAst(direction, expr));
     }
 
     /**

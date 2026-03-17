@@ -1,6 +1,10 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -263,6 +267,147 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         assertEquals(20L, select.solutionModifier().offset());
 
     }
+
+    @Test
+    @DisplayName("Should parse ORDER BY ASC(VAR)")
+    void shouldParseAscOrder() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY ASC(?s)
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(VarAst.class,  select.solutionModifier().orderBy().getFirst().expression());
+
+    }
+
+    @Test
+    @DisplayName("Should parse ORDER BY VAR")
+    void shouldParseOrder() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY ?s
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(VarAst.class,  select.solutionModifier().orderBy().getFirst().expression());
+
+    }
+
+    @Test
+    @DisplayName("Should parse ORDER BY DESC(VAR)")
+    void shouldParseDescOrder() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY DESC(?s)
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.DESC, select.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(VarAst.class,  select.solutionModifier().orderBy().getFirst().expression());
+
+    }
+
+    @Test
+    @DisplayName("Should parse multiple ORDER BY clauses")
+    void shouldParseMultipleOrder() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s ?p ?o WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY DESC(?s) ?p DESC(?o)
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(3, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.DESC, select.solutionModifier().orderBy().get(0).orderDirection());
+        assertInstanceOf(VarAst.class,  select.solutionModifier().orderBy().get(0).expression());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().get(1).orderDirection());
+        assertInstanceOf(VarAst.class,  select.solutionModifier().orderBy().get(1).expression());
+        assertEquals(ASTConstants.OrderDirection.DESC, select.solutionModifier().orderBy().get(2).orderDirection());
+        assertInstanceOf(VarAst.class,  select.solutionModifier().orderBy().get(2).expression());
+    }
+
+    @Test
+    @DisplayName("Should parse ORDER BY with a function call")
+    void shouldParseDescConstraintOrder() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY DESC(STR(?s))
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.DESC, select.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(StrAst.class,  select.solutionModifier().orderBy().getFirst().expression());
+    }
+
+    @Test
+    @DisplayName("Should parse multiple ORDER BY clauses combining vars and function calls")
+    void shouldParseCombinedMultipleOrder() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s ?p ?o WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY DESC(?s) ?p IsIRI(?o)
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(3, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.DESC, select.solutionModifier().orderBy().get(0).orderDirection());
+        assertInstanceOf(VarAst.class,  select.solutionModifier().orderBy().get(0).expression());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().get(1).orderDirection());
+        assertInstanceOf(VarAst.class,  select.solutionModifier().orderBy().get(1).expression());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().get(2).orderDirection());
+        assertInstanceOf(IsIriAst.class,  select.solutionModifier().orderBy().get(2).expression());
+    }
+
+    @Test
+    @DisplayName("Should not parse ORDER BY with a constant")
+    void shouldNotParseOrderByConstant() {
+        SparqlParser parser = newParserDefault();
+
+        assertThrows(QuerySyntaxException.class, () -> {
+            parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY <http://ns.inria.fr/test>
+                """);
+        });
+    }
+
     @DisplayName("Should parse SELECT DISTINCT ?city ?cityLabel WHERE with BGP and UNION")
     public void shouldParseSelectDistinctWithUnionQueryTest() {
         SparqlParser parser = newParserDefault();
