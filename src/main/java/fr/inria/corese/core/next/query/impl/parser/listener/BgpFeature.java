@@ -8,12 +8,13 @@ import java.util.List;
 
 
 /**
- * SPARQL 1.0 feature: build Triple patterns + BGPs
- *
+ * SPARQL 1.0 feature: build Triple patterns + BGPs + OPTIONAL
+ 
  * Grammar hooks used:
  * - GroupGraphPattern: { ... }  -> builder.enterGroup()/exitGroup()
  * - TriplesBlock: BGP block      -> builder.enterBgp()/exitBgp()
  * - TriplesSameSubject: produce actual triples -> builder.addTriple(s,p,o)
+ * - OptionalGraphPattern: OPTIONAL { ... } -> builder.enterOptional()/exitOptional()
  */
 public class BgpFeature extends AbstractSparqlFeature {
 
@@ -33,6 +34,17 @@ public class BgpFeature extends AbstractSparqlFeature {
     @Override
     public void exitGroupGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.GroupGraphPatternContext ctx) {
         builder.exitGroup();
+    }
+
+    // -------- OPTIONAL { ... } --------
+    @Override
+    public void enterOptionalGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.OptionalGraphPatternContext ctx) {
+        builder.enterOptional();
+    }
+
+    @Override
+    public void exitOptionalGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.OptionalGraphPatternContext ctx) {
+        builder.exitOptional();
     }
 
     // -------- BGP (TriplesBlock) --------

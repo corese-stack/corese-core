@@ -1,6 +1,14 @@
 package fr.inria.corese.core.next.query.kgram.core;
 
-import fr.inria.corese.core.next.query.kgram.api.core.*;
+import fr.inria.corese.core.next.query.kgram.api.core.Edge;
+import fr.inria.corese.core.next.query.kgram.api.core.ExpPattern;
+import fr.inria.corese.core.next.query.kgram.api.core.ExpType;
+import fr.inria.corese.core.next.query.kgram.api.core.Expr;
+import fr.inria.corese.core.next.query.kgram.api.core.ExprType;
+import fr.inria.corese.core.next.query.kgram.api.core.Filter;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.PointerType;
+import fr.inria.corese.core.next.query.kgram.api.core.Regex;
 import fr.inria.corese.core.next.query.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
 
@@ -337,14 +345,6 @@ public class Exp extends PointerObject
         return this.type.getTitle();
     }
 
-    public void skip(boolean b) {
-        skip = b;
-    }
-
-    public boolean skip() {
-        return skip;
-    }
-
     public void status(boolean b) {
         status = b;
     }
@@ -491,14 +491,6 @@ public class Exp extends PointerObject
         }
     }
 
-    public Exp last() {
-        if (!args.isEmpty()) {
-            return args.getLast();
-        } else {
-            return null;
-        }
-    }
-
     @Override
     @SuppressWarnings("NullableProblems")
     public Iterator<Exp> iterator() {
@@ -599,10 +591,6 @@ public class Exp extends PointerObject
 
     public void setPath(Exp path) {
         this.path = path;
-    }
-
-    public void setPath(boolean b) {
-        isPath = b;
     }
 
     public boolean isValues() {
@@ -1009,13 +997,6 @@ public class Exp extends PointerObject
         return true;
     }
 
-    public boolean bind(Filter f) {
-        List<String> lVar = f.getVariables();
-        List<String> lVarExp = new ArrayList<>();
-        share(lVar, lVarExp);
-        return bound(lVar, lVarExp);
-    }
-
     /**
      * Return variable nodes of this exp use case: find the variables for select
      * PRAGMA: subquery : return only the nodes of the select return only
@@ -1230,10 +1211,6 @@ public class Exp extends PointerObject
         return getTheNodes(handler(true, bind).sample());
     }
 
-    public List<Node> getAllNodes() {
-        return getTheNodes(handler(false, true).setBlank(true).sample());
-    }
-
     public List<Node> getTheNodes(ExpHandler h) {
         getNodes(h);
         return h.getNodes();
@@ -1353,18 +1330,6 @@ public class Exp extends PointerObject
             }
         }
         return false;
-    }
-
-    /**
-     * this is FILTER with TEST ?x &lt; ?y
-     */
-    public int oper() {
-        return getFilter().getExp().oper();
-    }
-
-    public void cache(Node n) {
-        setCacheNode(n);
-        cache = new HashMap<>();
     }
 
     boolean hasCache() {

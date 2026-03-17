@@ -1,16 +1,18 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
-import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
-import fr.inria.corese.core.next.query.api.exception.QueryException;
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
+import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
 import fr.inria.corese.core.next.query.api.base.io.AbstractQueryParser;
+import fr.inria.corese.core.next.query.api.exception.QueryException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
 import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -103,7 +105,9 @@ public class SparqlParser extends AbstractQueryParser {
             SparqlListener listener = new SparqlListener(List.of(
                     new BgpFeature(builder),
                     new AskQueryFeature(builder),
-                    new SelectQueryFeature(builder)
+                    new SelectQueryFeature(builder),
+                    new SolutionModifierFeature(builder),
+                    new UnionFeature(builder)
             ));
 
             walker.walk(listener, tree);

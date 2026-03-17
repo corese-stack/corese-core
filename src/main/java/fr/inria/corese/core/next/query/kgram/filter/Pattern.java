@@ -92,10 +92,6 @@ public class Pattern implements ExprType, Expr {
 		return args.get(i);
 	}
 
-	public Expr getExp() {
-		return exp;
-	}
-
 	public List<Expr> getExpList() {
 		return args;
 	}
@@ -131,10 +127,6 @@ public class Pattern implements ExprType, Expr {
 
 	public int oper() {
 		return oper;
-	}
-
-	public void setExp(Expr e) {
-		exp = e;
 	}
 
 	public void setIndex(int index) {

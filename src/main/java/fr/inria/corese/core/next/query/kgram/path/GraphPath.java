@@ -35,9 +35,5 @@ public class GraphPath extends Thread {
             Node cstart = finder.get(mem, finder.getIndex());
             finder.process(cstart, mem);
 	}
-	
-	
-	public void run(){
-		process();
-	}
+
 }

@@ -29,6 +29,10 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
     @Override
     public void enterSelectQuery(SparqlParser.SelectQueryContext ctx) {
         builder.enterSelectQuery();
+
+        if (ctx.DISTINCT() != null) { builder.setDistinct(true); }
+        if (ctx.REDUCED() != null) { builder.setReduced(true); }
+
         extractProjection(ctx);
     }
 

@@ -129,10 +129,6 @@ public class Group implements Comparator<Mappings> {
         return table.values();
     }
 
-    public Map<Mapping, Mappings> getTable() {
-        return table;
-    }
-
     class TreeMapping extends TreeMap<Mapping, Mappings> {
 
         TreeMapping(List<Node> ln) {

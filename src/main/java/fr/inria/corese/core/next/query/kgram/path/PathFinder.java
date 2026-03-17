@@ -125,10 +125,6 @@ public class PathFinder {
         store = new HashMap<>();
     }
 
-    public static PathFinder create(Producer p, Matcher match, Evaluator eval, Query q) {
-        return new PathFinder(p, match, eval, q);
-    }
-
     public static PathFinder create(Eval eval, Producer p, Query q) {
         PathFinder pf = new PathFinder(p, eval.getMatcher(), eval.getEvaluator(), q);
         pf.setEval(eval);
@@ -311,11 +307,6 @@ public class PathFinder {
         GraphPath graphPath = new GraphPath(this, mem);
         // launch path computing (one by one) eg launch process() below
         graphPath.start();
-    }
-
-    public void run() {
-        Node cstart = get(memory, index);
-        process(cstart, memory);
     }
 
     public void stop() {

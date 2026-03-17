@@ -23,23 +23,6 @@ public class ApproximateSearchEnv {
         this.all = new HashMap<>();
     }
 
-    public void add(Expr var, Node uri, Node node, String alg, double sim) {
-        Key key = new Key(var, uri);
-
-        if (all.containsKey(key)) {
-            Map<Node, Value> value = all.get(key);
-            if (!value.containsKey(node)) {
-                Value r = new Value(node, alg, sim);
-                value.put(node, r);
-            }
-        } else {
-            Map<Node, Value> m = new HashMap<>();
-            Value r = new Value(node, alg, sim);
-            m.put(node, r);
-            all.put(key, m);
-        }
-    }
-
     public Double getSimilarity(Expr var, Node node) {
         Key key = new Key(var);
         Value r = this.get(key, node);
@@ -68,26 +51,6 @@ public class ApproximateSearchEnv {
             }
         }
         return sb.toString();
-    }
-
-    /**
-     * Aggregate and get value of similarity using all existing variables
-     * 
-     */
-    public Double aggregate(Environment env) {
-        List<Expr> lv = this.getVariables();
-        return aggregate(env, lv);
-    }
-
-    /**
-     * Aggreate with existing variables (excpet for the given variable)
-     */
-    public Double aggregate(Environment env, Expr var, double sim) {
-        List<Expr> lv = this.getVariables();
-        lv.remove(var);
-
-        double cb = (lv.isEmpty()) ? 1 : aggregate(env, lv);
-        return cb * sim;
     }
 
     private Double aggregate(Environment env, List<Expr> lv) {
@@ -139,10 +102,6 @@ public class ApproximateSearchEnv {
             return var;
         }
 
-        public Node getUri() {
-            return uri;
-        }
-
         @Override
         public int hashCode() {
             return 5;
@@ -182,20 +141,8 @@ public class ApproximateSearchEnv {
             this.algorithms = algorithms;
         }
 
-        public Node getNode() {
-            return node;
-        }
-
-        public String getAlgorithms() {
-            return algorithms;
-        }
-
         public double getSimilarity() {
             return similarity;
-        }
-
-        public void setSimilarity(double similarity) {
-            this.similarity = similarity;
         }
 
         @Override

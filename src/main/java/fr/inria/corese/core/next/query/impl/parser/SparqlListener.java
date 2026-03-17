@@ -61,4 +61,45 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitTriplesSameSubject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesSameSubjectContext ctx) {
         for (var d : delegates) d.exitTriplesSameSubject(ctx);
     }
+
+    // ---------- OPTIONAL ----------
+    @Override
+    public void enterOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
+        for (var d : delegates) d.enterOptionalGraphPattern(ctx);
+    }
+
+    @Override
+    public void exitOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
+        for (var d : delegates) d.exitOptionalGraphPattern(ctx);
+    }
+
+    // ---------- SOLUTION MODIFIER (LIMIT / OFFSET) ----------
+    @Override
+    public void exitLimitClause(SparqlParser.LimitClauseContext ctx) {
+        for (var d : delegates) d.exitLimitClause(ctx);
+    }
+
+    @Override
+    public void exitOffsetClause(SparqlParser.OffsetClauseContext ctx) {
+        for (var d : delegates) d.exitOffsetClause(ctx);
+    }
+    /**
+     * Forwards {@code enterGroupOrUnionGraphPattern} events to all registered delegates.
+     *
+     * @param ctx the ANTLR parse context for {@code groupOrUnionGraphPattern}
+     */
+    @Override
+    public void enterGroupOrUnionGraphPattern(SparqlParser.GroupOrUnionGraphPatternContext ctx) {
+        for (var d : delegates) d.enterGroupOrUnionGraphPattern(ctx);
+    }
+
+    /**
+     * Forwards {@code exitGroupOrUnionGraphPattern} events to all registered delegates.
+     *
+     * @param ctx the ANTLR parse context for {@code groupOrUnionGraphPattern}
+     */
+    @Override
+    public void exitGroupOrUnionGraphPattern(SparqlParser.GroupOrUnionGraphPatternContext ctx) {
+        for (var d : delegates) d.exitGroupOrUnionGraphPattern(ctx);
+    }
 }

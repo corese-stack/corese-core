@@ -7,7 +7,6 @@ import fr.inria.corese.core.next.query.kgram.api.core.TripleStore;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
 
 public class NodeImpl implements Node {
 
@@ -18,22 +17,6 @@ public class NodeImpl implements Node {
 
     public NodeImpl(Atom at) {
         atom = at;
-    }
-
-    public static NodeImpl createNode(Atom at) {
-        return new NodeImpl(at);
-    }
-
-    public static NodeImpl createVariable(String name) {
-        return new NodeImpl(Variable.create(name));
-    }
-
-    public static NodeImpl createResource(String name) {
-        return new NodeImpl(Constant.create(name));
-    }
-
-    public Atom getAtom() {
-        return atom;
     }
 
     @Override
