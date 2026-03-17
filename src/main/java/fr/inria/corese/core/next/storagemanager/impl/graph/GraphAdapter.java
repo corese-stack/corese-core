@@ -354,9 +354,13 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
         Node object = valueToNode(stmt.getObject());
 
         Resource ctxResource = stmt.getContext();
-        Node context = (ctxResource != null) ? resourceToNode(ctxResource) : null;
 
-        return graph.create(subject, predicate, object, context);
+        if (ctxResource == null) {
+            return graph.create(null, subject, predicate, object);
+        } else {
+            Node context = resourceToNode(ctxResource);
+            return graph.create(context, subject, predicate, object);
+        }
     }
 
     /**
