@@ -1,0 +1,138 @@
+package fr.inria.corese.core.next.query.impl.parser;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Integration tests for DESCRIBE query parsing via {@link SparqlParser}.
+ */
+class SparqlParserDescribeTest {
+
+    private SparqlParser parser;
+
+    @BeforeEach
+    void setUp() {
+        parser = new SparqlParser();
+    }
+
+
+
+    @Nested
+    @DisplayName("DESCRIBE ?s WHERE { ?s ?p ?o }")
+    class DescribeVariableWithWhere {
+
+        @Test
+        @DisplayName("Produces a DescribeQueryAst")
+        void producesDescribeQueryAst() {
+            QueryAst result = parser.parse("DESCRIBE ?s WHERE { ?s ?p ?o }");
+            assertInstanceOf(DescribeQueryAst.class, result);
+        }
+
+        @Test
+        @DisplayName("Described list contains one variable")
+        void describedListContainsOneVariable() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE ?s WHERE { ?s ?p ?o }");
+
+            assertEquals(1, result.described().size());
+            assertInstanceOf(VarAst.class, result.described().getFirst());
+        }
+
+        @Test
+        @DisplayName("Variable name is 's'")
+        void variableNameIsS() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE ?s WHERE { ?s ?p ?o }");
+
+            VarAst var = (VarAst) result.described().getFirst();
+            assertEquals("s", var.name());
+        }
+
+        @Test
+        @DisplayName("WHERE clause contains one BGP")
+        void whereClauseContainsOneBgp() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE ?s WHERE { ?s ?p ?o }");
+
+            assertEquals(1, result.whereClause().patterns().size());
+            assertInstanceOf(BgpAst.class, result.whereClause().patterns().getFirst());
+        }
+
+        @Test
+        @DisplayName("BGP contains one triple ?s ?p ?o")
+        void bgpContainsOneTriple() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE ?s WHERE { ?s ?p ?o }");
+
+            BgpAst bgp = (BgpAst) result.whereClause().patterns().getFirst();
+            assertEquals(1, bgp.triples().size());
+
+            TriplePatternAst triple = bgp.triples().getFirst();
+            assertEquals("s", ((VarAst) triple.subject()).name());
+            assertEquals("p", ((VarAst) triple.predicate()).name());
+            assertEquals("o", ((VarAst) triple.object()).name());
+        }
+    }
+
+    @Nested
+    @DisplayName("DESCRIBE * WHERE { ?s ?p ?o }")
+    class DescribeAll {
+
+        @Test
+        @DisplayName("isDescribeAll() is true")
+        void isDescribeAllIsTrue() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE * WHERE { ?s ?p ?o }");
+
+            assertTrue(result.isDescribeAll());
+        }
+
+        @Test
+        @DisplayName("described list is empty")
+        void describedListIsEmpty() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE * WHERE { ?s ?p ?o }");
+
+            assertTrue(result.described().isEmpty());
+        }
+
+        @Test
+        @DisplayName("WHERE clause contains a BGP")
+        void whereClauseContainsBgp() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE * WHERE { ?s ?p ?o }");
+
+            assertFalse(result.whereClause().patterns().isEmpty());
+            assertInstanceOf(BgpAst.class, result.whereClause().patterns().getFirst());
+        }
+    }
+
+    @Nested
+    @DisplayName("DESCRIBE ?s ?p WHERE { ?s ?p ?o }")
+    class DescribeMultipleVariables {
+
+        @Test
+        @DisplayName("Described list contains two variables")
+        void describedListContainsTwoVariables() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE ?s ?p WHERE { ?s ?p ?o }");
+
+            assertEquals(2, result.described().size());
+        }
+
+        @Test
+        @DisplayName("Variable names are 's' and 'p' in order")
+        void variableNamesAreInOrder() {
+            DescribeQueryAst result = (DescribeQueryAst) parser.parse(
+                    "DESCRIBE ?s ?p WHERE { ?s ?p ?o }");
+
+            assertEquals("s", ((VarAst) result.described().get(0)).name());
+            assertEquals("p", ((VarAst) result.described().get(1)).name());
+        }
+    }
+}
