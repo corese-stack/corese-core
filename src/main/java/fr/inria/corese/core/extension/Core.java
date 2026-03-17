@@ -8,12 +8,10 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.core.FunctionEvaluator;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.transform.Transformer;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
-import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,25 +89,6 @@ public class Core extends PluginImpl implements FunctionEvaluator {
 
     Graph getGraph(IDatatype dt) {
         return (Graph) dt.getPointerObject();
-    }
-
-    IDatatype xt_turtle(IDatatype x) {
-        if (x.isLiteral() && x.getDatatypeURI().equals(IDatatype.GRAPH_DATATYPE)) {
-            try {
-                Transformer t = Transformer.create(getGraph(x), TransformerUtils.TURTLE);
-                return t.process();
-            } catch (EngineException ex) {
-                logger.error("An unexpected error has occurred", ex);
-            }
-        } else {
-            Transformer t = Transformer.create(getGraph(), TransformerUtils.TURTLE);
-            try {
-                return t.process(x);
-            } catch (EngineException ex) {
-                logger.error("An unexpected error has occurred", ex);
-            }
-        }
-        return x;
     }
 
 
