@@ -220,7 +220,8 @@ public final class SparqlAstBuilder {
         }
         return switch (this.queryType) {
             case ASK -> new AskQueryAst(whereClause);
-            case CONSTRUCT, DESCRIBE -> new DescribeQueryAst(describeResources, whereClause);
+            case CONSTRUCT -> null;
+            case DESCRIBE -> new DescribeQueryAst(describeResources, whereClause);
             case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
