@@ -73,8 +73,9 @@ public final class SparqlAstBuilder {
      */
     private Long limit;
     private Long offset;
+
     /**
-     * Order expression
+     * Order conditions
      */
     private final List<OrderConditionAst> orderConditions = new ArrayList<>();
 
