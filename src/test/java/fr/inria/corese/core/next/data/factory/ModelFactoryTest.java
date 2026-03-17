@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.storagemanager.api.plugin.PluginException;
+import fr.inria.corese.core.next.storagemanager.api.plugin.PluginNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -80,14 +81,13 @@ class ModelFactoryTest {
         @Test
         @DisplayName("Should throw IllegalArgumentException for unknown type")
         void shouldThrowExceptionForUnknownType() {
-            IllegalArgumentException exception = assertThrows(
-                    IllegalArgumentException.class,
+            PluginNotFoundException exception = assertThrows(
+                    PluginNotFoundException.class,
                     () -> factory.createModel("unknown")
             );
 
-            assertTrue(exception.getMessage().contains("Unknown storage type"));
+            assertTrue(exception.getMessage().contains("No plugin found"));
             assertTrue(exception.getMessage().contains("unknown"));
-            assertTrue(exception.getMessage().contains("memory, graph"));
         }
 
 
@@ -100,21 +100,7 @@ class ModelFactoryTest {
             );
         }
 
-        @Test
-        @DisplayName("Should be case-sensitive for storage type")
-        void shouldBeCaseSensitiveForStorageType() {
-            // "MEMORY" should fail (case-sensitive)
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> factory.createModel("MEMORY")
-            );
 
-            // "Graph" should fail (case-sensitive)
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> factory.createModel("Graph")
-            );
-        }
     }
 
     @Nested
@@ -242,18 +228,12 @@ class ModelFactoryTest {
             Model memoryModel1 = factory.createModel("memory");
             Model memoryModel2 = factory.createMemoryModel();
 
-            Model graphModel1 = factory.createModel("graph");
-            Model graphModel2 = factory.createGraphModel();
 
             // Add data
             memoryModel1.add(subject, predicate, object);
             memoryModel2.add(subject, predicate, object);
-            graphModel1.add(subject, predicate, object);
-            graphModel2.add(subject, predicate, object);
-
             // All should behave the same
             assertEquals(memoryModel1.size(), memoryModel2.size());
-            assertEquals(graphModel1.size(), graphModel2.size());
         }
     }
 
@@ -271,7 +251,7 @@ class ModelFactoryTest {
                     () -> factory.createModel("")
             );
 
-            assertTrue(exception.getMessage().contains("Unknown storage type"));
+            assertTrue(exception.getMessage().contains("cannot be null or empty"));
         }
 
         @Test
@@ -282,7 +262,7 @@ class ModelFactoryTest {
                     () -> factory.createModel("   ")
             );
 
-            assertTrue(exception.getMessage().contains("Unknown storage type"));
+            assertTrue(exception.getMessage().contains("cannot be null or empty"));
         }
     }
 

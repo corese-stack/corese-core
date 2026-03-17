@@ -19,8 +19,12 @@ public class StoragePluginManager {
     /**
      * ServiceLoader for discovering plugins
      */
-    private static final ServiceLoader<StoragePlugin> serviceLoader =
-            ServiceLoader.load(StoragePlugin.class);
+    private static final List<ClassLoader> classLoaders = Collections.synchronizedList(new ArrayList<>());
+
+    static {
+        // Always include the system ClassLoader for internal plugins
+        classLoaders.add(StoragePluginManager.class.getClassLoader());
+    }
 
     /**
      * Cache of discovered plugins (thread-safe)
@@ -110,27 +114,62 @@ public class StoragePluginManager {
         if (cachedPlugins == null) {
             synchronized (StoragePluginManager.class) {
                 if (cachedPlugins == null) {
-                    List<StoragePlugin> plugins = new ArrayList<>();
+                    Map<String, StoragePlugin> uniquePlugins = new HashMap<>();
 
-                    // Reload ServiceLoader to discover new plugins
-                    serviceLoader.reload();
+                    // Search all registered ClassLoaders
+                    for (ClassLoader classLoader : classLoaders) {
+                        ServiceLoader<StoragePlugin> loader = ServiceLoader.load(
+                                StoragePlugin.class,
+                                classLoader
+                        );
 
-                    // Collect all plugins
-                    for (StoragePlugin plugin : serviceLoader) {
-                        plugins.add(plugin);
-                        pluginsByName.put(plugin.getName(), plugin);
+                        for (StoragePlugin plugin : loader) {
+                            // Keep only the first occurrence of each plugin name
+                            // (external plugins can override internal ones if loaded first)
+                            uniquePlugins.putIfAbsent(plugin.getName(), plugin);
+                        }
                     }
 
+                    // Update name cache
+                    pluginsByName.clear();
+                    pluginsByName.putAll(uniquePlugins);
+
                     // Sort by priority (highest first)
+                    List<StoragePlugin> plugins = new ArrayList<>(uniquePlugins.values());
                     plugins.sort(Comparator.comparingInt(StoragePlugin::getPriority).reversed());
 
                     // Make immutable
                     cachedPlugins = Collections.unmodifiableList(plugins);
+
+                    logger.debug("Discovered {} plugin(s): {}",
+                            cachedPlugins.size(),
+                            cachedPlugins.stream()
+                                    .map(p -> p.getName() + "(" + p.getPriority() + ")")
+                                    .collect(Collectors.joining(", ")));
                 }
             }
         }
 
         return cachedPlugins;
+    }
+
+    /**
+     * Registers a ClassLoader to search for plugins.
+     *
+     * @param classLoader the ClassLoader to register (must not be null)
+     * @throws IllegalArgumentException if classLoader is null
+     */
+    public static void registerClassLoader(ClassLoader classLoader) {
+        if (classLoader == null) {
+            throw new IllegalArgumentException("ClassLoader cannot be null");
+        }
+
+        synchronized (classLoaders) {
+            if (!classLoaders.contains(classLoader)) {
+                classLoaders.add(classLoader);
+                logger.debug("Registered ClassLoader: {}", classLoader.getClass().getSimpleName());
+            }
+        }
     }
 
     /**
@@ -151,19 +190,6 @@ public class StoragePluginManager {
         return Optional.ofNullable(pluginsByName.get(name));
     }
 
-    /**
-     * Returns the names of all available plugins.
-     *
-     * @return unmodifiable set of plugin names (never null, may be empty)
-     */
-    public static Set<String> getPluginNames() {
-        return getAvailablePlugins().stream()
-                .map(StoragePlugin::getName)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toSet(),
-                        Collections::unmodifiableSet
-                ));
-    }
 
     /**
      * Reloads all plugins from the classpath.
@@ -172,6 +198,7 @@ public class StoragePluginManager {
         synchronized (StoragePluginManager.class) {
             cachedPlugins = null;
             pluginsByName.clear();
+            logger.debug("Plugin cache cleared");
         }
     }
 }

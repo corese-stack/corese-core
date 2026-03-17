@@ -43,22 +43,43 @@ public record ModelFactory(ValueFactory valueFactory) {
     /**
      * Creates a new Model instance with the specified storage backend type.
      *
-     * <p>This method provides a convenient way to create models without manually
-     * configuring the StorageManager and StorageConfig. The storage backend is
-     * selected based on the provided type string.
-     *
-     * @param storageType the storage backend type ("memory" or "graph")
+     * @param storageType the storage backend type (case-insensitive)
      * @return a new Model instance backed by the specified storage type
-     * @throws PluginException if the memory storage fails to initialize
+     * @throws IllegalArgumentException if storageType is null or empty
+     * @throws PluginException if the storage backend fails to initialize
+     * @see #createModel(StorageConfig)
      */
     public Model createModel(String storageType) throws PluginException {
-        StorageConfig config = switch (storageType) {
-            case "memory" -> createMemoryConfig();
-            case "graph" -> createGraphConfig();
-            default -> throw new IllegalArgumentException(
-                    "Unknown storage type: '" + storageType + "'. " +
-                            "Supported types: [memory, graph]");
-        };
+        if (storageType == null || storageType.trim().isEmpty()) {
+            throw new IllegalArgumentException("Storage type cannot be null or empty");
+        }
+
+        // Create minimal config with just the type
+        // Let StoragePluginManager discover and select the appropriate plugin
+        StorageConfig config = StorageConfig.builder()
+                .property("type", storageType.trim())
+                .build();
+
+        return createModel(config);
+    }
+
+    /**
+     * Creates a new Model instance from a {@link StorageConfig}.
+     *
+     * <p>This is the most flexible method for creating models, allowing full control
+     * over storage configuration. The {@link StoragePluginManager} will select the
+     * appropriate plugin based on the config.</p>
+     *
+     * @param config the storage configuration (must not be null)
+     * @return a new Model instance backed by the configured storage
+     * @throws IllegalArgumentException if config is null
+     * @throws PluginException          if the storage backend fails to initialize
+     * @see #createModel(String)
+     */
+    public Model createModel(StorageConfig config) throws PluginException {
+        if (config == null) {
+            throw new IllegalArgumentException("StorageConfig cannot be null");
+        }
 
         return StorageModel.builder()
                 .storage(StoragePluginManager.create(config))
@@ -75,14 +96,10 @@ public record ModelFactory(ValueFactory valueFactory) {
      * @return a new Model instance backed by memory storage
      * @throws PluginException if the memory storage fails to initialize
      * @see #createGraphModel()
+     * @see #createModel(String)
      */
     public Model createMemoryModel() throws PluginException {
-        StorageConfig config = createMemoryConfig();
-
-        return StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(valueFactory)
-                .build();
+        return createModel(createMemoryConfig());
     }
 
     /**
@@ -96,14 +113,10 @@ public record ModelFactory(ValueFactory valueFactory) {
      * @throws PluginException if the graph storage fails to initialize
      * @see #createGraphModel(Graph)
      * @see #createMemoryModel()
+     * @see #createModel(String)
      */
     public Model createGraphModel() throws PluginException {
-        StorageConfig config = createGraphConfig();
-
-        return StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(valueFactory)
-                .build();
+        return createModel(createGraphConfig());
     }
 
     /**
@@ -116,7 +129,7 @@ public record ModelFactory(ValueFactory valueFactory) {
      * @param graph the Graph instance to wrap with the Model API
      * @return a new Model instance backed by the specified Graph
      * @throws NullPointerException if graph is null
-     * @throws PluginException      if the graph storage fails to initialize
+     * @throws PluginException if the graph storage fails to initialize
      * @see #createGraphModel()
      */
     public Model createGraphModel(Graph graph) throws PluginException {
@@ -130,23 +143,7 @@ public record ModelFactory(ValueFactory valueFactory) {
                 .property("valueFactory", valueFactory)
                 .build();
 
-        return StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(valueFactory)
-                .build();
-    }
-
-    /**
-     * Returns the ValueFactory used by this factory.
-     *
-     * <p>The ValueFactory is used to create RDF values (IRIs, Literals, BNodes)
-     * for all models created by this factory.
-     *
-     * @return the ValueFactory instance
-     */
-    @Override
-    public ValueFactory valueFactory() {
-        return valueFactory;
+        return createModel(config);
     }
 
     /**

@@ -4,7 +4,6 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.storagemanager.api.plugin.PluginException;
 import fr.inria.corese.core.sparql.api.IDatatype;
 
 import java.util.Arrays;
@@ -41,13 +40,12 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
         Resource ctxResource = stmt.getContext();
         Node context = (ctxResource != null) ? resourceToNode(ctxResource) : null;
 
-        // Use Graph.addTriple() or Graph.add() instead of create() + addEdge()
-        // This bypasses the Edge creation issue
+        // Use Graph.addEdge() directly to bypass Edge creation issues
         Edge edge;
         if (context == null) {
             edge = graph.addEdge(subject, predicate, object);
         } else {
-            edge = graph.addEdge(subject, predicate, object, context);
+            edge = graph.addEdge(context, subject, predicate, object);
         }
 
         return edge != null;
@@ -82,7 +80,7 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
      * @param s        subject filter, or null for any
      * @param p        predicate filter, or null for any
      * @param o        object filter, or null for any
-     * @param contexts context filters; empty or null means any context
+     * @param contexts context filters; null/empty = wildcard, {null} = default graph only
      * @return set of matching statements
      */
     public Set<Statement> find(Resource s, IRI p, Value o, Resource[] contexts) {
@@ -94,9 +92,8 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
         if (contexts == null || contexts.length == 0) {
             edges = graph.getEdgesRDF4J(subject, predicate, object);
         } else {
-            Node[] ctxNodes = Arrays.stream(contexts)
-                    .map(ctx -> ctx != null ? resourceToNode(ctx) : null)
-                    .toArray(Node[]::new);
+            // Normalize contexts: convert null to default graph node
+            Node[] ctxNodes = normalizeContexts(contexts);
             edges = graph.getEdgesRDF4J(subject, predicate, object, ctxNodes);
         }
 
@@ -213,6 +210,18 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
             }
         }
         return contexts;
+    }
+
+    /**
+     * Normalizes context array for Graph backend.
+     *
+     * @param contexts the context resources (may contain null)
+     * @return normalized array of Graph nodes (never contains null)
+     */
+    private Node[] normalizeContexts(Resource[] contexts) {
+        return Arrays.stream(contexts)
+                .map(ctx -> ctx != null ? resourceToNode(ctx) : graph.getDefaultGraphNode())
+                .toArray(Node[]::new);
     }
 
     /**
