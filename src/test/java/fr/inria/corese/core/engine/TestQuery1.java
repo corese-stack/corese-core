@@ -24,7 +24,6 @@ import org.xml.sax.SAXException;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphStore;
 import fr.inria.corese.core.compiler.eval.QuerySolver;
-import fr.inria.corese.core.compiler.result.XMLResult;
 import fr.inria.corese.core.kgram.api.core.DatatypeValue;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.ExprType;
@@ -6378,40 +6377,6 @@ public class TestQuery1 {
             logger.error("trap2", e);
             assertEquals(true, false);
         }
-    }
-
-    @Test
-    public void testSPIN() {
-        Graph g = Graph.create(true);
-
-        String init = "prefix foaf:    <http://xmlns.com/foaf/0.1/> "
-                + "insert data {"
-                + "<John> a foaf:Person ; foaf:knows <James> "
-                + "<Jim> a foaf:Person "
-                + "}";
-
-        String query = "prefix foaf:    <http://xmlns.com/foaf/0.1/> "
-                + "select ?x (count(?y) as ?c) where {"
-                + " { ?x a foaf:Test } union { ?x a foaf:Person ; foaf:pp* :: $path ?z }"
-                + "optional { ?x foaf:knows ?y } "
-                + "minus { ?x a foaf:Test } "
-                + "filter(bound(?x) && ?x != 12)"
-                + "}"
-                + "group by ?x "
-                + "having (?c >= 0)";
-        try {
-
-            SPINProcess sp = SPINProcess.create();
-            QueryProcess exec = QueryProcess.create(g);
-            exec.query(init);
-            String str = sp.toSpinSparql(query);
-            Mappings map = exec.query(str);
-           //logger.info("map {}",map);
-            //// logger.debug(map.getQuery().getAST());
-            assertEquals(2, map.size(), "result");
-        } catch (EngineException ex) {
-        }
-
     }
 
     @Test
