@@ -38,15 +38,12 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
         Node object = valueToNode(stmt.getObject());
 
         Resource ctxResource = stmt.getContext();
-        Node context = (ctxResource != null) ? resourceToNode(ctxResource) : null;
+        Node context = (ctxResource != null)
+                ? resourceToNode(ctxResource)
+                : graph.getDefaultGraphNode();
 
-        // Use Graph.addEdge() directly to bypass Edge creation issues
-        Edge edge;
-        if (context == null) {
-            edge = graph.addEdge(subject, predicate, object);
-        } else {
-            edge = graph.addEdge(context, subject, predicate, object);
-        }
+        // Always use 4-argument form with explicit context
+        Edge edge = graph.addEdge(context, subject, predicate, object);
 
         return edge != null;
     }
@@ -254,9 +251,10 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
         IRI predicate = nodeToIRI(predicateNode);
         Value object = nodeToValue(objectNode);
 
-        // Context (named graph)
         Node graphNode = edge.getGraph();
-        Resource context = (graphNode != null) ? nodeToResource(graphNode) : null;
+        Resource context = (graphNode == null || graph.isDefaultGraphNode(graphNode))
+                ? null
+                : nodeToResource(graphNode);
 
         if (context == null) {
             return valueFactory.createStatement(subject, predicate, object);
@@ -354,13 +352,11 @@ public record GraphAdapter(Graph graph, ValueFactory valueFactory) {
         Node object = valueToNode(stmt.getObject());
 
         Resource ctxResource = stmt.getContext();
+        Node context = (ctxResource != null)
+                ? resourceToNode(ctxResource)
+                : graph.getDefaultGraphNode();
 
-        if (ctxResource == null) {
-            return graph.create(null, subject, predicate, object);
-        } else {
-            Node context = resourceToNode(ctxResource);
-            return graph.create(context, subject, predicate, object);
-        }
+        return graph.create(context, subject, predicate, object);
     }
 
     /**
