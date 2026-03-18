@@ -443,10 +443,10 @@ public final class SparqlAstBuilder {
                     case ASTConstants.OPERATOR.NOT -> {
                         return new BooleanNotAst(args.getFirst());
                     }
-                    case ASTConstants.OPERATOR.ADD -> {
+                    case ASTConstants.OPERATOR.PLUS -> {
                         return new UnaryPlusAst(args.getFirst());
                     }
-                    case ASTConstants.OPERATOR.SUB -> {
+                    case ASTConstants.OPERATOR.MINUS -> {
                         return new UnaryMinusAst(args.getFirst());
                     }
                     case ASTConstants.FUNCTION_CALL.BOUND -> {

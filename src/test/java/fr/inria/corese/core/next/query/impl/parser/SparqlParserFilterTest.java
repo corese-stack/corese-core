@@ -892,4 +892,42 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals("s", ((VarAst) t.arguments().getFirst()).name());
         assertEquals("\"test\"", ((LiteralAst) t.arguments().getLast()).lexical());
     }
+
+    @Test
+    void shouldParseAddsUnaryMinusEqualsFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(?s + - 2 = "test")
+                }
+                """);
+
+        assertNotNull(ast);
+        assertNotNull(ast.whereClause());
+
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
+
+        PatternAst p2 = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+
+        FilterAst filterAst = (FilterAst) p2;
+        assertInstanceOf(EqualsAst.class, filterAst.operator(), "Filter content should be an Equals operator");
+
+        EqualsAst t = (EqualsAst) filterAst.operator();
+
+        assertInstanceOf(AddAst.class, t.getLeftArgument(), "Equals left argument should be a addition operator");
+        assertInstanceOf(LiteralAst.class, t.getRightArgument(), "Equals right argument should be a literal");
+
+        AddAst addAst = (AddAst) t.getLeftArgument();
+
+        assertInstanceOf(VarAst.class, addAst.getLeftArgument());
+        assertEquals("s", ((VarAst) addAst.getLeftArgument()).name());
+        assertInstanceOf(UnaryMinusAst.class, addAst.getRightArgument());
+        UnaryMinusAst rightUnaryMinusAst = (UnaryMinusAst) addAst.getRightArgument();
+        assertInstanceOf(LiteralAst.class, rightUnaryMinusAst.getArgument());
+        assertEquals("2", ((LiteralAst) rightUnaryMinusAst.getArgument()).lexical());
+    }
 }
