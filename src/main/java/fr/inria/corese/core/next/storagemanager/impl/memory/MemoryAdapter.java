@@ -179,22 +179,6 @@ public class MemoryAdapter {
      */
     private boolean matchesContext(Resource stmtContext, Resource[] contexts) {
         return Arrays.stream(contexts)
-                .anyMatch(ctx -> {
-                    if (ctx == null && stmtContext == null) {
-                        return true;
-                    }
-                    if (ctx == null || stmtContext == null) {
-                        return false;
-                    }
-
-                    String ctxValue = ctx.stringValue();
-                    String stmtCtxValue = stmtContext.stringValue();
-
-                    if (ctxValue != null && stmtCtxValue != null) {
-                        return ctxValue.equals(stmtCtxValue);
-                    }
-
-                    return ctx.equals(stmtContext);
-                });
+                .anyMatch(ctx -> Objects.equals(ctx, stmtContext));
     }
 }

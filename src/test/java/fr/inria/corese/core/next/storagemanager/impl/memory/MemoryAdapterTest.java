@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.storagemanager.impl.memory;
 
 import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
@@ -14,10 +15,12 @@ import static org.mockito.Mockito.*;
 class MemoryAdapterTest {
 
     private MemoryAdapter adapter;
+    private ValueFactory valueFactory;
     
     @BeforeEach
     void setUp() {
         adapter = new MemoryAdapter();
+        valueFactory = new CoreseAdaptedValueFactory();
     }
 
     @Nested
@@ -183,34 +186,40 @@ class MemoryAdapterTest {
         @Test
         @DisplayName("Should find statements by context")
         void shouldFindStatementsByContext() {
-            Resource subject = mock(Resource.class);
-            IRI predicate = mock(IRI.class);
-            Value object = mock(Value.class);
-            Resource context1 = mock(Resource.class);
-            Resource context2 = mock(Resource.class);
+            Resource subject = valueFactory.createIRI("http://example.org/s");
+            IRI predicate = valueFactory.createIRI("http://example.org/p");
+            Value object = valueFactory.createLiteral("value");
+            Resource context1 = valueFactory.createIRI("http://example.org/graph1");
+            Resource equivalentContext1 = valueFactory.createIRI("http://example.org/graph1");
+            Resource context2 = valueFactory.createIRI("http://example.org/graph2");
 
-            when(context1.stringValue()).thenReturn("http://example.org/graph1");
-            when(context2.stringValue()).thenReturn("http://example.org/graph2");
+            Statement stmt1 = valueFactory.createStatement(subject, predicate, object, context1);
+            Statement stmt2 = valueFactory.createStatement(subject, predicate, object, context2);
 
-            Statement stmt1 = mock(Statement.class);
-            when(stmt1.getSubject()).thenReturn(subject);
-            when(stmt1.getPredicate()).thenReturn(predicate);
-            when(stmt1.getObject()).thenReturn(object);
-            when(stmt1.getContext()).thenReturn(context1);
-            
-            Statement stmt2 = mock(Statement.class);
-            when(stmt2.getSubject()).thenReturn(subject);
-            when(stmt2.getPredicate()).thenReturn(predicate);
-            when(stmt2.getObject()).thenReturn(object);
-            when(stmt2.getContext()).thenReturn(context2);
-            
             adapter.add(stmt1);
             adapter.add(stmt2);
-            
-            Set<Statement> results = adapter.find(null, null, null, new Resource[]{context1});
-            
+
+            Set<Statement> results = adapter.find(null, null, null, new Resource[]{equivalentContext1});
+
             assertEquals(1, results.size());
             assertTrue(results.contains(stmt1));
+        }
+
+        @Test
+        @DisplayName("Should not match IRI and blank node contexts sharing the same string value")
+        void shouldNotMatchIriAndBlankNodeContextsWithSameStringValue() {
+            Resource subject = valueFactory.createIRI("http://example.org/s");
+            IRI predicate = valueFactory.createIRI("http://example.org/p");
+            Value object = valueFactory.createLiteral("value");
+            BNode blankNodeContext = valueFactory.createBNode("http://example.org/g");
+            IRI iriContext = valueFactory.createIRI("http://example.org/g");
+
+            Statement stmt = valueFactory.createStatement(subject, predicate, object, blankNodeContext);
+            adapter.add(stmt);
+
+            Set<Statement> results = adapter.find(null, null, null, new Resource[]{iriContext});
+
+            assertTrue(results.isEmpty());
         }
         
         @Test
