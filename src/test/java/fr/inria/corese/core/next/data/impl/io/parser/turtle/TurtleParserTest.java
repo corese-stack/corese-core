@@ -4,14 +4,19 @@ import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Statement;
 import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+
 
 import java.io.StringReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,12 +27,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * and interact with the Model and ValueFactory, including error handling
  * and unescaping of IRIs and literals, and named graphs.
  */
-public class TurtleParserTest extends ParserTestBase {
+public class TurtleParserTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TurtleParserTest.class);
 
     private ValueFactory factory = new CoreseAdaptedValueFactory();
+    /**
+     * Helper method to create a test model.
+     */
+    private Model createTestModel() {
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
 
+        return StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(factory)
+                .build();
+    }
     @Test
     public void testParseWithPrefixAndTriple() {
         String turtle = " @prefix ex: <http://example.org/> . " +

@@ -330,7 +330,7 @@ class RDFC10SerializerTest {
     private String serializeToRdfCanonical(String resourcePath) {
         ValueFactory valueFactory = new CoreseAdaptedValueFactory();
         StorageConfig config = StorageConfig.builder()
-                .property("type", "graph")
+                .property("type", "memory")
                 .build();
 
         Model model = StorageModel.builder()

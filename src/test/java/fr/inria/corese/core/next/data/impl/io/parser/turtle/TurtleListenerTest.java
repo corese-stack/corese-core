@@ -45,7 +45,7 @@ class TurtleListenerTest {
         ParseTree tree = parser.turtleDoc();
 
         StorageConfig config = StorageConfig.builder()
-                .property("type", "graph")
+                .property("type", "memory")
                 .build();
 
         Model model = StorageModel.builder()

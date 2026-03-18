@@ -304,7 +304,7 @@ class TurtleSerializerTest {
         defaultConfig = TurtleSerializerOptions.defaultConfig();
 
         StorageConfig config = StorageConfig.builder()
-                .property("type", "graph")
+                .property("type", "memory")
                 .build();
 
         Model model = StorageModel.builder()
@@ -551,7 +551,7 @@ class TurtleSerializerTest {
         );
 
         StorageConfig config = StorageConfig.builder()
-                .property("type", "graph")
+                .property("type", "memory")
                 .build();
 
         Model coreseModel = StorageModel.builder()

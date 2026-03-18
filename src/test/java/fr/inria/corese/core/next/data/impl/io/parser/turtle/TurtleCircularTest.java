@@ -1,21 +1,28 @@
 package fr.inria.corese.core.next.data.impl.io.parser.turtle;
 
-import fr.inria.corese.core.next.data.api.*;
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+
+import fr.inria.corese.core.next.data.impl.StorageModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import fr.inria.corese.core.next.data.api.BNode;
+import fr.inria.corese.core.next.data.api.IRI;
+import fr.inria.corese.core.next.data.api.Literal;
+import fr.inria.corese.core.next.data.api.Model;
+import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializerOptions;
-import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * are compatible and preserve data integrity across format transformations.
  */
 @DisplayName("Turtle Circular Integration Tests")
-class TurtleCircularTest extends ParserTestBase {
+class TurtleCircularTest {
 
     private ValueFactory valueFactory;
     private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
@@ -56,7 +63,19 @@ class TurtleCircularTest extends ParserTestBase {
         parserFactory = new ParserFactory();
         defaultConfig = TurtleSerializerOptions.defaultConfig();
     }
+    /**
+     * Helper method to create a test model.
+     */
+    private Model createTestModel() {
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
 
+        return StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
+    }
     /**
      * Creates a simple model with basic triples containing IRIs and string
      * literals.

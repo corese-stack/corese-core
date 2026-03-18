@@ -36,7 +36,7 @@ public class RDFXMLStatementEmitterTest {
     public void setUp() {
         factory = new CoreseAdaptedValueFactory();
         StorageConfig config = StorageConfig.builder()
-                .property("type", "graph")
+                .property("type", "memory")
                 .build();
 
         model = StorageModel.builder()
