@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -354,5 +355,217 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         assertEquals(2, projection.variables().size());
         assertEquals("city", projection.variables().get(0).name());
         assertEquals("cityLabel", projection.variables().get(1).name());
+    }
+
+    @Test
+    @DisplayName("Insertion of a comment before the query should not change the treatment of the query")
+    public void shouldIgnoreCommentBeforeQuery() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                # This is a test comment
+                SELECT DISTINCT ?c ?p
+                WHERE {
+                    ?s a ?c ;
+                        ?p ?o .
+                } LIMIT 10
+                """;
+        assertDoesNotThrow(() -> {
+                    parser.parse(commentedQuery);
+                });
+        // Test if the query is still exactly as expected
+        QueryAst ast = parser.parse(commentedQuery);
+        assertNotNull(ast);
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst selectQueryAst = (SelectQueryAst) ast;
+        assertNotNull(selectQueryAst.projection());
+        assertInstanceOf(ProjectionAst.class, selectQueryAst.projection());
+        assertEquals(2, selectQueryAst.projection().variables().size());
+        assertInstanceOf(VarAst.class, selectQueryAst.projection().variables().getFirst());
+        assertEquals("c", selectQueryAst.projection().variables().getFirst().name());
+        assertInstanceOf(VarAst.class, selectQueryAst.projection().variables().getLast());
+        assertEquals("p", selectQueryAst.projection().variables().getLast().name());
+        assertNotNull(selectQueryAst.whereClause());
+        assertEquals(1, selectQueryAst.whereClause().patterns().size());
+        assertNotNull(selectQueryAst.whereClause().patterns().getFirst());
+        assertInstanceOf(BgpAst.class, selectQueryAst.whereClause().patterns().getFirst());
+        BgpAst bgpAst = (BgpAst) selectQueryAst.whereClause().patterns().getFirst();
+        assertEquals(2, bgpAst.triples().size());
+        assertNotNull(bgpAst.triples().getFirst());
+        assertNotNull(bgpAst.triples().getFirst().subject());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().subject());
+        assertEquals("s", ((VarAst)bgpAst.triples().getFirst().subject()).name());
+        assertInstanceOf(IriAst.class, bgpAst.triples().getFirst().predicate());
+        assertEquals("a", ((IriAst)bgpAst.triples().getFirst().predicate()).raw());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().object());
+        assertEquals("c", ((VarAst)bgpAst.triples().getFirst().object()).name());
+        assertNotNull(bgpAst.triples().getLast());
+        assertNotNull(bgpAst.triples().getLast().subject());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().subject());
+        assertEquals("s", ((VarAst)bgpAst.triples().getLast().subject()).name());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().predicate());
+        assertEquals("p", ((VarAst)bgpAst.triples().getLast().predicate()).name());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
+        assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
+        assertNotNull(selectQueryAst.solutionModifier());
+        assertEquals(10, selectQueryAst.solutionModifier().limit());
+    }
+
+    @Test
+    @DisplayName("Insertion of a comment after the query should not change the treatment of the query")
+    public void shouldIgnoreCommentAfterQuery() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                SELECT DISTINCT ?c ?p
+                WHERE {
+                    ?s a ?c ;
+                        ?p ?o .
+                } LIMIT 10
+               # This is a test comment
+               """;
+        assertDoesNotThrow(() -> {
+            parser.parse(commentedQuery);
+        });
+        // Test if the query is still exactly as expected
+        QueryAst ast = parser.parse(commentedQuery);
+        assertNotNull(ast);
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst selectQueryAst = (SelectQueryAst) ast;
+        assertNotNull(selectQueryAst.projection());
+        assertInstanceOf(ProjectionAst.class, selectQueryAst.projection());
+        assertEquals(2, selectQueryAst.projection().variables().size());
+        assertInstanceOf(VarAst.class, selectQueryAst.projection().variables().getFirst());
+        assertEquals("c", selectQueryAst.projection().variables().getFirst().name());
+        assertInstanceOf(VarAst.class, selectQueryAst.projection().variables().getLast());
+        assertEquals("p", selectQueryAst.projection().variables().getLast().name());
+        assertNotNull(selectQueryAst.whereClause());
+        assertEquals(1, selectQueryAst.whereClause().patterns().size());
+        assertNotNull(selectQueryAst.whereClause().patterns().getFirst());
+        assertInstanceOf(BgpAst.class, selectQueryAst.whereClause().patterns().getFirst());
+        BgpAst bgpAst = (BgpAst) selectQueryAst.whereClause().patterns().getFirst();
+        assertEquals(2, bgpAst.triples().size());
+        assertNotNull(bgpAst.triples().getFirst());
+        assertNotNull(bgpAst.triples().getFirst().subject());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().subject());
+        assertEquals("s", ((VarAst)bgpAst.triples().getFirst().subject()).name());
+        assertInstanceOf(IriAst.class, bgpAst.triples().getFirst().predicate());
+        assertEquals("a", ((IriAst)bgpAst.triples().getFirst().predicate()).raw());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().object());
+        assertEquals("c", ((VarAst)bgpAst.triples().getFirst().object()).name());
+        assertNotNull(bgpAst.triples().getLast());
+        assertNotNull(bgpAst.triples().getLast().subject());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().subject());
+        assertEquals("s", ((VarAst)bgpAst.triples().getLast().subject()).name());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().predicate());
+        assertEquals("p", ((VarAst)bgpAst.triples().getLast().predicate()).name());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
+        assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
+        assertNotNull(selectQueryAst.solutionModifier());
+        assertEquals(10, selectQueryAst.solutionModifier().limit());
+    }
+
+    @Test
+    @DisplayName("Insertion of a comment in the middle of the query should not change the treatment of the query")
+    public void shouldIgnoreCommentInTheMiddleOfQuery() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                SELECT DISTINCT ?c ?p
+                WHERE {
+                    ?s a ?c ;
+               # This is a test comment
+                        ?p ?o .
+                } LIMIT 10
+               """;
+        assertDoesNotThrow(() -> {
+            parser.parse(commentedQuery);
+        });
+        // Test if the query is still exactly as expected
+        QueryAst ast = parser.parse(commentedQuery);
+        assertNotNull(ast);
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst selectQueryAst = (SelectQueryAst) ast;
+        assertNotNull(selectQueryAst.projection());
+        assertInstanceOf(ProjectionAst.class, selectQueryAst.projection());
+        assertEquals(2, selectQueryAst.projection().variables().size());
+        assertInstanceOf(VarAst.class, selectQueryAst.projection().variables().getFirst());
+        assertEquals("c", selectQueryAst.projection().variables().getFirst().name());
+        assertInstanceOf(VarAst.class, selectQueryAst.projection().variables().getLast());
+        assertEquals("p", selectQueryAst.projection().variables().getLast().name());
+        assertNotNull(selectQueryAst.whereClause());
+        assertEquals(1, selectQueryAst.whereClause().patterns().size());
+        assertNotNull(selectQueryAst.whereClause().patterns().getFirst());
+        assertInstanceOf(BgpAst.class, selectQueryAst.whereClause().patterns().getFirst());
+        BgpAst bgpAst = (BgpAst) selectQueryAst.whereClause().patterns().getFirst();
+        assertEquals(2, bgpAst.triples().size());
+        assertNotNull(bgpAst.triples().getFirst());
+        assertNotNull(bgpAst.triples().getFirst().subject());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().subject());
+        assertEquals("s", ((VarAst)bgpAst.triples().getFirst().subject()).name());
+        assertInstanceOf(IriAst.class, bgpAst.triples().getFirst().predicate());
+        assertEquals("a", ((IriAst)bgpAst.triples().getFirst().predicate()).raw());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().object());
+        assertEquals("c", ((VarAst)bgpAst.triples().getFirst().object()).name());
+        assertNotNull(bgpAst.triples().getLast());
+        assertNotNull(bgpAst.triples().getLast().subject());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().subject());
+        assertEquals("s", ((VarAst)bgpAst.triples().getLast().subject()).name());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().predicate());
+        assertEquals("p", ((VarAst)bgpAst.triples().getLast().predicate()).name());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
+        assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
+        assertNotNull(selectQueryAst.solutionModifier());
+        assertEquals(10, selectQueryAst.solutionModifier().limit());
+    }
+
+    @Test
+    @DisplayName("Insertion of a comment in the middle of the query should not change the treatment of the query, even with a query containing #")
+    public void shouldIgnoreCommentInTheMiddleOfQueryWithIRI() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                SELECT DISTINCT ?c ?o
+                WHERE {
+                    ?s a ?c ;
+               # This is a test comment
+                        <http://ns.inria.fr/test#property> ?o .
+                } LIMIT 10
+               """;
+        assertDoesNotThrow(() -> {
+            parser.parse(commentedQuery);
+        });
+        // Test if the query is still exactly as expected
+        QueryAst ast = parser.parse(commentedQuery);
+        assertNotNull(ast);
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst selectQueryAst = (SelectQueryAst) ast;
+        assertNotNull(selectQueryAst.projection());
+        assertInstanceOf(ProjectionAst.class, selectQueryAst.projection());
+        assertEquals(2, selectQueryAst.projection().variables().size());
+        assertInstanceOf(VarAst.class, selectQueryAst.projection().variables().getFirst());
+        assertEquals("c", selectQueryAst.projection().variables().getFirst().name());
+        assertInstanceOf(VarAst.class, selectQueryAst.projection().variables().getLast());
+        assertEquals("o", selectQueryAst.projection().variables().getLast().name());
+        assertNotNull(selectQueryAst.whereClause());
+        assertEquals(1, selectQueryAst.whereClause().patterns().size());
+        assertNotNull(selectQueryAst.whereClause().patterns().getFirst());
+        assertInstanceOf(BgpAst.class, selectQueryAst.whereClause().patterns().getFirst());
+        BgpAst bgpAst = (BgpAst) selectQueryAst.whereClause().patterns().getFirst();
+        assertEquals(2, bgpAst.triples().size());
+        assertNotNull(bgpAst.triples().getFirst());
+        assertNotNull(bgpAst.triples().getFirst().subject());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().subject());
+        assertEquals("s", ((VarAst)bgpAst.triples().getFirst().subject()).name());
+        assertInstanceOf(IriAst.class, bgpAst.triples().getFirst().predicate());
+        assertEquals("a", ((IriAst)bgpAst.triples().getFirst().predicate()).raw());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().object());
+        assertEquals("c", ((VarAst)bgpAst.triples().getFirst().object()).name());
+        assertNotNull(bgpAst.triples().getLast());
+        assertNotNull(bgpAst.triples().getLast().subject());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().subject());
+        assertEquals("s", ((VarAst)bgpAst.triples().getLast().subject()).name());
+        assertInstanceOf(IriAst.class, bgpAst.triples().getLast().predicate());
+        assertEquals("<http://ns.inria.fr/test#property>", ((IriAst)bgpAst.triples().getLast().predicate()).raw());
+        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
+        assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
+        assertNotNull(selectQueryAst.solutionModifier());
+        assertEquals(10, selectQueryAst.solutionModifier().limit());
     }
 }
