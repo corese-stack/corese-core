@@ -1,8 +1,6 @@
 package fr.inria.corese.core.visitor.solver;
 
 import fr.inria.corese.core.compiler.eval.QuerySolverVisitorBasic;
-import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.workflow.Data;
 import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -22,28 +20,11 @@ public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
     
     private static String visitorName;
     
-    private Transformer transformer;
-
     public QuerySolverVisitorTransformer() {}
     
     public QuerySolverVisitorTransformer(Eval e) {
         super(e);
     }
-   
-    public QuerySolverVisitorTransformer(Transformer t, Eval e) {
-        super(e);
-        setTransformer(t);
-    }
-   
-
-    public IDatatype beforeTransformer(String uri) {
-        return callback(BEFORE_TRANSFORMER, toArray(getTransformer(), uri));
-    }
-
-    public IDatatype afterTransformer(String uri, String res) {
-        return callback(AFTER_TRANSFORMER, toArray(getTransformer(), uri, res));
-    }
-    
     
     
     public IDatatype beforeWorkflow(Context ctx, Data data) {
@@ -85,51 +66,6 @@ public class QuerySolverVisitorTransformer extends QuerySolverVisitorBasic {
 
         return null;
     }
-    
-    
-    public static QuerySolverVisitorTransformer create(Transformer t, Eval eval) {
-        if (getVisitorName() == null) {
-            return new QuerySolverVisitorTransformer(t, eval);
-        }
-        QuerySolverVisitorTransformer vis = create(t, eval, getVisitorName());
-        if (vis == null) {
-            return new QuerySolverVisitorTransformer(t, eval);
-        }
-        return vis;
-    }
-
-    static QuerySolverVisitorTransformer create(Transformer t, Eval eval, String name) {
-        try {
-            Class visClass = Class.forName(name);
-            Object obj = visClass.getDeclaredConstructor(Transformer.class, Eval.class).newInstance(t, eval);
-            if (obj instanceof QuerySolverVisitorTransformer) {
-                return (QuerySolverVisitorTransformer) obj;
-            } else {
-                logger.error("Uncorrect Visitor: " + name);
-            }
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
-                | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            logger.error("An unexpected error has occurred", ex);
-            logger.error("Undefined Visitor: " + name);
-        }
-
-        return null;
-    }
-    
-     /**
-     * @return the transformer
-     */
-    public Transformer getTransformer() {
-        return transformer;
-    }
-
-    /**
-     * @param transformer the transformer to set
-     */
-    public void setTransformer(Transformer transformer) {
-        this.transformer = transformer;
-    }
-    
 
     /**
      * @return the visitorName

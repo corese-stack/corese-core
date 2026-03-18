@@ -1,11 +1,8 @@
 package fr.inria.corese.core.print;
 
-import fr.inria.corese.core.transform.Transformer;
-
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.compiler.parser.Pragma;
-import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.Graph;
@@ -21,7 +18,6 @@ public class TemplateFormat {
     Query query;
     Graph graph;
     private NSManager nsm;
-    Transformer pp;
     boolean isTurtle = false;
     private boolean isCheck = false;
     private String start;
@@ -59,38 +55,6 @@ public class TemplateFormat {
 
     public void setNSM(NSManager n) {
         nsm = n;
-    }
-
-    @Override
-    public String toString() {
-        if (query != null && query.isTemplate()) {
-            Node node = map.getTemplateResult();
-            if (node != null) {
-                return node.getLabel();
-            }
-            return "";
-        }
-        if (graph == null) {
-            return "";
-        }
-        Transformer p = createPP();
-        return p.toString();
-    }
-
-    Transformer createPP() {
-        pp = Transformer.create(graph, printer);
-        if (isCheck) {
-            pp.check();
-        }
-        pp.setTurtle(isTurtle);
-
-        if (nsm != null) {
-            pp.setNSM(nsm);
-        }
-        if (start != null) {
-            pp.setStart(start);
-        }
-        return pp;
     }
 
 }

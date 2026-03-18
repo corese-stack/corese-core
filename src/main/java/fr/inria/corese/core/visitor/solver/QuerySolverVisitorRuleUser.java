@@ -1,8 +1,6 @@
 package fr.inria.corese.core.visitor.solver;
 
-import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.core.Eval;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
@@ -24,11 +22,6 @@ public class QuerySolverVisitorRuleUser extends QuerySolverVisitorRule {
     
     void setup() {
         mapInference = new HashMap<>();
-    }
-    
-    public QuerySolverVisitorRuleUser(RuleEngine t, Eval e) { 
-        super(t, e); 
-        setup();
     }
     
     @Override

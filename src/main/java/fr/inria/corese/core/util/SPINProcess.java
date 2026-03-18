@@ -10,11 +10,9 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.transform.Transformer;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
-import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -46,19 +44,6 @@ public class SPINProcess {
     @Deprecated
     SPINProcess() {
         exec = QueryProcess.create(Graph.create());
-    }
-
-    /**
-     * PPrint SPARQL query into SPIN Turtle using Visitor, parse SPIN Turtle
-     * into RDF Graph, PPrint RDF graph using templates back into SPARQL
-     */
-    @Deprecated
-    public String toSpinSparql(String sparql) throws EngineException {
-        Query qq = exec.compile(sparql);
-        if (isSPARQLCompliant && !qq.isCorrect()) {
-            return sparql;
-        }
-        return toSpinSparql(exec.getAST(qq));
     }
 
     @Deprecated
@@ -94,14 +79,6 @@ public class SPINProcess {
     }
 
     @Deprecated
-    String toSpinSparql(ASTQuery ast) throws EngineException {
-        SPIN sp = SPIN.create();
-        sp.visit(ast);
-        String spin = sp.toString();
-        return toSparql(spin, ast.getNSM());
-    }
-
-    @Deprecated
     public Graph toGraph(String spin) {
         graph = Graph.create();
         return toGraph(spin, graph);
@@ -116,26 +93,6 @@ public class SPINProcess {
             LoggerFactory.getLogger(SPINProcess.class.getName()).error("", ex);
         }
         return g;
-    }
-
-    @Deprecated
-    public String toSparql(String spin, NSManager nsm) throws EngineException {
-        Graph g = toGraph(spin);
-        return toSparql(g, nsm);
-    }
-
-    @Deprecated
-    public String toSparql(Graph g, NSManager nsm) throws EngineException {
-        Transformer p = Transformer.create(g, TransformerUtils.SPIN);
-        if (nsm != null) {
-            p.setNSM(nsm);
-        }
-        String s = p.toString();
-
-        if (s.length() == 0) {
-            throw new EngineException("Uncorrect SPIN Query");
-        }
-        return s;
     }
 
     /**

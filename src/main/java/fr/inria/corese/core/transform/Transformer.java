@@ -154,12 +154,13 @@ public class Transformer implements TransformProcessor {
         tcount = new HashMap<>();
         loaded = new HashMap<>();
         imported = new HashMap<>();
-
+/*
         try {
             setEventVisitor(QuerySolverVisitorTransformer.create(this, qp.getCreateEval()));
         } catch (EngineException ex) {
             logger.error(ex.getMessage());
         }
+*/
         init(level); // This calls the other init(Level) method
     }
 
@@ -498,15 +499,15 @@ public class Transformer implements TransformProcessor {
     void beforeTransformer(boolean astart) {
         if (astart) {
             setStarting(false);
-            if (isEvent())
-                getEventVisitor().beforeTransformer(getTransformation());
+//            if (isEvent())
+//                getEventVisitor().beforeTransformer(getTransformation());
         }
     }
 
     void afterTransformer(boolean astart, IDatatype dt) {
         if (astart) {
-            if (isEvent())
-                getEventVisitor().afterTransformer(getTransformation(), dt.getLabel());
+//            if (isEvent())
+//                getEventVisitor().afterTransformer(getTransformation(), dt.getLabel());
             setStarting(true);
         }
     }

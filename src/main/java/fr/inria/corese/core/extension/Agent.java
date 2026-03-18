@@ -63,43 +63,6 @@ public class Agent {
         return singleton;
     }
 
-    public static IDatatype getDatatypeValue() {
-        return dt;
-    }
-
-    public IDatatype setURI(IDatatype dt) {
-        uri = dt;
-        return dt;
-    }
-
-    public IDatatype getURI() {
-        return uri;
-    }
-
-    public IDatatype message(IDatatype name) {
-        String label = name.getLabel();
-        if (ENTAILMENT.equals(label)) {
-            entailment();
-        } else if (TEST.equals(label)) {
-            test();
-        }
-        return name;
-    }
-
-    public IDatatype message(IDatatype name, IDatatype dt) {
-        if (ENTAILMENT.equals(name.getLabel())) {
-            entailment();
-        }
-        return name;
-    }
-
-    public IDatatype message(IDatatype name, IDatatype... args) {
-        if (ENTAILMENT.equals(name.getLabel())) {
-            entailment();
-        }
-        return name;
-    }
-
     IDatatype test() {
         return DatatypeMap.TRUE;
     }
@@ -117,13 +80,6 @@ public class Agent {
     }
 
     /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * @param name the name to set
      */
     public void setName(String name) {
@@ -131,29 +87,10 @@ public class Agent {
     }
 
     /**
-     * @return the value
-     */
-    public IDatatype getValue() {
-        return value;
-    }
-
-    /**
-     * @param value the value to set
-     */
-    public IDatatype setValue(IDatatype value) {
-        this.value = value;
-        return value;
-    }
-
-    /**
      * @return the graph
      */
     public Graph getGraph() {
         return graph;
-    }
-
-    public void setGraph(Graph g) {
-        graph = g;
     }
 
 

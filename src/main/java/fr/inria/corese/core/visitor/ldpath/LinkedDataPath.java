@@ -94,19 +94,6 @@ public class LinkedDataPath implements QueryVisitor {
         option = new ArrayList<>();
     }
     
-    public LinkedDataPath(String uri) {
-        this();
-        getLocalList().add(uri);
-    }
-    
-    public LinkedDataPath(String uri1, String uri2) {
-        this();
-        getLocalList().add(uri1);
-        if (uri2 != null) {
-            getEndpointList().add(uri2);
-        }
-    }
-
     @Override
     public void visit(ASTQuery ast) {
         try {
@@ -132,10 +119,6 @@ public class LinkedDataPath implements QueryVisitor {
     
     public void setFile(String name) {
         file = name;
-    }
-    
-    public Result getResult() {
-        return result;
     }
     
     ASTQuery getAST() {
@@ -261,11 +244,6 @@ public class LinkedDataPath implements QueryVisitor {
             return uri.substring(0, uri.indexOf("@"));
         }
         return uri;
-    }
-    
-    public Result process(String q) throws EngineException, InterruptedException, IOException {
-        exec = QueryProcess.create(graph);
-        return process(exec.ast(q));
     }
     
     public Result process(ASTQuery ast) throws EngineException, InterruptedException, IOException {
@@ -579,23 +557,6 @@ public class LinkedDataPath implements QueryVisitor {
         return mapList;
     }
 
-    /**
-     * Create basic query
-     */
-    ASTQuery create() throws EngineException {
-
-        String q = "prefix nobel: <http://data.nobelprize.org/terms/>"
-                + "@ldpath <http://s-paths.lri.fr:8890/sparql> "
-                //+ "@rest <http://dbpedia.org/sparql>"
-                + "select * where {"
-                + "?s1 rdf:type nobel:Laureate ."
-                + "}";
-
-        Query qq = exec.compile(q);
-        ASTQuery ast = exec.getAST(qq);
-        return ast;
-    }
-
     ASTQuery federate(ASTQuery ast, List<String> list) {
         if (!list.isEmpty()) {
             Metadata meta = new Metadata().add(Metadata.Type.FEDERATE, list.get(0));
@@ -640,26 +601,12 @@ public class LinkedDataPath implements QueryVisitor {
     }
 
     /**
-     * @param endpointList the endpointList to set
-     */
-    public void setEndpointList(List<String> endpointList) {
-        this.endpointList = endpointList;
-    }
-
-    /**
      * @return the localList
      */
     public List<String> getLocalList() {
         return localList;
     }
 
-    /**
-     * @param localList the localList to set
-     */
-    public void setLocalList(List<String> localList) {
-        this.localList = localList;
-    }
-    
     /**
      * @return the accept
      */
@@ -674,10 +621,6 @@ public class LinkedDataPath implements QueryVisitor {
         this.accept = accept;
     }
     
-    public void setAccept(String uri) {
-        accept.add(uri);
-    }
-
     /**
      * @return the reject
      */
@@ -692,10 +635,6 @@ public class LinkedDataPath implements QueryVisitor {
         this.reject = reject;
     }
     
-    public void setReject(String uri) {
-        reject.add(uri);
-    }
-
     /**
      * @return the option
      */
@@ -710,20 +649,8 @@ public class LinkedDataPath implements QueryVisitor {
         this.option = option;
     }
     
-    public void setOption(String uri) {
-        option.add(uri);
-    }
-    
-    AST ast() {
-        return astq;
-    }
-    
     public void setMaxQuery(int n) {
         maxQuery = n;
-    }
-    
-    int getMaxQuery() {
-        return maxQuery;
     }
     
     String getGraph(int n) {
@@ -733,13 +660,6 @@ public class LinkedDataPath implements QueryVisitor {
         return graphList.get(n);
     }
     
-    /**
-     * @return the timeout
-     */
-    public int getTimeout() {
-        return timeout;
-    }
-
     /**
      * @param timeout the timeout to set
      */

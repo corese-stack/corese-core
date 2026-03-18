@@ -43,54 +43,12 @@ public class Report extends Extension implements URLParam {
         return myreport().get(name);
     }
 
-    public IDatatype myreport(IDatatype name, IDatatype key) {
-        IDatatype dt = myreport(name);
-        if (dt == null) {
-            return null;
-        }
-        return dt.get(key);
-    }
-
-    // key:string  -> return value of key in report 0
-    // key:integer -> return report number key
-    public IDatatype report(IDatatype key) {
-        if (key.isNumber()) {
-            return reportNumber(key);
-        } else {
-            return reportKey(key);
-        }
-    }
-
     public IDatatype header() {
         return reportKey(HEADER);
     }
 
-    public IDatatype header(IDatatype key) {
-        IDatatype dt = header();
-        if (dt == null) {
-            return null;
-        }
-        return dt.get(key);
-    }
-
     public IDatatype cookie() {
         return reportKey(COOKIE);
-    }
-
-    public IDatatype cookie(IDatatype key) {
-        IDatatype dt = cookie();
-        if (dt == null) {
-            return null;
-        }
-        return dt.get(key);
-    }
-
-    public IDatatype server() {
-        IDatatype server = reportKey(SERVER_NAME);
-        if (server == null) {
-            return null;
-        }
-        return server(server);
     }
 
     public IDatatype server(IDatatype server) {
@@ -121,23 +79,6 @@ public class Report extends Extension implements URLParam {
         return DatatypeMap.newList(list);
     }
 
-    // return list of values of name in reports
-    public IDatatype reports(IDatatype name) {
-        return myreports(name);
-    }
-
-    public IDatatype reports(IDatatype n1, IDatatype n2) {
-        return myreports(n1, n2);
-    }
-
-    public IDatatype reports(IDatatype n1, IDatatype n2, IDatatype n3) {
-        return myreports(n1, n2, n3);
-    }
-
-    public IDatatype reports(IDatatype n1, IDatatype n2, IDatatype n3, IDatatype n4) {
-        return myreports(n1, n2, n3, n4);
-    }
-
     // return list of values of keys in reports
     // (key1val1 .. key1valn .. keymval1 .. keymvaln)
     IDatatype myreports(IDatatype... nameList) {
@@ -152,25 +93,6 @@ public class Report extends Extension implements URLParam {
             }
         }
         return DatatypeMap.newList(list);
-    }
-
-    // return list(key, (key value list))
-    // ready for values (?key ?val) {unnest(fun:reportEnum())}
-    public IDatatype reportsEnum() {
-        return iterate(reports());
-    }
-
-    // focus on key(s)
-    public IDatatype reportsEnum(IDatatype key) {
-        return reports().iterate(DatatypeMap.newList(key));
-    }
-
-    public IDatatype reportsEnum(IDatatype k1, IDatatype k2) {
-        return reports().iterate(DatatypeMap.newList(k1, k2));
-    }
-
-    public IDatatype reportsEnum(IDatatype k1, IDatatype k2, IDatatype k3) {
-        return reports().iterate(DatatypeMap.newList(k1, k2, k3));
     }
 
     /**
@@ -216,15 +138,6 @@ public class Report extends Extension implements URLParam {
         return detail.getDatatypeValue();
     }
 
-    // value of key of report number n
-    public IDatatype report(IDatatype dt, IDatatype name) {
-        IDatatype detail = reportNumber(dt);
-        if (detail == null) {
-            return null;
-        }
-        return detail.getDatatypeValue().get(name);
-    }
-
     /**
      * Return report where result Mappings contains
      * Mapping var = value
@@ -242,31 +155,5 @@ public class Report extends Extension implements URLParam {
         }
         return null;
     }
-
-    // return slot name of provenance(value)
-    public IDatatype provenance(IDatatype value, IDatatype name) {
-        IDatatype report = provenance(value);
-        if (report == null) {
-            return null;
-        }
-        return report.get(name);
-    }
-
-    // return other reports of this service report
-    public IDatatype context(IDatatype dt) {
-        IDatatype num = dt.get(URLParam.CALL);
-        IDatatype list = dt.get(REPORT);
-        ArrayList<IDatatype> res = new ArrayList<>();
-
-        if (list != null && num != null) {
-            for (IDatatype rep : list) {
-                if (num.intValue() != rep.get(URLParam.CALL).intValue()) {
-                    res.add(rep);
-                }
-            }
-        }
-        return DatatypeMap.newList(res);
-    }
-
 
 }

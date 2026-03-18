@@ -7,8 +7,6 @@ import java.util.HashMap;
 import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
-import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.MappingsGraph;
 import fr.inria.corese.core.kgram.api.core.Node;
 import fr.inria.corese.core.kgram.core.Mappings;
@@ -198,26 +196,6 @@ public class ResultFormat implements ResultFormatDef {
         return new ResultFormat(m, type);
     }
 
-    static ResultFormat createFromTrans(Mappings m, String trans) {
-        if (trans == null) {
-            return null;
-        }
-        switch (NSManager.nsm().toNamespace(trans)) {
-            case TransformerUtils.XML:
-                return create(m, ResultFormatDef.format.XML_FORMAT);
-            case TransformerUtils.JSON:
-                return create(m, ResultFormatDef.format.JSON_FORMAT);
-            case TransformerUtils.JSON_LD:
-                return create(m, ResultFormatDef.format.JSONLD_FORMAT);
-            case TransformerUtils.RDF:
-                return create(m, ResultFormatDef.format.RDF_FORMAT);
-            case TransformerUtils.RDFXML:
-                return create(m, ResultFormatDef.format.RDF_XML_FORMAT);
-            default:
-                return null;
-        }
-    }
-
     ResultFormat transform(String trans) {
         if (trans != null) {
             String ft = NSManager.nsm().toNamespace(trans);
@@ -329,24 +307,11 @@ public class ResultFormat implements ResultFormatDef {
 
     @Override
     public String toString() {
-        if (isTransformer()) {
-            return transformer();
-        } else if (getMappings() == null) {
+        if (getMappings() == null) {
             return graphToString();
         } else {
             return mapToString();
         }
-    }
-
-    String transformer() {
-        Transformer t = Transformer.create(theGraph(), getMappings(), getTransformation());
-        if (getContext() != null) {
-            t.getContextManager().setContext(getContext());
-        }
-        if (getBind() != null) {
-            t.getContextManager().setBinding(getBind());
-        }
-        return t.toString();
     }
 
     Graph theGraph() {
@@ -368,9 +333,6 @@ public class ResultFormat implements ResultFormatDef {
     }
 
     static ResultFormatDef.format getSyntax(String syntax) {
-        if (syntax.equals(TransformerUtils.RDFXML)) {
-            return ResultFormatDef.format.RDF_XML_FORMAT;
-        }
         return ResultFormatDef.format.TURTLE_FORMAT;
     }
 

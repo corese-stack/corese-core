@@ -24,22 +24,14 @@ public class QueryProcessThread extends Thread {
     Constant predicate;
     private boolean join = false;
     
-    
+
     QueryProcessThread(Graph g, ASTQuery ast, Constant p) {
         exec = QueryProcess.create(g);
         this.ast = ast;
         predicate = p;
     }
     
-    void setVerbose(boolean b) {
-        exec.getGraph().setVerbose(b);
-    }
-    
-    @Override
-    public void run() {
-        process();
-    }
-    
+   
     void process() {
         try {
             map = exec.query(ast);

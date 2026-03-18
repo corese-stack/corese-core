@@ -48,14 +48,6 @@ public class QueryGraphVisitorImpl implements QueryGraphVisitor {
         predicates = new ArrayList<>();
     }
 
-    public static QueryGraphVisitorImpl create() {
-        return new QueryGraphVisitorImpl();
-    }
-
-    public void addPredicate(String name) {
-        predicates.add(name);
-    }
-
     @Override
     public Graph visit(Graph g) {
         g.init();

@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static fr.inria.corese.core.util.Property.Value.*;
 
@@ -108,39 +107,8 @@ public class Property {
         return singleton;
     }
 
-    public static void load(String path) throws IOException {
-        getSingleton().basicLoad(path);
-    }
-
-    /**
-     * Use case: corese gui initialize graph
-     */
-    public static void init(Graph g) {
-        getSingleton().basicInit(g);
-    }
-
     public static void set(Value value, boolean b) {
         basicSet(value, b);
-    }
-
-    public static void set(Value value, String str) {
-        basicSet(value, str);
-    }
-
-    public static void set(Value value, String... str) {
-        basicSet(value, str);
-    }
-
-    public static void set(Value value, double d) {
-        basicSet(value, Double.toString(d));
-    }
-
-    public static void set(Value value, int n) {
-        basicSet(value, n);
-    }
-
-    public static boolean hasProperty(Value value) {
-        return getSingleton().getBooleanProperty().containsKey(value) || getSingleton().getStringProperty().containsKey(value) || getSingleton().getIntegerProperty().containsKey(value) || getSingleton().getListProperty().containsKey(value);
     }
 
     public static Object get(Value value) {
@@ -174,31 +142,6 @@ public class Property {
 
     public static boolean hasValue(Value value, boolean b) {
         return get(value) != null && getBooleanValue(value) == b;
-    }
-
-    public static boolean hasValue(Value value, String str) {
-        return get(value) != null && getStringValue(value).equals(str);
-    }
-
-    public static boolean hasValue(Value value, int n) {
-        return get(value) != null && getIntegerValue(value) == n;
-    }
-
-    public static boolean hasValue(Value value, String... str) {
-        return get(value) != null && getListValue(value).containsAll(Arrays.asList(str));
-    }
-
-    public static Set<Value> getPropertySet() {
-        HashSet<Value> result = new HashSet<>();
-        result.addAll(getSingleton().getBooleanProperty().keySet());
-        result.addAll(getSingleton().getStringProperty().keySet());
-        result.addAll(getSingleton().getIntegerProperty().keySet());
-        result.addAll(getSingleton().getListProperty().keySet());
-        return result;
-    }
-
-    public static String display() {
-        return getSingleton().basicDisplay();
     }
 
     /**
@@ -572,23 +515,6 @@ public class Property {
                 FederateVisitor.NB_ENDPOINT = n;
                 break;
         }
-    }
-
-    public static List<List<String>> getStorageparameters() {
-
-        String storages = stringValue(STORAGE);
-
-        List<List<String>> storageList = new ArrayList<>();
-        if (storages == null) {
-            return storageList;
-        }
-
-        for (String storageStr : storages.split(SEP)) {
-
-            String[] storageLst = storageStr.split(",", 3);
-            storageList.add(List.of(storageLst).stream().map(str -> getSingleton().expand(str)).collect(Collectors.toList()));
-        }
-        return storageList;
     }
 
     public static Integer intValue(Value val) {
@@ -966,48 +892,20 @@ public class Property {
         return booleanProperty;
     }
 
-    protected void setBooleanProperty(Map<Value, Boolean> booleanProperty) {
-        this.booleanProperty = booleanProperty;
-    }
-
     protected Map<Value, String> getStringProperty() {
         return stringProperty;
-    }
-
-    protected void setStringProperty(Map<Value, String> stringProperty) {
-        this.stringProperty = stringProperty;
     }
 
     protected Properties getProperties() {
         return properties;
     }
 
-    protected void setProperties(Properties properties) {
-        this.properties = properties;
-    }
-
     protected Map<Value, Integer> getIntegerProperty() {
         return integerProperty;
     }
 
-    protected void setIntegerProperty(Map<Value, Integer> integerProperty) {
-        this.integerProperty = integerProperty;
-    }
-
-    protected String pathValue(Value val) {
-        return expand(stringValue(val));
-    }
-
     protected Map<String, String> getVariableMap() {
         return variableMap;
-    }
-
-    protected void setVariableMap(Map<String, String> variableMap) {
-        this.variableMap = variableMap;
-    }
-
-    protected String getPath() {
-        return path;
     }
 
     protected void setPath(String path) {
@@ -1026,16 +924,8 @@ public class Property {
         return imports;
     }
 
-    protected void setImports(Map<String, String> imports) {
-        this.imports = imports;
-    }
-
     protected Map<Value, List<String>> getListProperty() {
         return listProperty;
-    }
-
-    protected void setListProperty(Map<Value, List<String>> listProperty) {
-        this.listProperty = listProperty;
     }
 
     boolean protectEquals(String variable, String value) {
@@ -1244,20 +1134,12 @@ public class Property {
             return first;
         }
 
-        public void setFirst(String first) {
-            this.first = first;
-        }
-
         public String getValue() {
             return second;
         }
 
         public String getPath() {
             return expand(getValue());
-        }
-
-        public void setSecond(String second) {
-            this.second = second;
         }
 
     }
