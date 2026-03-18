@@ -65,6 +65,9 @@ public final class SparqlAstBuilder {
      */
     private final Deque<List<GroupGraphPatternAst>> unionStack = new ArrayDeque<>();
 
+    /** DESCRIBE resources (IRIs or variables). Set by DescribeQueryFeature. */
+    private final List<TermAst> describeResources = new ArrayList<>();
+
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
     }
@@ -217,7 +220,8 @@ public final class SparqlAstBuilder {
         }
         return switch (this.queryType) {
             case ASK -> new AskQueryAst(whereClause);
-            case CONSTRUCT, DESCRIBE -> null; // not yet implemented
+            case CONSTRUCT -> null;
+            case DESCRIBE -> new DescribeQueryAst(describeResources, whereClause);
             case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
@@ -339,5 +343,25 @@ public final class SparqlAstBuilder {
     /** Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT. */
     private SolutionModifierAst buildSolutionModifier() {
         return new SolutionModifierAst(distinct, reduced, List.of(), limit, offset);
+    }
+    /**
+     * Signals the start of a {@code DESCRIBE} query declaration.
+     * Sets the internal query type to {@link ASTConstants.QUERY_TYPE#DESCRIBE}.
+     */
+    public void enterDescribeQuery() {
+        queryType = ASTConstants.QUERY_TYPE.DESCRIBE;
+    }
+
+    /** Called when the parser exits a {@code DESCRIBE} query. No-op. */
+    public void exitDescribeQuery() {}
+
+    /**
+     * Adds a resource (IRI or variable) to the DESCRIBE target list.
+     *
+     * @param term the IRI or variable to describe; must not be {@code null}
+     */
+    public void addDescribeResource(TermAst term) {
+        if (term == null) throw new IllegalArgumentException("DESCRIBE resource term is null");
+        describeResources.add(term);
     }
 }
