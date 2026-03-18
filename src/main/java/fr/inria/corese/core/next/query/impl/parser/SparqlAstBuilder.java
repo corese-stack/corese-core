@@ -65,8 +65,11 @@ public final class SparqlAstBuilder {
     private ProjectionAst projection = ProjectionAsts.selectAll();
 
     /**
-     * SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ...
+     * Dataset clause (FROM/FROM NAMED)
      */
+    private DatasetClauseAst datasets = DatasetClauseAst.none();
+
+    /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
     private boolean distinct;
     private boolean reduced;
 
@@ -158,6 +161,14 @@ public final class SparqlAstBuilder {
      */
     public void setReduced(boolean reduced) {
         this.reduced = reduced;
+    }
+
+    public void addFromGraph(IriAst graph) {
+        this.datasets.graphs().add(graph);
+    }
+
+    public void addFromNamedGraph(IriAst graph) {
+        this.datasets.namedGraphs().add(graph);
     }
 
     /**
@@ -281,12 +292,11 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         return switch (this.queryType) {
-            case ASK -> new AskQueryAst(whereClause);
+            case DESCRIBE -> new DescribeQueryAst(describeResources, datasets, whereClause);
             case CONSTRUCT -> null;
-            case DESCRIBE -> new DescribeQueryAst(describeResources, whereClause);
-            case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
-            case UNDEFINED ->
-                    throw new QueryEvaluationException("Could not determine the type of query during parsing");
+            case ASK -> new AskQueryAst(datasets, whereClause);
+            case SELECT -> new SelectQueryAst(projection, datasets, whereClause, buildSolutionModifier());
+            case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
 
