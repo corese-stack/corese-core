@@ -344,7 +344,8 @@ class TurtleSerializerTest {
 
         turtleSerializer.write(writer);
         String actual = writer.toString().replace("\r\n", "\n");
-        System.out.println(actual);
+        logger.debug("Serialized Turtle output:\n{}", actual);
+
     }
 
     /**

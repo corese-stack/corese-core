@@ -36,7 +36,13 @@ public enum ErrorCode {
 
     /** Restart failed and rollback also failed (critical) */
     RESTART_FAILED_ROLLBACK_FAILED("RESTART_FAIL_ROLLBACK_FAIL",
-            "Restart failed and unable to restore previous configuration"),;
+            "Restart failed and unable to restore previous configuration"),
+
+    /**
+     * Plugin failed to create StorageManager instance
+     */
+    PLUGIN_CREATION_FAILED("PLUGIN_CREATION_FAILED", "Plugin failed to create StorageManager instance"),
+    ;
 
     private final String code;
     private final String description;

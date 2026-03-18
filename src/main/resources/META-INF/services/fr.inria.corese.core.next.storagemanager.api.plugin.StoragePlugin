@@ -1,0 +1,2 @@
+fr.inria.corese.core.next.storagemanager.impl.graph.plugin.GraphStoragePlugin
+fr.inria.corese.core.next.storagemanager.impl.memory.plugin.MemoryStoragePlugin

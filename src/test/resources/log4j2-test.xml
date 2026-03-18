@@ -31,6 +31,7 @@
             <AppenderRef ref="TestFileAppender" />
             <AppenderRef ref="Console" />
         </Logger>
+        <logger name="fr.inria.corese.core.next.storagemanager.api.plugin" level="DEBUG"/>
 
         <Root level="warn">
             <AppenderRef ref="Console" />
