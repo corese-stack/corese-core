@@ -4,27 +4,25 @@ import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
-import fr.inria.corese.core.next.data.impl.StorageModel;
-import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
-import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.Iterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RDFaParserTest {
+class RDFaParserTest extends ParserTestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(RDFaParserTest.class);
 
@@ -46,19 +44,7 @@ class RDFaParserTest {
             @prefix xhv: 	<http://www.w3.org/1999/xhtml/vocab#> .
             @prefix xsd: 	<http://www.w3.org/2001/XMLSchema#> .
             """;
-    /**
-     * Helper method to create a test model.
-     */
-    private Model createTestModel() {
-        StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
-                .build();
 
-        return StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(valueFactory)
-                .build();
-    }
     @Test
     void getRDFFormat() {
         Model model = createTestModel();
