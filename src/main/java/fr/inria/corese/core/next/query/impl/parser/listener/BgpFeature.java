@@ -67,6 +67,16 @@ public class BgpFeature extends AbstractTripleEmitterFeature {
     }
 
     @Override
+    public void enterOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
+        builder.enterOptional();
+    }
+
+    @Override
+    public void exitOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
+        builder.exitOptional();
+    }
+
+    @Override
     protected boolean shouldHandleTriplesSameSubject(SparqlParser.TriplesSameSubjectContext ctx) {
         return !(ctx.getParent() instanceof SparqlParser.ConstructTriplesContext);
     public void exitTriplesSameSubject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesSameSubjectContext ctx) {
