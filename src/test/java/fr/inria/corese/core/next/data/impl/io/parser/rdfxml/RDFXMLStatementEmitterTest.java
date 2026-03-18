@@ -1,12 +1,9 @@
 package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
-import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
@@ -26,26 +23,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * - RDF types
  * - Property attributes
  */
-public class RDFXMLStatementEmitterTest {
+public class RDFXMLStatementEmitterTest extends ParserTestBase {
 
     private Model model;
-    private ValueFactory factory;
     private RDFXMLStatementEmitter emitter;
 
     @BeforeEach
     public void setUp() {
-        factory = new CoreseAdaptedValueFactory();
-        StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
-                .build();
-
-        model = StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(factory)
-                .build();
-
-
-        emitter = new RDFXMLStatementEmitter(model, factory);
+        model = createTestModel();
+        emitter = new RDFXMLStatementEmitter(model, valueFactory);
     }
 
     /**
@@ -54,9 +40,9 @@ public class RDFXMLStatementEmitterTest {
      */
     @Test
     public void testEmitLiteral_plain() {
-        Literal literal = factory.createLiteral("hello");
-        Resource subject = factory.createBNode();
-        IRI predicate = factory.createIRI("http://example.org/predicate");
+        Literal literal = valueFactory.createLiteral("hello");
+        Resource subject = valueFactory.createBNode();
+        IRI predicate = valueFactory.createIRI("http://example.org/predicate");
         emitter.emitLiteral(subject, predicate, "hello", null, null);
         assertEquals(1, model.size());
         Iterable<Statement> statements = model.getStatements(subject, predicate, literal);
@@ -79,8 +65,8 @@ public class RDFXMLStatementEmitterTest {
      */
     @Test
     public void testEmitLiteral_withLang() {
-        Resource subject = factory.createBNode();
-        IRI predicate = factory.createIRI("http://example.org/predicate");
+        Resource subject = valueFactory.createBNode();
+        IRI predicate = valueFactory.createIRI("http://example.org/predicate");
         emitter.emitLiteral(subject, predicate, "bonjour", null, "fr");
 
         Value obj = model.objects().iterator().next();
@@ -94,8 +80,8 @@ public class RDFXMLStatementEmitterTest {
      */
     @Test
     public void testEmitLiteral_withDatatype() {
-        Resource subject = factory.createBNode();
-        IRI predicate = factory.createIRI("http://example.org/age");
+        Resource subject = valueFactory.createBNode();
+        IRI predicate = valueFactory.createIRI("http://example.org/age");
         emitter.emitLiteral(subject, predicate, "42", XSD.INTEGER.getIRI().stringValue(), null);
 
         Value obj = model.objects().iterator().next();
@@ -109,10 +95,10 @@ public class RDFXMLStatementEmitterTest {
      */
     @Test
     public void testEmitType() {
-        Resource subject = factory.createIRI("http://example.org/Alice");
+        Resource subject = valueFactory.createIRI("http://example.org/Alice");
         emitter.emitType(subject, "http://example.org/Person");
 
-        assertTrue(model.contains(subject, RDF.type.getIRI(), factory.createIRI("http://example.org/Person")));
+        assertTrue(model.contains(subject, RDF.type.getIRI(), valueFactory.createIRI("http://example.org/Person")));
     }
 
     /**
@@ -120,11 +106,11 @@ public class RDFXMLStatementEmitterTest {
      */
     @Test
     public void testEmitResourceTriple() {
-        Resource subject = factory.createIRI("http://example.org/Alice");
-        IRI predicate = factory.createIRI("http://example.org/knows");
+        Resource subject = valueFactory.createIRI("http://example.org/Alice");
+        IRI predicate = valueFactory.createIRI("http://example.org/knows");
         emitter.emitResourceTriple(subject, predicate, "Bob", "http://example.org/");
 
-        assertTrue(model.contains(subject, predicate, factory.createIRI("http://example.org/Bob")));
+        assertTrue(model.contains(subject, predicate, valueFactory.createIRI("http://example.org/Bob")));
     }
 
     /**
@@ -132,8 +118,8 @@ public class RDFXMLStatementEmitterTest {
      */
     @Test
     public void testEmitBNodeTriple() {
-        Resource subject = factory.createIRI("http://example.org/Alice");
-        IRI predicate = factory.createIRI("http://example.org/knows");
+        Resource subject = valueFactory.createIRI("http://example.org/Alice");
+        IRI predicate = valueFactory.createIRI("http://example.org/knows");
         emitter.emitBNodeTriple(subject, predicate, "b123");
 
         assertEquals(1, model.size());
@@ -146,9 +132,9 @@ public class RDFXMLStatementEmitterTest {
      */
     @Test
     public void testEmitTriple() {
-        Resource s = factory.createIRI("http://example.org/s");
-        IRI p = factory.createIRI("http://example.org/p");
-        Resource o = factory.createIRI("http://example.org/o");
+        Resource s = valueFactory.createIRI("http://example.org/s");
+        IRI p = valueFactory.createIRI("http://example.org/p");
+        Resource o = valueFactory.createIRI("http://example.org/o");
 
         emitter.emitTriple(s, p, o);
 
@@ -160,7 +146,7 @@ public class RDFXMLStatementEmitterTest {
      */
     @Test
     public void testEmitPropertyAttributes() {
-        Resource s = factory.createIRI("http://example.org/thing");
+        Resource s = valueFactory.createIRI("http://example.org/thing");
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute("http://example.org/", "foo", "ex:foo", "CDATA", "val1");
         attrs.addAttribute("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "about", "rdf:about", "CDATA", "ignored");

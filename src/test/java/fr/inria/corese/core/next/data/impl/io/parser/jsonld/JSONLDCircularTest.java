@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
 import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
 import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * like @context handling, so additional considerations are included.
  */
 @DisplayName("JSON-LD Circular Integration Tests")
-class JSONLDCircularTest {
+class JSONLDCircularTest extends ParserTestBase {
 
     private ValueFactory valueFactory;
     private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
@@ -65,20 +66,6 @@ class JSONLDCircularTest {
     }
 
     /**
-     * Helper method to create a test model.
-     */
-    private Model createTestModel() {
-        StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
-                .build();
-
-        return StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(valueFactory)
-                .build();
-    }
-
-    /**
      * Creates a simple model with basic triples containing IRIs and string
      * literals.
      *
@@ -106,7 +93,15 @@ class JSONLDCircularTest {
      * @return A model with triples in different named graphs
      */
     private Model createNamedGraphsTestModel() {
-        Model model = createTestModel();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
+        ;
 
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
         IRI subject2 = valueFactory.createIRI(SUBJECT_2);
@@ -133,8 +128,14 @@ class JSONLDCircularTest {
      * @return A model with diverse triple patterns
      */
     private Model createComplexTestModel() {
-        Model model = createTestModel();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
 
+        Model model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
         // Basic IRI and string literal triple
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
         IRI predicateName = valueFactory.createIRI(PREDICATE_NAME);
@@ -176,7 +177,14 @@ class JSONLDCircularTest {
      * @return A model with integer and string typed literals
      */
     private Model createTypedLiteralsTestModel() {
-        Model model = createTestModel();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateAge = valueFactory.createIRI(PREDICATE_AGE);

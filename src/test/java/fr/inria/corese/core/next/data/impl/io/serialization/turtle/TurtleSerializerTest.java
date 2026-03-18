@@ -1,16 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.serialization.turtle;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
-import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +25,7 @@ import static org.mockito.Mockito.*;
  * Test class for {@link TurtleSerializer} using Mockito to verify serialization behavior
  * under various configurations and RDF graph structures.
  */
-class TurtleSerializerTest {
+class TurtleSerializerTest extends ParserTestBase {
 
     private Model mockModel;
     private TurtleSerializerOptions defaultConfig;
@@ -102,9 +98,7 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleSerializerOptions options = TurtleSerializerOptions.builder()
-                .prefixHandler(new PrefixHandler(true))
-                .build();
+
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, defaultConfig);
 
 
@@ -295,22 +289,12 @@ class TurtleSerializerTest {
     void testBlankNodeSerializarionWithoutId() {
         Logger logger = LoggerFactory.getLogger(TurtleSerializerTest.class);
 
-        ValueFactory valueFactory;
-        TurtleSerializerOptions defaultConfig;
         String EXAMPLE_NS = "http://example.org/";
         String PREDICATE_KNOWS = EXAMPLE_NS + "knows";
 
-        valueFactory = new CoreseAdaptedValueFactory();
-        defaultConfig = TurtleSerializerOptions.defaultConfig();
+        TurtleSerializerOptions defaultConfig = TurtleSerializerOptions.defaultConfig();
 
-        StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
-                .build();
-
-        Model model = StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(valueFactory)
-                .build();
+        Model model = createTestModel();
 
         BNode blankSubject = valueFactory.createBNode();
         BNode blankObject = valueFactory.createBNode();
@@ -354,6 +338,7 @@ class TurtleSerializerTest {
         String actual = writer.toString().replace("\r\n", "\n");
         logger.debug("Serialized Turtle output:\n{}", actual);
     }
+
     /**
      * Tests serialization with a base IRI defined.
      * Verifies that the `@base` directive is included in the output.
@@ -543,21 +528,13 @@ class TurtleSerializerTest {
      */
     @Test
     void testEscapedCharacterLiteralSerialization() {
-        ValueFactory coreseFactory = new CoreseAdaptedValueFactory();
-        Statement statement = coreseFactory.createStatement(
-                coreseFactory.createIRI("http://example.org/book/1"),
-                coreseFactory.createIRI("http://example.org/properties/description"),
-                coreseFactory.createLiteral("\\ \t \b \n \r \f")
+        Model coreseModel = createTestModel();
+
+        Statement statement = valueFactory.createStatement(
+                valueFactory.createIRI("http://example.org/book/1"),
+                valueFactory.createIRI("http://example.org/properties/description"),
+                valueFactory.createLiteral("\\ \t \b \n \r \f")
         );
-
-        StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
-                .build();
-
-        Model coreseModel = StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(coreseFactory)
-                .build();
 
         coreseModel.add(statement);
 

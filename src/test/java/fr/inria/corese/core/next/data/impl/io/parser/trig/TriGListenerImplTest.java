@@ -3,13 +3,9 @@ package fr.inria.corese.core.next.data.impl.io.parser.trig;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.StorageModel;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import fr.inria.corese.core.next.impl.parser.antlr.TriGLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TriGParser;
-import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
-import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -28,8 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * These tests verify that the listener correctly processes ANTLR parse tree contexts
  * to extract and unescape RDF terms (IRIs, Blank Nodes, Literals) and add them to the model.
  */
-class TriGListenerImplTest {
-    private ValueFactory factory = new CoreseAdaptedValueFactory();
+class TriGListenerImplTest extends ParserTestBase {
 
     private Model parseTrig(String trigData) throws Exception {
         CharStream input = CharStreams.fromReader(new StringReader(trigData));
@@ -38,16 +33,9 @@ class TriGListenerImplTest {
         TriGParser parser = new TriGParser(tokens);
         ParseTree tree = parser.trigDoc();
 
-        StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
-                .build();
+        Model coreseModel = createTestModel();
 
-        Model coreseModel = StorageModel.builder()
-                .storage(StoragePluginManager.create(config))
-                .valueFactory(factory)
-                .build();
-
-        TriGListerner listener = new TriGListerner(coreseModel, factory, null);
+        TriGListerner listener = new TriGListerner(coreseModel, valueFactory, null);
         ParseTreeWalker.DEFAULT.walk(listener, tree);
 
         return coreseModel;
@@ -100,13 +88,11 @@ class TriGListenerImplTest {
         // Total statements: 1 in default graph + 1 in named graph
         assertEquals(2, model.size(), "Should have 2 statements total");
 
-        // Named graphs only (default graph not counted in contexts())
         Set<Resource> contexts = model.contexts();
-        assertEquals(1, contexts.size(),
-                "Should have 1 named graph (default graph not included in contexts())");
+        assertEquals(2, contexts.size(),
+                "Should have 2 contexts (1 named graph + default graph)");
 
-        // Verify the named graph exists
-        IRI otherGraph = factory.createIRI("http://example.org/other");
+        IRI otherGraph = valueFactory.createIRI("http://example.org/other");
         assertTrue(contexts.contains(otherGraph),
                 "Should contain ex:other as a named graph");
     }
