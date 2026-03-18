@@ -38,7 +38,7 @@ class TriGParserTest {
     private Model parseFromString(String trigData, String baseURI) {
         ValueFactory factory = new CoreseAdaptedValueFactory();
         StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
+                .property("type", "graph")
                 .build();
 
         Model model = StorageModel.builder()

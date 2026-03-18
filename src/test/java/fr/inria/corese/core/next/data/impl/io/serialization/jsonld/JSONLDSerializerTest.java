@@ -36,7 +36,7 @@ class JSONLDSerializerTest {
     @BeforeEach
     public void setUp() {
         StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
+                .property("type", "graph")
                 .build();
 
         model = StorageModel.builder()

@@ -113,7 +113,7 @@ public class RDFXMLUtilsTest {
     @Test
     public void testCreateRdfCollection() {
         StorageConfig config = StorageConfig.builder()
-                .property("type", "memory")
+                .property("type", "graph")
                 .build();
 
         Model model = StorageModel.builder()
