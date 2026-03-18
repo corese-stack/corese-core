@@ -173,4 +173,6 @@ fragment PN_CHARS_BASE options {
 
 fragment DIGIT: '0' ..'9';
 
+COMMENT: '#' ~[\r\n]* ('\r'? '\n' | EOF) -> channel(HIDDEN);
+
 WS: [ \t\n\r]+ -> channel(HIDDEN);
