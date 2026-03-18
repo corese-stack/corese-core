@@ -61,6 +61,10 @@ public class BgpFeature extends AbstractSparqlFeature {
     // -------- TRIPLE PATTERNS (?s ?p ?o) --------
     @Override
     public void exitTriplesSameSubject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesSameSubjectContext ctx) {
+        // Only handle triples inside a TriplesBlock (WHERE). Ignore triples inside CONSTRUCT template.
+        if (ctx.getParent() instanceof fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConstructTriplesContext) {
+            return;
+        }
         // subject + propertyListNotEmpty
         TermAst s = termFromVarOrTerm(ctx.varOrTerm());
         var pl = ctx.propertyListNotEmpty();

@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
 import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
@@ -106,6 +107,7 @@ public class SparqlParser extends AbstractQueryParser {
                     new BgpFeature(builder),
                     new AskQueryFeature(builder),
                     new SelectQueryFeature(builder),
+                    new ConstructQueryFeature(builder),
                     new SolutionModifierFeature(builder),
                     new UnionFeature(builder)
             ));
