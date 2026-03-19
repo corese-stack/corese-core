@@ -24,6 +24,7 @@ public abstract class AbstractTripleEmitterFeature extends AbstractSparqlFeature
     protected final SparqlAstBuilder builder;
 
     protected AbstractTripleEmitterFeature(SparqlAstBuilder builder) {
+        super(builder);
         this.builder = builder;
     }
 
