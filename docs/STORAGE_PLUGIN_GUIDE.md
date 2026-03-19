@@ -80,26 +80,6 @@ corese-core/
         └── test-plugins.jar
 ```
 
-### Runtime Backend Switching
-
-```java
-public Model createModel(String storageType, ValueFactory vf) {
-    ModelFactory factory = new ModelFactory(vf);
-    
-    return switch (storageType) {
-        case "memory" -> factory.createMemoryModel();
-        case "graph" -> factory.createGraphModel();
-        default -> throw new IllegalArgumentException(
-            "Unknown storage type: " + storageType
-        );
-    };
-}
-
-// Usage: switch based on environment
-String env = System.getProperty("storage.backend", "memory");
-Model model = createModel(env, valueFactory);
-```
-
 ---
 
 ## Creating Your Own Plugin
