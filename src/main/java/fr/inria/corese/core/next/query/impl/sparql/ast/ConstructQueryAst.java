@@ -30,13 +30,16 @@ import java.util.List;
  * triples are added to the output graph.
  * </p>
  */
-public record ConstructQueryAst(GroupGraphPatternAst constructTemplate, GroupGraphPatternAst whereClause) implements QueryAst {
+public record ConstructQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst constructTemplate, GroupGraphPatternAst whereClause) implements QueryAst {
     public ConstructQueryAst {
         if (constructTemplate == null) {
             constructTemplate = new GroupGraphPatternAst(List.of());
         }
         if (whereClause == null) {
             whereClause = new GroupGraphPatternAst(List.of());
+        }
+        if (datasetClause == null) {
+            datasetClause = DatasetClauseAst.none();
         }
     }
 }

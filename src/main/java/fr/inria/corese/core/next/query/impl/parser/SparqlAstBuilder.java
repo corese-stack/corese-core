@@ -292,7 +292,7 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         return switch (this.queryType) {
-            case DESCRIBE -> new DescribeQueryAst(describeResources, datasets, whereClause);
+            case DESCRIBE -> new DescribeQueryAst(datasets, describeResources, whereClause);
             case CONSTRUCT -> null;
             case ASK -> new AskQueryAst(datasets, whereClause);
             case SELECT -> new SelectQueryAst(projection, datasets, whereClause, buildSolutionModifier());
