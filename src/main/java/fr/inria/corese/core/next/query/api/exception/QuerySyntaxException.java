@@ -47,6 +47,17 @@ public class QuerySyntaxException extends QueryException {
     }
 
     /**
+     * Constructs a QuerySyntaxException with a detail message, position information, and cause.
+     *
+     * @param message the detail message explaining the syntax error
+     */
+    public QuerySyntaxException(String message) {
+        super(message);
+        this.line = -1;
+        this.column = -1;
+    }
+
+    /**
      * Returns the line number where the syntax error occurred.
      *
      * @return the line number (1-based), or -1 if position information is not available

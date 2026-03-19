@@ -16,16 +16,13 @@ import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
  * <p>The WHERE clause (optional) is built by {@link BgpFeature} as usual.
  */
 public class DescribeQueryFeature extends AbstractSparqlFeature {
-
-    private final SparqlAstBuilder builder;
-
     /**
      * Constructs bound to the given AST builder.
      *
      * @param builder the {@link SparqlAstBuilder} that will receive DESCRIBE lifecycle events
      */
     public DescribeQueryFeature(SparqlAstBuilder builder) {
-        this.builder = builder;
+        super(builder);
     }
 
     /**
@@ -36,7 +33,7 @@ public class DescribeQueryFeature extends AbstractSparqlFeature {
      */
     @Override
     public void enterDescribeQuery(SparqlParser.DescribeQueryContext ctx) {
-        builder.enterDescribeQuery();
+        builder().enterDescribeQuery();
     }
 
     /**
@@ -51,18 +48,18 @@ public class DescribeQueryFeature extends AbstractSparqlFeature {
     public void exitDescribeQuery(SparqlParser.DescribeQueryContext ctx) {
         // DESCRIBE * → empty resource list
         if (ctx.STAR() != null) {
-            builder.exitDescribeQuery();
+            builder().exitDescribeQuery();
             return;
         }
 
         for (SparqlParser.VarOrIRIrefContext ref : ctx.varOrIRIref()) {
             String txt = ref.getText();
             if (txt.startsWith("?") || txt.startsWith("$")) {
-                builder.addDescribeResource(builder.var(txt));
+                builder().addDescribeResource(builder().var(txt));
             } else {
-                builder.addDescribeResource(builder.iri(txt));
+                builder().addDescribeResource(builder().iri(txt));
             }
         }
-        builder.exitDescribeQuery();
+        builder().exitDescribeQuery();
     }
 }

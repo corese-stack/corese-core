@@ -9,15 +9,13 @@ import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
  */
 public class UnionFeature extends AbstractSparqlFeature {
 
-    private final SparqlAstBuilder builder;
-
     /**
      * Constructs a {@code UnionFeature} bound to the given AST builder.
      *
      * @param builder the {@link SparqlAstBuilder} that will receive UNION lifecycle events
      */
     public UnionFeature(SparqlAstBuilder builder) {
-        this.builder = builder;
+        super(builder);
     }
 
     /**
@@ -28,7 +26,7 @@ public class UnionFeature extends AbstractSparqlFeature {
      */
     @Override
     public void enterGroupOrUnionGraphPattern(SparqlParser.GroupOrUnionGraphPatternContext ctx) {
-        builder.enterUnion();
+        builder().enterUnion();
     }
 
     /**
@@ -41,7 +39,7 @@ public class UnionFeature extends AbstractSparqlFeature {
     @Override
     public void exitGroupGraphPattern(SparqlParser.GroupGraphPatternContext ctx) {
         if (ctx.getParent() instanceof SparqlParser.GroupOrUnionGraphPatternContext) {
-            builder.collectUnionBranch();
+            builder().collectUnionBranch();
         }
     }
 
@@ -55,6 +53,6 @@ public class UnionFeature extends AbstractSparqlFeature {
      */
     @Override
     public void exitGroupOrUnionGraphPattern(SparqlParser.GroupOrUnionGraphPatternContext ctx) {
-        builder.exitUnion();
+        builder().exitUnion();
     }
 }
