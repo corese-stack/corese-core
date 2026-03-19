@@ -1,14 +1,12 @@
 package fr.inria.corese.core.next.data.impl.io.serialization.turtle;
 
 import fr.inria.corese.core.next.data.api.*;
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.serialization.TestStatementFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.option.LiteralDatatypePolicyEnum;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +25,7 @@ import static org.mockito.Mockito.*;
  * Test class for {@link TurtleSerializer} using Mockito to verify serialization behavior
  * under various configurations and RDF graph structures.
  */
-class TurtleSerializerTest {
+class TurtleSerializerTest extends ParserTestBase {
 
     private Model mockModel;
     private TurtleSerializerOptions defaultConfig;
@@ -100,9 +98,7 @@ class TurtleSerializerTest {
                 .thenReturn(Stream.of(mockStatement));
 
         StringWriter writer = new StringWriter();
-        TurtleSerializerOptions options = TurtleSerializerOptions.builder()
-                .prefixHandler(new PrefixHandler(true))
-                .build();
+
         TurtleSerializer turtleSerializer = new TurtleSerializer(mockModel, defaultConfig);
 
 
@@ -293,22 +289,18 @@ class TurtleSerializerTest {
     void testBlankNodeSerializarionWithoutId() {
         Logger logger = LoggerFactory.getLogger(TurtleSerializerTest.class);
 
-        ValueFactory valueFactory;
-        TurtleSerializerOptions defaultConfig;
         String EXAMPLE_NS = "http://example.org/";
         String PREDICATE_KNOWS = EXAMPLE_NS + "knows";
 
-        valueFactory = new CoreseAdaptedValueFactory();
-        defaultConfig = TurtleSerializerOptions.defaultConfig();
+        TurtleSerializerOptions defaultConfig = TurtleSerializerOptions.defaultConfig();
 
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         BNode blankSubject = valueFactory.createBNode();
         BNode blankObject = valueFactory.createBNode();
         IRI predicate = valueFactory.createIRI(PREDICATE_KNOWS);
 
         model.add(blankSubject, predicate, blankObject);
-
 
         for (Statement stmt : model) {
             Value obj = stmt.getObject();
@@ -345,7 +337,6 @@ class TurtleSerializerTest {
         turtleSerializer.write(writer);
         String actual = writer.toString().replace("\r\n", "\n");
         logger.debug("Serialized Turtle output:\n{}", actual);
-
     }
 
     /**
@@ -534,29 +525,27 @@ class TurtleSerializerTest {
 
     /**
      * Tests serialization of a literal containing escaped characters.
-     *
-     * @throws SerializationException if a serialization error occurs.
      */
     @Test
-    void testEscapedCharacterLiteralSerialization() throws SerializationException {
-        ValueFactory coreseFactory = new CoreseAdaptedValueFactory();
-        Statement statement = coreseFactory.createStatement(
-                coreseFactory.createIRI("http://example.org/book/1"),
-                coreseFactory.createIRI("http://example.org/properties/description"),
-                coreseFactory.createLiteral("\\ \t \b \n \r \f")
+    void testEscapedCharacterLiteralSerialization() {
+        Model coreseModel = createTestModel();
+
+        Statement statement = valueFactory.createStatement(
+                valueFactory.createIRI("http://example.org/book/1"),
+                valueFactory.createIRI("http://example.org/properties/description"),
+                valueFactory.createLiteral("\\ \t \b \n \r \f")
         );
 
-        Model coreseModel = new CoreseModel();
         coreseModel.add(statement);
 
         StringWriter writer = new StringWriter();
-        TurtleSerializerOptions config = new TurtleSerializerOptions.Builder()
+        TurtleSerializerOptions serializerConfig = new TurtleSerializerOptions.Builder()
                 .autoDeclarePrefixes(false)
                 .includeContext(false)
                 .prettyPrint(false)
                 .usePrefixes(false)
                 .build();
-        TurtleSerializer turtleSerializer = new TurtleSerializer(coreseModel, config);
+        TurtleSerializer turtleSerializer = new TurtleSerializer(coreseModel, serializerConfig);
 
         turtleSerializer.write(writer);
 

@@ -1,11 +1,9 @@
 package fr.inria.corese.core.next.data.impl.io.parser.turtle;
 
 import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleLexer;
 import fr.inria.corese.core.next.impl.parser.antlr.TurtleParser;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for the TurtleListenerImpl parser.
  */
-class TurtleListenerTest {
+class TurtleListenerTest extends ParserTestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(TurtleListenerTest.class);
 
@@ -34,16 +32,15 @@ class TurtleListenerTest {
      * @throws Exception if parsing fails
      */
     private Model parseAndPrintModel(String turtleData) throws Exception {
-        ValueFactory factory = new CoreseAdaptedValueFactory();
-
         CharStream input = CharStreams.fromReader(new StringReader(turtleData));
         TurtleLexer lexer = new TurtleLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         TurtleParser parser = new TurtleParser(tokens);
         ParseTree tree = parser.turtleDoc();
 
-        Model model = new CoreseModel();
-        TurtleListener listener = new TurtleListener(model, factory, null);
+        Model model = createTestModel();
+
+        TurtleListener listener = new TurtleListener(model, valueFactory, null);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(listener, tree);
 

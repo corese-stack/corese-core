@@ -2,12 +2,9 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
-import fr.inria.corese.core.next.data.impl.io.parser.rdfxml.RDFXMLUtils;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -23,9 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * subject extraction, IRI resolution, container detection, syntax attribute recognition,
  * and RDF collection creation.
  */
-public class RDFXMLUtilsTest {
-
-    private final ValueFactory factory = new CoreseAdaptedValueFactory();
+public class RDFXMLUtilsTest extends ParserTestBase {
 
     /**
      * Tests expansion of QNames into full IRIs using provided namespace and local name.
@@ -52,7 +47,7 @@ public class RDFXMLUtilsTest {
     public void testExtractSubjectWithAbout() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "about", "", "CDATA", "http://example.org/subject");
-        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, null,null);
+        Resource subject = RDFXMLUtils.extractSubject(attrs, valueFactory, null, null);
         assertEquals("http://example.org/subject", subject.stringValue());
     }
 
@@ -64,7 +59,7 @@ public class RDFXMLUtilsTest {
     public void testExtractSubjectWithNodeID() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "nodeID", "", "CDATA", "b123");
-        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, null, null);
+        Resource subject = RDFXMLUtils.extractSubject(attrs, valueFactory, null, null);
         assertTrue(subject.stringValue().contains("_:b123"));
     }
 
@@ -75,7 +70,7 @@ public class RDFXMLUtilsTest {
     public void testExtractSubjectWithID() {
         AttributesImpl attrs = new AttributesImpl();
         attrs.addAttribute(RDF.type.getNamespace(), "ID", "", "CDATA", "id123");
-        Resource subject = RDFXMLUtils.extractSubject(attrs, factory, "http://example.org/", null);
+        Resource subject = RDFXMLUtils.extractSubject(attrs, valueFactory, "http://example.org/", null);
         assertEquals("http://example.org/#id123", subject.stringValue());
     }
 
@@ -111,10 +106,11 @@ public class RDFXMLUtilsTest {
      */
     @Test
     public void testCreateRdfCollection() {
-        Model model = new CoreseModel();
-        Resource r1 = factory.createIRI("http://example.org/A");
-        Resource r2 = factory.createIRI("http://example.org/B");
-        Resource head = RDFXMLUtils.createRdfCollection(List.of(r1, r2), model, factory);
+        Model model = createTestModel();
+
+        Resource r1 = valueFactory.createIRI("http://example.org/A");
+        Resource r2 = valueFactory.createIRI("http://example.org/B");
+        Resource head = RDFXMLUtils.createRdfCollection(List.of(r1, r2), model, valueFactory);
 
         assertNotNull(head);
         assertFalse(model.isEmpty());

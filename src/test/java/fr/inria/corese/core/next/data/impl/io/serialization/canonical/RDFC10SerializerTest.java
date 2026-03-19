@@ -2,13 +2,15 @@ package fr.inria.corese.core.next.data.impl.io.serialization.canonical;
 
 import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.exception.SerializationException;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
-import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -297,11 +299,11 @@ class RDFC10SerializerTest {
         assertFalse(canonicalOutput.isEmpty(), "Canonical output should not be empty");
         String actual = canonicalOutput.trim().replace("\r\n", "\n");
         String expected = """
-                <http://example.com/#p> <http://example.com/#q> _:c14n2 .
-                <http://example.com/#p> <http://example.com/#q> _:c14n3 .
-                _:c14n0 <http://example.com/#r> _:c14n1 .
-                _:c14n2 <http://example.com/#p> _:c14n1 .
-                _:c14n3 <http://example.com/#p> _:c14n0 .""";
+            <http://example.com/#p> <http://example.com/#q> _:c14n2 .
+            <http://example.com/#p> <http://example.com/#q> _:c14n3 .
+            _:c14n1 <http://example.com/#r> _:c14n0 .
+            _:c14n2 <http://example.com/#p> _:c14n1 .
+            _:c14n3 <http://example.com/#p> _:c14n0 .""";
 
         assertEquals(expected, actual, "Canonical output should match expected format");
     }
@@ -317,17 +319,25 @@ class RDFC10SerializerTest {
         String actual = canonicalOutput.trim().replace("\r\n", "\n");
 
         String expected = """
-                <http://example.com/#p> <http://example.com/#q> _:c14n0 .
-                <http://example.com/#p> <http://example.com/#r> _:c14n1 .
-                _:c14n0 <http://example.com/#s> <http://example.com/#u> .
-                _:c14n1 <http://example.com/#t> <http://example.com/#u> .""";
+            <http://example.com/#p> <http://example.com/#q> _:c14n1 .
+            <http://example.com/#p> <http://example.com/#r> _:c14n0 .
+            _:c14n0 <http://example.com/#t> <http://example.com/#u> .
+            _:c14n1 <http://example.com/#s> <http://example.com/#u> .""";
 
         assertEquals(expected, actual, "Canonical output should match RDFC-1.0 specification");
     }
 
     private String serializeToRdfCanonical(String resourcePath) {
-        Model model = new CoreseModel();
         ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        Model model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(valueFactory)
+                .build();
+
 
         ParserFactory parserFactory = new ParserFactory();
         RDFParser parser = parserFactory.createRDFParser(RDFFormat.TURTLE, model, valueFactory);

@@ -7,8 +7,8 @@ import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.nquads.NQuadsSerializerOptions;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * quad-based (subject, predicate, object, context) scenarios.
  */
 @DisplayName("N-Quads Circular Integration Tests")
-class NQuadsCircularTest {
+class NQuadsCircularTest extends ParserTestBase {
 
     private ValueFactory valueFactory;
     private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
@@ -61,14 +61,15 @@ class NQuadsCircularTest {
         defaultConfig = NQuadsSerializerOptions.defaultConfig();
     }
 
+
     /**
      * Creates a simple model with basic triples containing IRIs and string
      * literals.
-     * 
+     *
      * @return A model with two simple triples
      */
     private Model createSimpleTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
         IRI predicateName = valueFactory.createIRI(PREDICATE_NAME);
@@ -86,11 +87,11 @@ class NQuadsCircularTest {
     /**
      * Creates a model with named graphs (quads) for testing N-Quads specific
      * functionality.
-     * 
+     *
      * @return A model with quads in different named graphs
      */
     private Model createNamedGraphsTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
         IRI subject2 = valueFactory.createIRI(SUBJECT_2);
@@ -113,11 +114,11 @@ class NQuadsCircularTest {
     /**
      * Creates a complex model with various RDF value types including
      * typed literals, language-tagged literals, and blank nodes.
-     * 
+     *
      * @return A model with diverse triple patterns
      */
     private Model createComplexTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         // Basic IRI and string literal triple
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
@@ -156,11 +157,11 @@ class NQuadsCircularTest {
 
     /**
      * Creates a model with typed literals for testing.
-     * 
+     *
      * @return A model with integer and string typed literals
      */
     private Model createTypedLiteralsTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateAge = valueFactory.createIRI(PREDICATE_AGE);
@@ -181,11 +182,11 @@ class NQuadsCircularTest {
 
     /**
      * Creates a model with language-tagged literals for testing.
-     * 
+     *
      * @return A model with English and French language-tagged literals
      */
     private Model createLanguageTaggedLiteralsTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateGreeting = valueFactory.createIRI(EXAMPLE_NS + "greeting");
@@ -203,11 +204,11 @@ class NQuadsCircularTest {
 
     /**
      * Creates a model with blank nodes for testing.
-     * 
+     *
      * @return A model with blank nodes as subject and object
      */
     private Model createBlankNodesTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         BNode blankSubject = valueFactory.createBNode();
         BNode blankObject = valueFactory.createBNode();
@@ -220,11 +221,11 @@ class NQuadsCircularTest {
 
     /**
      * Creates a model with special characters and escape sequences for testing.
-     * 
+     *
      * @return A model with literals containing newlines, quotes, and Unicode
      */
     private Model createSpecialCharactersTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateDescription = valueFactory.createIRI(EXAMPLE_NS + "description");
@@ -243,7 +244,7 @@ class NQuadsCircularTest {
 
     /**
      * Performs a round-trip serialization and parsing cycle.
-     * 
+     *
      * @param originalModel The model to serialize and parse back
      * @return The model resulting from parsing the serialized data
      */
@@ -264,7 +265,7 @@ class NQuadsCircularTest {
         }
 
         // Parse back from N-Quads
-        Model deserializedModel = new CoreseModel();
+        Model deserializedModel = createTestModel();
         RDFParser parser = parserFactory.createRDFParser(
                 RDFFormat.NQUADS, deserializedModel, valueFactory);
 
@@ -327,7 +328,7 @@ class NQuadsCircularTest {
     @DisplayName("Round-trip test with empty model")
     void testRoundTripWithEmptyModel() {
         // Given: An empty model
-        Model originalModel = new CoreseModel();
+        Model originalModel = createTestModel();
 
         // When: Performing round-trip serialization and parsing
         Model deserializedModel = performRoundTrip(originalModel);

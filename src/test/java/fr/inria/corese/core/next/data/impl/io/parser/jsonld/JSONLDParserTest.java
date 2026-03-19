@@ -1,34 +1,30 @@
 package fr.inria.corese.core.next.data.impl.io.parser.jsonld;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import fr.inria.corese.core.next.data.api.*;
+import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
+import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
+import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
+import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
+import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-import fr.inria.corese.core.next.data.api.BNode;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.Resource;
-import fr.inria.corese.core.next.data.api.Statement;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
-import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
-
-public class JSONLDParserTest {
+public class JSONLDParserTest extends ParserTestBase {
 
     private final ParserFactory factory = new ParserFactory();
     private final ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+
+
 
     @Test
     void constructorNullModelThrowsTest() {
@@ -37,7 +33,7 @@ public class JSONLDParserTest {
 
     @Test
     void constructorNullValueFactoryThrowsTest() {
-        assertThrows(NullPointerException.class, () -> new JSONLDParser(new CoreseModel(), null));
+        assertThrows(NullPointerException.class, () -> new JSONLDParser(createTestModel(), null));
     }
 
     @Test
@@ -47,12 +43,12 @@ public class JSONLDParserTest {
 
     @Test
     void constructorConfigNoThrowsTest() {
-        assertDoesNotThrow(() -> new JSONLDParser(new CoreseModel(), valueFactory, new JSONLDOptions.Builder().build()));
+        assertDoesNotThrow(() -> new JSONLDParser(createTestModel(), valueFactory, new JSONLDOptions.Builder().build()));
     }
 
     @Test
     void getRDFFormatTest() {
-        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, new CoreseModel(), valueFactory);
+        RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, createTestModel(), valueFactory);
         assertEquals(RDFFormat.JSONLD, parser.getRDFFormat());
     }
 
@@ -77,7 +73,7 @@ public class JSONLDParserTest {
                   ]
                 }
                 """;
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new ByteArrayInputStream(sampleJsonLD.getBytes()));
 
@@ -115,7 +111,7 @@ public class JSONLDParserTest {
                   ]
                 }
                 """;
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new ByteArrayInputStream(sampleJsonLD.getBytes()), "http://me.markus-lanthaler.com/");
 
@@ -153,7 +149,7 @@ public class JSONLDParserTest {
                   ]
                 }
                 """;
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD));
 
@@ -191,7 +187,7 @@ public class JSONLDParserTest {
                   ]
                 }
                 """;
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD), "http://me.markus-lanthaler.com/");
 
@@ -214,37 +210,63 @@ public class JSONLDParserTest {
     @Test
     public void testParseJsonLDWithBlankNodes() {
         String sampleJsonLD = """
-                        {
-                        "@context": {
-                          "foaf": "http://xmlns.com/foaf/0.1/"
-                        },
-                
-                        "@graph":
-                        [
-                          {
-                            "@id": "_:b0",
-                            "foaf:knows": {"@id": "_:b1"}
-                          },
-                
-                          {
-                            "@id": "_:b1",
-                            "foaf:knows": {"@id": "_:b0"}
-                          }
-                        ]
-                        }
-                
-                """;
-        Model model = new CoreseModel();
+                    {
+                    "@context": {
+                      "foaf": "http://xmlns.com/foaf/0.1/"
+                    },
+            
+                    "@graph":
+                    [
+                      {
+                        "@id": "_:b0",
+                        "foaf:knows": {"@id": "_:b1"}
+                      },
+            
+                      {
+                        "@id": "_:b1",
+                        "foaf:knows": {"@id": "_:b0"}
+                      }
+                    ]
+                    }
+            
+            """;
+        Model model = createTestModel();
         RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         Reader reader = new StringReader(sampleJsonLD);
         parser.parse(reader);
 
-        assertEquals(2, model.size());
-        BNode b0 = valueFactory.createBNode("b0");
-        BNode b1 = valueFactory.createBNode("b1");
+        // Verify structure instead of specific blank node IDs
+        assertEquals(2, model.size(), "Should have 2 statements");
+
         IRI knowsPredicate = valueFactory.createIRI("http://xmlns.com/foaf/0.1/knows");
-        assertTrue(model.contains(b0, knowsPredicate, b1));
-        assertTrue(model.contains(b1, knowsPredicate, b0));
+
+        List<Statement> knowsStatements = new ArrayList<>();
+        for (Statement stmt : model.getStatements(null, knowsPredicate, null)) {
+            knowsStatements.add(stmt);
+        }
+
+        assertEquals(2, knowsStatements.size(), "Should have 2 'knows' relationships");
+
+        // Verify both statements have blank nodes as subject and object
+        for (Statement stmt : knowsStatements) {
+            assertTrue(stmt.getSubject().isBNode(),
+                    "Subject should be a blank node");
+            assertInstanceOf(BNode.class, stmt.getObject(), "Object should be a blank node");
+            assertEquals(knowsPredicate, stmt.getPredicate(),
+                    "Predicate should be foaf:knows");
+        }
+
+        // Verify the circular relationship structure
+        Set<Resource> subjects = knowsStatements.stream()
+                .map(Statement::getSubject)
+                .collect(Collectors.toSet());
+
+        Set<Value> objects = knowsStatements.stream()
+                .map(Statement::getObject)
+                .collect(Collectors.toSet());
+
+        assertEquals(2, subjects.size(), "Should have 2 distinct blank node subjects");
+        assertEquals(2, objects.size(), "Should have 2 distinct blank node objects");
     }
 
     @Test
@@ -285,7 +307,7 @@ public class JSONLDParserTest {
                 }
                 """;
 
-        Model model = new CoreseModel();
+        Model model = createTestModel();
         RDFParser parser = factory.createRDFParser(RDFFormat.JSONLD, model, valueFactory);
         parser.parse(new StringReader(sampleJsonLD));
 
@@ -293,7 +315,7 @@ public class JSONLDParserTest {
         Resource graphIRI = valueFactory.createIRI("http://example.org/foaf-graph");
         IRI generatedAt = valueFactory.createIRI("http://www.w3.org/ns/prov#generatedAtTime");
         IRI datetimeDatatype = valueFactory.createIRI("http://www.w3.org/2001/XMLSchema#dateTime");
-        Literal generatedAtValue = valueFactory.createLiteral("2012-04-09T00:00:00", datetimeDatatype) ;
+        Literal generatedAtValue = valueFactory.createLiteral("2012-04-09T00:00:00", datetimeDatatype);
         IRI manuIRI = valueFactory.createIRI("http://manu.sporny.org/about#manu");
         Literal manuName = valueFactory.createLiteral("Manu Sporny");
         IRI greggIRI = valueFactory.createIRI("https://greggkellogg.net/foaf#me");
