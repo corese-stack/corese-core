@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.impl.parser;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -20,11 +21,11 @@ import java.util.*;
  * - ASK query
  * Compatible with the common SPARQL grammar shape:
  * GroupGraphPattern
- *   : '{'
- *       ( TriplesBlock?
- *         ( GraphPatternNotTriples '.'? TriplesBlock? )*
- *       )?
- *     '}'
+ * : '{'
+ * ( TriplesBlock?
+ * ( GraphPatternNotTriples '.'? TriplesBlock? )*
+ * )?
+ * '}'
  * This builder expects the listener to call:
  * - enterGroup()/exitGroup() on enter/exitGroupGraphPattern
  * - enterBgp()/exitBgp() on enter/exitTriplesBlock
@@ -85,7 +86,9 @@ public final class SparqlAstBuilder {
      */
     private final Deque<List<GroupGraphPatternAst>> unionStack = new ArrayDeque<>();
 
-    /** DESCRIBE resources (IRIs or variables). Set by DescribeQueryFeature. */
+    /**
+     * DESCRIBE resources (IRIs or variables). Set by DescribeQueryFeature.
+     */
     private final List<TermAst> describeResources = new ArrayList<>();
 
     public SparqlAstBuilder(SparqlParserOptions options) {
@@ -369,6 +372,7 @@ public final class SparqlAstBuilder {
     private SolutionModifierAst buildSolutionModifier() {
         return new SolutionModifierAst(distinct, reduced, List.of(), limit, offset);
     }
+
     /**
      * Signals the start of a {@code DESCRIBE} query declaration.
      * Sets the internal query type to {@link ASTConstants.QUERY_TYPE#DESCRIBE}.
@@ -377,8 +381,11 @@ public final class SparqlAstBuilder {
         queryType = ASTConstants.QUERY_TYPE.DESCRIBE;
     }
 
-    /** Called when the parser exits a {@code DESCRIBE} query. No-op. */
-    public void exitDescribeQuery() {}
+    /**
+     * Called when the parser exits a {@code DESCRIBE} query. No-op.
+     */
+    public void exitDescribeQuery() {
+    }
 
     /**
      * Adds a resource (IRI or variable) to the DESCRIBE target list.
@@ -437,99 +444,87 @@ public final class SparqlAstBuilder {
      * @return An ConstraintAst
      */
     public ConstraintAst createConstraint(ASTConstants.Constraint constraint, List<TermAst> args) {
-        switch (args.size()) {
-            case 1 -> {
-                switch (constraint) {
-                    case ASTConstants.OPERATOR.NOT -> {
-                        return new BooleanNotAst(args.getFirst());
-                    }
-                    case ASTConstants.OPERATOR.PLUS -> {
-                        return new UnaryPlusAst(args.getFirst());
-                    }
-                    case ASTConstants.OPERATOR.MINUS -> {
-                        return new UnaryMinusAst(args.getFirst());
-                    }
-                    case ASTConstants.FUNCTION_CALL.BOUND -> {
-                        return new BoundAst(args.getFirst());
-                    }
-                    case ASTConstants.FUNCTION_CALL.IS_IRI -> {
-                        return new IsIriAst(args.getFirst());
-                    }
-                    case ASTConstants.FUNCTION_CALL.IS_BLANK -> {
-                        return new IsBlankAst(args.getFirst());
-                    }
-                    case ASTConstants.FUNCTION_CALL.IS_LITERAL -> {
-                        return new IsLiteralAst(args.getFirst());
-                    }
-                    case ASTConstants.FUNCTION_CALL.STR -> {
-                        return new StrAst(args.getFirst());
-                    }
-                    case ASTConstants.FUNCTION_CALL.LANG -> {
-                        return new LangAst(args.getFirst());
-                    }
-                    case ASTConstants.FUNCTION_CALL.DATATYPE -> {
-                        return new DatatypeAst(args.getFirst());
-                    }
-                    default ->
-                            throw new QueryEvaluationException("Unexpected number of arguments (1) for createFunCall " + constraint);
-                }
+        switch (constraint) {
+            case ASTConstants.OPERATOR.NOT -> {
+                return new BooleanNotAst(args);
             }
-            case 2 -> {
-                switch (constraint) {
-                    case ASTConstants.OPERATOR.OR -> {
-                        return new OrAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.AND -> {
-                        return new AndAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.EQ -> {
-                        return new EqualsAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.NE -> {
-                        return new DifferentAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.LT -> {
-                        return new LowerThanAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.LE -> {
-                        return new LowerOrEqualThanAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.GT -> {
-                        return new GreaterThanAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.GE -> {
-                        return new GreaterOrEqualThanAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.MUL -> {
-                        return new MultiplyAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.DIV -> {
-                        return new DivideAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.ADD -> {
-                        return new AddAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.OPERATOR.SUB -> {
-                        return new SubtractAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.FUNCTION_CALL.SAMETERM -> {
-                        return new SameTermAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.FUNCTION_CALL.LANGMATCHES -> {
-                        return new LangMatchesAst(args.getFirst(), args.getLast());
-                    }
-                    case ASTConstants.FUNCTION_CALL.REGEX -> {
-                        return new BinaryRegexAst(args.getFirst(), args.getLast());
-                    }
-                    default ->
-                            throw new QueryEvaluationException("Unexpected number of arguments (2) for " + constraint + " keyword");
-                }
+            case ASTConstants.OPERATOR.PLUS -> {
+                return new UnaryPlusAst(args);
             }
-            case 3 -> {
-                if (Objects.requireNonNull(constraint) == ASTConstants.FUNCTION_CALL.REGEX) {
-                    return new TrinaryRegexAst(args.getFirst(), args.get(1), args.getLast());
+            case ASTConstants.OPERATOR.MINUS -> {
+                return new UnaryMinusAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.BOUND -> {
+                return new BoundAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.IS_IRI -> {
+                return new IsIriAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.IS_BLANK -> {
+                return new IsBlankAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.IS_LITERAL -> {
+                return new IsLiteralAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.STR -> {
+                return new StrAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.LANG -> {
+                return new LangAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.DATATYPE -> {
+                return new DatatypeAst(args);
+            }
+            case ASTConstants.OPERATOR.OR -> {
+                return new OrAst(args);
+            }
+            case ASTConstants.OPERATOR.AND -> {
+                return new AndAst(args);
+            }
+            case ASTConstants.OPERATOR.EQ -> {
+                return new EqualsAst(args);
+            }
+            case ASTConstants.OPERATOR.NE -> {
+                return new DifferentAst(args);
+            }
+            case ASTConstants.OPERATOR.LT -> {
+                return new LowerThanAst(args);
+            }
+            case ASTConstants.OPERATOR.LE -> {
+                return new LowerOrEqualThanAst(args);
+            }
+            case ASTConstants.OPERATOR.GT -> {
+                return new GreaterThanAst(args);
+            }
+            case ASTConstants.OPERATOR.GE -> {
+                return new GreaterOrEqualThanAst(args);
+            }
+            case ASTConstants.OPERATOR.MUL -> {
+                return new MultiplyAst(args);
+            }
+            case ASTConstants.OPERATOR.DIV -> {
+                return new DivideAst(args);
+            }
+            case ASTConstants.OPERATOR.ADD -> {
+                return new AddAst(args);
+            }
+            case ASTConstants.OPERATOR.SUB -> {
+                return new SubtractAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.SAMETERM -> {
+                return new SameTermAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.LANGMATCHES -> {
+                return new LangMatchesAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.REGEX -> {
+                if (args.size() == 2) {
+                    return new BinaryRegexAst(args);
+                } else if (args.size() == 3) {
+                    return new TrinaryRegexAst(args);
+                } else {
+                    throw new QueryEvaluationException("Unexpected number of arguments (3) for REGEX keyword");
                 }
-                throw new QueryEvaluationException("Unexpected number of arguments (3) for " + constraint + " keyword");
             }
             default ->
                     throw new QueryEvaluationException("Unexpected number of arguments (" + args.size() + ") for " + constraint);
@@ -859,7 +854,7 @@ public final class SparqlAstBuilder {
                 ASTConstants.OPERATOR op = ASTConstants.OPERATOR.ADD;
                 for (int i = 1; i < ctx.getChildCount(); i++) {
                     ParseTree child = ctx.getChild(i);
-                    if(child instanceof TerminalNode) {
+                    if (child instanceof TerminalNode) {
                         if (Objects.equals(child.getText(), "+")) {
                             op = ASTConstants.OPERATOR.ADD;
                         } else if (Objects.equals(child.getText(), "-")) {
@@ -894,19 +889,27 @@ public final class SparqlAstBuilder {
         if (ctx.unaryExpression() != null && !ctx.unaryExpression().isEmpty()) {
             if (ctx.unaryExpression().size() > 1) {
                 TermAst head = termFromUnary(ctx.unaryExpression().getFirst());
-                for (int i = 1; i < ctx.getChildCount(); i++) {
-                    ParseTree numericChild = ctx.getChild(i);
-                    if (!(numericChild instanceof TerminalNode)) {
-                        TermAst leftHand = termFromUnary((fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.UnaryExpressionContext) numericChild);
-                        ASTConstants.OPERATOR op;
-                        if (!ctx.getTokens(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.STAR).isEmpty()) {
+                TermAst rightHand = null;
+                ASTConstants.OPERATOR op = null;
+                for (int i = 1; i < ctx.getChildCount(); i+=2) {
+                    ParseTree operatorContext = ctx.getChild(i);
+                    ParseTree rightHandContext = ctx.getChild(i+1);
+
+                    if(rightHandContext instanceof SparqlParser.UnaryExpressionContext unaryExpressionContext) {
+                        rightHand = termFromUnary( unaryExpressionContext);
+                    }
+
+                    if(operatorContext instanceof TerminalNode terminalNode) {
+                        if(Objects.equals(terminalNode.getText(), "*")) {
                             op = ASTConstants.OPERATOR.MUL;
-                        } else if (!ctx.getTokens(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.SLASH).isEmpty()) {
+                        } else if(Objects.equals(terminalNode.getText(), "/")) {
                             op = ASTConstants.OPERATOR.DIV;
-                        } else {
-                            throw new QueryEvaluationException("Unexpected operator in multiplicative termFromExpression " + ctx.getText());
                         }
-                        head = createConstraint(op, List.of(head, leftHand));
+                    }
+                    if(op != null && rightHand != null) {
+                        head = createConstraint(op, List.of(head, rightHand));
+                    } else {
+                        throw new QuerySyntaxException("Unexpected operator or right hand content in " + ctx.getText());
                     }
                 }
                 return head;

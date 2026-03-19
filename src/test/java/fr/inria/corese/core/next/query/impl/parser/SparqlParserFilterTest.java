@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.Test;
@@ -750,13 +751,14 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         FilterAst filterAst = (FilterAst) p2;
         assertInstanceOf(SameTermAst.class, filterAst.operator(), "Filter content should be a sameTerm operator");
 
-        SameTermAst t = (SameTermAst) filterAst.operator();
+        SameTermAst sameTermAst = (SameTermAst) filterAst.operator();
+        assertNotNull(sameTermAst.getLeftArgument());
+        assertInstanceOf(VarAst.class, sameTermAst.getLeftArgument());
+        assertNotNull(sameTermAst.getRightArgument());
+        assertInstanceOf(IriAst.class, sameTermAst.getRightArgument());
 
-        assertInstanceOf(VarAst.class, t.getLeftArgument());
-        assertInstanceOf(IriAst.class, t.getRightArgument());
-
-        assertEquals("s", ((VarAst) t.getLeftArgument()).name());
-        assertEquals("<http://example.com>", ((IriAst) t.getRightArgument()).raw());
+        assertEquals("s", ((VarAst) sameTermAst.getLeftArgument()).name());
+        assertEquals("<http://example.com>", ((IriAst) sameTermAst.getRightArgument()).raw());
     }
 
     @Test
@@ -816,11 +818,10 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         BinaryRegexAst t = (BinaryRegexAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getLeftArgument());
-        assertInstanceOf(LiteralAst.class, t.getRightArgument());
-
-        assertEquals("s", ((VarAst) t.getLeftArgument()).name());
-        assertEquals("\"test\"", ((LiteralAst) t.getRightArgument()).lexical());
+        assertInstanceOf(VarAst.class, t.getString());
+        assertEquals("s", ((VarAst) t.getString()).name());
+        assertInstanceOf(LiteralAst.class, t.getPattern());
+        assertEquals("\"test\"", ((LiteralAst) t.getPattern()).lexical());
     }
 
     @Test
@@ -848,13 +849,13 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         TrinaryRegexAst t = (TrinaryRegexAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.string());
-        assertInstanceOf(LiteralAst.class, t.pattern());
-        assertInstanceOf(LiteralAst.class, t.flags());
+        assertInstanceOf(VarAst.class, t.getString());
+        assertInstanceOf(LiteralAst.class, t.getPattern());
+        assertInstanceOf(LiteralAst.class, t.getFlags());
 
-        assertEquals("s", ((VarAst) t.string()).name());
-        assertEquals("\"test\"", ((LiteralAst) t.pattern()).lexical());
-        assertEquals("\"i\"", ((LiteralAst) t.flags()).lexical());
+        assertEquals("s", ((VarAst) t.getString()).name());
+        assertEquals("\"test\"", ((LiteralAst) t.getPattern()).lexical());
+        assertEquals("\"i\"", ((LiteralAst) t.getFlags()).lexical());
     }
 
     @Test
@@ -929,5 +930,268 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         UnaryMinusAst rightUnaryMinusAst = (UnaryMinusAst) addAst.getRightArgument();
         assertInstanceOf(LiteralAst.class, rightUnaryMinusAst.getArgument());
         assertEquals("2", ((LiteralAst) rightUnaryMinusAst.getArgument()).lexical());
+    }
+
+    @Test
+    void shouldParseAddSubChainEqualsFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(?s * 2 + ?o - 5 = "test")
+                }
+                """);
+
+        // Equal(Sub(Add(Mul(Var s ,Literal 2), Var o), Literal 5), Literal "test")
+
+        assertNotNull(ast);
+        assertNotNull(ast.whereClause());
+
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
+
+        PatternAst p2 = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+
+        FilterAst filterAst = (FilterAst) p2;
+        assertInstanceOf(EqualsAst.class, filterAst.operator(), "Filter content should be an Equals operator");
+
+        // Equal(Sub(...), Literal "test")
+        EqualsAst equalsAst = (EqualsAst) filterAst.operator();
+        assertInstanceOf(SubtractAst.class, equalsAst.getLeftArgument(), "Equals left argument should be a addtion operator");
+        assertInstanceOf(LiteralAst.class, equalsAst.getRightArgument(), "Equals right argument should be a literal");
+        assertEquals("\"test\"", ((LiteralAst) equalsAst.getRightArgument()).lexical());
+
+        // Sub(...), Literal 5)
+        SubtractAst subtractAst = (SubtractAst) equalsAst.getLeftArgument();
+        assertInstanceOf(AddAst.class, subtractAst.getLeftArgument());
+        assertInstanceOf(LiteralAst.class, subtractAst.getRightArgument());
+        assertEquals("5", ((LiteralAst) subtractAst.getRightArgument()).lexical());
+
+        // Add(Mul(...), Var o))
+        AddAst addAst1 = (AddAst) subtractAst.getLeftArgument();
+        assertInstanceOf(MultiplyAst.class, addAst1.getLeftArgument());
+        MultiplyAst multiplyAst1 = (MultiplyAst) addAst1.getLeftArgument();
+        assertInstanceOf(VarAst.class, addAst1.getRightArgument());
+        assertEquals("o", ((VarAst) addAst1.getRightArgument()).name());
+
+        // Mul(Var s ,Literal 2)
+        assertInstanceOf(VarAst.class, multiplyAst1.getLeftArgument());
+        assertEquals("s", ((VarAst) multiplyAst1.getLeftArgument()).name());
+        assertInstanceOf(LiteralAst.class, multiplyAst1.getRightArgument());
+        assertEquals("2", ((LiteralAst) multiplyAst1.getRightArgument()).lexical());
+
+    }
+
+    @Test
+    void shouldParseUnaryPlusFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(+ ?s)
+                }
+                """);
+
+        assertNotNull(ast);
+        assertNotNull(ast.whereClause());
+
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
+
+        PatternAst p2 = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+
+        FilterAst filterAst = (FilterAst) p2;
+        assertInstanceOf(UnaryPlusAst.class, filterAst.operator(), "Filter content should be a unary plus operator");
+
+        UnaryPlusAst t = (UnaryPlusAst) filterAst.operator();
+
+        assertInstanceOf(VarAst.class, t.getArgument());
+
+        assertEquals("s", ((VarAst) t.getArgument()).name());
+    }
+
+    @Test
+    void shouldParseUnaryMinusFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(- ?s)
+                }
+                """);
+
+        assertNotNull(ast);
+        assertNotNull(ast.whereClause());
+
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
+
+        PatternAst p2 = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+
+        FilterAst filterAst = (FilterAst) p2;
+        assertInstanceOf(UnaryMinusAst.class, filterAst.operator(), "Filter content should be a unary minus operator");
+
+        UnaryMinusAst t = (UnaryMinusAst) filterAst.operator();
+
+        assertInstanceOf(VarAst.class, t.getArgument());
+        assertEquals("s", ((VarAst) t.getArgument()).name());
+    }
+
+    @Test
+    void shouldParseChainedOrFilterLeftAssociatively() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(?a || ?b || ?c)
+                }
+                """);
+
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(OrAst.class, filterAst.operator(), "Filter content should be an Or operator");
+
+        OrAst root = (OrAst) filterAst.operator();
+        assertInstanceOf(OrAst.class, root.getLeftArgument(), "Chained OR should be folded into a binary tree");
+        assertInstanceOf(VarAst.class, root.getRightArgument());
+        assertEquals("c", ((VarAst) root.getRightArgument()).name());
+
+        OrAst left = (OrAst) root.getLeftArgument();
+        assertInstanceOf(VarAst.class, left.getLeftArgument());
+        assertInstanceOf(VarAst.class, left.getRightArgument());
+        assertEquals("a", ((VarAst) left.getLeftArgument()).name());
+        assertEquals("b", ((VarAst) left.getRightArgument()).name());
+    }
+
+    @Test
+    void shouldParseChainedAndFilterLeftAssociatively() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(?a && ?b && ?c)
+                }
+                """);
+
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(AndAst.class, filterAst.operator(), "Filter content should be an And operator");
+
+        AndAst root = (AndAst) filterAst.operator();
+        assertInstanceOf(AndAst.class, root.getLeftArgument(), "Chained AND should be folded into a binary tree");
+        assertInstanceOf(VarAst.class, root.getRightArgument());
+        assertEquals("c", ((VarAst) root.getRightArgument()).name());
+
+        AndAst left = (AndAst) root.getLeftArgument();
+        assertInstanceOf(VarAst.class, left.getLeftArgument());
+        assertInstanceOf(VarAst.class, left.getRightArgument());
+        assertEquals("a", ((VarAst) left.getLeftArgument()).name());
+        assertEquals("b", ((VarAst) left.getRightArgument()).name());
+    }
+
+    @Test
+    void shouldParseSignedNegativeLiteralInAdditiveExpression() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(?s - -2 = "test")
+                }
+                """);
+
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        EqualsAst equalsAst = (EqualsAst) filterAst.operator();
+
+        assertInstanceOf(SubtractAst.class, equalsAst.getLeftArgument());
+        SubtractAst subtractAst = (SubtractAst) equalsAst.getLeftArgument();
+
+        assertInstanceOf(VarAst.class, subtractAst.getLeftArgument());
+        assertEquals("s", ((VarAst) subtractAst.getLeftArgument()).name());
+        assertInstanceOf(LiteralAst.class, subtractAst.getRightArgument());
+        assertEquals("-2", ((LiteralAst) subtractAst.getRightArgument()).lexical());
+    }
+
+    @Test
+    void shouldParseSignedPositiveLiteralInAdditiveExpression() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(?s + +2 = "test")
+                }
+                """);
+
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        EqualsAst equalsAst = (EqualsAst) filterAst.operator();
+
+        assertInstanceOf(AddAst.class, equalsAst.getLeftArgument());
+        AddAst addAst = (AddAst) equalsAst.getLeftArgument();
+
+        assertInstanceOf(VarAst.class, addAst.getLeftArgument());
+        assertEquals("s", ((VarAst) addAst.getLeftArgument()).name());
+        assertInstanceOf(LiteralAst.class, addAst.getRightArgument());
+        assertEquals("+2", ((LiteralAst) addAst.getRightArgument()).lexical());
+    }
+
+    @Test
+    void shouldParseMixedMultiplyThenDivideLeftAssociatively() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(?s * 2 / 3 = "test")
+                }
+                """);
+
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        EqualsAst equalsAst = (EqualsAst) filterAst.operator();
+
+        assertInstanceOf(DivideAst.class, equalsAst.getLeftArgument());
+        DivideAst divideAst = (DivideAst) equalsAst.getLeftArgument();
+        assertInstanceOf(MultiplyAst.class, divideAst.getLeftArgument());
+        assertInstanceOf(LiteralAst.class, divideAst.getRightArgument());
+        assertEquals("3", ((LiteralAst) divideAst.getRightArgument()).lexical());
+
+        MultiplyAst multiplyAst = (MultiplyAst) divideAst.getLeftArgument();
+        assertInstanceOf(VarAst.class, multiplyAst.getLeftArgument());
+        assertEquals("s", ((VarAst) multiplyAst.getLeftArgument()).name());
+        assertInstanceOf(LiteralAst.class, multiplyAst.getRightArgument());
+        assertEquals("2", ((LiteralAst) multiplyAst.getRightArgument()).lexical());
+    }
+
+    @Test
+    void shouldParseMixedDivideThenMultiplyLeftAssociatively() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(?s / 2 * 3 = "test")
+                }
+                """);
+
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        EqualsAst equalsAst = (EqualsAst) filterAst.operator();
+
+        assertInstanceOf(MultiplyAst.class, equalsAst.getLeftArgument());
+        MultiplyAst multiplyAst = (MultiplyAst) equalsAst.getLeftArgument();
+        assertInstanceOf(DivideAst.class, multiplyAst.getLeftArgument());
+        assertInstanceOf(LiteralAst.class, multiplyAst.getRightArgument());
+        assertEquals("3", ((LiteralAst) multiplyAst.getRightArgument()).lexical());
+
+        DivideAst divideAst = (DivideAst) multiplyAst.getLeftArgument();
+        assertInstanceOf(VarAst.class, divideAst.getLeftArgument());
+        assertEquals("s", ((VarAst) divideAst.getLeftArgument()).name());
+        assertInstanceOf(LiteralAst.class, divideAst.getRightArgument());
+        assertEquals("2", ((LiteralAst) divideAst.getRightArgument()).lexical());
     }
 }

@@ -1,18 +1,22 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Abstract implementation of {@link BinaryConstraintAst}
  */
 public abstract class AbstractBinaryConstraintAst implements BinaryConstraintAst {
 
-    private final TermAst leftArgument;
-    private final TermAst rightArgument;
+    private TermAst leftArgument;
+    private TermAst rightArgument;
 
-    protected AbstractBinaryConstraintAst(TermAst left, TermAst right) {
-        this.leftArgument = left;
-        this.rightArgument = right;
+    protected AbstractBinaryConstraintAst(List<TermAst> args) {
+        Objects.requireNonNull(args);
     }
 
     @Override
@@ -20,8 +24,17 @@ public abstract class AbstractBinaryConstraintAst implements BinaryConstraintAst
         return this.leftArgument;
     }
 
+    protected void setLeftArgument(TermAst arg) {
+        this.leftArgument = arg;
+    }
+
     @Override
     public TermAst getRightArgument() {
         return this.rightArgument;
     }
+
+    protected void setRightArgument(TermAst arg) {
+        this.rightArgument = arg;
+    }
+
 }
