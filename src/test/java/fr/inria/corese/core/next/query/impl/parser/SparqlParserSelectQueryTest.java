@@ -776,7 +776,7 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         QueryAst queryAst = parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
-        assertNotNull(queryAst.datasetClause().graphs());
+        assertNotNull(queryAst.datasetClause().namedGraphs());
         assertEquals(1, queryAst.datasetClause().namedGraphs().size());
         assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[0]);
         assertNotNull(queryAst.datasetClause().graphs());
@@ -801,11 +801,11 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
+        assertNotNull(queryAst.datasetClause().namedGraphs());
         assertEquals(3, queryAst.datasetClause().namedGraphs().size());
         assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[0]);
         assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[1]);
         assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[2]);
-        assertNotNull(queryAst.datasetClause().graphs());
         assertEquals(0, queryAst.datasetClause().graphs().size());
     }
 
@@ -827,7 +827,7 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
-        assertEquals(3, queryAst.datasetClause().graphs().size());
+        assertEquals(2, queryAst.datasetClause().graphs().size());
         assertInstanceOf(IriAst.class, queryAst.datasetClause().graphs().toArray()[0]);
         assertInstanceOf(IriAst.class, queryAst.datasetClause().graphs().toArray()[1]);
         assertNotNull(queryAst.datasetClause().namedGraphs());
