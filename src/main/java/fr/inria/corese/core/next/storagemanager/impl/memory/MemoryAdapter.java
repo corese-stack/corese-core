@@ -171,11 +171,19 @@ public class MemoryAdapter {
     }
 
     /**
-     * Checks if a statement context matches any of the given contexts.
+     * Determines whether a statement's context matches any of the provided context filters.
      *
-     * @param stmtContext the statement's context (may be null)
-     * @param contexts    the context filters (must not be null or empty)
-     * @return true if the statement context matches any filter
+     * <p>The comparison relies on {@link Objects#equals(Object, Object)}, ensuring
+     * proper semantic equality between RDF {@link Resource} instances. In particular,
+     * this preserves type distinctions (e.g., IRI vs blank node) and correctly handles
+     * {@code null} values, which represent the default graph.</p>
+     *
+     * @param stmtContext the context of the statement, or {@code null} if it belongs
+     *                    to the default graph
+     * @param contexts    the context filters to match against; must not be {@code null}
+     *                    or empty
+     * @return {@code true} if the statement's context is equal to at least one of the
+     *         provided contexts, {@code false} otherwise
      */
     private boolean matchesContext(Resource stmtContext, Resource[] contexts) {
         return Arrays.stream(contexts)

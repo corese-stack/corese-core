@@ -71,6 +71,15 @@ Download the latest `.jar` file from:
 - [SPARQL Rule Engine](https://files.inria.fr/corese/doc/rule.html)
 - [LDScript Reference](https://files.inria.fr/corese/doc/ldscript.html)
 
+## Custom Storage Backends
+
+Corese supports pluggable storage backends.
+Create your own storage implementation (PostgreSQL, Redis, etc.)
+or use built-in backends (`graph`, `memory`).
+
+**- [Storage Backend Plugin Guide](docs/STORAGE_PLUGIN_GUIDE.md)**
+
+
 ## Contributing
 
 We welcome contributions! Here’s how to get involved:
