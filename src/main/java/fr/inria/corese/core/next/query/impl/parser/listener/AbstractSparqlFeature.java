@@ -20,4 +20,5 @@ public abstract class AbstractSparqlFeature extends SparqlParserBaseListener {
         return this.builder;
     }
 
+
 }
