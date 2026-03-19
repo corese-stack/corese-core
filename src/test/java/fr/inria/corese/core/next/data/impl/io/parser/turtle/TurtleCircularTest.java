@@ -1,26 +1,21 @@
 package fr.inria.corese.core.next.data.impl.io.parser.turtle;
 
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import fr.inria.corese.core.next.data.api.BNode;
-import fr.inria.corese.core.next.data.api.IRI;
-import fr.inria.corese.core.next.data.api.Literal;
-import fr.inria.corese.core.next.data.api.Model;
-import fr.inria.corese.core.next.data.api.ValueFactory;
+import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.base.io.RDFFormat;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
 import fr.inria.corese.core.next.data.impl.io.parser.ParserFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.DataSerializerFactory;
 import fr.inria.corese.core.next.data.impl.io.serialization.turtle.TurtleSerializerOptions;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * are compatible and preserve data integrity across format transformations.
  */
 @DisplayName("Turtle Circular Integration Tests")
-class TurtleCircularTest {
+class TurtleCircularTest extends ParserTestBase {
 
     private ValueFactory valueFactory;
     private fr.inria.corese.core.next.data.api.io.serializer.SerializerFactory serializerFactory;
@@ -69,7 +64,7 @@ class TurtleCircularTest {
      * @return A model with two simple triples
      */
     private Model createSimpleTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
         IRI predicateName = valueFactory.createIRI(PREDICATE_NAME);
@@ -91,7 +86,7 @@ class TurtleCircularTest {
      * @return A model with diverse triple patterns
      */
     private Model createComplexTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         // Basic IRI and string literal triple
         IRI subject1 = valueFactory.createIRI(SUBJECT_1);
@@ -134,7 +129,7 @@ class TurtleCircularTest {
      * @return A model with integer and string typed literals
      */
     private Model createTypedLiteralsTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateAge = valueFactory.createIRI(PREDICATE_AGE);
@@ -159,7 +154,7 @@ class TurtleCircularTest {
      * @return A model with English and French language-tagged literals
      */
     private Model createLanguageTaggedLiteralsTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateGreeting = valueFactory.createIRI(EXAMPLE_NS + "greeting");
@@ -181,7 +176,7 @@ class TurtleCircularTest {
      * @return A model with blank nodes as subject and object
      */
     private Model createBlankNodesTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         BNode blankSubject = valueFactory.createBNode();
         BNode blankObject = valueFactory.createBNode();
@@ -198,7 +193,7 @@ class TurtleCircularTest {
      * @return A model with literals containing newlines, quotes, and Unicode
      */
     private Model createSpecialCharactersTestModel() {
-        Model model = new CoreseModel();
+        Model model = createTestModel();
 
         IRI subject = valueFactory.createIRI(SUBJECT_1);
         IRI predicateDescription = valueFactory.createIRI(EXAMPLE_NS + "description");
@@ -243,7 +238,7 @@ class TurtleCircularTest {
         }
 
         // Parse back from Turtle
-        Model deserializedModel = new CoreseModel();
+        Model deserializedModel = createTestModel();
         RDFParser parser = parserFactory.createRDFParser(
                 RDFFormat.TURTLE, deserializedModel, valueFactory);
 
@@ -290,7 +285,7 @@ class TurtleCircularTest {
     @DisplayName("Round-trip test with empty model")
     void testRoundTripWithEmptyModel()  {
         // Given: An empty model
-        Model originalModel = new CoreseModel();
+        Model originalModel = createTestModel();
 
         // When: Performing round-trip serialization and parsing
         Model deserializedModel = performRoundTrip(originalModel);

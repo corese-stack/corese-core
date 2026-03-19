@@ -5,6 +5,7 @@ import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
 import fr.inria.corese.core.next.query.api.base.io.AbstractQueryParser;
 import fr.inria.corese.core.next.query.api.exception.QueryException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
 import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
@@ -112,6 +113,7 @@ public class SparqlParser extends AbstractQueryParser {
                     new SelectQueryFeature(builder),
                     new ConstructQueryFeature(builder),
                     new SolutionModifierFeature(builder),
+                    new FilterFeature(builder),
                     new UnionFeature(builder),
                     new DescribeQueryFeature(builder)
             ));
@@ -120,15 +122,12 @@ public class SparqlParser extends AbstractQueryParser {
 
             return builder.getResult();
 
-        } catch (QueryException e) {
-            throw e;
         }
         catch (IOException e) {
             throw new QueryException("Failed to parse SPARQL query: " + e.getMessage(), e);
-
         }
         catch (Exception e) {
-            throw new QueryException("Unexpected error during SPARQL parsing: " + e.getMessage(), e);
+            throw new QuerySyntaxException("Unexpected error during SPARQL parsing: " + e.getMessage(), e);
         }
     }
 

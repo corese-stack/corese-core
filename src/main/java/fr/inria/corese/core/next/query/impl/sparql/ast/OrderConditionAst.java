@@ -4,8 +4,8 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
  * One ORDER BY condition.
  */
 public record OrderConditionAst(
-        OrderDirection orderDirection,
-        ExprAst expression
+        ASTConstants.OrderDirection orderDirection,
+        TermAst expression
 ) {
     public OrderConditionAst {
         if (orderDirection == null) throw new IllegalArgumentException("direction is null");

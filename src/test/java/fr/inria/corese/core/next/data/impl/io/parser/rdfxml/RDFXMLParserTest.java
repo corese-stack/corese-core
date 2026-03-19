@@ -3,9 +3,7 @@ package fr.inria.corese.core.next.data.impl.io.parser.rdfxml;
 import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * and interact with the Model and ValueFactory, including error handling
  * and unescaping of IRIs and literals, and named graphs.
  */
-public class RDFXMLParserTest {
+public class RDFXMLParserTest extends ParserTestBase {
     private static final Logger logger = LoggerFactory.getLogger(RDFXMLParserTest.class);
 
     /**
@@ -33,13 +31,13 @@ public class RDFXMLParserTest {
      * @throws Exception if an error occurs during parsing or I/O.
      */
     private Model parseRdfXml(String rdfXml) throws Exception {
-        Model model = new CoreseModel();
-        ValueFactory valueFactory = new CoreseAdaptedValueFactory();
+        Model coreseModel = createTestModel();
+
         try (InputStream inputStream = new ByteArrayInputStream(rdfXml.getBytes(StandardCharsets.UTF_8))) {
-            RDFXMLParser parser = new RDFXMLParser(model, valueFactory);
+            RDFXMLParser parser = new RDFXMLParser(coreseModel, valueFactory);
             parser.parse(inputStream);
         }
-        return model;
+        return coreseModel;
     }
 
     /**

@@ -356,6 +356,17 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
                 public String getID() {
                     return resource.getValue();
                 }
+
+                @Override
+                public boolean equals(Object o) {
+                    return this == o || o instanceof BNode
+                            && getID().equals(((BNode) o).getID());
+                }
+
+                @Override
+                public int hashCode() {
+                    return getID().hashCode();
+                }
             };
         }
         return null;
@@ -483,6 +494,17 @@ public class TitaniumRDFDatasetSerializationAdapter implements RdfDataset {
             @Override
             public String stringValue() {
                 return iri;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return this == o || o instanceof IRI
+                        && stringValue().equals(((IRI) o).stringValue());
+            }
+
+            @Override
+            public int hashCode() {
+                return stringValue().hashCode();
             }
         };
     }

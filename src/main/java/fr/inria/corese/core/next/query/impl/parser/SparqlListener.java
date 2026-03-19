@@ -93,6 +93,18 @@ public final class SparqlListener extends SparqlParserBaseListener {
         for (var d : delegates) d.exitOptionalGraphPattern(ctx);
     }
 
+    // ---------- FILTER -----------
+
+    @Override
+    public void enterFilter_(SparqlParser.Filter_Context ctx) {
+        for(var d : delegates) d.enterFilter_(ctx);
+    }
+
+    @Override
+    public void exitFilter_(SparqlParser.Filter_Context ctx) {
+        for(var d : delegates) d.exitFilter_(ctx);
+    }
+
     // ---------- SOLUTION MODIFIER (LIMIT / OFFSET) ----------
     @Override
     public void exitLimitClause(SparqlParser.LimitClauseContext ctx) {
@@ -103,6 +115,12 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitOffsetClause(SparqlParser.OffsetClauseContext ctx) {
         for (var d : delegates) d.exitOffsetClause(ctx);
     }
+
+    @Override
+    public void exitOrderCondition(SparqlParser.OrderConditionContext ctx) {
+        for (var d : delegates) d.exitOrderCondition(ctx);
+    }
+
     /**
      * Forwards {@code enterGroupOrUnionGraphPattern} events to all registered delegates.
      *

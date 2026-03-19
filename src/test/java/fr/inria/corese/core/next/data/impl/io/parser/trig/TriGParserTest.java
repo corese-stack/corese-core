@@ -3,10 +3,8 @@ package fr.inria.corese.core.next.data.impl.io.parser.trig;
 import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Model;
 import fr.inria.corese.core.next.data.api.Value;
-import fr.inria.corese.core.next.data.api.ValueFactory;
 import fr.inria.corese.core.next.data.api.io.parser.RDFParser;
-import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.data.impl.io.util.ParserTestBase;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * and interact with the Model and ValueFactory, including error handling
  * and unescaping of IRIs and literals, and named graphs.
  */
-class TriGParserTest {
+class TriGParserTest extends ParserTestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(TriGParserTest.class);
 
@@ -32,11 +30,10 @@ class TriGParserTest {
      * @param baseURI the base uri
      * @return Corese rdf model
      */
-
     private Model parseFromString(String trigData, String baseURI) {
-        Model model = new CoreseModel();
-        ValueFactory factory = new CoreseAdaptedValueFactory();
-        RDFParser parser = new TriGParser(model, factory);
+        Model model = createTestModel();
+
+        RDFParser parser = new TriGParser(model, valueFactory);
         parser.parse(new StringReader(trigData), baseURI);
         return model;
     }
@@ -119,7 +116,7 @@ class TriGParserTest {
     }
 
     @Test
-    void testDocumentThatContainsTwoGraphExample()  {
+    void testDocumentThatContainsTwoGraphExample() {
         String trig = """
                 # This document contains a same data as the
                 # previous example.

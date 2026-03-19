@@ -3,9 +3,11 @@ package fr.inria.corese.core.next.data.impl.io.serialization.jsonld;
 import com.apicatalog.jsonld.json.JsonLdComparison;
 import fr.inria.corese.core.next.data.api.*;
 import fr.inria.corese.core.next.data.api.io.serializer.RDFSerializer;
+import fr.inria.corese.core.next.data.impl.StorageModel;
 import fr.inria.corese.core.next.data.impl.io.common.JSONLDOptions;
 import fr.inria.corese.core.next.data.impl.temp.CoreseAdaptedValueFactory;
-import fr.inria.corese.core.next.data.impl.temp.CoreseModel;
+import fr.inria.corese.core.next.storagemanager.api.plugin.StoragePluginManager;
+import fr.inria.corese.core.next.storagemanager.api.support.config.StorageConfig;
 import jakarta.json.Json;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonReaderFactory;
@@ -16,7 +18,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JSONLDSerializerTest {
 
@@ -33,7 +35,14 @@ class JSONLDSerializerTest {
 
     @BeforeEach
     public void setUp() {
-        model = new CoreseModel();
+        StorageConfig config = StorageConfig.builder()
+                .property("type", "memory")
+                .build();
+
+        model = StorageModel.builder()
+                .storage(StoragePluginManager.create(config))
+                .valueFactory(new CoreseAdaptedValueFactory())
+                .build();
     }
 
     /**

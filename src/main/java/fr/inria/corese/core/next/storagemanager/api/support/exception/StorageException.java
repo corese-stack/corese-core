@@ -3,7 +3,7 @@ package fr.inria.corese.core.next.storagemanager.api.support.exception;
 /**
  * Specific exception for StorageManager operations.
  */
-public class StorageException extends Exception {
+public class StorageException extends RuntimeException {
 
     private final ErrorCode code;
 

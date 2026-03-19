@@ -53,7 +53,7 @@ public class StoragePluginManager {
      * @throws PluginNotFoundException  if no plugin supports the configuration
      * @throws PluginException          if the StorageManager cannot be created
      */
-    public static StorageManager create(StorageConfig config) throws PluginException {
+    public static StorageManager create(StorageConfig config) {
         if (config == null) {
             throw new IllegalArgumentException("StorageConfig must not be null");
         }
