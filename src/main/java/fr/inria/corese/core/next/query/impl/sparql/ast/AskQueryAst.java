@@ -20,5 +20,8 @@ public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst w
         if (whereClause == null) {
             whereClause = new GroupGraphPatternAst(List.of());
         }
+        if(datasetClause == null) {
+            datasetClause = DatasetClauseAst.none();
+        }
     }
 }
