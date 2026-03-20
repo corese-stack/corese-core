@@ -1,17 +1,71 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ExprAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAsts;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AddAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AndAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryRegexAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BooleanNotAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DatatypeAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DifferentAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DivideAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterOrEqualThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsBlankAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsLiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangMatchesAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerOrEqualThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MultiplyAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.OrAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SameTermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SubtractAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryMinusAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryPlusAst;
 
 /**
  * Build a minimal SPARQL AST for:
@@ -282,9 +336,18 @@ public final class SparqlAstBuilder {
         }
         return switch (this.queryType) {
             case ASK -> new AskQueryAst(whereClause);
-            case CONSTRUCT -> null;
-            case DESCRIBE -> new DescribeQueryAst(describeResources, whereClause);
-            case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
+            case CONSTRUCT -> {
+                // TODO #306: validate variable visibility for solution modifiers when ConstructQueryAst carries them.
+                yield null;
+            }
+            case DESCRIBE -> {
+                // TODO #306: validate variable visibility for solution modifiers when DescribeQueryAst carries them.
+                yield new DescribeQueryAst(describeResources, whereClause);
+            }
+            case SELECT -> {
+                validateSelectQueryVariableVisibility();
+                yield new SelectQueryAst(projection, whereClause, buildSolutionModifier());
+            }
             case UNDEFINED ->
                     throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
@@ -313,6 +376,217 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException(
                     "exitGroup() called while a TriplesBlock/BGP is still open" +
                             " (open bgpStack depth=" + bgpStack.size() + ")");
+        }
+    }
+
+    /**
+     * Validates variable visibility for the parts of SELECT already supported by the next parser.
+     */
+    private void validateSelectQueryVariableVisibility() {
+        // TODO #306: extend this validation to GROUP BY when it is supported by the next parser.
+        Set<String> visibleVariables = collectVisibleVariables(whereClause);
+
+        if (projection.selectAll()) {
+            // SELECT * still needs ORDER BY validation.
+            validateOrderVariables(visibleVariables);
+            return;
+        }
+
+        // Explicit projection variables must come from the WHERE clause scope.
+        validateProjectionVariables(visibleVariables);
+
+        // ORDER BY may use visible variables even if they are not projected.
+        validateOrderVariables(visibleVariables);
+    }
+
+    /**
+     * Validates explicit projection variables against the WHERE clause scope.
+     *
+     * @param visibleVariables variable names visible from the WHERE clause
+     */
+    private void validateProjectionVariables(Set<String> visibleVariables) {
+        for (VarAst projectedVar : projection.variables()) {
+            if (!visibleVariables.contains(projectedVar.name())) {
+                // Projection variables must be visible before the SELECT AST is created.
+                throw new QuerySyntaxException(buildVariableVisibilityErrorMessage(
+                        projectedVar.name(),
+                        "SELECT projection"));
+            }
+        }
+    }
+
+    /**
+     * Validates ORDER BY variables against the WHERE clause scope.
+     *
+     * @param visibleVariables variable names visible from the WHERE clause
+     */
+    private void validateOrderVariables(Set<String> visibleVariables) {
+        for (OrderConditionAst orderCondition : orderConditions) {
+            // ORDER BY expressions may reference several variables.
+            Set<String> referencedVariables = collectReferencedVariables(orderCondition.expression());
+
+            for (String variableName : referencedVariables) {
+                if (!visibleVariables.contains(variableName)) {
+                    // Each referenced variable must be visible in the WHERE clause.
+                    throw new QuerySyntaxException(buildVariableVisibilityErrorMessage(
+                            variableName,
+                            "ORDER BY"));
+                }
+            }
+        }
+    }
+
+    /**
+     * Builds the error message used when a modifier references a variable outside the WHERE scope.
+     *
+     * @param variableName the variable name without {@code ?}
+     * @param modifier the modifier using the variable
+     * @return a user-facing syntax error message
+     */
+    private String buildVariableVisibilityErrorMessage(String variableName, String modifier) {
+        return "Variable ?" + variableName + " used in " + modifier + " is not visible in WHERE clause";
+    }
+
+    /**
+     * Collects variables visible from the current WHERE clause.
+     *
+     * @param whereClause the WHERE clause of the current query
+     * @return the set of visible variable names, without {@code ?} or {@code $}
+     */
+    private Set<String> collectVisibleVariables(GroupGraphPatternAst whereClause) {
+        Set<String> visibleVariables = new LinkedHashSet<>();
+        if (whereClause == null) {
+            return visibleVariables;
+        }
+
+        for (PatternAst pattern : whereClause.patterns()) {
+            collectVisibleVariables(pattern, visibleVariables);
+        }
+
+        return visibleVariables;
+    }
+
+    /**
+     * Recursively collects visible variables from supported graph patterns.
+     *
+     * @param pattern the pattern to inspect
+     * @param visibleVariables the accumulator for visible variable names
+     */
+    private void collectVisibleVariables(PatternAst pattern, Set<String> visibleVariables) {
+        if (pattern == null) {
+            return;
+        }
+
+        switch (pattern) {
+            case BgpAst(List<TriplePatternAst> triples) -> {
+                // Variables come from triple terms.
+                for (TriplePatternAst triple : triples) {
+                    addIfVariable(triple.subject(), visibleVariables);
+                    addIfVariable(triple.predicate(), visibleVariables);
+                    addIfVariable(triple.object(), visibleVariables);
+                }
+            }
+
+            case GroupGraphPatternAst(List<PatternAst> patterns) -> {
+                // Recurse into nested groups.
+                for (PatternAst nestedPattern : patterns) {
+                    collectVisibleVariables(nestedPattern, visibleVariables);
+                }
+            }
+
+            case OptionalAst(PatternAst optionalPattern) ->
+                // OPTIONAL keeps variables in scope.
+                collectVisibleVariables(optionalPattern, visibleVariables);
+
+            case UnionAst(GroupGraphPatternAst left, GroupGraphPatternAst right) -> {
+                // UNION exposes variables from both branches.
+                collectVisibleVariables(left, visibleVariables);
+                collectVisibleVariables(right, visibleVariables);
+            }
+
+            case FilterAst ignored -> {
+                // FILTER does not make a variable visible by itself.
+            }
+        }
+    }
+
+    /**
+     * Adds the term name when the term is a variable.
+     *
+     * @param term the term to inspect
+     * @param visibleVariables the accumulator for visible variable names
+     */
+    private void addIfVariable(TermAst term, Set<String> visibleVariables) {
+        if (term instanceof VarAst(String name)) {
+            visibleVariables.add(name);
+        }
+    }
+
+    /**
+     * Collects variables referenced by a term or expression.
+     *
+     * @param term the term or expression to inspect
+     * @return the set of referenced variable names
+     */
+    private Set<String> collectReferencedVariables(TermAst term) {
+        Set<String> referencedVariables = new LinkedHashSet<>();
+        collectReferencedVariables(term, referencedVariables);
+        return referencedVariables;
+    }
+
+    /**
+     * Recursively collects variables referenced by a term or expression.
+     *
+     * @param term the term or expression to inspect
+     * @param referencedVariables the accumulator for referenced variable names
+     */
+    private void collectReferencedVariables(TermAst term, Set<String> referencedVariables) {
+        if (term == null) {
+            return;
+        }
+
+        switch (term) {
+            case VarAst(String name) -> {
+                // A direct variable reference contributes to ORDER BY validation.
+                referencedVariables.add(name);
+            }
+
+            case UnaryConstraintAst unaryConstraint -> {
+                // Recurse into unary expressions such as STR(?x) or BOUND(?x).
+                collectReferencedVariables(unaryConstraint.getArgument(), referencedVariables);
+            }
+
+            case BinaryConstraintAst binaryConstraint -> {
+                // Recurse into both operands of binary expressions.
+                collectReferencedVariables(binaryConstraint.getLeftArgument(), referencedVariables);
+                collectReferencedVariables(binaryConstraint.getRightArgument(), referencedVariables);
+            }
+
+            case FunctionCallAst(TermAst ignored, List<TermAst> arguments) -> {
+                // Recurse into each function argument.
+                for (TermAst argument : arguments) {
+                    collectReferencedVariables(argument, referencedVariables);
+                }
+            }
+
+            case TrinaryRegexAst regexAst -> {
+                // REGEX may reference variables in the text, pattern or flags.
+                collectReferencedVariables(regexAst.getString(), referencedVariables);
+                collectReferencedVariables(regexAst.getPattern(), referencedVariables);
+                collectReferencedVariables(regexAst.getFlags(), referencedVariables);
+            }
+
+            case IriAst ignoredIri -> {
+                // Constants do not contribute referenced variables.
+            }
+
+            case LiteralAst ignoredLiteral -> {
+                // Constants do not contribute referenced variables.
+            }
+
+            case ConstraintAst ignored -> {
+                // Other constraint shapes are ignored until they are supported here.
+            }
         }
     }
 

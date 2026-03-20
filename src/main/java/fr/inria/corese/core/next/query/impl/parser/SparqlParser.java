@@ -1,5 +1,21 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
@@ -8,18 +24,14 @@ import fr.inria.corese.core.next.query.api.exception.QueryException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
-import fr.inria.corese.core.next.query.impl.parser.listener.*;
+import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.FilterFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class SparqlParser extends AbstractQueryParser {
 
@@ -113,6 +125,9 @@ public class SparqlParser extends AbstractQueryParser {
 
             return builder.getResult();
 
+        }
+        catch (QueryException e) {
+            throw e;
         }
         catch (IOException e) {
             throw new QueryException("Failed to parse SPARQL query: " + e.getMessage(), e);
