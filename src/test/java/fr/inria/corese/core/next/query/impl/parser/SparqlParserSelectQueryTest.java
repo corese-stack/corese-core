@@ -614,7 +614,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("Should parse SELECT DISTINCT ?city ?cityLabel WHERE with BGP and UNION")
+    @DisplayName("Should parse SELECT DISTINCT ?city ?country WHERE with BGP and UNION")
     void shouldParseSelectDistinctWithUnionQueryTest() {
         SparqlParser parser = newParserDefault();
 
