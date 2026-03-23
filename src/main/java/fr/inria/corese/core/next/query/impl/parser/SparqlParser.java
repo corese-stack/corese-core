@@ -96,7 +96,7 @@ public class SparqlParser extends AbstractQueryParser {
             ParseTree tree;
 
             try {
-                tree= parser.query();
+                tree = parser.query();
                 if (errorListener.hasErrors()) {
                     String errorMsg = errorListener.getErrorMessage();
                     if (errorMsg == null || errorMsg.trim().isEmpty()) {
@@ -107,7 +107,6 @@ public class SparqlParser extends AbstractQueryParser {
             } catch (RecognitionException e) {
                 throw new QueryException("Recognition error in Sparql query: " + e.getMessage(), e);
             }
-
 
             SparqlAstBuilder builder = new SparqlAstBuilder(sparqlParserOptions);
 
@@ -124,15 +123,11 @@ public class SparqlParser extends AbstractQueryParser {
             walker.walk(listener, tree);
 
             return builder.getResult();
-
-        }
-        catch (QueryException e) {
+        } catch (QueryException e) {
             throw e;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new QueryException("Failed to parse SPARQL query: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new QuerySyntaxException("Unexpected error during SPARQL parsing: " + e.getMessage(), e);
         }
     }
