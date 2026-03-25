@@ -9,8 +9,6 @@ import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
 import fr.inria.corese.core.next.query.impl.parser.listener.*;
-import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;

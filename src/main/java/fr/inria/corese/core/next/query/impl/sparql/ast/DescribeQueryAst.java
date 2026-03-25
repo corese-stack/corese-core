@@ -39,12 +39,4 @@ public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> des
     public boolean isDescribeAll() {
         return described.isEmpty();
     }
-
-    /**
-     * Returns {@code true} if this is a {@code DESCRIBE *} query
-     * (no explicit resources specified).
-     */
-    public boolean isDescribeAll() {
-        return described.isEmpty();
-    }
 }

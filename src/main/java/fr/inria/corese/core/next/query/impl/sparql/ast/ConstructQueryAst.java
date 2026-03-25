@@ -32,12 +32,16 @@ import java.util.List;
  */
 public record ConstructQueryAst(
         ConstructTemplateAst constructTemplate,
+        DatasetClauseAst datasetClause,
         GroupGraphPatternAst whereClause,
         SolutionModifierAst solutionModifier
 ) implements QueryAst {
     public ConstructQueryAst {
         if (constructTemplate == null) {
             constructTemplate = new ConstructTemplateAst(List.of());
+        }
+        if (datasetClause == null) {
+            datasetClause = DatasetClauseAst.none();
         }
         if (whereClause == null) {
             whereClause = new GroupGraphPatternAst(List.of());
@@ -48,6 +52,6 @@ public record ConstructQueryAst(
     }
 
     public ConstructQueryAst(ConstructTemplateAst template, GroupGraphPatternAst whereClause) {
-        this(template, whereClause, SolutionModifierAst.empty());
+        this(template, DatasetClauseAst.none(), whereClause, SolutionModifierAst.empty());
     }
 }
