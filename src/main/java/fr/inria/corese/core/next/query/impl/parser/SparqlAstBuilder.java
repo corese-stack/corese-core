@@ -8,8 +8,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.util.*;
 
@@ -32,6 +31,8 @@ import java.util.*;
  * - addTriple(s,p,o) whenever a triple pattern is recognized (usually on exitTriplesSameSubject)
  * - enterAskQuery at the start of the declaration of an ASK query
  * - enterSelectQuery at the start of the declaration of a Select query
+ * - enterConstructQuery / enterConstructTemplate / exitConstructTemplate / exitConstructQuery for CONSTRUCT
+ * - addConstructTriple for triples inside the CONSTRUCT template (not WHERE)
  */
 public final class SparqlAstBuilder {
 
@@ -100,6 +101,17 @@ public final class SparqlAstBuilder {
      */
     private final List<TermAst> describeResources = new ArrayList<>();
 
+    /**
+     * Triples of the CONSTRUCT template (not the WHERE BGP). Filled between
+     * {@link #enterConstructTemplate()} and {@link #exitConstructTemplate()}.
+     */
+    private final List<TriplePatternAst> constructTriples = new ArrayList<>();
+
+    /**
+     * Template AST after {@link #exitConstructTemplate()}; consumed in {@link #getResult()}.
+     */
+    private ConstructTemplateAst constructTemplate;
+
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
     }
@@ -118,6 +130,30 @@ public final class SparqlAstBuilder {
     }
 
     public void exitSelectQuery() {
+    }
+
+    public void enterConstructQuery() {
+        queryType = ASTConstants.QUERY_TYPE.CONSTRUCT;
+        constructTemplate = null;
+        constructTriples.clear();
+    }
+
+    public void exitConstructQuery() {
+    }
+
+    public void enterConstructTemplate() {
+        constructTriples.clear();
+    }
+
+    public void exitConstructTemplate() {
+        this.constructTemplate = new ConstructTemplateAst(List.copyOf(constructTriples));
+    }
+
+    /**
+     * Adds a triple to the CONSTRUCT template (inside {@code ConstructTriples}, not WHERE).
+     */
+    public void addConstructTriple(TermAst s, TermAst p, TermAst o) {
+        constructTriples.add(new TriplePatternAst(s, p, o));
     }
 
     /**
@@ -282,9 +318,9 @@ public final class SparqlAstBuilder {
     /**
      * Returns the final AST.
      * The top-level WHERE clause must have been set by exitGroup() (root group closed).
-     * One of enterAskQuery() or enterSelectQuery() must have been called before, or this throws.
+     * One of the enter*Query() methods must have been called for the corresponding query form.
      *
-     * @return the root QueryAst (AskQueryAst or SelectQueryAst)
+     * @return the root {@link QueryAst}
      * @throws QueryEvaluationException if query type could not be determined (no enter*Query() called)
      * @throws IllegalStateException    if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
      */
@@ -295,7 +331,11 @@ public final class SparqlAstBuilder {
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
         return switch (this.queryType) {
             case DESCRIBE -> new DescribeQueryAst(datasetClauseAst, describeResources, whereClause);
-            case CONSTRUCT -> null;
+            case CONSTRUCT -> new ConstructQueryAst(
+                    constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
+                    datasetClauseAst,
+                    whereClause,
+                    buildSolutionModifier());
             case ASK -> new AskQueryAst(datasetClauseAst, whereClause);
             case SELECT -> new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier());
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");

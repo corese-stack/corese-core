@@ -103,6 +103,7 @@ public class SparqlParser extends AbstractQueryParser {
                     new BgpFeature(builder),
                     new AskQueryFeature(builder),
                     new SelectQueryFeature(builder),
+                    new ConstructQueryFeature(builder),
                     new SolutionModifierFeature(builder),
                     new FilterFeature(builder),
                     new UnionFeature(builder),
