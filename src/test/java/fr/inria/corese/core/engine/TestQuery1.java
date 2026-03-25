@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import fr.inria.corese.core.transform.TransformerUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,7 +35,6 @@ import fr.inria.corese.core.kgram.event.StatListener;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
-import fr.inria.corese.core.logic.RDFS;
 import fr.inria.corese.core.print.JSONLDFormat;
 import fr.inria.corese.core.print.NTriplesFormat;
 import fr.inria.corese.core.print.ResultFormat;
@@ -47,7 +45,6 @@ import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.datatype.extension.CoresePointer;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.exceptions.LDScriptException;
@@ -57,14 +54,10 @@ import fr.inria.corese.core.sparql.storage.api.Parameters;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Access;
-import fr.inria.corese.core.sparql.triple.parser.Access.Feature;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.transform.Loader;
-import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.util.Property;
-import fr.inria.corese.core.util.SPINProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +78,7 @@ public class TestQuery1 {
     // <http://ns.inria.fr/ast/sql#>\n";
     static Graph graph;
 
+    private static final String Loader_PPLIB = "/template/";
     private static final String localRDF = data + "rdf.2014.ttl";
     private static final String localRDFS = data + "rdfs.2014.ttl";
 
@@ -240,7 +234,7 @@ public class TestQuery1 {
         exec.query(q);
     }
 
-    @Test
+/*    @Test
     public void typecheckowlrl() throws EngineException, MalformedURLException, LoadException {
         Graph g = Graph.create();
         Load load = Load.create(g);
@@ -254,6 +248,7 @@ public class TestQuery1 {
 
         assertEquals(true, dt.getLabel().contains("<span class='fail'>"));
     }
+*/
 
     @Test
     public void union5() throws EngineException, MalformedURLException, LoadException {
@@ -3532,19 +3527,6 @@ public class TestQuery1 {
     }
 
     @Test
-    public void testFormatBase() throws EngineException, LoadException {
-        Graph g = Graph.create();
-        // Access.define("junit/sttl/format1/", true);
-        Access.define("junit/sttl/format2/", true);
-        Access.authorize(Feature.READ_FILE);
-        Transformer t = Transformer.createWE(g, data + "junit/sttl/format1/");
-        String res = t.transform();
-        // logger.debug("result: " + res);
-        assertEquals(true, res != null && res.equals("test"));
-        Access.define("junit/sttl/format2/", false);
-    }
-
-    @Test
     public void testReturn() throws EngineException {
         Graph g = Graph.create();
         QueryProcess exec = QueryProcess.create(g);
@@ -3700,56 +3682,6 @@ public class TestQuery1 {
         assertEquals("aoobooooc", dt.getLabel());
     }
 
-    @Test
-    public void testrdfxml() throws LoadException, IOException {
-        Graph g = Graph.create();
-        Load ld = Load.create(g);
-        ld.parse(TestQuery1.class.getResource("/data-test/test/primer.owl").getPath());
-        g.init();
-
-        Transformer t = Transformer.create(g, TransformerUtils.RDFXML);
-        // Transformer t = Transformer.create(g, RDFXMLNEW);
-        File tempFileRdf = File.createTempFile("temp-rdf", ".rdf");
-        t.write(tempFileRdf.toString());
-
-        Graph g1 = Graph.create();
-        Load ld1 = Load.create(g1);
-        ld1.parse(tempFileRdf.toString());
-        g1.init();
-
-        Transformer t2 = Transformer.create(g1, TransformerUtils.TURTLE);
-        File tempFileTtl = File.createTempFile("temp-ttl", ".ttl");
-        t2.write(tempFileTtl.toString());
-
-        Graph g2 = Graph.create();
-        Load ld2 = Load.create(g2);
-        ld2.parse(tempFileTtl.toString());
-        g2.init();
-
-        assertEquals(354, g.size());
-        assertEquals(g.size(), g1.size());
-        // missing: _:b a rdf:List
-        assertEquals(308, g2.size());
-
-
-    }
-
-    @Test
-    public void testTTLabc() throws EngineException, LoadException {
-
-        Graph g = Graph.create();
-        QueryProcess exec = QueryProcess.create(g);
-
-        String i = "insert data {  "
-                + "_:b rdf:value _:b, (_:b (_:b) ((_:b)))  "
-                + "}";
-
-        exec.query(i);
-
-        Transformer t = Transformer.create(g, TransformerUtils.TURTLE);
-        logger.info("testTTLabc {} " , t.transform());
-        // assertEquals(197, t.transform().length());
-    }
 
     @Test
     public void testIndex() throws EngineException {
@@ -5538,17 +5470,6 @@ public class TestQuery1 {
         return g;
     }
 
-    @Test
-    public void testOWLRL() throws EngineException, LoadException {
-        GraphStore gs = GraphStore.create();
-        QueryProcess.create(gs);
-        Load ld = Load.create(gs);
-        ld.parse(data + "template/owl/data/primer.owl");
-        Transformer t = Transformer.create(gs, TransformerUtils.OWLRL);
-        IDatatype dt = t.process();
-
-        assertEquals(DatatypeMap.FALSE, dt);
-    }
 
     // @Test
     // public void testTCgg () throws EngineException{
@@ -5745,30 +5666,6 @@ public class TestQuery1 {
     }
 
     @Test
-    public void testGTT() throws LoadException, EngineException {
-
-        Graph g = createGraph();
-        Load ld = Load.create(g);
-        ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-
-        Transformer t = Transformer.createWE(g, TransformerUtils.TURTLE, RDF.RDF);
-        String str = normalizeLineEndings(t.transform());
-        // logger.debug("result:\n {}" + str);
-        assertEquals(6202, str.length());
-
-        t = Transformer.createWE(g, TransformerUtils.TURTLE, RDFS.RDFS);
-        str = normalizeLineEndings(t.transform());
-        // logger.debug(str);
-        assertEquals(3849, str.length()); // TODO: need a more robust test
-
-        t = Transformer.create(g, TransformerUtils.TURTLE);
-        str = normalizeLineEndings(t.transform());
-        // logger.debug(str);
-        assertEquals(9859, str.length()); // TODO: need a more robust test
-    }
-
-    @Test
     public void testGT() throws LoadException, EngineException {
         Graph g = createGraph();
         Load ld = Load.create(g);
@@ -5825,20 +5722,6 @@ public class TestQuery1 {
         IDatatype dt2 = map.get(2).getValue("?g");
         assertEquals(true, dt2.getLang() != null && dt2.getLang().equals("fr"));
 
-    }
-
-    @Test
-    public void testTrig() throws LoadException, EngineException {
-        Property.set(LOAD_IN_DEFAULT_GRAPH, true);
-        Graph g = Graph.create(true);
-        Load ld = Load.create(g);
-        ld.parse(localRDF, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        ld.parse(localRDFS, fr.inria.corese.core.api.Loader.format.TURTLE_FORMAT);
-        Property.set(LOAD_IN_DEFAULT_GRAPH, false);
-
-        Transformer pp = Transformer.create(g, TransformerUtils.TRIG);
-        String str = normalizeLineEndings(pp.transform());
-        assertEquals(14928, str.length()); // @Todo: need a more robust test
     }
 
     @Test
@@ -6416,7 +6299,7 @@ public class TestQuery1 {
     }
 
     InputStream test(String pp) {
-        String lib = Loader.PPLIB;
+        String lib = Loader_PPLIB;
 
         InputStream stream = getClass().getResourceAsStream(lib + pp);
         if (stream != null) {
