@@ -43,7 +43,6 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.*;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.storage.api.datamanager.DataManager;
-import fr.inria.corese.core.transform.TransformerUtils;
 import fr.inria.corese.core.util.GraphListen;
 import fr.inria.corese.core.util.MappingsGraph;
 import fr.inria.corese.core.util.SPINProcess;
@@ -71,6 +70,7 @@ public class PluginImpl
         implements GraphProcessor {
 
     static final String EXT = ExpType.EXT;
+    public static final String STL_TEXT = NSManager.STL + "text";
     public static final String METADATA = EXT + "metadata";
     public static final String VISITOR = EXT + "visitor";
     public static final String LISTEN = EXT + "listen";
@@ -96,11 +96,11 @@ public class PluginImpl
     private static final IDatatype SUB_CLASS_OF = DatatypeMap.newResource(RDFS.SUBCLASSOF);
     private static final String QM = "?";
     static public Logger logger = LoggerFactory.getLogger(PluginImpl.class);
-    static String DEF_PPRINTER = TransformerUtils.PPRINTER;
+
     static int nbBufferedValue = 0;
     // draft storage for large literal values (not used)
     private static IStorage storageMgr;
-    String PPRINTER = DEF_PPRINTER;
+
     MatcherImpl match;
     int index = 0;
     // Plugin for Transformer functions
@@ -433,7 +433,7 @@ public class PluginImpl
             if (expectedFormat == null) {
                 // use content negotiation for format
                 ld.parse(dt.getLabel(), getFormat(expectedFormat));
-            } else if (expectedFormat.getLabel().equals(TransformerUtils.TEXT)) {
+            } else if (expectedFormat.getLabel().equals(STL_TEXT)) {
                 // xt:load(uri, st:text, st:turtle)
                 ld.loadString(dt.stringValue(), getFormat(requiredFormat));
             } else {
