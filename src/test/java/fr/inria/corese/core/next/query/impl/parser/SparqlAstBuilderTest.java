@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +44,7 @@ class SparqlAstBuilderTest {
     void shouldBuildSingleBgpWithOneTriple() {
         SparqlAstBuilder b = newBuilder();
 
+        b.setBaseUri(IOConstants.getDefaultBaseURI());
         b.enterSelectQuery();
         b.enterGroup();
         b.enterBgp();

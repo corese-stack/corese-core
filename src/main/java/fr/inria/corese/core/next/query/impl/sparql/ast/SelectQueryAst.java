@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import fr.inria.corese.core.next.data.api.IPrefixHandler;
 import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 
 import java.util.List;
 
@@ -40,7 +41,8 @@ public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetC
             solutionModifier = SolutionModifierAst.empty();
         }
         if (prefixHandler == null) {
-            prefixHandler = new PrefixHandler(true);
+            prefixHandler = new PrefixHandler();
+            prefixHandler.setDefaultNamespace(IOConstants.getDefaultBaseURI());
         }
     }
 }

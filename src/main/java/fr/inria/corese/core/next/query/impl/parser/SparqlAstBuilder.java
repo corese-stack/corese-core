@@ -119,8 +119,14 @@ public final class SparqlAstBuilder {
      */
     private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
+    /**
+     * Base URI for ":" prefixed IRI resolution
+     */
     private String baseUri = IOConstants.getDefaultBaseURI();
-    private Map<String, String> prefixes = new HashMap<>();
+    /**
+     * <prefix, namespace> map storage
+     */
+    private final Map<String, String> prefixes = new HashMap<>();
 
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
@@ -356,7 +362,7 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
-        PrefixHandler prefixHandler = new PrefixHandler(true);
+        PrefixHandler prefixHandler = new PrefixHandler();
         prefixHandler.setDefaultNamespace(this.baseUri);
         this.prefixes.forEach(prefixHandler::setPrefix);
         return switch (this.queryType) {
