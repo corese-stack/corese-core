@@ -52,7 +52,7 @@ public class DescribeQueryFeature extends AbstractSparqlFeature {
             return;
         }
 
-        for (SparqlParser.VarOrIRIrefContext ref : ctx.varOrIRIref()) {
+        for (SparqlParser.VarOrIriContext ref : ctx.varOrIri()) {
             String txt = ref.getText();
             if (txt.startsWith("?") || txt.startsWith("$")) {
                 builder().addDescribeResource(builder().var(txt));
