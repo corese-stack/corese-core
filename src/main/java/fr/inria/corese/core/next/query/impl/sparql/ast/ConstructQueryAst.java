@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
+
 import java.util.List;
 
 /**
@@ -34,8 +36,9 @@ public record ConstructQueryAst(
         ConstructTemplateAst constructTemplate,
         DatasetClauseAst datasetClause,
         GroupGraphPatternAst whereClause,
-        SolutionModifierAst solutionModifier
-) implements QueryAst {
+        SolutionModifierAst solutionModifier,
+        PrefixHandler prefixHandler
+            ) implements QueryAst {
     public ConstructQueryAst {
         if (constructTemplate == null) {
             constructTemplate = new ConstructTemplateAst(List.of());
@@ -49,9 +52,22 @@ public record ConstructQueryAst(
         if (solutionModifier == null) {
             solutionModifier = SolutionModifierAst.empty();
         }
+        if (prefixHandler == null) {
+            prefixHandler = new PrefixHandler(true);
+        }
     }
 
+    /**
+     * constructor with default prefix handler
+     */
+    public ConstructQueryAst(ConstructTemplateAst template, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, SolutionModifierAst solutionModifier) {
+        this(template, datasetClause, whereClause, solutionModifier, null);
+    }
+
+    /**
+     * constructor with default prefix handler and default solution modifier
+     */
     public ConstructQueryAst(ConstructTemplateAst template, GroupGraphPatternAst whereClause) {
-        this(template, DatasetClauseAst.none(), whereClause, SolutionModifierAst.empty());
+        this(template, DatasetClauseAst.none(), whereClause, SolutionModifierAst.empty(), null);
     }
 }

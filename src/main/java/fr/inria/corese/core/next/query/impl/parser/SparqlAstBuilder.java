@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
@@ -117,11 +119,33 @@ public final class SparqlAstBuilder {
      */
     private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
+    private String baseUri = IOConstants.getDefaultBaseURI();
+    private Map<String, String> prefixes = new HashMap<>();
+
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
     }
 
     // --- Construction entry points (called by listener) ---
+
+    public void setBaseUri(String uri) {
+        if(uri.startsWith("<") && uri.endsWith(">")) {
+            uri = uri.substring(0, uri.lastIndexOf(">"));
+            uri = uri.substring(uri.indexOf("<")+1);
+        }
+        this.baseUri = uri;
+    }
+
+    public void addPrefix(String prefix, String uri) {
+        if(prefix.endsWith(":")) {
+            prefix = prefix.substring(0, prefix.lastIndexOf(":"));
+        }
+        if(uri.startsWith("<") && uri.endsWith(">")) {
+            uri = uri.substring(0, uri.lastIndexOf(">"));
+            uri = uri.substring(uri.indexOf("<") +1);
+        }
+        this.prefixes.put(prefix, uri);
+    }
 
     public void enterAskQuery() {
         queryType = ASTConstants.QUERY_TYPE.ASK;
@@ -332,6 +356,9 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
+        PrefixHandler prefixHandler = new PrefixHandler(true);
+        prefixHandler.setDefaultNamespace(this.baseUri);
+        this.prefixes.forEach(prefixHandler::setPrefix);
         return switch (this.queryType) {
             case ASK -> buildAskQueryAst(datasetClauseAst);
             case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst);

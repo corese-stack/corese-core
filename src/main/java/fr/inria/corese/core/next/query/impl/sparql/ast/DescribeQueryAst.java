@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.data.impl.common.prefix.PrefixHandler;
+
 import java.util.List;
 
 /**
@@ -21,7 +23,7 @@ import java.util.List;
  * }
  * }</pre>
  */
-public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause) implements QueryAst {
+public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause, PrefixHandler prefixHandler) implements QueryAst {
     public DescribeQueryAst {
         described = described != null ? List.copyOf(described) : List.of();
         if (whereClause == null) {
@@ -30,6 +32,16 @@ public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> des
         if(datasetClause == null) {
             datasetClause = DatasetClauseAst.none();
         }
+        if(prefixHandler == null) {
+            prefixHandler = new PrefixHandler(true);
+        }
+    }
+
+    /**
+     * constructor with default prefix handler
+     */
+    public DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause) {
+        this(datasetClause, described, whereClause, null);
     }
 
     /**
