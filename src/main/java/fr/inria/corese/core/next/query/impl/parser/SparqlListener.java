@@ -150,4 +150,14 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitDescribeQuery(SparqlParser.DescribeQueryContext ctx) {
         for (var d : delegates) d.exitDescribeQuery(ctx);
     }
+
+    @Override
+    public void exitDefaultGraphClause(SparqlParser.DefaultGraphClauseContext ctx) {
+        for (var d : delegates) d.exitDefaultGraphClause(ctx);
+    }
+
+    @Override
+    public void exitNamedGraphClause(SparqlParser.NamedGraphClauseContext ctx) {
+        for (var d : delegates) d.exitNamedGraphClause(ctx);
+    }
 }

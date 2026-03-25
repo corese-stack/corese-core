@@ -426,7 +426,7 @@ class SparqlAstTest {
             GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
                     new BgpAst(List.of(new TriplePatternAst(
                             new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
-            QueryAst q = new AskQueryAst(where);
+            QueryAst q = new AskQueryAst(DatasetClauseAst.none(), where);
             assertSame(where, q.whereClause());
         }
 
@@ -434,8 +434,8 @@ class SparqlAstTest {
         @DisplayName("AskQueryAst record equality when same whereClause")
         void askQueryAstEquality() {
             GroupGraphPatternAst where = new GroupGraphPatternAst(List.of());
-            AskQueryAst a = new AskQueryAst(where);
-            AskQueryAst b = new AskQueryAst(where);
+            AskQueryAst a = new AskQueryAst(DatasetClauseAst.none(), where);
+            AskQueryAst b = new AskQueryAst(DatasetClauseAst.none(), where);
             assertEquals(a, b);
             assertEquals(a.hashCode(), b.hashCode());
         }
@@ -443,7 +443,7 @@ class SparqlAstTest {
         @Test
         @DisplayName("AskQueryAst with null whereClause uses empty group")
         void nullWhereClauseDefaultsToEmpty() {
-            AskQueryAst q = new AskQueryAst(null);
+            AskQueryAst q = new AskQueryAst(DatasetClauseAst.none(), null);
             assertNotNull(q.whereClause());
             assertTrue(q.whereClause().patterns().isEmpty());
         }
@@ -451,7 +451,7 @@ class SparqlAstTest {
         @Test
         @DisplayName("AskQueryAst implements QueryAst")
         void implementsQueryAst() {
-            assertInstanceOf(QueryAst.class, new AskQueryAst(new GroupGraphPatternAst(List.of())));
+            assertInstanceOf(QueryAst.class, new AskQueryAst(DatasetClauseAst.none(), new GroupGraphPatternAst(List.of())));
         }
     }
 

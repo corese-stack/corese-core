@@ -109,7 +109,8 @@ public class SparqlParser extends AbstractQueryParser {
                     new SolutionModifierFeature(builder),
                     new FilterFeature(builder),
                     new UnionFeature(builder),
-                    new DescribeQueryFeature(builder)
+                    new DescribeQueryFeature(builder),
+                    new DatasetClauseFeature(builder)
             ));
 
             walker.walk(listener, tree);
