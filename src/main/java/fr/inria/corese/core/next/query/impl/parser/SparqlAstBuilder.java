@@ -65,8 +65,12 @@ public final class SparqlAstBuilder {
     private ProjectionAst projection = ProjectionAsts.selectAll();
 
     /**
-     * SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ...
+     * Dataset clause (FROM/FROM NAMED)
      */
+    private final Set<IriAst> datasetDefaultGraphs = new LinkedHashSet<>();
+    private final Set<IriAst> datasetNamedGraphs = new LinkedHashSet<>();
+
+    /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
     private boolean distinct;
     private boolean reduced;
 
@@ -158,6 +162,14 @@ public final class SparqlAstBuilder {
      */
     public void setReduced(boolean reduced) {
         this.reduced = reduced;
+    }
+
+    public void addFromGraph(IriAst graph) {
+        this.datasetDefaultGraphs.add(graph);
+    }
+
+    public void addFromNamedGraph(IriAst graph) {
+        this.datasetNamedGraphs.add(graph);
     }
 
     /**
@@ -280,13 +292,13 @@ public final class SparqlAstBuilder {
         if (whereClause == null) {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
+        DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
         return switch (this.queryType) {
-            case ASK -> new AskQueryAst(whereClause);
+            case DESCRIBE -> new DescribeQueryAst(datasetClauseAst, describeResources, whereClause);
             case CONSTRUCT -> null;
-            case DESCRIBE -> new DescribeQueryAst(describeResources, whereClause);
-            case SELECT -> new SelectQueryAst(projection, whereClause, buildSolutionModifier());
-            case UNDEFINED ->
-                    throw new QueryEvaluationException("Could not determine the type of query during parsing");
+            case ASK -> new AskQueryAst(datasetClauseAst, whereClause);
+            case SELECT -> new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier());
+            case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
 

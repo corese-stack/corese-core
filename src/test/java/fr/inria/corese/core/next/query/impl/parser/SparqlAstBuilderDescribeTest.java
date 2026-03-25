@@ -203,7 +203,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("null described list defaults to empty list")
         void nullDescribedDefaultsToEmpty() {
-            DescribeQueryAst ast = new DescribeQueryAst(null, null);
+            DescribeQueryAst ast = new DescribeQueryAst(null,null, null);
             assertNotNull(ast.described());
             assertTrue(ast.described().isEmpty());
         }
@@ -211,7 +211,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("null whereClause defaults to empty GroupGraphPatternAst")
         void nullWhereClauseDefaultsToEmptyGroup() {
-            DescribeQueryAst ast = new DescribeQueryAst(null, null);
+            DescribeQueryAst ast = new DescribeQueryAst(null,null, null);
             assertNotNull(ast.whereClause());
             assertTrue(ast.whereClause().patterns().isEmpty());
         }

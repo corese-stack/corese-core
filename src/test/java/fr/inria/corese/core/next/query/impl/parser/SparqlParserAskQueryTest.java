@@ -208,4 +208,126 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
         assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
     }
+
+    @Test
+    @DisplayName("a list of From graphs can be inserted")
+    public void fromGraphs() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                ASK
+                FROM <http://ns.inria.fr/graph>
+                WHERE {
+                    ?s a ?c ;
+                        <http://ns.inria.fr/test#property> ?o .
+                }
+               """;
+        QueryAst queryAst = parser.parse(commentedQuery);
+        assertNotNull(queryAst);
+        assertNotNull(queryAst.datasetClause());
+        assertNotNull(queryAst.datasetClause().graphs());
+        assertEquals(1, queryAst.datasetClause().graphs().size());
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().graphs().toArray()[0]);
+        assertNotNull(queryAst.datasetClause().namedGraphs());
+        assertEquals(0, queryAst.datasetClause().namedGraphs().size());
+    }
+
+    @Test
+    @DisplayName("a list of From graphs can be inserted")
+    public void fromMultipleGraphs() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                ASK
+                FROM <http://ns.inria.fr/graph1>
+                FROM <http://ns.inria.fr/graph2>
+                FROM <http://ns.inria.fr/graph3>
+                WHERE {
+                    ?s a ?c ;
+                        <http://ns.inria.fr/test#property> ?o .
+                }
+               """;
+        QueryAst queryAst = parser.parse(commentedQuery);
+        assertNotNull(queryAst);
+        assertNotNull(queryAst.datasetClause());
+        assertNotNull(queryAst.datasetClause().graphs());
+        assertEquals(3, queryAst.datasetClause().graphs().size());
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().graphs().toArray()[0]);
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().graphs().toArray()[1]);
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().graphs().toArray()[2]);
+        assertNotNull(queryAst.datasetClause().namedGraphs());
+        assertEquals(0, queryAst.datasetClause().namedGraphs().size());
+    }
+
+    @Test
+    @DisplayName("a list of From graphs can be inserted")
+    public void fromNamedGraphs() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                ASK
+                FROM NAMED <http://ns.inria.fr/graph>
+                WHERE {
+                    ?s a ?c ;
+                        <http://ns.inria.fr/test#property> ?o .
+                }
+               """;
+        QueryAst queryAst = parser.parse(commentedQuery);
+        assertNotNull(queryAst);
+        assertNotNull(queryAst.datasetClause());
+        assertNotNull(queryAst.datasetClause().namedGraphs());
+        assertEquals(1, queryAst.datasetClause().namedGraphs().size());
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[0]);
+        assertNotNull(queryAst.datasetClause().graphs());
+        assertEquals(0, queryAst.datasetClause().graphs().size());
+    }
+
+    @Test
+    @DisplayName("a list of From graphs can be inserted")
+    public void fromMultipleNamedGraphs() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                ASK
+                FROM NAMED <http://ns.inria.fr/graph1>
+                FROM NAMED <http://ns.inria.fr/graph2>
+                FROM NAMED <http://ns.inria.fr/graph3>
+                WHERE {
+                    ?s a ?c ;
+                        <http://ns.inria.fr/test#property> ?o .
+                }
+               """;
+        QueryAst queryAst = parser.parse(commentedQuery);
+        assertNotNull(queryAst);
+        assertNotNull(queryAst.datasetClause());
+        assertNotNull(queryAst.datasetClause().graphs());
+        assertNotNull(queryAst.datasetClause().namedGraphs());
+        assertEquals(3, queryAst.datasetClause().namedGraphs().size());
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[0]);
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[1]);
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[2]);
+        assertEquals(0, queryAst.datasetClause().graphs().size());
+    }
+
+    @Test
+    @DisplayName("a list of From graphs can be inserted")
+    public void fromMultipleMixedGraphs() {
+        SparqlParser parser = newParserDefault();
+        String commentedQuery = """
+                ASK
+                FROM <http://ns.inria.fr/graph1>
+                FROM NAMED <http://ns.inria.fr/graph2>
+                FROM <http://ns.inria.fr/graph3>
+                WHERE {
+                    ?s a ?c ;
+                        <http://ns.inria.fr/test#property> ?o .
+                }
+               """;
+        QueryAst queryAst = parser.parse(commentedQuery);
+        assertNotNull(queryAst);
+        assertNotNull(queryAst.datasetClause());
+        assertNotNull(queryAst.datasetClause().graphs());
+        assertEquals(2, queryAst.datasetClause().graphs().size());
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().graphs().toArray()[0]);
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().graphs().toArray()[1]);
+        assertNotNull(queryAst.datasetClause().namedGraphs());
+        assertEquals(1, queryAst.datasetClause().namedGraphs().size());
+        assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[0]);
+    }
 }

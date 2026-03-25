@@ -15,10 +15,13 @@ import java.util.List;
  * }
  * }</pre>
  */
-public record AskQueryAst(GroupGraphPatternAst whereClause) implements QueryAst {
+public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause) implements QueryAst {
     public AskQueryAst {
         if (whereClause == null) {
             whereClause = new GroupGraphPatternAst(List.of());
+        }
+        if(datasetClause == null) {
+            datasetClause = DatasetClauseAst.none();
         }
     }
 }
