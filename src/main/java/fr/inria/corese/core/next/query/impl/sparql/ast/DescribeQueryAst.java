@@ -21,11 +21,14 @@ import java.util.List;
  * }
  * }</pre>
  */
-public record DescribeQueryAst(List<TermAst> described, GroupGraphPatternAst whereClause) implements QueryAst {
+public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause) implements QueryAst {
     public DescribeQueryAst {
         described = described != null ? List.copyOf(described) : List.of();
         if (whereClause == null) {
             whereClause = new GroupGraphPatternAst(List.of());
+        }
+        if(datasetClause == null) {
+            datasetClause = DatasetClauseAst.none();
         }
     }
 

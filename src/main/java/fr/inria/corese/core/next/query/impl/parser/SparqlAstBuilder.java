@@ -1,68 +1,15 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
-import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ExprAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAsts;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AddAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AndAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryRegexAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BooleanNotAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DatatypeAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DifferentAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DivideAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterOrEqualThanAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsBlankAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsLiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangMatchesAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerOrEqualThanAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerThanAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MultiplyAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.OrAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SameTermAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SubtractAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryMinusAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryPlusAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.*;
 
 /**
  * Build a minimal SPARQL AST for:
@@ -83,6 +30,8 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryPlusAst;
  * - addTriple(s,p,o) whenever a triple pattern is recognized (usually on exitTriplesSameSubject)
  * - enterAskQuery at the start of the declaration of an ASK query
  * - enterSelectQuery at the start of the declaration of a Select query
+ * - enterConstructQuery / enterConstructTemplate / exitConstructTemplate / exitConstructQuery for CONSTRUCT
+ * - addConstructTriple for triples inside the CONSTRUCT template (not WHERE)
  */
 public final class SparqlAstBuilder {
 
@@ -116,8 +65,12 @@ public final class SparqlAstBuilder {
     private ProjectionAst projection = ProjectionAsts.selectAll();
 
     /**
-     * SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ...
+     * Dataset clause (FROM/FROM NAMED)
      */
+    private final Set<IriAst> datasetDefaultGraphs = new LinkedHashSet<>();
+    private final Set<IriAst> datasetNamedGraphs = new LinkedHashSet<>();
+
+    /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
     private boolean distinct;
     private boolean reduced;
 
@@ -148,6 +101,17 @@ public final class SparqlAstBuilder {
     private final List<TermAst> describeResources = new ArrayList<>();
 
     /**
+     * Triples of the CONSTRUCT template (not the WHERE BGP). Filled between
+     * {@link #enterConstructTemplate()} and {@link #exitConstructTemplate()}.
+     */
+    private final List<TriplePatternAst> constructTriples = new ArrayList<>();
+
+    /**
+     * Template AST after {@link #exitConstructTemplate()}; consumed in {@link #getResult()}.
+     */
+    private ConstructTemplateAst constructTemplate;
+
+    /**
      * Helper used to compute visible and referenced variables.
      */
     private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
@@ -170,6 +134,30 @@ public final class SparqlAstBuilder {
     }
 
     public void exitSelectQuery() {
+    }
+
+    public void enterConstructQuery() {
+        queryType = ASTConstants.QUERY_TYPE.CONSTRUCT;
+        constructTemplate = null;
+        constructTriples.clear();
+    }
+
+    public void exitConstructQuery() {
+    }
+
+    public void enterConstructTemplate() {
+        constructTriples.clear();
+    }
+
+    public void exitConstructTemplate() {
+        this.constructTemplate = new ConstructTemplateAst(List.copyOf(constructTriples));
+    }
+
+    /**
+     * Adds a triple to the CONSTRUCT template (inside {@code ConstructTriples}, not WHERE).
+     */
+    public void addConstructTriple(TermAst s, TermAst p, TermAst o) {
+        constructTriples.add(new TriplePatternAst(s, p, o));
     }
 
     /**
@@ -214,6 +202,14 @@ public final class SparqlAstBuilder {
      */
     public void setReduced(boolean reduced) {
         this.reduced = reduced;
+    }
+
+    public void addFromGraph(IriAst graph) {
+        this.datasetDefaultGraphs.add(graph);
+    }
+
+    public void addFromNamedGraph(IriAst graph) {
+        this.datasetNamedGraphs.add(graph);
     }
 
     /**
@@ -326,9 +322,9 @@ public final class SparqlAstBuilder {
     /**
      * Returns the final AST.
      * The top-level WHERE clause must have been set by exitGroup() (root group closed).
-     * One of enterAskQuery() or enterSelectQuery() must have been called before, or this throws.
+     * One of the enter*Query() methods must have been called for the corresponding query form.
      *
-     * @return the root QueryAst (AskQueryAst or SelectQueryAst)
+     * @return the root {@link QueryAst}
      * @throws QueryEvaluationException if query type could not be determined (no enter*Query() called)
      * @throws IllegalStateException    if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
      */
@@ -336,13 +332,13 @@ public final class SparqlAstBuilder {
         if (whereClause == null) {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
+        DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
         return switch (this.queryType) {
-            case ASK -> buildAskQueryAst();
-            case CONSTRUCT -> buildConstructQueryAst();
-            case DESCRIBE -> buildDescribeQueryAst();
-            case SELECT -> buildSelectQueryAst();
-            case UNDEFINED ->
-                    throw new QueryEvaluationException("Could not determine the type of query during parsing");
+            case ASK -> buildAskQueryAst(datasetClauseAst);
+            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst);
+            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst);
+            case SELECT -> buildSelectQueryAst(datasetClauseAst);
+            case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
 
@@ -375,32 +371,36 @@ public final class SparqlAstBuilder {
     /**
      * Builds the AST for ASK queries.
      */
-    private AskQueryAst buildAskQueryAst() {
-        return new AskQueryAst(whereClause);
+    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst) {
+        return new AskQueryAst(datasetClauseAst, whereClause);
     }
 
     /**
      * Builds the AST for SELECT queries.
      */
-    private SelectQueryAst buildSelectQueryAst() {
+    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst) {
         validateSelectQueryScope();
-        return new SelectQueryAst(projection, whereClause, buildSolutionModifier());
+        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier());
     }
 
     /**
      * Builds the AST for DESCRIBE queries.
      */
-    private DescribeQueryAst buildDescribeQueryAst() {
+    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst) {
         // TODO #306: validate variable scope for DESCRIBE modifiers when DescribeQueryAst carries them.
-        return new DescribeQueryAst(describeResources, whereClause);
+        return new DescribeQueryAst(datasetClauseAst, describeResources, whereClause);
     }
 
     /**
      * Builds the AST for CONSTRUCT queries.
      */
-    private QueryAst buildConstructQueryAst() {
+    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst) {
         // TODO #306: validate variable scope for CONSTRUCT modifiers when ConstructQueryAst carries them.
-        return null;
+        return new ConstructQueryAst(
+                constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
+                datasetClauseAst,
+                whereClause,
+                buildSolutionModifier());
     }
 
     /**

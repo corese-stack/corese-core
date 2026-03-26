@@ -34,6 +34,26 @@ public final class SparqlListener extends SparqlParserBaseListener {
         for(var d : delegates) d.enterAskQuery(ctx);
     }
 
+    @Override
+    public void enterConstructQuery(SparqlParser.ConstructQueryContext ctx) {
+        for (var d : delegates) d.enterConstructQuery(ctx);
+    }
+
+    @Override
+    public void exitConstructQuery(SparqlParser.ConstructQueryContext ctx) {
+        for (var d : delegates) d.exitConstructQuery(ctx);
+    }
+
+    @Override
+    public void enterConstructTemplate(SparqlParser.ConstructTemplateContext ctx) {
+        for (var d : delegates) d.enterConstructTemplate(ctx);
+    }
+
+    @Override
+    public void exitConstructTemplate(SparqlParser.ConstructTemplateContext ctx) {
+        for (var d : delegates) d.exitConstructTemplate(ctx);
+    }
+
     // ---------- GROUP GRAPH PATTERN ----------
     @Override
     public void enterGroupGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.GroupGraphPatternContext ctx) {
@@ -129,5 +149,15 @@ public final class SparqlListener extends SparqlParserBaseListener {
     @Override
     public void exitDescribeQuery(SparqlParser.DescribeQueryContext ctx) {
         for (var d : delegates) d.exitDescribeQuery(ctx);
+    }
+
+    @Override
+    public void exitDefaultGraphClause(SparqlParser.DefaultGraphClauseContext ctx) {
+        for (var d : delegates) d.exitDefaultGraphClause(ctx);
+    }
+
+    @Override
+    public void exitNamedGraphClause(SparqlParser.NamedGraphClauseContext ctx) {
+        for (var d : delegates) d.exitNamedGraphClause(ctx);
     }
 }

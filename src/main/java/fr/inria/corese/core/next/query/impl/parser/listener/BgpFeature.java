@@ -1,19 +1,22 @@
 package fr.inria.corese.core.next.query.impl.parser.listener;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.List;
 
-
 /**
- * SPARQL 1.0 feature: build Triple patterns + BGPs + OPTIONAL
- 
- * Grammar hooks used:
- * - GroupGraphPattern: { ... }  -> builder.enterGroup()/exitGroup()
- * - TriplesBlock: BGP block      -> builder.enterBgp()/exitBgp()
- * - TriplesSameSubject: produce actual triples -> builder.addTriple(s,p,o)
- * - OptionalGraphPattern: OPTIONAL { ... } -> builder.enterOptional()/exitOptional()
+ * SPARQL 1.0 feature: build triple patterns, BGPs and OPTIONAL for the WHERE clause.
+ *
+ * <p>Grammar hooks:
+ * <ul>
+ *   <li>GroupGraphPattern: {@code { ... } } → builder.enterGroup() / exitGroup()</li>
+ *   <li>TriplesBlock: BGP boundary → builder.enterBgp() / exitBgp()</li>
+ *   <li>TriplesSameSubject (when not inside CONSTRUCT template): {@link SparqlAstBuilder} term helpers
+ *       → builder.addTriple(subject, predicate, object)</li>
+ *   <li>OptionalGraphPattern: {@code OPTIONAL { ... } } → builder.enterOptional() / exitOptional()</li>
+ * </ul>
  */
 public class BgpFeature extends AbstractSparqlFeature {
 
@@ -21,51 +24,56 @@ public class BgpFeature extends AbstractSparqlFeature {
         super(builder);
     }
 
-    // ------------ GROUP { .... } ------------
-
     @Override
-    public void enterGroupGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.GroupGraphPatternContext ctx) {
+    public void enterGroupGraphPattern(SparqlParser.GroupGraphPatternContext ctx) {
         builder().enterGroup();
     }
 
     @Override
-    public void exitGroupGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.GroupGraphPatternContext ctx) {
+    public void exitGroupGraphPattern(SparqlParser.GroupGraphPatternContext ctx) {
         builder().exitGroup();
     }
 
-    // -------- OPTIONAL { ... } --------
     @Override
-    public void enterOptionalGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.OptionalGraphPatternContext ctx) {
-        builder().enterOptional();
-    }
-
-    @Override
-    public void exitOptionalGraphPattern(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.OptionalGraphPatternContext ctx) {
-        builder().exitOptional();
-    }
-
-    // -------- BGP (TriplesBlock) --------
-    @Override
-    public void enterTriplesBlock(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesBlockContext ctx) {
+    public void enterTriplesBlock(SparqlParser.TriplesBlockContext ctx) {
         builder().enterBgp();
     }
 
     @Override
-    public void exitTriplesBlock(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesBlockContext ctx) {
+    public void exitTriplesBlock(SparqlParser.TriplesBlockContext ctx) {
         builder().exitBgp();
     }
 
-    // -------- TRIPLE PATTERNS (?s ?p ?o) --------
     @Override
-    public void exitTriplesSameSubject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesSameSubjectContext ctx) {
-        // subject + propertyListNotEmpty
-        TermAst s = builder().termFromVarOrTerm(ctx.varOrTerm());
-        var pl = ctx.propertyListNotEmpty();
-        if (pl == null) return;
-        for (int i = 0; i < pl.verb().size(); i++) {
-            TermAst p = builder().termFromVerb(pl.verb(i));
-            List<TermAst> objects = builder().termListFromObjectList(pl.objectList(i));
-            for (TermAst o : objects) { builder().addTriple(s, p, o); }
+    public void enterOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
+        builder().enterOptional();
+    }
+
+    @Override
+    public void exitOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
+        builder().exitOptional();
+    }
+
+    /**
+     * Triples in the WHERE clause only (ignore triples inside the CONSTRUCT template).
+     */
+    @Override
+    public void exitTriplesSameSubject(SparqlParser.TriplesSameSubjectContext ctx) {
+        if (ctx.getParent() instanceof SparqlParser.ConstructTriplesContext) {
+            return;
+        }
+        if (ctx.varOrTerm() == null || ctx.propertyListNotEmpty() == null) {
+            return;
+        }
+        SparqlAstBuilder b = builder();
+        TermAst subject = b.termFromVarOrTerm(ctx.varOrTerm());
+        var propertyList = ctx.propertyListNotEmpty();
+        for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
+            TermAst predicate = b.termFromVerb(propertyList.verb(verbIndex));
+            List<TermAst> objects = b.termListFromObjectList(propertyList.objectList(verbIndex));
+            for (TermAst object : objects) {
+                b.addTriple(subject, predicate, object);
+            }
         }
     }
 }
