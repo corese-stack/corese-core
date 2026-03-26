@@ -120,16 +120,22 @@ public final class SparqlAstBuilder {
     private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
     /**
-     * Base URI for ":" prefixed IRI resolution
+     * Effective base URI after prologue (parser options, then possibly {@code BASE}).
      */
-    private String baseUri = IOConstants.getDefaultBaseURI();
+    private String baseUri;
     /**
-     * <prefix, namespace> map storage
+     * Prefix declarations in source order (including redeclarations).
      */
-    private final Map<String, String> prefixes = new HashMap<>();
+    private final List<PrefixDeclarationAst> prefixDeclarations = new ArrayList<>();
+    /**
+     * Mutable view of prefix mappings for resolution while building; kept in sync with {@link #prefixDeclarations}.
+     */
+    private final PrefixHandler prefixHandler = new PrefixHandler();
 
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
+        this.baseUri = options.getBaseIRI();
+        this.prefixHandler.setDefaultNamespace(this.baseUri);
     }
 
     // --- Construction entry points (called by listener) ---
@@ -140,6 +146,7 @@ public final class SparqlAstBuilder {
             uri = uri.substring(uri.indexOf("<")+1);
         }
         this.baseUri = uri;
+        this.prefixHandler.setDefaultNamespace(uri);
     }
 
     public void addPrefix(String prefix, String uri) {
@@ -150,7 +157,8 @@ public final class SparqlAstBuilder {
             uri = uri.substring(0, uri.lastIndexOf(">"));
             uri = uri.substring(uri.indexOf("<") +1);
         }
-        this.prefixes.put(prefix, uri);
+        this.prefixHandler.setPrefix(prefix, uri);
+        this.prefixDeclarations.add(new PrefixDeclarationAst(prefix, new IriAst(uri)));
     }
 
     public void enterAskQuery() {
@@ -362,9 +370,8 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
-        PrefixHandler prefixHandler = new PrefixHandler();
-        prefixHandler.setDefaultNamespace(this.baseUri);
-        this.prefixes.forEach(prefixHandler::setPrefix);
+        QueryPrologueAst selectPrologue = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
+        PrefixHandler resolvedPrefixes = selectPrologue.toPrefixHandler();
         return switch (this.queryType) {
             case ASK -> buildAskQueryAst(datasetClauseAst);
             case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst);

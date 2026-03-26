@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -72,8 +73,8 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
 
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse(query);
-        assertEquals("http://ns.inria.fr/test/", ast.prefixHandler().getDefaultNamespace());
+        SelectQueryAst ast = (SelectQueryAst) parser.parse(query);
+        assertEquals("http://ns.inria.fr/test/", ast.prologue().baseIri().raw());
     }
 
     @Test
@@ -89,12 +90,12 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
 
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse(query);
-        assertEquals("http://ns.inria.fr/test/", ast.prefixHandler().getDefaultNamespace());
-        assertTrue(ast.prefixHandler().hasPrefix("test"));
-        assertEquals("test", ast.prefixHandler().getPrefix("https://ns.inria.fr/otherTest/#"));
-        assertTrue(ast.prefixHandler().hasNamespace("https://ns.inria.fr/otherTest/#"));
-        assertEquals("https://ns.inria.fr/otherTest/#", ast.prefixHandler().getNamespace("test"));
+        SelectQueryAst ast = (SelectQueryAst) parser.parse(query);
+        assertEquals("http://ns.inria.fr/test/", ast.prologue().baseIri().raw());
+        assertTrue(ast.prologue().toPrefixHandler().hasPrefix("test"));
+        assertEquals("test", ast.prologue().toPrefixHandler().getPrefix("https://ns.inria.fr/otherTest/#"));
+        assertTrue(ast.prologue().toPrefixHandler().hasNamespace("https://ns.inria.fr/otherTest/#"));
+        assertEquals("https://ns.inria.fr/otherTest/#", ast.prologue().toPrefixHandler().getNamespace("test"));
     }
 
     @Test
@@ -112,20 +113,20 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
 
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse(query);
-        assertEquals("http://ns.inria.fr/test/", ast.prefixHandler().getDefaultNamespace());
-        assertTrue(ast.prefixHandler().hasPrefix("test1"));
-        assertEquals("test1", ast.prefixHandler().getPrefix("https://ns.inria.fr/otherTest1/#"));
-        assertTrue(ast.prefixHandler().hasNamespace("https://ns.inria.fr/otherTest1/#"));
-        assertEquals("https://ns.inria.fr/otherTest1/#", ast.prefixHandler().getNamespace("test1"));
-        assertTrue(ast.prefixHandler().hasPrefix("test2"));
-        assertEquals("test2", ast.prefixHandler().getPrefix("https://ns.inria.fr/otherTest2/#"));
-        assertTrue(ast.prefixHandler().hasNamespace("https://ns.inria.fr/otherTest2/#"));
-        assertEquals("https://ns.inria.fr/otherTest2/#", ast.prefixHandler().getNamespace("test2"));
-        assertTrue(ast.prefixHandler().hasPrefix("test3"));
-        assertEquals("test3", ast.prefixHandler().getPrefix("https://ns.inria.fr/otherTest3/#"));
-        assertTrue(ast.prefixHandler().hasNamespace("https://ns.inria.fr/otherTest3/#"));
-        assertEquals("https://ns.inria.fr/otherTest3/#", ast.prefixHandler().getNamespace("test3"));
+        SelectQueryAst ast = (SelectQueryAst) parser.parse(query);
+        assertEquals("http://ns.inria.fr/test/", ast.prologue().baseIri().raw());
+        assertTrue(ast.prologue().toPrefixHandler().hasPrefix("test1"));
+        assertEquals("test1", ast.prologue().toPrefixHandler().getPrefix("https://ns.inria.fr/otherTest1/#"));
+        assertTrue(ast.prologue().toPrefixHandler().hasNamespace("https://ns.inria.fr/otherTest1/#"));
+        assertEquals("https://ns.inria.fr/otherTest1/#", ast.prologue().toPrefixHandler().getNamespace("test1"));
+        assertTrue(ast.prologue().toPrefixHandler().hasPrefix("test2"));
+        assertEquals("test2", ast.prologue().toPrefixHandler().getPrefix("https://ns.inria.fr/otherTest2/#"));
+        assertTrue(ast.prologue().toPrefixHandler().hasNamespace("https://ns.inria.fr/otherTest2/#"));
+        assertEquals("https://ns.inria.fr/otherTest2/#", ast.prologue().toPrefixHandler().getNamespace("test2"));
+        assertTrue(ast.prologue().toPrefixHandler().hasPrefix("test3"));
+        assertEquals("test3", ast.prologue().toPrefixHandler().getPrefix("https://ns.inria.fr/otherTest3/#"));
+        assertTrue(ast.prologue().toPrefixHandler().hasNamespace("https://ns.inria.fr/otherTest3/#"));
+        assertEquals("https://ns.inria.fr/otherTest3/#", ast.prologue().toPrefixHandler().getNamespace("test3"));
     }
 
     @Test
@@ -149,19 +150,19 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
 
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse(query);
-        assertEquals("http://ns.inria.fr/test/", ast.prefixHandler().getDefaultNamespace());
-        assertTrue(ast.prefixHandler().hasPrefix("test1"));
-        assertEquals("test2", ast.prefixHandler().getPrefix("https://ns.inria.fr/otherTest1/#"));
-        assertEquals("https://ns.inria.fr/otherTest2/#", ast.prefixHandler().getNamespace("test1"));
-        assertTrue(ast.prefixHandler().hasPrefix("test2"));
-        assertEquals("test2", ast.prefixHandler().getPrefix("https://ns.inria.fr/otherTest1/#"));
-        assertTrue(ast.prefixHandler().hasNamespace("https://ns.inria.fr/otherTest1/#"));
-        assertEquals("https://ns.inria.fr/otherTest1/#", ast.prefixHandler().getNamespace("test2"));
-        assertTrue(ast.prefixHandler().hasPrefix("test1"));
-        assertEquals("test1", ast.prefixHandler().getPrefix("https://ns.inria.fr/otherTest2/#"));
-        assertTrue(ast.prefixHandler().hasNamespace("https://ns.inria.fr/otherTest2/#"));
-        assertEquals("https://ns.inria.fr/otherTest2/#", ast.prefixHandler().getNamespace("test1"));
+        SelectQueryAst ast = (SelectQueryAst) parser.parse(query);
+        assertEquals("http://ns.inria.fr/test/", ast.prologue().baseIri().raw());
+        assertTrue(ast.prologue().toPrefixHandler().hasPrefix("test1"));
+        assertEquals("test2", ast.prologue().toPrefixHandler().getPrefix("https://ns.inria.fr/otherTest1/#"));
+        assertEquals("https://ns.inria.fr/otherTest2/#", ast.prologue().toPrefixHandler().getNamespace("test1"));
+        assertTrue(ast.prologue().toPrefixHandler().hasPrefix("test2"));
+        assertEquals("test2", ast.prologue().toPrefixHandler().getPrefix("https://ns.inria.fr/otherTest1/#"));
+        assertTrue(ast.prologue().toPrefixHandler().hasNamespace("https://ns.inria.fr/otherTest1/#"));
+        assertEquals("https://ns.inria.fr/otherTest1/#", ast.prologue().toPrefixHandler().getNamespace("test2"));
+        assertTrue(ast.prologue().toPrefixHandler().hasPrefix("test1"));
+        assertEquals("test1", ast.prologue().toPrefixHandler().getPrefix("https://ns.inria.fr/otherTest2/#"));
+        assertTrue(ast.prologue().toPrefixHandler().hasNamespace("https://ns.inria.fr/otherTest2/#"));
+        assertEquals("https://ns.inria.fr/otherTest2/#", ast.prologue().toPrefixHandler().getNamespace("test1"));
     }
 
     @Test
