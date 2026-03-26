@@ -75,6 +75,23 @@ public class IRIUtilsTest {
         }
     }
 
+    @Test
+    public void isAbsoluteIRITest() {
+        assertTrue(IRIUtils.isAbsoluteIRI("mailto://user@example.com"));
+        assertTrue(IRIUtils.isAbsoluteIRI("mongodb://user:password@127.0.0.1:3307"));
+        assertTrue(IRIUtils.isAbsoluteIRI("https://laconsole.dev"));
+        assertTrue(IRIUtils.isAbsoluteIRI("http://127.0.0.1:3000"));;
+        assertTrue(IRIUtils.isAbsoluteIRI("urn:isbn:978-2-7654-0912-0"));
+        assertTrue(IRIUtils.isAbsoluteIRI("urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6"));
+        assertTrue(IRIUtils.isAbsoluteIRI("urn:ietf:rfc:2648"));
+        assertTrue(IRIUtils.isAbsoluteIRI("https://www.w3.org/TR/rdf-sparql-query/#iriRefs"));
+        assertTrue(IRIUtils.isAbsoluteIRI("https://ns.inria.fr/otherTest1/#"));
+        assertTrue(IRIUtils.isAbsoluteIRI("https://www.w3.org/TR/rdf-sparql-query/#iriRefs"));
+        assertTrue(IRIUtils.isAbsoluteIRI("http://xmlns.com/foaf/0.1/"));
+        assertFalse(IRIUtils.isAbsoluteIRI("child/password@127.0.0.1:3307"));
+        assertFalse(IRIUtils.isAbsoluteIRI("child/otherChild/otherotherchild/#patate"));
+    }
+
     /**
      * Helper method to escape strings for display in test failure messages
      */

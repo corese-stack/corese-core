@@ -7,8 +7,8 @@ import java.util.Objects;
  */
 public record PrefixDeclarationAst(String prefix, IriAst namespace) {
     public PrefixDeclarationAst {
-        if (prefix == null || prefix.isEmpty()) {
-            throw new IllegalArgumentException("prefix must be non-null and non-empty");
+        if (prefix == null ) {
+            throw new IllegalArgumentException("prefix must be non-null");
         }
         namespace = Objects.requireNonNull(namespace, "namespace");
     }

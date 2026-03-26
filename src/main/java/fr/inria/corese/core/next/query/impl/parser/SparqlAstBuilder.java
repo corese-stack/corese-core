@@ -127,38 +127,26 @@ public final class SparqlAstBuilder {
      * Prefix declarations in source order (including redeclarations).
      */
     private final List<PrefixDeclarationAst> prefixDeclarations = new ArrayList<>();
-    /**
-     * Mutable view of prefix mappings for resolution while building; kept in sync with {@link #prefixDeclarations}.
-     */
-    private final PrefixHandler prefixHandler = new PrefixHandler();
 
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
         this.baseUri = options.getBaseIRI();
-        this.prefixHandler.setDefaultNamespace(this.baseUri);
     }
 
     // --- Construction entry points (called by listener) ---
 
     public void setBaseUri(String uri) {
-        if(uri.startsWith("<") && uri.endsWith(">")) {
-            uri = uri.substring(0, uri.lastIndexOf(">"));
-            uri = uri.substring(uri.indexOf("<")+1);
-        }
         this.baseUri = uri;
-        this.prefixHandler.setDefaultNamespace(uri);
     }
 
     public void addPrefix(String prefix, String uri) {
-        if(prefix.endsWith(":")) {
-            prefix = prefix.substring(0, prefix.lastIndexOf(":"));
+        PrefixDeclarationAst declarationAst = new PrefixDeclarationAst(prefix, new IriAst(uri));
+        if(this.prefixDeclarations.stream().anyMatch(declaration ->
+                 Objects.equals(declaration.prefix(), declarationAst.prefix())
+            )) {
+            throw new QuerySyntaxException("Prefix " + prefix + " has already been declared");
         }
-        if(uri.startsWith("<") && uri.endsWith(">")) {
-            uri = uri.substring(0, uri.lastIndexOf(">"));
-            uri = uri.substring(uri.indexOf("<") +1);
-        }
-        this.prefixHandler.setPrefix(prefix, uri);
-        this.prefixDeclarations.add(new PrefixDeclarationAst(prefix, new IriAst(uri)));
+        this.prefixDeclarations.add(declarationAst);
     }
 
     public void enterAskQuery() {

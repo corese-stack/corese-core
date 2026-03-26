@@ -27,6 +27,13 @@ public class IRIUtils {
             "(?<fragment>[\\w\\-_]+)?" + // line1
             "$"
     );
+    private static final Pattern ABSOLUTE_IRI_PATTERN = Pattern.compile("^(?<root>(" +
+            "?<protocol>[\\w\\-]+)" +
+            ":(\\/\\/)?" +
+            "(?<path>([\\S\\-\\._\\:]+[\\/\\.\\:\\@\\-])?)+" +
+            "(?<query>\\?[\\S\\-\\\"\\'_\\:\\?\\=]+)?)" +
+            "(?<fragment>[\\S\\-_]+)?" +
+            "$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
@@ -113,6 +120,20 @@ public class IRIUtils {
         } catch (IllegalStateException e) {
             return "";
         }
+    }
+
+    /**
+     * Detects if an IRI is absolute according to the REGEX given in the recommendation RFC3987
+     * @param iri any uri (expecting to be the content between < and >
+     * @return true if it is compliant with RFC3987. May accept the prefixed for of uri, as there is no way to
+     * distinguish a prefix from a protocol
+     */
+    public static boolean isAbsoluteIRI(String iri) {
+        Matcher matcher = matchWithTimeout(ABSOLUTE_IRI_PATTERN, iri);
+        if (matcher == null || !matcher.matches()) {
+            return false;
+        }
+        return matcher.matches();
     }
 
     /**
