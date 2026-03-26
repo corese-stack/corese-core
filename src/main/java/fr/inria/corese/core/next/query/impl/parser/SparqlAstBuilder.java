@@ -370,8 +370,7 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
-        QueryPrologueAst selectPrologue = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
-        PrefixHandler resolvedPrefixes = selectPrologue.toPrefixHandler();
+        QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
         return switch (this.queryType) {
             case ASK -> buildAskQueryAst(datasetClauseAst);
             case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst);

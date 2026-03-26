@@ -9,5 +9,5 @@ import fr.inria.corese.core.next.data.api.IPrefixHandler;
 public sealed interface QueryAst permits AskQueryAst, ConstructQueryAst, DescribeQueryAst, SelectQueryAst {
     DatasetClauseAst datasetClause();
     GroupGraphPatternAst whereClause();
-    IPrefixHandler prefixHandler();
+    QueryPrologueAst prologue();
 }

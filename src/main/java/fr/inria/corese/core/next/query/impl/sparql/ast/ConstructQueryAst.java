@@ -38,7 +38,7 @@ public record ConstructQueryAst(
         DatasetClauseAst datasetClause,
         GroupGraphPatternAst whereClause,
         SolutionModifierAst solutionModifier,
-        PrefixHandler prefixHandler
+        QueryPrologueAst prologue
             ) implements QueryAst {
     public ConstructQueryAst {
         if (constructTemplate == null) {
@@ -53,9 +53,8 @@ public record ConstructQueryAst(
         if (solutionModifier == null) {
             solutionModifier = SolutionModifierAst.empty();
         }
-        if (prefixHandler == null) {
-            prefixHandler = new PrefixHandler();
-            prefixHandler.setDefaultNamespace(IOConstants.getDefaultBaseURI());
+        if (prologue == null) {
+            prologue = QueryPrologueAst.empty();
         }
     }
 

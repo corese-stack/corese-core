@@ -18,7 +18,7 @@ import java.util.List;
  * }
  * }</pre>
  */
-public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, PrefixHandler prefixHandler) implements QueryAst {
+public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, QueryPrologueAst prologue) implements QueryAst {
     /**
      * constructor with default prefix handler
      */
@@ -33,9 +33,8 @@ public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst w
         if (datasetClause == null) {
             datasetClause = DatasetClauseAst.none();
         }
-        if (prefixHandler == null) {
-            prefixHandler = new PrefixHandler();
-            prefixHandler.setDefaultNamespace(IOConstants.getDefaultBaseURI());
+        if (prologue == null) {
+            prologue = QueryPrologueAst.empty();
         }
     }
 }

@@ -45,9 +45,4 @@ public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetC
             prologue = QueryPrologueAst.empty();
         }
     }
-
-    @Override
-    public IPrefixHandler prefixHandler() {
-        return prologue.toPrefixHandler();
-    }
 }

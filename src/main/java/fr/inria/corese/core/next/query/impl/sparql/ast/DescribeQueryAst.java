@@ -24,7 +24,7 @@ import java.util.List;
  * }
  * }</pre>
  */
-public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause, PrefixHandler prefixHandler) implements QueryAst {
+public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause, QueryPrologueAst prologue) implements QueryAst {
     public DescribeQueryAst {
         described = described != null ? List.copyOf(described) : List.of();
         if (whereClause == null) {
@@ -33,9 +33,8 @@ public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> des
         if(datasetClause == null) {
             datasetClause = DatasetClauseAst.none();
         }
-        if(prefixHandler == null) {
-            prefixHandler = new PrefixHandler();
-            prefixHandler.setDefaultNamespace(IOConstants.getDefaultBaseURI());
+        if(prologue == null) {
+            prologue = QueryPrologueAst.empty();
         }
     }
 

@@ -23,7 +23,7 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse(query);
-        assertEquals("http://ns.inria.fr/test/", ast.prefixHandler().getDefaultNamespace());
+        assertEquals("http://ns.inria.fr/test/", ast.prologue().toPrefixHandler().getDefaultNamespace());
     }
 
     @Test
@@ -42,7 +42,7 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse(query);
-        assertEquals("http://ns.inria.fr/test/", ast.prefixHandler().getDefaultNamespace());
+        assertEquals("http://ns.inria.fr/test/", ast.prologue().toPrefixHandler().getDefaultNamespace());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse(query);
-        assertEquals("http://ns.inria.fr/test/", ast.prefixHandler().getDefaultNamespace());
+        assertEquals("http://ns.inria.fr/test/", ast.prologue().toPrefixHandler().getDefaultNamespace());
     }
 
     @Test
