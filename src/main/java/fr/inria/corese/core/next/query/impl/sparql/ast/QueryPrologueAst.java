@@ -28,11 +28,11 @@ public record QueryPrologueAst(List<PrefixDeclarationAst> prefixDeclarations, Ir
      * Rebuilds a {@link PrefixHandler} with the same effective mappings as while parsing.
      */
     public PrefixHandler toPrefixHandler() {
-        PrefixHandler h = new PrefixHandler();
-        h.setDefaultNamespace(baseIri.raw());
+        PrefixHandler prefixHandler = new PrefixHandler();
+        prefixHandler.setDefaultNamespace(baseIri.raw());
         for (PrefixDeclarationAst d : prefixDeclarations) {
-            h.setPrefix(d.prefix(), d.namespace().raw());
+            prefixHandler.setPrefix(d.prefix(), d.namespace().raw());
         }
-        return h;
+        return prefixHandler;
     }
 }
