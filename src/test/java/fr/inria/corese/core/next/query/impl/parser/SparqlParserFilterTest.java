@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
@@ -48,8 +46,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryMinusAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryPlusAst;
 
 class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(SparqlParserFilterTest.class);
 
     @Test
     void shouldRejectProjectionVariableOnlyReferencedInFilter() {
@@ -108,7 +104,6 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast.whereClause());
 
         GroupGraphPatternAst where = ast.whereClause();
-        logger.info("{}", ast);
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();
