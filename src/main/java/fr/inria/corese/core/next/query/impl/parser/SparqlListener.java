@@ -179,4 +179,14 @@ public final class SparqlListener extends SparqlParserBaseListener {
     @Override public void exitPrefixDecl(SparqlParser.PrefixDeclContext ctx) {
         for (var d : delegates) d.exitPrefixDecl(ctx);
     }
+
+    @Override
+    public void enterExistsFunc(SparqlParser.ExistsFuncContext ctx) {
+        for (var d : delegates) d.enterExistsFunc(ctx);
+    }
+
+    @Override
+    public void enterNotExistsFunc(SparqlParser.NotExistsFuncContext ctx) {
+        for (var d : delegates) d.enterNotExistsFunc(ctx);
+    }
 }

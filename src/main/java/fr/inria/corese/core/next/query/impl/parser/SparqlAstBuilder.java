@@ -56,6 +56,18 @@ public final class SparqlAstBuilder {
     private final Deque<Integer> optionalGroupDepths = new ArrayDeque<>();
 
     /**
+     * At enterExistsFunc()/enterNotExistsFunc(), we push groupStack.size().
+     * At exitGroup(), if groupStack.size() equals peek, we capture in capturedExistsPattern.
+     */
+    private final Deque<Integer> existsGroupDepths = new ArrayDeque<>();
+
+    /**
+     * Captured GroupGraphPattern for the last closed EXISTS/NOT EXISTS block.
+     * Consumed by termFromBuiltInCall via popCapturedExistsPattern().
+     */
+    private GroupGraphPatternAst capturedExistsPattern;
+
+    /**
      * Top-level WHERE clause, set when the root group is closed in exitGroup().
      */
     private GroupGraphPatternAst whereClause;
@@ -277,6 +289,9 @@ public final class SparqlAstBuilder {
         if (!optionalGroupDepths.isEmpty() && groupStack.size() == optionalGroupDepths.peek()) {
             optionalGroupDepths.pop();
             currentGroup().add(new OptionalAst(group));
+        } else if (!existsGroupDepths.isEmpty() && groupStack.size() == existsGroupDepths.peek()) {
+            existsGroupDepths.pop();
+            capturedExistsPattern = group;
         } else if (groupStack.isEmpty()) {
             whereClause = group;
         } else {
@@ -341,6 +356,32 @@ public final class SparqlAstBuilder {
      * Exit OPTIONAL scope. No-op: the optional content was already wrapped in {@link OptionalAst} in {@link #exitGroup()}.
      */
     public void exitOptional() {
+    }
+
+
+    /**
+     * Enter EXISTS scope. Records current group stack size so that when we exitGroup() and the stack
+     * is back to that size, we capture the group in {@link #capturedExistsPattern}.
+     */
+    public void enterExistsFunc() {
+        existsGroupDepths.push(groupStack.size());
+    }
+
+    /**
+     * Enter NOT EXISTS scope. Same mechanism as EXISTS.
+     */
+    public void enterNotExistsFunc() {
+        existsGroupDepths.push(groupStack.size());
+    }
+
+    /**
+     * Pops the captured GroupGraphPattern from the last closed EXISTS/NOT EXISTS block.
+     * Called by {@link #termFromBuiltInCall} after the listener has closed the group.
+     */
+    public GroupGraphPatternAst popCapturedExistsPattern() {
+        GroupGraphPatternAst p = capturedExistsPattern;
+        capturedExistsPattern = null;
+        return p;
     }
 
     // --- Result ---
@@ -569,7 +610,7 @@ public final class SparqlAstBuilder {
     }
 
     public boolean isOrdered() {
-        return ! this.orderConditions.isEmpty();
+        return !this.orderConditions.isEmpty();
     }
 
     /**
@@ -943,7 +984,11 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromBuiltInCall(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BuiltInCallContext ctx) {
-        if (ctx.expression() != null) {
+        if (ctx.existsFunc() != null) {
+            return new ExistsAst(popCapturedExistsPattern());
+        } else if (ctx.notExistsFunc() != null) {
+            return new NotExistsAst(popCapturedExistsPattern());
+        } else if (ctx.expression() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
