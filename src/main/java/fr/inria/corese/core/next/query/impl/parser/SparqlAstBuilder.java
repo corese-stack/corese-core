@@ -211,7 +211,6 @@ public final class SparqlAstBuilder {
     /**
      * Sets the LIMIT for pagination
      *
-     * @param limit
      */
     public void setLimit(long limit) {
         this.limit = limit;
@@ -220,7 +219,6 @@ public final class SparqlAstBuilder {
     /**
      * Sets the OFFSET for pagination
      *
-     * @param offset
      */
     public void setOffset(long offset) {
         this.offset = offset;
@@ -608,7 +606,7 @@ public final class SparqlAstBuilder {
 
     public TermAst termFromVerb(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VerbContext ctx) {
         if (ctx.A() != null) return this.iri("a");
-        return termFromVarOrIriRef(ctx.varOrIRIref());
+        return termFromVarOrIriRef(ctx.varOrIri());
     }
 
     public TermAst termFromVarOrTerm(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VarOrTermContext ctx) {
@@ -616,7 +614,7 @@ public final class SparqlAstBuilder {
         return termFromGraphTerm(ctx.graphTerm());
     }
 
-    public TermAst termFromVarOrIriRef(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VarOrIRIrefContext ctx) {
+    public TermAst termFromVarOrIriRef(SparqlParser.VarOrIriContext ctx) {
         if (ctx.var_() != null) {
             return termFromVar(ctx.var_());
         }
@@ -731,7 +729,7 @@ public final class SparqlAstBuilder {
     }
 
     public List<TermAst> termListFromArgList(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ArgListContext ctx) {
-        return ctx.expression().stream().map(arg -> (TermAst) termFromExpression(arg)).toList();
+        return ctx.expression().stream().map(this::termFromExpression).toList();
     }
 
     public TermAst termFromIriRef(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.IriRefContext ctx) {
@@ -940,7 +938,12 @@ public final class SparqlAstBuilder {
                             case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralNegativeContext numericLiteralNegativeContext ->
                                     (ExprAst) termFromNumericLiteralNegative(numericLiteralNegativeContext);
                             case null, default ->
-                                    throw new QueryEvaluationException("Unexpected left hand termFromExpression in additive termFromExpression " + ctx.getText() + " " + child.getText());
+                                    throw new QueryEvaluationException(
+                                            "Unexpected left hand termFromExpression in additive termFromExpression "
+                                                    + ctx.getText()
+                                                    + " "
+                                                    + (child != null ? child.getText() : "null")
+                                    );
                         };
                         leftHand = createConstraint(op, List.of(leftHand, rightHand));
                     }
@@ -994,7 +997,7 @@ public final class SparqlAstBuilder {
         ASTConstants.Constraint op = null;
         if (ctx.PLUS() != null) {
             op = ASTConstants.OPERATOR.PLUS;
-        } else if (ctx.MINUS() != null) {
+        } else if (ctx.MINUS_SIGN() != null) {
             op = ASTConstants.OPERATOR.MINUS;
         } else if (ctx.EXCLAMATION() != null) {
             op = ASTConstants.OPERATOR.NOT;
@@ -1017,5 +1020,38 @@ public final class SparqlAstBuilder {
         } else {
             throw new QueryEvaluationException("Unexpected arguments for REGEX call");
         }
+    }
+
+    /**
+     * Predicate as a property path.
+     * For simple triples without a composed path, this is just an iriRef or 'a'.
+     * Composed property paths will be expanded in a later phase if needed.
+     */
+    public TermAst termFromVerbPath(SparqlParser.VerbPathContext ctx) {
+        return this.iri(ctx.getText());
+    }
+
+    /**
+     * Predicate as a simple variable (e.g. ?p used as a predicate).
+     */
+    public TermAst termFromVerbSimple(SparqlParser.VerbSimpleContext ctx) {
+        return termFromVar(ctx.var_());
+    }
+
+    /**
+     * List of objects inside a property path triple.
+     * Blank node property lists and collections are not yet fully supported (raw text fallback).
+     */
+    public List<TermAst> termListFromObjectListPath(SparqlParser.ObjectListPathContext ctx) {
+        List<TermAst> out = new ArrayList<>();
+        for (var objPath : ctx.objectPath()) {
+            var graphNodePath = objPath.graphNodePath();
+            if (graphNodePath.varOrTerm() != null) {
+                out.add(termFromVarOrTerm(graphNodePath.varOrTerm()));
+            } else {
+                out.add(this.iri(graphNodePath.getText()));
+            }
+        }
+        return out;
     }
 }

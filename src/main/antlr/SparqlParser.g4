@@ -33,6 +33,7 @@
  */
 /*
  * Ported to Antlr4 by Tom Everett
+ * Updated to SPARQL 1.1
  */
 
 // $antlr-format alignTrailingComments true, columnLimit 150, minEmptyLines 1, maxEmptyLinesToKeep 1, reflowComments false, useTab false
@@ -44,12 +45,20 @@ options {
     tokenVocab = SparqlLexer;
 }
 
+queryUnit
+    : query EOF
+    ;
+
 query
-    : prologue (selectQuery | constructQuery | describeQuery | askQuery) EOF
+    : prologue (selectQuery | constructQuery | describeQuery | askQuery) valuesClause
+    ;
+
+updateUnit
+    : update EOF
     ;
 
 prologue
-    : baseDecl? prefixDecl*
+    : (baseDecl | prefixDecl)*
     ;
 
 baseDecl
@@ -61,19 +70,32 @@ prefixDecl
     ;
 
 selectQuery
-    : SELECT (DISTINCT | REDUCED)? (var_+ | '*') datasetClause* whereClause solutionModifier
+    : selectClause datasetClause* whereClause solutionModifier
+    ;
+
+subSelect
+    : selectClause whereClause solutionModifier valuesClause
+    ;
+
+selectClause
+    : SELECT (DISTINCT | REDUCED)? (selectVar+ | STAR)
+    ;
+
+selectVar
+    : var_
+    | L_PAREN expression AS var_ R_PAREN
     ;
 
 constructQuery
-    : CONSTRUCT constructTemplate datasetClause* whereClause solutionModifier
+    : CONSTRUCT (constructTemplate datasetClause* whereClause solutionModifier | datasetClause* WHERE L_CURLY triplesTemplate? R_CURLY solutionModifier)
     ;
 
 describeQuery
-    : DESCRIBE (varOrIRIref+ | '*') datasetClause* whereClause? solutionModifier
+    : DESCRIBE (varOrIri+ | STAR) datasetClause* whereClause? solutionModifier
     ;
 
 askQuery
-    : ASK datasetClause* whereClause
+    : ASK datasetClause* whereClause solutionModifier
     ;
 
 datasetClause
@@ -97,12 +119,26 @@ whereClause
     ;
 
 solutionModifier
-    : orderClause? limitOffsetClauses?
+    : groupClause? havingClause? orderClause? limitOffsetClauses?
     ;
 
-limitOffsetClauses
-    : limitClause offsetClause?
-    | offsetClause limitClause?
+groupClause
+    : GROUP BY groupCondition+
+    ;
+
+groupCondition
+    : builtInCall
+    | functionCall
+    | L_PAREN expression (AS var_)? R_PAREN
+    | var_
+    ;
+
+havingClause
+    : HAVING havingCondition+
+    ;
+
+havingCondition
+    : constraint
     ;
 
 orderClause
@@ -115,6 +151,11 @@ orderCondition
     | var_
     ;
 
+limitOffsetClauses
+    : limitClause offsetClause?
+    | offsetClause limitClause?
+    ;
+
 limitClause
     : LIMIT INTEGER
     ;
@@ -123,18 +164,142 @@ offsetClause
     : OFFSET INTEGER
     ;
 
+valuesClause
+    : (VALUES dataBlock)?
+    ;
+
+update
+    : prologue (update1 (SEMICOLON update)?)?
+    ;
+
+update1
+    : load
+    | clear
+    | drop
+    | add
+    | move
+    | copy
+    | create
+    | insertData
+    | deleteData
+    | deleteWhere
+    | modify
+    ;
+
+load
+    : LOAD SILENT? iriRef (INTO graphRef)?
+    ;
+
+clear
+    : CLEAR SILENT? graphRefAll
+    ;
+
+drop
+    : DROP SILENT? graphRefAll
+    ;
+
+create
+    : CREATE SILENT? graphRef
+    ;
+
+add
+    : ADD SILENT? graphOrDefault TO graphOrDefault
+    ;
+
+move
+    : MOVE SILENT? graphOrDefault TO graphOrDefault
+    ;
+
+copy
+    : COPY SILENT? graphOrDefault TO graphOrDefault
+    ;
+
+insertData
+    : INSERT DATA quadData
+    ;
+
+deleteData
+    : DELETE DATA quadData
+    ;
+
+deleteWhere
+    : DELETE WHERE quadPattern
+    ;
+
+modify
+    : (WITH iriRef)? (deleteClause insertClause? | insertClause) usingClause* WHERE groupGraphPattern
+    ;
+
+deleteClause
+    : DELETE quadPattern
+    ;
+
+insertClause
+    : INSERT quadPattern
+    ;
+
+usingClause
+    : USING iriRef
+    | USING NAMED iriRef
+    ;
+
+graphOrDefault
+    : DEFAULT
+    | GRAPH? iriRef
+    ;
+
+graphRef
+    : GRAPH iriRef
+    ;
+
+graphRefAll
+    : graphRef
+    | DEFAULT
+    | NAMED
+    | ALL
+    ;
+
+quadPattern
+    : L_CURLY quads R_CURLY
+    ;
+
+quadData
+    : L_CURLY quads R_CURLY
+    ;
+
+quads
+    : triplesTemplate? (quadsNotTriples DOT? triplesTemplate?)*
+    ;
+
+quadsNotTriples
+    : GRAPH varOrIri L_CURLY triplesTemplate? R_CURLY
+    ;
+
+triplesTemplate
+    : triplesSameSubject (DOT triplesTemplate?)?
+    ;
+
 groupGraphPattern
-    : '{' triplesBlock? ((graphPatternNotTriples | filter_) '.'? triplesBlock?)* '}'
+    : L_CURLY (subSelect | groupGraphPatternSub) R_CURLY
+    ;
+
+groupGraphPatternSub
+    : triplesBlock? (graphPatternNotTriples DOT? triplesBlock?)*
     ;
 
 triplesBlock
-    : triplesSameSubject ('.' triplesBlock?)?
+    : triplesSameSubjectPath (DOT triplesBlock?)?
     ;
 
 graphPatternNotTriples
-    : optionalGraphPattern
-    | groupOrUnionGraphPattern
+    : groupOrUnionGraphPattern
+    | optionalGraphPattern
+    | minusGraphPattern
     | graphGraphPattern
+    | serviceGraphPattern
+    | filter_
+    | bind
+    | inlineData
     ;
 
 optionalGraphPattern
@@ -142,7 +307,50 @@ optionalGraphPattern
     ;
 
 graphGraphPattern
-    : GRAPH varOrIRIref groupGraphPattern
+    : GRAPH varOrIri groupGraphPattern
+    ;
+
+serviceGraphPattern
+    : SERVICE SILENT? varOrIri groupGraphPattern
+    ;
+
+bind
+    : BIND L_PAREN expression AS var_ R_PAREN
+    ;
+
+inlineData
+    : VALUES dataBlock
+    ;
+
+dataBlock
+    : inlineDataOneVar
+    | inlineDataFull
+    ;
+
+inlineDataOneVar
+    : var_ L_CURLY dataBlockValue* R_CURLY
+    ;
+
+inlineDataFull
+    : NIL L_CURLY dataBlockValues* R_CURLY
+    | L_PAREN var_* R_PAREN L_CURLY dataBlockValues* R_CURLY
+    ;
+
+dataBlockValues
+    : L_PAREN dataBlockValue* R_PAREN
+    | NIL
+    ;
+
+dataBlockValue
+    : iriRef
+    | rdfLiteral
+    | numericLiteral
+    | booleanLiteral
+    | UNDEF
+    ;
+
+minusGraphPattern
+    : MINUS groupGraphPattern
     ;
 
 groupOrUnionGraphPattern
@@ -165,15 +373,20 @@ functionCall
 
 argList
     : NIL
-    | '(' expression (',' expression)* ')'
+    | L_PAREN DISTINCT? expression (COMMA expression)* R_PAREN
+    ;
+
+expressionList
+    : NIL
+    | L_PAREN expression (COMMA expression)* R_PAREN
     ;
 
 constructTemplate
-    : '{' constructTriples? '}'
+    : L_CURLY constructTriples? R_CURLY
     ;
 
 constructTriples
-    : triplesSameSubject ('.' constructTriples?)?
+    : triplesSameSubject (DOT constructTriples?)?
     ;
 
 triplesSameSubject
@@ -181,25 +394,99 @@ triplesSameSubject
     | triplesNode propertyList
     ;
 
-propertyListNotEmpty
-    : verb objectList (';' (verb objectList)?)*
-    ;
-
 propertyList
     : propertyListNotEmpty?
     ;
 
+propertyListNotEmpty
+    : verb objectList (SEMICOLON (verb objectList)?)*
+    ;
+
+verb
+    : varOrIri
+    | A
+    ;
+
 objectList
-    : object_ (',' object_)*
+    : object_ (COMMA object_)*
     ;
 
 object_
     : graphNode
     ;
 
-verb
-    : varOrIRIref
+triplesSameSubjectPath
+    : varOrTerm propertyListPathNotEmpty
+    | triplesNodePath propertyListPath
+    ;
+
+propertyListPath
+    : propertyListPathNotEmpty?
+    ;
+
+propertyListPathNotEmpty
+    : (verbPath | verbSimple) objectListPath (SEMICOLON ((verbPath | verbSimple) objectListPath)?)*
+    ;
+
+verbPath
+    : path
+    ;
+
+verbSimple
+    : var_
+    ;
+
+objectListPath
+    : objectPath (COMMA objectPath)*
+    ;
+
+objectPath
+    : graphNodePath
+    ;
+
+path
+    : pathAlternative
+    ;
+
+pathAlternative
+    : pathSequence (PIPE pathSequence)*
+    ;
+
+pathSequence
+    : pathEltOrInverse (SLASH pathEltOrInverse)*
+    ;
+
+pathElt
+    : pathPrimary pathMod?
+    ;
+
+pathEltOrInverse
+    : pathElt
+    | CARET pathElt
+    ;
+
+pathMod
+    : QUESTION
+    | STAR
+    | PLUS
+    ;
+
+pathPrimary
+    : iriRef
     | A
+    | EXCLAMATION pathNegatedPropertySet
+    | L_PAREN path R_PAREN
+    ;
+
+pathNegatedPropertySet
+    : pathOneInPropertySet
+    | L_PAREN (pathOneInPropertySet (PIPE pathOneInPropertySet)*)? R_PAREN
+    ;
+
+pathOneInPropertySet
+    : iriRef
+    | A
+    | CARET (iriRef | A)
     ;
 
 triplesNode
@@ -208,11 +495,24 @@ triplesNode
     ;
 
 blankNodePropertyList
-    : '[' propertyListNotEmpty ']'
+    : L_SQUARE propertyListNotEmpty R_SQUARE
+    ;
+
+triplesNodePath
+    : collectionPath
+    | blankNodePropertyListPath
+    ;
+
+blankNodePropertyListPath
+    : L_SQUARE propertyListPathNotEmpty R_SQUARE
     ;
 
 collection
-    : '(' graphNode+ ')'
+    : L_PAREN graphNode+ R_PAREN
+    ;
+
+collectionPath
+    : L_PAREN graphNodePath+ R_PAREN
     ;
 
 graphNode
@@ -220,12 +520,17 @@ graphNode
     | triplesNode
     ;
 
+graphNodePath
+    : varOrTerm
+    | triplesNodePath
+    ;
+
 varOrTerm
     : var_
     | graphTerm
     ;
 
-varOrIRIref
+varOrIri
     : var_
     | iriRef
     ;
@@ -249,11 +554,11 @@ expression
     ;
 
 conditionalOrExpression
-    : conditionalAndExpression ('||' conditionalAndExpression)*
+    : conditionalAndExpression (DOUBLE_BAR conditionalAndExpression)*
     ;
 
 conditionalAndExpression
-    : valueLogical ('&&' valueLogical)*
+    : valueLogical (DOUBLE_AMP valueLogical)*
     ;
 
 valueLogical
@@ -261,7 +566,11 @@ valueLogical
     ;
 
 relationalExpression
-    : numericExpression (('=' | '!=' | '<' | '>' | '<=' | '>=') numericExpression)?
+    : numericExpression (
+        (EQUAL | NOT_EQUAL | LESS | GREATER | LESS_OR_EQUAL | GREATER_OR_EQUAL) numericExpression
+        | IN expressionList
+        | NOT IN expressionList
+    )?
     ;
 
 numericExpression
@@ -270,18 +579,18 @@ numericExpression
 
 additiveExpression
     : multiplicativeExpression (
-        ('+' | '-') multiplicativeExpression
+        (PLUS | MINUS_SIGN) multiplicativeExpression
         | numericLiteralPositive
         | numericLiteralNegative
     )*
     ;
 
 multiplicativeExpression
-    : unaryExpression (('*' | '/') unaryExpression)*
+    : unaryExpression ((STAR | SLASH) unaryExpression)*
     ;
 
 unaryExpression
-    : ('!' | '+' | '-')? primaryExpression
+    : (EXCLAMATION | PLUS | MINUS_SIGN)? primaryExpression
     ;
 
 primaryExpression
@@ -295,25 +604,95 @@ primaryExpression
     ;
 
 brackettedExpression
-    : '(' expression ')'
+    : L_PAREN expression R_PAREN
     ;
 
 builtInCall
-    : STR '(' expression ')'
-    | LANG '(' expression ')'
-    | LANGMATCHES '(' expression ',' expression ')'
-    | DATATYPE '(' expression ')'
-    | BOUND '(' var_ ')'
-    | SAME_TERM '(' expression ',' expression ')'
-    | IS_IRI '(' expression ')'
-    | IS_URI '(' expression ')'
-    | IS_BLANK '(' expression ')'
-    | IS_LITERAL '(' expression ')'
+    : aggregate
+    | STR L_PAREN expression R_PAREN
+    | LANG L_PAREN expression R_PAREN
+    | LANGMATCHES L_PAREN expression COMMA expression R_PAREN
+    | DATATYPE L_PAREN expression R_PAREN
+    | BOUND L_PAREN var_ R_PAREN
+    | IRI L_PAREN expression R_PAREN
+    | URI L_PAREN expression R_PAREN
+    | BNODE (L_PAREN expression R_PAREN | NIL)
+    | RAND NIL
+    | ABS L_PAREN expression R_PAREN
+    | CEIL L_PAREN expression R_PAREN
+    | FLOOR L_PAREN expression R_PAREN
+    | ROUND L_PAREN expression R_PAREN
+    | CONCAT L_PAREN expression (COMMA expression)* R_PAREN
+    | subStringExpression
+    | strReplaceExpression
+    | STRLEN L_PAREN expression R_PAREN
+    | UCASE L_PAREN expression R_PAREN
+    | LCASE L_PAREN expression R_PAREN
+    | ENCODE_FOR_URI L_PAREN expression R_PAREN
+    | CONTAINS L_PAREN expression COMMA expression R_PAREN
+    | STRSTARTS L_PAREN expression COMMA expression R_PAREN
+    | STRENDS L_PAREN expression COMMA expression R_PAREN
+    | STRBEFORE L_PAREN expression COMMA expression R_PAREN
+    | STRAFTER L_PAREN expression COMMA expression R_PAREN
+    | YEAR L_PAREN expression R_PAREN
+    | MONTH L_PAREN expression R_PAREN
+    | DAY L_PAREN expression R_PAREN
+    | HOURS L_PAREN expression R_PAREN
+    | MINUTES L_PAREN expression R_PAREN
+    | SECONDS L_PAREN expression R_PAREN
+    | TIMEZONE L_PAREN expression R_PAREN
+    | TZ L_PAREN expression R_PAREN
+    | NOW NIL
+    | UUID NIL
+    | STRUUID NIL
+    | MD5 L_PAREN expression R_PAREN
+    | SHA1 L_PAREN expression R_PAREN
+    | SHA256 L_PAREN expression R_PAREN
+    | SHA384 L_PAREN expression R_PAREN
+    | SHA512 L_PAREN expression R_PAREN
+    | COALESCE L_PAREN expression (COMMA expression)* R_PAREN
+    | IF L_PAREN expression COMMA expression COMMA expression R_PAREN
+    | STRLANG L_PAREN expression COMMA expression R_PAREN
+    | STRDT L_PAREN expression COMMA expression R_PAREN
+    | SAME_TERM L_PAREN expression COMMA expression R_PAREN
+    | IS_IRI L_PAREN expression R_PAREN
+    | IS_URI L_PAREN expression R_PAREN
+    | IS_BLANK L_PAREN expression R_PAREN
+    | IS_LITERAL L_PAREN expression R_PAREN
+    | IS_NUMERIC L_PAREN expression R_PAREN
     | regexExpression
+    | existsFunc
+    | notExistsFunc
     ;
 
 regexExpression
-    : REGEX '(' expression ',' expression (',' expression)? ')'
+    : REGEX L_PAREN expression COMMA expression (COMMA expression)? R_PAREN
+    ;
+
+subStringExpression
+    : SUBSTR L_PAREN expression COMMA expression (COMMA expression)? R_PAREN
+    ;
+
+strReplaceExpression
+    : REPLACE L_PAREN expression COMMA expression COMMA expression (COMMA expression)? R_PAREN
+    ;
+
+existsFunc
+    : EXISTS groupGraphPattern
+    ;
+
+notExistsFunc
+    : NOT EXISTS groupGraphPattern
+    ;
+
+aggregate
+    : COUNT L_PAREN DISTINCT? (STAR | expression) R_PAREN
+    | SUM L_PAREN DISTINCT? expression R_PAREN
+    | MIN L_PAREN DISTINCT? expression R_PAREN
+    | MAX L_PAREN DISTINCT? expression R_PAREN
+    | AVG L_PAREN DISTINCT? expression R_PAREN
+    | SAMPLE L_PAREN DISTINCT? expression R_PAREN
+    | GROUP_CONCAT L_PAREN DISTINCT? expression (SEMICOLON SEPARATOR EQUAL string_)? R_PAREN
     ;
 
 iriRefOrFunction
@@ -321,7 +700,7 @@ iriRefOrFunction
     ;
 
 rdfLiteral
-    : string_ (LANGTAG | '^^' iriRef)?
+    : string_ (LANGTAG | DOUBLE_CARET iriRef)?
     ;
 
 numericLiteral
@@ -356,7 +735,8 @@ booleanLiteral
 string_
     : STRING_LITERAL1
     | STRING_LITERAL2
-    /* | STRING_LITERAL_LONG('0'..'9') | STRING_LITERAL_LONG('0'..'9')*/
+    | STRING_LITERAL_LONG1
+    | STRING_LITERAL_LONG2
     ;
 
 iriRef
