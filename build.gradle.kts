@@ -296,7 +296,9 @@ tasks.withType<PublishToMavenRepository>().configureEach {
 tasks.named<AntlrTask>("generateGrammarSource") {
     arguments.addAll(listOf("-visitor", "-long-messages", "-package", "fr.inria.corese.core.next.impl.parser.antlr"))
     outputDirectory = antlrPackageDir
-    inputs.files(fileTree("src/main/antlr"))
+    setSource(fileTree("src/main/antlr") {
+        include("**/*.g4")
+    })
     outputs.dir(antlrPackageDir)
 }
 

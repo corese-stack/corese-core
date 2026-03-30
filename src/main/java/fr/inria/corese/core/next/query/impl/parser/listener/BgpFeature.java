@@ -76,4 +76,39 @@ public class BgpFeature extends AbstractSparqlFeature {
             }
         }
     }
+
+    @Override
+    public void exitTriplesSameSubjectPath(SparqlParser.TriplesSameSubjectPathContext ctx) {
+        TermAst s = builder().termFromVarOrTerm(ctx.varOrTerm());
+        var pl = ctx.propertyListPathNotEmpty();
+        if (pl == null) return;
+
+        var verbPaths = pl.verbPath();
+        var verbSimples = pl.verbSimple();
+        var objLists = pl.objectListPath();
+
+        int verbPathIdx = 0;
+        int verbSimpleIdx = 0;
+
+        for (SparqlParser.ObjectListPathContext objList : objLists) {
+            TermAst p;
+
+            boolean useVerbPath = verbPathIdx < verbPaths.size() && (
+                    verbSimpleIdx >= verbSimples.size() ||
+                            verbPaths.get(verbPathIdx).getStart().getTokenIndex()
+                                    < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex()
+            );
+
+            if (useVerbPath) {
+                p = builder().termFromVerbPath(verbPaths.get(verbPathIdx++));
+            } else {
+                p = builder().termFromVerbSimple(verbSimples.get(verbSimpleIdx++));
+            }
+
+            List<TermAst> objects = builder().termListFromObjectListPath(objList);
+            for (TermAst o : objects) {
+                builder().addTriple(s, p, o);
+            }
+        }
+    }
 }

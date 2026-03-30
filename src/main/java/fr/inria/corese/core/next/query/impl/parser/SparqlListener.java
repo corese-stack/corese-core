@@ -78,10 +78,13 @@ public final class SparqlListener extends SparqlParserBaseListener {
 
     // ---------- TRIPLES (subject + property list) ----------
     @Override
-    public void exitTriplesSameSubject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesSameSubjectContext ctx) {
+    public void exitTriplesSameSubject(SparqlParser.TriplesSameSubjectContext ctx) {
         for (var d : delegates) d.exitTriplesSameSubject(ctx);
     }
-
+    @Override
+    public void exitTriplesSameSubjectPath(SparqlParser.TriplesSameSubjectPathContext ctx) {
+        for (var d : delegates) d.exitTriplesSameSubjectPath(ctx);
+    }
     // ---------- OPTIONAL ----------
     @Override
     public void enterOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {

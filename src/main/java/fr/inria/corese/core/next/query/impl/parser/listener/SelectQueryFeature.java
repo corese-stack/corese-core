@@ -27,11 +27,11 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
     @Override
     public void enterSelectQuery(SparqlParser.SelectQueryContext ctx) {
         builder().enterSelectQuery();
+        SparqlParser.SelectClauseContext selectClause = ctx.selectClause();
+        if (selectClause.DISTINCT() != null) { builder().setDistinct(true); }
+        if (selectClause.REDUCED() != null) { builder().setReduced(true); }
 
-        if (ctx.DISTINCT() != null) { builder().setDistinct(true); }
-        if (ctx.REDUCED() != null) { builder().setReduced(true); }
-
-        extractProjection(ctx);
+        extractProjection(selectClause);
     }
 
     @Override
@@ -43,14 +43,16 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
      * Extracts SELECT * or SELECT ?v1 ?v2 ... from the parse context.
      * Grammar: {@code SELECT (DISTINCT | REDUCED)? (var_+ | '*') ...}
      */
-    private void extractProjection(SparqlParser.SelectQueryContext ctx) {
+    private void extractProjection(SparqlParser.SelectClauseContext ctx) {
         if (ctx.STAR() != null) {
             builder().setProjectionAll();
             return;
         }
         List<String> vars = new ArrayList<>();
-        for (SparqlParser.Var_Context varCtx : ctx.var_()) {
-            vars.add(varCtx.getText());
+        for (SparqlParser.SelectVarContext selectVar : ctx.selectVar()) {
+            if (selectVar.var_() != null) {
+                vars.add(selectVar.var_().getText());
+            }
         }
         builder().setProjectionVariables(vars);
     }
