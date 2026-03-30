@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
@@ -109,6 +110,8 @@ public class SparqlParser extends AbstractQueryParser {
                 }
             } catch (RecognitionException e) {
                 throw new QuerySyntaxException("Recognition error in SPARQL query: " + e.getMessage(), e);
+            } catch (ParseCancellationException e) {
+                throw toQuerySyntaxException(e, errorListener);
             }
 
             SparqlAstBuilder builder = new SparqlAstBuilder(sparqlParserOptions);
@@ -150,6 +153,37 @@ public class SparqlParser extends AbstractQueryParser {
     private String getBaseIRIFromConfig() {
         SparqlParserOptions opts = getEffectiveConfig();
         return opts.getBaseIRI();
+    }
+
+    /**
+     * Normalizes ANTLR fail-fast parse cancellations into a Corese syntax exception.
+     * Reuses an existing QuerySyntaxException when available, otherwise prefers
+     * diagnostics collected by the error listener before falling back to the
+     * cancellation or cause message.
+     * 
+     * @param e the original ParseCancellationException thrown by ANTLR
+     * @param errorListener the error listener that may have collected syntax errors
+     * @return a QuerySyntaxException with an informative message and the original exception as cause
+     */
+    static QuerySyntaxException toQuerySyntaxException(ParseCancellationException e, SparqlErrorListener errorListener) {
+        if (e.getCause() instanceof QuerySyntaxException querySyntaxException) {
+            return querySyntaxException;
+        }
+
+        String errorMsg = null;
+        if (errorListener != null && errorListener.hasErrors()) {
+            errorMsg = errorListener.getErrorMessage();
+        } else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().trim().isEmpty()) {
+            errorMsg = e.getCause().getMessage();
+        } else if (e.getMessage() != null && !e.getMessage().trim().isEmpty()) {
+            errorMsg = e.getMessage();
+        }
+
+        if (errorMsg == null || errorMsg.trim().isEmpty()) {
+            errorMsg = "Parsing cancelled due to a syntax error";
+        }
+
+        return new QuerySyntaxException(errorMsg, e);
     }
 
     /** Returns config as SparqlParserOptions, or default options if null or wrong type. */

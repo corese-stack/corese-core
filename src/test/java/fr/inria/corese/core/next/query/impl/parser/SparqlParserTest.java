@@ -15,6 +15,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
@@ -98,6 +99,33 @@ class SparqlParserTest {
 
         assertThrows(QuerySyntaxException.class, () ->
                 parser.parse("SELECT * WHERE { ?s ?p . }"));
+    }
+
+    @Test
+    void parseCancellationWithSyntaxCauseReturnsOriginalSyntaxException() {
+        QuerySyntaxException cause = new QuerySyntaxException("expected syntax error");
+
+        QuerySyntaxException actual = SparqlParser.toQuerySyntaxException(
+                new ParseCancellationException(cause),
+                null);
+
+        assertSame(cause, actual);
+    }
+
+    @Test
+    void parseCancellationUsesCollectedDiagnosticsWhenAvailable() {
+        SparqlParserOptions options = new SparqlParserOptions.Builder()
+                .failFast(false)
+                .collectErrors(true)
+                .build();
+        SparqlErrorListener listener = new SparqlErrorListener(options);
+        listener.syntaxError(null, null, 3, 7, "mismatched input", null);
+
+        QuerySyntaxException exception = SparqlParser.toQuerySyntaxException(
+                new ParseCancellationException(),
+                listener);
+
+        assertTrue(exception.getMessage().contains("mismatched input"));
     }
 
     @Test
