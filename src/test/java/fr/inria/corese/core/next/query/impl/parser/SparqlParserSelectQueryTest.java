@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
@@ -472,7 +473,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     void shouldRejectSelectAllWithOrderByVariableNotVisibleInWhere() {
         SparqlParser parser = newParserDefault();
 
-        QuerySyntaxException exception = assertThrows(QuerySyntaxException.class, () -> parser.parse("""
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
                     SELECT * WHERE {
                         ?s ?p ?o
                     }
@@ -529,7 +530,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     void shouldRejectOrderByVariableNotVisibleInWhere() {
         SparqlParser parser = newParserDefault();
 
-        QuerySyntaxException exception = assertThrows(QuerySyntaxException.class, () -> parser.parse("""
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
                     SELECT ?s WHERE {
                         ?s ?p ?o
                     }
@@ -544,7 +545,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     void shouldRejectMultipleOrderByWhenOneVariableIsNotVisibleInWhere() {
         SparqlParser parser = newParserDefault();
 
-        QuerySyntaxException exception = assertThrows(QuerySyntaxException.class, () -> parser.parse("""
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
                     SELECT ?s WHERE {
                         ?s ?p ?o
                     }
@@ -559,7 +560,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     void shouldRejectOrderByExpressionNotVisibleInWhere() {
         SparqlParser parser = newParserDefault();
 
-        QuerySyntaxException exception = assertThrows(QuerySyntaxException.class, () -> parser.parse("""
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
                     SELECT ?s WHERE {
                         ?s ?p ?o
                     }
@@ -574,7 +575,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     void shouldRejectInvalidProjection() {
         SparqlParser parser = newParserDefault();
 
-        QuerySyntaxException exception = assertThrows(QuerySyntaxException.class, () -> parser.parse("""
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
                     SELECT ?x WHERE {
                         ?s ?p ?o
                     }
@@ -600,7 +601,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     void shouldRejectInvalidProjectionWithUnion() {
         SparqlParser parser = newParserDefault();
 
-        QuerySyntaxException exception = assertThrows(QuerySyntaxException.class, () -> parser.parse("""
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
                     SELECT ?cityLabel
                     WHERE {
                       { ?country wdt:P36 ?city. }

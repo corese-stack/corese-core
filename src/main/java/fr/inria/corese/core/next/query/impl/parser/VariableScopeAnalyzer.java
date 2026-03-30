@@ -23,6 +23,10 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryConstrain
 
 /**
  * Collects visible and referenced variables from the next SPARQL AST.
+ * A visible variable is introduced by a graph pattern in the WHERE clause and
+ * can appear in the query solutions. A referenced variable is only mentioned
+ * in an expression such as FILTER or ORDER BY; mentioning it there does not
+ * make it visible.
  */
 public final class VariableScopeAnalyzer {
 

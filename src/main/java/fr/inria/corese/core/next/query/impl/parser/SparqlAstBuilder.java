@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -415,7 +416,7 @@ public final class SparqlAstBuilder {
             validateProjectionVariables(visibleVariables);
         }
 
-        validateOrderVariables(visibleVariables);
+        validateOrderVariables(collectOrderByAvailableVariables(visibleVariables));
     }
 
     /**
@@ -426,7 +427,7 @@ public final class SparqlAstBuilder {
     private void validateProjectionVariables(Set<String> visibleVariables) {
         for (VarAst projectedVar : projection.variables()) {
             if (!visibleVariables.contains(projectedVar.name())) {
-                throw new QuerySyntaxException(buildOutOfScopeVariableMessage(
+                throw new QueryValidationException(buildOutOfScopeVariableMessage(
                         projectedVar.name(),
                         "SELECT projection"));
             }
@@ -434,18 +435,39 @@ public final class SparqlAstBuilder {
     }
 
     /**
-     * Validates ORDER BY variables against the WHERE clause scope.
+     * Collects variables that may be referenced from ORDER BY.
+     *
+     * <p>SPARQL applies ORDER BY before the final projection step. In the current next parser,
+     * explicit projection variables are already validated against the WHERE clause, so adding
+     * them here mainly keeps the availability rule explicit while staying within the current
+     * SPARQL 1.0 feature set.
      *
      * @param visibleVariables variable names visible from the WHERE clause
+     * @return variable names available to ORDER BY validation
      */
-    private void validateOrderVariables(Set<String> visibleVariables) {
+    private Set<String> collectOrderByAvailableVariables(Set<String> visibleVariables) {
+        Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
+        if (!projection.selectAll()) {
+            for (VarAst projectedVar : projection.variables()) {
+                availableVariables.add(projectedVar.name());
+            }
+        }
+        return availableVariables;
+    }
+
+    /**
+     * Validates ORDER BY variables against the variables available at ORDER BY time.
+     *
+     * @param availableOrderVariables variable names available to ORDER BY
+     */
+    private void validateOrderVariables(Set<String> availableOrderVariables) {
         for (OrderConditionAst orderCondition : orderConditions) {
             Set<String> referencedVariables = variableScopeAnalyzer
                     .collectReferencedVariables(orderCondition.expression());
 
             for (String variableName : referencedVariables) {
-                if (!visibleVariables.contains(variableName)) {
-                    throw new QuerySyntaxException(buildOutOfScopeVariableMessage(
+                if (!availableOrderVariables.contains(variableName)) {
+                    throw new QueryValidationException(buildOutOfScopeVariableMessage(
                             variableName,
                             "ORDER BY"));
                 }

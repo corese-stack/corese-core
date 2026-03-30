@@ -1,11 +1,12 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.api.exception.QueryException;
-import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,7 +14,14 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 /**
  * Unit tests for {@link SparqlParser}: parse overloads, config, and error handling.
@@ -88,8 +96,7 @@ class SparqlParserTest {
         parser.setConfig(
                 new SparqlParserOptions.Builder().failFast(false).collectErrors(true).build());
 
-        // With failFast false, invalid query throws QueryException (after collection), not QuerySyntaxException
-        assertThrows(QueryException.class, () ->
+        assertThrows(QuerySyntaxException.class, () ->
                 parser.parse("SELECT * WHERE { ?s ?p . }"));
     }
 
@@ -113,7 +120,7 @@ class SparqlParserTest {
     }
 
     @Test
-    void parseReaderIoExceptionWrapsInQueryException() {
+    void parseReaderIoExceptionWrapsInQueryEvaluationException() {
         SparqlParser parser = new SparqlParser(new SparqlParserOptions.Builder().build());
         Reader failingReader = new Reader() {
             @Override
@@ -124,7 +131,7 @@ class SparqlParserTest {
             public void close() {}
         };
 
-        QueryException ex = assertThrows(QueryException.class, () ->
+        QueryEvaluationException ex = assertThrows(QueryEvaluationException.class, () ->
                 parser.parse(failingReader, null));
 
         assertTrue(ex.getMessage().contains("Failed to parse") || ex.getCause() instanceof IOException);

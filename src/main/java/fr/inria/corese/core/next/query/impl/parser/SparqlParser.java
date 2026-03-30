@@ -20,8 +20,9 @@ import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
 import fr.inria.corese.core.next.query.api.base.io.AbstractQueryParser;
-import fr.inria.corese.core.next.query.api.exception.QueryException;
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
 import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
@@ -104,10 +105,10 @@ public class SparqlParser extends AbstractQueryParser {
                     if (errorMsg == null || errorMsg.trim().isEmpty()) {
                         errorMsg = "Unknown syntax error detected";
                     }
-                    throw new QueryException("Syntax error in Sparql query: " + errorMsg);
+                    throw new QuerySyntaxException("Syntax error in SPARQL query: " + errorMsg);
                 }
             } catch (RecognitionException e) {
-                throw new QueryException("Recognition error in Sparql query: " + e.getMessage(), e);
+                throw new QuerySyntaxException("Recognition error in SPARQL query: " + e.getMessage(), e);
             }
 
             SparqlAstBuilder builder = new SparqlAstBuilder(sparqlParserOptions);
@@ -127,10 +128,10 @@ public class SparqlParser extends AbstractQueryParser {
             walker.walk(listener, tree);
 
             return builder.getResult();
-        } catch (QueryException e) {
+        } catch (QuerySyntaxException | QueryValidationException | QueryEvaluationException e) {
             throw e;
         } catch (IOException e) {
-            throw new QueryException("Failed to parse SPARQL query: " + e.getMessage(), e);
+            throw new QueryEvaluationException("Failed to parse SPARQL query: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new QuerySyntaxException("Unexpected error during SPARQL parsing: " + e.getMessage(), e);
         }

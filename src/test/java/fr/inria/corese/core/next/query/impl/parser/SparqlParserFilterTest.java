@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
@@ -51,7 +51,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldRejectProjectionVariableOnlyReferencedInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QuerySyntaxException exception = assertThrows(QuerySyntaxException.class, () -> parser.parse("""
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
                 SELECT ?x WHERE {
                   ?s ?p ?o .
                   FILTER(BOUND(?x))
