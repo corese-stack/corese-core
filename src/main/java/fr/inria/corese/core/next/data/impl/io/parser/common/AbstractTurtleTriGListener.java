@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.exception.ParsingErrorException;
 import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
+import fr.inria.corese.core.next.util.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -652,8 +653,8 @@ public abstract class AbstractTurtleTriGListener {
             // Check for forbidden characters
             if (IRIUtils.isInvalidIRICharacter(c)) {
                 String codePoint = String.format("U+%04X", (int) c);
-                String charDesc = IRIUtils.getCharacterDescription(c);
-                String displayIRI = IRIUtils.escapeForDisplay(iri);
+                String charDesc = StringUtils.getCharacterDescription(c);
+                String displayIRI = StringUtils.escapeForDisplay(iri);
 
                 throw new ParsingErrorException(
                         "Invalid character in IRI: " + codePoint + " (" + charDesc + ") " +
