@@ -12,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(SparqlParserPrologueTest.class);
-
     @Test
     @DisplayName("Basic Ask with base")
     public void askWithBase() {
@@ -95,8 +93,6 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
         SparqlParser parser = newParserDefault();
 
         SelectQueryAst ast = (SelectQueryAst) parser.parse(query);
-
-        logger.debug("{}", ast.prologue());
 
         assertEquals("http://ns.inria.fr/test/", ast.prologue().baseIri().raw());
         assertTrue(ast.prologue().prefixDeclarations().stream().anyMatch(prefixDecl -> prefixDecl.prefix().equals("test")));
@@ -197,6 +193,7 @@ public class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
         SparqlParser parser = newParserDefault();
 
         SelectQueryAst ast = assertDoesNotThrow(() -> (SelectQueryAst) parser.parse(query));
+
         assertTrue(ast.prologue().prefixDeclarations().stream().anyMatch(prefixDecl -> prefixDecl.prefix().equals("ex")), "ex: is in the prologue");
         assertTrue(ast.prologue().prefixDeclarations().stream().anyMatch(prefixDecl -> prefixDecl.prefix().equals("ex") && prefixDecl.namespace().raw().equals("http://example.org/root/ns/")), "the IRI of ex: in http://example.org/root/ns/");
     }

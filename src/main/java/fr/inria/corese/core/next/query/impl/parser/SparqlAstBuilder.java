@@ -134,6 +134,9 @@ public final class SparqlAstBuilder {
     // --- Construction entry points (called by listener) ---
 
     public void setBaseUri(String uri) {
+        if(this.baseUri != null && !this.baseUri.equals(options.getBaseIRI())) {
+            throw new QuerySyntaxException("Base URI already set, multiple BASE declarations are forbidden.");
+        }
         this.baseUri = uri;
     }
 
