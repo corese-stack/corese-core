@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 
 import java.util.List;
@@ -22,6 +23,14 @@ public record QueryPrologueAst(List<PrefixDeclarationAst> prefixDeclarations, Ir
         } else {
             baseIri = new IriAst(trimChevronIRIs(baseIri.raw()));
         }
+        // resolving relative namespaces in prefix declarations
+        IriAst finalBaseIri = baseIri;
+        prefixDeclarations = prefixDeclarations.stream().map(prefixDecl -> {
+            if(IRIUtils.isAbsoluteIRI(prefixDecl.namespace().raw())) {
+                return prefixDecl;
+            }
+            return new PrefixDeclarationAst(prefixDecl.prefix(), new IriAst(IRIUtils.resolveIRIAgainstBase(finalBaseIri.raw(), prefixDecl.namespace().raw())));
+        }).toList();
     }
 
     public static QueryPrologueAst empty() {
