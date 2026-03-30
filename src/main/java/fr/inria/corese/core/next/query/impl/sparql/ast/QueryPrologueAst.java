@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ public record QueryPrologueAst(List<PrefixDeclarationAst> prefixDeclarations, Ir
             baseIri = new IriAst(IOConstants.getDefaultBaseURI());
         } else {
             baseIri = new IriAst(trimChevronIRIs(baseIri.raw()));
+        }
+        if (!IRIUtils.isAbsoluteIRI(baseIri.raw())) {
+            throw new QuerySyntaxException("Base IRI should be absolute, got " + baseIri.raw());
         }
         // resolving relative namespaces in prefix declarations
         IriAst finalBaseIri = baseIri;
