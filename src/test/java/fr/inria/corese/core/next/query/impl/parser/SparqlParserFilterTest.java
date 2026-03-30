@@ -1,21 +1,49 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import org.junit.jupiter.api.Test;
 
-public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AddAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AndAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryRegexAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BooleanNotAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DatatypeAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DifferentAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DivideAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterOrEqualThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsBlankAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsLiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangMatchesAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerOrEqualThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MultiplyAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.OrAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SameTermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SubtractAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryMinusAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryPlusAst;
 
-    private static final Logger logger = LoggerFactory.getLogger(SparqlParserFilterTest.class);
+class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     void shouldParseTrueFilter() {
@@ -60,7 +88,6 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast.whereClause());
 
         GroupGraphPatternAst where = ast.whereClause();
-        logger.info("{}", ast);
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();

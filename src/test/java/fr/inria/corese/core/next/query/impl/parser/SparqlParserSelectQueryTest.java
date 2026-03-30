@@ -1,22 +1,41 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
 
 
-public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
+@SuppressWarnings("java:S5976")
+class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     @Test
     @DisplayName("Should parse a basic SELECT ?s ?o ?p WHERE {?s ?p ?o} query")
-    public void shouldParseBasicSelectQueryTest() {
+    void shouldParseBasicSelectQueryTest() {
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse("""
@@ -71,7 +90,7 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
 
     @Test
     @DisplayName("Should parse a basic SELECT * WHERE { ?s ?p ?o } query")
-    public void shouldParseBasicSelectAllQueryTest() {
+    void shouldParseBasicSelectAllQueryTest() {
 
         SparqlParser parser = newParserDefault();
 
@@ -120,7 +139,7 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
 
     @Test
     @DisplayName("Should parse a short form SELECT ?s ?o { ?s ?p ?o } query")
-    public void shouldParseBasicSelectShortQueryTest() {
+    void shouldParseBasicSelectShortQueryTest() {
 
         SparqlParser parser = newParserDefault();
 
@@ -408,13 +427,108 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         });
     }
 
-    @DisplayName("Should parse SELECT DISTINCT ?city ?cityLabel WHERE with BGP and UNION")
-    public void shouldParseSelectDistinctWithUnionQueryTest() {
+    @Test
+    @DisplayName("Should accept ORDER BY variable visible in WHERE but not projected")
+    void shouldAcceptOrderByVariableVisibleInWhere() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY ?o
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(VarAst.class, select.solutionModifier().orderBy().getFirst().expression());
+        assertEquals("o", ((VarAst) select.solutionModifier().orderBy().getFirst().expression()).name());
+    }
+
+    @Test
+    @DisplayName("Should accept SELECT * with ORDER BY variable visible in WHERE")
+    void shouldAcceptSelectAllWithOrderByVariableVisibleInWhere() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT * WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY ?o
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertTrue(select.projection().selectAll());
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertInstanceOf(VarAst.class, select.solutionModifier().orderBy().getFirst().expression());
+        assertEquals("o", ((VarAst) select.solutionModifier().orderBy().getFirst().expression()).name());
+    }
+
+    @Test
+    @DisplayName("Should accept ORDER BY expression using a variable visible in WHERE but not projected")
+    void shouldAcceptOrderByExpressionVisibleInWhere() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY STR(?o)
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(StrAst.class, select.solutionModifier().orderBy().getFirst().expression());
+    }
+
+    @Test
+    @DisplayName("Should accept ORDER BY variable visible through OPTIONAL and UNION")
+    void shouldAcceptOrderByVariableVisibleThroughOptionalAndUnion() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        OPTIONAL {
+                            { ?s ?p ?o }
+                            UNION
+                            { ?s ?q ?o }
+                        }
+                    }
+                    ORDER BY ?o
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertInstanceOf(VarAst.class, select.solutionModifier().orderBy().getFirst().expression());
+        assertEquals("o", ((VarAst) select.solutionModifier().orderBy().getFirst().expression()).name());
+    }
+
+    @Test
+    @DisplayName("Should accept projection variables visible through OPTIONAL")
+    void shouldAcceptProjectionVisibleThroughOptional() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                    SELECT ?o WHERE {
+                        OPTIONAL { ?s ?p ?o }
+                    }
+                """));
+    }
+
+    @Test
+    @DisplayName("Should parse SELECT DISTINCT ?city ?country WHERE with BGP and UNION")
+    void shouldParseSelectDistinctWithUnionQueryTest() {
         SparqlParser parser = newParserDefault();
 
         //https://en.wikibooks.org/wiki/SPARQL/UNION
         QueryAst ast = parser.parse("""
-                SELECT DISTINCT ?city ?cityLabel
+                SELECT DISTINCT ?city ?country
                 WHERE {
                   wd:Q458 wdt:P150 ?country.
                   { ?country wdt:P36 ?city. }
@@ -498,12 +612,12 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         assertFalse(projection.selectAll(), "Projection should not be SELECT *");
         assertEquals(2, projection.variables().size());
         assertEquals("city", projection.variables().get(0).name());
-        assertEquals("cityLabel", projection.variables().get(1).name());
+        assertEquals("country", projection.variables().get(1).name());
     }
 
     @Test
     @DisplayName("Insertion of a comment before the query should not change the treatment of the query")
-    public void shouldIgnoreCommentBeforeQuery() {
+    void shouldIgnoreCommentBeforeQuery() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 # This is a test comment
@@ -556,7 +670,7 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
 
     @Test
     @DisplayName("Insertion of a comment after the query should not change the treatment of the query")
-    public void shouldIgnoreCommentAfterQuery() {
+    void shouldIgnoreCommentAfterQuery() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 SELECT DISTINCT ?c ?p
@@ -609,7 +723,7 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
 
     @Test
     @DisplayName("Insertion of a comment in the middle of the query should not change the treatment of the query")
-    public void shouldIgnoreCommentInTheMiddleOfQuery() {
+    void shouldIgnoreCommentInTheMiddleOfQuery() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 SELECT DISTINCT ?c ?p
@@ -662,7 +776,7 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
 
     @Test
     @DisplayName("Insertion of a comment in the middle of the query should not change the treatment of the query, even with a query containing #")
-    public void shouldIgnoreCommentInTheMiddleOfQueryWithIRI() {
+    void shouldIgnoreCommentInTheMiddleOfQueryWithIRI() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 SELECT DISTINCT ?c ?o
@@ -712,7 +826,6 @@ public class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest
         assertNotNull(selectQueryAst.solutionModifier());
         assertEquals(10, selectQueryAst.solutionModifier().limit());
     }
-
     @Test
     @DisplayName("a list of From graphs can be inserted")
     public void fromGraphs() {

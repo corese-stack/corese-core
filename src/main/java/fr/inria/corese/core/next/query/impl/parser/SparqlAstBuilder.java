@@ -4,11 +4,11 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
 
 import java.util.*;
 
@@ -111,6 +111,11 @@ public final class SparqlAstBuilder {
      * Template AST after {@link #exitConstructTemplate()}; consumed in {@link #getResult()}.
      */
     private ConstructTemplateAst constructTemplate;
+
+    /**
+     * Helper used to compute visible and referenced variables.
+     */
+    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
@@ -328,14 +333,10 @@ public final class SparqlAstBuilder {
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
         return switch (this.queryType) {
-            case DESCRIBE -> new DescribeQueryAst(datasetClauseAst, describeResources, whereClause);
-            case CONSTRUCT -> new ConstructQueryAst(
-                    constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
-                    datasetClauseAst,
-                    whereClause,
-                    buildSolutionModifier());
-            case ASK -> new AskQueryAst(datasetClauseAst, whereClause);
-            case SELECT -> new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier());
+            case ASK -> buildAskQueryAst(datasetClauseAst);
+            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst);
+            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst);
+            case SELECT -> buildSelectQueryAst(datasetClauseAst);
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
@@ -364,6 +365,116 @@ public final class SparqlAstBuilder {
                     "exitGroup() called while a TriplesBlock/BGP is still open" +
                             " (open bgpStack depth=" + bgpStack.size() + ")");
         }
+    }
+
+    /**
+     * Builds the AST for ASK queries.
+     */
+    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst) {
+        return new AskQueryAst(datasetClauseAst, whereClause);
+    }
+
+    /**
+     * Builds the AST for SELECT queries.
+     */
+    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst) {
+        validateSelectQueryScope();
+        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier());
+    }
+
+    /**
+     * Builds the AST for DESCRIBE queries.
+     */
+    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst) {
+        // TODO #306: validate variable scope for DESCRIBE modifiers when DescribeQueryAst carries them.
+        return new DescribeQueryAst(datasetClauseAst, describeResources, whereClause);
+    }
+
+    /**
+     * Builds the AST for CONSTRUCT queries.
+     */
+    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst) {
+        // TODO #306: validate variable scope for CONSTRUCT modifiers when ConstructQueryAst carries them.
+        return new ConstructQueryAst(
+                constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
+                datasetClauseAst,
+                whereClause,
+                buildSolutionModifier());
+    }
+
+    /**
+     * Validates SELECT projection and ORDER BY variables against the WHERE clause scope.
+     */
+    private void validateSelectQueryScope() {
+        // TODO #306: extend this validation to GROUP BY when it is supported by the next parser.
+        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(whereClause);
+
+        // SELECT * still needs ORDER BY validation.
+        if (!projection.selectAll()) {
+            validateProjectionVariables(visibleVariables);
+        }
+
+        validateOrderVariables(collectOrderByAvailableVariables(visibleVariables));
+    }
+
+    /**
+     * Validates explicit projection variables against the WHERE clause scope.
+     *
+     * @param visibleVariables variable names visible from the WHERE clause
+     */
+    private void validateProjectionVariables(Set<String> visibleVariables) {
+        for (VarAst projectedVar : projection.variables()) {
+            if (!visibleVariables.contains(projectedVar.name())) {
+                throw new QueryValidationException(buildOutOfScopeVariableMessage(
+                        projectedVar.name(),
+                        "SELECT projection"));
+            }
+        }
+    }
+
+    /**
+     * Collects variables that may be referenced from ORDER BY.
+     *
+     * <p>SPARQL applies ORDER BY before the final projection step. In the current next parser,
+     * explicit projection variables are already validated against the WHERE clause, so adding
+     * them here mainly keeps the availability rule explicit while staying within the current
+     * SPARQL 1.0 feature set.
+     *
+     * @param visibleVariables variable names visible from the WHERE clause
+     * @return variable names available to ORDER BY validation
+     */
+    private Set<String> collectOrderByAvailableVariables(Set<String> visibleVariables) {
+        Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
+        if (!projection.selectAll()) {
+            for (VarAst projectedVar : projection.variables()) {
+                availableVariables.add(projectedVar.name());
+            }
+        }
+        return availableVariables;
+    }
+
+    /**
+     * Validates ORDER BY variables against the variables available at ORDER BY time.
+     *
+     * @param availableOrderVariables variable names available to ORDER BY
+     */
+    private void validateOrderVariables(Set<String> availableOrderVariables) {
+        for (OrderConditionAst orderCondition : orderConditions) {
+            Set<String> referencedVariables = variableScopeAnalyzer
+                    .collectReferencedVariables(orderCondition.expression());
+
+            for (String variableName : referencedVariables) {
+                if (!availableOrderVariables.contains(variableName)) {
+                    throw new QueryValidationException(buildOutOfScopeVariableMessage(
+                            variableName,
+                            "ORDER BY"));
+                }
+            }
+        }
+    }
+
+    private String buildOutOfScopeVariableMessage(String variableName, String clause) {
+        return "Variable ?" + variableName + " used in " + clause + " is not visible in WHERE clause";
     }
 
     /**
@@ -1021,7 +1132,6 @@ public final class SparqlAstBuilder {
             throw new QueryEvaluationException("Unexpected arguments for REGEX call");
         }
     }
-
     /**
      * Predicate as a property path.
      * For simple triples without a composed path, this is just an iriRef or 'a'.

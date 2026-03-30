@@ -1,25 +1,41 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
-import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
-import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
-import fr.inria.corese.core.next.query.api.base.io.AbstractQueryParser;
-import fr.inria.corese.core.next.query.api.exception.QueryException;
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
-import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
-import fr.inria.corese.core.next.query.impl.parser.listener.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import org.antlr.v4.runtime.BailErrorStrategy;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
+import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
+import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
+import fr.inria.corese.core.next.query.api.base.io.AbstractQueryParser;
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
+import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
+import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
+import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.DatasetClauseFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.FilterFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 
 public class SparqlParser extends AbstractQueryParser {
 
@@ -84,18 +100,19 @@ public class SparqlParser extends AbstractQueryParser {
             ParseTree tree;
 
             try {
-                tree= parser.query();
+                tree = parser.query();
                 if (errorListener.hasErrors()) {
                     String errorMsg = errorListener.getErrorMessage();
                     if (errorMsg == null || errorMsg.trim().isEmpty()) {
                         errorMsg = "Unknown syntax error detected";
                     }
-                    throw new QueryException("Syntax error in Sparql query: " + errorMsg);
+                    throw new QuerySyntaxException("Syntax error in SPARQL query: " + errorMsg);
                 }
             } catch (RecognitionException e) {
-                throw new QueryException("Recognition error in Sparql query: " + e.getMessage(), e);
+                throw new QuerySyntaxException("Recognition error in SPARQL query: " + e.getMessage(), e);
+            } catch (ParseCancellationException e) {
+                throw toQuerySyntaxException(e, errorListener);
             }
-
 
             SparqlAstBuilder builder = new SparqlAstBuilder(sparqlParserOptions);
 
@@ -114,12 +131,11 @@ public class SparqlParser extends AbstractQueryParser {
             walker.walk(listener, tree);
 
             return builder.getResult();
-
-        }
-        catch (IOException e) {
-            throw new QueryException("Failed to parse SPARQL query: " + e.getMessage(), e);
-        }
-        catch (Exception e) {
+        } catch (QuerySyntaxException | QueryValidationException | QueryEvaluationException e) {
+            throw e;
+        } catch (IOException e) {
+            throw new QueryEvaluationException("Failed to parse SPARQL query: " + e.getMessage(), e);
+        } catch (Exception e) {
             throw new QuerySyntaxException("Unexpected error during SPARQL parsing: " + e.getMessage(), e);
         }
     }
@@ -137,6 +153,37 @@ public class SparqlParser extends AbstractQueryParser {
     private String getBaseIRIFromConfig() {
         SparqlParserOptions opts = getEffectiveConfig();
         return opts.getBaseIRI();
+    }
+
+    /**
+     * Normalizes ANTLR fail-fast parse cancellations into a Corese syntax exception.
+     * Reuses an existing QuerySyntaxException when available, otherwise prefers
+     * diagnostics collected by the error listener before falling back to the
+     * cancellation or cause message.
+     * 
+     * @param e the original ParseCancellationException thrown by ANTLR
+     * @param errorListener the error listener that may have collected syntax errors
+     * @return a QuerySyntaxException with an informative message and the original exception as cause
+     */
+    static QuerySyntaxException toQuerySyntaxException(ParseCancellationException e, SparqlErrorListener errorListener) {
+        if (e.getCause() instanceof QuerySyntaxException querySyntaxException) {
+            return querySyntaxException;
+        }
+
+        String errorMsg = null;
+        if (errorListener != null && errorListener.hasErrors()) {
+            errorMsg = errorListener.getErrorMessage();
+        } else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().trim().isEmpty()) {
+            errorMsg = e.getCause().getMessage();
+        } else if (e.getMessage() != null && !e.getMessage().trim().isEmpty()) {
+            errorMsg = e.getMessage();
+        }
+
+        if (errorMsg == null || errorMsg.trim().isEmpty()) {
+            errorMsg = "Parsing cancelled due to a syntax error";
+        }
+
+        return new QuerySyntaxException(errorMsg, e);
     }
 
     /** Returns config as SparqlParserOptions, or default options if null or wrong type. */
