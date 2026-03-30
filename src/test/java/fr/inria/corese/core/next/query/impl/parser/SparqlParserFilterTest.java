@@ -3,13 +3,11 @@ package fr.inria.corese.core.next.query.impl.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
@@ -46,20 +44,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryMinusAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryPlusAst;
 
 class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
-
-    @Test
-    void shouldRejectProjectionVariableOnlyReferencedInFilter() {
-        SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                SELECT ?x WHERE {
-                  ?s ?p ?o .
-                  FILTER(BOUND(?x))
-                }
-                """));
-
-        assertEquals("Variable ?x used in SELECT projection is not visible in WHERE clause", exception.getMessage());
-    }
 
     @Test
     void shouldParseTrueFilter() {

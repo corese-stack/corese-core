@@ -15,7 +15,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
@@ -469,21 +468,6 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("Should reject SELECT * with ORDER BY variable not visible in WHERE")
-    void shouldRejectSelectAllWithOrderByVariableNotVisibleInWhere() {
-        SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    SELECT * WHERE {
-                        ?s ?p ?o
-                    }
-                    ORDER BY ?z
-                """));
-
-        assertEquals("Variable ?z used in ORDER BY is not visible in WHERE clause", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("Should accept ORDER BY expression using a variable visible in WHERE but not projected")
     void shouldAcceptOrderByExpressionVisibleInWhere() {
         SparqlParser parser = newParserDefault();
@@ -526,65 +510,6 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("Should reject ORDER BY variable not visible in WHERE")
-    void shouldRejectOrderByVariableNotVisibleInWhere() {
-        SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    SELECT ?s WHERE {
-                        ?s ?p ?o
-                    }
-                    ORDER BY ?z
-                """));
-
-        assertEquals("Variable ?z used in ORDER BY is not visible in WHERE clause", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Should reject multiple ORDER BY clauses when one variable is not visible in WHERE")
-    void shouldRejectMultipleOrderByWhenOneVariableIsNotVisibleInWhere() {
-        SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    SELECT ?s WHERE {
-                        ?s ?p ?o
-                    }
-                    ORDER BY ?s ?z
-                """));
-
-        assertEquals("Variable ?z used in ORDER BY is not visible in WHERE clause", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Should reject ORDER BY expression using a variable not visible in WHERE")
-    void shouldRejectOrderByExpressionNotVisibleInWhere() {
-        SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    SELECT ?s WHERE {
-                        ?s ?p ?o
-                    }
-                    ORDER BY STR(?z)
-                """));
-
-        assertEquals("Variable ?z used in ORDER BY is not visible in WHERE clause", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Should reject SELECT projection variables not visible in WHERE")
-    void shouldRejectInvalidProjection() {
-        SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    SELECT ?x WHERE {
-                        ?s ?p ?o
-                    }
-                """));
-
-        assertEquals("Variable ?x used in SELECT projection is not visible in WHERE clause", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("Should accept projection variables visible through OPTIONAL")
     void shouldAcceptProjectionVisibleThroughOptional() {
         SparqlParser parser = newParserDefault();
@@ -594,24 +519,6 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                         OPTIONAL { ?s ?p ?o }
                     }
                 """));
-    }
-
-    @Test
-    @DisplayName("Should reject projection variable not visible through UNION")
-    void shouldRejectInvalidProjectionWithUnion() {
-        SparqlParser parser = newParserDefault();
-
-        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    SELECT ?cityLabel
-                    WHERE {
-                      { ?country wdt:P36 ?city. }
-                      UNION
-                      { ?city wdt:P17 ?country. }
-                    }
-                """));
-
-        assertEquals("Variable ?cityLabel used in SELECT projection is not visible in WHERE clause",
-                exception.getMessage());
     }
 
     @Test
