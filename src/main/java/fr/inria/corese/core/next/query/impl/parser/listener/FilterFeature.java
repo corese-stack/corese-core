@@ -30,4 +30,14 @@ public class FilterFeature extends AbstractSparqlFeature {
 
         this.builder().addFilter(filter);
     }
+
+    @Override
+    public void enterExistsFunc(SparqlParser.ExistsFuncContext ctx) {
+        builder().enterExistsFunc();
+    }
+
+    @Override
+    public void enterNotExistsFunc(SparqlParser.NotExistsFuncContext ctx) {
+        builder().enterNotExistsFunc();
+    }
 }

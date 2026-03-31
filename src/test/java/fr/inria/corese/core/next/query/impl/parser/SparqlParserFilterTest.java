@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
@@ -1220,5 +1220,147 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals("s", ((VarAst) divideAst.getLeftArgument()).name());
         assertInstanceOf(LiteralAst.class, divideAst.getRightArgument());
         assertEquals("2", ((LiteralAst) divideAst.getRightArgument()).lexical());
+    }
+
+    @Test
+    void shouldParseExistsFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER EXISTS { ?s ex:email ?e }
+                }
+                """);
+
+        assertNotNull(ast);
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size());
+
+        PatternAst last = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, last);
+
+        FilterAst filterAst = (FilterAst) last;
+        assertInstanceOf(ExistsAst.class, filterAst.operator());
+
+        ExistsAst existsAst = (ExistsAst) filterAst.operator();
+        assertNotNull(existsAst.pattern());
+        assertFalse(existsAst.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseNotExistsFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER NOT EXISTS { ?s ex:email ?e }
+                }
+                """);
+
+        assertNotNull(ast);
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size());
+
+        PatternAst last = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, last);
+
+        FilterAst filterAst = (FilterAst) last;
+        assertInstanceOf(NotExistsAst.class, filterAst.operator());
+
+        NotExistsAst notExistsAst = (NotExistsAst) filterAst.operator();
+        assertNotNull(notExistsAst.pattern());
+        assertFalse(notExistsAst.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseExistsWithMultipleTriples() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER EXISTS {
+                    ?s ex:email ?e .
+                    ?s ex:name ?n
+                  }
+                }
+                """);
+
+        assertNotNull(ast);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(ExistsAst.class, filterAst.operator());
+
+        ExistsAst existsAst = (ExistsAst) filterAst.operator();
+        assertNotNull(existsAst.pattern());
+    }
+
+    @Test
+    void shouldParseNotExistsEmpty() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER NOT EXISTS { }
+                }
+                """);
+
+        assertNotNull(ast);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(NotExistsAst.class, filterAst.operator());
+
+        NotExistsAst notExistsAst = (NotExistsAst) filterAst.operator();
+        assertNotNull(notExistsAst.pattern());
+        assertTrue(notExistsAst.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseAndBetweenTwoExistsFilters() {
+        SparqlParser parser = newParserDefault();
+        QueryAst ast = parser.parse("""
+          PREFIX ex: <http://example.org/>
+          
+          SELECT * WHERE {
+            ?s ?p ?o .
+            FILTER(EXISTS { ?s ex:email ?e } && EXISTS { ?s ex:name ?n })
+          }
+          """);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(AndAst.class, filterAst.operator());
+        AndAst andAst = (AndAst) filterAst.operator();
+        assertInstanceOf(ExistsAst.class, andAst.getLeftArgument());
+        assertInstanceOf(ExistsAst.class, andAst.getRightArgument());
+        ExistsAst left = (ExistsAst) andAst.getLeftArgument();
+        ExistsAst right = (ExistsAst) andAst.getRightArgument();
+        assertNotNull(left.pattern());
+        assertNotNull(right.pattern());
+        assertFalse(left.pattern().patterns().isEmpty());
+        assertFalse(right.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseOrBetweenExistsAndNotExistsFilters() {
+        SparqlParser parser = newParserDefault();
+        QueryAst ast = parser.parse("""
+          PREFIX ex: <http://example.org/>
+          
+          SELECT * WHERE {
+            ?s ?p ?o .
+            FILTER(EXISTS { ?s ex:email ?e } || NOT EXISTS { ?s ex:phone ?ph })
+          }
+          """);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(OrAst.class, filterAst.operator());
+        OrAst orAst = (OrAst) filterAst.operator();
+        assertInstanceOf(ExistsAst.class, orAst.getLeftArgument());
+        assertInstanceOf(NotExistsAst.class, orAst.getRightArgument());
+        ExistsAst left = (ExistsAst) orAst.getLeftArgument();
+        NotExistsAst right = (NotExistsAst) orAst.getRightArgument();
+        assertNotNull(left.pattern());
+        assertNotNull(right.pattern());
+        assertFalse(left.pattern().patterns().isEmpty());
+        assertFalse(right.pattern().patterns().isEmpty());
     }
 }
