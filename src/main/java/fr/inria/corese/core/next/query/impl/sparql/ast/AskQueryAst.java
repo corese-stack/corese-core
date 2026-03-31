@@ -15,12 +15,11 @@ import java.util.List;
  * }
  * }</pre>
  */
-public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, QueryPrologueAst prologue) implements QueryAst {
-    /**
-     * constructor with default prefix handler
-     */
+public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause,
+                          SolutionModifierAst solutionModifier, QueryPrologueAst prologue) implements QueryAst {
+
     public AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause) {
-        this(datasetClause, whereClause, null);
+        this(datasetClause, whereClause, null, null);
     }
 
     public AskQueryAst {
@@ -32,6 +31,9 @@ public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst w
         }
         if (prologue == null) {
             prologue = QueryPrologueAst.empty();
+        }
+        if (solutionModifier == null) {
+            solutionModifier = SolutionModifierAst.empty();
         }
     }
 }

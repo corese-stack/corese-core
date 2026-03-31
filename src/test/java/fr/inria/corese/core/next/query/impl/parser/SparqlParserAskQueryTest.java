@@ -330,4 +330,22 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
         assertEquals(1, queryAst.datasetClause().namedGraphs().size());
         assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[0]);
     }
+
+    @Test
+    @DisplayName("Ask short form with limit")
+    public void shortformWithLimit() {
+        SparqlParser parser = newParserDefault();
+        String query = """
+                ASK  {
+                    ?s ?p ?o .
+                } LIMIT 10
+               """;
+        QueryAst queryAst = parser.parse(query);
+        assertNotNull(queryAst);
+        assertNotNull(queryAst.datasetClause());
+        assertInstanceOf(AskQueryAst.class, queryAst);
+        AskQueryAst askQueryAst = (AskQueryAst) queryAst;
+        assertNotNull(askQueryAst.solutionModifier());
+        assertEquals(10L, askQueryAst.solutionModifier().limit());
+    }
 }
