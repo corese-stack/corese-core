@@ -1315,4 +1315,48 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(notExistsAst.pattern());
         assertTrue(notExistsAst.pattern().patterns().isEmpty());
     }
+
+    @Test
+    void shouldParseAndBetweenTwoExistsFilters() {
+        SparqlParser parser = newParserDefault();
+        QueryAst ast = parser.parse("""
+          SELECT * WHERE {
+            ?s ?p ?o .
+            FILTER(EXISTS { ?s ex:email ?e } && EXISTS { ?s ex:name ?n })
+          }
+          """);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(AndAst.class, filterAst.operator());
+        AndAst andAst = (AndAst) filterAst.operator();
+        assertInstanceOf(ExistsAst.class, andAst.getLeftArgument());
+        assertInstanceOf(ExistsAst.class, andAst.getRightArgument());
+        ExistsAst left = (ExistsAst) andAst.getLeftArgument();
+        ExistsAst right = (ExistsAst) andAst.getRightArgument();
+        assertNotNull(left.pattern());
+        assertNotNull(right.pattern());
+        assertFalse(left.pattern().patterns().isEmpty());
+        assertFalse(right.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseOrBetweenExistsAndNotExistsFilters() {
+        SparqlParser parser = newParserDefault();
+        QueryAst ast = parser.parse("""
+          SELECT * WHERE {
+            ?s ?p ?o .
+            FILTER(EXISTS { ?s ex:email ?e } || NOT EXISTS { ?s ex:phone ?ph })
+          }
+          """);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(OrAst.class, filterAst.operator());
+        OrAst orAst = (OrAst) filterAst.operator();
+        assertInstanceOf(ExistsAst.class, orAst.getLeftArgument());
+        assertInstanceOf(NotExistsAst.class, orAst.getRightArgument());
+        ExistsAst left = (ExistsAst) orAst.getLeftArgument();
+        NotExistsAst right = (NotExistsAst) orAst.getRightArgument();
+        assertNotNull(left.pattern());
+        assertNotNull(right.pattern());
+        assertFalse(left.pattern().patterns().isEmpty());
+        assertFalse(right.pattern().patterns().isEmpty());
+    }
 }
