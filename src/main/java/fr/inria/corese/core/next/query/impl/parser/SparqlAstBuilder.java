@@ -65,7 +65,7 @@ public final class SparqlAstBuilder {
      * Captured GroupGraphPattern for the last closed EXISTS/NOT EXISTS block.
      * Consumed by termFromBuiltInCall via popCapturedExistsPattern().
      */
-    private GroupGraphPatternAst capturedExistsPattern;
+    private final Deque<GroupGraphPatternAst> capturedExistsStack = new ArrayDeque<>();
 
     /**
      * Top-level WHERE clause, set when the root group is closed in exitGroup().
@@ -286,12 +286,13 @@ public final class SparqlAstBuilder {
         ensureNoOpenBgp();
         List<PatternAst> popped = groupStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
+
         if (!optionalGroupDepths.isEmpty() && groupStack.size() == optionalGroupDepths.peek()) {
             optionalGroupDepths.pop();
             currentGroup().add(new OptionalAst(group));
         } else if (!existsGroupDepths.isEmpty() && groupStack.size() == existsGroupDepths.peek()) {
             existsGroupDepths.pop();
-            capturedExistsPattern = group;
+            capturedExistsStack.push(group);
         } else if (groupStack.isEmpty()) {
             whereClause = group;
         } else {
@@ -361,7 +362,7 @@ public final class SparqlAstBuilder {
 
     /**
      * Enter EXISTS scope. Records current group stack size so that when we exitGroup() and the stack
-     * is back to that size, we capture the group in {@link #capturedExistsPattern}.
+     * is back to that size.
      */
     public void enterExistsFunc() {
         existsGroupDepths.push(groupStack.size());
@@ -379,9 +380,7 @@ public final class SparqlAstBuilder {
      * Called by {@link #termFromBuiltInCall} after the listener has closed the group.
      */
     public GroupGraphPatternAst popCapturedExistsPattern() {
-        GroupGraphPatternAst p = capturedExistsPattern;
-        capturedExistsPattern = null;
-        return p;
+        return capturedExistsStack.pollFirst();
     }
 
     // --- Result ---
