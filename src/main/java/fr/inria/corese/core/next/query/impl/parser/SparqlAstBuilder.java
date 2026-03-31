@@ -439,7 +439,7 @@ public final class SparqlAstBuilder {
      * Builds the AST for ASK queries.
      */
     private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
-        return new AskQueryAst(datasetClauseAst, whereClause, prologue);
+        return new AskQueryAst(datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
     }
 
     /**
