@@ -19,7 +19,7 @@ public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst w
                           SolutionModifierAst solutionModifier, QueryPrologueAst prologue) implements QueryAst {
 
     public AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause) {
-        this(datasetClause, whereClause, null);
+        this(datasetClause, whereClause, null, null);
     }
 
     public AskQueryAst {
