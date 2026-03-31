@@ -1320,6 +1320,8 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAndBetweenTwoExistsFilters() {
         SparqlParser parser = newParserDefault();
         QueryAst ast = parser.parse("""
+          PREFIX ex: <http://example.org/>
+          
           SELECT * WHERE {
             ?s ?p ?o .
             FILTER(EXISTS { ?s ex:email ?e } && EXISTS { ?s ex:name ?n })
@@ -1342,6 +1344,8 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseOrBetweenExistsAndNotExistsFilters() {
         SparqlParser parser = newParserDefault();
         QueryAst ast = parser.parse("""
+          PREFIX ex: <http://example.org/>
+          
           SELECT * WHERE {
             ?s ?p ?o .
             FILTER(EXISTS { ?s ex:email ?e } || NOT EXISTS { ?s ex:phone ?ph })
