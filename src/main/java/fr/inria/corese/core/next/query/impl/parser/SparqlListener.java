@@ -189,4 +189,9 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void enterNotExistsFunc(SparqlParser.NotExistsFuncContext ctx) {
         for (var d : delegates) d.enterNotExistsFunc(ctx);
     }
+
+    @Override
+    public void exitBind(SparqlParser.BindContext ctx) {
+        for (var d : delegates) d.exitBind(ctx);
+    }
 }
