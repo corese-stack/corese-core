@@ -31,6 +31,13 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
 
     /**
      * Creates a new PrefixHandler.
+     */
+    public PrefixHandler() {
+        this(false);
+    }
+
+    /**
+     * Creates a new PrefixHandler.
      *
      * @param includeStandardVocabularies if true, initializes with standard W3C vocabularies
      *                                    (rdf, rdfs, xsd, owl, foaf)
@@ -416,6 +423,21 @@ public class PrefixHandler implements IPrefixHandler, Cloneable {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(! (other instanceof IPrefixHandler)) {
+            return false;
+        }
+        return Objects.equals(this.getDefaultNamespace(), ((IPrefixHandler) other).getDefaultNamespace())
+                && Objects.equals(this.getNamespaceMap(), ((IPrefixHandler) other).getNamespaceMap())
+                && Objects.equals(this.getPrefixMap(), ((IPrefixHandler) other).getPrefixMap());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(defaultNamespace, prefixToNamespace, namespaceToPrefix);
     }
 
     /**

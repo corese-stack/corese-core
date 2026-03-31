@@ -163,4 +163,20 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitNamedGraphClause(SparqlParser.NamedGraphClauseContext ctx) {
         for (var d : delegates) d.exitNamedGraphClause(ctx);
     }
+
+    @Override public void enterBaseDecl(SparqlParser.BaseDeclContext ctx) {
+        for (var d : delegates) d.enterBaseDecl(ctx);
+    }
+
+    @Override public void exitBaseDecl(SparqlParser.BaseDeclContext ctx) {
+        for (var d : delegates) d.exitBaseDecl(ctx);
+    }
+
+    @Override public void enterPrefixDecl(SparqlParser.PrefixDeclContext ctx) {
+        for (var d : delegates) d.enterPrefixDecl(ctx);
+    }
+
+    @Override public void exitPrefixDecl(SparqlParser.PrefixDeclContext ctx) {
+        for (var d : delegates) d.exitPrefixDecl(ctx);
+    }
 }

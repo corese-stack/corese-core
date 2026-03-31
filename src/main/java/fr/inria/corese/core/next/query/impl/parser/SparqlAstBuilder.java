@@ -117,11 +117,38 @@ public final class SparqlAstBuilder {
      */
     private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
+    /**
+     * Effective base URI after prologue (parser options, then possibly {@code BASE}).
+     */
+    private String baseUri;
+    /**
+     * Prefix declarations in source order (including redeclarations).
+     */
+    private final List<PrefixDeclarationAst> prefixDeclarations = new ArrayList<>();
+
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
+        this.baseUri = options.getBaseIRI();
     }
 
     // --- Construction entry points (called by listener) ---
+
+    public void setBaseUri(String uri) {
+        if(this.baseUri != null && !this.baseUri.equals(options.getBaseIRI())) {
+            throw new QuerySyntaxException("Base URI already set, multiple BASE declarations are forbidden.");
+        }
+        this.baseUri = uri;
+    }
+
+    public void addPrefix(String prefix, String uri) {
+        PrefixDeclarationAst declarationAst = new PrefixDeclarationAst(prefix, new IriAst(uri));
+        if(this.prefixDeclarations.stream().anyMatch(declaration ->
+                 Objects.equals(declaration.prefix(), declarationAst.prefix())
+            )) {
+            throw new QuerySyntaxException("Prefix " + prefix + " has already been declared");
+        }
+        this.prefixDeclarations.add(declarationAst);
+    }
 
     public void enterAskQuery() {
         queryType = ASTConstants.QUERY_TYPE.ASK;
@@ -332,11 +359,12 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
+        QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
         return switch (this.queryType) {
-            case ASK -> buildAskQueryAst(datasetClauseAst);
-            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst);
-            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst);
-            case SELECT -> buildSelectQueryAst(datasetClauseAst);
+            case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst);
+            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst);
+            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst);
+            case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst);
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
@@ -370,36 +398,37 @@ public final class SparqlAstBuilder {
     /**
      * Builds the AST for ASK queries.
      */
-    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst) {
-        return new AskQueryAst(datasetClauseAst, whereClause);
+    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+        return new AskQueryAst(datasetClauseAst, whereClause, prologue);
     }
 
     /**
      * Builds the AST for SELECT queries.
      */
-    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst) {
+    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
         validateSelectQueryScope();
-        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier());
+        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
     }
 
     /**
      * Builds the AST for DESCRIBE queries.
      */
-    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst) {
+    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
         // TODO #306: validate variable scope for DESCRIBE modifiers when DescribeQueryAst carries them.
-        return new DescribeQueryAst(datasetClauseAst, describeResources, whereClause);
+        return new DescribeQueryAst(datasetClauseAst, describeResources, whereClause, prologue);
     }
 
     /**
      * Builds the AST for CONSTRUCT queries.
      */
-    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst) {
+    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
         // TODO #306: validate variable scope for CONSTRUCT modifiers when ConstructQueryAst carries them.
         return new ConstructQueryAst(
                 constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
                 datasetClauseAst,
                 whereClause,
-                buildSolutionModifier());
+                buildSolutionModifier(),
+                prologue);
     }
 
     /**

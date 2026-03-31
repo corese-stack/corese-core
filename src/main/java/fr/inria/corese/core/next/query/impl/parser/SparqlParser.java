@@ -7,6 +7,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import fr.inria.corese.core.next.query.impl.parser.listener.*;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -26,15 +27,6 @@ import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
-import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.DatasetClauseFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.FilterFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 
 public class SparqlParser extends AbstractQueryParser {
@@ -125,7 +117,8 @@ public class SparqlParser extends AbstractQueryParser {
                     new FilterFeature(builder),
                     new UnionFeature(builder),
                     new DescribeQueryFeature(builder),
-                    new DatasetClauseFeature(builder)
+                    new DatasetClauseFeature(builder),
+                    new PrologueFeature(builder)
             ));
 
             walker.walk(listener, tree);
