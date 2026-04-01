@@ -21,7 +21,13 @@ import java.util.List;
  * }
  * }</pre>
  */
-public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause, QueryPrologueAst prologue) implements QueryAst {
+public record DescribeQueryAst(
+        DatasetClauseAst datasetClause,
+        List<TermAst> described,
+        GroupGraphPatternAst whereClause,
+        SolutionModifierAst solutionModifier,
+        QueryPrologueAst prologue
+) implements QueryAst {
     public DescribeQueryAst {
         described = described != null ? List.copyOf(described) : List.of();
         if (whereClause == null) {
@@ -29,6 +35,9 @@ public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> des
         }
         if(datasetClause == null) {
             datasetClause = DatasetClauseAst.none();
+        }
+        if (solutionModifier == null) {
+            solutionModifier = SolutionModifierAst.empty();
         }
         if(prologue == null) {
             prologue = QueryPrologueAst.empty();
@@ -38,8 +47,20 @@ public record DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> des
     /**
      * constructor with default prefix handler
      */
+    public DescribeQueryAst(
+            DatasetClauseAst datasetClause,
+            List<TermAst> described,
+            GroupGraphPatternAst whereClause,
+            SolutionModifierAst solutionModifier
+    ) {
+        this(datasetClause, described, whereClause, solutionModifier, null);
+    }
+
+    /**
+     * constructor with default prefix handler and default solution modifier
+     */
     public DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause) {
-        this(datasetClause, described, whereClause, null);
+        this(datasetClause, described, whereClause, null, null);
     }
 
     /**

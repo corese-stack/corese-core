@@ -1,4 +1,4 @@
-package fr.inria.corese.core.next.query.impl.parser;
+package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import java.util.LinkedHashSet;
 import java.util.List;

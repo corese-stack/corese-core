@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SparqlParserConstructQueryTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserConstructQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("Should parse a basic CONSTRUCT query")
@@ -44,9 +44,9 @@ public class SparqlParserConstructQueryTest extends AbstractSparqlParserFeatureT
     @Test
     @DisplayName("Should parse a template with Blank Nodes")
     void shouldParseATemplateWithBlankNodes() {
-        SparqlParser parse = newParserDefault();
+        SparqlParser sparqlParser = newParserDefault();
 
-        QueryAst ast = parse.parse("""
+        QueryAst ast = sparqlParser.parse("""
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
                 PREFIX vcard:   <http://www.w3.org/2001/vcard-rdf/3.0#>
                 
@@ -65,46 +65,79 @@ public class SparqlParserConstructQueryTest extends AbstractSparqlParserFeatureT
 
         assertNotNull(construct.constructTemplate());
         assertNotNull(construct.whereClause());
+        assertTemplateWithBlankNodes(construct.constructTemplate());
+        assertWhereContainsTwoUnions(construct.whereClause());
+    }
 
-        // --- Template: 3 triples (?x vcard:N _:v . _:v vcard:givenName ?gname . _:v vcard:familyName ?fname)
-        ConstructTemplateAst template = construct.constructTemplate();
+    @Test
+    @DisplayName("Should parse CONSTRUCT solution modifiers")
+    void shouldParseConstructSolutionModifiers() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+            CONSTRUCT {
+                ?s ?p ?o
+            }
+            WHERE {
+                ?s ?p ?o
+            }
+            ORDER BY DESC(?o)
+            LIMIT 10
+            OFFSET 5
+            """);
+
+        assertInstanceOf(ConstructQueryAst.class, ast);
+
+        ConstructQueryAst construct = (ConstructQueryAst) ast;
+        SolutionModifierAst solutionModifier = construct.solutionModifier();
+
+        assertNotNull(solutionModifier);
+        assertEquals(1, solutionModifier.orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.DESC, solutionModifier.orderBy().getFirst().orderDirection());
+        assertInstanceOf(VarAst.class, solutionModifier.orderBy().getFirst().expression());
+        assertEquals("o", ((VarAst) solutionModifier.orderBy().getFirst().expression()).name());
+        assertEquals(10L, solutionModifier.limit());
+        assertEquals(5L, solutionModifier.offset());
+    }
+
+    private void assertTemplateWithBlankNodes(ConstructTemplateAst template) {
         assertEquals(3, template.triplePatternAsts().size());
 
-        TriplePatternAst t0 = template.triplePatternAsts().get(0);
-        assertInstanceOf(VarAst.class, t0.subject());
-        assertInstanceOf(IriAst.class, t0.predicate());
-        assertInstanceOf(IriAst.class, t0.object());
-        assertEquals("x", ((VarAst) t0.subject()).name());
-        assertEquals("vcard:N", ((IriAst) t0.predicate()).raw());
-        assertTrue(((IriAst) t0.object()).raw().startsWith("_:"), "object should be a blank node");
+        TriplePatternAst firstTriple = template.triplePatternAsts().get(0);
+        assertInstanceOf(VarAst.class, firstTriple.subject());
+        assertInstanceOf(IriAst.class, firstTriple.predicate());
+        assertInstanceOf(IriAst.class, firstTriple.object());
+        assertEquals("x", ((VarAst) firstTriple.subject()).name());
+        assertEquals("vcard:N", ((IriAst) firstTriple.predicate()).raw());
+        assertTrue(((IriAst) firstTriple.object()).raw().startsWith("_:"), "object should be a blank node");
 
-        TriplePatternAst t1 = template.triplePatternAsts().get(1);
-        assertInstanceOf(IriAst.class, t1.subject());
-        assertInstanceOf(IriAst.class, t1.predicate());
-        assertInstanceOf(VarAst.class, t1.object());
-        assertTrue(((IriAst) t1.subject()).raw().startsWith("_:"), "subject should be a blank node");
-        assertEquals("vcard:givenName", ((IriAst) t1.predicate()).raw());
-        assertEquals("gname", ((VarAst) t1.object()).name());
+        TriplePatternAst secondTriple = template.triplePatternAsts().get(1);
+        assertInstanceOf(IriAst.class, secondTriple.subject());
+        assertInstanceOf(IriAst.class, secondTriple.predicate());
+        assertInstanceOf(VarAst.class, secondTriple.object());
+        assertTrue(((IriAst) secondTriple.subject()).raw().startsWith("_:"), "subject should be a blank node");
+        assertEquals("vcard:givenName", ((IriAst) secondTriple.predicate()).raw());
+        assertEquals("gname", ((VarAst) secondTriple.object()).name());
 
-        TriplePatternAst t2 = template.triplePatternAsts().get(2);
-        assertInstanceOf(IriAst.class, t2.subject());
-        assertInstanceOf(IriAst.class, t2.predicate());
-        assertInstanceOf(VarAst.class, t2.object());
-        assertTrue(((IriAst) t2.subject()).raw().startsWith("_:"), "subject should be a blank node");
-        assertEquals("vcard:familyName", ((IriAst) t2.predicate()).raw());
-        assertEquals("fname", ((VarAst) t2.object()).name());
+        TriplePatternAst thirdTriple = template.triplePatternAsts().get(2);
+        assertInstanceOf(IriAst.class, thirdTriple.subject());
+        assertInstanceOf(IriAst.class, thirdTriple.predicate());
+        assertInstanceOf(VarAst.class, thirdTriple.object());
+        assertTrue(((IriAst) thirdTriple.subject()).raw().startsWith("_:"), "subject should be a blank node");
+        assertEquals("vcard:familyName", ((IriAst) thirdTriple.predicate()).raw());
+        assertEquals("fname", ((VarAst) thirdTriple.object()).name());
+    }
 
-        // --- WHERE: two UNION patterns
-        GroupGraphPatternAst where = construct.whereClause();
-        assertEquals(2, where.patterns().size());
-        assertInstanceOf(UnionAst.class, where.patterns().get(0));
-        assertInstanceOf(UnionAst.class, where.patterns().get(1));
+    private void assertWhereContainsTwoUnions(GroupGraphPatternAst whereClause) {
+        assertEquals(2, whereClause.patterns().size());
+        assertInstanceOf(UnionAst.class, whereClause.patterns().get(0));
+        assertInstanceOf(UnionAst.class, whereClause.patterns().get(1));
 
-        UnionAst union1 = (UnionAst) where.patterns().get(0);
-        UnionAst union2 = (UnionAst) where.patterns().get(1);
-        assertNotNull(union1.left());
-        assertNotNull(union1.right());
-        assertNotNull(union2.left());
-        assertNotNull(union2.right());
+        UnionAst firstUnion = (UnionAst) whereClause.patterns().get(0);
+        UnionAst secondUnion = (UnionAst) whereClause.patterns().get(1);
+        assertNotNull(firstUnion.left());
+        assertNotNull(firstUnion.right());
+        assertNotNull(secondUnion.left());
+        assertNotNull(secondUnion.right());
     }
 }
