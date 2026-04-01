@@ -81,9 +81,9 @@ public final class VariableScopeAnalyzer {
                 collectVisibleVariables(left, visibleVariables);
                 collectVisibleVariables(right, visibleVariables);
             }
-            case BindAst(TermAst expression, VarAst variable) -> {
+            case BindAst(TermAst expression, VarAst variable) ->
                 visibleVariables.add(variable.name());
-            }
+
             case FilterAst ignored -> {
                 // FILTER does not make a variable visible by itself.
             }

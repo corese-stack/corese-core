@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("SPARQL 1.1 - Parser and AST : BIND")
-public class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("BIND(?s AS ?x) — variable expression")
