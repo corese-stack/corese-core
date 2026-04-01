@@ -1242,11 +1242,24 @@ public final class SparqlAstBuilder {
     }
 
     /**
-     * Adds a BIND clause to the current group
+     * Adds a BIND clause to the current group.
+     *
+     * @throws QueryValidationException if the variable introduced by BIND is already visible
+     *                                  in the group graph pattern up to this point, as required
+     *                                  by the SPARQL 1.1 specification.
      */
     public void addBind(BindAst bind) {
-        if (this.hasCurrentGroup()) {
-            this.currentGroup().add(bind);
+        if (!this.hasCurrentGroup()) {
+            return;
         }
+        List<PatternAst> current = this.currentGroup();
+        Set<String> alreadyVisible = variableScopeAnalyzer
+                .collectVisibleVariables(new GroupGraphPatternAst(current));
+        if (alreadyVisible.contains(bind.variable().name())) {
+            throw new QueryValidationException(
+                    "Variable ?" + bind.variable().name()
+                            + " used in BIND is already declared in the same group graph pattern");
+        }
+        current.add(bind);
     }
 }

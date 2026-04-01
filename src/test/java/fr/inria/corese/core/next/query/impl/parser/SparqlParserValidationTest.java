@@ -121,4 +121,42 @@ public class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest 
 
     }
 
+    @Nested
+    class BindValidationTest {
+
+        @Test
+        @DisplayName("Should reject BIND when variable is already introduced by a triple pattern")
+        void shouldRejectBindVariableAlreadyVisibleFromTriple() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      BIND(?o AS ?x)
+                    }
+                """));
+
+            assertEquals("Variable ?x used in BIND is already declared in the same group graph pattern",
+                    exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject BIND when variable is already introduced by a previous BIND")
+        void shouldRejectBindVariableAlreadyVisibleFromPreviousBind() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      ?s ?p ?o .
+                      BIND(?s AS ?x)
+                      BIND(?p AS ?x)
+                    }
+                """));
+
+            assertEquals("Variable ?x used in BIND is already declared in the same group graph pattern",
+                    exception.getMessage());
+        }
+
+    }
+
 }
