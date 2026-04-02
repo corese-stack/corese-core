@@ -42,6 +42,11 @@ public final class SparqlAstBuilder {
     // --- Internal stacks (scopes) ---
 
     /**
+     * Stack of currently open SELECT queries (top-level SELECT and nested SELECT subqueries).
+     */
+    private final Deque<SelectFrame> selectStack = new ArrayDeque<>();
+
+    /**
      * Stack of groups; each group is a list of patterns (BgpAst now, later OptionalAst/UnionAst/...)
      */
     private final Deque<List<PatternAst>> groupStack = new ArrayDeque<>();
@@ -63,10 +68,30 @@ public final class SparqlAstBuilder {
     private final Deque<Integer> existsGroupDepths = new ArrayDeque<>();
 
     /**
+     * When true, the next {@link #enterGroup()} opens the {@code groupGraphPattern} of a
+     * {@code whereClause} for the innermost active {@link SelectFrame}. On matching
+     * {@link #exitGroup()}, that group is stored as {@link SelectFrame#whereClause} instead of
+     * being appended to the enclosing graph group (required when outer WHERE groups are still open,
+     * e.g. subqueries {@code { SELECT ... WHERE { ... }}}).
+     */
+    private boolean selectWhereGroupFollows;
+
+    /**
+     * Depths ({@code groupStack.size()} after push) of SELECT WHERE groups still to be closed,
+     * innermost last. Matched on {@link #exitGroup()} while {@link #hasCurrentSelect()}.
+     */
+    private final Deque<Integer> selectWhereGroupDepths = new ArrayDeque<>();
+
+    /**
      * Captured GroupGraphPattern for the last closed EXISTS/NOT EXISTS block.
      * Consumed by termFromBuiltInCall via popCapturedExistsPattern().
      */
     private final Deque<GroupGraphPatternAst> capturedExistsStack = new ArrayDeque<>();
+
+    /**
+     * Final query AST result, set when the top-level SELECT finishes.
+     */
+    private QueryAst selectQueryResult;
 
     /**
      * Top-level WHERE clause, set when the root group is closed in exitGroup().
@@ -100,6 +125,19 @@ public final class SparqlAstBuilder {
     private final List<OrderConditionAst> orderConditions = new ArrayList<>();
 
     /**
+     * Per-SELECT frame used to support nested SELECT subqueries.
+     */
+    private static final class SelectFrame {
+        private GroupGraphPatternAst whereClause;
+        private ProjectionAst projection = ProjectionAsts.selectAll();
+        private boolean distinct;
+        private boolean reduced;
+        private Long limit;
+        private Long offset;
+        private final List<OrderConditionAst> orderConditions = new ArrayList<>();
+    }
+
+    /**
      * Parser options (e.g. for future use: strict mode, base IRI).
      */
     private final SparqlParserOptions options;
@@ -129,6 +167,11 @@ public final class SparqlAstBuilder {
      * Template AST after {@link #exitConstructTemplate()}; consumed in {@link #getResult()}.
      */
     private ConstructTemplateAst constructTemplate;
+
+    /**
+     * Helper used to compute visible and referenced variables.
+     */
+    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
     /**
      * Effective base URI after prologue (parser options, then possibly {@code BASE}).
@@ -171,10 +214,53 @@ public final class SparqlAstBuilder {
     }
 
     public void enterSelectQuery() {
-        queryType = ASTConstants.QUERY_TYPE.SELECT;
+        if (this.queryType == ASTConstants.QUERY_TYPE.UNDEFINED) {
+            this.queryType = ASTConstants.QUERY_TYPE.SELECT;
+        }
+        selectStack.push(new SelectFrame());
     }
 
     public void exitSelectQuery() {
+        SelectFrame frame = selectStack.pop();
+
+        if (frame.whereClause == null) {
+            throw new IllegalStateException("No WHERE clause for SELECT query");
+        }
+
+        validateSelectQueryScope(frame);
+
+        /*
+         * Top-level SELECT keeps the dataset clause declared at query level.
+         * Nested SELECT subqueries use an empty dataset clause for now.
+         *
+         * Prologue is inherited from the enclosing query source context.
+         */
+        DatasetClauseAst datasetClauseAst = hasCurrentGroup()
+                ? DatasetClauseAst.none()
+                : new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
+
+        QueryPrologueAst prologueAst = new QueryPrologueAst(
+                List.copyOf(prefixDeclarations),
+                new IriAst(baseUri)
+        );
+
+        SelectQueryAst selectQueryAst = new SelectQueryAst(
+                frame.projection,
+                datasetClauseAst,
+                frame.whereClause,
+                buildSolutionModifier(frame),
+                prologueAst
+        );
+
+        /*
+         * If we are still inside a parent group, this SELECT is a subquery.
+         * Otherwise it is the top-level SELECT result.
+         */
+        if (hasCurrentGroup()) {
+            currentGroup().add(new SubQueryAst(selectQueryAst));
+        } else {
+            selectQueryResult = selectQueryAst;
+        }
     }
 
     public void enterConstructQuery() {
@@ -205,6 +291,9 @@ public final class SparqlAstBuilder {
      * Sets SELECT * (project all variables from the body).
      */
     public void setProjectionAll() {
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().projection = ProjectionAsts.selectAll();
+        }
         this.projection = ProjectionAsts.selectAll();
     }
 
@@ -221,28 +310,46 @@ public final class SparqlAstBuilder {
                 .filter(s -> !s.isBlank())
                 .map(VarAst::new)
                 .toList();
-        this.projection = vars.isEmpty() ? ProjectionAsts.selectAll() : ProjectionAsts.of(vars);
+
+        ProjectionAst newProjection = vars.isEmpty()
+                ? ProjectionAsts.selectAll()
+                :ProjectionAsts.of(vars);
+
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().projection = newProjection;
+        }
+        else this.projection = newProjection;
     }
 
     /**
      * Sets the projection from an existing AST.
      */
     public void setProjection(ProjectionAst projection) {
-        this.projection = projection != null ? projection : ProjectionAsts.selectAll();
+        ProjectionAst effectiveProjection = projection != null ? projection : ProjectionAsts.selectAll();
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().projection = effectiveProjection;
+        }
+        else this.projection = effectiveProjection;
     }
 
     /**
      * Sets SELECT DISTINCT. Called by SelectQueryFeature when {@code DISTINCT} is present.
      */
     public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().distinct = distinct;
+        }
+        else this.distinct = distinct;
     }
 
     /**
      * Sets SELECT REDUCED. Called by SelectQueryFeature when {@code REDUCED} is present.
      */
     public void setReduced(boolean reduced) {
-        this.reduced = reduced;
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().reduced = reduced;
+        }
+        else this.reduced = reduced;
     }
 
     public void addFromGraph(IriAst graph) {
@@ -258,7 +365,10 @@ public final class SparqlAstBuilder {
      *
      */
     public void setLimit(long limit) {
-        this.limit = limit;
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().limit = limit;
+        }
+        else  this.limit = limit;
     }
 
     /**
@@ -266,7 +376,38 @@ public final class SparqlAstBuilder {
      *
      */
     public void setOffset(long offset) {
-        this.offset = offset;
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().offset = offset;
+        }
+        else this.offset = offset;
+    }
+
+    /**
+     * Check current select stack
+     */
+    private boolean hasCurrentSelect() {
+        return !selectStack.isEmpty();
+    }
+
+    /**
+     * Peek current select stack
+     */
+    private SelectFrame getCurrentSelectFrame() {
+        if (selectStack.isEmpty()) {
+            throw new IllegalStateException("No Current SELECT frame");
+        }
+        return selectStack.peek();
+    }
+
+    /**
+     * Called when the parser enters a {@code whereClause} (SELECT / sub-SELECT / any query with WHERE).
+     * The following {@link #enterGroup()} for that clause must attach to the current {@link SelectFrame}
+     * when one is active.
+     */
+    public void enterWhereClause() {
+        if (hasCurrentSelect()) {
+            selectWhereGroupFollows = true;
+        }
     }
 
     /**
@@ -274,6 +415,12 @@ public final class SparqlAstBuilder {
      */
     public void enterGroup() {
         groupStack.push(new ArrayList<>());
+        if (selectWhereGroupFollows && hasCurrentSelect()) {
+            selectWhereGroupDepths.push(groupStack.size());
+            selectWhereGroupFollows = false;
+        } else {
+            selectWhereGroupFollows = false;
+        }
     }
 
     /**
@@ -285,6 +432,17 @@ public final class SparqlAstBuilder {
      */
     public void exitGroup() {
         ensureNoOpenBgp();
+        int depthBeforePop = groupStack.size();
+
+        if (!selectWhereGroupDepths.isEmpty()
+                && hasCurrentSelect()
+                && depthBeforePop == selectWhereGroupDepths.peek()) {
+            selectWhereGroupDepths.pop();
+            List<PatternAst> popped = groupStack.pop();
+            getCurrentSelectFrame().whereClause = new GroupGraphPatternAst(popped);
+            return;
+        }
+
         List<PatternAst> popped = groupStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
 
@@ -295,7 +453,8 @@ public final class SparqlAstBuilder {
             existsGroupDepths.pop();
             capturedExistsStack.push(group);
         } else if (groupStack.isEmpty()) {
-            whereClause = group;
+            if (hasCurrentSelect()) getCurrentSelectFrame().whereClause = group;
+            else whereClause = group;
         } else {
             currentGroup().add(group);
         }
@@ -396,6 +555,8 @@ public final class SparqlAstBuilder {
      * @throws IllegalStateException    if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
      */
     public QueryAst getResult() {
+        if (selectQueryResult != null) return selectQueryResult;
+
         if (whereClause == null) {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
@@ -447,6 +608,18 @@ public final class SparqlAstBuilder {
      * Builds the AST for SELECT queries.
      */
     private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+        if (hasCurrentSelect()) {
+            SelectFrame frame = getCurrentSelectFrame();
+            validateSelectQueryScope();
+            return new SelectQueryAst(
+                    frame.projection,
+                    datasetClauseAst,
+                    frame.whereClause,
+                    buildSolutionModifier(frame),
+                    prologue
+            );
+        }
+        validateSelectQueryScope();
         return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
     }
 
@@ -467,6 +640,81 @@ public final class SparqlAstBuilder {
                 whereClause,
                 buildSolutionModifier(),
                 prologue);
+    }
+
+    /**
+     * Validates SELECT projection and ORDER BY variables against the WHERE clause scope.
+     */
+    private void validateSelectQueryScope() {
+        // TODO #306: extend this validation to GROUP BY when it is supported by the next parser.
+        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(whereClause);
+
+        // SELECT * still needs ORDER BY validation.
+        if (!projection.selectAll()) {
+            validateProjectionVariables(visibleVariables);
+        }
+
+        validateOrderVariables(collectOrderByAvailableVariables(visibleVariables));
+    }
+
+    /**
+     * Validates explicit projection variables against the WHERE clause scope.
+     *
+     * @param visibleVariables variable names visible from the WHERE clause
+     */
+    private void validateProjectionVariables(Set<String> visibleVariables) {
+        for (VarAst projectedVar : projection.variables()) {
+            if (!visibleVariables.contains(projectedVar.name())) {
+                throw new QueryValidationException(buildOutOfScopeVariableMessage(
+                        projectedVar.name(),
+                        "SELECT projection"));
+            }
+        }
+    }
+
+    /**
+     * Collects variables that may be referenced from ORDER BY.
+     *
+     * <p>SPARQL applies ORDER BY before the final projection step. In the current next parser,
+     * explicit projection variables are already validated against the WHERE clause, so adding
+     * them here mainly keeps the availability rule explicit while staying within the current
+     * SPARQL 1.0 feature set.
+     *
+     * @param visibleVariables variable names visible from the WHERE clause
+     * @return variable names available to ORDER BY validation
+     */
+    private Set<String> collectOrderByAvailableVariables(Set<String> visibleVariables) {
+        Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
+        if (!projection.selectAll()) {
+            for (VarAst projectedVar : projection.variables()) {
+                availableVariables.add(projectedVar.name());
+            }
+        }
+        return availableVariables;
+    }
+
+    /**
+     * Validates ORDER BY variables against the variables available at ORDER BY time.
+     *
+     * @param availableOrderVariables variable names available to ORDER BY
+     */
+    private void validateOrderVariables(Set<String> availableOrderVariables) {
+        for (OrderConditionAst orderCondition : orderConditions) {
+            Set<String> referencedVariables = variableScopeAnalyzer
+                    .collectReferencedVariables(orderCondition.expression());
+
+            for (String variableName : referencedVariables) {
+                if (!availableOrderVariables.contains(variableName)) {
+                    throw new QueryValidationException(buildOutOfScopeVariableMessage(
+                            variableName,
+                            "ORDER BY"));
+                }
+            }
+        }
+    }
+
+    private String buildOutOfScopeVariableMessage(String variableName, String clause) {
+        return "Variable ?" + variableName + " used in " + clause + " is not visible in WHERE clause";
     }
 
     /**
@@ -531,7 +779,17 @@ public final class SparqlAstBuilder {
         return new SolutionModifierAst(distinct, reduced, this.orderConditions, limit, offset);
     }
 
+    /**
+     * Builds solution modifiers for the current SELECT frame.
+     */
+    private SolutionModifierAst buildSolutionModifier(SelectFrame frame) {
+        return new SolutionModifierAst(frame.distinct, frame.reduced, frame.orderConditions, frame.limit, frame.offset);
+    }
+
     public boolean isOrdered() {
+        if (hasCurrentSelect()) {
+            return !getCurrentSelectFrame().orderConditions.isEmpty();
+        }
         return !this.orderConditions.isEmpty();
     }
 
@@ -540,7 +798,10 @@ public final class SparqlAstBuilder {
      * @param expr either a variable or a contraint
      */
     public void addOrderExpression(ASTConstants.OrderDirection direction, TermAst expr) {
-        this.orderConditions.add(new OrderConditionAst(direction, expr));
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().orderConditions.add(new OrderConditionAst(direction, expr));
+        }
+        else this.orderConditions.add(new OrderConditionAst(direction, expr));
     }
 
     /**

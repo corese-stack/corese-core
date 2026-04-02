@@ -25,6 +25,11 @@ public class BgpFeature extends AbstractSparqlFeature {
     }
 
     @Override
+    public void enterWhereClause(SparqlParser.WhereClauseContext ctx) {
+        builder().enterWhereClause();
+    }
+
+    @Override
     public void enterGroupGraphPattern(SparqlParser.GroupGraphPatternContext ctx) {
         builder().enterGroup();
     }

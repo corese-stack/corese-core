@@ -1,6 +1,21 @@
-package fr.inria.corese.core.next.query.impl.parser.semantic.support;
+package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
@@ -87,6 +102,21 @@ public final class VariableScopeAnalyzer {
             case FilterAst ignored -> {
                 // FILTER does not make a variable visible by itself.
             }
+
+            case SubQueryAst(QueryAst query) -> {
+                if (query instanceof SelectQueryAst select) {
+                    ProjectionAst proj = select.projection();
+                    if (proj.selectAll()) {
+                        collectVisibleVariables(select.whereClause(), visibleVariables);
+                    } else {
+                        for (VarAst v : proj.variables()) {
+                            visibleVariables.add(v.name());
+                        }
+                    }
+                }
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + pattern);
         }
     }
 

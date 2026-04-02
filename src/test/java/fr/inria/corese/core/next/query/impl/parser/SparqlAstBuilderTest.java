@@ -191,6 +191,9 @@ class SparqlAstBuilderTest {
         b.addTriple(new VarAst("s"), new VarAst("p"), new VarAst("o"));
 
         assertThrows(IllegalStateException.class, b::exitGroup, "Should not exit group while BGP is open");
+
+        b.exitBgp();
+        b.exitGroup();
         b.exitSelectQuery();
     }
 
