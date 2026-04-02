@@ -30,6 +30,21 @@ public final class SparqlListener extends SparqlParserBaseListener {
     }
 
     @Override
+    public void exitSelectQuery(SparqlParser.SelectQueryContext ctx) {
+        for (var d : delegates) d.exitSelectQuery(ctx);
+    }
+
+    @Override
+    public void enterSubSelect(SparqlParser.SubSelectContext ctx) {
+        for (var d : delegates) d.enterSubSelect(ctx);
+    }
+
+    @Override
+    public void exitSubSelect(SparqlParser.SubSelectContext ctx) {
+        for (var d : delegates) d.exitSubSelect(ctx);
+    }
+
+    @Override
     public void enterAskQuery(SparqlParser.AskQueryContext ctx) {
         for(var d : delegates) d.enterAskQuery(ctx);
     }
@@ -52,6 +67,11 @@ public final class SparqlListener extends SparqlParserBaseListener {
     @Override
     public void exitConstructTemplate(SparqlParser.ConstructTemplateContext ctx) {
         for (var d : delegates) d.exitConstructTemplate(ctx);
+    }
+
+    @Override
+    public void enterWhereClause(SparqlParser.WhereClauseContext ctx) {
+        for (var d : delegates) d.enterWhereClause(ctx);
     }
 
     // ---------- GROUP GRAPH PATTERN ----------

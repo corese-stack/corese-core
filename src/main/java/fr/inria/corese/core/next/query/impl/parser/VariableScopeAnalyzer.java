@@ -12,6 +12,10 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SubQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
@@ -96,6 +100,21 @@ public final class VariableScopeAnalyzer {
             case FilterAst ignored -> {
                 // FILTER does not make a variable visible by itself.
             }
+
+            case SubQueryAst(QueryAst query) -> {
+                if (query instanceof SelectQueryAst select) {
+                    ProjectionAst proj = select.projection();
+                    if (proj.selectAll()) {
+                        collectVisibleVariables(select.whereClause(), visibleVariables);
+                    } else {
+                        for (VarAst v : proj.variables()) {
+                            visibleVariables.add(v.name());
+                        }
+                    }
+                }
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + pattern);
         }
     }
 
