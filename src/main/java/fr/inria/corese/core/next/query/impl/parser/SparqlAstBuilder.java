@@ -169,11 +169,6 @@ public final class SparqlAstBuilder {
     private ConstructTemplateAst constructTemplate;
 
     /**
-     * Helper used to compute visible and referenced variables.
-     */
-    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
-
-    /**
      * Effective base URI after prologue (parser options, then possibly {@code BASE}).
      */
     private String baseUri;
@@ -662,29 +657,36 @@ public final class SparqlAstBuilder {
      */
     private void validateSelectQueryScope() {
         // TODO #306: extend this validation to GROUP BY when it is supported by the next parser.
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(whereClause);
-
-        // SELECT * still needs ORDER BY validation.
-        if (!projection.selectAll()) {
-            validateProjectionVariables(visibleVariables);
+        if (hasCurrentSelect()) {
+            validateSelectQueryScope(getCurrentSelectFrame());
+            return;
         }
-
-        validateOrderVariables(collectOrderByAvailableVariables(visibleVariables));
+        validateSelectQueryScope(projection, whereClause, orderConditions);
     }
 
-    /**
-     * Validates explicit projection variables against the WHERE clause scope.
-     *
-     * @param visibleVariables variable names visible from the WHERE clause
-     */
-    private void validateProjectionVariables(Set<String> visibleVariables) {
-        for (VarAst projectedVar : projection.variables()) {
-            if (!visibleVariables.contains(projectedVar.name())) {
-                throw new QueryValidationException(buildOutOfScopeVariableMessage(
-                        projectedVar.name(),
-                        "SELECT projection"));
+    private void validateSelectQueryScope(SelectFrame frame) {
+        validateSelectQueryScope(frame.projection, frame.whereClause, frame.orderConditions);
+    }
+
+    private void validateSelectQueryScope(
+            ProjectionAst projection,
+            GroupGraphPatternAst whereClause,
+            List<OrderConditionAst> orderConditions) {
+        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(whereClause);
+
+        if (!projection.selectAll()) {
+            for (VarAst projectedVar : projection.variables()) {
+                if (!visibleVariables.contains(projectedVar.name())) {
+                    throw new QueryValidationException(buildOutOfScopeVariableMessage(
+                            projectedVar.name(),
+                            "SELECT projection"));
+                }
             }
         }
+
+        validateOrderVariables(
+                orderConditions,
+                collectOrderByAvailableVariables(visibleVariables, projection));
     }
 
     /**
@@ -698,7 +700,8 @@ public final class SparqlAstBuilder {
      * @param visibleVariables variable names visible from the WHERE clause
      * @return variable names available to ORDER BY validation
      */
-    private Set<String> collectOrderByAvailableVariables(Set<String> visibleVariables) {
+    private Set<String> collectOrderByAvailableVariables(
+            Set<String> visibleVariables, ProjectionAst projection) {
         Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
         if (!projection.selectAll()) {
             for (VarAst projectedVar : projection.variables()) {
@@ -713,7 +716,8 @@ public final class SparqlAstBuilder {
      *
      * @param availableOrderVariables variable names available to ORDER BY
      */
-    private void validateOrderVariables(Set<String> availableOrderVariables) {
+    private void validateOrderVariables(
+            List<OrderConditionAst> orderConditions, Set<String> availableOrderVariables) {
         for (OrderConditionAst orderCondition : orderConditions) {
             Set<String> referencedVariables = variableScopeAnalyzer
                     .collectReferencedVariables(orderCondition.expression());
@@ -788,7 +792,7 @@ public final class SparqlAstBuilder {
     }
 
     /**
-     * Builds the parsed solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET).
+     * Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT.
      */
     private SolutionModifierAst buildSolutionModifier() {
         return new SolutionModifierAst(distinct, reduced, this.orderConditions, limit, offset);
@@ -1212,8 +1216,12 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_BLANK, args);
             } else if (ctx.IS_LITERAL() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_LITERAL, args);
+            } else if (ctx.BOUND() != null) {
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
+            } else if (ctx.regexExpression() != null) {
+                return termFromRegex(ctx.regexExpression());
             } else {
-                throw new QueryEvaluationException("Unexpected function for a BuiltInCall for token " + ctx.getText());
+                throw new QueryEvaluationException("Unexpected function for a  BuiltInCall for token " + ctx.getText());
             }
         } else {
             throw new QueryEvaluationException("Unable to resolve BuiltInCall for token " + ctx.getText());
