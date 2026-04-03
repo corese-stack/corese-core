@@ -232,10 +232,6 @@ class SparqlParserTest {
         assertEquals(4, result.diagnostics().size());
         assertTrue(result.diagnostics().stream()
                 .allMatch(diagnostic -> diagnostic.kind() == QueryDiagnostic.Kind.SEMANTIC_ERROR));
-
-
-                // Print all diagnostic messages for debugging
-        result.diagnostics().forEach(diagnostic -> System.out.println(diagnostic.message()));
     }
 
     @Test
