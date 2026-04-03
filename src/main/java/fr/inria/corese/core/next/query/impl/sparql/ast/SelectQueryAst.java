@@ -6,7 +6,7 @@ import java.util.List;
  * Abstract Syntax Tree (AST) representation of a SPARQL {@code SELECT} query.
  * Holds the projection (SELECT * or SELECT ?v1 ?v2 ...) and the WHERE clause.
  * <p>
- * {@link #prologue()} captures PREFIX/BASE for SELECT; {@link #prefixHandler()} is derived from it
+ * {@link #prologue()} captures PREFIX/BASE for SELECT;
  * for {@link QueryAst} compatibility.
  */
 public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, SolutionModifierAst solutionModifier, QueryPrologueAst prologue) implements QueryAst {

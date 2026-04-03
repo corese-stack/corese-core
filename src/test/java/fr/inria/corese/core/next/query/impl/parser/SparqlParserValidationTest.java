@@ -21,6 +21,8 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             "Variable ?x used in SELECT projection is not visible in WHERE clause";
     private static final String CITY_LABEL_SCOPE_MESSAGE =
             "Variable ?cityLabel used in SELECT projection is not visible in WHERE clause";
+    private static final String BIND_SCOPE_MESSAGE =
+            "Variable ?x used in BIND is already declared in the same group graph pattern";
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("invalidSelectQueries")
@@ -71,6 +73,41 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                 """));
 
             assertEquals(ORDER_BY_SCOPE_MESSAGE, exception.getMessage());
+        }
+    }
+
+    @Nested
+    class BindValidationTest {
+
+        @Test
+        @DisplayName("Should reject BIND when variable is already introduced by a triple pattern")
+        void shouldRejectBindVariableAlreadyVisibleFromTriple() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      BIND(?o AS ?x)
+                    }
+                """));
+
+            assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject BIND when variable is already introduced by a previous BIND")
+        void shouldRejectBindVariableAlreadyVisibleFromPreviousBind() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      ?s ?p ?o .
+                      BIND(?s AS ?x)
+                      BIND(?p AS ?x)
+                    }
+                """));
+
+            assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
         }
     }
 

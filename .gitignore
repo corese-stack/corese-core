@@ -89,3 +89,4 @@ gradle/gradle-daemon-jvm.properties
 logs/
 *.log
 .sonarlint/
+.codex

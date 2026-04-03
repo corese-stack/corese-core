@@ -126,7 +126,7 @@ public class IRIUtils {
 
     /**
      * Detects if an IRI is absolute according to the REGEX given in the recommendation RFC3987
-     * @param iri any uri (expecting to be the content between < and >
+     * @param iri any uri (expecting to be the content between &lt; and &gt;)
      * @return true if it is compliant with RFC3987. May accept the prefixed for of uri, as there is no way to
      * distinguish a prefix from a protocol
      */

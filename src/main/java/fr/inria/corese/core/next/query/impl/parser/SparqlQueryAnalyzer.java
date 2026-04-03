@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
 import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.BindFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.DatasetClauseFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature;
@@ -118,7 +119,8 @@ final class SparqlQueryAnalyzer {
                 new UnionFeature(builder),
                 new DescribeQueryFeature(builder),
                 new DatasetClauseFeature(builder),
-                new PrologueFeature(builder)
+                new PrologueFeature(builder),
+                new BindFeature(builder)
         ));
 
         ParseTreeWalker walker = new ParseTreeWalker();

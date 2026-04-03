@@ -4,6 +4,8 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -101,6 +103,11 @@ public final class SparqlAstBuilder {
      * Parser options (e.g. for future use: strict mode, base IRI).
      */
     private final SparqlParserOptions options;
+
+    /**
+     * Helper used to compute visible and referenced variables.
+     */
+    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
     /**
      * Stack of UNION branch lists currently being collected.
@@ -903,7 +910,14 @@ public final class SparqlAstBuilder {
             return new ExistsAst(popCapturedExistsPattern());
         } else if (ctx.notExistsFunc() != null) {
             return new NotExistsAst(popCapturedExistsPattern());
-        } else if (ctx.expression() != null) {
+        } else if (ctx.regexExpression() != null) {
+            return termFromRegex(ctx.regexExpression());
+        } else if (ctx.BOUND() != null) {
+            return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
+        } else if (ctx.CONCAT() != null) {
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            return new FunctionCallAst(new IriAst("CONCAT"), args);
+        } else if (ctx.expression() != null && !ctx.expression().isEmpty()) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
@@ -921,12 +935,8 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_BLANK, args);
             } else if (ctx.IS_LITERAL() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_LITERAL, args);
-            } else if (ctx.BOUND() != null) {
-                return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
-            } else if (ctx.regexExpression() != null) {
-                return termFromRegex(ctx.regexExpression());
             } else {
-                throw new QueryEvaluationException("Unexpected function for a  BuiltInCall for token " + ctx.getText());
+                throw new QueryEvaluationException("Unexpected function for a BuiltInCall for token " + ctx.getText());
             }
         } else {
             throw new QueryEvaluationException("Unable to resolve BuiltInCall for token " + ctx.getText());
@@ -1152,5 +1162,27 @@ public final class SparqlAstBuilder {
             }
         }
         return out;
+    }
+
+    /**
+     * Adds a BIND clause to the current group.
+     *
+     * @throws QueryValidationException if the variable introduced by BIND is already visible
+     *                                  in the group graph pattern up to this point, as required
+     *                                  by the SPARQL 1.1 specification.
+     */
+    public void addBind(BindAst bind) {
+        if (!this.hasCurrentGroup()) {
+            return;
+        }
+        List<PatternAst> current = this.currentGroup();
+        Set<String> alreadyVisible = variableScopeAnalyzer
+                .collectVisibleVariables(new GroupGraphPatternAst(current));
+        if (alreadyVisible.contains(bind.variable().name())) {
+            throw new QueryValidationException(
+                    "Variable ?" + bind.variable().name()
+                            + " used in BIND is already declared in the same group graph pattern");
+        }
+        current.add(bind);
     }
 }
