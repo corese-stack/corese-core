@@ -1,10 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.sparql.options.SparqlAstError;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
@@ -34,57 +31,23 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-/** Shared SPARQL analysis pipeline used by both parsing and validation entry points. */
+/**
+ * Performs SPARQL syntax, AST, and semantic analysis and returns the
+ * collected result to the caller.
+ */
 final class SparqlQueryAnalyzer {
 
     private final SparqlQuerySemanticValidator semanticValidator = new SparqlQuerySemanticValidator();
 
-    /**
-     * Parses a SPARQL query and keeps the historical parser contract:
-     * syntax problems raise {@link QuerySyntaxException}, semantic problems
-     * raise {@link QueryValidationException}.
-     */
-    QueryAst parse(Reader reader, String baseIRI, SparqlParserOptions config) {
-        AnalysisResult analysisResult = analyze(reader, baseIRI, config, false);
-        if (!analysisResult.validationResult().isValid()) {
-            QueryDiagnostic firstError = firstErrorDiagnostic(analysisResult.validationResult());
-
-            if (firstError.kind() == QueryDiagnostic.Kind.SEMANTIC_ERROR) {
-                throw new QueryValidationException(firstError.message());
-            }
-            throw buildSyntaxException(analysisResult.validationResult());
-        }
-
-        if (analysisResult.ast() == null) {
-            throw new QueryEvaluationException("SPARQL analysis completed without producing an AST");
-        }
-
-        return analysisResult.ast();
-    }
-
-    /**
-     * Validates a SPARQL query and returns structured diagnostics instead of
-     * throwing on syntax or semantic issues.
-     */
-    QueryValidationResult validate(Reader reader, String baseIRI, SparqlParserOptions config) {
-        return analyze(reader, baseIRI, config, true).validationResult();
-    }
-
-    private AnalysisResult analyze(
-            Reader reader,
-            String baseIRI,
-            SparqlParserOptions config,
-            boolean validationMode
-    ) {
-        SparqlParserOptions effectiveOptions = buildEffectiveOptions(baseIRI, config, validationMode);
-        SyntaxAnalysis syntaxAnalysis = analyzeSyntax(reader, effectiveOptions);
+    AnalysisResult analyze(Reader reader, SparqlParserOptions options) throws IOException {
+        SyntaxAnalysis syntaxAnalysis = analyzeSyntax(reader, options);
 
         if (!syntaxAnalysis.validationResult().isValid()) {
             return new AnalysisResult(null, syntaxAnalysis.validationResult());
         }
 
         try {
-            QueryAst ast = buildAst(syntaxAnalysis.parseTree(), effectiveOptions);
+            QueryAst ast = buildAst(syntaxAnalysis.parseTree(), options);
             QueryValidationResult semanticValidation = semanticValidator.validate(ast);
             return new AnalysisResult(ast, semanticValidation);
         } catch (QuerySyntaxException e) {
@@ -92,21 +55,7 @@ final class SparqlQueryAnalyzer {
         }
     }
 
-    private SparqlParserOptions buildEffectiveOptions(
-            String baseIRI,
-            SparqlParserOptions config,
-            boolean validationMode
-    ) {
-        String effectiveBaseIRI = baseIRI != null ? baseIRI : IOConstants.getDefaultBaseURI();
-        return new SparqlParserOptions.Builder()
-                .baseIRI(effectiveBaseIRI)
-                .strictMode(config.isStrictMode())
-                .failFast(!validationMode && config.isFailFast())
-                .collectErrors(validationMode || config.isCollectErrors())
-                .build();
-    }
-
-    private SyntaxAnalysis analyzeSyntax(Reader reader, SparqlParserOptions options) {
+    private SyntaxAnalysis analyzeSyntax(Reader reader, SparqlParserOptions options) throws IOException {
         SparqlErrorListener errorListener = null;
         try {
             CharStream charStream = CharStreams.fromReader(reader);
@@ -153,8 +102,6 @@ final class SparqlQueryAnalyzer {
             return new SyntaxAnalysis(null, new QueryValidationResult(List.of(toSyntaxDiagnostic(syntaxException))));
         } catch (QuerySyntaxException e) {
             return new SyntaxAnalysis(null, new QueryValidationResult(List.of(toSyntaxDiagnostic(e))));
-        } catch (IOException e) {
-            throw new QueryEvaluationException("Failed to validate SPARQL query: " + e.getMessage(), e);
         }
     }
 
@@ -219,31 +166,9 @@ final class SparqlQueryAnalyzer {
                 exception.getClass().getSimpleName());
     }
 
-    private QueryDiagnostic firstErrorDiagnostic(QueryValidationResult validationResult) {
-        return validationResult.diagnostics().stream()
-                .filter(diagnostic -> diagnostic.severity() == QueryDiagnostic.Severity.ERROR)
-                .findFirst()
-                .orElse(validationResult.diagnostics().getFirst());
-    }
-
-    private QuerySyntaxException buildSyntaxException(QueryValidationResult validationResult) {
-        List<QueryDiagnostic> diagnostics = validationResult.diagnostics();
-        QueryDiagnostic firstDiagnostic = diagnostics.getFirst();
-        String formattedDiagnostics = diagnostics.stream()
-                .map(QueryDiagnostic::format)
-                .reduce((left, right) -> left + "; " + right)
-                .orElse("Unknown syntax error detected");
-
-        String message = "Syntax error in SPARQL query: " + formattedDiagnostics;
-        if (firstDiagnostic.line() >= 1 && firstDiagnostic.column() >= 0) {
-            return new QuerySyntaxException(message, firstDiagnostic.line(), firstDiagnostic.column());
-        }
-        return new QuerySyntaxException(message);
-    }
-
     private record SyntaxAnalysis(ParseTree parseTree, QueryValidationResult validationResult) {
     }
 
-    private record AnalysisResult(QueryAst ast, QueryValidationResult validationResult) {
+    record AnalysisResult(QueryAst ast, QueryValidationResult validationResult) {
     }
 }

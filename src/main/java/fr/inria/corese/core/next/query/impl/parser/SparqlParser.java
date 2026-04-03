@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -14,6 +15,7 @@ import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
+import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryTextValidator;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
@@ -61,9 +63,28 @@ public class SparqlParser extends AbstractQueryParser implements QueryTextValida
     @Override
     public QueryAst parse(Reader reader, String baseIRI) {
         try {
-            return analyzer.parse(reader, baseIRI, getEffectiveConfig());
+            SparqlQueryAnalyzer.AnalysisResult analysisResult = analyzer.analyze(
+                    reader,
+                    buildEffectiveOptions(baseIRI, false));
+
+            if (!analysisResult.validationResult().isValid()) {
+                QueryDiagnostic firstError = firstErrorDiagnostic(analysisResult.validationResult());
+
+                if (firstError.kind() == QueryDiagnostic.Kind.SEMANTIC_ERROR) {
+                    throw new QueryValidationException(firstError.message());
+                }
+                throw buildSyntaxException(analysisResult.validationResult());
+            }
+
+            if (analysisResult.ast() == null) {
+                throw new QueryEvaluationException("SPARQL analysis completed without producing an AST");
+            }
+
+            return analysisResult.ast();
         } catch (QuerySyntaxException | QueryValidationException | QueryEvaluationException e) {
             throw e;
+        } catch (IOException e) {
+            throw new QueryEvaluationException("Failed to parse SPARQL query: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new QuerySyntaxException("Unexpected error during SPARQL parsing: " + e.getMessage(), e);
         }
@@ -100,7 +121,11 @@ public class SparqlParser extends AbstractQueryParser implements QueryTextValida
 
     @Override
     public QueryValidationResult validate(Reader reader, String baseIRI) {
-        return analyzer.validate(reader, baseIRI, getEffectiveConfig());
+        try {
+            return analyzer.analyze(reader, buildEffectiveOptions(baseIRI, true)).validationResult();
+        } catch (IOException e) {
+            throw new QueryEvaluationException("Failed to validate SPARQL query: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -116,6 +141,38 @@ public class SparqlParser extends AbstractQueryParser implements QueryTextValida
     private String getBaseIRIFromConfig() {
         SparqlParserOptions opts = getEffectiveConfig();
         return opts.getBaseIRI();
+    }
+
+    private SparqlParserOptions buildEffectiveOptions(String baseIRI, boolean validationMode) {
+        SparqlParserOptions config = getEffectiveConfig();
+        String effectiveBaseIRI = baseIRI != null ? baseIRI : IOConstants.getDefaultBaseURI();
+        return new SparqlParserOptions.Builder()
+                .baseIRI(effectiveBaseIRI)
+                .strictMode(config.isStrictMode())
+                .failFast(!validationMode && config.isFailFast())
+                .collectErrors(validationMode || config.isCollectErrors())
+                .build();
+    }
+
+    private QueryDiagnostic firstErrorDiagnostic(QueryValidationResult validationResult) {
+        return validationResult.diagnostics().stream()
+                .filter(diagnostic -> diagnostic.severity() == QueryDiagnostic.Severity.ERROR)
+                .findFirst()
+                .orElse(validationResult.diagnostics().getFirst());
+    }
+
+    private QuerySyntaxException buildSyntaxException(QueryValidationResult validationResult) {
+        QueryDiagnostic firstDiagnostic = validationResult.diagnostics().getFirst();
+        String formattedDiagnostics = validationResult.diagnostics().stream()
+                .map(QueryDiagnostic::format)
+                .reduce((left, right) -> left + "; " + right)
+                .orElse("Unknown syntax error detected");
+
+        String message = "Syntax error in SPARQL query: " + formattedDiagnostics;
+        if (firstDiagnostic.line() >= 1 && firstDiagnostic.column() >= 0) {
+            return new QuerySyntaxException(message, firstDiagnostic.line(), firstDiagnostic.column());
+        }
+        return new QuerySyntaxException(message);
     }
 
     /**
