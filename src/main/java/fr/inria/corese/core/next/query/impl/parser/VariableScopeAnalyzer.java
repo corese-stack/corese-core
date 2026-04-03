@@ -1,25 +1,14 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryConstraintAst;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Collects visible and referenced variables from the next SPARQL AST.
@@ -92,6 +81,8 @@ public final class VariableScopeAnalyzer {
                 collectVisibleVariables(left, visibleVariables);
                 collectVisibleVariables(right, visibleVariables);
             }
+            case BindAst(TermAst expression, VarAst variable) ->
+                visibleVariables.add(variable.name());
 
             case FilterAst ignored -> {
                 // FILTER does not make a variable visible by itself.
