@@ -914,6 +914,9 @@ public final class SparqlAstBuilder {
             return termFromRegex(ctx.regexExpression());
         } else if (ctx.BOUND() != null) {
             return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
+        } else if (ctx.IF() != null) {
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            return new IfAst(args.get(0), args.get(1), args.get(2));
         } else if (ctx.CONCAT() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return new FunctionCallAst(new IriAst("CONCAT"), args);
