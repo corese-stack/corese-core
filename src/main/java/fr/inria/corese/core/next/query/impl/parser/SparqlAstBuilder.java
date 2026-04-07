@@ -169,11 +169,6 @@ public final class SparqlAstBuilder {
     private ConstructTemplateAst constructTemplate;
 
     /**
-     * Helper used to compute visible and referenced variables.
-     */
-    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
-
-    /**
      * Effective base URI after prologue (parser options, then possibly {@code BASE}).
      */
     private String baseUri;

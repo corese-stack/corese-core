@@ -1,25 +1,10 @@
-package fr.inria.corese.core.next.query.impl.parser;
+package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SubQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
