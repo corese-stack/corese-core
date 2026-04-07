@@ -201,6 +201,7 @@ public final class SparqlAstBuilder {
     }
 
     public void enterAskQuery() {
+        assertTopLevelQueryFormOnly("ASK");
         queryType = ASTConstants.QUERY_TYPE.ASK;
     }
 
@@ -258,6 +259,7 @@ public final class SparqlAstBuilder {
     }
 
     public void enterConstructQuery() {
+        assertTopLevelQueryFormOnly("CONSTRUCT");
         queryType = ASTConstants.QUERY_TYPE.CONSTRUCT;
         constructTemplate = null;
         constructTriples.clear();
@@ -374,6 +376,19 @@ public final class SparqlAstBuilder {
             getCurrentSelectFrame().offset = offset;
         }
         else this.offset = offset;
+    }
+
+    /**
+     * ASK, CONSTRUCT and DESCRIBE may only appear as the root {@code query} in {@code queryUnit}.
+     * Nested graph patterns use {@code subSelect} (SELECT only) per SPARQL 1.1; the grammar enforces this,
+     * but we guard against inconsistent listener wiring.
+     */
+    private void assertTopLevelQueryFormOnly(String queryForm) {
+        if (!groupStack.isEmpty() || !selectStack.isEmpty()) {
+            throw new QuerySyntaxException(
+                    queryForm + " is only allowed as the top-level query form. "
+                            + "Inside { ... }, only a SELECT subquery is valid in SPARQL.");
+        }
     }
 
     /**
@@ -814,6 +829,7 @@ public final class SparqlAstBuilder {
      * Sets the internal query type to {@link ASTConstants.QUERY_TYPE#DESCRIBE}.
      */
     public void enterDescribeQuery() {
+        assertTopLevelQueryFormOnly("DESCRIBE");
         queryType = ASTConstants.QUERY_TYPE.DESCRIBE;
     }
 
