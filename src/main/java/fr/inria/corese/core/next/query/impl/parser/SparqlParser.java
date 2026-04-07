@@ -5,31 +5,34 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
-import fr.inria.corese.core.next.query.impl.parser.listener.*;
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.DefaultErrorStrategy;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
-import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
-import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
 import fr.inria.corese.core.next.query.api.base.io.AbstractQueryParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryOptions;
 import fr.inria.corese.core.next.query.api.sparql.options.BaseIRIOptions;
+import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
+import fr.inria.corese.core.next.query.api.validation.QueryTextValidator;
+import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 
-public class SparqlParser extends AbstractQueryParser {
+/**
+ * SPARQL parser exposing both AST parsing and non-throwing validation entry points.
+ *
+ * <p>{@code parse(...)} keeps the traditional parser contract: syntax and
+ * semantic query errors are reported with exceptions and a valid query returns
+ * a {@link QueryAst}. By contrast, {@code validate(...)} is intended for
+ * linter-style usage and reports query problems through
+ * {@link QueryValidationResult} diagnostics. Both families may still throw on
+ * technical failures unrelated to the query validity itself.</p>
+ */
+public class SparqlParser extends AbstractQueryParser implements QueryTextValidator {
+
+    private final SparqlQueryAnalyzer analyzer = new SparqlQueryAnalyzer();
 
     public SparqlParser() {
         this(new SparqlParserOptions.Builder().build());
@@ -59,72 +62,25 @@ public class SparqlParser extends AbstractQueryParser {
 
     @Override
     public QueryAst parse(Reader reader, String baseIRI) {
-        SparqlParserOptions config = getEffectiveConfig();
-        SparqlParserOptions sparqlParserOptions = new SparqlParserOptions.Builder()
-                .baseIRI(baseIRI != null ? baseIRI : ParserConstants.getDefaultBaseURI())
-                .failFast(config.isFailFast())
-                .collectErrors(config.isCollectErrors())
-                .build();
-
         try {
-            CharStream charStream = CharStreams.fromReader(reader);
-            SparqlLexer lexer = new SparqlLexer(charStream);
+            SparqlQueryAnalyzer.AnalysisResult analysisResult = analyzer.analyze(
+                    reader,
+                    buildEffectiveOptions(baseIRI, false));
 
-            SparqlErrorListener errorListener = new SparqlErrorListener(sparqlParserOptions);
+            if (!analysisResult.validationResult().isValid()) {
+                QueryDiagnostic firstError = firstErrorDiagnostic(analysisResult.validationResult());
 
-            lexer.removeErrorListeners();
-            lexer.addErrorListener(errorListener);
-
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            fr.inria.corese.core.next.impl.parser.antlr.SparqlParser parser = new fr.inria.corese.core.next.impl.parser.antlr.SparqlParser(tokens);
-
-            parser.removeErrorListeners();
-            parser.addErrorListener(errorListener);
-
-            if (sparqlParserOptions.isFailFast()) {
-                parser.setErrorHandler(new BailErrorStrategy());
-            } else {
-                parser.setErrorHandler(new DefaultErrorStrategy());
-            }
-
-            ParseTreeWalker walker = new ParseTreeWalker();
-
-            ParseTree tree;
-
-            try {
-                tree = parser.query();
-                if (errorListener.hasErrors()) {
-                    String errorMsg = errorListener.getErrorMessage();
-                    if (errorMsg == null || errorMsg.trim().isEmpty()) {
-                        errorMsg = "Unknown syntax error detected";
-                    }
-                    throw new QuerySyntaxException("Syntax error in SPARQL query: " + errorMsg);
+                if (firstError.kind() == QueryDiagnostic.Kind.SEMANTIC_ERROR) {
+                    throw new QueryValidationException(firstError.message());
                 }
-            } catch (RecognitionException e) {
-                throw new QuerySyntaxException("Recognition error in SPARQL query: " + e.getMessage(), e);
-            } catch (ParseCancellationException e) {
-                throw toQuerySyntaxException(e, errorListener);
+                throw buildSyntaxException(analysisResult.validationResult());
             }
 
-            SparqlAstBuilder builder = new SparqlAstBuilder(sparqlParserOptions);
+            if (analysisResult.ast() == null) {
+                throw new QueryEvaluationException("SPARQL analysis completed without producing an AST");
+            }
 
-            SparqlListener listener = new SparqlListener(List.of(
-                    new BgpFeature(builder),
-                    new AskQueryFeature(builder),
-                    new SelectQueryFeature(builder),
-                    new ConstructQueryFeature(builder),
-                    new SolutionModifierFeature(builder),
-                    new FilterFeature(builder),
-                    new UnionFeature(builder),
-                    new DescribeQueryFeature(builder),
-                    new DatasetClauseFeature(builder),
-                    new PrologueFeature(builder),
-                    new BindFeature(builder)
-            ));
-
-            walker.walk(listener, tree);
-
-            return builder.getResult();
+            return analysisResult.ast();
         } catch (QuerySyntaxException | QueryValidationException | QueryEvaluationException e) {
             throw e;
         } catch (IOException e) {
@@ -144,9 +100,79 @@ public class SparqlParser extends AbstractQueryParser {
         return parse(new StringReader(queryString), baseIRI);
     }
 
+    @Override
+    public QueryValidationResult validate(InputStream in) {
+        String baseIri = IOConstants.getDefaultBaseURI();
+        if (getConfig() instanceof BaseIRIOptions baseIRIOptions) {
+            baseIri = baseIRIOptions.getBaseIRI();
+        }
+        return validate(new java.io.InputStreamReader(in, StandardCharsets.UTF_8), baseIri);
+    }
+
+    @Override
+    public QueryValidationResult validate(InputStream in, String baseIRI) {
+        return validate(new java.io.InputStreamReader(in, StandardCharsets.UTF_8), baseIRI);
+    }
+
+    @Override
+    public QueryValidationResult validate(Reader reader) {
+        return validate(reader, getBaseIRIFromConfig());
+    }
+
+    @Override
+    public QueryValidationResult validate(Reader reader, String baseIRI) {
+        try {
+            return analyzer.analyze(reader, buildEffectiveOptions(baseIRI, true)).validationResult();
+        } catch (IOException e) {
+            throw new QueryEvaluationException("Failed to validate SPARQL query: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public QueryValidationResult validate(String queryString) {
+        return validate(new StringReader(queryString), getBaseIRIFromConfig());
+    }
+
+    @Override
+    public QueryValidationResult validate(String queryString, String baseIRI) {
+        return validate(new StringReader(queryString), baseIRI);
+    }
+
     private String getBaseIRIFromConfig() {
         SparqlParserOptions opts = getEffectiveConfig();
         return opts.getBaseIRI();
+    }
+
+    private SparqlParserOptions buildEffectiveOptions(String baseIRI, boolean validationMode) {
+        SparqlParserOptions config = getEffectiveConfig();
+        String effectiveBaseIRI = baseIRI != null ? baseIRI : IOConstants.getDefaultBaseURI();
+        return new SparqlParserOptions.Builder()
+                .baseIRI(effectiveBaseIRI)
+                .strictMode(config.isStrictMode())
+                .failFast(!validationMode && config.isFailFast())
+                .collectErrors(validationMode || config.isCollectErrors())
+                .build();
+    }
+
+    private QueryDiagnostic firstErrorDiagnostic(QueryValidationResult validationResult) {
+        return validationResult.diagnostics().stream()
+                .filter(diagnostic -> diagnostic.severity() == QueryDiagnostic.Severity.ERROR)
+                .findFirst()
+                .orElse(validationResult.diagnostics().getFirst());
+    }
+
+    private QuerySyntaxException buildSyntaxException(QueryValidationResult validationResult) {
+        QueryDiagnostic firstDiagnostic = validationResult.diagnostics().getFirst();
+        String formattedDiagnostics = validationResult.diagnostics().stream()
+                .map(QueryDiagnostic::format)
+                .reduce((left, right) -> left + "; " + right)
+                .orElse("Unknown syntax error detected");
+
+        String message = "Syntax error in SPARQL query: " + formattedDiagnostics;
+        if (firstDiagnostic.line() >= 1 && firstDiagnostic.column() >= 0) {
+            return new QuerySyntaxException(message, firstDiagnostic.line(), firstDiagnostic.column());
+        }
+        return new QuerySyntaxException(message);
     }
 
     /**
