@@ -143,11 +143,6 @@ public final class SparqlAstBuilder {
     private final SparqlParserOptions options;
 
     /**
-     * Helper used to compute visible and referenced variables.
-     */
-    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
-
-    /**
      * Stack of UNION branch lists currently being collected.
      */
     private final Deque<List<GroupGraphPatternAst>> unionStack = new ArrayDeque<>();
@@ -167,6 +162,11 @@ public final class SparqlAstBuilder {
      * Template AST after {@link #exitConstructTemplate()}; consumed in {@link #getResult()}.
      */
     private ConstructTemplateAst constructTemplate;
+
+    /**
+     * Used for BIND scope checks (variable must not already be visible in the same group).
+     */
+    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
     /**
      * Effective base URI after prologue (parser options, then possibly {@code BASE}).
@@ -223,7 +223,7 @@ public final class SparqlAstBuilder {
             throw new IllegalStateException("No WHERE clause for SELECT query");
         }
 
-        validateSelectQueryScope(frame);
+        // SELECT projection / ORDER BY scope: reported by SparqlQuerySemanticValidator (validate() collects all diagnostics).
 
         /*
          * Top-level SELECT keeps the dataset clause declared at query level.
@@ -388,7 +388,7 @@ public final class SparqlAstBuilder {
         if (!groupStack.isEmpty() || !selectStack.isEmpty()) {
             throw new QuerySyntaxException(
                     queryForm + " is only allowed as the top-level query form. "
-                            + "Inside { ... }, only a SELECT subquery is valid in SPARQL.");
+                            + "Inside { ... }, SPArQL only allows SELECT subqueries.");
         }
     }
 
@@ -513,6 +513,31 @@ public final class SparqlAstBuilder {
         }
     }
 
+    /**
+     * Adds {@code BIND(expression AS ?var)} to the current group. The variable must not already be
+     * visible from earlier patterns in the same group (SPARQL 1.1 scoping).
+     */
+    public void addBind(BindAst bind) {
+        if (bind == null) {
+            throw new IllegalArgumentException("bind is null");
+        }
+        if (!hasCurrentGroup()) {
+            throw new IllegalStateException("addBind() called outside of a group graph pattern");
+        }
+        List<PatternAst> group = currentGroup();
+        Set<String> visibleSoFar = new LinkedHashSet<>();
+        for (PatternAst prior : group) {
+            visibleSoFar.addAll(
+                    variableScopeAnalyzer.collectVisibleVariables(new GroupGraphPatternAst(List.of(prior))));
+        }
+        String name = bind.variable().name();
+        if (visibleSoFar.contains(name)) {
+            throw new QueryValidationException(
+                    "Variable ?" + name + " used in BIND is already declared in the same group graph pattern");
+        }
+        group.add(bind);
+    }
+
     // --- Optional ---
 
     /**
@@ -620,7 +645,6 @@ public final class SparqlAstBuilder {
     private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
         if (hasCurrentSelect()) {
             SelectFrame frame = getCurrentSelectFrame();
-            validateSelectQueryScope();
             return new SelectQueryAst(
                     frame.projection,
                     datasetClauseAst,
@@ -629,7 +653,6 @@ public final class SparqlAstBuilder {
                     prologue
             );
         }
-        validateSelectQueryScope();
         return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
     }
 
@@ -637,103 +660,26 @@ public final class SparqlAstBuilder {
      * Builds the AST for DESCRIBE queries.
      */
     private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
-        return new DescribeQueryAst(datasetClauseAst, describeResources, whereClause, buildSolutionModifier(), prologue);
-    }
-
-    /**
-     * Builds the AST for CONSTRUCT queries.
-     */
-    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
-        return new ConstructQueryAst(
-                constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
+        // TODO #306: validate variable scope for DESCRIBE modifiers when DescribeQueryAst carries them.
+        return new DescribeQueryAst(
                 datasetClauseAst,
+                describeResources,
                 whereClause,
                 buildSolutionModifier(),
                 prologue);
     }
 
     /**
-     * Validates SELECT projection and ORDER BY variables against the WHERE clause scope.
+     * Builds the AST for CONSTRUCT queries.
      */
-    private void validateSelectQueryScope() {
-        // TODO #306: extend this validation to GROUP BY when it is supported by the next parser.
-        if (hasCurrentSelect()) {
-            validateSelectQueryScope(getCurrentSelectFrame());
-            return;
-        }
-        validateSelectQueryScope(projection, whereClause, orderConditions);
-    }
-
-    private void validateSelectQueryScope(SelectFrame frame) {
-        validateSelectQueryScope(frame.projection, frame.whereClause, frame.orderConditions);
-    }
-
-    private void validateSelectQueryScope(
-            ProjectionAst projection,
-            GroupGraphPatternAst whereClause,
-            List<OrderConditionAst> orderConditions) {
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(whereClause);
-
-        if (!projection.selectAll()) {
-            for (VarAst projectedVar : projection.variables()) {
-                if (!visibleVariables.contains(projectedVar.name())) {
-                    throw new QueryValidationException(buildOutOfScopeVariableMessage(
-                            projectedVar.name(),
-                            "SELECT projection"));
-                }
-            }
-        }
-
-        validateOrderVariables(
-                orderConditions,
-                collectOrderByAvailableVariables(visibleVariables, projection));
-    }
-
-    /**
-     * Collects variables that may be referenced from ORDER BY.
-     *
-     * <p>SPARQL applies ORDER BY before the final projection step. In the current next parser,
-     * explicit projection variables are already validated against the WHERE clause, so adding
-     * them here mainly keeps the availability rule explicit while staying within the current
-     * SPARQL 1.0 feature set.
-     *
-     * @param visibleVariables variable names visible from the WHERE clause
-     * @return variable names available to ORDER BY validation
-     */
-    private Set<String> collectOrderByAvailableVariables(
-            Set<String> visibleVariables, ProjectionAst projection) {
-        Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
-        if (!projection.selectAll()) {
-            for (VarAst projectedVar : projection.variables()) {
-                availableVariables.add(projectedVar.name());
-            }
-        }
-        return availableVariables;
-    }
-
-    /**
-     * Validates ORDER BY variables against the variables available at ORDER BY time.
-     *
-     * @param availableOrderVariables variable names available to ORDER BY
-     */
-    private void validateOrderVariables(
-            List<OrderConditionAst> orderConditions, Set<String> availableOrderVariables) {
-        for (OrderConditionAst orderCondition : orderConditions) {
-            Set<String> referencedVariables = variableScopeAnalyzer
-                    .collectReferencedVariables(orderCondition.expression());
-
-            for (String variableName : referencedVariables) {
-                if (!availableOrderVariables.contains(variableName)) {
-                    throw new QueryValidationException(buildOutOfScopeVariableMessage(
-                            variableName,
-                            "ORDER BY"));
-                }
-            }
-        }
-    }
-
-    private String buildOutOfScopeVariableMessage(String variableName, String clause) {
-        return "Variable ?" + variableName + " used in " + clause + " is not visible in WHERE clause";
+    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+        // TODO #306: validate variable scope for CONSTRUCT modifiers when ConstructQueryAst carries them.
+        return new ConstructQueryAst(
+                constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
+                datasetClauseAst,
+                whereClause,
+                buildSolutionModifier(),
+                prologue);
     }
 
     /**
@@ -1191,14 +1137,10 @@ public final class SparqlAstBuilder {
             return new ExistsAst(popCapturedExistsPattern());
         } else if (ctx.notExistsFunc() != null) {
             return new NotExistsAst(popCapturedExistsPattern());
-        } else if (ctx.regexExpression() != null) {
-            return termFromRegex(ctx.regexExpression());
-        } else if (ctx.BOUND() != null) {
-            return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
         } else if (ctx.CONCAT() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return new FunctionCallAst(new IriAst("CONCAT"), args);
-        } else if (ctx.expression() != null && !ctx.expression().isEmpty()) {
+        } else if (ctx.expression() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
@@ -1447,27 +1389,5 @@ public final class SparqlAstBuilder {
             }
         }
         return out;
-    }
-
-    /**
-     * Adds a BIND clause to the current group.
-     *
-     * @throws QueryValidationException if the variable introduced by BIND is already visible
-     *                                  in the group graph pattern up to this point, as required
-     *                                  by the SPARQL 1.1 specification.
-     */
-    public void addBind(BindAst bind) {
-        if (!this.hasCurrentGroup()) {
-            return;
-        }
-        List<PatternAst> current = this.currentGroup();
-        Set<String> alreadyVisible = variableScopeAnalyzer
-                .collectVisibleVariables(new GroupGraphPatternAst(current));
-        if (alreadyVisible.contains(bind.variable().name())) {
-            throw new QueryValidationException(
-                    "Variable ?" + bind.variable().name()
-                            + " used in BIND is already declared in the same group graph pattern");
-        }
-        current.add(bind);
     }
 }

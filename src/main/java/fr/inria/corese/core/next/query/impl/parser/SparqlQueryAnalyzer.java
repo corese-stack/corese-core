@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.sparql.options.SparqlAstError;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
@@ -53,6 +54,18 @@ final class SparqlQueryAnalyzer {
             return new AnalysisResult(ast, semanticValidation);
         } catch (QuerySyntaxException e) {
             return new AnalysisResult(null, new QueryValidationResult(List.of(toSyntaxDiagnostic(e))));
+        } catch (QueryValidationException e) {
+            return new AnalysisResult(
+                    null,
+                    new QueryValidationResult(List.of(
+                            new QueryDiagnostic(
+                                    QueryDiagnostic.Kind.SEMANTIC_ERROR,
+                                    QueryDiagnostic.Severity.ERROR,
+                                    e.getMessage(),
+                                    -1,
+                                    -1,
+                                    null,
+                                    "SparqlAstBuilder"))));
         }
     }
 
