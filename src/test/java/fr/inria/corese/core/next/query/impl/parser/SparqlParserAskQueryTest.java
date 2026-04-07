@@ -332,6 +332,41 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("should parse ASK with a SELECT subquery inside WHERE")
+    public void shouldParseAskWithSubqueryInWhere() {
+        SparqlParser parser = newParserDefault();
+        QueryAst ast = parser.parse("""
+                PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                ASK WHERE {
+                  {
+                    SELECT ?s WHERE {
+                      ?s a foaf:Person
+                    }
+                  }
+                }
+                """);
+
+        assertInstanceOf(AskQueryAst.class, ast);
+        AskQueryAst ask = (AskQueryAst) ast;
+        GroupGraphPatternAst outerWhere = ask.whereClause();
+
+        assertEquals(1, outerWhere.patterns().size());
+        assertInstanceOf(GroupGraphPatternAst.class, outerWhere.patterns().getFirst());
+
+        GroupGraphPatternAst wrapperGroup = (GroupGraphPatternAst) outerWhere.patterns().getFirst();
+        assertEquals(1, wrapperGroup.patterns().size());
+        assertInstanceOf(SubQueryAst.class, wrapperGroup.patterns().getFirst());
+
+        SubQueryAst subQuery = (SubQueryAst) wrapperGroup.patterns().getFirst();
+        assertInstanceOf(SelectQueryAst.class, subQuery.query());
+
+        SelectQueryAst inner = (SelectQueryAst) subQuery.query();
+        assertNotNull(inner.whereClause());
+        assertEquals(1, inner.whereClause().patterns().size());
+        assertInstanceOf(BgpAst.class, inner.whereClause().patterns().getFirst());
+    }
+
+    @Test
     @DisplayName("Ask short form with limit")
     public void shortformWithLimit() {
         SparqlParser parser = newParserDefault();
