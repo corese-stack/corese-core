@@ -23,6 +23,9 @@ import java.util.List;
  * SPARQL 1.1: only {@code SELECT} may appear as a subquery inside {@code { ... }} ({@code subSelect} rule).
  * Top-level {@code query} may be {@code SELECT}, {@code ASK}, {@code CONSTRUCT}, or {@code DESCRIBE}.
  * Nested {@code subSelect} uses the same {@link SparqlAstBuilder} stack frames as a top-level {@code SELECT}.
+ * SPARQL 1.1: only {@code SELECT} may appear as a subquery inside {@code { ... }} ({@code subSelect} rule).
+ * Top-level {@code query} may be {@code SELECT}, {@code ASK}, {@code CONSTRUCT}, or {@code DESCRIBE}.
+ * Nested {@code subSelect} uses the same {@link SparqlAstBuilder} stack frames as a top-level {@code SELECT}.
  */
 public class SelectQueryFeature extends AbstractSparqlFeature {
 
