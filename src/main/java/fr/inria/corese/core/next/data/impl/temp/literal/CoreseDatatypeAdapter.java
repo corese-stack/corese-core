@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.data.impl.temp.literal;
 
 import fr.inria.corese.core.next.data.impl.temp.CoreseNodeAdapter;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 
 /**
  * Interface for Corese datatype adapter.

@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.data.impl.temp.literal;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.base.model.literal.AbstractLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 
 /**
  * An implementation of the {@code xsd:boolean} datatype used by Corese.
@@ -22,7 +22,7 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
     /**
      * The Corese object representing the boolean literal in the old API.
      */
-    private final fr.inria.corese.core.sparql.datatype.CoreseBoolean coreseObject;
+    private final CoreseBoolean coreseObject;
 
     /**
      * The core datatype of this literal, which is XSD.BOOLEAN.
@@ -54,12 +54,12 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
      *                     boolean literal.
      * @throws IncorrectOperationException If the provided {@link IDatatype} is not
      *                                     a valid
-     *                                     {@link fr.inria.corese.core.sparql.datatype.CoreseBoolean}.
+     *                                     {@link CoreseBoolean}.
      */
     public CoreseBoolean(IDatatype coreseObject) {
         super(new CoreseIRI(coreseObject.getDatatypeURI()));
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseBoolean) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseBoolean) coreseObject;
+        if (coreseObject instanceof CoreseBoolean) {
+            this.coreseObject = (CoreseBoolean) coreseObject;
             this.value = this.coreseObject.booleanValue();
             this.coreDatatype = XSD.BOOLEAN;
             this.datatype = XSD.BOOLEAN.getIRI();
@@ -74,7 +74,7 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
      * @param value The boolean value for the literal.
      */
     public CoreseBoolean(boolean value) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseBoolean(value));
+        this(new CoreseBoolean(value));
         this.value = value;
         this.coreDatatype = XSD.BOOLEAN;
         this.datatype = XSD.BOOLEAN.getIRI();

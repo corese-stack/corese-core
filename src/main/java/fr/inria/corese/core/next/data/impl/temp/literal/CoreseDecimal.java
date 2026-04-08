@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.base.model.literal.AbstractNumber;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectDatatypeException;
-import fr.inria.corese.core.sparql.datatype.CoreseDouble;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseDouble;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

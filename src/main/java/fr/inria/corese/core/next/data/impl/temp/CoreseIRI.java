@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.data.impl.temp;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.base.model.AbstractIRI;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.CoreseURI;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseURI;
 
 /**
  * Wrapper for Corese Node that represents an IRI

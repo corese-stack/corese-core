@@ -6,9 +6,8 @@ import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
-import fr.inria.corese.core.next.data.impl.temp.literal.CoreseTyped;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.CoreseString;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +28,7 @@ public class CoreseTypedTest {
     @Test
     public void testConstructorWithIDatatype() {
         // Create a mock CoreseLiteral with value
-        fr.inria.corese.core.sparql.datatype.CoreseString coreseLiteral = new CoreseString(testValue);
+        CoreseString coreseLiteral = new CoreseString(testValue);
 
         CoreseTyped coreseTyped = new CoreseTyped(coreseLiteral);
         assertEquals(testValue, coreseTyped.getLabel());

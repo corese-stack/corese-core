@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.data.impl.temp;
 
-import fr.inria.corese.core.edge.EdgeImpl;
-import fr.inria.corese.core.kgram.api.core.Edge;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.edge.EdgeImpl;
+import fr.inria.corese.core.next.query.kgram.api.core.Edge;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
@@ -47,7 +47,7 @@ public class CoreseStatement extends AbstractStatement implements CoreseEdgeAdap
         Node objectNode = converter.toCoreseNode(object);
         Node contextNode = converter.toCoreseContext(context);
 
-        EdgeImpl edgeImpl = EdgeImpl.create(contextNode, subjectNode, predicateNode, objectNode);
+        Edge edgeImpl = EdgeImpl.create(contextNode, subjectNode, predicateNode, objectNode);
         this.edge = edgeImpl;
     }
 
@@ -70,7 +70,7 @@ public class CoreseStatement extends AbstractStatement implements CoreseEdgeAdap
         Resource subject_corese = (Resource) converter.toRdf4jValue(edge.getSubjectValue());
         IRI predicate_corese = (IRI) converter.toRdf4jValue(edge.getPredicateValue());
         Value object_corese = converter.toRdf4jValue(edge.getObjectValue());
-        Resource context_corese = (Resource) converter.toRdf4jValueContext(edge.getGraph());
+        Resource context_corese = converter.toRdf4jValueContext(edge.getGraph());
 
         this.subject = subject_corese;
         this.predicate = predicate_corese;

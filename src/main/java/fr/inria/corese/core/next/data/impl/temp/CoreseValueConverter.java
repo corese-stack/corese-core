@@ -1,15 +1,15 @@
 package fr.inria.corese.core.next.data.impl.temp;
 
-import fr.inria.corese.core.kgram.api.core.ExpType;
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.BNode;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.DatatypeMap;
 
 /**
  * Utility class for converting between Corese-compatible Node objects
@@ -21,7 +21,7 @@ public class CoreseValueConverter {
     private final ValueFactory factory = new CoreseAdaptedValueFactory();
 
     // Constant representing the default Corese graph context
-    private static final Node DEFAULT_CORESE_CONTEXT = DatatypeMap.createResource(ExpType.DEFAULT_GRAPH);
+    private static final Node DEFAULT_CORESE_CONTEXT = DatatypeMap.createResource(IOConstants.getDefaultBaseURI());
 
     // --- Rdf4j to Corese conversion methods ---
 

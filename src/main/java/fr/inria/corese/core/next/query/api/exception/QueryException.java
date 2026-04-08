@@ -9,6 +9,15 @@ import fr.inria.corese.core.next.data.api.base.exception.CoreseException;
 public class QueryException extends CoreseException {
 
     /**
+     * Wraps the QueryException around the given Throwable
+     *
+     * @param e a throwable
+     */
+    public QueryException(Throwable e) {
+        super(e);
+    }
+
+    /**
      * Constructs a new QueryException with the specified detail message.
      *
      * @param message the detail message explaining the reason for the exception

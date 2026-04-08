@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.data.impl.temp.literal;
 
 import java.util.Objects;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.base.model.literal.AbstractStringLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
@@ -10,9 +10,9 @@ import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.common.util.literal.CoreDatatypeHelper;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.CoreseGeneric;
-import fr.inria.corese.core.sparql.datatype.CoreseString;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseGeneric;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseString;
 
 import static fr.inria.corese.core.next.data.impl.common.vocabulary.XSD.xsdString;
 

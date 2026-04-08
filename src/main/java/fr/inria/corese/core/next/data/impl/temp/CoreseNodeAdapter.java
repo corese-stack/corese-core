@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.data.impl.temp;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 
 /**
  * Wrapper for objects that are represented as Node in Corese code, e.g. IRI, Literal, etc.

@@ -1,12 +1,12 @@
 package fr.inria.corese.core.next.data.impl.temp.literal;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.api.base.model.literal.AbstractDuration;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.CoreseUndefLiteral;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseUndefLiteral;
 
 import java.time.temporal.TemporalAmount;
 

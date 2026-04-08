@@ -1,11 +1,11 @@
 package fr.inria.corese.core.next.data.impl.temp.literal;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.base.model.AbstractBNode;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.temp.CoreseNodeAdapter;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.CoreseBlankNode;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseBlankNode;
 
 /**
  * An implementation of a blank node (BNode) used by Corese.
@@ -41,7 +41,7 @@ public class CoreseBNode extends AbstractBNode implements CoreseNodeAdapter {
      */
     public CoreseBNode(IDatatype coreseObject) {
         if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseBlankNode) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseBlankNode) coreseObject;
+            this.coreseObject = (CoreseBlankNode) coreseObject;
             this.id = this.coreseObject.getID();
         } else {
             throw new IncorrectOperationException("Cannot create CoreseLiteral from a non-literal Corese object");
@@ -51,13 +51,13 @@ public class CoreseBNode extends AbstractBNode implements CoreseNodeAdapter {
     /**
      * Constructs a {@link CoreseBNode} instance from a string identifier.
      * This constructor creates a
-     * {@link fr.inria.corese.core.sparql.datatype.CoreseBlankNode} from the
+     * {@link CoreseBlankNode} from the
      * provided string id.
      *
      * @param id The unique identifier for the blank node.
      */
     public CoreseBNode(String id) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseBlankNode(id));
+        this(new CoreseBlankNode(id));
         this.id = id;
     }
 

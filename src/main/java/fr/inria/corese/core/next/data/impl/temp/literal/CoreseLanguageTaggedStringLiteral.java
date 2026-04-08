@@ -2,14 +2,14 @@ package fr.inria.corese.core.next.data.impl.temp.literal;
 
 import java.util.Optional;
 
-import fr.inria.corese.core.kgram.api.core.Node;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.base.model.literal.AbstractStringLiteral;
 import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.impl.common.literal.RDF;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 
 /**
  * An implementation of a language-tagged string literal used by Corese.
@@ -25,7 +25,7 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
      * The Corese object that holds the literal value and language tag in the old
      * API.
      */
-    private final fr.inria.corese.core.sparql.datatype.CoreseLiteral coreseObject;
+    private final fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseLiteral coreseObject;
 
     /**
      * The language tag associated with the literal.
@@ -40,18 +40,18 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
      * Constructs a {@link CoreseLanguageTaggedStringLiteral} instance from an
      * {@link IDatatype} Corese object.
      * The Corese object should be an instance of
-     * {@link fr.inria.corese.core.sparql.datatype.CoreseString}.
+     * {@link fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseString}.
      * 
      * @param coreseObject The {@link IDatatype} Corese object representing the
      *                     tagged literal.
      * @throws IncorrectOperationException If the provided {@code coreseObject} is
      *                                     not a valid
-     *                                     {@link fr.inria.corese.core.sparql.datatype.CoreseLiteral}.
+     *                                     {@link fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseLiteral}.
      */
     public CoreseLanguageTaggedStringLiteral(IDatatype coreseObject) {
         super(new CoreseIRI(coreseObject.getDatatypeURI()));
-        if (coreseObject instanceof fr.inria.corese.core.sparql.datatype.CoreseLiteral) {
-            this.coreseObject = (fr.inria.corese.core.sparql.datatype.CoreseLiteral) coreseObject;
+        if (coreseObject instanceof fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseLiteral) {
+            this.coreseObject = (fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseLiteral) coreseObject;
             this.language = coreseObject.getLang();
             this.value = coreseObject.getLabel();
         } else {
@@ -69,7 +69,7 @@ public class CoreseLanguageTaggedStringLiteral extends AbstractStringLiteral imp
      * @param language The language tag associated with the literal.
      */
     public CoreseLanguageTaggedStringLiteral(String value, String language) {
-        this(new fr.inria.corese.core.sparql.datatype.CoreseLiteral(value, language));
+        this(new fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseLiteral(value, language));
         this.language = language;
         this.value = value;
     }
