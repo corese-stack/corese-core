@@ -6,6 +6,7 @@ import java.util.Set;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.CoalesceAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IfAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
@@ -155,6 +156,12 @@ public final class VariableScopeAnalyzer {
                 collectReferencedVariables(condition, referencedVariables);
                 collectReferencedVariables(thenExpr, referencedVariables);
                 collectReferencedVariables(elseExpr, referencedVariables);
+            }
+
+            case CoalesceAst(List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariables(argument, referencedVariables);
+                }
             }
 
             case ConstraintAst ignored -> {

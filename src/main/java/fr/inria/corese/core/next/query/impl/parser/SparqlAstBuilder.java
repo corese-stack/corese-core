@@ -1147,6 +1147,9 @@ public final class SparqlAstBuilder {
         } else if (ctx.CONCAT() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return new FunctionCallAst(new IriAst("CONCAT"), args);
+        } else if (ctx.COALESCE() != null) {
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            return new CoalesceAst(args);
         } else if (ctx.expression() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
