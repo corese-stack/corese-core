@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.DisplayName;
@@ -96,5 +97,21 @@ public class SparqlParserIfTest extends AbstractSparqlParserFeatureTest {
         assertEquals("s", assertInstanceOf(VarAst.class, outer.condition()).name());
         assertInstanceOf(IfAst.class, outer.thenExpr());
         assertEquals("o", assertInstanceOf(VarAst.class, outer.elseExpr()).name());
+    }
+
+
+    @Test
+    @DisplayName("BIND(IF(?s, IF(?p, ?p, ?o), ?o) AS ?s) — nested IF with already-declared variable should fail")
+    void shouldFailNestedIfWhenBindVariableAlreadyDeclared() {
+        SparqlParser parser = newParserDefault();
+
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  BIND(IF(?s, IF(?p, ?p, ?o), ?o) AS ?s)
+                }
+                """));
+
+        assertEquals("Variable ?s used in BIND is already declared in the same group graph pattern", exception.getMessage());
     }
 }
