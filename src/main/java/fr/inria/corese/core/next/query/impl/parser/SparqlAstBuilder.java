@@ -1316,6 +1316,8 @@ public final class SparqlAstBuilder {
             } else {
                 throw new QueryEvaluationException("Unexpected function for a  BuiltInCall for token " + ctx.getText());
             }
+        } else if (ctx.UUID() != null) {
+            return new UuidAst();
         } else {
             throw new QueryEvaluationException("Unable to resolve BuiltInCall for token " + ctx.getText());
         }
