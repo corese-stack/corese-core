@@ -1,5 +1,9 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
@@ -88,6 +92,21 @@ public final class VariableScopeAnalyzer {
             case FilterAst ignored -> {
                 // FILTER does not make a variable visible by itself.
             }
+
+            case SubQueryAst(QueryAst query) -> {
+                if (query instanceof SelectQueryAst select) {
+                    ProjectionAst proj = select.projection();
+                    if (proj.selectAll()) {
+                        collectVisibleVariables(select.whereClause(), visibleVariables);
+                    } else {
+                        for (VarAst v : proj.variables()) {
+                            visibleVariables.add(v.name());
+                        }
+                    }
+                }
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + pattern);
         }
     }
 
