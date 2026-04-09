@@ -78,4 +78,24 @@ public class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
         CoalesceAst coalesce = (CoalesceAst) filter.operator();
         assertEquals(1, coalesce.arguments().size());
     }
+
+    @Test
+    @DisplayName("ORDER BY COALESCE(?s, ?o) — exercises VariableScopeAnalyzer on COALESCE via semantic validation")
+    void shouldParseOrderByCoalesceAndValidateVariableScope() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT ?s WHERE {
+                  ?s ?p ?o .
+                } ORDER BY COALESCE(?s, ?o)
+                """);
+
+        assertNotNull(ast);
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
+        assertFalse(select.solutionModifier().orderBy().isEmpty());
+        var order = select.solutionModifier().orderBy().getFirst();
+        assertInstanceOf(CoalesceAst.class, order.expression());
+        CoalesceAst coalesce = (CoalesceAst) order.expression();
+        assertEquals(2, coalesce.arguments().size());
+    }
 }
