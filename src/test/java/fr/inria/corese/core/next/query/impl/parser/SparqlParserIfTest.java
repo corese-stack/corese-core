@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("SPARQL 1.1 - Parser and AST : IF")
-public class SparqlParserIfTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserIfTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("FILTER(IF(?s > 0, true, false)) — IF inside FILTER")

@@ -170,6 +170,15 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                         """,
                         ORDER_BY_SCOPE_MESSAGE),
                 Arguments.of(
+                        "Should reject ORDER BY IF expression using a variable not visible in WHERE",
+                        """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        ORDER BY IF(BOUND(?o), ?o, ?z)
+                        """,
+                        ORDER_BY_SCOPE_MESSAGE),
+                Arguments.of(
                         "Should reject SELECT projection variables not visible in WHERE",
                         """
                         SELECT ?x WHERE {
