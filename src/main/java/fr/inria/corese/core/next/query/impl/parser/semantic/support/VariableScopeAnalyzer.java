@@ -7,6 +7,7 @@ import java.util.Set;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IfAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryConstraintAst;
 
@@ -148,6 +149,12 @@ public final class VariableScopeAnalyzer {
 
             case LiteralAst ignoredLiteral -> {
                 // Constants do not contribute referenced variables.
+            }
+
+            case IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) -> {
+                collectReferencedVariables(condition, referencedVariables);
+                collectReferencedVariables(thenExpr, referencedVariables);
+                collectReferencedVariables(elseExpr, referencedVariables);
             }
 
             case ConstraintAst ignored -> {

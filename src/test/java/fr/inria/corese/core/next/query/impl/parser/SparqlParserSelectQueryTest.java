@@ -16,6 +16,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IfAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
 
@@ -473,6 +487,29 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertEquals(1, select.solutionModifier().orderBy().size());
         assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().getFirst().orderDirection());
         assertInstanceOf(StrAst.class, select.solutionModifier().orderBy().getFirst().expression());
+    }
+
+    @Test
+    @DisplayName("Should accept ORDER BY IF expression using only variables visible in WHERE")
+    void shouldAcceptOrderByIfExpressionVisibleInWhere() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY IF(BOUND(?o), STR(?o), ?s)
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+        IfAst ifAst = assertInstanceOf(IfAst.class, select.solutionModifier().orderBy().getFirst().expression());
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(BoundAst.class, ifAst.condition());
+        assertInstanceOf(StrAst.class, ifAst.thenExpr());
+        assertInstanceOf(VarAst.class, ifAst.elseExpr());
+        assertEquals("s", ((VarAst) ifAst.elseExpr()).name());
     }
 
     @Test
