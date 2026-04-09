@@ -1334,6 +1334,8 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
             } else if (ctx.regexExpression() != null) {
                 return termFromRegex(ctx.regexExpression());
+            } else if (ctx.STRLEN() != null) {
+                return new StrLenAst(args.getFirst());
             } else {
                 throw new QueryEvaluationException("Unexpected function for a  BuiltInCall for token " + ctx.getText());
             }
