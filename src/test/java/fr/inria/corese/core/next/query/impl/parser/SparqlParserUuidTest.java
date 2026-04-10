@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("SPARQL 1.1 - Parser and AST : UUID")
-public class SparqlParserUuidTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserUuidTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("BIND(UUID() AS ?id)")
