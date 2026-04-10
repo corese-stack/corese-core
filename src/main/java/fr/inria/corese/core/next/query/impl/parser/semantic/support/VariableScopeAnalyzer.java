@@ -1,15 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IfAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -155,6 +147,12 @@ public final class VariableScopeAnalyzer {
                 collectReferencedVariables(condition, referencedVariables);
                 collectReferencedVariables(thenExpr, referencedVariables);
                 collectReferencedVariables(elseExpr, referencedVariables);
+            }
+
+            case CoalesceAst(List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariables(argument, referencedVariables);
+                }
             }
 
             case ConstraintAst ignored -> {
