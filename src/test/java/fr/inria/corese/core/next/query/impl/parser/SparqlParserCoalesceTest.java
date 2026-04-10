@@ -1,14 +1,25 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.CoalesceAst;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.CoalesceAst;
 
 @DisplayName("SPARQL 1.1 - Parser and AST : COALESCE")
-public class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("COALESCE(?a, ?b, ?c)")
@@ -97,5 +108,19 @@ public class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(CoalesceAst.class, order.expression());
         CoalesceAst coalesce = (CoalesceAst) order.expression();
         assertEquals(2, coalesce.arguments().size());
+    }
+
+    @Test
+    @DisplayName("ORDER BY COALESCE(?s, ?z) — should reject variable not visible in WHERE")
+    void shouldRejectOrderByCoalesceWhenVariableNotVisibleInWhere() {
+        SparqlParser parser = newParserDefault();
+
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                SELECT ?s WHERE {
+                  ?s ?p ?o .
+                } ORDER BY COALESCE(?s, ?z)
+                """));
+
+        assertEquals("Variable ?z used in ORDER BY is not visible in WHERE clause", exception.getMessage());
     }
 }
