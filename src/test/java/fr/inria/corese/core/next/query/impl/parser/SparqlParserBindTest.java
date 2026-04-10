@@ -2,6 +2,8 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MultiplyAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SubtractAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -87,6 +89,41 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
         BindAst bindAst = (BindAst) last;
         assertEquals("y", bindAst.variable().name());
         assertNotNull(bindAst.expression());
+    }
+
+    @Test
+    @DisplayName("BIND(?p*(1-?discount) AS ?price) — arithmetic expression without whitespace around minus")
+    void shouldParseBindWithSubtractWithoutWhitespace() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT ?price WHERE {
+                  ?x ?p ?discount .
+                  BIND(?p*(1-?discount) AS ?price)
+                }
+                """);
+
+        assertNotNull(ast);
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size());
+
+        PatternAst last = where.patterns().getLast();
+        assertInstanceOf(BindAst.class, last);
+
+        BindAst bindAst = (BindAst) last;
+        assertEquals("price", bindAst.variable().name());
+        assertInstanceOf(MultiplyAst.class, bindAst.expression());
+
+        MultiplyAst multiplyAst = (MultiplyAst) bindAst.expression();
+        assertInstanceOf(VarAst.class, multiplyAst.getLeftArgument());
+        assertEquals("p", ((VarAst) multiplyAst.getLeftArgument()).name());
+        assertInstanceOf(SubtractAst.class, multiplyAst.getRightArgument());
+
+        SubtractAst subtractAst = (SubtractAst) multiplyAst.getRightArgument();
+        assertInstanceOf(LiteralAst.class, subtractAst.getLeftArgument());
+        assertEquals("1", ((LiteralAst) subtractAst.getLeftArgument()).lexical());
+        assertInstanceOf(VarAst.class, subtractAst.getRightArgument());
+        assertEquals("discount", ((VarAst) subtractAst.getRightArgument()).name());
     }
 
     @Test
