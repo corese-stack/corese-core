@@ -1242,6 +1242,8 @@ public final class SparqlAstBuilder {
             return new IfAst(args.get(0), args.get(1), args.get(2));
         } else if (ctx.RAND() != null) {
             return new RandAst();
+        } else if (ctx.UUID() != null) {
+            return new UuidAst();
         } else if (ctx.CONCAT() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return this.createConstraint(ASTConstants.FUNCTION_CALL.CONCAT, args);
@@ -1316,8 +1318,6 @@ public final class SparqlAstBuilder {
             } else {
                 throw new QueryEvaluationException("Unexpected function for a  BuiltInCall for token " + ctx.getText());
             }
-        } else if (ctx.UUID() != null) {
-            return new UuidAst();
         } else {
             throw new QueryEvaluationException("Unable to resolve BuiltInCall for token " + ctx.getText());
         }
