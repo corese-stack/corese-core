@@ -1,9 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.bridge.CoreseAstQueryBuilder;
-import fr.inria.corese.core.next.query.kgram.core.Exp;
-import fr.inria.corese.core.next.query.kgram.core.Query;
+import fr.inria.corese.core.next.query.kgram.api.core.Filter;
+
+import java.util.Objects;
 
 /**
  * Adapts SPARQL query AST to KGRAM Exp/Query. Delegates to {@link CoreseAstQueryBuilder}.
@@ -13,12 +14,20 @@ public final class CoreseQueryArtifactAdapter {
     private final CoreseAstQueryBuilder queryBuilder;
 
     public CoreseQueryArtifactAdapter() {
-        this.queryBuilder = new CoreseAstQueryBuilder();
+        this(new CoreseAstQueryBuilder());
     }
 
     public CoreseQueryArtifactAdapter(CoreseAstQueryBuilder queryBuilder) {
-        this.queryBuilder = queryBuilder;
+        this.queryBuilder = Objects.requireNonNull(queryBuilder);
     }
 
+    /**
+     * Converts a WHERE filter term from the next AST into a KGRAM {@link Filter} (legacy-backed).
+     */
+    public Filter adaptFilter(TermAst filterExpression) {
+        return queryBuilder.toNextFilter(filterExpression);
+    }
+
+    // Full QueryAst → Query / Exp translation is future work (see CoreseAstQueryBuilder javadoc).
 
 }
