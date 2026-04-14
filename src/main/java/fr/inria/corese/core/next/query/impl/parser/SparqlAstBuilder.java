@@ -1154,6 +1154,8 @@ public final class SparqlAstBuilder {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
+            } else if (ctx.ENCODE_FOR_URI() != null) {
+                return new EncodeForUriAst(args);
             } else if (ctx.LANG() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.LANG, args);
             } else if (ctx.LANGMATCHES() != null) {
