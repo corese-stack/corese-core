@@ -118,6 +118,12 @@ public class ASTConstants {
         LANGMATCHES,
 
         /**
+         * {@code CONTAINS(string1, string2)}: returns {@code true} if {@code string1}
+         * contains {@code string2}.
+         */
+        CONTAINS,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
