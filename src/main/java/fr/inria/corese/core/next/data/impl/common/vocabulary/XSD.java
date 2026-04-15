@@ -181,6 +181,41 @@ public enum XSD implements Vocabulary {
     xsdToken("token"),
 
     /**
+     * <a href="https://www.w3.org/TR/xmlschema-2/#ENTITY">XML Schema Part 2: Datatypes Second Edition</a>
+     */
+    xsdENTITY("ENTITY"),
+
+    /**
+     * <a href="https://www.w3.org/TR/xmlschema-2/#ENTITIES">XML Schema Part 2: Datatypes Second Edition</a>
+     */
+    xsdENTITIES("ENTITIES"),
+
+    /**
+     * <a href="https://www.w3.org/TR/xmlschema-2/#ID">XML Schema Part 2: Datatypes Second Edition</a>
+     */
+    xsdID("ID"),
+
+    /**
+     * <a href="https://www.w3.org/TR/xmlschema-2/#IDREF">XML Schema Part 2: Datatypes Second Edition</a>
+     */
+    xsdIDREF("IDREF"),
+
+    /**
+     * <a href="https://www.w3.org/TR/xmlschema-2/#IDREFS">XML Schema Part 2: Datatypes Second Edition</a>
+     */
+    xsdIDREFS("IDREFS"),
+
+    /**
+     * <a href="https://www.w3.org/TR/xmlschema-2/#NMTOKEN">XML Schema Part 2: Datatypes Second Edition</a>
+     */
+    xsdNMTOKEN("NMTOKEN"),
+
+    /**
+     * <a href="https://www.w3.org/TR/xmlschema-2/#NMTOKENS">XML Schema Part 2: Datatypes Second Edition</a>
+     */
+    xsdNMTOKENS("NMTOKENS"),
+
+    /**
      * <a href="https://www.w3.org/TR/xmlschema-2/#QName">XML Schema Part 2: Datatypes Second Edition</a>
      */
     xsdLanguage("language"),
