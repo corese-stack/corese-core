@@ -2,7 +2,7 @@ package fr.inria.corese.core.next.query.kgram.sparql.datatype;
 
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
-import fr.inria.corese.core.next.query.kgram.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
 /**
  * Edge reference datatype for edge reference node

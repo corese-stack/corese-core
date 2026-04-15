@@ -34,7 +34,7 @@ public interface DatatypeValue {
      *
      * @return true if this value is truthy
      */
-    boolean isTrue();
+    boolean isTrue() throws CoreseDatatypeException;
 
     /**
      * Tests if this value is equivalent to another for comparison purposes.

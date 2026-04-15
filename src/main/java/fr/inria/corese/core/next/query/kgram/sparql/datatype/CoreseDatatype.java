@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.query.kgram.path.Path;
 import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatypeList;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.sparql.storage.api.IStorage;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
@@ -365,7 +366,7 @@ public abstract class CoreseDatatype
      * coerce to type error but literals, see number and string
      */
     @Override
-    public boolean isTrue() {
+    public boolean isTrue() throws CoreseDatatypeException {
         throw new QueryEvaluationException("istrue not implemented");
     }
 
@@ -670,24 +671,6 @@ public abstract class CoreseDatatype
     @Override
     public boolean isDate() {
         return false;
-    }
-
-    @Override
-    public Object objectValue() {
-        switch (getCode()) {
-            case INTEGER:
-                return longValue();
-            case DOUBLE:
-                return doubleValue();
-            case DECIMAL:
-                return decimalValue();
-            case FLOAT:
-                return floatValue();
-            case BOOLEAN:
-                return booleanValue();
-            default:
-                return stringValue();
-        }
     }
 
     @Override

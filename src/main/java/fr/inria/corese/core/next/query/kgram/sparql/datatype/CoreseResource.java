@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.kgram.sparql.datatype;
 
+import fr.inria.corese.core.next.query.kgram.api.core.DatatypeValue;
 import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
@@ -34,6 +35,16 @@ public class CoreseResource extends CoreseStringableImpl {
        }
 
     @Override
+    public boolean equalsWE(DatatypeValue other) throws CoreseDatatypeException {
+        return false;
+    }
+
+    @Override
+    public int compare(DatatypeValue other) throws CoreseDatatypeException {
+        return 0;
+    }
+
+    @Override
        public boolean isTrueAble() {
          return false;
        }
@@ -41,6 +52,16 @@ public class CoreseResource extends CoreseStringableImpl {
     @Override
     public boolean booleanValue() {
         return false;
+    }
+
+    @Override
+    public IDatatype toList() {
+        return null;
+    }
+
+    @Override
+    public Iterable getLoop() {
+        return null;
     }
 
     @Override

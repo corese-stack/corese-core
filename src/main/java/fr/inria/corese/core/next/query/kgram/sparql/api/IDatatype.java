@@ -18,8 +18,8 @@ import java.util.Map;
  *
  * @author Olivier Corby & Olivier Savoie & Virginie Bottollier
  */
-public interface IDatatype
-        extends Iterable<IDatatype>, Node, Loopable, DatatypeValue, Comparable {
+public interface IDatatype<T>
+        extends Iterable<IDatatype>, Node, Loopable<T>, DatatypeValue, Comparable {
 
     int VALUE = -1;
     int RESULT = -2;
@@ -544,7 +544,7 @@ public interface IDatatype
 
     boolean hasLang();
 
-    boolean isTrue();
+    boolean isTrue() throws CoreseDatatypeException;
 
     boolean isTrueAble();
 
