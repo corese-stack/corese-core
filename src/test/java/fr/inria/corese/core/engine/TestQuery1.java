@@ -2142,6 +2142,7 @@ public class TestQuery1 {
         assertEquals(55, dt.intValue());
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testGName() throws LoadException, EngineException {
         Graph gg = Graph.create();
@@ -2158,6 +2159,7 @@ public class TestQuery1 {
         IDatatype v2 = map.getValue("?b2");
         assertEquals(true, v1.intValue() == 10 && v2.intValue() == 20);
     }
+    */
 
     @Test
     public void testGName2() throws LoadException, EngineException {
@@ -3722,6 +3724,7 @@ public class TestQuery1 {
         assertEquals(0, dt2.intValue());
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testContext2() throws EngineException {
         Graph g = GraphStore.create();
@@ -3743,7 +3746,9 @@ public class TestQuery1 {
         assertEquals(10, val.intValue());
         assertEquals(true, map.getQuery().getTransformer() == null);
     }
+    */
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testContext() throws EngineException {
         Graph g = GraphStore.create();
@@ -3764,6 +3769,7 @@ public class TestQuery1 {
         IDatatype val = c.getName("test");
         assertEquals(10, val.intValue());
     }
+    */
 
     // loop return concat of results of body of loop
 
@@ -3968,6 +3974,7 @@ public class TestQuery1 {
         assertEquals("John", dt.stringValue());
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testNSMUnnest() throws EngineException {
         Graph g = GraphStore.create();
@@ -3995,6 +4002,7 @@ public class TestQuery1 {
         Mappings map = exec.query(q);
         assertEquals(1, map.size());
     }
+    */
 
     @Test
     public void testQueryUnnest() throws EngineException {
@@ -4043,6 +4051,7 @@ public class TestQuery1 {
         assertEquals(2, map.size());
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testUnnestNSM() throws EngineException {
         Graph g = GraphStore.create();
@@ -4067,6 +4076,7 @@ public class TestQuery1 {
         // assertEquals("ex", p.stringValue());
         // assertEquals("htp://example.org/", n.stringValue());
     }
+    */
 
     @Test
     public void testExtNode() throws EngineException {
@@ -5179,6 +5189,7 @@ public class TestQuery1 {
         assertEquals(3, dt2.intValue());
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testFuture() throws EngineException {
         Graph g = createGraph();
@@ -5194,8 +5205,8 @@ public class TestQuery1 {
         Mappings map = exec.query(q);
         String str = map.getTemplateStringResult();
         assertEquals(true, str.contains("8 : 1"));
-
     }
+    */
 
     public void testCal2() throws EngineException, LoadException {
         Graph g = createGraph();
