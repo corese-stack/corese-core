@@ -273,7 +273,7 @@ public class QueryEngine implements Engine {
             complete(q);
         }
     }
-*/
+    */
 
     void complete(Query q) {
         q.setTransformationTemplate(true);
