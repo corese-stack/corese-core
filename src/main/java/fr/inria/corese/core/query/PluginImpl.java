@@ -103,13 +103,9 @@ public class PluginImpl
 
     MatcherImpl match;
     int index = 0;
-    // Plugin for Transformer functions
-    private PluginTransform pt;
+    public PluginImpl() {  }
 
-    public PluginImpl() {
-        init();
-    }
-
+ 
     PluginImpl(Matcher m) {
         this();
         if (m instanceof MatcherImpl) {
@@ -121,9 +117,6 @@ public class PluginImpl
         return new PluginImpl(m);
     }
 
-    void init() {
-        pt = new PluginTransform(this);    }
-
     @Override
     public void setMode(Evaluator.Mode mode) {
         // TODO document why this method is empty
@@ -132,11 +125,6 @@ public class PluginImpl
     @Override
     public void start(Producer p, Environment env) {
         setMethodHandler(p, env);
-    }
-
-    @Override
-    public PluginTransform getComputerTransform() {
-        return pt;
     }
 
     /**
@@ -236,7 +224,7 @@ public class PluginImpl
     // function st:format
     @Override
     public IDatatype format(IDatatype[] ldt) {
-        return getPluginTransform().format(ldt);
+        return null; //getPluginTransform().format(ldt);
     }
 
     // function xt:depth
@@ -488,10 +476,6 @@ public class PluginImpl
         ResultFormat ft = ResultFormat.create(g, syntax.getLabel());
         String str = (node == null) ? ft.toString() : ft.toString(node);
         return DatatypeMap.newInstance(str);
-    }
-
-    public PluginTransform getPluginTransform() {
-        return pt;
     }
 
     // function st:index
