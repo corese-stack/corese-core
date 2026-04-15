@@ -17,6 +17,12 @@ import java.util.List;
  * The WHERE clause is built by {@link BgpFeature} (enter/exit GroupGraphPattern, TriplesBlock, addTriple).
  * At {@link SparqlAstBuilder#getResult()}, the builder produces a {@link fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst}
  * with both {@link fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst} and the WHERE group.
+ * <p>
+ * Grammar {@code subSelect} (nested {@code SELECT} in a group) uses the same {@link SparqlAstBuilder} stack frames as a top-level SELECT.
+ * <p>
+ * SPARQL 1.1: only {@code SELECT} may appear as a subquery inside {@code { ... }} ({@code subSelect} rule).
+ * Top-level {@code query} may be {@code SELECT}, {@code ASK}, {@code CONSTRUCT}, or {@code DESCRIBE}.
+ * Nested {@code subSelect} uses the same {@link SparqlAstBuilder} stack frames as a top-level {@code SELECT}.
  */
 public class SelectQueryFeature extends AbstractSparqlFeature {
 
@@ -27,11 +33,11 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
     @Override
     public void enterSelectQuery(SparqlParser.SelectQueryContext ctx) {
         builder().enterSelectQuery();
+        SparqlParser.SelectClauseContext selectClause = ctx.selectClause();
+        if (selectClause.DISTINCT() != null) { builder().setDistinct(true); }
+        if (selectClause.REDUCED() != null) { builder().setReduced(true); }
 
-        if (ctx.DISTINCT() != null) { builder().setDistinct(true); }
-        if (ctx.REDUCED() != null) { builder().setReduced(true); }
-
-        extractProjection(ctx);
+        extractProjection(selectClause);
     }
 
     @Override
@@ -39,18 +45,38 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
         builder().exitSelectQuery();
     }
 
+    @Override
+    public void enterSubSelect(SparqlParser.SubSelectContext ctx) {
+        builder().enterSelectQuery();
+        SparqlParser.SelectClauseContext selectClause = ctx.selectClause();
+        if (selectClause.DISTINCT() != null) {
+            builder().setDistinct(true);
+        }
+        if (selectClause.REDUCED() != null) {
+            builder().setReduced(true);
+        }
+        extractProjection(selectClause);
+    }
+
+    @Override
+    public void exitSubSelect(SparqlParser.SubSelectContext ctx) {
+        builder().exitSelectQuery();
+    }
+
     /**
      * Extracts SELECT * or SELECT ?v1 ?v2 ... from the parse context.
      * Grammar: {@code SELECT (DISTINCT | REDUCED)? (var_+ | '*') ...}
      */
-    private void extractProjection(SparqlParser.SelectQueryContext ctx) {
+    private void extractProjection(SparqlParser.SelectClauseContext ctx) {
         if (ctx.STAR() != null) {
             builder().setProjectionAll();
             return;
         }
         List<String> vars = new ArrayList<>();
-        for (SparqlParser.Var_Context varCtx : ctx.var_()) {
-            vars.add(varCtx.getText());
+        for (SparqlParser.SelectVarContext selectVar : ctx.selectVar()) {
+            if (selectVar.var_() != null) {
+                vars.add(selectVar.var_().getText());
+            }
         }
         builder().setProjectionVariables(vars);
     }

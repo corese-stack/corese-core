@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.data.impl.common.util;
 
+import fr.inria.corese.core.next.data.impl.io.parser.util.ParserConstants;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
@@ -27,6 +29,13 @@ public class IRIUtils {
             "(?<fragment>[\\w\\-_]+)?" + // line1
             "$"
     );
+    private static final Pattern ABSOLUTE_IRI_PATTERN = Pattern.compile("^(?<root>(" +
+            "?<protocol>[\\w\\-]+)" +
+            ":(\\/\\/)?" +
+            "(?<path>([\\S\\-\\._\\:]+[\\/\\.\\:\\@\\-])?)+" +
+            "(?<query>\\?[\\S\\-\\\"\\'_\\:\\?\\=]+)?)" +
+            "(?<fragment>[\\S\\-_]+)?" +
+            "$");
     private static final Pattern STANDARD_IRI_PATTERN = Pattern.compile("^(([^:/?#\\s]+):)(\\/\\/([^/?#\\s]*))?([^?#\\s]*)(\\?([^#\\s]*))?(#(.*))?");
     private static final int MAX_IRI_LENGTH = 2048;
     private static final long REGEX_TIMEOUT_MS = 100;
@@ -113,6 +122,20 @@ public class IRIUtils {
         } catch (IllegalStateException e) {
             return "";
         }
+    }
+
+    /**
+     * Detects if an IRI is absolute according to the REGEX given in the recommendation RFC3987
+     * @param iri any uri (expecting to be the content between &lt; and &gt;)
+     * @return true if it is compliant with RFC3987. May accept the prefixed for of uri, as there is no way to
+     * distinguish a prefix from a protocol
+     */
+    public static boolean isAbsoluteIRI(String iri) {
+        Matcher matcher = matchWithTimeout(ABSOLUTE_IRI_PATTERN, iri);
+        if (matcher == null || !matcher.matches()) {
+            return false;
+        }
+        return matcher.matches();
     }
 
     /**
@@ -260,79 +283,276 @@ public class IRIUtils {
         };
     }
 
-    /**
-     * Returns a human-readable description of a character for error messages.
-     *
-     * @param c the character to describe
-     * @return human-readable description
-     */
-    public static String getCharacterDescription(char c) {
-        switch (c) {
-            case 0x00:
-                return "null character";
-            case 0x09:
-                return "tab";
-            case 0x0A:
-                return "line feed";
-            case 0x0D:
-                return "carriage return";
-            case 0x20:
-                return "space";
-            case 0x7F:
-                return "delete";
-            case '<':
-                return "less than";
-            case '>':
-                return "greater than";
-            case '{':
-                return "left curly bracket";
-            case '}':
-                return "right curly bracket";
-            case '\\':
-                return "backslash";
-            case '^':
-                return "circumflex";
-            case '`':
-                return "grave accent";
-            case '|':
-                return "pipe";
-            case '"':
-                return "quotation mark";
-            default:
-                if (c < 0x20) {
-                    return "control character";
-                } else if (c >= 0x80 && c <= 0x9F) {
-                    return "high control character";
+    public static String resolveIRIAgainstBase(String baseIri, String relativePath) {
+
+        if (relativePath.isEmpty()) {
+            return baseIri;
+        }
+
+        try {
+            URI baseUri = new URI(baseIri);
+            String baseScheme = baseUri.getScheme();
+            String baseAuthority = baseUri.getAuthority();
+            String basePath = baseUri.getPath();
+            String baseQuery = baseUri.getQuery();
+
+            String[] refParts = parseReference(relativePath);
+            String refScheme = refParts[0];
+            String refAuthority = refParts[1];
+            String refPath = refParts[2];
+            String refQuery = refParts[3];
+            String refFragment = refParts[4];
+
+            String targetScheme, targetAuthority, targetPath, targetQuery, targetFragment;
+
+            // RFC 3986 Section 5.2.2 - Reference Resolution Algorithm
+            if (refScheme != null) {
+                targetScheme = refScheme;
+                targetAuthority = refAuthority;
+                targetPath = removeDotSegments(refPath);
+                targetQuery = refQuery;
+            } else {
+                if (refAuthority != null) {
+                    targetScheme = baseScheme;
+                    targetAuthority = refAuthority;
+                    targetPath = removeDotSegments(refPath);
+                    targetQuery = refQuery;
                 } else {
-                    return String.format("character '%c'", c);
+                    targetScheme = baseScheme;
+                    targetAuthority = baseAuthority;
+                    if (refPath.isEmpty()) {
+                        targetPath = basePath;
+                        targetQuery = refQuery != null ? refQuery : baseQuery;
+                    } else {
+                        if (refPath.startsWith(ParserConstants.SLASH)) {
+                            targetPath = removeDotSegments(refPath);
+                        } else {
+                            targetPath = removeDotSegments(mergePaths(basePath, refPath));
+                        }
+                        targetQuery = refQuery;
+                    }
                 }
+            }
+            targetFragment = refFragment;
+
+            return buildURI(targetScheme, targetAuthority, targetPath, targetQuery, targetFragment);
+
+        } catch (URISyntaxException e) {
+            return performSimpleFallback(baseIri, relativePath);
         }
     }
 
     /**
-     * Escapes characters in a string for display in error messages.
+     * Constructs a URI from its components.
      *
-     * @param iri the IRI to escape for display
-     * @return escaped version suitable for error messages
+     * @param scheme    URI scheme (e.g., "http", "file")
+     * @param authority authority component (host, port, userinfo)
+     * @param path      path component
+     * @param query     query component
+     * @param fragment  fragment identifier
+     * @return normalized URI string
      */
-    public static String escapeForDisplay(String iri) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < iri.length(); i++) {
-            char c = iri.charAt(i);
-            if (c < 0x20 || (c >= 0x7F && c <= 0x9F)) {
-                // Display control characters as Unicode escapes
-                sb.append(String.format("\\u%04X", (int) c));
-            } else if (c > 0x7E) {
-                // Display non-ASCII as Unicode escapes for clarity
-                sb.append(String.format("\\u%04X", (int) c));
-            } else if (c == '<' || c == '>' || c == '{' || c == '}' || c == '\\' || c == '^' || c == '`' || c == '|' || c == '"') {
-                // Display reserved characters with backslash escape
-                sb.append('\\').append(c);
+    private static  String buildURI(String scheme, String authority, String path, String query, String fragment) {
+        StringBuilder result = new StringBuilder();
+        if (scheme != null) {
+            result.append(scheme).append(ParserConstants.COLON);
+        }
+        if (authority != null) {
+            result.append(ParserConstants.DOUBLE_SLASH).append(authority);
+        }
+        if (path != null) {
+            result.append(path);
+        }
+        if (query != null) {
+            result.append(ParserConstants.QUERY_MARK).append(query);
+        }
+        if (fragment != null) {
+            result.append(ParserConstants.HASH).append(fragment);
+        }
+        return normalizeURI(result.toString());
+    }
+
+    /**
+     * Parses a URI reference into its five components.
+     *
+     * @param ref URI reference to parse
+     * @return array containing [scheme, authority, path, query, fragment]
+     */
+    private static String[] parseReference(String ref) {
+        String[] parts = new String[5];
+        String remaining = ref;
+
+        int fragmentIndex = remaining.indexOf('#');
+        if (fragmentIndex >= 0) {
+            parts[4] = remaining.substring(fragmentIndex + 1);
+            remaining = remaining.substring(0, fragmentIndex);
+        }
+
+        int queryIndex = remaining.indexOf('?');
+        if (queryIndex >= 0) {
+            parts[3] = remaining.substring(queryIndex + 1);
+            remaining = remaining.substring(0, queryIndex);
+        }
+
+        int colonIndex = remaining.indexOf(':');
+        if (colonIndex > 0 && isValidScheme(remaining.substring(0, colonIndex))) {
+            parts[0] = remaining.substring(0, colonIndex);
+            remaining = remaining.substring(colonIndex + 1);
+        }
+
+        if (remaining.startsWith(ParserConstants.DOUBLE_SLASH)) {
+            int authorityEnd = remaining.indexOf('/', 2);
+            if (authorityEnd < 0) {
+                authorityEnd = remaining.length();
+            }
+            parts[1] = remaining.substring(2, authorityEnd);
+            remaining = remaining.substring(authorityEnd);
+        }
+
+        parts[2] = remaining;
+        return parts;
+    }
+
+    /**
+     * Merges a base path with a relative path.
+     *
+     * @param basePath base path from base URI
+     * @param refPath  relative path from reference
+     * @return merged path
+     */
+    private static String mergePaths(String basePath, String refPath) {
+        if (basePath == null || basePath.isEmpty()) {
+            return ParserConstants.SLASH + refPath;
+        }
+        int lastSlash = basePath.lastIndexOf('/');
+        return lastSlash >= 0 ? basePath.substring(0, lastSlash + 1) + refPath : refPath;
+    }
+
+    /**
+     * Removes dot segments from a path (RFC 3986 Section 5.2.4).
+     * Processes ".." and "." segments according to the normalization algorithm.
+     *
+     * @param path path to normalize
+     * @return normalized path without dot segments
+     */
+    private static String removeDotSegments(String path) {
+        if (path == null || path.isEmpty()) {
+            return ParserConstants.EMPTY_STRING;
+        }
+
+        String input = path;
+        StringBuilder output = new StringBuilder();
+
+        while (!input.isEmpty()) {
+            if (input.startsWith(ParserConstants.DOUBLE_DOT + ParserConstants.SLASH)) {
+                input = input.substring(3);
+            } else if (input.startsWith(ParserConstants.DOT + ParserConstants.SLASH)) {
+                input = input.substring(2);
+            } else if (input.startsWith(ParserConstants.SLASH + ParserConstants.DOT + ParserConstants.SLASH)) {
+                input = ParserConstants.SLASH + input.substring(3);
+            } else if (input.equals(ParserConstants.SLASH + ParserConstants.DOT)) {
+                input = ParserConstants.SLASH;
+            } else if (input.startsWith(ParserConstants.SLASH + ParserConstants.DOUBLE_DOT + ParserConstants.SLASH)) {
+                input = ParserConstants.SLASH + input.substring(4);
+                removeLastSegment(output);
+            } else if (input.equals(ParserConstants.SLASH + ParserConstants.DOUBLE_DOT)) {
+                input = ParserConstants.SLASH;
+                removeLastSegment(output);
+            } else if (input.equals(ParserConstants.POINT) || input.equals(ParserConstants.DOUBLE_DOT)) {
+                input = ParserConstants.EMPTY_STRING;
             } else {
-                // Display normal ASCII characters as-is
-                sb.append(c);
+                int nextSlash;
+                if (input.startsWith(ParserConstants.SLASH)) {
+                    nextSlash = input.indexOf(ParserConstants.SLASH, 1);
+                    if (nextSlash >= 0) {
+                        output.append(input, 0, nextSlash);
+                        input = input.substring(nextSlash);
+                    } else {
+                        output.append(input);
+                        input = ParserConstants.EMPTY_STRING;
+                    }
+                } else {
+                    nextSlash = input.indexOf(ParserConstants.SLASH);
+                    if (nextSlash >= 0) {
+                        output.append(input, 0, nextSlash);
+                        input = input.substring(nextSlash);
+                    } else {
+                        output.append(input);
+                        input = ParserConstants.EMPTY_STRING;
+                    }
+                }
             }
         }
-        return sb.toString();
+
+        return output.toString();
     }
+
+    /**
+     * Removes the last path segment from the output buffer.
+     * Used during dot segment removal when processing ".." segments.
+     *
+     * @param output string builder containing the path being constructed
+     */
+    private static void removeLastSegment(StringBuilder output) {
+        String outputStr = output.toString();
+        int lastSlash = outputStr.lastIndexOf(ParserConstants.SLASH);
+        output.setLength(Math.max(lastSlash, 0));
+    }
+
+    /**
+     * Provides a fallback resolution mechanism when RFC 3986 parsing fails.
+     *
+     * @param base     base URI
+     * @param relative relative IRI reference
+     * @return resolved IRI using simple concatenation rules
+     */
+    private static String performSimpleFallback(String base, String relative) {
+        if (relative.isEmpty()) {
+            return base;
+        }
+        if (base.endsWith(ParserConstants.SLASH)) {
+            return base + relative;
+        }
+        int lastSlash = base.lastIndexOf('/');
+        return lastSlash >= 0 ? base.substring(0, lastSlash + 1) + relative : base + ParserConstants.SLASH + relative;
+    }
+
+    /**
+     * Normalizes URI strings, ensuring proper format for file:// URIs.
+     *
+     * @param uri URI to normalize
+     * @return normalized URI string
+     */
+    public static String normalizeURI(String uri) {
+        if (uri == null) {
+            return null;
+        }
+        if (uri.startsWith(ParserConstants.FILE_PROTOCOL_SIMPLE) && !uri.startsWith(ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH)) {
+            if (!uri.startsWith(ParserConstants.FILE_PROTOCOL)) {
+                uri = uri.replace(ParserConstants.FILE_PROTOCOL_SIMPLE, ParserConstants.FILE_PROTOCOL_TRIPLE_SLASH);
+            }
+        }
+        return uri;
+    }
+
+    /**
+     * Validates a URI scheme according to RFC 3986.
+     * A valid scheme must start with a letter and contain only letters, digits, '+', '-', or '.'.
+     *
+     * @param scheme scheme to validate
+     * @return true if the scheme is valid, false otherwise
+     */
+    public static boolean isValidScheme(String scheme) {
+        if (scheme == null || scheme.isEmpty() || !Character.isLetter(scheme.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < scheme.length(); i++) {
+            char c = scheme.charAt(i);
+            if (!Character.isLetterOrDigit(c) && c != '+' && c != '-' && c != '.') {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

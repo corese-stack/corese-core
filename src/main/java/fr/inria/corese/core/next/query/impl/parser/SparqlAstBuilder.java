@@ -4,11 +4,12 @@ import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
 
 import java.util.*;
 
@@ -41,6 +42,11 @@ public final class SparqlAstBuilder {
     // --- Internal stacks (scopes) ---
 
     /**
+     * Stack of currently open SELECT queries (top-level SELECT and nested SELECT subqueries).
+     */
+    private final Deque<SelectFrame> selectStack = new ArrayDeque<>();
+
+    /**
      * Stack of groups; each group is a list of patterns (BgpAst now, later OptionalAst/UnionAst/...)
      */
     private final Deque<List<PatternAst>> groupStack = new ArrayDeque<>();
@@ -54,6 +60,38 @@ public final class SparqlAstBuilder {
      * At enterOptional(), we push groupStack.size(). At exitGroup(), if groupStack.size() equals peek, we wrap in OptionalAst.
      */
     private final Deque<Integer> optionalGroupDepths = new ArrayDeque<>();
+
+    /**
+     * At enterExistsFunc()/enterNotExistsFunc(), we push groupStack.size().
+     * At exitGroup(), if groupStack.size() equals peek, we capture in capturedExistsPattern.
+     */
+    private final Deque<Integer> existsGroupDepths = new ArrayDeque<>();
+
+    /**
+     * When true, the next {@link #enterGroup()} opens the {@code groupGraphPattern} of a
+     * {@code whereClause} for the innermost active {@link SelectFrame}. On matching
+     * {@link #exitGroup()}, that group is stored as {@link SelectFrame#whereClause} instead of
+     * being appended to the enclosing graph group (required when outer WHERE groups are still open,
+     * e.g. subqueries {@code { SELECT ... WHERE { ... }}}).
+     */
+    private boolean selectWhereGroupFollows;
+
+    /**
+     * Depths ({@code groupStack.size()} after push) of SELECT WHERE groups still to be closed,
+     * innermost last. Matched on {@link #exitGroup()} while {@link #hasCurrentSelect()}.
+     */
+    private final Deque<Integer> selectWhereGroupDepths = new ArrayDeque<>();
+
+    /**
+     * Captured GroupGraphPattern for the last closed EXISTS/NOT EXISTS block.
+     * Consumed by termFromBuiltInCall via popCapturedExistsPattern().
+     */
+    private final Deque<GroupGraphPatternAst> capturedExistsStack = new ArrayDeque<>();
+
+    /**
+     * Final query AST result, set when the top-level SELECT finishes.
+     */
+    private QueryAst selectQueryResult;
 
     /**
      * Top-level WHERE clause, set when the root group is closed in exitGroup().
@@ -87,6 +125,19 @@ public final class SparqlAstBuilder {
     private final List<OrderConditionAst> orderConditions = new ArrayList<>();
 
     /**
+     * Per-SELECT frame used to support nested SELECT subqueries.
+     */
+    private static final class SelectFrame {
+        private GroupGraphPatternAst whereClause;
+        private ProjectionAst projection = ProjectionAsts.selectAll();
+        private boolean distinct;
+        private boolean reduced;
+        private Long limit;
+        private Long offset;
+        private final List<OrderConditionAst> orderConditions = new ArrayList<>();
+    }
+
+    /**
      * Parser options (e.g. for future use: strict mode, base IRI).
      */
     private final SparqlParserOptions options;
@@ -112,13 +163,46 @@ public final class SparqlAstBuilder {
      */
     private ConstructTemplateAst constructTemplate;
 
+    /**
+     * Used for BIND scope checks (variable must not already be visible in the same group).
+     */
+    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
+
+    /**
+     * Effective base URI after prologue (parser options, then possibly {@code BASE}).
+     */
+    private String baseUri;
+    /**
+     * Prefix declarations in source order (including redeclarations).
+     */
+    private final List<PrefixDeclarationAst> prefixDeclarations = new ArrayList<>();
+
     public SparqlAstBuilder(SparqlParserOptions options) {
         this.options = options;
+        this.baseUri = options.getBaseIRI();
     }
 
     // --- Construction entry points (called by listener) ---
 
+    public void setBaseUri(String uri) {
+        if(this.baseUri != null && !this.baseUri.equals(options.getBaseIRI())) {
+            throw new QuerySyntaxException("Base URI already set, multiple BASE declarations are forbidden.");
+        }
+        this.baseUri = uri;
+    }
+
+    public void addPrefix(String prefix, String uri) {
+        PrefixDeclarationAst declarationAst = new PrefixDeclarationAst(prefix, new IriAst(uri));
+        if(this.prefixDeclarations.stream().anyMatch(declaration ->
+                 Objects.equals(declaration.prefix(), declarationAst.prefix())
+            )) {
+            throw new QuerySyntaxException("Prefix " + prefix + " has already been declared");
+        }
+        this.prefixDeclarations.add(declarationAst);
+    }
+
     public void enterAskQuery() {
+        assertTopLevelQueryFormOnly("ASK");
         queryType = ASTConstants.QUERY_TYPE.ASK;
     }
 
@@ -126,13 +210,57 @@ public final class SparqlAstBuilder {
     }
 
     public void enterSelectQuery() {
-        queryType = ASTConstants.QUERY_TYPE.SELECT;
+        if (this.queryType == ASTConstants.QUERY_TYPE.UNDEFINED) {
+            this.queryType = ASTConstants.QUERY_TYPE.SELECT;
+        }
+        selectStack.push(new SelectFrame());
     }
 
     public void exitSelectQuery() {
+        SelectFrame frame = selectStack.pop();
+
+        if (frame.whereClause == null) {
+            throw new IllegalStateException("No WHERE clause for SELECT query");
+        }
+
+        // SELECT projection / ORDER BY scope: reported by SparqlQuerySemanticValidator (validate() collects all diagnostics).
+
+        /*
+         * Top-level SELECT keeps the dataset clause declared at query level.
+         * Nested SELECT subqueries use an empty dataset clause for now.
+         *
+         * Prologue is inherited from the enclosing query source context.
+         */
+        DatasetClauseAst datasetClauseAst = hasCurrentGroup()
+                ? DatasetClauseAst.none()
+                : new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
+
+        QueryPrologueAst prologueAst = new QueryPrologueAst(
+                List.copyOf(prefixDeclarations),
+                new IriAst(baseUri)
+        );
+
+        SelectQueryAst selectQueryAst = new SelectQueryAst(
+                frame.projection,
+                datasetClauseAst,
+                frame.whereClause,
+                buildSolutionModifier(frame),
+                prologueAst
+        );
+
+        /*
+         * If we are still inside a parent group, this SELECT is a subquery.
+         * Otherwise it is the top-level SELECT result.
+         */
+        if (hasCurrentGroup()) {
+            currentGroup().add(new SubQueryAst(selectQueryAst));
+        } else {
+            selectQueryResult = selectQueryAst;
+        }
     }
 
     public void enterConstructQuery() {
+        assertTopLevelQueryFormOnly("CONSTRUCT");
         queryType = ASTConstants.QUERY_TYPE.CONSTRUCT;
         constructTemplate = null;
         constructTriples.clear();
@@ -160,6 +288,9 @@ public final class SparqlAstBuilder {
      * Sets SELECT * (project all variables from the body).
      */
     public void setProjectionAll() {
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().projection = ProjectionAsts.selectAll();
+        }
         this.projection = ProjectionAsts.selectAll();
     }
 
@@ -176,28 +307,46 @@ public final class SparqlAstBuilder {
                 .filter(s -> !s.isBlank())
                 .map(VarAst::new)
                 .toList();
-        this.projection = vars.isEmpty() ? ProjectionAsts.selectAll() : ProjectionAsts.of(vars);
+
+        ProjectionAst newProjection = vars.isEmpty()
+                ? ProjectionAsts.selectAll()
+                :ProjectionAsts.of(vars);
+
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().projection = newProjection;
+        }
+        else this.projection = newProjection;
     }
 
     /**
      * Sets the projection from an existing AST.
      */
     public void setProjection(ProjectionAst projection) {
-        this.projection = projection != null ? projection : ProjectionAsts.selectAll();
+        ProjectionAst effectiveProjection = projection != null ? projection : ProjectionAsts.selectAll();
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().projection = effectiveProjection;
+        }
+        else this.projection = effectiveProjection;
     }
 
     /**
      * Sets SELECT DISTINCT. Called by SelectQueryFeature when {@code DISTINCT} is present.
      */
     public void setDistinct(boolean distinct) {
-        this.distinct = distinct;
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().distinct = distinct;
+        }
+        else this.distinct = distinct;
     }
 
     /**
      * Sets SELECT REDUCED. Called by SelectQueryFeature when {@code REDUCED} is present.
      */
     public void setReduced(boolean reduced) {
-        this.reduced = reduced;
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().reduced = reduced;
+        }
+        else this.reduced = reduced;
     }
 
     public void addFromGraph(IriAst graph) {
@@ -211,19 +360,64 @@ public final class SparqlAstBuilder {
     /**
      * Sets the LIMIT for pagination
      *
-     * @param limit
      */
     public void setLimit(long limit) {
-        this.limit = limit;
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().limit = limit;
+        }
+        else  this.limit = limit;
     }
 
     /**
      * Sets the OFFSET for pagination
      *
-     * @param offset
      */
     public void setOffset(long offset) {
-        this.offset = offset;
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().offset = offset;
+        }
+        else this.offset = offset;
+    }
+
+    /**
+     * ASK, CONSTRUCT and DESCRIBE may only appear as the root {@code query} in {@code queryUnit}.
+     * Nested graph patterns use {@code subSelect} (SELECT only) per SPARQL 1.1; the grammar enforces this,
+     * but we guard against inconsistent listener wiring.
+     */
+    private void assertTopLevelQueryFormOnly(String queryForm) {
+        if (!groupStack.isEmpty() || !selectStack.isEmpty()) {
+            throw new QuerySyntaxException(
+                    queryForm + " is only allowed as the top-level query form. "
+                            + "Inside { ... }, SPArQL only allows SELECT subqueries.");
+        }
+    }
+
+    /**
+     * Check current select stack
+     */
+    private boolean hasCurrentSelect() {
+        return !selectStack.isEmpty();
+    }
+
+    /**
+     * Peek current select stack
+     */
+    private SelectFrame getCurrentSelectFrame() {
+        if (selectStack.isEmpty()) {
+            throw new IllegalStateException("No Current SELECT frame");
+        }
+        return selectStack.peek();
+    }
+
+    /**
+     * Called when the parser enters a {@code whereClause} (SELECT / sub-SELECT / any query with WHERE).
+     * The following {@link #enterGroup()} for that clause must attach to the current {@link SelectFrame}
+     * when one is active.
+     */
+    public void enterWhereClause() {
+        if (hasCurrentSelect()) {
+            selectWhereGroupFollows = true;
+        }
     }
 
     /**
@@ -231,6 +425,12 @@ public final class SparqlAstBuilder {
      */
     public void enterGroup() {
         groupStack.push(new ArrayList<>());
+        if (selectWhereGroupFollows && hasCurrentSelect()) {
+            selectWhereGroupDepths.push(groupStack.size());
+            selectWhereGroupFollows = false;
+        } else {
+            selectWhereGroupFollows = false;
+        }
     }
 
     /**
@@ -242,13 +442,29 @@ public final class SparqlAstBuilder {
      */
     public void exitGroup() {
         ensureNoOpenBgp();
+        int depthBeforePop = groupStack.size();
+
+        if (!selectWhereGroupDepths.isEmpty()
+                && hasCurrentSelect()
+                && depthBeforePop == selectWhereGroupDepths.peek()) {
+            selectWhereGroupDepths.pop();
+            List<PatternAst> popped = groupStack.pop();
+            getCurrentSelectFrame().whereClause = new GroupGraphPatternAst(popped);
+            return;
+        }
+
         List<PatternAst> popped = groupStack.pop();
         GroupGraphPatternAst group = new GroupGraphPatternAst(popped);
+
         if (!optionalGroupDepths.isEmpty() && groupStack.size() == optionalGroupDepths.peek()) {
             optionalGroupDepths.pop();
             currentGroup().add(new OptionalAst(group));
+        } else if (!existsGroupDepths.isEmpty() && groupStack.size() == existsGroupDepths.peek()) {
+            existsGroupDepths.pop();
+            capturedExistsStack.push(group);
         } else if (groupStack.isEmpty()) {
-            whereClause = group;
+            if (hasCurrentSelect()) getCurrentSelectFrame().whereClause = group;
+            else whereClause = group;
         } else {
             currentGroup().add(group);
         }
@@ -297,6 +513,31 @@ public final class SparqlAstBuilder {
         }
     }
 
+    /**
+     * Adds {@code BIND(expression AS ?var)} to the current group. The variable must not already be
+     * visible from earlier patterns in the same group (SPARQL 1.1 scoping).
+     */
+    public void addBind(BindAst bind) {
+        if (bind == null) {
+            throw new IllegalArgumentException("bind is null");
+        }
+        if (!hasCurrentGroup()) {
+            throw new IllegalStateException("addBind() called outside of a group graph pattern");
+        }
+        List<PatternAst> group = currentGroup();
+        Set<String> visibleSoFar = new LinkedHashSet<>();
+        for (PatternAst prior : group) {
+            visibleSoFar.addAll(
+                    variableScopeAnalyzer.collectVisibleVariables(new GroupGraphPatternAst(List.of(prior))));
+        }
+        String name = bind.variable().name();
+        if (visibleSoFar.contains(name)) {
+            throw new QueryValidationException(
+                    "Variable ?" + name + " used in BIND is already declared in the same group graph pattern");
+        }
+        group.add(bind);
+    }
+
     // --- Optional ---
 
     /**
@@ -313,6 +554,30 @@ public final class SparqlAstBuilder {
     public void exitOptional() {
     }
 
+
+    /**
+     * Enter EXISTS scope. Records current group stack size so that when we exitGroup() and the stack
+     * is back to that size.
+     */
+    public void enterExistsFunc() {
+        existsGroupDepths.push(groupStack.size());
+    }
+
+    /**
+     * Enter NOT EXISTS scope. Same mechanism as EXISTS.
+     */
+    public void enterNotExistsFunc() {
+        existsGroupDepths.push(groupStack.size());
+    }
+
+    /**
+     * Pops the captured GroupGraphPattern from the last closed EXISTS/NOT EXISTS block.
+     * Called by {@link #termFromBuiltInCall} after the listener has closed the group.
+     */
+    public GroupGraphPatternAst popCapturedExistsPattern() {
+        return capturedExistsStack.pollFirst();
+    }
+
     // --- Result ---
 
     /**
@@ -325,19 +590,18 @@ public final class SparqlAstBuilder {
      * @throws IllegalStateException    if no WHERE clause was set (exitGroup() not called for root) or unhandled query type
      */
     public QueryAst getResult() {
+        if (selectQueryResult != null) return selectQueryResult;
+
         if (whereClause == null) {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
+        QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
         return switch (this.queryType) {
-            case DESCRIBE -> new DescribeQueryAst(datasetClauseAst, describeResources, whereClause);
-            case CONSTRUCT -> new ConstructQueryAst(
-                    constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
-                    datasetClauseAst,
-                    whereClause,
-                    buildSolutionModifier());
-            case ASK -> new AskQueryAst(datasetClauseAst, whereClause);
-            case SELECT -> new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier());
+            case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst);
+            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst);
+            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst);
+            case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst);
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
@@ -366,6 +630,56 @@ public final class SparqlAstBuilder {
                     "exitGroup() called while a TriplesBlock/BGP is still open" +
                             " (open bgpStack depth=" + bgpStack.size() + ")");
         }
+    }
+
+    /**
+     * Builds the AST for ASK queries.
+     */
+    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+        return new AskQueryAst(datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
+    }
+
+    /**
+     * Builds the AST for SELECT queries.
+     */
+    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+        if (hasCurrentSelect()) {
+            SelectFrame frame = getCurrentSelectFrame();
+            return new SelectQueryAst(
+                    frame.projection,
+                    datasetClauseAst,
+                    frame.whereClause,
+                    buildSolutionModifier(frame),
+                    prologue
+            );
+        }
+        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
+    }
+
+    /**
+     * Builds the AST for DESCRIBE queries.
+     */
+    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+        // TODO #306: validate variable scope for DESCRIBE modifiers when DescribeQueryAst carries them.
+        return new DescribeQueryAst(
+                datasetClauseAst,
+                describeResources,
+                whereClause,
+                buildSolutionModifier(),
+                prologue);
+    }
+
+    /**
+     * Builds the AST for CONSTRUCT queries.
+     */
+    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+        // TODO #306: validate variable scope for CONSTRUCT modifiers when ConstructQueryAst carries them.
+        return new ConstructQueryAst(
+                constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
+                datasetClauseAst,
+                whereClause,
+                buildSolutionModifier(),
+                prologue);
     }
 
     /**
@@ -430,8 +744,18 @@ public final class SparqlAstBuilder {
         return new SolutionModifierAst(distinct, reduced, this.orderConditions, limit, offset);
     }
 
+    /**
+     * Builds solution modifiers for the current SELECT frame.
+     */
+    private SolutionModifierAst buildSolutionModifier(SelectFrame frame) {
+        return new SolutionModifierAst(frame.distinct, frame.reduced, frame.orderConditions, frame.limit, frame.offset);
+    }
+
     public boolean isOrdered() {
-        return ! this.orderConditions.isEmpty();
+        if (hasCurrentSelect()) {
+            return !getCurrentSelectFrame().orderConditions.isEmpty();
+        }
+        return !this.orderConditions.isEmpty();
     }
 
     /**
@@ -439,7 +763,10 @@ public final class SparqlAstBuilder {
      * @param expr either a variable or a contraint
      */
     public void addOrderExpression(ASTConstants.OrderDirection direction, TermAst expr) {
-        this.orderConditions.add(new OrderConditionAst(direction, expr));
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().orderConditions.add(new OrderConditionAst(direction, expr));
+        }
+        else this.orderConditions.add(new OrderConditionAst(direction, expr));
     }
 
     /**
@@ -447,6 +774,7 @@ public final class SparqlAstBuilder {
      * Sets the internal query type to {@link ASTConstants.QUERY_TYPE#DESCRIBE}.
      */
     public void enterDescribeQuery() {
+        assertTopLevelQueryFormOnly("DESCRIBE");
         queryType = ASTConstants.QUERY_TYPE.DESCRIBE;
     }
 
@@ -608,7 +936,7 @@ public final class SparqlAstBuilder {
 
     public TermAst termFromVerb(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VerbContext ctx) {
         if (ctx.A() != null) return this.iri("a");
-        return termFromVarOrIriRef(ctx.varOrIRIref());
+        return termFromVarOrIriRef(ctx.varOrIri());
     }
 
     public TermAst termFromVarOrTerm(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VarOrTermContext ctx) {
@@ -616,7 +944,7 @@ public final class SparqlAstBuilder {
         return termFromGraphTerm(ctx.graphTerm());
     }
 
-    public TermAst termFromVarOrIriRef(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VarOrIRIrefContext ctx) {
+    public TermAst termFromVarOrIriRef(SparqlParser.VarOrIriContext ctx) {
         if (ctx.var_() != null) {
             return termFromVar(ctx.var_());
         }
@@ -731,7 +1059,7 @@ public final class SparqlAstBuilder {
     }
 
     public List<TermAst> termListFromArgList(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ArgListContext ctx) {
-        return ctx.expression().stream().map(arg -> (TermAst) termFromExpression(arg)).toList();
+        return ctx.expression().stream().map(this::termFromExpression).toList();
     }
 
     public TermAst termFromIriRef(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.IriRefContext ctx) {
@@ -805,7 +1133,24 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromBuiltInCall(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BuiltInCallContext ctx) {
-        if (ctx.expression() != null) {
+        if (ctx.existsFunc() != null) {
+            return new ExistsAst(popCapturedExistsPattern());
+        } else if (ctx.notExistsFunc() != null) {
+            return new NotExistsAst(popCapturedExistsPattern());
+        } else if (ctx.regexExpression() != null) {
+            return termFromRegex(ctx.regexExpression());
+        } else if (ctx.BOUND() != null) {
+            return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
+        } else if (ctx.IF() != null) {
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            return new IfAst(args.get(0), args.get(1), args.get(2));
+        } else if (ctx.CONCAT() != null) {
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            return new FunctionCallAst(new IriAst("CONCAT"), args);
+        } else if (ctx.COALESCE() != null) {
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            return new CoalesceAst(args);
+        } else if (ctx.expression() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
@@ -940,7 +1285,12 @@ public final class SparqlAstBuilder {
                             case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralNegativeContext numericLiteralNegativeContext ->
                                     (ExprAst) termFromNumericLiteralNegative(numericLiteralNegativeContext);
                             case null, default ->
-                                    throw new QueryEvaluationException("Unexpected left hand termFromExpression in additive termFromExpression " + ctx.getText() + " " + child.getText());
+                                    throw new QueryEvaluationException(
+                                            "Unexpected left hand termFromExpression in additive termFromExpression "
+                                                    + ctx.getText()
+                                                    + " "
+                                                    + (child != null ? child.getText() : "null")
+                                    );
                         };
                         leftHand = createConstraint(op, List.of(leftHand, rightHand));
                     }
@@ -994,7 +1344,7 @@ public final class SparqlAstBuilder {
         ASTConstants.Constraint op = null;
         if (ctx.PLUS() != null) {
             op = ASTConstants.OPERATOR.PLUS;
-        } else if (ctx.MINUS() != null) {
+        } else if (ctx.MINUS_SIGN() != null) {
             op = ASTConstants.OPERATOR.MINUS;
         } else if (ctx.EXCLAMATION() != null) {
             op = ASTConstants.OPERATOR.NOT;
@@ -1017,5 +1367,37 @@ public final class SparqlAstBuilder {
         } else {
             throw new QueryEvaluationException("Unexpected arguments for REGEX call");
         }
+    }
+    /**
+     * Predicate as a property path.
+     * For simple triples without a composed path, this is just an iriRef or 'a'.
+     * Composed property paths will be expanded in a later phase if needed.
+     */
+    public TermAst termFromVerbPath(SparqlParser.VerbPathContext ctx) {
+        return this.iri(ctx.getText());
+    }
+
+    /**
+     * Predicate as a simple variable (e.g. ?p used as a predicate).
+     */
+    public TermAst termFromVerbSimple(SparqlParser.VerbSimpleContext ctx) {
+        return termFromVar(ctx.var_());
+    }
+
+    /**
+     * List of objects inside a property path triple.
+     * Blank node property lists and collections are not yet fully supported (raw text fallback).
+     */
+    public List<TermAst> termListFromObjectListPath(SparqlParser.ObjectListPathContext ctx) {
+        List<TermAst> out = new ArrayList<>();
+        for (var objPath : ctx.objectPath()) {
+            var graphNodePath = objPath.graphNodePath();
+            if (graphNodePath.varOrTerm() != null) {
+                out.add(termFromVarOrTerm(graphNodePath.varOrTerm()));
+            } else {
+                out.add(this.iri(graphNodePath.getText()));
+            }
+        }
+        return out;
     }
 }

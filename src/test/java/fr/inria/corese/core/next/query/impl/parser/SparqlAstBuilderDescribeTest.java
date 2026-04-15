@@ -118,8 +118,8 @@ class SparqlAstBuilderDescribeTest {
             builder.addDescribeResource(builder.var("?s"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
-            VarAst var = (VarAst) result.described().getFirst();
-            assertEquals("s", var.name());
+            VarAst describedVar = (VarAst) result.described().getFirst();
+            assertEquals("s", describedVar.name());
         }
 
         @Test
@@ -128,8 +128,8 @@ class SparqlAstBuilderDescribeTest {
             builder.addDescribeResource(builder.var("$x"));
             DescribeQueryAst result = buildWithEmptyWhere();
 
-            VarAst var = (VarAst) result.described().getFirst();
-            assertEquals("x", var.name());
+            VarAst describedVar = (VarAst) result.described().getFirst();
+            assertEquals("x", describedVar.name());
         }
     }
 
@@ -203,7 +203,7 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("null described list defaults to empty list")
         void nullDescribedDefaultsToEmpty() {
-            DescribeQueryAst ast = new DescribeQueryAst(null,null, null);
+            DescribeQueryAst ast = new DescribeQueryAst(null, null, null);
             assertNotNull(ast.described());
             assertTrue(ast.described().isEmpty());
         }
@@ -211,9 +211,19 @@ class SparqlAstBuilderDescribeTest {
         @Test
         @DisplayName("null whereClause defaults to empty GroupGraphPatternAst")
         void nullWhereClauseDefaultsToEmptyGroup() {
-            DescribeQueryAst ast = new DescribeQueryAst(null,null, null);
+            DescribeQueryAst ast = new DescribeQueryAst(null, null, null);
             assertNotNull(ast.whereClause());
             assertTrue(ast.whereClause().patterns().isEmpty());
+        }
+
+        @Test
+        @DisplayName("null solutionModifier defaults to empty SolutionModifierAst")
+        void nullSolutionModifierDefaultsToEmpty() {
+            DescribeQueryAst ast = new DescribeQueryAst(null, null, null, null);
+            assertNotNull(ast.solutionModifier());
+            assertTrue(ast.solutionModifier().orderBy().isEmpty());
+            assertNull(ast.solutionModifier().limit());
+            assertNull(ast.solutionModifier().offset());
         }
 
         @Test

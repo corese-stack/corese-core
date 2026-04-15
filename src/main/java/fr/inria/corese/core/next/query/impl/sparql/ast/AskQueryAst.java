@@ -15,13 +15,25 @@ import java.util.List;
  * }
  * }</pre>
  */
-public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause) implements QueryAst {
+public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause,
+                          SolutionModifierAst solutionModifier, QueryPrologueAst prologue) implements QueryAst {
+
+    public AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause) {
+        this(datasetClause, whereClause, null, null);
+    }
+
     public AskQueryAst {
         if (whereClause == null) {
             whereClause = new GroupGraphPatternAst(List.of());
         }
-        if(datasetClause == null) {
+        if (datasetClause == null) {
             datasetClause = DatasetClauseAst.none();
+        }
+        if (prologue == null) {
+            prologue = QueryPrologueAst.empty();
+        }
+        if (solutionModifier == null) {
+            solutionModifier = SolutionModifierAst.empty();
         }
     }
 }

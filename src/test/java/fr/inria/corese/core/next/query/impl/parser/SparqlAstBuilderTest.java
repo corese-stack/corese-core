@@ -1,6 +1,8 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +45,7 @@ class SparqlAstBuilderTest {
     void shouldBuildSingleBgpWithOneTriple() {
         SparqlAstBuilder b = newBuilder();
 
+        b.setBaseUri(IOConstants.getDefaultBaseURI());
         b.enterSelectQuery();
         b.enterGroup();
         b.enterBgp();
@@ -189,6 +192,9 @@ class SparqlAstBuilderTest {
         b.addTriple(new VarAst("s"), new VarAst("p"), new VarAst("o"));
 
         assertThrows(IllegalStateException.class, b::exitGroup, "Should not exit group while BGP is open");
+
+        b.exitBgp();
+        b.exitGroup();
         b.exitSelectQuery();
     }
 
@@ -199,6 +205,43 @@ class SparqlAstBuilderTest {
         b.enterSelectQuery();
         b.enterGroup();
         assertThrows(Exception.class, b::exitBgp); // ArrayDeque pop throws NoSuchElementException
+    }
+
+    /**
+     * SPARQL allows only SELECT as a subquery inside { ... }; ASK/CONSTRUCT/DESCRIBE are top-level only.
+     * The ANTLR grammar enforces this; the builder rejects inconsistent listener order.
+     */
+    @Test
+    void askConstructDescribeMustNotStartInsideGraphPattern() {
+        SparqlAstBuilder b = newBuilder();
+        b.enterSelectQuery();
+        b.enterWhereClause();
+        b.enterGroup();
+        assertThrows(QuerySyntaxException.class, b::enterAskQuery);
+
+        b = newBuilder();
+        b.enterSelectQuery();
+        b.enterWhereClause();
+        b.enterGroup();
+        assertThrows(QuerySyntaxException.class, b::enterConstructQuery);
+
+        b = newBuilder();
+        b.enterSelectQuery();
+        b.enterWhereClause();
+        b.enterGroup();
+        assertThrows(QuerySyntaxException.class, b::enterDescribeQuery);
+    }
+
+    @Test
+    void askConstructDescribeMustNotStartInsideSelectSubqueryFrame() {
+        SparqlAstBuilder b = newBuilder();
+        b.enterSelectQuery();
+        b.enterWhereClause();
+        b.enterGroup();
+        b.enterSelectQuery();
+        b.enterWhereClause();
+        b.enterGroup();
+        assertThrows(QuerySyntaxException.class, b::enterAskQuery);
     }
 
     // ---------- Defensive copy / immutability checks ----------

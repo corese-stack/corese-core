@@ -1,21 +1,49 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AddAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AndAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryRegexAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BooleanNotAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DatatypeAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DifferentAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DivideAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterOrEqualThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsBlankAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsLiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LangMatchesAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerOrEqualThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.LowerThanAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MultiplyAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.OrAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SameTermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SubtractAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryMinusAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryPlusAst;
 
-    private static final Logger logger = LoggerFactory.getLogger(SparqlParserFilterTest.class);
+class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     void shouldParseTrueFilter() {
@@ -60,7 +88,6 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast.whereClause());
 
         GroupGraphPatternAst where = ast.whereClause();
-        logger.info("{}", ast);
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();
@@ -985,6 +1012,37 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    void shouldParseSubtractWithoutWhitespaceInsideParenthesizedMultiplyExpression() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?x ?p ?discount .
+                  ?x ?pricePredicate ?price .
+                  FILTER(?p*(1-?discount) = ?price)
+                }
+                """);
+
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        EqualsAst equalsAst = (EqualsAst) filterAst.operator();
+
+        assertInstanceOf(MultiplyAst.class, equalsAst.getLeftArgument());
+        assertInstanceOf(VarAst.class, equalsAst.getRightArgument());
+        assertEquals("price", ((VarAst) equalsAst.getRightArgument()).name());
+
+        MultiplyAst multiplyAst = (MultiplyAst) equalsAst.getLeftArgument();
+        assertInstanceOf(VarAst.class, multiplyAst.getLeftArgument());
+        assertEquals("p", ((VarAst) multiplyAst.getLeftArgument()).name());
+        assertInstanceOf(SubtractAst.class, multiplyAst.getRightArgument());
+
+        SubtractAst subtractAst = (SubtractAst) multiplyAst.getRightArgument();
+        assertInstanceOf(LiteralAst.class, subtractAst.getLeftArgument());
+        assertEquals("1", ((LiteralAst) subtractAst.getLeftArgument()).lexical());
+        assertInstanceOf(VarAst.class, subtractAst.getRightArgument());
+        assertEquals("discount", ((VarAst) subtractAst.getRightArgument()).name());
+    }
+
+    @Test
     void shouldParseUnaryPlusFilter() {
         SparqlParser parser = newParserDefault();
 
@@ -1193,5 +1251,147 @@ public class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals("s", ((VarAst) divideAst.getLeftArgument()).name());
         assertInstanceOf(LiteralAst.class, divideAst.getRightArgument());
         assertEquals("2", ((LiteralAst) divideAst.getRightArgument()).lexical());
+    }
+
+    @Test
+    void shouldParseExistsFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER EXISTS { ?s ex:email ?e }
+                }
+                """);
+
+        assertNotNull(ast);
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size());
+
+        PatternAst last = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, last);
+
+        FilterAst filterAst = (FilterAst) last;
+        assertInstanceOf(ExistsAst.class, filterAst.operator());
+
+        ExistsAst existsAst = (ExistsAst) filterAst.operator();
+        assertNotNull(existsAst.pattern());
+        assertFalse(existsAst.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseNotExistsFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER NOT EXISTS { ?s ex:email ?e }
+                }
+                """);
+
+        assertNotNull(ast);
+        GroupGraphPatternAst where = ast.whereClause();
+        assertEquals(2, where.patterns().size());
+
+        PatternAst last = where.patterns().getLast();
+        assertInstanceOf(FilterAst.class, last);
+
+        FilterAst filterAst = (FilterAst) last;
+        assertInstanceOf(NotExistsAst.class, filterAst.operator());
+
+        NotExistsAst notExistsAst = (NotExistsAst) filterAst.operator();
+        assertNotNull(notExistsAst.pattern());
+        assertFalse(notExistsAst.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseExistsWithMultipleTriples() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER EXISTS {
+                    ?s ex:email ?e .
+                    ?s ex:name ?n
+                  }
+                }
+                """);
+
+        assertNotNull(ast);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(ExistsAst.class, filterAst.operator());
+
+        ExistsAst existsAst = (ExistsAst) filterAst.operator();
+        assertNotNull(existsAst.pattern());
+    }
+
+    @Test
+    void shouldParseNotExistsEmpty() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER NOT EXISTS { }
+                }
+                """);
+
+        assertNotNull(ast);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(NotExistsAst.class, filterAst.operator());
+
+        NotExistsAst notExistsAst = (NotExistsAst) filterAst.operator();
+        assertNotNull(notExistsAst.pattern());
+        assertTrue(notExistsAst.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseAndBetweenTwoExistsFilters() {
+        SparqlParser parser = newParserDefault();
+        QueryAst ast = parser.parse("""
+          PREFIX ex: <http://example.org/>
+          
+          SELECT * WHERE {
+            ?s ?p ?o .
+            FILTER(EXISTS { ?s ex:email ?e } && EXISTS { ?s ex:name ?n })
+          }
+          """);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(AndAst.class, filterAst.operator());
+        AndAst andAst = (AndAst) filterAst.operator();
+        assertInstanceOf(ExistsAst.class, andAst.getLeftArgument());
+        assertInstanceOf(ExistsAst.class, andAst.getRightArgument());
+        ExistsAst left = (ExistsAst) andAst.getLeftArgument();
+        ExistsAst right = (ExistsAst) andAst.getRightArgument();
+        assertNotNull(left.pattern());
+        assertNotNull(right.pattern());
+        assertFalse(left.pattern().patterns().isEmpty());
+        assertFalse(right.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseOrBetweenExistsAndNotExistsFilters() {
+        SparqlParser parser = newParserDefault();
+        QueryAst ast = parser.parse("""
+          PREFIX ex: <http://example.org/>
+          
+          SELECT * WHERE {
+            ?s ?p ?o .
+            FILTER(EXISTS { ?s ex:email ?e } || NOT EXISTS { ?s ex:phone ?ph })
+          }
+          """);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(OrAst.class, filterAst.operator());
+        OrAst orAst = (OrAst) filterAst.operator();
+        assertInstanceOf(ExistsAst.class, orAst.getLeftArgument());
+        assertInstanceOf(NotExistsAst.class, orAst.getRightArgument());
+        ExistsAst left = (ExistsAst) orAst.getLeftArgument();
+        NotExistsAst right = (NotExistsAst) orAst.getRightArgument();
+        assertNotNull(left.pattern());
+        assertNotNull(right.pattern());
+        assertFalse(left.pattern().patterns().isEmpty());
+        assertFalse(right.pattern().patterns().isEmpty());
     }
 }

@@ -1,20 +1,28 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.data.impl.common.literal.XSD;
-import fr.inria.corese.core.next.query.api.exception.QueryException;
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BooleanNotAst;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 /**
  * Test if we parse the Basic Graph Pattern (BGP)
  */
-public class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
+class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     void shouldParseSingleTriplePatternInBgp() {
@@ -134,6 +142,78 @@ public class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    void shouldParsePrefixedNameWithDigitOnlyLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                PREFIX ex: <http://example.org/>
+                SELECT * WHERE {
+                  ?s ex:1 ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, triple.predicate());
+        assertEquals("ex:1", ((IriAst) triple.predicate()).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithHyphenInLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                PREFIX ex: <http://example.org/>
+                SELECT * WHERE {
+                  ?s ex:abc-def ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, triple.predicate());
+        assertEquals("ex:abc-def", ((IriAst) triple.predicate()).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithEscapedReservedCharacterInLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                PREFIX ns: <http://example.org/ns#>
+                SELECT * WHERE {
+                  ?s ns:id\\=123 ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, triple.predicate());
+        assertEquals("ns:id\\=123", ((IriAst) triple.predicate()).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithDefaultPrefix() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                PREFIX : <http://example.org/default#>
+                SELECT * WHERE {
+                  ?s :foo ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, triple.predicate());
+        assertEquals(":foo", ((IriAst) triple.predicate()).raw());
+    }
+
+    @Test
     void failFastTrueShouldThrowQuerySyntaxExceptionOnInvalidQuery() {
         SparqlParser parser = newParser(true, true);
 
@@ -144,10 +224,10 @@ public class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    void failFastFalseCollectErrorsTrueShouldThrowQueryExceptionWithCollectedErrors() {
+    void failFastFalseCollectErrorsTrueShouldThrowQuerySyntaxExceptionWithCollectedErrors() {
         SparqlParser parser = newParser(false, true);
 
-        QueryException ex = assertThrows(QueryException.class, () ->
+        QuerySyntaxException ex = assertThrows(QuerySyntaxException.class, () ->
                 parser.parse("SELECT * WHERE { ?s ?p . }")
         );
 

@@ -30,6 +30,21 @@ public final class SparqlListener extends SparqlParserBaseListener {
     }
 
     @Override
+    public void exitSelectQuery(SparqlParser.SelectQueryContext ctx) {
+        for (var d : delegates) d.exitSelectQuery(ctx);
+    }
+
+    @Override
+    public void enterSubSelect(SparqlParser.SubSelectContext ctx) {
+        for (var d : delegates) d.enterSubSelect(ctx);
+    }
+
+    @Override
+    public void exitSubSelect(SparqlParser.SubSelectContext ctx) {
+        for (var d : delegates) d.exitSubSelect(ctx);
+    }
+
+    @Override
     public void enterAskQuery(SparqlParser.AskQueryContext ctx) {
         for(var d : delegates) d.enterAskQuery(ctx);
     }
@@ -52,6 +67,11 @@ public final class SparqlListener extends SparqlParserBaseListener {
     @Override
     public void exitConstructTemplate(SparqlParser.ConstructTemplateContext ctx) {
         for (var d : delegates) d.exitConstructTemplate(ctx);
+    }
+
+    @Override
+    public void enterWhereClause(SparqlParser.WhereClauseContext ctx) {
+        for (var d : delegates) d.enterWhereClause(ctx);
     }
 
     // ---------- GROUP GRAPH PATTERN ----------
@@ -78,10 +98,13 @@ public final class SparqlListener extends SparqlParserBaseListener {
 
     // ---------- TRIPLES (subject + property list) ----------
     @Override
-    public void exitTriplesSameSubject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.TriplesSameSubjectContext ctx) {
+    public void exitTriplesSameSubject(SparqlParser.TriplesSameSubjectContext ctx) {
         for (var d : delegates) d.exitTriplesSameSubject(ctx);
     }
-
+    @Override
+    public void exitTriplesSameSubjectPath(SparqlParser.TriplesSameSubjectPathContext ctx) {
+        for (var d : delegates) d.exitTriplesSameSubjectPath(ctx);
+    }
     // ---------- OPTIONAL ----------
     @Override
     public void enterOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext ctx) {
@@ -159,5 +182,36 @@ public final class SparqlListener extends SparqlParserBaseListener {
     @Override
     public void exitNamedGraphClause(SparqlParser.NamedGraphClauseContext ctx) {
         for (var d : delegates) d.exitNamedGraphClause(ctx);
+    }
+
+    @Override public void enterBaseDecl(SparqlParser.BaseDeclContext ctx) {
+        for (var d : delegates) d.enterBaseDecl(ctx);
+    }
+
+    @Override public void exitBaseDecl(SparqlParser.BaseDeclContext ctx) {
+        for (var d : delegates) d.exitBaseDecl(ctx);
+    }
+
+    @Override public void enterPrefixDecl(SparqlParser.PrefixDeclContext ctx) {
+        for (var d : delegates) d.enterPrefixDecl(ctx);
+    }
+
+    @Override public void exitPrefixDecl(SparqlParser.PrefixDeclContext ctx) {
+        for (var d : delegates) d.exitPrefixDecl(ctx);
+    }
+
+    @Override
+    public void enterExistsFunc(SparqlParser.ExistsFuncContext ctx) {
+        for (var d : delegates) d.enterExistsFunc(ctx);
+    }
+
+    @Override
+    public void enterNotExistsFunc(SparqlParser.NotExistsFuncContext ctx) {
+        for (var d : delegates) d.enterNotExistsFunc(ctx);
+    }
+
+    @Override
+    public void exitBind(SparqlParser.BindContext ctx) {
+        for (var d : delegates) d.exitBind(ctx);
     }
 }
