@@ -1139,6 +1139,7 @@ public class TestQuery1 {
 
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testTTL1() throws EngineException, LoadException {
 
@@ -1168,7 +1169,9 @@ public class TestQuery1 {
         Mappings m2 = ex.query(qq);
         assertEquals(m1.size(), m2.size());
     }
+    */
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testTTL2() throws EngineException, LoadException {
 
@@ -1196,7 +1199,9 @@ public class TestQuery1 {
         Mappings m2 = ex.query(qq);
         assertEquals(m1.size(), m2.size());
     }
+    */
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testTTL3() throws EngineException, LoadException {
 
@@ -1224,7 +1229,9 @@ public class TestQuery1 {
         Mappings m2 = ex.query(qq);
         assertEquals(m1.size(), m2.size());
     }
+    */
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testTTL4() throws EngineException, LoadException {
 
@@ -1257,6 +1264,7 @@ public class TestQuery1 {
         Mappings m2 = ex.query(qq);
         assertEquals(m1.size(), m2.size());
     }
+    */
 
     @Test
     public void testOPP2() throws EngineException, LoadException {
@@ -2285,6 +2293,7 @@ public class TestQuery1 {
         assertEquals(10, dt.intValue());
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testJSON() throws EngineException, LoadException {
         String t = "template  {  st:apply-templates-with(st:json)}"
@@ -2307,8 +2316,8 @@ public class TestQuery1 {
         ll.loadString(json, fr.inria.corese.core.api.Loader.format.JSONLD_FORMAT);
 
         assertEquals(g.size(), gg.size());
-
     }
+    */
 
     @Test
     public void testNG2() throws EngineException {
@@ -5374,6 +5383,7 @@ public class TestQuery1 {
 
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void myastpp2() throws LoadException, EngineException {
         GraphStore graph = GraphStore.create();
@@ -5413,8 +5423,8 @@ public class TestQuery1 {
                 + "}";
         Mappings map = exec.query(q);
         assertEquals(258, normalizeLineEndings(map.getTemplateStringResult()).length());
-
     }
+    */
 
     public static String normalizeLineEndings(String input) {
         return input.replace("\r\n", "\n"); // Convertir CRLF (Windows) en LF (Linux)
@@ -5665,6 +5675,7 @@ public class TestQuery1 {
 
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testGT() throws LoadException, EngineException {
         Graph g = createGraph();
@@ -5690,6 +5701,7 @@ public class TestQuery1 {
         str = normalizeLineEndings(map.getTemplateStringResult());
         assertEquals(9859, str.length()); // TODO: need a more robust test
     }
+    */
 
     @Test
     public void testGCC() throws EngineException {
@@ -5724,6 +5736,7 @@ public class TestQuery1 {
 
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testPPOWL() throws EngineException, LoadException {
         Graph g = Graph.create();
@@ -5746,9 +5759,10 @@ public class TestQuery1 {
         map = exec.query(t2);
 
         assertEquals(9438, normalizeLineEndings(map.getTemplateResult().getLabel()).length());
-
     }
+    */
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testPPSPIN() throws EngineException, LoadException {
         Graph g = createGraph();
@@ -5764,8 +5778,8 @@ public class TestQuery1 {
         Mappings map = exec.query(t1);
         int size = map.getTemplateResult().getLabel().length();
         assertTrue(3000 <= size, () -> "Result not big enough: size = " + size);
-
     }
+    */
 
     @Test
     public void testMove1() throws EngineException {
@@ -6156,6 +6170,7 @@ public class TestQuery1 {
         assertEquals(3, map.size(), "result");
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testTurtle() throws EngineException {
         Graph g = createGraph();
@@ -6177,7 +6192,9 @@ public class TestQuery1 {
             assertFalse(node.getLabel().contains("Property"), "result");
         }
     }
+    */
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testTurtle2() throws EngineException {
         Graph g = Graph.create(true);
@@ -6199,6 +6216,7 @@ public class TestQuery1 {
             assertTrue(node.getLabel().contains("Property"), "result");
         }
     }
+    */
 
     // @Test
     public void testQV()  throws EngineException {
@@ -6227,6 +6245,7 @@ public class TestQuery1 {
 
     }
 
+    /* REMOVED as part of eliminating dependencies to Transformer
     @Test
     public void testPPSPINwdfgdwfgd() throws EngineException, LoadException {
         File f = new File(data + "template/spinhtml/data/");
@@ -6236,6 +6255,7 @@ public class TestQuery1 {
             testSPPP(ff.getAbsolutePath());
         }
     }
+    */
 
     public void testSPPP(String path) throws EngineException, LoadException {
         String t1 = "prefix f: <http://example.com/owl/families/> "
