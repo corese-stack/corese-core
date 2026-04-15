@@ -8,8 +8,7 @@ import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
-import fr.inria.corese.core.next.query.kgram.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  * Utility class for converting between Corese-compatible Node objects
@@ -21,7 +20,7 @@ public class CoreseValueConverter {
     private final ValueFactory factory = new CoreseAdaptedValueFactory();
 
     // Constant representing the default Corese graph context
-    private static final Node DEFAULT_CORESE_CONTEXT = DatatypeMap.createResource(IOConstants.getDefaultBaseURI());
+    private static final Node DEFAULT_CORESE_CONTEXT = new CoreseIRI(IOConstants.getDefaultBaseURI()).getCoreseNode();
 
     // --- Rdf4j to Corese conversion methods ---
 

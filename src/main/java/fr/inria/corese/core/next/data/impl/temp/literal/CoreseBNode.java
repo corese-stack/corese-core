@@ -4,8 +4,8 @@ import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.base.model.AbstractBNode;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.temp.CoreseNodeAdapter;
-import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
-import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseBlankNode;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseBlankNode;
 
 /**
  * An implementation of a blank node (BNode) used by Corese.
@@ -73,6 +73,6 @@ public class CoreseBNode extends AbstractBNode implements CoreseNodeAdapter {
 
     @Override
     public Node getCoreseNode() {
-        return coreseObject;
+        return (Node) coreseObject;
     }
 }

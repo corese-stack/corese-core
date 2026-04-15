@@ -1,0 +1,134 @@
+package fr.inria.corese.core.next.query.kgram.sparql.datatype;
+
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+
+/**
+ * Title: Corese
+ * Description: A Semantic Search Engine
+ * Copyright: Copyright INRIA (c) 2007
+ * Company: INRIA
+ * Project: Acacia
+ *
+ * @author Olivier Savoie
+ * @deprecated @TODO replace by fr.inria.corese.core.next.data class
+ */
+public class CoreseBlankNode extends CoreseResource {
+
+    static Datatype code = Datatype.BLANK;
+    // true when this bnode is the datatype value of a variable.
+    boolean variable = false;
+
+    public CoreseBlankNode(String value) {
+        super(value);
+    }
+
+    @Override
+    public Datatype getCode() {
+        return code;
+    }
+    
+    @Override
+    public IDatatype.NodeKind getNodeKind() {
+        return NodeKind.BNODE;
+    }
+
+    @Override
+    public boolean isBlank() {
+        return true;
+    }
+
+    @Override
+    public boolean isConstant() {
+        return false;
+    }
+
+    @Override
+    public boolean isVariable() {
+        return variable;
+    }
+
+    @Override
+    public void setVariable(boolean b) {
+        variable = b;
+    }
+
+    /**
+     * @throws CoreseDatatypeException
+     * @TODO Should not throw on inequality
+     */
+    @Override
+    public int compare(IDatatype iod) throws CoreseDatatypeException {
+        switch (iod.getCode()) {
+            case BLANK: 
+                return getLabel().compareTo(iod.getLabel());
+        }
+        throw new CoreseDatatypeException("Could not evaluate comaprison");
+    }
+
+    @Override
+    public boolean less(IDatatype iod) throws CoreseDatatypeException {
+        switch (iod.getCode()) {
+            case BLANK: 
+                return getLabel().compareTo(iod.getLabel()) < 0;
+        }
+        throw new CoreseDatatypeException("Could not evaluate comaprison");
+    }
+
+    @Override
+    public boolean lessOrEqual(IDatatype iod) throws CoreseDatatypeException {
+        switch (iod.getCode()) {
+            case BLANK: 
+                return getLabel().compareTo(iod.getLabel()) <= 0;
+        }
+        throw new CoreseDatatypeException("Could not evaluate comaprison");
+    }
+
+    @Override
+    public boolean greater(IDatatype iod) throws CoreseDatatypeException {
+        switch (iod.getCode()) {
+            case BLANK: 
+                return getLabel().compareTo(iod.getLabel()) > 0;
+        }
+        throw new CoreseDatatypeException("Could not evaluate comaprison");
+    }
+
+    @Override
+    public boolean greaterOrEqual(IDatatype iod) throws CoreseDatatypeException {
+        switch (iod.getCode()) {
+            case BLANK: 
+                return getLabel().compareTo(iod.getLabel()) >= 0;
+        }
+        throw new CoreseDatatypeException("Could not evaluate comaprison");
+    }
+
+    @Override
+    public boolean equalsWE(IDatatype iod) throws CoreseDatatypeException {
+        switch (iod.getCode()) {
+            case BLANK: 
+                return getLabel().equals(iod.getLabel());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getLabel().hashCode();
+    }   
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CoreseBlankNode other = (CoreseBlankNode) obj;
+        return getLabel().equals(other.getLabel());
+    }
+   
+}

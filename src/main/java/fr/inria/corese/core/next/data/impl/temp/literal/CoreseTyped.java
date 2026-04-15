@@ -10,9 +10,9 @@ import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.common.util.literal.CoreDatatypeHelper;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
-import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
-import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseGeneric;
-import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseString;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseGeneric;
+import fr.inria.corese.core.sparql.datatype.CoreseString;
 
 import static fr.inria.corese.core.next.data.impl.common.vocabulary.XSD.xsdString;
 
@@ -162,6 +162,6 @@ public class CoreseTyped extends AbstractStringLiteral implements CoreseDatatype
 
     @Override
     public Node getCoreseNode() {
-        return this.coreseObject;
+        return (Node) this.coreseObject;
     }
 }

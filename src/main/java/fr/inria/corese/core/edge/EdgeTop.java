@@ -116,7 +116,7 @@ public abstract class EdgeTop extends GraphObject implements Edge {
         return null;
     }
 
-    IDatatype nodeValue(Node n) {
+    protected IDatatype nodeValue(Node n) {
         return n.getDatatypeValue();
     }
 

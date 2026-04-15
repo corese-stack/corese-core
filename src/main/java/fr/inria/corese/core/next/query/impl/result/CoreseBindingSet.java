@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.impl.temp.CoreseValueConverter;
 import fr.inria.corese.core.next.query.api.result.Binding;
 import fr.inria.corese.core.next.query.api.result.BindingSet;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Mapping;
 
 import java.util.Iterator;
@@ -34,13 +35,13 @@ public class CoreseBindingSet implements BindingSet {
     @Override
     public Value getValue(String name) {
         if(this.hasBinding(name)) {
-            return converter.toRdf4jValue(this.mapping.getValue(name));
+            return converter.toRdf4jValue((Node) this.mapping.getValue(name));
         }
         return null;
     }
 
     @Override
     public Iterator<Binding> iterator() {
-        return this.mapping.getMap().entrySet().stream().map((entry) -> (Binding) new CoreseBinding(entry.getKey(), converter.toRdf4jValue(entry.getValue()))).iterator();
+        return this.mapping.getMap().entrySet().stream().map((entry) -> (Binding) new CoreseBinding(entry.getKey(), converter.toRdf4jValue((Node) entry.getValue()))).iterator();
     }
 }

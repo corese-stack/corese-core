@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.data.api.literal.CoreDatatype;
 import fr.inria.corese.core.next.data.impl.common.literal.XSD;
 import fr.inria.corese.core.next.data.impl.exception.IncorrectOperationException;
 import fr.inria.corese.core.next.data.impl.temp.CoreseIRI;
-import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.api.IDatatype;
 
 /**
  * An implementation of the {@code xsd:boolean} datatype used by Corese.
@@ -74,7 +74,7 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
      * @param value The boolean value for the literal.
      */
     public CoreseBoolean(boolean value) {
-        this(new CoreseBoolean(value));
+        this((IDatatype) new CoreseBoolean(value));
         this.value = value;
         this.coreDatatype = XSD.BOOLEAN;
         this.datatype = XSD.BOOLEAN.getIRI();
@@ -125,11 +125,11 @@ public class CoreseBoolean extends AbstractLiteral implements CoreseDatatypeAdap
 
     @Override
     public Node getCoreseNode() {
-        return this.coreseObject;
+        return (Node) this.coreseObject;
     }
 
     @Override
     public IDatatype getIDatatype() {
-        return this.coreseObject;
+        return (IDatatype) this.coreseObject;
     }
 }

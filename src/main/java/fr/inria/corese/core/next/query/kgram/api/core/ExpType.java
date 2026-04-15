@@ -14,6 +14,8 @@ public interface ExpType {
     String DOM = "http://ns.inria.fr/sparql-extension/dom/";
     String BNODE = EXT + "bnode";
     String DT = "http://ns.inria.fr/sparql-datatype/";
+    String SKOLEM_MARKER = "/.well-known/genid/";
+    String SKOLEM = "http://ns.inria.fr" + SKOLEM_MARKER;
 
 
 

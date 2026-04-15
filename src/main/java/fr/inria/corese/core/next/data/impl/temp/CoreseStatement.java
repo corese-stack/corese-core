@@ -67,9 +67,9 @@ public class CoreseStatement extends AbstractStatement implements CoreseEdgeAdap
             throw new IllegalArgumentException("Edge cannot be null");
         }
 
-        Resource subject_corese = (Resource) converter.toRdf4jValue(edge.getSubjectValue());
-        IRI predicate_corese = (IRI) converter.toRdf4jValue(edge.getPredicateValue());
-        Value object_corese = converter.toRdf4jValue(edge.getObjectValue());
+        Resource subject_corese = (Resource) converter.toRdf4jValue((Node) edge.getSubjectValue());
+        IRI predicate_corese = (IRI) converter.toRdf4jValue((Node) edge.getPredicateValue());
+        Value object_corese = converter.toRdf4jValue((Node) edge.getObjectValue());
         Resource context_corese = converter.toRdf4jValueContext(edge.getGraph());
 
         this.subject = subject_corese;

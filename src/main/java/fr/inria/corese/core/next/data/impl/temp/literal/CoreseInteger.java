@@ -22,14 +22,14 @@ public class CoreseInteger extends AbstractCoreseNumber {
      * @param value  the value of the integer literal
      */
     public CoreseInteger(long value) {
-        super(new fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseInteger(value), XSD.INTEGER.getIRI());
+        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(value), XSD.INTEGER.getIRI());
     }
 
     /**
      * Constructor for CoreseInteger.
      * @param coreseObject the CoreseInteger object
      */
-    public CoreseInteger(fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseInteger coreseObject) {
+    public CoreseInteger(fr.inria.corese.core.sparql.datatype.CoreseInteger coreseObject) {
         super(coreseObject, XSD.INTEGER.getIRI());
     }
 
@@ -38,7 +38,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      * @param coreseObject the CoreseInteger object
      * @param datatype the datatype of the literal
      */
-    public CoreseInteger(fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseInteger coreseObject, IRI datatype) {
+    public CoreseInteger(fr.inria.corese.core.sparql.datatype.CoreseInteger coreseObject, IRI datatype) {
         super(coreseObject, datatype);
     }
 
@@ -47,7 +47,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      * @param value the value of the integer literal
      */
     public CoreseInteger(String value) {
-        this(new fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseInteger(value));
+        this(new fr.inria.corese.core.sparql.datatype.CoreseInteger(value));
     }
 
     /**
@@ -56,7 +56,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      * @param datatype the datatype of the literal
      */
     public CoreseInteger(String value, IRI datatype) {
-        this(new fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseInteger(value), datatype);
+        this(new fr.inria.corese.core.sparql.datatype.CoreseInteger(value), datatype);
     }
 
     /**
@@ -77,7 +77,7 @@ public class CoreseInteger extends AbstractCoreseNumber {
      * @param bigInteger the BigInteger value of the integer literal
      */
     public CoreseInteger(BigInteger bigInteger) {
-        super(new fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseInteger(bigInteger.longValue()), XSD.INTEGER.getIRI());
+        super(new fr.inria.corese.core.sparql.datatype.CoreseInteger(bigInteger.longValue()), XSD.INTEGER.getIRI());
     }
 
     /**

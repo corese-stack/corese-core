@@ -8,8 +8,8 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Query;
-import fr.inria.corese.core.next.query.kgram.edge.EdgeImpl;
-import fr.inria.corese.core.next.query.kgram.sparql.triple.parser.Variable;
+import fr.inria.corese.core.edge.EdgeImpl;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 import fr.inria.corese.core.next.util.StringUtils;
 
 import java.util.List;

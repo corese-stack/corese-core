@@ -17,6 +17,10 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
     int OBJECT = 3;
 
 
+    default IDatatype.NodeKind getNodeKind() {
+        return getValue().getNodeKind();
+    }
+
 
     /**
      * Query nodes have an index computed by KGRAM

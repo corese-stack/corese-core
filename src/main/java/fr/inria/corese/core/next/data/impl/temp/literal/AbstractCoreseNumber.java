@@ -3,8 +3,8 @@ package fr.inria.corese.core.next.data.impl.temp.literal;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.data.api.IRI;
 import fr.inria.corese.core.next.data.api.base.model.literal.AbstractNumber;
-import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
-import fr.inria.corese.core.next.query.kgram.sparql.datatype.CoreseNumber;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.CoreseNumber;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -30,7 +30,7 @@ public abstract class AbstractCoreseNumber extends AbstractNumber implements Cor
 
     @Override
     public Node getCoreseNode() {
-        return coreseObject;
+        return (Node) coreseObject;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.kgram.api.core;
 
+import fr.inria.corese.core.kgram.api.core.Loopable;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Mapping;
 import fr.inria.corese.core.next.query.kgram.core.Mappings;
