@@ -158,7 +158,7 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
     }
 
     @Override
-    public Iterable<IDatatype> getLoop() {
+    public Iterable<Object> getLoop() {
         return list;
     }
 

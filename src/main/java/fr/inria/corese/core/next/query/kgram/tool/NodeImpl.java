@@ -9,9 +9,6 @@ import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 
 public class NodeImpl implements Node {
-
-    
-
     Atom atom;
     int index = -1;
 
@@ -21,7 +18,7 @@ public class NodeImpl implements Node {
 
     @Override
     public IDatatype getValue() {
-        return atom.getDatatypeValue();
+        return (IDatatype) atom.getDatatypeValue();
     }
     
     public IDatatype getValue(Node n) {
@@ -30,12 +27,12 @@ public class NodeImpl implements Node {
 
     @Override
     public IDatatype getDatatypeValue() {
-        return atom.getDatatypeValue();
+        return (IDatatype) atom.getDatatypeValue();
     }
     
     @Override   
     public void setDatatypeValue(IDatatype dt) {
-        atom = Constant.create(dt);
+        atom = Constant.create((fr.inria.corese.core.sparql.api.IDatatype) dt);
     }
     
     @Override

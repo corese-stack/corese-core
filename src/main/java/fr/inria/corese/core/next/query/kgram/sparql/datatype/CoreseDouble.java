@@ -106,7 +106,7 @@ public class CoreseDouble extends CoreseNumber {
                 double d1 = iod.doubleValue();
                 return (dvalue < d1) ? -1 : (d1 == dvalue ? 0 : 1);
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be computed");
         }
     }
 
@@ -119,7 +119,7 @@ public class CoreseDouble extends CoreseNumber {
             case DOUBLE:
                 return dvalue < iod.doubleValue();
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be computed");
         }
     }
 
@@ -132,7 +132,7 @@ public class CoreseDouble extends CoreseNumber {
             case DOUBLE:
                 return dvalue <= iod.doubleValue();
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be computed");
         }
     }
 
@@ -145,7 +145,7 @@ public class CoreseDouble extends CoreseNumber {
             case DOUBLE:
                 return dvalue > iod.doubleValue();
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be computed");
         }
     }
 
@@ -158,7 +158,7 @@ public class CoreseDouble extends CoreseNumber {
             case DOUBLE:
                 return dvalue >= iod.doubleValue();
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be computed");
         }
     }
 
@@ -177,7 +177,7 @@ public class CoreseDouble extends CoreseNumber {
                 return false;
 
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be computed");
         }
     }
     

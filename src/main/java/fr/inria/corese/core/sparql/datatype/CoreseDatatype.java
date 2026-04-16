@@ -1035,15 +1035,6 @@ public class CoreseDatatype
         return res;
     }
 
-    /**
-     * Same datatype or String &amp; Literal
-     */
-//    boolean equivalentDatatype(IDatatype dt) {
-//        return getDatatype() == dt.getDatatype()
-//                || getCode() == STRING && dt.getCode() == LITERAL
-//                || getCode() == LITERAL && dt.getCode() == STRING;
-//    }
-
     // compare values (e.g. for numbers)
     @Override
     public int compare(IDatatype iod) throws CoreseDatatypeException {

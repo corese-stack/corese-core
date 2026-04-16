@@ -144,7 +144,7 @@ public class CoreseInteger extends CoreseNumber {
                 double d1 = iod.doubleValue();
                 return (doubleValue() < d1) ? -1 : (d1 == doubleValue() ? 0 : 1);
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be done");
         }
     }
 
@@ -158,7 +158,7 @@ public class CoreseInteger extends CoreseNumber {
             case DOUBLE:
                 return doubleValue() < iod.doubleValue();
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be done");
         }
     }
 
@@ -172,7 +172,7 @@ public class CoreseInteger extends CoreseNumber {
             case DOUBLE:
                 return doubleValue() <= iod.doubleValue();
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be done");
         }
     }
       
@@ -186,7 +186,7 @@ public class CoreseInteger extends CoreseNumber {
             case DOUBLE:
                 return doubleValue() > iod.doubleValue();
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be done");
         }
     }
 
@@ -200,7 +200,7 @@ public class CoreseInteger extends CoreseNumber {
             case DOUBLE:
                 return doubleValue() >= iod.doubleValue();
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be done");
         }
     }
 
@@ -221,7 +221,7 @@ public class CoreseInteger extends CoreseNumber {
                 return false;
                     
             default:
-                throw failure();
+                throw new CoreseDatatypeException("Comparison could not be done");
         }
     }
     
@@ -316,45 +316,7 @@ public class CoreseInteger extends CoreseNumber {
         }
         return null;
     }
-    
-//    @Override    
-//    public IDatatype plus(IDatatype dt) {
-//        switch (dt.getCode()) {
-//            case DOUBLE:
-//                return CoreseDouble.create(doubleValue() + dt.doubleValue());
-//            case FLOAT:
-//                return CoreseFloat.create(floatValue() + dt.floatValue());
-//            case DECIMAL:
-//                return CoreseDecimal.create(doubleValue() + dt.doubleValue());
-//            case INTEGER:
-//                try {
-//                    return CoreseInteger.create(Math.addExact(longValue(), dt.longValue()));
-//                } catch (ArithmeticException e) {
-//                    return null;
-//                }
-//        }
-//        return null;
-//    }
-//    
-//    @Override
-//    public IDatatype minus(IDatatype dt) {
-//        switch (dt.getCode()) {
-//            case DOUBLE:
-//                return CoreseDouble.create(doubleValue() - dt.doubleValue());
-//            case FLOAT:
-//                return new CoreseFloat(floatValue() - dt.floatValue());
-//            case DECIMAL:
-//                return CoreseDecimal.create(doubleValue() - dt.doubleValue());
-//            case INTEGER:
-//                try {
-//                    return CoreseInteger.create(Math.subtractExact(longValue(), dt.longValue()));
-//                } catch (ArithmeticException e) {
-//                    return null;
-//                }
-//        }
-//        return null;
-//    }
-    
+
     @Override
     public IDatatype minus(long val) {
         return CoreseInteger.create(longValue() - val);

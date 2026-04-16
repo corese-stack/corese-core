@@ -70,42 +70,31 @@ public class CoreseGenericInteger extends CoreseInteger {
     }
     
     boolean validate(String datatype){
-        switch (datatype){
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdbyte:
-                return intValue() <= 127 && intValue() >= -128;
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdshort:
-                return intValue() <= 32767 && intValue() >= -32768;
-                
-             case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdint:
-                return intValue() <= 2147483647 && intValue() >= -2147483648;    
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdpositiveInteger:
-                return intValue() > 0; 
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdnegativeInteger:
-                return intValue() < 0; 
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdnonNegativeInteger:
-                return intValue() >= 0; 
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdnonPositiveInteger:
-                 return intValue() <= 0; 
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdunsignedByte:
-                return validate(XSD.xsdByte.getIRI().stringValue()) && intValue() >= 0;
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdunsignedInt:
-                return validate(XSD.xsdInt.getIRI().stringValue()) && intValue() >= 0;
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdunsignedLong:
-                return validate(XSD.xsdLong.getIRI().stringValue()) && intValue() >= 0;
-                
-            case fr.inria.corese.core.next.query.kgram.sparql.datatype.RDF.xsdunsignedShort:
-                return validate(XSD.xsdShort.getIRI().stringValue()) && intValue() >= 0;
-                
-        }
-        return true;
+        final String xsdByte = XSD.xsdByte.getIRI().stringValue();
+        final String xsdShort = XSD.xsdShort.getIRI().stringValue();
+        final String xsdInt = XSD.xsdInt.getIRI().stringValue();
+        final String xsdPositiveInteger = XSD.xsdPositiveInteger.getIRI().stringValue();
+        final String xsdNegativeInteger = XSD.xsdNegativeInteger.getIRI().stringValue();
+        final String xsdNonNegativeInteger = XSD.xsdNonNegativeInteger.getIRI().stringValue();
+        final String xsdNonPositiveInteger = XSD.xsdNonPositiveInteger.getIRI().stringValue();
+        final String xsdUnsignedByte = XSD.xsdUnsignedByte.getIRI().stringValue();
+        final String xsdUnsignedInt = XSD.xsdUnsignedInt.getIRI().stringValue();
+        final String xsdUnsignedLong = XSD.xsdUnsignedLong.getIRI().stringValue();
+        final String xsdUnsignedShort = XSD.xsdUnsignedShort.getIRI().stringValue();
+        return switch (datatype) {
+            case xsdByte -> intValue() <= 127 && intValue() >= -128;
+            case xsdShort -> intValue() <= 32767 && intValue() >= -32768;
+            case xsdInt -> intValue() <= 2147483647 && intValue() >= -2147483648;
+            case xsdPositiveInteger -> intValue() > 0;
+            case xsdNegativeInteger -> intValue() < 0;
+            case xsdNonNegativeInteger -> intValue() >= 0;
+            case xsdNonPositiveInteger -> intValue() <= 0;
+            case xsdUnsignedByte -> validate(XSD.xsdByte.getIRI().stringValue()) && intValue() >= 0;
+            case xsdUnsignedInt -> validate(XSD.xsdInt.getIRI().stringValue()) && intValue() >= 0;
+            case xsdUnsignedLong -> validate(XSD.xsdLong.getIRI().stringValue()) && intValue() >= 0;
+            case xsdUnsignedShort -> validate(XSD.xsdShort.getIRI().stringValue()) && intValue() >= 0;
+            default -> true;
+        };
     }
     
     

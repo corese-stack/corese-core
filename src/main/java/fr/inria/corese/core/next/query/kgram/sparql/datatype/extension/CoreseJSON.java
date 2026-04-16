@@ -356,7 +356,7 @@ public class CoreseJSON extends CoreseExtension {
     }
 
     @Override
-    public Iterable<IDatatype> getLoop() {
+    public Iterable<Object> getLoop() {
         return getValueList();
     }
 

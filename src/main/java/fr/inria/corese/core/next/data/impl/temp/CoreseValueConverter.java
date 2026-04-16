@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.data.api.Literal;
 import fr.inria.corese.core.next.data.api.Resource;
 import fr.inria.corese.core.next.data.api.Value;
 import fr.inria.corese.core.next.data.api.ValueFactory;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 
 /**
  * Utility class for converting between Corese-compatible Node objects

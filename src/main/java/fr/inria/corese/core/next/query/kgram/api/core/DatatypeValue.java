@@ -45,7 +45,7 @@ public interface DatatypeValue {
      * @param other the other value
      * @return true if equivalent
      */
-    boolean equalsWE(DatatypeValue other) throws CoreseDatatypeException;
+//    boolean equalsWE(DatatypeValue other) throws CoreseDatatypeException;
 
     /**
      * Compares this value to another.
@@ -53,7 +53,7 @@ public interface DatatypeValue {
      * @param other the other value
      * @return negative if less, 0 if equal, positive if greater
      */
-    int compare(DatatypeValue other) throws CoreseDatatypeException;
+//    int compare(DatatypeValue other) throws CoreseDatatypeException;
 
     /**
      * Returns the integer value if this is a numeric type.

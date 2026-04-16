@@ -1,10 +1,10 @@
 package fr.inria.corese.core.next.query.kgram.edge;
 
 import fr.inria.corese.core.GraphObject;
-import fr.inria.corese.core.kgram.api.core.Edge;
+import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.api.core.PointerType;
-import fr.inria.corese.core.kgram.api.core.TripleStore;
+import fr.inria.corese.core.next.query.kgram.api.core.PointerType;
+import fr.inria.corese.core.next.query.kgram.api.core.TripleStore;
 import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.next.query.kgram.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;

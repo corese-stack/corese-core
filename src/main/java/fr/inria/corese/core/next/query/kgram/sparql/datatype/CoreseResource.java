@@ -16,23 +16,23 @@ import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
  */
 
 public class CoreseResource extends CoreseStringableImpl {
-    static Datatype  code= Datatype.URI;
+    static Datatype code = Datatype.URI;
 
     public CoreseResource(String value) {
-      super(value);
+        super(value);
 
-  }
+    }
 
-// URI and Blank have no lang, hence return null
+    // URI and Blank have no lang, hence return null
     @Override
-  public IDatatype getDataLang() {
-       return null;
-     }
+    public IDatatype getDataLang() {
+        return null;
+    }
 
     @Override
-     public boolean isTrue() throws CoreseDatatypeException {
-         throw new CoreseDatatypeException("isTrue not implemented");
-       }
+    public boolean isTrue() throws CoreseDatatypeException {
+        throw new CoreseDatatypeException("isTrue not implemented");
+    }
 
     @Override
     public boolean equalsWE(DatatypeValue other) throws CoreseDatatypeException {
@@ -45,10 +45,10 @@ public class CoreseResource extends CoreseStringableImpl {
     }
 
     @Override
-       public boolean isTrueAble() {
-         return false;
-       }
-       
+    public boolean isTrueAble() {
+        return false;
+    }
+
     @Override
     public boolean booleanValue() {
         return false;
@@ -65,24 +65,21 @@ public class CoreseResource extends CoreseStringableImpl {
     }
 
     @Override
-       public boolean isLiteral() {
-    	   return false;
-       }
-       
-       /**
-        * SPARQL fails because URI have no datatype
-        */
-    @Override
-       public IDatatype getDatatype(){
-    	   return null;
-       }
-       
-    @Override
-       public  Datatype getCode(){
-    	   return code;
-       }
-       
+    public boolean isLiteral() {
+        return false;
+    }
 
+    /**
+     * SPARQL fails because URI have no datatype
+     */
+    @Override
+    public IDatatype getDatatype() {
+        return null;
+    }
 
+    @Override
+    public Datatype getCode() {
+        return code;
+    }
 
 }
