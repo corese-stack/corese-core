@@ -52,7 +52,7 @@ public class CoreseLiteral extends CoreseStringLiteral {
 	}
      
     @Override
-    public fr.inria.corese.core.sparql.api.IDatatype.NodeKind getNodeKind() {
+    public NodeKind getNodeKind() {
         return NodeKind.LITERAL;
     }
 

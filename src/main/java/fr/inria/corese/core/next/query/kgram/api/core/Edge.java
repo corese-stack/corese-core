@@ -1,6 +1,6 @@
 package fr.inria.corese.core.next.query.kgram.api.core;
 
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.AccessRight;
 
 /**

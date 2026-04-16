@@ -18,8 +18,8 @@ import java.util.Map;
  *
  * @author Olivier Corby & Olivier Savoie & Virginie Bottollier
  */
-public interface IDatatype<T>
-        extends Iterable<IDatatype>, Node, Loopable<T>, DatatypeValue, Comparable {
+public interface IDatatype
+        extends Iterable<IDatatype>, Node, DatatypeValue {
 
     int VALUE = -1;
     int RESULT = -2;
@@ -81,6 +81,9 @@ public interface IDatatype<T>
 
     boolean isXMLLiteral();
 
+    @Override
+    boolean isUndefined();
+
     boolean isGeneralized(); // isExtension or isUndefined
 
     boolean isList();
@@ -106,9 +109,14 @@ public interface IDatatype<T>
     }
 
     @Override
+    List<IDatatype> getValueList();
+
+    @Override
     IDatatype getValue(String varString, int n);
 
     IDatatype toList();
+
+    IDatatypeList getList();
 
     default Map<IDatatype, IDatatype> getMap() {
         return null;
@@ -489,6 +497,15 @@ public interface IDatatype<T>
 
     void setDatatype(String uri);
 
+    // IDatatype value of Pointer Object (eg XML TEXT Node as xsd:string)
+    IDatatype getObjectDatatypeValue();
+
+    /**
+     * @return the lang of this ('fr', 'en',...)
+     */
+    @Override
+    String getLang();
+
     void setLang(String str);
 
     /**
@@ -528,6 +545,9 @@ public interface IDatatype<T>
 
     boolean isDate();
 
+    @Override
+    boolean isBoolean();
+
     /*
      * ************************************************
      */
@@ -542,9 +562,21 @@ public interface IDatatype<T>
 
     Datatype getCode();
 
+    default NodeKind getNodeKind() {
+        return NodeKind.UNDEF;
+    }
+
     boolean hasLang();
 
     boolean isTrue() throws CoreseDatatypeException;
+
+    default boolean isTrueTest() {
+        try {
+            return isTrue();
+        } catch (CoreseDatatypeException e) {
+            return false;
+        }
+    }
 
     boolean isTrueAble();
 

@@ -2,6 +2,9 @@ package fr.inria.corese.core.next.query.kgram.api.core;
 
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 /**
  * Datatype value interface for KGRAM.
  */
@@ -69,6 +72,30 @@ public interface DatatypeValue {
     double doubleValue();
 
     /**
+     * Returns the BigDecimal value if this is a numeric type.
+     *
+     * @return the BigDecimal value
+     * @throws NumberFormatException if not numeric
+     */
+    BigDecimal decimalValue();
+
+    /**
+     * Returns the float value if this is a numeric type.
+     *
+     * @return the float value
+     * @throws NumberFormatException if not numeric
+     */
+    float floatValue();
+
+    /**
+     * Returns the long value if this is a numeric type.
+     *
+     * @return the long value
+     * @throws NumberFormatException if not numeric
+     */
+    long longValue();
+
+    /**
      * Tests if this is a number type.
      *
      * @return true if numeric
@@ -89,10 +116,43 @@ public interface DatatypeValue {
      */
     boolean isURI();
 
+
+    /**
+     * Tests if this is a boolean literal.
+     *
+     * @return true if boolean literal
+     */
+    boolean isBoolean();
+
+    /**
+     * Returns the boolean value if this is a boolean type.
+     *
+     * @return the boolean value
+     */
+    boolean booleanValue();
+
     /**
      * Tests if this is a blank node.
      *
      * @return true if blank node
      */
     boolean isBlank();
+
+    /**
+     * Returns the lang tag if this is a lang tagged literal.
+     *
+     * @return the lang tag as string
+     */
+    String getLang();
+
+    /**
+     * Returns the string value if this is a literal.
+     *
+     * @return the string value
+     */
+    String stringValue();
+
+    boolean isUndefined();
+
+    List getValueList();
 }

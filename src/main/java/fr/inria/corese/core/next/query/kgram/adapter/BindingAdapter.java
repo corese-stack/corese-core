@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Mappings;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 
 import java.util.HashMap;

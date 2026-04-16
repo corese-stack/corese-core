@@ -137,19 +137,9 @@ public class EvalGraph {
         Exp body = exp.rest();
         Mappings res;
         Node varNode = null;
-        Node target = null;
-
-        if (external) {
-            if (graphNode.isVariable() && graph.getDatatypeValue().isExtension()) {
-                varNode = graphNode;
-                target = graph;
-            }
-        } else {
-            target = graph;
-        }
 
         if (eval.isFederate(exp)) {
-            res = eval.subEval(np, target, varNode, body, exp, map, null, false, external);
+            res = eval.subEval(np, graph, varNode, body, exp, map, null, false, external);
         } else {
             Exp ee = body;
             Mappings data = null;
@@ -166,7 +156,7 @@ public class EvalGraph {
                 }
             }
 
-            res = eval.subEval(np, target, varNode, ee, exp, data, null, false, external);
+            res = eval.subEval(np, graph, varNode, ee, exp, data, null, false, external);
         }
         res.setNamedGraph(graph);
 

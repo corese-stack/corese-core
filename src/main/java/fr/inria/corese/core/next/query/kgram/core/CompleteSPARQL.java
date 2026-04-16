@@ -1,14 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package fr.inria.corese.core.next.query.kgram.core;
 
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.api.query.Producer;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.kgram.api.core;
 
 import fr.inria.corese.core.next.query.kgram.path.Path;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 
 
 /**
@@ -17,7 +17,7 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
     int OBJECT = 3;
 
 
-    default IDatatype.NodeKind getNodeKind() {
+    default fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype.NodeKind getNodeKind() {
         return getValue().getNodeKind();
     }
 
@@ -103,7 +103,7 @@ public interface Node extends Pointerable<Object>, Comparable<Node> {
     }
 
     default void setEdge(Edge e) {
-        getDatatypeValue().setEdge((fr.inria.corese.core.kgram.api.core.Edge) e);
+        getDatatypeValue().setEdge(e);
     }
 
 }

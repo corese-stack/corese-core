@@ -88,7 +88,7 @@ public abstract class CoreseDatatype
         javaClassMap.put(i, c);
     }
 
-    public static fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype getGenericDatatype(String uri) {
+    public static IDatatype getGenericDatatype(String uri) {
         IDatatype dt = hdt.get(uri);
         if (dt == null) {
             dt = new CoreseURI(uri);
@@ -406,8 +406,26 @@ public abstract class CoreseDatatype
     }
 
     @Override
+    public List<IDatatype> getValueList() {
+        ArrayList<IDatatype> list = new ArrayList();
+        if (isLoop()) {
+            for (IDatatype dt : this) {
+                if (dt != null) {
+                    list.add(dt);
+                }
+            }
+        }
+        return list;
+    }
+
+    @Override
     public IDatatype getValue(String varString, int n) {
         return get(n);
+    }
+
+    @Override
+    public IDatatype toList() {
+        return DatatypeMap.newInstance(getValueList());
     }
 
     @Override
@@ -437,6 +455,11 @@ public abstract class CoreseDatatype
                 return DatatypeMap.getValue(obj);
             }
         };
+    }
+
+    @Override
+    public Iterable getLoop() {
+        return null;
     }
 
     @Override
@@ -705,30 +728,6 @@ public abstract class CoreseDatatype
 
     @Override
     public float floatValue() {
-        return -1;
-    }
-
-    /**
-     * Generic comparison between datatypes, used to sort the projection cache
-     * and to sort results. It sorts deterministically different datatypes with
-     * their natural order (e.g. : numbers, strings, dates) The order is :
-     * Literal, URI, BlankNode
-     * string/literal/XMLliteral/boolean undef numbers are sorted by values
-     * string/literal/XMLLiteral/undef/boolean are sorted alphabetically then by
-     * datatypes (by their code) literals are sorted with their lang if any
-     *
-     * the primary order (Lit URI BN) is inverse of SPARQL !!!
-     * used for select distinct, group by (sameTerm semantics)
-     * used by Graph Node table to retrieve an existing Node
-     * Distinguish 1 01 1.0 '1'^^xsd:long (does not return 0 but -1 or +1)
-     * Distinguish true '1'^^xsd:boolean
-     * Distinguish date with Z and +00:00
-     */
-    @Override
-    public int compareTo(Object d2) {
-        if (d2 instanceof IDatatype) {
-            return compareTo((IDatatype) d2);
-        }
         return -1;
     }
 

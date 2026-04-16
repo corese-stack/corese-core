@@ -3,9 +3,9 @@ package fr.inria.corese.core.next.query.kgram.edge;
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.kgram.api.core.Edge;
 import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.edge.EdgeTop;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.next.query.kgram.edge.EdgeTop;
 
 import java.util.ArrayList;
 import java.util.Arrays;

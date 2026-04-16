@@ -5,8 +5,8 @@ import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.kgram.core.Query;
 import fr.inria.corese.core.next.query.kgram.core.SparqlException;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.DatatypeMap;
 
 import java.util.ArrayList;
 import java.util.List;

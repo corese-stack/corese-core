@@ -4,7 +4,7 @@ import fr.inria.corese.core.next.query.kgram.api.core.*;
 import fr.inria.corese.core.next.query.kgram.api.query.Result;
 import fr.inria.corese.core.next.query.kgram.path.Path;
 import fr.inria.corese.core.next.query.kgram.tool.EnvironmentImpl;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 
 import java.util.*;
 

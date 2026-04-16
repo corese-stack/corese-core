@@ -29,7 +29,7 @@ public class CoreseBlankNode extends CoreseResource {
     }
     
     @Override
-    public IDatatype.NodeKind getNodeKind() {
+    public NodeKind getNodeKind() {
         return NodeKind.BNODE;
     }
 

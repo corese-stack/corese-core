@@ -9,8 +9,8 @@ import fr.inria.corese.core.next.query.kgram.event.EventImpl;
 import fr.inria.corese.core.next.query.kgram.event.EventManager;
 import fr.inria.corese.core.next.query.kgram.event.ResultListener;
 import fr.inria.corese.core.next.query.kgram.path.PathFinder;
-import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.datatype.DatatypeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

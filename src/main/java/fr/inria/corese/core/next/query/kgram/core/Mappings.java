@@ -7,7 +7,7 @@ import fr.inria.corese.core.next.query.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.kgram.event.Event;
 import fr.inria.corese.core.next.query.kgram.event.EventImpl;
 import fr.inria.corese.core.next.query.kgram.event.EventManager;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 
 import java.util.*;

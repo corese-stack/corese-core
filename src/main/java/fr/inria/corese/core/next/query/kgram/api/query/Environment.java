@@ -8,7 +8,7 @@ import fr.inria.corese.core.next.query.kgram.core.*;
 import fr.inria.corese.core.next.query.kgram.event.EventManager;
 import fr.inria.corese.core.next.query.kgram.path.Path;
 import fr.inria.corese.core.next.query.kgram.tool.ApproximateSearchEnv;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 
 import java.util.Map;

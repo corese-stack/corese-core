@@ -2,9 +2,10 @@ package fr.inria.corese.core.next.query.kgram.sparql.datatype;
 
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDFS;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.query.kgram.api.core.*;
 import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+import fr.inria.corese.core.next.query.kgram.sparql.exceptions.CoreseDatatypeException;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.next.query.kgram.sparql.datatype.extension.CoreseList;
 import fr.inria.corese.core.next.query.kgram.sparql.datatype.extension.CoreseJSON;
@@ -36,7 +37,7 @@ import java.util.*;
  *
  * @author Olivier Corby, Olivier Savoie
  */
-public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
+public class DatatypeMap implements Cst, DatatypeValueFactory {
 
     public static final IDatatype ERROR = CoreseUndefLiteral.ERROR;
     public static final IDatatype UNBOUND = CoreseUndefLiteral.UNBOUND;
@@ -49,7 +50,7 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
     private static final Logger logger = LoggerFactory.getLogger(DatatypeMap.class);
     private static final String DEFAULT = "default";
     private static final String NWFL = "NWFL";
-    private static final String BLANK = BLANKSEED + "bb";
+    private static final String BLANK = IOConstants.BLANK_NODE_PREFIX + "bb";
     private static final int INTMAX = 100;
     // if true, number values are equal by = but not match same sparql variable
     // otherwise same value space, match same sparql variable
@@ -229,6 +230,22 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
 
     public static IDatatype newInstance(IDatatype.Datatype result) {
         return getValue(result);
+    }
+
+    public static IDatatype newInstance(List<IDatatype> ldt) {
+        IDatatype dt = CoreseList.create(ldt);
+        return dt;
+    }
+
+    public static IDatatype createList(IDatatype dt) {
+        ArrayList<IDatatype> ldt = new ArrayList<IDatatype>();
+        ldt.add(dt);
+        return CoreseList.create(ldt);
+    }
+
+    public static IDatatype createList(Collection<IDatatype> ldt) {
+        IDatatype dt = CoreseList.create(ldt);
+        return dt;
     }
 
     public static IDatatype create(int result) {
@@ -643,9 +660,9 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
 
     public static String datatype(String lang) {
         if (LITERAL_AS_STRING && (lang == null || lang.equals(""))) {
-            return qxsdString;
+            return XSD.xsdString.getIRI().stringValue();
         } else {
-            return qrdfsLiteral;
+            return RDFS.Literal.getIRI().stringValue();
         }
     }
 

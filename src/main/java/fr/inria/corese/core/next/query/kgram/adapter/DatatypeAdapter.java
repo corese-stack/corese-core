@@ -1,8 +1,11 @@
 package fr.inria.corese.core.next.query.kgram.adapter;
 
 import fr.inria.corese.core.next.query.kgram.api.core.DatatypeValue;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Adapter to use an IDatatype via the DatatypeValue interface.
@@ -98,8 +101,52 @@ public record DatatypeAdapter(IDatatype delegate) implements DatatypeValue {
     }
 
     @Override
+    public boolean isBoolean() {
+        return delegate.isBoolean();
+    }
+
+    @Override
+    public boolean booleanValue() {
+        return delegate.booleanValue();
+    }
+
+    @Override
     public boolean isBlank() {
         return delegate.isBlank();
+    }
+
+    @Override
+    public String getLang() {
+        return delegate.getLang();
+    }
+
+    @Override
+    public String stringValue() {
+        return delegate.stringValue();
+    }
+
+    @Override
+    public boolean isUndefined() {
+        return delegate.isUndefined();
+    }
+
+    @Override
+    public List getValueList() {
+        return delegate.getValueList();
+    }
+
+    public BigDecimal decimalValue() {
+        return delegate.decimalValue();
+    }
+
+    @Override
+    public float floatValue() {
+        return delegate.floatValue();
+    }
+
+    @Override
+    public long longValue() {
+        return delegate.longValue();
     }
 
 }

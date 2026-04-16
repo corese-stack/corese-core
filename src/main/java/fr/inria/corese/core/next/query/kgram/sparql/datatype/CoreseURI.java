@@ -4,6 +4,8 @@ import fr.inria.corese.core.next.query.kgram.api.core.ExpType;
 import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
+import static fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype.NodeKind.URI;
+
 
 /**
  * <p>Title: Corese</p>
@@ -42,7 +44,7 @@ public class CoreseURI extends CoreseResource {
   
   @Override
   public NodeKind getNodeKind() {
-      return NodeKind.URI;
+      return URI;
   }
   
     @Override

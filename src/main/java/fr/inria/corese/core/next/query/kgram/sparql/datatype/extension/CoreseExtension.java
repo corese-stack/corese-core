@@ -21,7 +21,6 @@ public class CoreseExtension extends CoreseUndefLiteral {
         return display().toString();
     }
 
-    @Override
     public boolean isExtension() {
         return true;
     }
@@ -42,9 +41,6 @@ public class CoreseExtension extends CoreseUndefLiteral {
      */
     @Override
     public boolean equalsWE(IDatatype dt) throws CoreseDatatypeException {
-        if (dt.isExtension()) {
-            return this == dt;
-        }
         return super.equalsWE(dt);
     }
 

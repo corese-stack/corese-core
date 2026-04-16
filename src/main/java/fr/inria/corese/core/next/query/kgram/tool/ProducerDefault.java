@@ -6,7 +6,7 @@ import fr.inria.corese.core.next.query.kgram.api.query.Producer;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Mappings;
 import fr.inria.corese.core.next.query.kgram.core.Query;
-import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.next.query.kgram.sparql.api.IDatatype;
 
 import java.util.ArrayList;
 import java.util.List;

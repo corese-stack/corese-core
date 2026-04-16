@@ -26,7 +26,7 @@ public class CoreseTriple extends CoreseResource {
     }
     
     @Override
-    public fr.inria.corese.core.sparql.api.IDatatype.NodeKind getNodeKind() {
+    public NodeKind getNodeKind() {
         return NodeKind.TRIPLE;
     }
 
