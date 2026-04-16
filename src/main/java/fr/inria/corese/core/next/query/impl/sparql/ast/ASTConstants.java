@@ -124,6 +124,12 @@ public class ASTConstants {
         CONTAINS,
 
         /**
+         * {@code STRDT(string, datatype)}: constructs a typed literal from a lexical
+         * string and a datatype IRI.
+         */
+        STRDT,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
