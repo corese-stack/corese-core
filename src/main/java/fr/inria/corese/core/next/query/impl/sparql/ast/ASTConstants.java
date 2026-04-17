@@ -124,6 +124,13 @@ public class ASTConstants {
         CONTAINS,
 
         /**
+         * {@code SUBSTR(string, start)} or {@code SUBSTR(string, start, length)}:
+         * returns the substring of {@code string} starting at {@code start} with an
+         * optional {@code length}.
+         */
+        SUBSTR,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */

@@ -135,6 +135,12 @@ public final class VariableScopeAnalyzer {
                 collectReferencedVariables(regexAst.getFlags(), referencedVariables);
             }
 
+            case SubstrAst substrAst -> {
+                collectReferencedVariables(substrAst.getString(), referencedVariables);
+                collectReferencedVariables(substrAst.getStart(), referencedVariables);
+                collectReferencedVariables(substrAst.getLength(), referencedVariables);
+            }
+
             case IriAst ignoredIri -> {
                 // Constants do not contribute referenced variables.
             }
