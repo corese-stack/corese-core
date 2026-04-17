@@ -130,6 +130,12 @@ public class ASTConstants {
         DATATYPE,
 
         /**
+         * {@code IRI(term)} or {@code URI(term)}: returns an IRI built from the lexical form
+         * of {@code term}.
+         */
+        IRI,
+
+        /**
          * {@code REGEX(string, pattern)} and {@code REGEX(string, pattern, flags)}: Returns {@code true} if {@code string} matches the given {@code regex}. the matching is influenced by the {@code flags} when they are given.
          */
         REGEX,
