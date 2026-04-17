@@ -130,6 +130,12 @@ public class ASTConstants {
         DATATYPE,
 
         /**
+         * {@code BNODE()} or {@code BNODE(label)}: returns a fresh blank node, optionally
+         * stable for the given lexical label within the solution.
+         */
+        BNODE,
+
+        /**
          * {@code REGEX(string, pattern)} and {@code REGEX(string, pattern, flags)}: Returns {@code true} if {@code string} matches the given {@code regex}. the matching is influenced by the {@code flags} when they are given.
          */
         REGEX,
