@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ConcatAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MultiplyAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.SubtractAst;
 import org.junit.jupiter.api.DisplayName;
@@ -57,11 +57,10 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(BindAst.class, last);
 
         BindAst bindAst = (BindAst) last;
-        assertInstanceOf(FunctionCallAst.class, bindAst.expression());
+        assertInstanceOf(ConcatAst.class, bindAst.expression());
         assertEquals("c", bindAst.variable().name());
 
-        FunctionCallAst concatAst = (FunctionCallAst) bindAst.expression();
-        assertEquals("CONCAT", ((IriAst) concatAst.functionName()).raw());
+        ConcatAst concatAst = (ConcatAst) bindAst.expression();
         assertEquals(2, concatAst.arguments().size());
         assertEquals("a", ((VarAst) concatAst.arguments().getFirst()).name());
         assertEquals("b", ((VarAst) concatAst.arguments().getLast()).name());

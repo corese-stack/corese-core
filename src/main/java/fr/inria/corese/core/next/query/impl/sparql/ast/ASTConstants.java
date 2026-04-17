@@ -124,6 +124,12 @@ public class ASTConstants {
         CONTAINS,
 
         /**
+         * {@code CONCAT(expr1, expr2, ...)}: concatenates the lexical forms of its arguments
+         * into a single string result.
+         */
+        CONCAT,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
