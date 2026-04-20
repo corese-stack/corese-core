@@ -872,6 +872,9 @@ public final class SparqlAstBuilder {
             case ASTConstants.FUNCTION_CALL.STRDT -> {
                 return new StrDtAst(args);
             }
+            case ASTConstants.FUNCTION_CALL.STRLANG -> {
+                return new StrLangAst(args);
+            }
             case ASTConstants.FUNCTION_CALL.DATATYPE -> {
                 return new DatatypeAst(args);
             }
@@ -1170,6 +1173,8 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.CONTAINS, args);
             } else if (ctx.STRDT() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STRDT, args);
+            } else if (ctx.STRLANG() != null) {
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.STRLANG, args);
             } else if (ctx.DATATYPE() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
             } else if (ctx.SAME_TERM() != null) {
