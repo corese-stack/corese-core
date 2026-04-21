@@ -917,6 +917,9 @@ public final class SparqlAstBuilder {
             case ASTConstants.FUNCTION_CALL.CONTAINS -> {
                 return new ContainsAst(args);
             }
+            case ASTConstants.FUNCTION_CALL.REPLACE -> {
+                return new ReplaceAst(args);
+            }
             case ASTConstants.FUNCTION_CALL.REGEX -> {
                 if (args.size() == 2) {
                     return new BinaryRegexAst(args);
@@ -1142,6 +1145,8 @@ public final class SparqlAstBuilder {
             return new NotExistsAst(popCapturedExistsPattern());
         } else if (ctx.regexExpression() != null) {
             return termFromRegex(ctx.regexExpression());
+        } else if (ctx.strReplaceExpression() != null) {
+            return termFromReplace(ctx.strReplaceExpression());
         } else if (ctx.BOUND() != null) {
             return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
         } else if (ctx.IF() != null) {
@@ -1375,6 +1380,16 @@ public final class SparqlAstBuilder {
             throw new QueryEvaluationException("Unexpected arguments for REGEX call");
         }
     }
+
+    public TermAst termFromReplace(SparqlParser.StrReplaceExpressionContext ctx) {
+        if (ctx.expression() != null) {
+            List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
+            return this.createConstraint(ASTConstants.FUNCTION_CALL.REPLACE, args);
+        } else {
+            throw new QueryEvaluationException("Unexpected arguments for REPLACE call");
+        }
+    }
+
     /**
      * Predicate as a property path.
      * For simple triples without a composed path, this is just an iriRef or 'a'.
