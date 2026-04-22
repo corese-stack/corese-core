@@ -28,7 +28,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
                     SELECT *
                     WHERE {
                       SERVICE <https://dbpedia.org/sparql> {
-                        ?s a dbo:Person .
+                        ?s a <http://dbpedia.org/ontology/Person> .
                       }
                     }
                     """);
@@ -56,7 +56,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
                     SELECT *
                     WHERE {
                       SERVICE <https://dbpedia.org/sparql> {
-                        ?s a dbo:Person .
+                        ?s a <http://dbpedia.org/ontology/Person> .
                       }
                     }
                     """);
@@ -70,7 +70,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
             assertEquals(1, bgp.triples().size());
             assertEquals(new VarAst("s"), bgp.triples().getFirst().subject());
             assertEquals(new IriAst("a"), bgp.triples().getFirst().predicate());
-            assertEquals(new IriAst("dbo:Person"), bgp.triples().getFirst().object());
+            assertEquals(new IriAst("<http://dbpedia.org/ontology/Person>"), bgp.triples().getFirst().object());
         }
     }
 
@@ -238,8 +238,8 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
                     SELECT *
                     WHERE {
                       SERVICE <https://dbpedia.org/sparql> {
-                        ?s a dbo:Person ;
-                           dbo:birthDate ?date .
+                        ?s a <http://dbpedia.org/ontology/Person> ;
+                           <http://dbpedia.org/ontology/birthDate> ?date .
                       }
                     }
                     """);
