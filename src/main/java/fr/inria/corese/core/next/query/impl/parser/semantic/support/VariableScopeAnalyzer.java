@@ -85,7 +85,7 @@ public final class VariableScopeAnalyzer {
                 // FILTER does not make a variable visible by itself.
             }
 
-            case ServiceAst(TermAst ignored, boolean ignoredSilent, GroupGraphPatternAst servicePattern) ->
+            case ServiceAst(TermAst endpoint, boolean silentFlag, GroupGraphPatternAst servicePattern) ->
                 // SERVICE exposes variables from its inner graph pattern.
                 collectVisibleVariables(servicePattern, visibleVariables);
 

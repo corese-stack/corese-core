@@ -70,6 +70,14 @@ public final class SparqlAstBuilder {
     /**
      * Holds the endpoint and silent flag for each active SERVICE scope.
      * Pushed on enterService(), matched (by groupDepth) in exitGroup() to produce a ServiceAst.
+     *
+     * @param groupDepth the {@code groupStack.size()} at the time {@link #enterService} was called,
+     *                   i.e. the depth before the SERVICE body's {@link #enterGroup()} is invoked.
+     *                   After {@link #exitGroup()} pops the service body the stack returns to this
+     *                   depth, which is used as the signal to wrap the group in a
+     *                   {@link fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst}.
+     * @param endpoint   the remote service endpoint (IRI or variable)
+     * @param silent     whether the {@code SILENT} keyword was present
      */
     private record ServiceEntry(int groupDepth, TermAst endpoint, boolean silent) {}
 
