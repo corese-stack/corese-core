@@ -85,6 +85,10 @@ public final class VariableScopeAnalyzer {
                 // FILTER does not make a variable visible by itself.
             }
 
+            case ServiceAst(TermAst ignored, boolean ignoredSilent, GroupGraphPatternAst servicePattern) ->
+                // SERVICE exposes variables from its inner graph pattern.
+                collectVisibleVariables(servicePattern, visibleVariables);
+
             case SubQueryAst(QueryAst query) -> {
                 if (query instanceof SelectQueryAst select) {
                     ProjectionAst proj = select.projection();

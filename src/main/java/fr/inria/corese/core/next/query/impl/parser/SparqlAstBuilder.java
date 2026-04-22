@@ -68,6 +68,20 @@ public final class SparqlAstBuilder {
     private final Deque<Integer> existsGroupDepths = new ArrayDeque<>();
 
     /**
+     * Holds the endpoint and silent flag for each active SERVICE scope.
+     * Pushed on enterService(), matched (by groupDepth) in exitGroup() to produce a ServiceAst.
+     */
+    private record ServiceEntry(int groupDepth, TermAst endpoint, boolean silent) {}
+
+    /**
+     * Stack of pending SERVICE entries, innermost last.
+     * At enterService(), we push a ServiceEntry with the current groupStack depth.
+     * At exitGroup(), if groupStack.size() equals the top entry's groupDepth, we wrap the closed
+     * group in a ServiceAst.
+     */
+    private final Deque<ServiceEntry> serviceStack = new ArrayDeque<>();
+
+    /**
      * When true, the next {@link #enterGroup()} opens the {@code groupGraphPattern} of a
      * {@code whereClause} for the innermost active {@link SelectFrame}. On matching
      * {@link #exitGroup()}, that group is stored as {@link SelectFrame#whereClause} instead of
@@ -462,6 +476,9 @@ public final class SparqlAstBuilder {
         } else if (!existsGroupDepths.isEmpty() && groupStack.size() == existsGroupDepths.peek()) {
             existsGroupDepths.pop();
             capturedExistsStack.push(group);
+        } else if (!serviceStack.isEmpty() && groupStack.size() == serviceStack.peek().groupDepth()) {
+            ServiceEntry entry = serviceStack.pop();
+            currentGroup().add(new ServiceAst(entry.endpoint(), entry.silent(), group));
         } else if (groupStack.isEmpty()) {
             if (hasCurrentSelect()) getCurrentSelectFrame().whereClause = group;
             else whereClause = group;
@@ -552,6 +569,28 @@ public final class SparqlAstBuilder {
      * Exit OPTIONAL scope. No-op: the optional content was already wrapped in {@link OptionalAst} in {@link #exitGroup()}.
      */
     public void exitOptional() {
+    }
+
+    // --- Service ---
+
+    /**
+     * Enter SERVICE scope.  Records the current group stack size, the endpoint term and the
+     * {@code SILENT} flag so that when {@link #exitGroup()} is called and the stack returns to
+     * that size, the closed group is wrapped in a
+     * {@link fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst}.
+     *
+     * @param endpoint the remote endpoint (IRI or variable)
+     * @param silent   {@code true} when the {@code SILENT} keyword was present
+     */
+    public void enterService(TermAst endpoint, boolean silent) {
+        serviceStack.push(new ServiceEntry(groupStack.size(), endpoint, silent));
+    }
+
+    /**
+     * Exit SERVICE scope.  No-op: the service body was already wrapped in
+     * {@link fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst} in {@link #exitGroup()}.
+     */
+    public void exitService() {
     }
 
 

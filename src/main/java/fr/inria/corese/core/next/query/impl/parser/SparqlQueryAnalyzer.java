@@ -15,6 +15,7 @@ import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature
 import fr.inria.corese.core.next.query.impl.parser.listener.FilterFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.PrologueFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.ServiceFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
 import fr.inria.corese.core.next.query.impl.parser.semantic.validator.SparqlQuerySemanticValidator;
@@ -133,7 +134,8 @@ final class SparqlQueryAnalyzer {
                 new DescribeQueryFeature(builder),
                 new DatasetClauseFeature(builder),
                 new PrologueFeature(builder),
-                new BindFeature(builder)
+                new BindFeature(builder),
+                new ServiceFeature(builder)
         ));
 
         ParseTreeWalker walker = new ParseTreeWalker();
