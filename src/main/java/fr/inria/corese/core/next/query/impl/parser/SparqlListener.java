@@ -116,6 +116,18 @@ public final class SparqlListener extends SparqlParserBaseListener {
         for (var d : delegates) d.exitOptionalGraphPattern(ctx);
     }
 
+    // ---------- SERVICE ----------
+
+    @Override
+    public void enterServiceGraphPattern(SparqlParser.ServiceGraphPatternContext ctx) {
+        for (var d : delegates) d.enterServiceGraphPattern(ctx);
+    }
+
+    @Override
+    public void exitServiceGraphPattern(SparqlParser.ServiceGraphPatternContext ctx) {
+        for (var d : delegates) d.exitServiceGraphPattern(ctx);
+    }
+
     // ---------- FILTER -----------
 
     @Override
