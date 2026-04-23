@@ -130,6 +130,12 @@ public class ASTConstants {
         STRDT,
 
         /**
+         * {@code STRLANG(string, language)}: constructs a plain literal with a language
+         * tag from a lexical string and a language tag string.
+         */
+        STRLANG,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
