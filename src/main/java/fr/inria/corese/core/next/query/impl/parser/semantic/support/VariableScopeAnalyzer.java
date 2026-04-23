@@ -132,6 +132,9 @@ public final class VariableScopeAnalyzer {
                 }
             }
 
+            case BnodeAst bnodeAst ->
+                collectReferencedVariables(bnodeAst.getLabel(), referencedVariables);
+
             case TrinaryRegexAst regexAst -> {
                 // REGEX may reference variables in the text, pattern or flags.
                 collectReferencedVariables(regexAst.getString(), referencedVariables);

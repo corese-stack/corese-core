@@ -934,6 +934,9 @@ public final class SparqlAstBuilder {
             case ASTConstants.FUNCTION_CALL.IRI -> {
                 return new IriFunctionAst(args);
             }
+            case ASTConstants.FUNCTION_CALL.BNODE -> {
+                return new BnodeAst(args);
+            }
             case ASTConstants.OPERATOR.OR -> {
                 return new OrAst(args);
             }
@@ -1215,6 +1218,11 @@ public final class SparqlAstBuilder {
             return termFromRegex(ctx.regexExpression());
         } else if (ctx.BOUND() != null) {
             return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
+        } else if (ctx.BNODE() != null) {
+            List<TermAst> args = ctx.expression() == null
+                    ? List.of()
+                    : ctx.expression().stream().map(this::termFromExpression).toList();
+            return this.createConstraint(ASTConstants.FUNCTION_CALL.BNODE, args);
         } else if (ctx.IF() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return new IfAst(args.get(0), args.get(1), args.get(2));
