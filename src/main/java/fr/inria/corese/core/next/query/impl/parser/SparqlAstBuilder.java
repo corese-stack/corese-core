@@ -919,6 +919,9 @@ public final class SparqlAstBuilder {
             case ASTConstants.FUNCTION_CALL.DATATYPE -> {
                 return new DatatypeAst(args);
             }
+            case ASTConstants.FUNCTION_CALL.IRI -> {
+                return new IriFunctionAst(args);
+            }
             case ASTConstants.OPERATOR.OR -> {
                 return new OrAst(args);
             }
@@ -1219,6 +1222,8 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STRSTARTS, args);
             } else if (ctx.DATATYPE() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
+            } else if (ctx.IRI() != null || ctx.URI() != null) {
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.IRI, args);
             } else if (ctx.SAME_TERM() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.SAMETERM, args);
             } else if (ctx.IS_URI() != null || ctx.IS_IRI() != null) {
