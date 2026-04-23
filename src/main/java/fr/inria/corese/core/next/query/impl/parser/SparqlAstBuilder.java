@@ -913,6 +913,9 @@ public final class SparqlAstBuilder {
             case ASTConstants.FUNCTION_CALL.STR -> {
                 return new StrAst(args);
             }
+            case ASTConstants.FUNCTION_CALL.UCASE -> {
+                return new UcaseAst(args);
+            }
             case ASTConstants.FUNCTION_CALL.LANG -> {
                 return new LangAst(args);
             }
@@ -1213,6 +1216,8 @@ public final class SparqlAstBuilder {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STR, args);
+            } else if (ctx.UCASE() != null) {
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.UCASE, args);
             } else if (ctx.ENCODE_FOR_URI() != null) {
                 return new EncodeForUriAst(args);
             } else if (ctx.LANG() != null) {

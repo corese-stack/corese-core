@@ -136,6 +136,11 @@ public class ASTConstants {
         STRENDS,
 
         /**
+         * {@code UCASE(string)}: returns an uppercased copy of {@code string}.
+         */
+        UCASE,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
