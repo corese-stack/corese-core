@@ -141,6 +141,11 @@ public class ASTConstants {
         UCASE,
 
         /**
+         * {@code LCASE(string)}: returns a lowercased copy of {@code string}.
+         */
+        LCASE,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
