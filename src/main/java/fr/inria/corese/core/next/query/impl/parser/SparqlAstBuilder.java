@@ -1222,6 +1222,16 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_BLANK, args);
             } else if (ctx.IS_LITERAL() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.IS_LITERAL, args);
+            } else if (ctx.MD5() != null) {
+                return new Md5Ast(args);
+            } else if (ctx.SHA1() != null) {
+                return new Sha1Ast(args);
+            } else if (ctx.SHA256() != null) {
+                return new Sha256Ast(args);
+            } else if (ctx.SHA384() != null) {
+                return new Sha384Ast(args);
+            } else if (ctx.SHA512() != null) {
+                return new Sha512Ast(args);
             } else if (ctx.BOUND() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
             } else if (ctx.regexExpression() != null) {
