@@ -997,6 +997,9 @@ public final class SparqlAstBuilder {
             case ASTConstants.FUNCTION_CALL.STRBEFORE -> {
                 return new StrBeforeAst(args);
             }
+            case ASTConstants.FUNCTION_CALL.STRAFTER -> {
+                return new StrAfterAst(args);
+            }
             case ASTConstants.FUNCTION_CALL.REGEX -> {
                 if (args.size() == 2) {
                     return new BinaryRegexAst(args);
@@ -1267,6 +1270,8 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STRLANG, args);
             } else if (ctx.STRBEFORE() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STRBEFORE, args);
+            } else if (ctx.STRAFTER() != null) {
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.STRAFTER, args);
             } else if (ctx.DATATYPE() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
             } else if (ctx.IRI() != null || ctx.URI() != null) {

@@ -177,6 +177,12 @@ public class ASTConstants {
         STRBEFORE,
 
         /**
+         * {@code STRAFTER(string1, string2)}: returns the part of {@code string1}
+         * that follows the first occurrence of {@code string2}.
+         */
+        STRAFTER,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
