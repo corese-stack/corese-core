@@ -171,6 +171,12 @@ public class ASTConstants {
         CONCAT,
 
         /**
+         * {@code STRBEFORE(string1, string2)}: returns the part of {@code string1}
+         * that precedes the first occurrence of {@code string2}.
+         */
+        STRBEFORE,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
