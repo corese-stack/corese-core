@@ -183,6 +183,15 @@ public class ASTConstants {
         STRAFTER,
 
         /**
+         * {@code REPLACE(arg, pattern, replacement)} and
+         * {@code REPLACE(arg, pattern, replacement, flags)}: returns the string
+         * obtained by replacing each non-overlapping match of {@code pattern} in
+         * {@code arg} with {@code replacement}. Matching may be affected by
+         * regular-expression {@code flags}.
+         */
+        REPLACE,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
