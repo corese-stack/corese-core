@@ -130,6 +130,12 @@ public class ASTConstants {
         STRSTARTS,
 
         /**
+         * {@code STRENDS(string1, string2)}: returns {@code true} if {@code string1}
+         * ends with {@code string2}.
+         */
+        STRENDS,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
