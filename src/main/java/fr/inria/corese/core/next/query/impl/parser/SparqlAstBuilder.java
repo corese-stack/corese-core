@@ -991,6 +991,9 @@ public final class SparqlAstBuilder {
             case ASTConstants.FUNCTION_CALL.SUBSTR -> {
                 return new SubstrAst(args);
             }
+            case ASTConstants.FUNCTION_CALL.CONCAT -> {
+                return new ConcatAst(args);
+            }
             case ASTConstants.FUNCTION_CALL.REGEX -> {
                 if (args.size() == 2) {
                     return new BinaryRegexAst(args);
@@ -1228,7 +1231,7 @@ public final class SparqlAstBuilder {
             return new IfAst(args.get(0), args.get(1), args.get(2));
         } else if (ctx.CONCAT() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
-            return new FunctionCallAst(new IriAst("CONCAT"), args);
+            return this.createConstraint(ASTConstants.FUNCTION_CALL.CONCAT, args);
         } else if (ctx.COALESCE() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return new CoalesceAst(args);

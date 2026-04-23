@@ -168,6 +168,12 @@ public final class VariableScopeAnalyzer {
                 }
             }
 
+            case ConcatAst(List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariables(argument, referencedVariables);
+                }
+            }
+
             case ConstraintAst ignored -> {
                 // Other constraint shapes are ignored until they are supported here.
             }
