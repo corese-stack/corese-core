@@ -922,6 +922,12 @@ public final class SparqlAstBuilder {
             case ASTConstants.FUNCTION_CALL.LANG -> {
                 return new LangAst(args);
             }
+            case ASTConstants.FUNCTION_CALL.STRDT -> {
+                return new StrDtAst(args);
+            }
+            case ASTConstants.FUNCTION_CALL.STRLANG -> {
+                return new StrLangAst(args);
+            }
             case ASTConstants.FUNCTION_CALL.DATATYPE -> {
                 return new DatatypeAst(args);
             }
@@ -1235,6 +1241,10 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STRSTARTS, args);
             } else if (ctx.STRENDS() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STRENDS, args);
+            } else if (ctx.STRDT() != null) {
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.STRDT, args);
+            } else if (ctx.STRLANG() != null) {
+                return this.createConstraint(ASTConstants.FUNCTION_CALL.STRLANG, args);
             } else if (ctx.DATATYPE() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
             } else if (ctx.IRI() != null || ctx.URI() != null) {
