@@ -15,7 +15,9 @@ import java.util.Optional;
  * {@link fr.inria.corese.core.next.query.impl.sparql.bridge.SparqlAstToExpression}
  * and {@link fr.inria.corese.core.next.query.impl.sparql.bridge.AstBackedExpr} /
  * {@link fr.inria.corese.core.next.query.impl.sparql.bridge.NextFilterFromAst}.
- * {@link #getFilterExpression()} remains the bridge to the legacy interpreter until KGRAM is fully unified.
+ * {@link #getFilterExpression()} still exposes the SPARQL {@link Expression} tree for the
+ * interpreter; {@link #getExp()} and {@link #coreseNextSource()} carry the
+ * {@link fr.inria.corese.core.next.query.kgram.api.core.Expr} / Corese-next AST view.
  *
  * @author Olivier Corby, Edelweiss, INRIA 2010
  */

@@ -7,12 +7,12 @@ import fr.inria.corese.core.next.query.kgram.api.core.DatatypeValue;
 import fr.inria.corese.core.next.query.kgram.api.core.Expr;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.kgram.adapter.BindingAdapter;
+import fr.inria.corese.core.next.query.kgram.adapter.TripleParserEvalSupport;
 import fr.inria.corese.core.next.query.kgram.api.query.Environment;
 import fr.inria.corese.core.next.query.kgram.api.query.Evaluator;
 import fr.inria.corese.core.next.query.kgram.api.query.Producer;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
 
@@ -22,14 +22,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Wraps a legacy {@link Expression} as a {@link fr.inria.corese.core.next.query.kgram.api.core.Expr}.
+ * Wraps a {@link fr.inria.corese.core.sparql.triple.parser.Expression} (SPARQL interpreter tree) as a
+ * {@link fr.inria.corese.core.next.query.kgram.api.core.Expr}.
  *
- * <p>{@link #evalWE} forwards to the legacy tree and therefore requires:
- * <ul>
- *   <li>{@code eval} implementing {@link Computer}</li>
- *   <li>{@code b} as {@link BindingAdapter} (or raw {@link Binding} via adapter)</li>
- *   <li>{@code env} and {@code p} as legacy {@code fr.inria.corese.core.kgram.api.query.*} types</li>
- * </ul>
+ * <p>{@link #evalWE} follows {@link fr.inria.corese.core.next.query.kgram.api.core.Expr#evalWE}; the
+ * underlying {@link Expression#evalWE} call is delegated through
+ * {@link fr.inria.corese.core.next.query.kgram.adapter.TripleParserEvalSupport}.
  */
 public final class AstBackedExpr implements Expr {
 
@@ -47,7 +45,10 @@ public final class AstBackedExpr implements Expr {
         this.filterView = new NextFilterFromAst(this);
     }
 
-    public Expression legacyExpression() {
+    /**
+     * The underlying SPARQL interpreter {@link Expression} (triple.parser), for metadata and {@link Filter#getFilterExpression()}.
+     */
+    public Expression asTripleParserExpression() {
         return delegate;
     }
 
@@ -55,18 +56,14 @@ public final class AstBackedExpr implements Expr {
         return sourceAst;
     }
 
-    private fr.inria.corese.core.kgram.api.core.Expr legacy() {
-        return delegate;
-    }
-
-    private static Expr wrap(fr.inria.corese.core.kgram.api.core.Expr e) {
-        if (e == null) {
+    private static Expr wrapInterpreterSubexpr(Object node) {
+        if (node == null) {
             return null;
         }
-        if (e instanceof Expression ex) {
+        if (node instanceof Expression ex) {
             return new AstBackedExpr(ex);
         }
-        throw new IllegalArgumentException("Cannot wrap as AstBackedExpr: " + e);
+        throw new IllegalArgumentException("Cannot wrap as AstBackedExpr: " + node);
     }
 
     @Override
@@ -76,69 +73,68 @@ public final class AstBackedExpr implements Expr {
 
     @Override
     public Object getPattern() {
-        return legacy().getPattern();
+        return delegate.getPattern();
     }
 
     @Override
     public boolean isSystem() {
-        return legacy().isSystem();
+        return delegate.isSystem();
     }
 
     @Override
     public boolean isPublic() {
-        return legacy().isPublic();
+        return delegate.isPublic();
     }
 
     @Override
     public void setPublic(boolean b) {
-        legacy().setPublic(b);
+        delegate.setPublic(b);
     }
 
     @Override
     public boolean isDynamic() {
-        return legacy().isDynamic();
+        return delegate.isDynamic();
     }
 
     @Override
     public boolean isTrace() {
-        return legacy().isTrace();
+        return delegate.isTrace();
     }
 
     @Override
     public boolean isDebug() {
-        return legacy().isDebug();
+        return delegate.isDebug();
     }
 
     @Override
     public String getLabel() {
-        return legacy().getLabel();
+        return delegate.getLabel();
     }
 
     @Override
     public String getModality() {
-        return legacy().getModality();
+        return delegate.getModality();
     }
 
     @Override
     public List<Expr> getExpList() {
-        List<fr.inria.corese.core.kgram.api.core.Expr> in = legacy().getExpList();
+        List<?> in = delegate.getExpList();
         List<Expr> out = new ArrayList<>(in.size());
-        for (fr.inria.corese.core.kgram.api.core.Expr e : in) {
-            out.add(wrap(e));
+        for (Object o : in) {
+            out.add(wrapInterpreterSubexpr(o));
         }
         return out;
     }
 
     @Override
     public Expr getExp(int i) {
-        fr.inria.corese.core.kgram.api.core.Expr e = legacy().getExp(i);
-        return e == null ? null : wrap(e);
+        return wrapInterpreterSubexpr(delegate.getExp(i));
     }
 
     @Override
     public void setExp(int i, Expr e) {
         if (e instanceof AstBackedExpr ab) {
-            legacy().setExp(i, ab.delegate);
+            delegate.setExp(i, ab.delegate);
         } else {
             throw new IllegalArgumentException("Expr must be AstBackedExpr");
         }
@@ -146,14 +142,13 @@ public final class AstBackedExpr implements Expr {
 
     @Override
     public Expr getArg() {
-        fr.inria.corese.core.kgram.api.core.Expr a = legacy().getArg();
-        return a == null ? null : wrap(a);
+        return wrapInterpreterSubexpr(delegate.getArg());
     }
 
     @Override
     public void setArg(Expr exp) {
         if (exp instanceof AstBackedExpr ab) {
-            legacy().setArg(ab.delegate);
+            delegate.setArg(ab.delegate);
         } else {
             throw new IllegalArgumentException("Expr must be AstBackedExpr");
         }
@@ -161,114 +156,113 @@ public final class AstBackedExpr implements Expr {
 
     @Override
     public DatatypeValue getValue() {
-        return NextDatatypeValueAdapter.ofNullable(legacy().getValue());
+        return NextDatatypeValueAdapter.ofNullable(delegate.getValue());
     }
 
     @Override
     public DatatypeValue getDatatypeValue() {
-        return NextDatatypeValueAdapter.ofNullable(legacy().getDatatypeValue());
+        return NextDatatypeValueAdapter.ofNullable(delegate.getDatatypeValue());
     }
 
     @Override
     public int type() {
-        return legacy().type();
+        return delegate.type();
     }
 
     @Override
     public int subtype() {
-        return legacy().subtype();
+        return delegate.subtype();
     }
 
     @Override
     public void setSubtype(int n) {
-        legacy().setSubtype(n);
+        delegate.setSubtype(n);
     }
 
     @Override
     public int oper() {
-        return legacy().oper();
+        return delegate.oper();
     }
 
     @Override
     public boolean match(int oper) {
-        return legacy().match(oper);
+        return delegate.match(oper);
     }
 
     @Override
     public void setOper(int n) {
-        legacy().setOper(n);
+        delegate.setOper(n);
     }
 
     @Override
     public boolean isAggregate() {
-        return legacy().isAggregate();
+        return delegate.isAggregate();
     }
 
     @Override
     public boolean isRecAggregate() {
-        return legacy().isRecAggregate();
+        return delegate.isRecAggregate();
     }
 
     @Override
     public boolean isExist() {
-        return legacy().isExist();
+        return delegate.isExist();
     }
 
     @Override
     public boolean isRecExist() {
-        return legacy().isRecExist();
+        return delegate.isRecExist();
     }
 
     @Override
     public boolean isVariable() {
-        return legacy().isVariable();
+        return delegate.isVariable();
     }
 
     @Override
     public boolean isConstant() {
-        return legacy().isConstant();
+        return delegate.isConstant();
     }
 
     @Override
     public boolean isFuncall() {
-        return legacy().isFuncall();
+        return delegate.isFuncall();
     }
 
     @Override
     public boolean isBound() {
-        return legacy().isBound();
+        return delegate.isBound();
     }
 
     @Override
     public boolean isDistinct() {
-        return legacy().isDistinct();
+        return delegate.isDistinct();
     }
 
     @Override
     public int arity() {
-        return legacy().arity();
+        return delegate.arity();
     }
 
     @Override
     public int getIndex() {
-        return legacy().getIndex();
+        return delegate.getIndex();
     }
 
     @Override
     public void setIndex(int index) {
-        legacy().setIndex(index);
+        delegate.setIndex(index);
     }
 
     @Override
     public Expr getDefine() {
-        fr.inria.corese.core.kgram.api.core.Expr d = legacy().getDefine();
-        return d == null ? null : wrap(d);
+        return wrapInterpreterSubexpr(delegate.getDefine());
     }
 
     @Override
     public void setDefine(Expr exp) {
         if (exp instanceof AstBackedExpr ab) {
-            legacy().setDefine(ab.delegate);
+            delegate.setDefine(ab.delegate);
         } else {
             throw new IllegalArgumentException("Expr must be AstBackedExpr");
         }
@@ -276,50 +270,36 @@ public final class AstBackedExpr implements Expr {
 
     @Override
     public Expr getFunction() {
-        fr.inria.corese.core.kgram.api.core.Expr f = legacy().getFunction();
-        return f == null ? null : wrap(f);
+        return wrapInterpreterSubexpr(delegate.getFunction());
     }
 
     @Override
     public Expr getBody() {
-        fr.inria.corese.core.kgram.api.core.Expr b = legacy().getBody();
-        return b == null ? null : wrap(b);
+        return wrapInterpreterSubexpr(delegate.getBody());
     }
 
     @Override
     public Expr getVariable() {
-        fr.inria.corese.core.kgram.api.core.Expr v = legacy().getVariable();
-        return v == null ? null : wrap(v);
+        return wrapInterpreterSubexpr(delegate.getVariable());
     }
 
     @Override
     public Expr getDefinition() {
-        fr.inria.corese.core.kgram.api.core.Expr d = legacy().getDefinition();
-        return d == null ? null : wrap(d);
+        return wrapInterpreterSubexpr(delegate.getDefinition());
     }
 
     @Override
     public boolean hasMetadata(String name) {
-        return legacy().hasMetadata(name);
+        return delegate.hasMetadata(name);
     }
 
     @Override
     public IDatatype evalWE(Evaluator eval, BindingContext b, Environment env, Producer p) {
         if (!(eval instanceof Computer computer)) {
-            throw new QueryEvaluationException("Evaluator must implement Computer for legacy Expression evaluation");
+            throw new QueryEvaluationException("Evaluator must implement Computer for triple.parser Expression evaluation");
         }
         Binding binding = bindingFrom(b);
-        if (!(env instanceof fr.inria.corese.core.kgram.api.query.Environment legacyEnv)) {
-            throw new QueryEvaluationException("Environment must be legacy fr.inria.corese.core.kgram.api.query.Environment");
-        }
-        if (!(p instanceof fr.inria.corese.core.kgram.api.query.Producer legacyProducer)) {
-            throw new QueryEvaluationException("Producer must be legacy fr.inria.corese.core.kgram.api.query.Producer");
-        }
-        try {
-            return delegate.evalWE(computer, binding, legacyEnv, legacyProducer);
-        } catch (EngineException e) {
-            throw new QueryEvaluationException(e.getMessage(), e);
-        }
+        return TripleParserEvalSupport.evalWE(delegate, computer, binding, env, p);
     }
 
     private static Binding bindingFrom(BindingContext b) {

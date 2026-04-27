@@ -5,7 +5,7 @@ import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.CoreseDatatypeException;
 
 /**
- * Adapts a legacy {@link IDatatype} to the Corese-next {@link DatatypeValue} API.
+ * Adapts a runtime {@link IDatatype} to the Corese-next {@link DatatypeValue} API.
  */
 public final class NextDatatypeValueAdapter implements DatatypeValue {
 

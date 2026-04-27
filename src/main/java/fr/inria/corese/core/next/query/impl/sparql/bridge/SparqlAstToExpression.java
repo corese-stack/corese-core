@@ -14,10 +14,12 @@ import java.util.Optional;
 
 /**
  * Converts Corese-next {@link TermAst} nodes (including {@link ConstraintAst}) into
- * legacy {@link Expression} trees for the existing KGRAM / interpreter stack.
+ * {@link Expression} trees for the SPARQL interpreter, consumable from KGRAM “next” via
+ * {@link fr.inria.corese.core.next.query.kgram.api.core.Filter} / {@link AstBackedExpr}.
  *
  * <p>{@link ExistsAst} and {@link NotExistsAst} are not supported until
- * {@link CoreseAstQueryBuilder} can translate {@code GroupGraphPatternAst} to legacy {@code Exp}.
+ * {@link CoreseAstQueryBuilder} can translate {@code GroupGraphPatternAst} to
+ * {@link fr.inria.corese.core.next.query.kgram.core.Exp Exp}.
  */
 public final class SparqlAstToExpression {
 
@@ -38,15 +40,15 @@ public final class SparqlAstToExpression {
     }
 
     /**
-     * Converts a filter {@link TermAst} to a legacy {@link Expression}, then wraps it as a Corese-next
+     * Converts a filter {@link TermAst} to an {@link Expression}, then wraps it as a
      * {@link Filter} with {@link Filter#coreseNextSource()} set to {@code filterExpression}.
      *
      * <p>Prefer {@link CoreseAstQueryBuilder#toNextFilter(TermAst)} at call sites that build queries; this
      * method is the shared implementation.
      */
     public static Filter toNextFilter(TermAst filterExpression) {
-        Expression legacy = convert(filterExpression);
-        AstBackedExpr expr = new AstBackedExpr(legacy, Optional.of(filterExpression));
+        Expression exprTree = convert(filterExpression);
+        AstBackedExpr expr = new AstBackedExpr(exprTree, Optional.of(filterExpression));
         return expr.getFilter();
     }
 
@@ -119,9 +121,9 @@ public final class SparqlAstToExpression {
             case TrinaryRegexAst r -> regexTerm(convert(r.getString()), convert(r.getPattern()), convert(r.getFlags()));
             case FunctionCallAst f -> functionCallAst(f);
             case ExistsAst ignored ->
-                    throw new UnsupportedOperationException("EXISTS { ... } conversion requires GroupGraphPatternAst → legacy Exp (see CoreseAstQueryBuilder)");
+                    throw new UnsupportedOperationException("EXISTS { ... } conversion requires GroupGraphPatternAst → Exp (see CoreseAstQueryBuilder)");
             case NotExistsAst ignored ->
-                    throw new UnsupportedOperationException("NOT EXISTS { ... } conversion requires GroupGraphPatternAst → legacy Exp (see CoreseAstQueryBuilder)");
+                    throw new UnsupportedOperationException("NOT EXISTS { ... } conversion requires GroupGraphPatternAst → Exp (see CoreseAstQueryBuilder)");
             default ->
                     throw new UnsupportedOperationException("Unsupported constraint AST: " + c.getClass().getName());
         };

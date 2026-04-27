@@ -22,7 +22,8 @@ public final class CoreseQueryArtifactAdapter {
     }
 
     /**
-     * Converts a WHERE filter term from the next AST into a KGRAM {@link Filter} (legacy-backed).
+     * Converts a WHERE filter term from the next AST into a KGRAM {@link Filter} (backed by
+     * {@link fr.inria.corese.core.sparql.triple.parser.Expression} under {@link fr.inria.corese.core.next.query.impl.sparql.bridge.AstBackedExpr}).
      */
     public Filter adaptFilter(TermAst filterExpression) {
         return queryBuilder.toNextFilter(filterExpression);

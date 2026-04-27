@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {@link Filter} view for an {@link AstBackedExpr}, delegating metadata to the legacy {@link Expression}
+ * {@link Filter} view for an {@link AstBackedExpr}, delegating metadata to the underlying
+ * {@link fr.inria.corese.core.sparql.triple.parser.Expression}
  * while exposing the Corese-next {@link Expr} API.
  */
 public final class NextFilterFromAst implements Filter {
@@ -22,12 +23,12 @@ public final class NextFilterFromAst implements Filter {
 
     @Override
     public List<String> getVariables() {
-        return owner.legacyExpression().getVariables();
+        return owner.asTripleParserExpression().getVariables();
     }
 
     @Override
     public List<String> getVariables(boolean excludeLocal) {
-        return owner.legacyExpression().getVariables(excludeLocal);
+        return owner.asTripleParserExpression().getVariables(excludeLocal);
     }
 
     @Override
@@ -37,32 +38,32 @@ public final class NextFilterFromAst implements Filter {
 
     @Override
     public Expression getFilterExpression() {
-        return owner.legacyExpression();
+        return owner.asTripleParserExpression();
     }
 
     @Override
     public boolean isBound() {
-        return owner.legacyExpression().isBound();
+        return owner.asTripleParserExpression().isBound();
     }
 
     @Override
     public boolean isAggregate() {
-        return owner.legacyExpression().isAggregate();
+        return owner.asTripleParserExpression().isAggregate();
     }
 
     @Override
     public boolean isRecAggregate() {
-        return owner.legacyExpression().isRecAggregate();
+        return owner.asTripleParserExpression().isRecAggregate();
     }
 
     @Override
     public boolean isFunctional() {
-        return owner.legacyExpression().isFunctional();
+        return owner.asTripleParserExpression().isFunctional();
     }
 
     @Override
     public boolean isRecExist() {
-        return owner.legacyExpression().isRecExist();
+        return owner.asTripleParserExpression().isRecExist();
     }
 
     @Override
