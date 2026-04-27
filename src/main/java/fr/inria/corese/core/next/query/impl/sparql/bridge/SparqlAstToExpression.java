@@ -17,9 +17,6 @@ import java.util.Optional;
  * {@link Expression} trees for the SPARQL interpreter, consumable from KGRAM “next” via
  * {@link fr.inria.corese.core.next.query.kgram.api.core.Filter} / {@link AstBackedExpr}.
  *
- * <p>{@link ExistsAst} and {@link NotExistsAst} are not supported until
- * {@link CoreseAstQueryBuilder} can translate {@code GroupGraphPatternAst} to
- * {@link fr.inria.corese.core.next.query.kgram.core.Exp Exp}.
  */
 public final class SparqlAstToExpression {
 

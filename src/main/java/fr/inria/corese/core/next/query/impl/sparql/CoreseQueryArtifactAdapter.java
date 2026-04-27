@@ -29,6 +29,5 @@ public final class CoreseQueryArtifactAdapter {
         return queryBuilder.toNextFilter(filterExpression);
     }
 
-    // Full QueryAst → Query / Exp translation is future work (see CoreseAstQueryBuilder javadoc).
 
 }

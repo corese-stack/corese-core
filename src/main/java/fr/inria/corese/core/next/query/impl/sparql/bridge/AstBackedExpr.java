@@ -25,9 +25,6 @@ import java.util.Optional;
  * Wraps a {@link fr.inria.corese.core.sparql.triple.parser.Expression} (SPARQL interpreter tree) as a
  * {@link fr.inria.corese.core.next.query.kgram.api.core.Expr}.
  *
- * <p>{@link #evalWE} follows {@link fr.inria.corese.core.next.query.kgram.api.core.Expr#evalWE}; the
- * underlying {@link Expression#evalWE} call is delegated through
- * {@link fr.inria.corese.core.next.query.kgram.adapter.TripleParserEvalSupport}.
  */
 public final class AstBackedExpr implements Expr {
 

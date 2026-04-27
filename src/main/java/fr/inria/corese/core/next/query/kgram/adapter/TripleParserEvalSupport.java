@@ -11,12 +11,6 @@ import fr.inria.corese.core.sparql.triple.parser.Expression;
 
 /**
  * Invokes {@link Expression#evalWE} for Corese-next {@link fr.inria.corese.core.next.query.kgram.api.core.Expr}
- * wrappers built on the SPARQL triple.parser tree. The interpreter is still compiled against
- * {@link fr.inria.corese.core.kgram.api.query.Environment} and
- * {@link fr.inria.corese.core.kgram.api.query.Producer}; concrete values must implement those
- * types in addition to the
- * {@link fr.inria.corese.core.next.query.kgram.api.query} interfaces used on
- * {@link fr.inria.corese.core.next.query.kgram.api.core.Expr#evalWE}.
  */
 public final class TripleParserEvalSupport {
 

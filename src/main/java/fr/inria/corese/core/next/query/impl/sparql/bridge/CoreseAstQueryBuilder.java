@@ -6,11 +6,6 @@ import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 /**
  * Builds KGRAM {@code Exp} / {@code Query} structures from Corese-next query AST nodes.
  *
- * <p>Filter expressions are converted today via {@link SparqlAstToExpression} and wrapped with
- * {@link AstBackedExpr} / {@link NextFilterFromAst}. Translating full {@code GroupGraphPatternAst}
- * or complete {@code QueryAst} into KGRAM “next” {@link fr.inria.corese.core.next.query.kgram.core.Query} /
- * {@link fr.inria.corese.core.next.query.kgram.core.Exp} is future work (required for
- * {@code EXISTS} / {@code NOT EXISTS} inside {@link SparqlAstToExpression}).
  */
 public final class CoreseAstQueryBuilder {
 
