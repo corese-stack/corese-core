@@ -49,33 +49,90 @@ public class SparqlAstToExpressionTest {
     }
 
 //    @Test
-//    void triplePatternAstToEdge() {
+//    void triplePatternAstIriIriIriToEdge() {
 //        IriAst iri = new IriAst("<http://ns.inria.fr/test/iri>");
-//        LiteralAst lit = new LiteralAst("1234", "fr", null);
-//        VarAst var = new VarAst("var1");
 //
 //        TriplePatternAst iriiriiri = new TriplePatternAst(iri, iri, iri);
 //        Edge iriiriiriEdge = SparqlAstToExpression.convert(iriiriiri);
 //        assertNotNull(iriiriiriEdge);
 //        assertInstanceOf(Edge.class, iriiriiriEdge);
-//        assertInstanceOf(Expression.class, iriiriiriEdge.getSubjectNode());
-//        assertInstanceOf(Expression.class, iriiriiriEdge.getPropertyNode());
-//        assertInstanceOf(Expression.class, iriiriiriEdge.getObjectNode());
+//        assertInstanceOf(Constant.class, iriiriiriEdge.getSubjectNode());
+//        assertInstanceOf(Constant.class, iriiriiriEdge.getPropertyNode());
+//        assertInstanceOf(Constant.class, iriiriiriEdge.getObjectNode());
+//    }
+//
+//    @Test
+//    void triplePatternAstIriIriLitToEdge() {
+//        IriAst iri = new IriAst("<http://ns.inria.fr/test/iri>");
+//        LiteralAst lit = new LiteralAst("1234", "fr", null);
+//        VarAst var = new VarAst("var1");
 //
 //        TriplePatternAst iriirilit = new TriplePatternAst(iri, iri, lit);
 //        Edge iriirilitEdge = SparqlAstToExpression.convert(iriirilit);
-//        assertNotNull(iriiriiriEdge);
+//        assertNotNull(iriirilitEdge);
 //        assertInstanceOf(Edge.class, iriirilitEdge);
-//        assertInstanceOf(Expression.class, iriirilitEdge.getSubjectNode());
-//        assertInstanceOf(Expression.class, iriirilitEdge.getPropertyNode());
-//        assertInstanceOf(Expression.class, iriirilitEdge.getObjectNode());
+//        assertInstanceOf(Constant.class, iriirilitEdge.getSubjectNode());
+//        assertInstanceOf(Constant.class, iriirilitEdge.getPropertyNode());
+//        assertInstanceOf(Constant.class, iriirilitEdge.getObjectNode());
+//    }
+//
+//    @Test
+//    void triplePatternAstVarIriLitToEdge() {
+//        IriAst iri = new IriAst("<http://ns.inria.fr/test/iri>");
+//        LiteralAst lit = new LiteralAst("1234", "fr", null);
+//        VarAst var = new VarAst("var1");
 //
 //        TriplePatternAst varirilit = new TriplePatternAst(var, iri, lit);
 //        Edge varirilitEdge = SparqlAstToExpression.convert(varirilit);
 //        assertNotNull(varirilitEdge);
 //        assertInstanceOf(Edge.class, varirilitEdge);
-//        assertInstanceOf(Expression.class, varirilitEdge.getSubjectNode());
-//        assertInstanceOf(Expression.class, varirilitEdge.getPropertyNode());
-//        assertInstanceOf(Expression.class, varirilitEdge.getObjectNode());
+//        assertInstanceOf(Variable.class, varirilitEdge.getSubjectNode());
+//        assertInstanceOf(Constant.class, varirilitEdge.getPropertyNode());
+//        assertInstanceOf(Constant.class, varirilitEdge.getObjectNode());
+//    }
+//
+//    @Test
+//    void triplePatternAstIriVarLitToEdge() {
+//        IriAst iri = new IriAst("<http://ns.inria.fr/test/iri>");
+//        LiteralAst lit = new LiteralAst("1234", "fr", null);
+//        VarAst var = new VarAst("var1");
+//
+//        TriplePatternAst irivarlit = new TriplePatternAst(iri, var, lit);
+//        Edge irivarlitEdge = SparqlAstToExpression.convert(irivarlit);
+//        assertNotNull(irivarlitEdge);
+//        assertInstanceOf(Edge.class, irivarlitEdge);
+//        assertInstanceOf(Constant.class, irivarlitEdge.getSubjectNode());
+//        assertInstanceOf(Variable.class, irivarlitEdge.getPropertyNode());
+//        assertInstanceOf(Constant.class, irivarlitEdge.getObjectNode());
+//    }
+//
+//    @Test
+//    void triplePatternAstVarIriVarToEdge() {
+//        IriAst iri = new IriAst("<http://ns.inria.fr/test/iri>");
+//        VarAst var1 = new VarAst("var1");
+//        VarAst var2 = new VarAst("var2");
+//
+//        TriplePatternAst varirivar = new TriplePatternAst(var1, iri, var2);
+//        Edge varirivarEdge = SparqlAstToExpression.convert(varirivar);
+//        assertNotNull(varirivarEdge);
+//        assertInstanceOf(Edge.class, varirivarEdge);
+//        assertInstanceOf(Variable.class, varirivarEdge.getSubjectNode());
+//        assertInstanceOf(Constant.class, varirivarEdge.getPropertyNode());
+//        assertInstanceOf(Variable.class, varirivarEdge.getObjectNode());
+//    }
+//
+//    @Test
+//    void triplePatternAstVarVarVarToEdge() {
+//        VarAst var1 = new VarAst("var1");
+//        VarAst var2 = new VarAst("var2");
+//        VarAst var3 = new VarAst("var3");
+//
+//        TriplePatternAst varirivar = new TriplePatternAst(var1, var2, var3);
+//        Edge varirivarEdge = SparqlAstToExpression.convert(varirivar);
+//        assertNotNull(varirivarEdge);
+//        assertInstanceOf(Edge.class, varirivarEdge);
+//        assertInstanceOf(Variable.class, varirivarEdge.getSubjectNode());
+//        assertInstanceOf(Variable.class, varirivarEdge.getPropertyNode());
+//        assertInstanceOf(Variable.class, varirivarEdge.getObjectNode());
 //    }
 }
