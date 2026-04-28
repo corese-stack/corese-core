@@ -1240,6 +1240,8 @@ public final class SparqlAstBuilder {
         } else if (ctx.IF() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return new IfAst(args.get(0), args.get(1), args.get(2));
+        } else if (ctx.RAND() != null) {
+            return new RandAst();
         } else if (ctx.CONCAT() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return this.createConstraint(ASTConstants.FUNCTION_CALL.CONCAT, args);
@@ -1299,6 +1301,14 @@ public final class SparqlAstBuilder {
                 return new Sha384Ast(args);
             } else if (ctx.SHA512() != null) {
                 return new Sha512Ast(args);
+            } else if (ctx.ABS() != null) {
+                return new AbsAst(args);
+            } else if (ctx.CEIL() != null) {
+                return new CeilAst(args);
+            } else if (ctx.FLOOR() != null) {
+                return new FloorAst(args);
+            } else if (ctx.ROUND() != null) {
+                return new RoundAst(args);
             } else if (ctx.BOUND() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.BOUND, List.of(this.var(ctx.var_().getText())));
             } else if (ctx.regexExpression() != null) {
