@@ -43,6 +43,7 @@ class SparqlAstBuilderUnionTest {
 
         builder.exitUnion();
         builder.exitGroup();           // }
+        builder.exitSelectQuery();
         return Objects.requireNonNull(builder.getResult()).whereClause();
     }
 
@@ -110,6 +111,7 @@ class SparqlAstBuilderUnionTest {
             builder.exitUnion();
             builder.exitGroup();
 
+            builder.exitSelectQuery();
             SelectQueryAst result = (SelectQueryAst) builder.getResult();
             assertNotNull(result);
             UnionAst union = (UnionAst) result.whereClause().patterns().getFirst();
@@ -158,6 +160,7 @@ class SparqlAstBuilderUnionTest {
             builder.exitUnion();
             builder.exitGroup();
 
+            builder.exitSelectQuery();
             SelectQueryAst result = (SelectQueryAst) builder.getResult();
             assertNotNull(result);
             return (UnionAst) result.whereClause().patterns().getFirst();
@@ -221,6 +224,7 @@ class SparqlAstBuilderUnionTest {
             builder.exitUnion();
             builder.exitGroup();
 
+            builder.exitSelectQuery();
             SelectQueryAst result = (SelectQueryAst) builder.getResult();
             assertNotNull(result);
             PatternAst pattern = result.whereClause().patterns().getFirst();
@@ -243,6 +247,7 @@ class SparqlAstBuilderUnionTest {
             builder.exitUnion();
             builder.exitGroup();
 
+            builder.exitSelectQuery();
             SelectQueryAst result = (SelectQueryAst) builder.getResult();
             assertNotNull(result);
             GroupGraphPatternAst group = (GroupGraphPatternAst) result.whereClause().patterns().getFirst();
@@ -314,6 +319,7 @@ class SparqlAstBuilderUnionTest {
 
             builder.exitGroup();                        // }
 
+            builder.exitSelectQuery();
             SelectQueryAst result = (SelectQueryAst) builder.getResult();
             assertNotNull(result);
             List<PatternAst> patterns = result.whereClause().patterns();

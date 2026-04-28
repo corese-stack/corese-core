@@ -1,10 +1,7 @@
-package fr.inria.corese.core.next.query.impl.parser;
+package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -87,6 +84,25 @@ public final class VariableScopeAnalyzer {
             case FilterAst ignored -> {
                 // FILTER does not make a variable visible by itself.
             }
+
+            case ServiceAst(TermAst endpoint, boolean silentFlag, GroupGraphPatternAst servicePattern) ->
+                // SERVICE exposes variables from its inner graph pattern.
+                collectVisibleVariables(servicePattern, visibleVariables);
+
+            case SubQueryAst(QueryAst query) -> {
+                if (query instanceof SelectQueryAst select) {
+                    ProjectionAst proj = select.projection();
+                    if (proj.selectAll()) {
+                        collectVisibleVariables(select.whereClause(), visibleVariables);
+                    } else {
+                        for (VarAst v : proj.variables()) {
+                            visibleVariables.add(v.name());
+                        }
+                    }
+                }
+            }
+
+            default -> throw new IllegalStateException("Unexpected value: " + pattern);
         }
     }
 
@@ -116,11 +132,29 @@ public final class VariableScopeAnalyzer {
                 }
             }
 
+            case BnodeAst bnodeAst ->
+                collectReferencedVariables(bnodeAst.getLabel(), referencedVariables);
+
             case TrinaryRegexAst regexAst -> {
                 // REGEX may reference variables in the text, pattern or flags.
                 collectReferencedVariables(regexAst.getString(), referencedVariables);
                 collectReferencedVariables(regexAst.getPattern(), referencedVariables);
                 collectReferencedVariables(regexAst.getFlags(), referencedVariables);
+            }
+
+            case SubstrAst substrAst -> {
+                collectReferencedVariables(substrAst.getString(), referencedVariables);
+                collectReferencedVariables(substrAst.getStart(), referencedVariables);
+                collectReferencedVariables(substrAst.getLength(), referencedVariables);
+            }
+
+            case ReplaceAst replaceAst -> {
+                collectReferencedVariables(replaceAst.getString(), referencedVariables);
+                collectReferencedVariables(replaceAst.getPattern(), referencedVariables);
+                collectReferencedVariables(replaceAst.getReplacement(), referencedVariables);
+                if (replaceAst.hasFlags()) {
+                    collectReferencedVariables(replaceAst.getFlags(), referencedVariables);
+                }
             }
 
             case IriAst ignoredIri -> {
@@ -129,6 +163,24 @@ public final class VariableScopeAnalyzer {
 
             case LiteralAst ignoredLiteral -> {
                 // Constants do not contribute referenced variables.
+            }
+
+            case IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) -> {
+                collectReferencedVariables(condition, referencedVariables);
+                collectReferencedVariables(thenExpr, referencedVariables);
+                collectReferencedVariables(elseExpr, referencedVariables);
+            }
+
+            case CoalesceAst(List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariables(argument, referencedVariables);
+                }
+            }
+
+            case ConcatAst(List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariables(argument, referencedVariables);
+                }
             }
 
             case ConstraintAst ignored -> {

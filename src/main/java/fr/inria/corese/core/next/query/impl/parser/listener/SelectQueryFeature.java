@@ -17,6 +17,12 @@ import java.util.List;
  * The WHERE clause is built by {@link BgpFeature} (enter/exit GroupGraphPattern, TriplesBlock, addTriple).
  * At {@link SparqlAstBuilder#getResult()}, the builder produces a {@link fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst}
  * with both {@link fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst} and the WHERE group.
+ * <p>
+ * Grammar {@code subSelect} (nested {@code SELECT} in a group) uses the same {@link SparqlAstBuilder} stack frames as a top-level SELECT.
+ * <p>
+ * SPARQL 1.1: only {@code SELECT} may appear as a subquery inside {@code { ... }} ({@code subSelect} rule).
+ * Top-level {@code query} may be {@code SELECT}, {@code ASK}, {@code CONSTRUCT}, or {@code DESCRIBE}.
+ * Nested {@code subSelect} uses the same {@link SparqlAstBuilder} stack frames as a top-level {@code SELECT}.
  */
 public class SelectQueryFeature extends AbstractSparqlFeature {
 
@@ -36,6 +42,24 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
 
     @Override
     public void exitSelectQuery(SparqlParser.SelectQueryContext ctx) {
+        builder().exitSelectQuery();
+    }
+
+    @Override
+    public void enterSubSelect(SparqlParser.SubSelectContext ctx) {
+        builder().enterSelectQuery();
+        SparqlParser.SelectClauseContext selectClause = ctx.selectClause();
+        if (selectClause.DISTINCT() != null) {
+            builder().setDistinct(true);
+        }
+        if (selectClause.REDUCED() != null) {
+            builder().setReduced(true);
+        }
+        extractProjection(selectClause);
+    }
+
+    @Override
+    public void exitSubSelect(SparqlParser.SubSelectContext ctx) {
         builder().exitSelectQuery();
     }
 

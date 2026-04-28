@@ -236,7 +236,7 @@ fragment PN_CHARS
 
 PN_PREFIX: PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?;
 
-PN_LOCAL: (PN_CHARS_U | ':' | DIGIT | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?;
+fragment PN_LOCAL: (PN_CHARS_U | ':' | DIGIT | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?;
 
 fragment PLX: PERCENT | PN_LOCAL_ESC;
 

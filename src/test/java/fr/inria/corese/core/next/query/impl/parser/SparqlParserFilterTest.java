@@ -1012,6 +1012,37 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    void shouldParseSubtractWithoutWhitespaceInsideParenthesizedMultiplyExpression() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?x ?p ?discount .
+                  ?x ?pricePredicate ?price .
+                  FILTER(?p*(1-?discount) = ?price)
+                }
+                """);
+
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        EqualsAst equalsAst = (EqualsAst) filterAst.operator();
+
+        assertInstanceOf(MultiplyAst.class, equalsAst.getLeftArgument());
+        assertInstanceOf(VarAst.class, equalsAst.getRightArgument());
+        assertEquals("price", ((VarAst) equalsAst.getRightArgument()).name());
+
+        MultiplyAst multiplyAst = (MultiplyAst) equalsAst.getLeftArgument();
+        assertInstanceOf(VarAst.class, multiplyAst.getLeftArgument());
+        assertEquals("p", ((VarAst) multiplyAst.getLeftArgument()).name());
+        assertInstanceOf(SubtractAst.class, multiplyAst.getRightArgument());
+
+        SubtractAst subtractAst = (SubtractAst) multiplyAst.getRightArgument();
+        assertInstanceOf(LiteralAst.class, subtractAst.getLeftArgument());
+        assertEquals("1", ((LiteralAst) subtractAst.getLeftArgument()).lexical());
+        assertInstanceOf(VarAst.class, subtractAst.getRightArgument());
+        assertEquals("discount", ((VarAst) subtractAst.getRightArgument()).name());
+    }
+
+    @Test
     void shouldParseUnaryPlusFilter() {
         SparqlParser parser = newParserDefault();
 

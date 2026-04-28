@@ -49,8 +49,8 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
             DescribeQueryAst result = (DescribeQueryAst) parser.parse(
                     "DESCRIBE ?s WHERE { ?s ?p ?o }");
 
-            VarAst var = (VarAst) result.described().getFirst();
-            assertEquals("s", var.name());
+            VarAst describedVar = (VarAst) result.described().getFirst();
+            assertEquals("s", describedVar.name());
         }
 
         @Test
@@ -138,8 +138,8 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromGraphs() {
-        SparqlParser parser = newParserDefault();
+    void fromGraphs() {
+        SparqlParser queryParser = newParserDefault();
         String commentedQuery = """
                 DESCRIBE ?s
                 FROM <http://ns.inria.fr/graph>
@@ -148,7 +148,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        QueryAst queryAst = queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -160,8 +160,8 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleGraphs() {
-        SparqlParser parser = newParserDefault();
+    void fromMultipleGraphs() {
+        SparqlParser queryParser = newParserDefault();
         String commentedQuery = """
                 DESCRIBE ?s
                 FROM <http://ns.inria.fr/graph1>
@@ -172,7 +172,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        QueryAst queryAst = queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -186,8 +186,8 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromNamedGraphs() {
-        SparqlParser parser = newParserDefault();
+    void fromNamedGraphs() {
+        SparqlParser queryParser = newParserDefault();
         String commentedQuery = """
                 DESCRIBE ?s
                 FROM NAMED <http://ns.inria.fr/graph>
@@ -196,7 +196,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        QueryAst queryAst = queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().namedGraphs());
@@ -208,8 +208,8 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleNamedGraphs() {
-        SparqlParser parser = newParserDefault();
+    void fromMultipleNamedGraphs() {
+        SparqlParser queryParser = newParserDefault();
         String commentedQuery = """
                 DESCRIBE ?s
                 FROM NAMED <http://ns.inria.fr/graph1>
@@ -220,7 +220,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        QueryAst queryAst = queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -234,8 +234,8 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleMixedGraphs() {
-        SparqlParser parser = newParserDefault();
+    void fromMultipleMixedGraphs() {
+        SparqlParser queryParser = newParserDefault();
         String commentedQuery = """
                 DESCRIBE ?s
                 FROM <http://ns.inria.fr/graph1>
@@ -246,7 +246,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        QueryAst queryAst = queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -256,5 +256,30 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(queryAst.datasetClause().namedGraphs());
         assertEquals(1, queryAst.datasetClause().namedGraphs().size());
         assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[0]);
+    }
+
+    @Test
+    @DisplayName("DESCRIBE should parse solution modifiers")
+    void describeShouldParseSolutionModifiers() {
+        QueryAst ast = parser.parse("""
+                DESCRIBE ?s
+                WHERE {
+                    ?s ?p ?o
+                }
+                ORDER BY ?o
+                LIMIT 10
+                OFFSET 5
+                """);
+
+        assertInstanceOf(DescribeQueryAst.class, ast);
+        DescribeQueryAst describe = (DescribeQueryAst) ast;
+
+        assertNotNull(describe.solutionModifier());
+        assertEquals(1, describe.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.ASC, describe.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(VarAst.class, describe.solutionModifier().orderBy().getFirst().expression());
+        assertEquals("o", ((VarAst) describe.solutionModifier().orderBy().getFirst().expression()).name());
+        assertEquals(10L, describe.solutionModifier().limit());
+        assertEquals(5L, describe.solutionModifier().offset());
     }
 }

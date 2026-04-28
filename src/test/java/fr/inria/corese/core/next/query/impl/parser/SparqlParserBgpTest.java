@@ -142,6 +142,78 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    void shouldParsePrefixedNameWithDigitOnlyLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                PREFIX ex: <http://example.org/>
+                SELECT * WHERE {
+                  ?s ex:1 ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, triple.predicate());
+        assertEquals("ex:1", ((IriAst) triple.predicate()).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithHyphenInLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                PREFIX ex: <http://example.org/>
+                SELECT * WHERE {
+                  ?s ex:abc-def ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, triple.predicate());
+        assertEquals("ex:abc-def", ((IriAst) triple.predicate()).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithEscapedReservedCharacterInLocalPart() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                PREFIX ns: <http://example.org/ns#>
+                SELECT * WHERE {
+                  ?s ns:id\\=123 ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, triple.predicate());
+        assertEquals("ns:id\\=123", ((IriAst) triple.predicate()).raw());
+    }
+
+    @Test
+    void shouldParsePrefixedNameWithDefaultPrefix() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                PREFIX : <http://example.org/default#>
+                SELECT * WHERE {
+                  ?s :foo ?o .
+                }
+                """);
+
+        BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
+        TriplePatternAst triple = bgp.triples().getFirst();
+
+        assertInstanceOf(IriAst.class, triple.predicate());
+        assertEquals(":foo", ((IriAst) triple.predicate()).raw());
+    }
+
+    @Test
     void failFastTrueShouldThrowQuerySyntaxExceptionOnInvalidQuery() {
         SparqlParser parser = newParser(true, true);
 

@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,8 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BoundAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IfAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IsIriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
 
@@ -484,6 +487,29 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertEquals(1, select.solutionModifier().orderBy().size());
         assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().getFirst().orderDirection());
         assertInstanceOf(StrAst.class, select.solutionModifier().orderBy().getFirst().expression());
+    }
+
+    @Test
+    @DisplayName("Should accept ORDER BY IF expression using only variables visible in WHERE")
+    void shouldAcceptOrderByIfExpressionVisibleInWhere() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                    SELECT ?s WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY IF(BOUND(?o), STR(?o), ?s)
+                """);
+
+        SelectQueryAst select = (SelectQueryAst) ast;
+        IfAst ifAst = assertInstanceOf(IfAst.class, select.solutionModifier().orderBy().getFirst().expression());
+
+        assertEquals(1, select.solutionModifier().orderBy().size());
+        assertEquals(ASTConstants.OrderDirection.ASC, select.solutionModifier().orderBy().getFirst().orderDirection());
+        assertInstanceOf(BoundAst.class, ifAst.condition());
+        assertInstanceOf(StrAst.class, ifAst.thenExpr());
+        assertInstanceOf(VarAst.class, ifAst.elseExpr());
+        assertEquals("s", ((VarAst) ifAst.elseExpr()).name());
     }
 
     @Test
@@ -946,5 +972,41 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(queryAst.datasetClause().namedGraphs());
         assertEquals(1, queryAst.datasetClause().namedGraphs().size());
         assertInstanceOf(IriAst.class, queryAst.datasetClause().namedGraphs().toArray()[0]);
+    }
+
+    @Test
+    @DisplayName("Should parse a SELECT Subquery inside WHERE")
+    public void shouldParseASelectWithSubquery() {
+        SparqlParser parser = newParserDefault();
+        QueryAst ast = parser.parse("""
+            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            SELECT ?s WHERE {
+              {
+                SELECT ?s WHERE {
+                  ?s a foaf:Person
+                }
+              }
+            }
+            """);
+
+        assertInstanceOf(SelectQueryAst.class, ast);
+
+        SelectQueryAst outer = (SelectQueryAst) ast;
+        GroupGraphPatternAst outerWhere = outer.whereClause();
+
+        assertEquals(1, outerWhere.patterns().size());
+        assertInstanceOf(GroupGraphPatternAst.class, outerWhere.patterns().getFirst());
+
+        GroupGraphPatternAst wrapperGroup = (GroupGraphPatternAst) outerWhere.patterns().getFirst();
+        assertEquals(1, wrapperGroup.patterns().size());
+        assertInstanceOf(SubQueryAst.class, wrapperGroup.patterns().getFirst());
+
+        SubQueryAst subQuery = (SubQueryAst) wrapperGroup.patterns().getFirst();
+        assertInstanceOf(SelectQueryAst.class, subQuery.query());
+
+        SelectQueryAst inner = (SelectQueryAst) subQuery.query();
+        assertNotNull(inner.whereClause());
+        assertEquals(1, inner.whereClause().patterns().size());
+        assertInstanceOf(BgpAst.class, inner.whereClause().patterns().getFirst());
     }
 }

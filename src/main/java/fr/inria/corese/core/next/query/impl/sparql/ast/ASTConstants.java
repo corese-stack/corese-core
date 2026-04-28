@@ -118,10 +118,96 @@ public class ASTConstants {
         LANGMATCHES,
 
         /**
+         * {@code CONTAINS(string1, string2)}: returns {@code true} if {@code string1}
+         * contains {@code string2}.
+         */
+        CONTAINS,
+
+        /**
+         * {@code STRSTARTS(string1, string2)}: returns {@code true} if {@code string1}
+         * starts with {@code string2}.
+         */
+        STRSTARTS,
+
+        /**
+         * {@code STRENDS(string1, string2)}: returns {@code true} if {@code string1}
+         * ends with {@code string2}.
+         */
+        STRENDS,
+
+        /**
+         * {@code UCASE(string)}: returns an uppercased copy of {@code string}.
+         */
+        UCASE,
+
+        /**
+         * {@code LCASE(string)}: returns a lowercased copy of {@code string}.
+         */
+        LCASE,
+
+        /**
+         * {@code STRDT(string, datatype)}: constructs a typed literal from a lexical
+         * string and a datatype IRI.
+         */
+        STRDT,
+
+        /**
+         * {@code STRLANG(string, language)}: constructs a plain literal with a language
+         * tag from a lexical string and a language tag string.
+         */
+        STRLANG,
+
+        /**
+         * {@code SUBSTR(string, start)} or {@code SUBSTR(string, start, length)}:
+         * returns the substring of {@code string} starting at {@code start} with an
+         * optional {@code length}.
+         */
+        SUBSTR,
+
+        /**
+         * {@code CONCAT(expr1, expr2, ...)}: concatenates the lexical forms of its arguments
+         * into a single string result.
+         */
+        CONCAT,
+
+        /**
+         * {@code STRBEFORE(string1, string2)}: returns the part of {@code string1}
+         * that precedes the first occurrence of {@code string2}.
+         */
+        STRBEFORE,
+
+        /**
+         * {@code STRAFTER(string1, string2)}: returns the part of {@code string1}
+         * that follows the first occurrence of {@code string2}.
+         */
+        STRAFTER,
+
+        /**
+         * {@code REPLACE(arg, pattern, replacement)} and
+         * {@code REPLACE(arg, pattern, replacement, flags)}: returns the string
+         * obtained by replacing each non-overlapping match of {@code pattern} in
+         * {@code arg} with {@code replacement}. Matching may be affected by
+         * regular-expression {@code flags}.
+         */
+        REPLACE,
+
+        /**
          * {@code DATATYPE(literal)}: returns the datatype IRI of a typed literal.
          * For a plain literal with no language tag, returns {@code xsd:string}.
          */
         DATATYPE,
+
+        /**
+         * {@code IRI(term)} or {@code URI(term)}: returns an IRI built from the lexical form
+         * of {@code term}.
+         */
+        IRI,
+
+        /**
+         * {@code BNODE()} or {@code BNODE(label)}: returns a fresh blank node, optionally
+         * stable for the given lexical label within the solution.
+         */
+        BNODE,
 
         /**
          * {@code REGEX(string, pattern)} and {@code REGEX(string, pattern, flags)}: Returns {@code true} if {@code string} matches the given {@code regex}. the matching is influenced by the {@code flags} when they are given.
