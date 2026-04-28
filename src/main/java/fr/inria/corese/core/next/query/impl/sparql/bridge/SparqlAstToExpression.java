@@ -1,8 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
+import fr.inria.corese.core.next.util.StringUtils;
 import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
@@ -10,6 +12,7 @@ import fr.inria.corese.core.sparql.triple.parser.Processor;
 import fr.inria.corese.core.sparql.triple.parser.Term;
 import fr.inria.corese.core.sparql.triple.parser.Variable;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -37,11 +40,22 @@ public final class SparqlAstToExpression {
     }
 
     /**
+     * Converts the operator of a SPARQL {@code FILTER} clause ({@link FilterAst}) the same way as
+     * {@link #toNextFilter(TermAst)}.
+     *
+     * <p>Prefer {@link CoreseAstQueryBuilder#toNextFilter(FilterAst)} at call sites that build queries.
+     */
+    public static Filter toNextFilter(FilterAst filterClause) {
+        Objects.requireNonNull(filterClause, "filterClause");
+        return toNextFilter(filterClause.operator());
+    }
+
+    /**
      * Converts a filter {@link TermAst} to an {@link Expression}, then wraps it as a
      * {@link Filter} with {@link Filter#coreseNextSource()} set to {@code filterExpression}.
      *
      * <p>Prefer {@link CoreseAstQueryBuilder#toNextFilter(TermAst)} at call sites that build queries; this
-     * method is the shared implementation.
+     * method is the shared implementation. For a full {@link FilterAst} node, use {@link #toNextFilter(FilterAst)}.
      */
     public static Filter toNextFilter(TermAst filterExpression) {
         Expression exprTree = convert(filterExpression);
@@ -73,17 +87,14 @@ public final class SparqlAstToExpression {
     }
 
     private static String normalizeDatatypeIri(String dt) {
-        String d = dt.trim();
-        if (d.length() >= 2 && d.charAt(0) == '<' && d.charAt(d.length() - 1) == '>') {
-            return d.substring(1, d.length() - 1);
-        }
+        String d =  StringUtils.trimChevronIRIs(dt);
         return fr.inria.corese.core.sparql.triple.parser.NSManager.nsm().toNamespace(d);
     }
 
     private static Constant iriToConstant(IriAst i) {
         String raw = i.raw().trim();
-        if (raw.startsWith("_:")) {
-            return Constant.createBlank(raw.substring(2));
+        if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
+            return Constant.createBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
         }
         return Constant.createResource(raw);
     }
