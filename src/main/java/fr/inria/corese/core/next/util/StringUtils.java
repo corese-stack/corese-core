@@ -6,9 +6,11 @@ public class StringUtils {
 
     public static String trimChevronIRIs(String uri) {
         uri = uri.trim();
-        if(uri.startsWith("<") && uri.endsWith(">")) {
-            uri = uri.substring(0, uri.lastIndexOf(">"));
+        if(uri.startsWith("<")) {
             uri = uri.substring(uri.indexOf("<") +1);
+        }
+        if(uri.endsWith(">")) {
+            uri = uri.substring(0, uri.lastIndexOf(">"));
         }
         return uri;
     }

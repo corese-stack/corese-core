@@ -24,7 +24,7 @@ public class SparqlAstToExpressionTest {
         Expression iriNode = SparqlAstToExpression.convert(iri);
         assertNotNull(iriNode);
         assertInstanceOf(Constant.class, iriNode);
-        assertTrue(((Constant)iriNode).isURI());
+        assertTrue(iriNode.isURI());
         assertEquals("http://ns.inria.fr/test/iri", ((Constant)iriNode).getLabel());
     }
 
@@ -34,9 +34,9 @@ public class SparqlAstToExpressionTest {
         Expression litNode = SparqlAstToExpression.convert(lit);
         assertNotNull(litNode);
         assertInstanceOf(Constant.class, litNode);
-        assertTrue(((Constant)litNode).isLiteral());
-        assertEquals("1234", ((Constant)litNode).getLabel());
-        assertEquals("fr", ((Constant)litNode).getLang());
+        assertTrue(litNode.isLiteral());
+        assertEquals("1234", litNode.getLabel());
+        assertEquals("fr", litNode.getLang());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class SparqlAstToExpressionTest {
         Expression varNode = SparqlAstToExpression.convert(var);
         assertNotNull(varNode);
         assertInstanceOf(Variable.class, varNode);
-        assertEquals("var1", ((Variable) varNode).getSimpleName());
+        assertEquals("var1", varNode.getLabel());
     }
 
 //    @Test
