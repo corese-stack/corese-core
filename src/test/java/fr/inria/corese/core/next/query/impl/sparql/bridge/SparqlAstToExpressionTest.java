@@ -5,11 +5,12 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Variable;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SparqlAstToExpressionTest {
 
@@ -22,7 +23,9 @@ public class SparqlAstToExpressionTest {
         IriAst iri = new IriAst("<http://ns.inria.fr/test/iri");
         Expression iriNode = SparqlAstToExpression.convert(iri);
         assertNotNull(iriNode);
-        assertInstanceOf(Expression.class, iriNode);
+        assertInstanceOf(Constant.class, iriNode);
+        assertTrue(((Constant)iriNode).isURI());
+        assertEquals("http://ns.inria.fr/test/iri", ((Constant)iriNode).getLabel());
     }
 
     @Test
@@ -30,7 +33,10 @@ public class SparqlAstToExpressionTest {
         LiteralAst lit = new LiteralAst("1234", "fr", null);
         Expression litNode = SparqlAstToExpression.convert(lit);
         assertNotNull(litNode);
-        assertInstanceOf(Expression.class, litNode);
+        assertInstanceOf(Constant.class, litNode);
+        assertTrue(((Constant)litNode).isLiteral());
+        assertEquals("1234", ((Constant)litNode).getLabel());
+        assertEquals("fr", ((Constant)litNode).getLang());
     }
 
     @Test
@@ -38,7 +44,8 @@ public class SparqlAstToExpressionTest {
         VarAst var = new VarAst("var1");
         Expression varNode = SparqlAstToExpression.convert(var);
         assertNotNull(varNode);
-        assertInstanceOf(Expression.class, varNode);
+        assertInstanceOf(Variable.class, varNode);
+        assertEquals("var1", ((Variable) varNode).getSimpleName());
     }
 
 //    @Test
