@@ -1,9 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.ExprAst;
-
 /**
  * Any expression that can be resolved as an {@code xsd:dayTimeDuration} value.
  */
-public interface XsdDayTimeDurationExpressionAst extends ExprAst {
+public interface XsdDayTimeDurationExpressionAst extends LiteralExpressionAst {
 }
