@@ -1364,32 +1364,57 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromRelational(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.RelationalExpressionContext ctx) {
-        if (ctx.numericExpression() != null && !ctx.numericExpression().isEmpty()) {
-            if (ctx.numericExpression().size() > 1) {
-                ASTConstants.OPERATOR op;
-                if (ctx.EQUAL() != null) {
-                    op = ASTConstants.OPERATOR.EQ;
-                } else if (ctx.NOT_EQUAL() != null) {
-                    op = ASTConstants.OPERATOR.NE;
-                } else if (ctx.LESS() != null) {
-                    op = ASTConstants.OPERATOR.LT;
-                } else if (ctx.LESS_OR_EQUAL() != null) {
-                    op = ASTConstants.OPERATOR.LE;
-                } else if (ctx.GREATER() != null) {
-                    op = ASTConstants.OPERATOR.GT;
-                } else if (ctx.GREATER_OR_EQUAL() != null) {
-                    op = ASTConstants.OPERATOR.GE;
-                } else {
-                    throw new QueryEvaluationException("Unexpected operator in relational termFromExpression");
-                }
-                List<TermAst> args = ctx.numericExpression().stream().map(this::termFromNumeric).toList();
-                return createConstraint(op, args);
-            } else {
-                return termFromNumeric(ctx.numericExpression().getFirst());
-            }
-        } else {
+        if (ctx.numericExpression() == null || ctx.numericExpression().isEmpty()) {
             throw new QueryEvaluationException("No numeric termFromExpression found");
         }
+        TermAst lhs = termFromNumeric(ctx.numericExpression().getFirst());
+
+        if (ctx.IN() != null) {
+            List<TermAst> candidates = termFromExpressionList(ctx.expressionList());
+            if (ctx.NOT() != null) {
+                return new NotInAst(lhs, candidates);
+            }
+            return new InAst(lhs, candidates);
+        }
+
+        if (ctx.numericExpression().size() > 1) {
+            ASTConstants.OPERATOR op;
+            if (ctx.EQUAL() != null) {
+                op = ASTConstants.OPERATOR.EQ;
+            } else if (ctx.NOT_EQUAL() != null) {
+                op = ASTConstants.OPERATOR.NE;
+            } else if (ctx.LESS() != null) {
+                op = ASTConstants.OPERATOR.LT;
+            } else if (ctx.LESS_OR_EQUAL() != null) {
+                op = ASTConstants.OPERATOR.LE;
+            } else if (ctx.GREATER() != null) {
+                op = ASTConstants.OPERATOR.GT;
+            } else if (ctx.GREATER_OR_EQUAL() != null) {
+                op = ASTConstants.OPERATOR.GE;
+            } else {
+                throw new QueryEvaluationException("Unexpected operator in relational termFromExpression");
+            }
+            List<TermAst> args = ctx.numericExpression().stream().map(this::termFromNumeric).toList();
+            return createConstraint(op, args);
+        }
+
+        return lhs;
+    }
+
+    /**
+     * Right-hand side of {@code IN} / {@code NOT IN}: {@code NIL} ({@code ()}) or parenthesized expression list.
+     */
+    public List<TermAst> termFromExpressionList(SparqlParser.ExpressionListContext ctx) {
+        if (ctx == null) {
+            throw new QueryEvaluationException("expressionList missing for IN / NOT IN");
+        }
+        if (ctx.NIL() != null) {
+            return List.of();
+        }
+        if (ctx.expression() != null && !ctx.expression().isEmpty()) {
+            return ctx.expression().stream().map(this::termFromExpression).toList();
+        }
+        return List.of();
     }
 
     public TermAst termFromNumeric(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericExpressionContext ctx) {

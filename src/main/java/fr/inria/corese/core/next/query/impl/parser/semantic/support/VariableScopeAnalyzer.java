@@ -183,6 +183,20 @@ public final class VariableScopeAnalyzer {
                 }
             }
 
+            case InAst(TermAst left, List<TermAst> candidates) -> {
+                collectReferencedVariables(left, referencedVariables);
+                for (TermAst candidate : candidates) {
+                    collectReferencedVariables(candidate, referencedVariables);
+                }
+            }
+
+            case NotInAst(TermAst left, List<TermAst> candidates) -> {
+                collectReferencedVariables(left, referencedVariables);
+                for (TermAst candidate : candidates) {
+                    collectReferencedVariables(candidate, referencedVariables);
+                }
+            }
+
             case ConstraintAst ignored -> {
                 // Other constraint shapes are ignored until they are supported here.
             }
