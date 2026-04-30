@@ -9,7 +9,7 @@ import java.util.List;
  * {@link #prologue()} captures PREFIX/BASE for SELECT;
  * for {@link QueryAst} compatibility.
  */
-public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, SolutionModifierAst solutionModifier, QueryPrologueAst prologue) implements QueryAst {
+public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, SolutionModifierAst solutionModifier, QueryPrologueAst prologue, ValuesAst valuesClause) implements QueryAst {
 
     /** Constructor with default projection SELECT *. */
     public SelectQueryAst(GroupGraphPatternAst whereClause) {
@@ -18,12 +18,12 @@ public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetC
 
     /** Constructor with default solution modifier (no DISTINCT/REDUCED/ORDER BY/LIMIT/OFFSET) and default prologue. */
     public SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause) {
-        this(projection, datasetClause, whereClause, null, null);
+        this(projection, datasetClause, whereClause, null, null, null);
     }
 
     /** Constructor with default prologue */
     public SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, SolutionModifierAst solutionModifier) {
-        this(projection, datasetClause, whereClause, solutionModifier, null);
+        this(projection, datasetClause, whereClause, solutionModifier, null, null);
     }
 
     public SelectQueryAst {
@@ -41,6 +41,9 @@ public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetC
         }
         if (prologue == null) {
             prologue = QueryPrologueAst.empty();
+        }
+        if(valuesClause == null) {
+            valuesClause = ValuesAst.none();
         }
     }
 }

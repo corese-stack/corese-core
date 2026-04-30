@@ -242,4 +242,24 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitBind(SparqlParser.BindContext ctx) {
         for (var d : delegates) d.exitBind(ctx);
     }
+
+    @Override
+    public void enterValuesClause(SparqlParser.ValuesClauseContext ctx) {
+        for (var d : delegates) d.enterValuesClause(ctx);
+    }
+
+    @Override
+    public void exitValuesClause(SparqlParser.ValuesClauseContext ctx) {
+        for (var d : delegates) d.exitValuesClause(ctx);
+    }
+
+    @Override
+    public void enterInlineData(SparqlParser.InlineDataContext ctx) {
+        for (var d : delegates) d.enterInlineData(ctx);
+    }
+
+    @Override
+    public void exitInlineData(SparqlParser.InlineDataContext ctx) {
+        for (var d : delegates) d.exitInlineData(ctx);
+    }
 }

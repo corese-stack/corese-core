@@ -137,6 +137,11 @@ public final class SparqlAstBuilder {
     private final Set<IriAst> datasetDefaultGraphs = new LinkedHashSet<>();
     private final Set<IriAst> datasetNamedGraphs = new LinkedHashSet<>();
 
+    /**
+     * VALUES clause (agglomerate all VALUES declarations in the query)
+     */
+    private final List<ValueMappingAst> values = new ArrayList<>();
+
     /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
     private boolean distinct;
     private boolean reduced;
@@ -274,12 +279,15 @@ public final class SparqlAstBuilder {
                 new IriAst(baseUri)
         );
 
+        ValuesAst valuesClause = new ValuesAst(this.values);
+
         SelectQueryAst selectQueryAst = new SelectQueryAst(
                 frame.projection,
                 datasetClauseAst,
                 frame.whereClause,
                 buildSolutionModifier(frame),
-                prologueAst
+                prologueAst,
+                valuesClause
         );
 
         /*
@@ -562,12 +570,16 @@ public final class SparqlAstBuilder {
     // --- Filters ---
 
     /**
-     * Exits a Filter, builds FilterAst and adds it to the current group
+     * Exits a Filter and adds it to the current group
      */
     public void addFilter(FilterAst filter) {
         if (this.hasCurrentGroup()) {
             this.currentGroup().add(filter);
         }
+    }
+
+    public void addValues(List<ValueMappingAst> mappings) {
+        this.values.addAll(mappings);
     }
 
     /**
@@ -705,11 +717,12 @@ public final class SparqlAstBuilder {
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
         QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
+        ValuesAst valuesClause = new ValuesAst(this.values);
         return switch (this.queryType) {
-            case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst);
-            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst);
-            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst);
-            case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst);
+            case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst, valuesClause);
+            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst, valuesClause);
+            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst, valuesClause);
+            case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst, valuesClause);
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
@@ -743,14 +756,14 @@ public final class SparqlAstBuilder {
     /**
      * Builds the AST for ASK queries.
      */
-    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
-        return new AskQueryAst(datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
+    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
+        return new AskQueryAst(datasetClauseAst, whereClause, buildSolutionModifier(), prologue, valuesClause);
     }
 
     /**
      * Builds the AST for SELECT queries.
      */
-    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
         if (hasCurrentSelect()) {
             SelectFrame frame = getCurrentSelectFrame();
             return new SelectQueryAst(
@@ -758,36 +771,39 @@ public final class SparqlAstBuilder {
                     datasetClauseAst,
                     frame.whereClause,
                     buildSolutionModifier(frame),
-                    prologue
+                    prologue,
+                    valuesClause
             );
         }
-        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
+        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier(), prologue, valuesClause);
     }
 
     /**
      * Builds the AST for DESCRIBE queries.
      */
-    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
         // TODO #306: validate variable scope for DESCRIBE modifiers when DescribeQueryAst carries them.
         return new DescribeQueryAst(
                 datasetClauseAst,
                 describeResources,
                 whereClause,
                 buildSolutionModifier(),
-                prologue);
+                prologue,
+                valuesClause);
     }
 
     /**
      * Builds the AST for CONSTRUCT queries.
      */
-    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
         // TODO #306: validate variable scope for CONSTRUCT modifiers when ConstructQueryAst carries them.
         return new ConstructQueryAst(
                 constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
                 datasetClauseAst,
                 whereClause,
                 buildSolutionModifier(),
-                prologue);
+                prologue,
+                valuesClause);
     }
 
     /**
