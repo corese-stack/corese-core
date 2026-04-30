@@ -1223,10 +1223,20 @@ public final class SparqlAstBuilder {
 
     public TermAst termFromBuiltInCall(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BuiltInCallContext ctx) {
         if (ctx.existsFunc() != null) {
-            return new ExistsAst(popCapturedExistsPattern());
-        } else if (ctx.notExistsFunc() != null) {
-            return new NotExistsAst(popCapturedExistsPattern());
-        } else if (ctx.regexExpression() != null) {
+            GroupGraphPatternAst existsPattern = popCapturedExistsPattern();
+            if (existsPattern == null) {
+                throw new QueryEvaluationException("EXISTS { ... } inner pattern was not captured; check listener order");
+            }
+            return new ExistsAst(existsPattern);
+        }
+        if (ctx.notExistsFunc() != null) {
+            GroupGraphPatternAst notExistsPattern = popCapturedExistsPattern();
+            if (notExistsPattern == null) {
+                throw new QueryEvaluationException("NOT EXISTS { ... } inner pattern was not captured; check listener order");
+            }
+            return new NotExistsAst(notExistsPattern);
+        }
+        if (ctx.regexExpression() != null) {
             return termFromRegex(ctx.regexExpression());
         } else if (ctx.strReplaceExpression() != null) {
             return termFromReplace(ctx.strReplaceExpression());
