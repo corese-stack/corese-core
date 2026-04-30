@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.Test;
 
@@ -1301,6 +1300,52 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(NotExistsAst.class, filterAst.operator());
 
         NotExistsAst notExistsAst = (NotExistsAst) filterAst.operator();
+        assertNotNull(notExistsAst.pattern());
+        assertFalse(notExistsAst.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseNotOverExistsFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(!EXISTS { ?s ex:email ?e })
+                }
+                """);
+
+        assertNotNull(ast);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(BooleanNotAst.class, filterAst.operator());
+
+        BooleanNotAst booleanNotAst = (BooleanNotAst) filterAst.operator();
+        assertInstanceOf(ExistsAst.class, booleanNotAst.getArgument());
+
+        ExistsAst existsAst = (ExistsAst) booleanNotAst.getArgument();
+        assertNotNull(existsAst.pattern());
+        assertFalse(existsAst.pattern().patterns().isEmpty());
+    }
+
+    @Test
+    void shouldParseNotOverNotExistsFilter() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT * WHERE {
+                  ?s ?p ?o .
+                  FILTER(!NOT EXISTS { ?s ex:email ?e })
+                }
+                """);
+
+        assertNotNull(ast);
+        FilterAst filterAst = (FilterAst) ast.whereClause().patterns().getLast();
+        assertInstanceOf(BooleanNotAst.class, filterAst.operator());
+
+        BooleanNotAst booleanNotAst = (BooleanNotAst) filterAst.operator();
+        assertInstanceOf(NotExistsAst.class, booleanNotAst.getArgument());
+
+        NotExistsAst notExistsAst = (NotExistsAst) booleanNotAst.getArgument();
         assertNotNull(notExistsAst.pattern());
         assertFalse(notExistsAst.pattern().patterns().isEmpty());
     }
