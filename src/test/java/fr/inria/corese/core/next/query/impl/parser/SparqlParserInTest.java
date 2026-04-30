@@ -1,8 +1,10 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.InAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.NotInAst;
@@ -10,8 +12,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("SPARQL 1.1 - Parser and AST : IN / NOT IN")
@@ -75,5 +79,41 @@ class SparqlParserInTest extends AbstractSparqlParserFeatureTest {
         NotInAst notIn = assertInstanceOf(NotInAst.class, filter.operator());
         assertEquals("x", assertInstanceOf(VarAst.class, notIn.left()).name());
         assertEquals(2, notIn.candidates().size());
+    }
+
+    @Test
+    @DisplayName("ORDER BY (?label IN (?altLabel, \"core\"))")
+    void shouldParseOrderByInAndValidateVariableScope() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT ?label WHERE {
+                  ?s ?p ?label .
+                  ?s <http://example.com/altLabel> ?altLabel .
+                } ORDER BY (?label IN (?altLabel, "core"))
+                """);
+
+        assertNotNull(ast);
+        SelectQueryAst select = assertInstanceOf(SelectQueryAst.class, ast);
+        assertFalse(select.solutionModifier().orderBy().isEmpty());
+        InAst in = assertInstanceOf(InAst.class, select.solutionModifier().orderBy().getFirst().expression());
+        assertEquals("label", assertInstanceOf(VarAst.class, in.left()).name());
+        assertEquals("altLabel", assertInstanceOf(VarAst.class, in.candidates().get(0)).name());
+        assertEquals("\"core\"", assertInstanceOf(LiteralAst.class, in.candidates().get(1)).lexical());
+    }
+
+    @Test
+    @DisplayName("ORDER BY (?label NOT IN (?altLabel, ?missing)) — should reject variable not visible in WHERE")
+    void shouldRejectOrderByNotInWhenVariableNotVisibleInWhere() {
+        SparqlParser parser = newParserDefault();
+
+        QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                SELECT ?label WHERE {
+                  ?s ?p ?label .
+                  ?s <http://example.com/altLabel> ?altLabel .
+                } ORDER BY (?label NOT IN (?altLabel, ?missing))
+                """));
+
+        assertEquals("Variable ?missing used in ORDER BY is not visible in WHERE clause", exception.getMessage());
     }
 }
