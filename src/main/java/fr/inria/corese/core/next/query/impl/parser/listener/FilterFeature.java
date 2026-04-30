@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
  */
 public class FilterFeature extends AbstractSparqlFeature {
 
-    private static final Logger logger = LoggerFactory.getLogger(FilterFeature.class);
-
     public FilterFeature(SparqlAstBuilder builder) {
         super(builder);
     }

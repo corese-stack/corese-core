@@ -6,6 +6,8 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +17,16 @@ import java.util.Set;
  * Validates that explicitly projected SELECT variables are visible from the
  * WHERE clause scope.
  */
-public final class SelectProjectionScopeValidationRule implements SemanticValidationRule {
+public final class SelectProjectionScopeValidationRule extends AbstractSemanticValidationRule {
 
     private static final String DIAGNOSTIC_SOURCE = "SelectProjectionScopeValidationRule";
 
     private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
+
+    @Override
+    protected String getDiagnosticSource() {
+        return DIAGNOSTIC_SOURCE;
+    }
 
     @Override
     public List<QueryDiagnostic> validate(QueryAst queryAst) {
@@ -30,7 +37,7 @@ public final class SelectProjectionScopeValidationRule implements SemanticValida
             return List.of();
         }
 
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(selectQueryAst.whereClause());
+        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(selectQueryAst);
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
         validateProjectionVariables(selectQueryAst.projection(), visibleVariables, diagnostics);
         return List.copyOf(diagnostics);
@@ -51,16 +58,5 @@ public final class SelectProjectionScopeValidationRule implements SemanticValida
                 diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), "SELECT projection"));
             }
         }
-    }
-
-    private QueryDiagnostic buildOutOfScopeDiagnostic(String variableName, String clause) {
-        return new QueryDiagnostic(
-                QueryDiagnostic.Kind.SEMANTIC_ERROR,
-                QueryDiagnostic.Severity.ERROR,
-                "Variable ?" + variableName + " used in " + clause + " is not visible in WHERE clause",
-                -1,
-                -1,
-                "?" + variableName,
-                DIAGNOSTIC_SOURCE);
     }
 }
