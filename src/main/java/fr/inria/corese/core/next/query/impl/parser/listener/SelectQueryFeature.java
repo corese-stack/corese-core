@@ -64,20 +64,27 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
     }
 
     /**
-     * Extracts SELECT * or SELECT ?v1 ?v2 ... from the parse context.
-     * Grammar: {@code SELECT (DISTINCT | REDUCED)? (var_+ | '*') ...}
+     * Extracts SELECT * or SELECT ?v1 ?v2 ... (expr AS ?v3) ... from the parse context.
+     * Grammar: {@code SELECT (DISTINCT | REDUCED)? (selectVar+ | '*')}
+     * where {@code selectVar ::= var_ | '(' expression AS var_ ')'}
      */
     private void extractProjection(SparqlParser.SelectClauseContext ctx) {
         if (ctx.STAR() != null) {
             builder().setProjectionAll();
             return;
         }
-        List<String> vars = new ArrayList<>();
+        List<String> allVars = new ArrayList<>();
+        List<String> expressionBoundVars = new ArrayList<>();
         for (SparqlParser.SelectVarContext selectVar : ctx.selectVar()) {
-            if (selectVar.var_() != null) {
-                vars.add(selectVar.var_().getText());
+            if (selectVar.expression() != null) {
+                // (expr AS ?var) — introduces a new variable, not projected from WHERE
+                String varName = selectVar.var_().getText();
+                allVars.add(varName);
+                expressionBoundVars.add(varName);
+            } else if (selectVar.var_() != null) {
+                allVars.add(selectVar.var_().getText());
             }
         }
-        builder().setProjectionVariables(vars);
+        builder().setProjectionVariables(allVars, expressionBoundVars);
     }
 }
