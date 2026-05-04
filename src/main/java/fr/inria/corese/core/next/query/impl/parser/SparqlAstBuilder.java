@@ -320,6 +320,17 @@ public final class SparqlAstBuilder {
      * Sets explicit SELECT variables (e.g. SELECT ?s ?p). Variable names may include ? or $ prefix.
      */
     public void setProjectionVariables(List<String> variableNames) {
+        setProjectionVariables(variableNames, List.of());
+    }
+
+    /**
+     * Sets explicit SELECT variables where some may be introduced by {@code (expr AS ?var)}.
+     * Variable names may include ? or $ prefix.
+     *
+     * @param variableNames        all projected variable names (plain + expression-bound), in order
+     * @param expressionBoundNames names of variables introduced by {@code (expr AS ?var)}
+     */
+    public void setProjectionVariables(List<String> variableNames, List<String> expressionBoundNames) {
         if (variableNames == null || variableNames.isEmpty()) {
             setProjectionAll();
             return;
@@ -330,9 +341,15 @@ public final class SparqlAstBuilder {
                 .map(VarAst::new)
                 .toList();
 
+        Set<String> expressionBound = expressionBoundNames == null ? Set.of() :
+                expressionBoundNames.stream()
+                        .map(s -> s == null ? "" : (s.startsWith("?") || s.startsWith("$") ? s.substring(1).trim() : s.trim()))
+                        .filter(s -> !s.isBlank())
+                        .collect(java.util.stream.Collectors.toUnmodifiableSet());
+
         ProjectionAst newProjection = vars.isEmpty()
                 ? ProjectionAsts.selectAll()
-                :ProjectionAsts.of(vars);
+                : ProjectionAsts.of(vars, expressionBound);
 
         if (hasCurrentSelect()) {
             getCurrentSelectFrame().projection = newProjection;
@@ -1242,6 +1259,8 @@ public final class SparqlAstBuilder {
             return new IfAst(args.get(0), args.get(1), args.get(2));
         } else if (ctx.RAND() != null) {
             return new RandAst();
+        } else if (ctx.UUID() != null) {
+            return new UuidAst();
         } else if (ctx.CONCAT() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             return this.createConstraint(ASTConstants.FUNCTION_CALL.CONCAT, args);

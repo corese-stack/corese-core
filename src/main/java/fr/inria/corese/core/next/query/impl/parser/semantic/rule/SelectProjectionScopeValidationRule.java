@@ -43,6 +43,10 @@ public final class SelectProjectionScopeValidationRule implements SemanticValida
     ) {
         // TODO: handle SELECT (expr AS ?var) with SPARQL 1.1 support.
         for (VarAst projectedVar : projection.variables()) {
+            if (projection.expressionBoundVariables().contains(projectedVar.name())) {
+                // Variable introduced by (expr AS ?var) — not required to be visible in WHERE.
+                continue;
+            }
             if (!visibleVariables.contains(projectedVar.name())) {
                 diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), "SELECT projection"));
             }
