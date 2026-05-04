@@ -1,12 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryConstraintAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IfAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrLenAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.UnaryConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
