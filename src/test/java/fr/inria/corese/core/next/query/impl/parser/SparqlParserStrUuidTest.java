@@ -3,10 +3,16 @@ package fr.inria.corese.core.next.query.impl.parser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrUuidAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -26,24 +32,47 @@ class SparqlParserStrUuidTest extends AbstractSparqlParserFeatureTest {
                 """);
 
         assertNotNull(ast);
-        BindAst bind = (BindAst) ast.whereClause().patterns().getLast();
+        BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         assertInstanceOf(StrUuidAst.class, bind.expression());
+        assertEquals("id", bind.variable().name());
     }
 
     @Test
-    @DisplayName("FILTER(STRUUID())")
+    @DisplayName("FILTER(STRUUID() = STR(?s))")
     void shouldParseStrUuidInFilter() {
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(STRUUID())
+                  FILTER(STRUUID() = STR(?s))
                 }
                 """);
 
         assertNotNull(ast);
-        FilterAst filter = (FilterAst) ast.whereClause().patterns().getLast();
-        assertInstanceOf(StrUuidAst.class, filter.operator());
+        FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
+        EqualsAst equals = assertInstanceOf(EqualsAst.class, filter.operator());
+        assertInstanceOf(StrUuidAst.class, equals.getLeftArgument());
+        StrAst str = assertInstanceOf(StrAst.class, equals.getRightArgument());
+        assertEquals("s", assertInstanceOf(VarAst.class, str.getArgument()).name());
+    }
+
+    @Test
+    @DisplayName("SELECT (STRUUID() AS ?id) ?s WHERE { ?s ?p ?o }")
+    void shouldParseStrUuidInProjectionBinding() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT (STRUUID() AS ?id) ?s WHERE {
+                  ?s ?p ?o .
+                }
+                """);
+
+        assertNotNull(ast);
+        SelectQueryAst selectAst = assertInstanceOf(SelectQueryAst.class, ast);
+        assertFalse(selectAst.projection().selectAll());
+        assertEquals(2, selectAst.projection().variables().size());
+        assertEquals("id", selectAst.projection().variables().getFirst().name());
+        assertEquals("s", selectAst.projection().variables().getLast().name());
     }
 }
