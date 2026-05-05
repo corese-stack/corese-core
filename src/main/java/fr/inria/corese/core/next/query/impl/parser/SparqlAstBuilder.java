@@ -1310,7 +1310,7 @@ public final class SparqlAstBuilder {
             } else if (ctx.LANG() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.LANG, args);
             } else if (ctx.LANGMATCHES() != null) {
-                return this.createConstraint(ASTConstants.FUNCTION_CALL.LANGMATCHES, args);
+                return new LangMatchesAst(args);
             } else if (ctx.CONTAINS() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.CONTAINS, args);
             } else if (ctx.STRSTARTS() != null) {
