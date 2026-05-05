@@ -62,6 +62,11 @@ public final class SparqlAstBuilder {
     private final Deque<Integer> optionalGroupDepths = new ArrayDeque<>();
 
     /**
+     * At enterMinus(), we push groupStack.size(). At exitGroup(), if groupStack.size() equals peek, we wrap in MinusAst.
+     */
+    private final Deque<Integer> minusGroupDepths = new ArrayDeque<>();
+
+    /**
      * At enterExistsFunc()/enterNotExistsFunc(), we push groupStack.size().
      * At exitGroup(), if groupStack.size() equals peek, we capture in capturedExistsPattern.
      */
@@ -475,7 +480,7 @@ public final class SparqlAstBuilder {
     /**
      * Exit a { ... } groupGraphPattern.
      * Pops the current group, wraps it in {@link GroupGraphPatternAst}. If we had entered OPTIONAL
-     * and the parent group depth matches {@link #optionalGroupDepths}, wraps in {@link OptionalAst} and adds to parent;
+      * or MINUS and the parent group depth matches the corresponding stack, wraps in the dedicated AST node and adds to parent;
      * otherwise adds the group to parent or sets as top-level WHERE.
      * Must not be called while a TriplesBlock is still open (no pending enterBgp without exitBgp).
      */
@@ -498,6 +503,9 @@ public final class SparqlAstBuilder {
         if (!optionalGroupDepths.isEmpty() && groupStack.size() == optionalGroupDepths.peek()) {
             optionalGroupDepths.pop();
             currentGroup().add(new OptionalAst(group));
+        } else if (!minusGroupDepths.isEmpty() && groupStack.size() == minusGroupDepths.peek()) {
+            minusGroupDepths.pop();
+            currentGroup().add(new MinusAst(group));
         } else if (!existsGroupDepths.isEmpty() && groupStack.size() == existsGroupDepths.peek()) {
             existsGroupDepths.pop();
             capturedExistsStack.push(group);
@@ -594,6 +602,23 @@ public final class SparqlAstBuilder {
      * Exit OPTIONAL scope. No-op: the optional content was already wrapped in {@link OptionalAst} in {@link #exitGroup()}.
      */
     public void exitOptional() {
+    }
+
+    // --- Minus ---
+
+    /**
+     * Enter MINUS scope. Records current group stack size so that when we exitGroup() and the stack
+     * is back to that size, we wrap the popped group in {@link MinusAst}.
+     */
+    public void enterMinus() {
+        minusGroupDepths.push(groupStack.size());
+    }
+
+    /**
+     * Exit MINUS scope. No-op: the MINUS content was already wrapped in {@link MinusAst} in {@link #exitGroup()}.
+     */
+    public void exitMinus() {
+        // No-op: the MINUS content was already wrapped in MinusAst in exitGroup().
     }
 
     // --- Service ---

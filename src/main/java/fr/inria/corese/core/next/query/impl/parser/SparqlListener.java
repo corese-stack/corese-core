@@ -116,6 +116,17 @@ public final class SparqlListener extends SparqlParserBaseListener {
         for (var d : delegates) d.exitOptionalGraphPattern(ctx);
     }
 
+    // ---------- MINUS ----------
+    @Override
+    public void enterMinusGraphPattern(SparqlParser.MinusGraphPatternContext ctx) {
+        for (var d : delegates) d.enterMinusGraphPattern(ctx);
+    }
+
+    @Override
+    public void exitMinusGraphPattern(SparqlParser.MinusGraphPatternContext ctx) {
+        for (var d : delegates) d.exitMinusGraphPattern(ctx);
+    }
+
     // ---------- SERVICE ----------
 
     @Override

@@ -3,5 +3,5 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 /**
  * Element of a group graph pattern (BGP, optional, union, etc.).
  */
-public sealed interface PatternAst permits BgpAst, BindAst, FilterAst, GroupGraphPatternAst, OptionalAst, ServiceAst, UnionAst, SubQueryAst {
+public sealed interface PatternAst permits BgpAst, BindAst, FilterAst, GroupGraphPatternAst, MinusAst, OptionalAst, ServiceAst, UnionAst, SubQueryAst {
 }

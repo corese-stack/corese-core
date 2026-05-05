@@ -89,6 +89,40 @@ class SparqlAstBuilderTest {
     }
 
     @Test
+    void shouldWrapMinusGroupAsMinusAst() {
+        SparqlAstBuilder b = newBuilder();
+
+        b.enterSelectQuery();
+        b.enterGroup();
+
+        b.enterBgp();
+        b.addTriple(new VarAst("s"), new VarAst("p"), new VarAst("o"));
+        b.exitBgp();
+
+        b.enterMinus();
+        b.enterGroup();
+        b.enterBgp();
+        b.addTriple(new VarAst("s"), new VarAst("q"), new VarAst("hidden"));
+        b.exitBgp();
+        b.exitGroup();
+        b.exitMinus();
+
+        b.exitGroup();
+        b.exitSelectQuery();
+
+        SelectQueryAst select = (SelectQueryAst) b.getResult();
+        assertNotNull(select);
+
+        GroupGraphPatternAst where = select.whereClause();
+        assertEquals(2, where.patterns().size());
+        assertInstanceOf(BgpAst.class, where.patterns().getFirst());
+
+        MinusAst minus = assertInstanceOf(MinusAst.class, where.patterns().get(1));
+        assertEquals(1, minus.pattern().patterns().size());
+        assertInstanceOf(BgpAst.class, minus.pattern().patterns().getFirst());
+    }
+
+    @Test
     void shouldAllowMultipleBgpsInSameGroup() {
         SparqlAstBuilder b = newBuilder();
 

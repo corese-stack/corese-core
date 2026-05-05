@@ -13,6 +13,7 @@ import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeatur
 import fr.inria.corese.core.next.query.impl.parser.listener.DatasetClauseFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.FilterFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.MinusFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.PrologueFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
 import fr.inria.corese.core.next.query.impl.parser.listener.ServiceFeature;
@@ -131,6 +132,7 @@ final class SparqlQueryAnalyzer {
                 new SolutionModifierFeature(builder),
                 new FilterFeature(builder),
                 new UnionFeature(builder),
+                new MinusFeature(builder),
                 new DescribeQueryFeature(builder),
                 new DatasetClauseFeature(builder),
                 new PrologueFeature(builder),

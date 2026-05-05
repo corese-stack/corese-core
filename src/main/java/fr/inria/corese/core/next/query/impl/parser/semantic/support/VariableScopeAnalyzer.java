@@ -73,6 +73,10 @@ public final class VariableScopeAnalyzer {
                 // OPTIONAL keeps variables in scope.
                 collectVisibleVariables(optionalPattern, visibleVariables);
 
+            case MinusAst ignored -> {
+                // MINUS does not make its inner variables visible outside the pattern.
+            }
+
             case UnionAst(GroupGraphPatternAst left, GroupGraphPatternAst right) -> {
                 // UNION exposes variables from both branches.
                 collectVisibleVariables(left, visibleVariables);
