@@ -1297,6 +1297,8 @@ public final class SparqlAstBuilder {
         } else if (ctx.subStringExpression() != null) {
             List<TermAst> args = ctx.subStringExpression().expression().stream().map(this::termFromExpression).toList();
             return this.createConstraint(ASTConstants.FUNCTION_CALL.SUBSTR, args);
+        } else if (ctx.NOW() != null) {
+            return new NowAst();
         } else if (ctx.expression() != null) {
             List<TermAst> args = ctx.expression().stream().map(this::termFromExpression).toList();
             if (ctx.STR() != null) {
@@ -1325,6 +1327,22 @@ public final class SparqlAstBuilder {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STRBEFORE, args);
             } else if (ctx.STRAFTER() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.STRAFTER, args);
+            } else if (ctx.YEAR() != null) {
+                return new YearAst(args);
+            } else if (ctx.MONTH() != null) {
+                return new MonthAst(args);
+            } else if (ctx.DAY() != null) {
+                return new DayAst(args);
+            } else if (ctx.HOURS() != null) {
+                return new HoursAst(args);
+            } else if (ctx.MINUTES() != null) {
+                return new MinutesAst(args);
+            } else if (ctx.SECONDS() != null) {
+                return new SecondsAst(args);
+            } else if (ctx.TIMEZONE() != null) {
+                return new TimezoneAst(args);
+            } else if (ctx.TZ() != null) {
+                return new TzAst(args);
             } else if (ctx.DATATYPE() != null) {
                 return this.createConstraint(ASTConstants.FUNCTION_CALL.DATATYPE, args);
             } else if (ctx.IRI() != null || ctx.URI() != null) {
