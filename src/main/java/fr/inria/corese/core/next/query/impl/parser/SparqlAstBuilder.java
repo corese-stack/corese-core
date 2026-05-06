@@ -1063,6 +1063,11 @@ public final class SparqlAstBuilder {
         return new FunctionCallAst(functionName, args);
     }
 
+    public AggregateAst createAggregate(
+            AggregateFunction function, boolean distinct, TermAst expression, String groupConcatSeparator) {
+        return new AggregateAst(function, distinct, expression, groupConcatSeparator);
+    }
+
     // ---- term helpers ----
 
     public TermAst termFromVerb(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VerbContext ctx) {
@@ -1264,6 +1269,10 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromBuiltInCall(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BuiltInCallContext ctx) {
+        if (ctx.aggregate() != null) {
+            return termFromAggregate(ctx.aggregate());
+        }
+
         if (ctx.existsFunc() != null) {
             return new ExistsAst(popCapturedExistsPattern());
         } else if (ctx.notExistsFunc() != null) {
@@ -1641,5 +1650,46 @@ public final class SparqlAstBuilder {
             }
         }
         return out;
+    }
+
+    public TermAst termFromAggregate(SparqlParser.AggregateContext ctx) {
+        boolean distinct = ctx.DISTINCT() != null;
+
+        if (ctx.COUNT() != null) {
+            TermAst expression = null;
+
+            if (ctx.STAR() == null && ctx.expression() != null && !ctx.expression().isEmpty()) {
+                expression = termFromExpression(ctx.expression());
+            }
+            return createAggregate(AggregateFunction.COUNT, distinct, expression, null);
+        }
+
+        if (ctx.SUM() != null) {
+            return createAggregate(AggregateFunction.SUM, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.AVG() != null) {
+            return createAggregate(AggregateFunction.AVG, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.MIN() != null) {
+            return createAggregate(AggregateFunction.MIN, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.MAX() != null) {
+            return createAggregate(AggregateFunction.MAX, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.SAMPLE() != null) {
+            return createAggregate(AggregateFunction.SAMPLE, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.GROUP_CONCAT() != null) {
+            String sep = ctx.string_() != null ? ctx.string_().getText() : null;
+            return createAggregate(
+                    AggregateFunction.GROUP_CONCAT, distinct, termFromExpression(ctx.expression()), sep);
+        }
+
+        throw new QueryEvaluationException("Unsupported aggregate: " + ctx.getText());
     }
 }
