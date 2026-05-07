@@ -4,12 +4,25 @@ import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupByAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SolutionModifierFeature extends AbstractSparqlFeature {
 
     public SolutionModifierFeature(SparqlAstBuilder builder) {
         super(builder);
+    }
+
+    @Override
+    public void exitGroupClause(SparqlParser.GroupClauseContext ctx) {
+        List<TermAst> terms = new ArrayList<>(ctx.groupCondition().size());
+        for (SparqlParser.GroupConditionContext gcc : ctx.groupCondition()) {
+            terms.add(builder().termFromGroupCondition(gcc));
+        }
+        builder().setGroupBy(new GroupByAst(terms));
     }
 
     @Override

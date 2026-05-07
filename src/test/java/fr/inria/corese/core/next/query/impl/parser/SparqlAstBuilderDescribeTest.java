@@ -221,6 +221,7 @@ class SparqlAstBuilderDescribeTest {
         void nullSolutionModifierDefaultsToEmpty() {
             DescribeQueryAst ast = new DescribeQueryAst(null, null, null, null);
             assertNotNull(ast.solutionModifier());
+            assertTrue(ast.solutionModifier().groupBy().isEmpty());
             assertTrue(ast.solutionModifier().orderBy().isEmpty());
             assertNull(ast.solutionModifier().limit());
             assertNull(ast.solutionModifier().offset());

@@ -92,6 +92,7 @@ class SparqlParserConstructQueryTest extends AbstractSparqlParserFeatureTest {
         SolutionModifierAst solutionModifier = construct.solutionModifier();
 
         assertNotNull(solutionModifier);
+        assertTrue(solutionModifier.groupBy().isEmpty());
         assertEquals(1, solutionModifier.orderBy().size());
         assertEquals(ASTConstants.OrderDirection.DESC, solutionModifier.orderBy().getFirst().orderDirection());
         assertInstanceOf(VarAst.class, solutionModifier.orderBy().getFirst().expression());

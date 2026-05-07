@@ -213,6 +213,26 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should parse GROUP BY ?g on SELECT")
+    void shouldParseGroupBy() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+            SELECT ?s WHERE {
+                ?s ?p ?o
+            }
+            GROUP BY ?s
+            """);
+
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst select = (SelectQueryAst) ast;
+        SolutionModifierAst mod = select.solutionModifier();
+        assertEquals(1, mod.groupBy().expressions().size());
+        assertEquals("s", assertInstanceOf(VarAst.class, mod.groupBy().expressions().getFirst()).name());
+        assertFalse(mod.hasOrderBy());
+    }
+
+    @Test
     @DisplayName("Should parse SELECT REDUCED without ORDER BY, LIMIT or OFFSET")
     void shouldParseReducedOnly() {
         SparqlParser parser = newParserDefault();
