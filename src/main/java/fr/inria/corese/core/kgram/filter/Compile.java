@@ -48,17 +48,6 @@ public class Compile implements ExprType {
 		checker = new Checker(query);
 	}
 	
-	public boolean check(String v1, String v2, Exp exp){
-		return checker.check(v1, v2, exp.getFilter().getExp());
-	}
-	
-	public boolean check(Exp exp){
-		return checker.check(exp.getFilter().getExp());
-	}
-	
-	public boolean check(Exp exp1, Exp exp2){
-		return checker.check(exp1.getFilter().getExp(), exp2.getFilter().getExp());
-	}
 
 	/**
 	 * exp is a FILTER Exp
@@ -95,25 +84,6 @@ public class Compile implements ExprType {
                 
 	}
 	
-	/**
-	 * ! bound(?x)
-	 */
-	void not(Exp exp){
-		Filter ff = exp.getFilter();
-		Expr ee = ff.getExp();
-		Pattern pat = new Pattern(BOOLEAN, NOT, new Pattern(FUNCTION, BOUND, VARIABLE));
-		if (matcher.match(pat, ee)){ 
-			// ! bound(?x)
-			List<String> list = ff.getVariables();
-			if (list.size()>0){
-				Node node = query.getProperAndSubSelectNode(list.get(0));
-				if (node != null){
-					exp.setNode(node);
-					exp.status(true);
-				}
-			}
-		}
-	}
 	
 
 	

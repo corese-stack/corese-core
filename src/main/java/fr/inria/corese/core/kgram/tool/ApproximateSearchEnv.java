@@ -27,28 +27,6 @@ public class ApproximateSearchEnv {
         this.all = new HashMap<Key, Map<Node, Value>>();
     }
 
-    public void add(Expr var, Node uri, Node node, String alg, double sim) {
-        Key key = new Key(var, uri);
-
-        if (all.containsKey(key)) {
-            Map<Node, Value> value = all.get(key);
-            if (!value.containsKey(node)) {
-                Value r = new Value(node, alg, sim);
-                value.put(node, r);
-            }
-        } else {
-            Map<Node, Value> m = new HashMap<Node, Value>();
-            Value r = new Value(node, alg, sim);
-            m.put(node, r);
-            all.put(key, m);
-        }
-    }
-
-    public Double getSimilarity(Expr var, Node node, String algs) {
-        Key key = new Key(var);
-        Value r = this.get(key, node);
-        return (r != null && r.getAlgorithms().equalsIgnoreCase(algs)) ? r.getSimilarity() : null;
-    }
 
     public Double getSimilarity(Expr var, Node node) {
         Key key = new Key(var);
@@ -80,31 +58,6 @@ public class ApproximateSearchEnv {
         return sb.toString();
     }
 
-    /**
-     * Aggregate and get value of similarity using all existing variables
-     * 
-     * @param env
-     * @return 
-     */
-    public Double aggregate(Environment env) {
-        List<Expr> lv = this.getVariables();
-        return aggregate(env, lv);
-    }
-
-    /**
-     * Aggreate with existing variables (excpet for the given variable)
-     * @param env
-     * @param var
-     * @param sim
-     * @return 
-     */
-    public Double aggregate(Environment env, Expr var, double sim) {
-        List<Expr> lv = this.getVariables();
-        lv.remove(var);
-
-        Double cb = (lv.isEmpty()) ? 1 : aggregate(env, lv);
-        return cb * sim;
-    }
 
     private Double aggregate(Environment env, List<Expr> lv) {
         if (lv.isEmpty()) {
@@ -155,9 +108,6 @@ public class ApproximateSearchEnv {
             return var;
         }
 
-        public Node getUri() {
-            return uri;
-        }
 
         @Override
         public int hashCode() {
@@ -200,9 +150,6 @@ public class ApproximateSearchEnv {
             this.algorithms = algorithms;
         }
 
-        public Node getNode() {
-            return node;
-        }
 
         public String getAlgorithms() {
             return algorithms;
@@ -212,9 +159,6 @@ public class ApproximateSearchEnv {
             return similarity;
         }
 
-        public void setSimilarity(double similarity) {
-            this.similarity = similarity;
-        }
 
         @Override
         public String toString() {

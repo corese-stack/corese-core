@@ -25,29 +25,6 @@ public class NodeImpl implements Node {
         atom = at;
     }
 
-    public static NodeImpl createNode(Atom at) {
-        return new NodeImpl(at);
-    }
-
-    public static NodeImpl createVariable(String name) {
-        return new NodeImpl(Variable.create(name));
-    }
-
-    public static NodeImpl createResource(String name) {
-        return new NodeImpl(Constant.create(name));
-    }
-
-    public static NodeImpl createConstant(String name) {
-        return new NodeImpl(Constant.create(name, RDFS.xsdstring));
-    }
-
-    public static NodeImpl createConstant(String name, String datatype) {
-        return new NodeImpl(Constant.create(name, datatype));
-    }
-
-    public static NodeImpl createConstant(String name, String datatype, String lang) {
-        return new NodeImpl(Constant.create(name, null, lang));
-    }
 
     public Atom getAtom() {
         return atom;

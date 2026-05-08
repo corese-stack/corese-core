@@ -50,42 +50,22 @@ class Step {
 		enter = b;
 	}
 	
-	public boolean isEnter(){
-		return enter;
-	}
 
 	
 	void setLeave(boolean b){
 		leave = b;
 	}
 	
-	public boolean isLeave(){
-		return leave;
-	}
 	
 	void setLoop(boolean b){
 		loop = b;
 	}
 	
-	public boolean isLoop(){
-		return loop;
-	}
-	
-	void setCheck(boolean b){
-		check = b;
-	}
-	
-	public boolean isCheck(){
-		return check;
-	}
 	
 	void setWalk(boolean b){
 		walk = b;
 	}
 	
-	public boolean isWalk(){
-		return walk;
-	}
 	
 	void setState(State state){
 		states.add(state);
@@ -97,13 +77,6 @@ class Step {
 		return prop;
 	}
 	
-	public Regex getRegex(){
-		return prop;
-	}
-	
-	public List<State> getStates(){
-		return states;
-	}
 	
 	public State getState(){
 		return state;

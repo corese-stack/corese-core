@@ -106,13 +106,6 @@ public class Exp extends PointerObject
         return e;
     }
 
-    public static Exp create(Type t, Exp e1, Exp e2, Exp e3) {
-        Exp e = create(t);
-        e.add(e1);
-        e.add(e2);
-        e.add(e3);
-        return e;
-    }
 
     public static Exp create(Type t, Exp e1) {
         Exp e = create(t);
@@ -169,9 +162,6 @@ public class Exp extends PointerObject
         return isSystem;
     }
 
-    public void setSystem(boolean b) {
-        isSystem = b;
-    }
 
     public int getLevel() {
         return level;
@@ -230,9 +220,6 @@ public class Exp extends PointerObject
         return exp;
     }
 
-    public boolean hasArg() {
-        return !args.isEmpty();
-    }
 
     @Override
     public int size() {
@@ -243,9 +230,6 @@ public class Exp extends PointerObject
         args.add(e);
     }
 
-    public void add(Edge e) {
-        args.add(create(Type.EDGE, e));
-    }
 
     public void add(Node n) {
         args.add(create(Type.NODE, n));
@@ -375,9 +359,6 @@ public class Exp extends PointerObject
         skip = b;
     }
 
-    public boolean skip() {
-        return skip;
-    }
 
     public void status(boolean b) {
         status = b;
@@ -407,9 +388,6 @@ public class Exp extends PointerObject
         }
     }
 
-    public int getIndex() {
-        return index;
-    }
 
     public void setIndex(int n) {
         index = n;
@@ -448,9 +426,6 @@ public class Exp extends PointerObject
         isSilent = b;
     }
 
-    public boolean isNode() {
-        return type == Type.NODE;
-    }
 
     public boolean isEdge() {
         return type == Type.EDGE;
@@ -472,9 +447,6 @@ public class Exp extends PointerObject
         return type == Type.JOIN;
     }
 
-    public boolean isAndJoin() {
-        return isJoin() || (isBGPAnd() && size() == 1 && get(0).isJoin());
-    }
 
     public boolean isAnd() {
         return type == Type.AND;
@@ -504,22 +476,11 @@ public class Exp extends PointerObject
         return type == Type.SERVICE;
     }
 
-    public boolean isAtomic() {
-        return type == Type.FILTER || type == Type.EDGE || type == Type.NODE
-                || type == Type.ACCEPT;
-    }
 
     public void setType(Type n) {
         type = n;
     }
 
-    Exp getNext() {
-        return next;
-    }
-
-    void setNext(Exp e) {
-        next = e;
-    }
 
     public List<Exp> getExpList() {
         return args;
@@ -660,13 +621,6 @@ public class Exp extends PointerObject
         return type == Type.PATH;
     }
 
-    public void setPath(Exp path) {
-        this.path = path;
-    }
-
-    public void setPath(boolean b) {
-        isPath = b;
-    }
 
     public boolean isValues() {
         return type == Type.VALUES;
@@ -676,9 +630,6 @@ public class Exp extends PointerObject
         this.values = values;
     }
 
-    public boolean isBind() {
-        return type == Type.BIND;
-    }
 
     public void setBind(Exp bind) {
         this.bind = bind;
@@ -732,13 +683,6 @@ public class Exp extends PointerObject
         object = o;
     }
 
-    public Producer getProducer() {
-        return producer;
-    }
-
-    public void setProducer(Producer p) {
-        producer = p;
-    }
 
     public List<Object> getObjectValues() {
         if (object instanceof List) {
@@ -1091,12 +1035,6 @@ public class Exp extends PointerObject
         return true;
     }
 
-    public boolean bind(Filter f) {
-        List<String> lVar = f.getVariables();
-        List<String> lVarExp = new ArrayList<>();
-        share(lVar, lVarExp);
-        return bound(lVar, lVarExp);
-    }
 
     /**
      * Return variable nodes of this exp use case: find the variables for select
@@ -1297,9 +1235,6 @@ public class Exp extends PointerObject
         return getInScopeNodeList();
     }
 
-    public List<Node> getRecordInScopeNodes() {
-        return getRecordInScopeNodes(true);
-    }
 
     public List<Node> getRecordInScopeNodesWithoutBind() {
         return getRecordInScopeNodes(false);
@@ -1410,9 +1345,6 @@ public class Exp extends PointerObject
         return type() == Type.OPT_BIND && size() == 1;
     }
 
-    boolean isBindVar() {
-        return type() == Type.OPT_BIND && size() == 2;
-    }
 
     /**
      * Add BIND ?x = ?y
@@ -1472,16 +1404,6 @@ public class Exp extends PointerObject
         return false;
     }
 
-    boolean match(Node node, Filter f) {
-        if (!node.isVariable() || f.getExp().isRecExist()) {
-            return false;
-        }
-        List<String> lVar = f.getVariables();
-        if (lVar.size() != 1) {
-            return false;
-        }
-        return lVar.get(0).equals(node.getLabel());
-    }
 
     /**
      * this is FILTER with TEST ?x &lt; ?y
@@ -1490,55 +1412,6 @@ public class Exp extends PointerObject
         return getFilter().getExp().oper();
     }
 
-    boolean check(Exp filter, int index) {
-        int oper = filter.oper();
-        if (oper == ExprType.LT || oper == ExprType.LE) {
-            return index == 0;
-        } else if (oper == ExprType.GT || oper == ExprType.GE) {
-            return index == 1;
-        }
-        return false;
-    }
-
-    boolean order(Exp filter, int index) {
-        int oper = filter.oper();
-        if (oper == ExprType.LT || oper == ExprType.LE) {
-            return index == 0;
-        } else if (oper == ExprType.GT || oper == ExprType.GE) {
-            return index == 1;
-        }
-        return true;
-    }
-
-    /**
-     * index of Node in Edge
-     */
-    public int indexNode(Node node) {
-        if (!isEdge()) {
-            return -1;
-        }
-        for (int i = 0; i < nbNode(); i++) {
-            if (node.same(getNode(i))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * index of node in FILTER ?x &lt; ?y
-     */
-    public int indexVar(Node node) {
-        Expr ee = getFilter().getExp();
-        String name = node.getLabel();
-        for (int i = 0; i < 2; i++) {
-            if (ee.getExp(i).type() == ExprType.VARIABLE
-                    && ee.getExp(i).getLabel().equals(name)) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     boolean isBound(List<String> lvar, List<Node> lnode) {
         for (String varString : lvar) {
@@ -1837,9 +1710,6 @@ public class Exp extends PointerObject
         return type() == Type.GRAPH && size() > 1 && get(1).isFirstWith(type);
     }
 
-    boolean isJoinFirstWith(Type type) {
-        return isFirstWith(type) || isGraphFirstWith(type);
-    }
 
     Exp complete(Mappings map) {
         if (map == null || !map.isNodeList()) {
@@ -1854,17 +1724,11 @@ public class Exp extends PointerObject
         return createValues(map.getNodeList(), map);
     }
 
-    public boolean isMappings() {
-        return mappings;
-    }
 
     public void setMappings(Mappings m) {
         map = m;
     }
 
-    public void setMappings(boolean mappings) {
-        this.mappings = mappings;
-    }
 
     public boolean isGenerated() {
         return generated;
@@ -1882,13 +1746,6 @@ public class Exp extends PointerObject
         this.simpleNodeList = simpleNodeList;
     }
 
-    public Query getExternQuery() {
-        return externQuery;
-    }
-
-    public void setExternQuery(Query externQuery) {
-        this.externQuery = externQuery;
-    }
 
     public int getNum() {
         return num;

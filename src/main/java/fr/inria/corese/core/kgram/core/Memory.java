@@ -75,9 +75,6 @@ public class Memory extends PointerObject implements Environment {
         this.appxSearchEnv = new ApproximateSearchEnv();
     }
 
-    public static void recordEdge(boolean b) {
-        IS_EDGE = b;
-    }
 
     @Override
     public EventManager getEventManager() {
@@ -116,9 +113,6 @@ public class Memory extends PointerObject implements Environment {
         group = lm;
     }
 
-    Mappings getResults() {
-        return results;
-    }
 
     public Memory setResults(Mappings r) {
         results = r;
@@ -130,9 +124,6 @@ public class Memory extends PointerObject implements Environment {
         return query;
     }
 
-    public Matcher getMatcher() {
-        return match;
-    }
 
     @Override
     public Node getGraphNode() {
@@ -144,13 +135,6 @@ public class Memory extends PointerObject implements Environment {
         gNode = g;
     }
 
-    public Stack getStack() {
-        return stack;
-    }
-
-    void setStack(Stack s) {
-        stack = s;
-    }
 
     @Override
     public Exp getExp() {
@@ -162,9 +146,6 @@ public class Memory extends PointerObject implements Environment {
         exp = ee;
     }
 
-    public boolean isAggregate() {
-        return isAggregate;
-    }
 
     public void init(Memory memory) {
         setGraphNode(memory.getGraphNode());
@@ -354,12 +335,6 @@ public class Memory extends PointerObject implements Environment {
         }
     }
 
-    /**
-     * Store a new result: take a picture of the stack as a Mapping
-     */
-    Mapping store(Query q, Producer p) throws SparqlException {
-        return store(query, p, false, false);
-    }
 
     Mapping store(Query q, Producer p, boolean subEval) throws SparqlException {
         return store(query, p, subEval, false);
@@ -552,12 +527,6 @@ public class Memory extends PointerObject implements Environment {
         bnode = m;
     }
 
-    Mapping store(Query q, Mapping map, Producer p) throws SparqlException {
-        Node[] gnode = new Node[q.getGroupBy().size()];
-        orderGroup(q.getGroupBy(), gnode, p);
-        map.setGroupBy(gnode);
-        return map;
-    }
 
     void orderGroup(List<Exp> lExp, Node[] nodes, Producer p) throws SparqlException {
         int n = 0;
@@ -663,14 +632,6 @@ public class Memory extends PointerObject implements Environment {
         }
     }
 
-    void event(Edge q) {
-        for (int i = 0; i < q.nbNode(); i++) {
-            Node node = q.getNode(i);
-            if ((node != null) && (nbNodes[node.getIndex()] == 1)) {
-                send(Event.BIND, node, nodes[node.getIndex()]);
-            }
-        }
-    }
 
     void send(int type, Object obj, Object arg) {
         Event e = EventImpl.create(type, obj, arg);
@@ -978,9 +939,6 @@ public class Memory extends PointerObject implements Environment {
         return result[qEdge.getEdgeIndex()];
     }
 
-    public Edge getEdge(int n) {
-        return result[n];
-    }
 
     public Edge[] getQueryEdges() {
         return qEdges;
@@ -991,25 +949,6 @@ public class Memory extends PointerObject implements Environment {
         return result;
     }
 
-    public Edge getEdge(Node qnode) {
-        for (Edge e : getQueryEdges()) {
-            if (e.getEdgeVariable() != null
-                    && e.getEdgeVariable().equals(qnode)) {
-                return getEdge(e);
-            }
-        }
-        return null;
-    }
-
-    public Edge getEdge(String varString) {
-        for (Edge e : getQueryEdges()) {
-            if (e != null && e.getEdgeVariable() != null
-                    && e.getEdgeVariable().getLabel().equals(varString)) {
-                return getEdge(e);
-            }
-        }
-        return null;
-    }
 
     @Override
     public Node[] getNodes() {
@@ -1092,10 +1031,6 @@ public class Memory extends PointerObject implements Environment {
         return getNode(index);
     }
 
-    // Filter evaluator
-    public Evaluator getEvaluator() {
-        return eval;
-    }
 
     /*
      * *************************************
@@ -1107,17 +1042,6 @@ public class Memory extends PointerObject implements Environment {
         return current().size();
     }
 
-    public int sum(Node qNode) {
-        return -1;
-    }
-
-    public Node max(Node qNode) {
-        return current().max(qNode);
-    }
-
-    public Node min(Node qNode) {
-        return current().min(qNode);
-    }
 
     /**
      * Current group is set by Mappings aggregate function
@@ -1148,9 +1072,6 @@ public class Memory extends PointerObject implements Environment {
         return current();
     }
 
-    void setAggregate(boolean b) {
-        isAggregate = b;
-    }
 
     /**
      * Prepare Mapping for aggregate
@@ -1190,9 +1111,6 @@ public class Memory extends PointerObject implements Environment {
         return node.getPath();
     }
 
-    boolean isPath(Node qNode) {
-        return getPath(qNode) != null;
-    }
 
     @Override
     public Object getObject() {

@@ -17,9 +17,6 @@ public interface ProcessVisitor extends Pointerable {
 
     int SLICE_DEFAULT = 20;
 
-    default boolean isActive() {
-        return true;
-    }
 
     default void setActive(boolean b) {
     }

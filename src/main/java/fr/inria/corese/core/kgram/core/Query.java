@@ -59,12 +59,6 @@ public class Query extends Exp  {
         return factory;
     }
 
-    /**
-     * @param aFactory the factory to set
-     */
-    public static void setFactory(DQPFactory aFactory) {
-        factory = aFactory;
-    }
 
     int limit = Integer.MAX_VALUE, offset = 0,
             // if slice > 0 : service gets mappings from previous pattern by slices
@@ -264,9 +258,6 @@ public class Query extends Exp  {
         return new Query(e);
     }
 
-    public static Query create(int type) {
-        return new Query();
-    }
 
     @Override
     public String toString() {
@@ -315,14 +306,6 @@ public class Query extends Exp  {
     }
     
     
-    /**
-     * Add values () {} for this Mappings
-     */
-    public void addMappings(Mappings map) {
-        Exp values = createValues(getNodeListValues(map), map);
-        getBody().add(values);
-        setMappings(map);
-    }
     
     List<Node> getNodeListValues(Mappings map) {
         List<Node> list = new ArrayList<>();
@@ -335,9 +318,6 @@ public class Query extends Exp  {
         return list;
     }
 
-    public void set(Sorter s) {
-        querySorter.setSorter(s);
-    }
 
     public void set(Edge e, Query q) {
         table.put(e, q);
@@ -347,9 +327,6 @@ public class Query extends Exp  {
         return table.get(e);
     }
 
-    public void addQuery(Query q) {
-        queries.add(q);
-    }
 
     public List<Query> getQueries() {
         return queries;
@@ -414,9 +391,6 @@ public class Query extends Exp  {
         getGlobalQuery().setError(mes, obj);
     }
 
-    public void addError(String mes, Object obj, boolean duplicate) {
-        getGlobalQuery().setError(mes, obj, duplicate);
-    }
 
     void setError(String mes, Object obj) {
         setError(mes, obj, true);
@@ -493,9 +467,6 @@ public class Query extends Exp  {
         }
     }
     
-    boolean needEdge(){
-        return getGlobalQuery().isRelax() || getGlobalQuery().isRule();
-    }
 
     public Query getGlobalQuery() {
         if (query != null) {
@@ -519,15 +490,6 @@ public class Query extends Exp  {
         return query != null;
     }
     
-    /**
-     * Select Query is empty and does nothing
-     */
-    boolean isEmpty(){
-        return isSelect()
-                && getSelectFun().isEmpty()
-                && getBody().size() == 0
-                && getValues().getMappings() == null;            
-    }
     
     public boolean isSelectExpression(){
          for (Exp e : getSelectFun()) {
@@ -546,13 +508,6 @@ public class Query extends Exp  {
         isCheckLoop = b;
     }
 
-    boolean isPipe() {
-        return isPipe;
-    }
-
-    public void setPipe(boolean b) {
-        isPipe = b;
-    }
 
     /**
      * Fake local graph node
@@ -593,18 +548,6 @@ public class Query extends Exp  {
         return funList;
     }
 
-    /**
-     * Return equivalent local node for graph node it may be a local node with
-     * same variable name it may be a fake node
-     */
-    public Node getGraphNode(Node g) {
-        Node node = getSelectNode(g.getLabel());
-        if (node != null) {
-            return node;
-        } else {
-            return getGraphNode();
-        }
-    }
 
     public Exp getFunction() {
         for (Exp exp : getSelectFun()) {
@@ -615,9 +558,6 @@ public class Query extends Exp  {
         return null;
     }
 
-    public static boolean isSPARQL2() {
-        return true;
-    }
     
     public String getFromName() {
         List<Node> from = getFrom();
@@ -655,17 +595,11 @@ public class Query extends Exp  {
         return patternNodes;
     }
 
-    public List<Node> getQueryNodes() {
-        return queryNodes;
-    }
 
     public List<Node> getPatternSelectNodes() {
         return patternSelectNodes;
     }
 
-    public List<Node> getQuerySelectNodes() {
-        return querySelectNodes;
-    }
 
     public List<Node> getBindingNodes() {
         if (getValues() == null) {
@@ -760,17 +694,6 @@ public class Query extends Exp  {
         slice = n;
     }
 
-    public int getSlice() {
-        return slice;
-    }
-
-    public void setMap(boolean b) {
-        isMap = b;
-    }
-
-    public boolean isMap() {
-        return isMap;
-    }
 
     public void setLimit(int n) {
         limit = n;
@@ -889,25 +812,11 @@ public class Query extends Exp  {
         isUpdate = b;
     }
 
-    public boolean isTest() {
-        return isTest;
-    }
 
     public void setTest(boolean b) {
         isTest = b;
     }
     
-    public boolean isNew() {
-        return isNew;
-    }
-
-    public void setNew(boolean b) {
-        isNew = b;
-    }
-
-    public boolean isOptimize() {
-        return isOptimize;
-    }
 
     public void setOptimize(boolean b) {
         isOptimize = b;
@@ -932,9 +841,6 @@ public class Query extends Exp  {
         }
     }
 
-    public void addFailure(Filter exp) {
-        failure.add(exp);
-    }
 
     public List<Filter> getFailures() {
         return failure;
@@ -944,25 +850,16 @@ public class Query extends Exp  {
         selectExp = s;
     }
     
-    public void addSelect(Exp exp) {
-        selectExp.add(exp);
-    }
 
     public void addSelect(Node node) {
         selectExp.add(Exp.create(ExpType.Type.NODE, node));
     }
 
-    public void addOrderBy(Exp exp) {
-        orderBy.add(exp);
-    }
 
     public void addOrderBy(Node node) {
         orderBy.add(Exp.create(ExpType.Type.NODE, node));
     }
 
-    public void addGroupBy(Exp exp) {
-        groupBy.add(exp);
-    }
 
     public void addGroupBy(Node node) {
         groupBy.add(Exp.create(ExpType.Type.NODE, node));
@@ -1052,9 +949,6 @@ public class Query extends Exp  {
         return construct;
     }
 
-    public Exp getInsert() {
-        return construct;
-    }
 
     public void setDelete(Exp c) {
         delete = c;
@@ -1064,15 +958,6 @@ public class Query extends Exp  {
         return delete;
     }
 
-    public int nbFun() {
-        int nbfun = 0;
-        for (Exp e : getSelectFun()) {
-            if (e.getFilter() != null) {
-                nbfun++;
-            }
-        }
-        return nbfun;
-    }
 
     /**
      * Check that select variables and expressions are compatible with group by
@@ -1191,9 +1076,6 @@ public class Query extends Exp  {
         return iEdge;
     }
 
-    public synchronized int nbPath() {
-        return iPath++;
-    }
 
     /**
      * Called by Eval before query evaluation
@@ -1272,9 +1154,6 @@ public class Query extends Exp  {
         }
     }
 
-    void compile(Filter f) {
-        querySorter.compile(f);
-    }
 
     void index(List<Exp> list) {
         for (Exp ee : list) {
@@ -1660,15 +1539,6 @@ public class Query extends Exp  {
         return false;
     }
 
-    boolean inSelect(Node qNode) {
-        for (Exp exp : getSelectFun()) {
-            Node node = exp.getNode();
-            if (node == qNode) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Generate or retrieve index of node 
@@ -1707,9 +1577,6 @@ public class Query extends Exp  {
         return iNode;
     }
 
-    void setNodeIndex(int n) {
-        iNode = n;
-    }
 
     /**
      *
@@ -1747,18 +1614,12 @@ public class Query extends Exp  {
   
 
    
-    public boolean isPrinterTemplate() {
-        return isPrinterTemplate;
-    }
 
     
     public void setPrinterTemplate(boolean isPrinterTemplate) {
         this.isPrinterTemplate = isPrinterTemplate;
     }
 
-    public boolean isMatchBlank() {
-        return isMatch;
-    }
 
     
     public void setMatchBlank(boolean match) {
@@ -1815,25 +1676,6 @@ public class Query extends Exp  {
         profile = uri;
     }
 
-    public String getProfile() {
-        return profile;
-    }
-
-    public void setNumbering(boolean b) {
-        isNumbering = b;
-    }
-
-    public boolean isNumbering() {
-        return isNumbering;
-    }
-    
-    public Query getTemplateProfile() {
-        return templateProfile;
-    }
-    
-    public void setTemplateProfile(Query templateProfile) {
-        this.templateProfile = templateProfile;
-    }
 
     /**
      * Compute node list for filter variables use case: Pattern compiler (?x =
@@ -1855,14 +1697,6 @@ public class Query extends Exp  {
         return lNode;
     }
 
-    /**
-     * use case: select count(distinct ?x)
-     */
-    public List<Node> getAggNodes(Filter f) {
-        ArrayList<Node> lNode = new ArrayList<>();
-        getAggNodes(f.getExp(), lNode);
-        return lNode;
-    }
 
     void getAggNodes(Expr exp, ArrayList<Node> lNode) {
         if (exp.type() == ExprType.VARIABLE) {
@@ -1903,42 +1737,6 @@ public class Query extends Exp  {
         return b;
     }
 
-    /**
-     * ********************************************************************
-     *
-     * Pipeline using operators on queries: union/and/optional/minus
-     * q1.union(q2).and(q3).optional(q4).minus(q5)
-     *
-     *********************************************************************
-     */
-    public Query union(Query q2) {
-        Query q1 = this;
-        Exp exp = Exp.create(ExpType.Type.UNION, q1, q2);
-        return Query.create(exp).complete(q1, q2);
-    }
-
-    public Query and(Query q2) {
-        Query q1 = this;
-        Exp exp = Exp.create(ExpType.Type.AND, q1, q2);
-        return Query.create(exp).complete(q1, q2);
-    }
-
-    public Query minus(Query q2) {
-        Query q1 = this;
-        Exp exp = Exp.create(ExpType.Type.MINUS, q1, Exp.create(ExpType.Type.AND, q2));
-        return Query.create(exp).complete(q1, q2);
-    }
-
-    public Query optional(Query q2) {
-        Query q1 = this;
-        Exp exp = Exp.create(ExpType.Type.AND, q1, Exp.create(ExpType.Type.OPTION, Exp.create(ExpType.Type.AND, q2)));
-        return Query.create(exp).complete(q1, q2);
-    }
-
-    public Query ifthen(Query q1, Query q2) {
-
-        return this;
-    }
 
     public Query orderBy(Node node) {
         if (node != null && !contain(getOrderBy(), node)) {
@@ -1947,9 +1745,6 @@ public class Query extends Exp  {
         return this;
     }
 
-    public Query orderBy(String n) {
-        return orderBy(getNode(n));
-    }
 
     public Query groupBy(Node node) {
         if (node != null && !contain(getGroupBy(), node)) {
@@ -1958,9 +1753,6 @@ public class Query extends Exp  {
         return this;
     }
 
-    public Query groupBy(String n) {
-        return groupBy(getNode(n));
-    }
 
     public Query select(Node node) {
         if (node != null && !contain(getSelectFun(), node)) {
@@ -1969,9 +1761,6 @@ public class Query extends Exp  {
         return this;
     }
 
-    public Query select(String n) {
-        return select(getNode(n));
-    }
 
     Query complete(Query q1, Query q2) {
         q1.setOuterQuery(this);
@@ -2033,16 +1822,6 @@ public class Query extends Exp  {
         return ftable.get(name);
     }
 
-    public Expr getProfile(String name) {
-        if (templateProfile == null) {
-            return null;
-        }
-        Filter f = templateProfile.getFilter(name);
-        if (f == null) {
-            return null;
-        }
-        return f.getExp();
-    }
 
     public Filter getGlobalFilter(String name) {
         return getGlobalQuery().getFilter(name);
@@ -2052,31 +1831,17 @@ public class Query extends Exp  {
         ftable.put(name, filter);
     }
 
-    public Iterable<String> getFilterNames() {
-        return ftable.keySet();
-    }
 
     public Object getPragma(String name) {
         return pragma.get(name);
     }
 
-    public String getStringPragma(String name) {
-        return (String) pragma.get(name);
-    }
 
     public boolean hasPragma(String name) {
         return pragma.get(name) != null;
 
     }
 
-    public boolean isPragma(String name) {
-        Object obj = pragma.get(name);
-        if (obj == null || !(obj instanceof Boolean)) {
-            return false;
-        }
-        Boolean b = (Boolean) obj;
-        return b;
-    }
 
     public void setPragma(String name, Object value) {
         pragma.put(name, value);
@@ -2103,13 +1868,6 @@ public class Query extends Exp  {
         return isDetail;
     }
 
-    public void setSynchronized(boolean b) {
-        isSynchronized = b;
-    }
-
-    public boolean isSynchronized() {
-        return isSynchronized;
-    }
     
     public Object getTransformer(String p) {
         return getGlobalQuery().getPPrinter(p);
@@ -2165,9 +1923,6 @@ public class Query extends Exp  {
         this.number = number;
     }
 
-    public boolean isAllResult() {
-        return true; //isAllResult;
-    }
 
     public void setAllResult(boolean isAllResult) {
         this.isAllResult = isAllResult;
@@ -2189,9 +1944,6 @@ public class Query extends Exp  {
         this.templateNL = nl;
     }
 
-    public boolean isStdOptional() {
-        return isOptional;
-    }
 
     public void recordPredicate(Node p, Edge edge) {
         Integer i = ptable.get(p.getLabel());
@@ -2254,9 +2006,6 @@ public class Query extends Exp  {
     }
 
    
-    public int getID() {
-        return id;
-    }
 
    
     public void setID(int id) {
@@ -2273,30 +2022,6 @@ public class Query extends Exp  {
         this.provenance = provenance;
     }
 
-/*
-    @Override
-    public Object getGraph() {
-        return graph;
-    }
-
- 
-    @Override
-    public void setGraph(Object graph) {
-        this.graph = graph;
-    }
-
-    @Override
-    public String toGraph() {
-        return getAST().toGraph();
-    }
-*/
-    public void setExtension(boolean b) {
-        isExtension = b;
-    }
-
-    public boolean isExtension() {
-        return isExtension;
-    }
 
     public ASTExtension getExtension() {
         return extension;
@@ -2323,10 +2048,6 @@ public class Query extends Exp  {
     }
     
     
-    // API for Eval event-driven function call 
-    public Expr getExpression(String name){
-        return getExpression(name, false);
-    }
     
     public Expr getExpression(String name, boolean inherit){
         Expr ee = getLocalExpression(name);
@@ -2406,26 +2127,6 @@ public class Query extends Exp  {
         this.bgpGenerator = bgpGenerator;
     }
     
-    public HashMap<Edge, Exp> getEdgeAndContext() {
-        if (getBgpGenerator() == null){
-            return  null;
-        }
-        return getBgpGenerator().getEdgeAndContext();
-    }
- 
-
-    public List<Edge> getQueryEdgeList() {
-        return queryEdgeList;
-    }
-
-    public void setQueryEdgeList(List<Edge> queryEdgeList) {
-        this.queryEdgeList = queryEdgeList;
-    }
-
-   
-    public boolean isFun() {
-        return isFun;
-    }
 
    
     public void setFun(boolean isFun) {
@@ -2494,16 +2195,6 @@ public class Query extends Exp  {
         tprinter = map;
     }
     
-    /**
-     * Use case: PluginImpl kgram()
-     * Query inherits q transformer information
-     * @param q 
-     */
-    public void complete(Query q, Context context){
-        setEnvironment(q.getEnvironment());
-        setTransformer(q.getTransformer());
-        setContext(context);
-    }
 
    
     @Override
@@ -2517,9 +2208,6 @@ public class Query extends Exp  {
     }
 
     
-    public int getPriority() {
-        return priority;
-    }
 
    
     public void setPriority(int priority) {
@@ -2545,25 +2233,6 @@ public class Query extends Exp  {
         return isInsert;
     }
     
-    public boolean isUpdateInsert() {
-        return getAST().isUpdateInsert();
-    }
-    
-    public boolean isUpdateDelete() {
-        return getAST().isUpdateDelete();
-    }
-    
-    public boolean isUpdateInsertData() {
-        return getAST().isUpdateInsertData();
-    }
-    
-    public boolean isUpdateDeleteData() {
-        return getAST().isUpdateDeleteData();
-    }
-    
-    public boolean isUpdateLoad() {
-        return getAST().isUpdateLoad();
-    }
     
   
     public boolean isLock() {
@@ -2586,9 +2255,6 @@ public class Query extends Exp  {
     }
 
    
-    public boolean isServiceResult() {
-        return serviceResult;
-    }
 
     
     public void setServiceResult(boolean serviceResult) {
@@ -2611,9 +2277,6 @@ public class Query extends Exp  {
     }
 
     
-    public void setValidate(boolean validate) {
-        this.validate = validate;
-    }
 
    
     public boolean isAlgebra() {
@@ -2641,9 +2304,6 @@ public class Query extends Exp  {
     }
 
    
-    public void setImportFailure(boolean importFailure) {
-        this.importFailure = importFailure;
-    }
 
     public Mappings getSelection() {
         return selection;

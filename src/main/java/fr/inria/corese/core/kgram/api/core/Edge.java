@@ -209,12 +209,6 @@ public interface Edge extends Pointerable {
     default void setTripleNode(Node node) {
     }
 
-    default boolean sameTerm(Edge e) {
-        return sameTermWithoutGraph(e)
-                && (getGraphValue() == null || e.getGraphValue() == null
-                ? getGraphValue() == e.getGraphValue()
-                : getGraphValue().sameTerm(e.getGraphValue()));
-    }
 
     default boolean sameTermWithoutGraph(Edge e) {
         return getSubjectValue().sameTerm(e.getSubjectValue())
@@ -222,12 +216,6 @@ public interface Edge extends Pointerable {
                 && getObjectValue().sameTerm(e.getObjectValue());
     }
 
-    default boolean equals(Edge e) {
-        return equalsWithoutGraph(e)
-                && (getGraphValue() == null || e.getGraphValue() == null
-                ? getGraphValue() == e.getGraphValue()
-                : getGraphValue().equals(e.getGraphValue()));
-    }
 
     default boolean equalsWithoutGraph(Edge e) {
         return getObjectValue().equals(e.getObjectValue())

@@ -210,21 +210,6 @@ public class Mapping
         }
     }
 
-    @Deprecated
-    public void bind(Node qNode, Node tNode) {
-        Node[] qq = new Node[getQueryNodes().length + 1];
-        Node[] tt = new Node[getTargetNodes().length + 1];
-        int i = 0;
-        for (Node q : getQueryNodes()) {
-            qq[i] = q;
-            tt[i] = getTargetNodes()[i];
-            i++;
-        }
-        qq[i] = qNode;
-        tt[i] = tNode;
-        setQueryNodes(qq);
-        setTargetNodes(tt);
-    }
 
     @Override
     public int count() {
@@ -300,9 +285,6 @@ public class Mapping
         getOrderByNodes()[0] = node;
     }
 
-    public Node[] getGroupBy() {
-        return getGroupByNodes();
-    }
 
     void setGroupBy(Node[] nodes) {
         setGroupByNodes(nodes);
@@ -316,17 +298,6 @@ public class Mapping
         setSelectNodes(nodes);
     }
 
-    @Deprecated
-    public void rename(Node oName, Node nName) {
-        int i = 0;
-        for (Node qn : getQueryNodes()) {
-            if (qn != null && qn.getLabel().equals(oName.getLabel())) {
-                getQueryNodes()[i] = nName;
-                return;
-            }
-            i++;
-        }
-    }
 
     @Override
     public Path getPath(Node qNode) {
@@ -337,13 +308,6 @@ public class Mapping
         return node.getPath();
     }
 
-    public Path getPath(String name) {
-        Node qNode = getQueryNode(name);
-        if (qNode == null) {
-            return null;
-        }
-        return getPath(qNode);
-    }
 
     /**
      * Index of qNode in mapping (not in stack)
@@ -368,14 +332,6 @@ public class Mapping
         return path.length();
     }
 
-    @Override
-    public int pathWeight(Node qNode) {
-        Path path = getPath(qNode);
-        if (path == null) {
-            return -1;
-        }
-        return path.weight();
-    }
 
     boolean isPath(int n) {
         return getPath(n) != null;
@@ -430,9 +386,6 @@ public class Mapping
         return sb.toString();
     }
 
-    public List<Node> getNodes(Node varNode) {
-        return getNodes(varNode.getLabel());
-    }
 
     public List<Node> getNodes(String varString) {
         return getNodes(varString, false);
@@ -488,12 +441,6 @@ public class Mapping
         }
     }
 
-    /**
-     * min(?l, groupBy(?x, ?y)) retrieve value of ?x ?y in an array
-     */
-    Node getGroupNode(int n) {
-        return getGroupAlter()[n];
-    }
 
     Node[] getGroupNodes() {
         return getGroupAlter();
@@ -503,17 +450,6 @@ public class Mapping
         return getDistinctNodes()[n];
     }
 
-    public Node[] getDistinct() {
-        return getDistinctNodes();
-    }
-
-    public Node getTNode(Node node) {
-        return getNode(node);
-    }
-
-    public Node getGroupBy(int n) {
-        return getGroupByNodes()[n];
-    }
 
     public Node getGroupBy(Node qNode, int n) {
         if (getGroupByNodes().length == 0) {
@@ -597,9 +533,6 @@ public class Mapping
         getOrderByNodes()[n] = node;
     }
 
-    public void setGroupBy(int n, Node node) {
-        getGroupByNodes()[n] = node;
-    }
 
     public Node getNode(int n) {
         return getTargetNodes()[n];
@@ -625,9 +558,6 @@ public class Mapping
         return node.getNodeObject();
     }
 
-    public Map<String, Node> getNodeValues() {
-        return values;
-    }
 
     // variable name only
     public Node getNodeValue(String name) {
@@ -699,16 +629,6 @@ public class Mapping
         return null;
     }
 
-    Node getNodeBasic(String label) {
-        int n = 0;
-        for (Node qnode : getQueryNodes()) {
-            if (qnode.getLabel().equals(label)) {
-                return getTargetNodes()[n];
-            }
-            n++;
-        }
-        return null;
-    }
 
     /**
      * Use case:
@@ -1182,9 +1102,6 @@ public class Mapping
         return bind != null && bind.hasBind();
     }
 
-    Binding getCreateBind() {
-        return bind;
-    }
 
     @Override
     public Node get(Expr varExpr) {
@@ -1210,10 +1127,6 @@ public class Mapping
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public ApproximateSearchEnv getAppxSearchEnv() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     @Override
     public TripleStore getTripleStore() {

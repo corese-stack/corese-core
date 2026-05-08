@@ -50,32 +50,6 @@ public class Automaton {
 		return in;
 	}
 	
-	public State getOut(){
-		return out;
-	}
-	
-	public void setCurrent(State state){
-		current = state;
-	}
-	
-	public State getCurrent(){
-		return current;
-	}
-	
-	boolean isBound(){
-		return isBound;
-	}
-	
-	public void start(){
-		current = in;
-		for (State state : table){
-			state.setLoop(-1);
-			state.setCount(0);
-			for (Step step : state.getSteps()){
-				step.setWalk(false);
-			}
-		}
-	}
 	
 	public String toString(){
 		String str = "";
@@ -93,26 +67,6 @@ public class Automaton {
 		return str;
 	}
 	
-	/**
-	 * Compile regex into automaton
-	 */
-	void compile(Regex exp){
-		compute(exp, null,  false, false, false);
-		if (pending.size()>0){
-			// complete pending transitions to final state
-			out = create();
-			for (Step step : pending){
-				step.setState(out);
-			}
-			pending.clear();
-		}
-		else {
-			// use case: star(Exp)
-			out = current;
-		}
-		out.setOut(true);
-		compile();
-	}
 
 	void compile(){
 		for (State state : table){
@@ -303,18 +257,6 @@ public class Automaton {
 	}
 		
 	
-	/**
-	 * use case:
-	 * (p1/p2)*
-	 * exp = p1/p2
-	 * return true
-	 * 
-	 * TODO:
-	 * ((p1?/p2?)/p3)*
-	 */
-	boolean isStar(Regex exp, int n){
-		return true;
-	}
 	
 	boolean isBound(Regex exp){
 		boolean b = exp.getMin() != -1 || exp.getMax() != -1;
@@ -328,16 +270,6 @@ public class Automaton {
 	}
 	
 	
-	/**
-	 	return starting properties of automaton
-	 	WARNING: 
-	 	return null means all properties needed
-	 */
-	List<Regex> getStart(){
-		ArrayList<Regex> evec = new ArrayList<Regex> ();
-		Table svec = new Table();
-		return getStart(getIn(), evec, svec);
-	}
 	
 	ArrayList<Regex> getStart(State st, ArrayList<Regex> evec, Table svec){
 		svec.add(st);

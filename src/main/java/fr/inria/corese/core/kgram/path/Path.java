@@ -47,9 +47,6 @@ public class Path extends ProducerDefault implements Pointerable {
         path = new ArrayList<Edge>(n);
     }
 
-    public ArrayList<Edge> getEdges() {
-        return path;
-    }
     
     @Override
     public Path getPathObject() {
@@ -89,13 +86,6 @@ public class Path extends ProducerDefault implements Pointerable {
         return max;
     }
 
-    void checkLoopNode(boolean b) {
-        loopNode = b;
-    }
-
-    public void clear() {
-        path.clear();
-    }
 
     public void add(Edge ent) {
         path.add(ent);
@@ -111,18 +101,6 @@ public class Path extends ProducerDefault implements Pointerable {
         weight -= w;
     }
 
-    public void remove() {
-        path.remove(path.size() - 1);
-    }
-
-    // after reverse path
-    public Node getSource() {
-        return getEdge(0).getNode(0);
-    }
-
-    public Node getTarget() {
-        return getEdge(size() - 1).getNode(1);
-    }
 
     // before reverse path
     // edge may be EdgeInv in case of ^p
@@ -157,28 +135,6 @@ public class Path extends ProducerDefault implements Pointerable {
         return ent.getEdge();
     }
 
-    public Edge last() {
-        if (size() > 0) {
-            return get(size() - 1);
-        } else {
-            return null;
-        }
-    }
-
-    public Path copy() {
-        Path path = new Path(size());
-        for (Edge ent : this.path) {
-            // when r is reverse, add real target relation
-            if (ent instanceof EdgeInv) {
-                EdgeInv ee = (EdgeInv) ent;
-                path.add(ee.getEdgeEntity());
-            } else {
-                path.add(ent);
-            }
-        }
-        path.setWeight(weight);
-        return path;
-    }
 
     public Path copy(Producer p) {
         Path path = new Path(size());
@@ -210,18 +166,6 @@ public class Path extends ProducerDefault implements Pointerable {
         weight = w;
     }
 
-    // nb getResultValues()
-    public int nbValues() {
-        return 1 + 2 * path.size();
-    }
-
-    public void setRadius(int d) {
-        radius = d;
-    }
-
-    public int radius() {
-        return radius;
-    }
 
     public Path reverse() {
         for (int i = 0; i < length() / 2; i++) {
@@ -232,48 +176,6 @@ public class Path extends ProducerDefault implements Pointerable {
         return this;
     }
     
-    public Iterator<Node> nodeIterator() {
-
-        return new Iterator<Node>() {
-            private int i = 0;
-            private int j = 0;
-            private int ii;
-            private boolean hasNext = length() > 0;
-
-            @Override
-            public boolean hasNext() {
-                return hasNext;
-            }
-
-            @Override
-            public Node next() {
-                switch (j) {
-                    case 0:
-                        j = 1;
-                        return path.get(i).getNode(0);
-                    case 1:
-                        ii = i;
-                        if (i == path.size() - 1) {
-                            j = 2;
-                        } else {
-                            j = 0;
-                            i++;
-                        }
-                        return path.get(ii).getEdgeNode();
-                    case 2:
-                        hasNext = false;
-                        j = -1;
-                        return path.get(i).getNode(1);
-                }
-                return null;
-            }
-
-            @Override
-            public void remove() {
-            }
-        };
-
-    }
     
 
     @Override
