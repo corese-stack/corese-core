@@ -151,6 +151,11 @@ public final class SparqlAstBuilder {
      */
     private final List<OrderConditionAst> orderConditions = new ArrayList<>();
 
+    /*
+    * having conditions
+    */
+    private final List<TermAst> havingConditions = new ArrayList<>();
+
     /**
      * Per-SELECT frame used to support nested SELECT subqueries.
      */
@@ -162,6 +167,7 @@ public final class SparqlAstBuilder {
         private Long limit;
         private Long offset;
         private final List<OrderConditionAst> orderConditions = new ArrayList<>();
+        private final List<TermAst> havingConditions = new ArrayList<>();
     }
 
     /**
@@ -588,6 +594,18 @@ public final class SparqlAstBuilder {
         group.add(bind);
     }
 
+    public void addHavingCondition(TermAst condition) {
+        if (condition == null) {
+            throw new IllegalArgumentException("HAVING condition is null");
+        }
+
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().havingConditions.add(condition);
+        } else {
+            havingConditions.add(condition);
+        }
+    }
+
     // --- Optional ---
 
     /**
@@ -827,17 +845,30 @@ public final class SparqlAstBuilder {
     }
 
     /**
-     * Builds the solution modifier (DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT.
+     * Builds the solution modifier (DISTINCT, REDUCED, HAVING, ORDER BY, LIMIT, OFFSET) for non-SELECT
+     * query forms and for top-level SELECT when not using a {@link SelectFrame}.
      */
     private SolutionModifierAst buildSolutionModifier() {
-        return new SolutionModifierAst(distinct, reduced, this.orderConditions, limit, offset);
+        return new SolutionModifierAst(
+                distinct,
+                reduced,
+                this.orderConditions,
+                new HavingAst(List.copyOf(havingConditions)),
+                limit,
+                offset);
     }
 
     /**
-     * Builds solution modifiers for the current SELECT frame.
+     * Builds solution modifiers for the given SELECT frame.
      */
     private SolutionModifierAst buildSolutionModifier(SelectFrame frame) {
-        return new SolutionModifierAst(frame.distinct, frame.reduced, frame.orderConditions, frame.limit, frame.offset);
+        return new SolutionModifierAst(
+                frame.distinct,
+                frame.reduced,
+                frame.orderConditions,
+                new HavingAst(List.copyOf(frame.havingConditions)),
+                frame.limit,
+                frame.offset);
     }
 
     public boolean isOrdered() {

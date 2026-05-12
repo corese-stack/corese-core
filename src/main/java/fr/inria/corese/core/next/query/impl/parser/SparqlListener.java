@@ -151,7 +151,12 @@ public final class SparqlListener extends SparqlParserBaseListener {
         for(var d : delegates) d.exitFilter_(ctx);
     }
 
-    // ---------- SOLUTION MODIFIER (LIMIT / OFFSET) ----------
+    // ---------- SOLUTION MODIFIER (HAVING / ORDER BY / LIMIT / OFFSET) ----------
+    @Override
+    public void exitHavingClause(SparqlParser.HavingClauseContext ctx) {
+        for (var d : delegates) d.exitHavingClause(ctx);
+    }
+
     @Override
     public void exitLimitClause(SparqlParser.LimitClauseContext ctx) {
         for (var d : delegates) d.exitLimitClause(ctx);

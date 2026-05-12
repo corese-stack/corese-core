@@ -536,6 +536,31 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should parse SELECT with GROUP BY and HAVING (constraint)")
+    void shouldParseSelectWithGroupByAndHaving() {
+        SparqlParser parser = newParserDefault();
+
+        // Aggregates (e.g. COUNT) in SELECT / HAVING are not yet mapped in termFromBuiltInCall;
+        // use a built-in constraint to exercise the HAVING → HavingAst pipeline.
+        QueryAst ast = parser.parse("""
+                SELECT ?s
+                WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY ?s
+                HAVING (BOUND(?s))
+                """);
+
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        SolutionModifierAst modifiers = select.solutionModifier();
+        assertTrue(modifiers.hasHaving(), "HAVING clause should populate solution modifier");
+        assertEquals(1, modifiers.having().conditions().size());
+        assertNotNull(modifiers.having().conditions().getFirst());
+    }
+
+    @Test
     @DisplayName("Should accept projection variables visible through OPTIONAL")
     void shouldAcceptProjectionVisibleThroughOptional() {
         SparqlParser parser = newParserDefault();
