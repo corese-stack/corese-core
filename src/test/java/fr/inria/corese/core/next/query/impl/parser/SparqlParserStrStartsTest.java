@@ -1,12 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrStartsAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +20,7 @@ class SparqlParserStrStartsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrStartsInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   FILTER(STRSTARTS(?label, "core"))
@@ -44,7 +39,7 @@ class SparqlParserStrStartsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrStartsInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(STRSTARTS(?label, "core") AS ?startsWithCore)
@@ -64,7 +59,7 @@ class SparqlParserStrStartsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrStartsWithLiteralArguments() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(STRSTARTS("foobar", "foo") AS ?startsWithFoo)

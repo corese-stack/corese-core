@@ -1,11 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AbsAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.CeilAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FloorAst;
@@ -28,7 +24,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAbsInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(ABS(?x) AS ?abs)
@@ -47,7 +43,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseRoundInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(ROUND(?x))
@@ -65,7 +61,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseCeilInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(CEIL(?x))
@@ -83,7 +79,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseFloorInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(FLOOR(?x))
@@ -101,7 +97,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseRandInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(RAND() AS ?rand)
@@ -119,7 +115,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseRandInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(RAND())

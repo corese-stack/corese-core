@@ -1,10 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrUuidAst;
@@ -24,7 +20,7 @@ class SparqlParserStrUuidTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrUuid() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(STRUUID() AS ?id)
@@ -42,7 +38,7 @@ class SparqlParserStrUuidTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrUuidInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(STRUUID() = STR(?s))

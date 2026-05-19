@@ -44,7 +44,7 @@ class SparqlAstBuilderUnionTest {
         builder.exitUnion();
         builder.exitGroup();           // }
         builder.exitSelectQuery();
-        return Objects.requireNonNull(builder.getResult()).whereClause();
+        return Objects.requireNonNull((SelectQueryAst)builder.getResult()).whereClause();
     }
 
     /**
