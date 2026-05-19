@@ -1,12 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.IriFunctionAst;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +21,7 @@ class SparqlParserIriTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIriInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?lex .
                   BIND(IRI(?lex) AS ?iri)
@@ -45,7 +40,7 @@ class SparqlParserIriTest extends AbstractSparqlParserFeatureTest {
     void shouldParseUriAliasInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?lex .
                   BIND(URI(?lex) AS ?iri)
@@ -64,7 +59,7 @@ class SparqlParserIriTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIriInFilterComparison() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?lex .
                   FILTER(IRI(?lex) = <http://example.org/resource>)
@@ -84,7 +79,7 @@ class SparqlParserIriTest extends AbstractSparqlParserFeatureTest {
     void shouldParseOrderByIri() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT ?lex WHERE {
                   ?s ?p ?lex .
                 } ORDER BY IRI(?lex)

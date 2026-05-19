@@ -385,7 +385,7 @@ class SparqlAstTest {
             GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
                     new BgpAst(List.of(new TriplePatternAst(
                             new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
-            QueryAst q = new SelectQueryAst(where);
+            SparqlQueryAst q = new SelectQueryAst(where);
             assertSame(where, q.whereClause());
         }
 
@@ -426,7 +426,7 @@ class SparqlAstTest {
             GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(
                     new BgpAst(List.of(new TriplePatternAst(
                             new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
-            QueryAst q = new AskQueryAst(DatasetClauseAst.none(), where);
+            SparqlQueryAst q = new AskQueryAst(DatasetClauseAst.none(), where);
             assertSame(where, q.whereClause());
         }
 
@@ -503,7 +503,7 @@ class SparqlAstTest {
             BgpAst bgp = new BgpAst(List.of(
                     new TriplePatternAst(new VarAst("s"), new IriAst("a"), new VarAst("o"))));
             GroupGraphPatternAst where = new GroupGraphPatternAst(List.of(bgp));
-            QueryAst q = new SelectQueryAst(where);
+            SparqlQueryAst q = new SelectQueryAst(where);
             assertEquals(1, q.whereClause().patterns().size());
             assertEquals(1, ((BgpAst) q.whereClause().patterns().get(0)).triples().size());
         }

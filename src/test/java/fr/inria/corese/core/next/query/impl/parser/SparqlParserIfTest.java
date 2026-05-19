@@ -16,7 +16,7 @@ class SparqlParserIfTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIfInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(IF(?s > 0, true, false))
@@ -38,7 +38,7 @@ class SparqlParserIfTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIfInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(IF(?s > 0, ?s, ?o) AS ?result)
@@ -60,7 +60,7 @@ class SparqlParserIfTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIfWithBoundCondition() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(IF(BOUND(?o), ?o, "default") AS ?val)
@@ -82,7 +82,7 @@ class SparqlParserIfTest extends AbstractSparqlParserFeatureTest {
     void shouldParseNestedIf() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(IF(?s, IF(?p, ?p, ?o), ?o) AS ?r)

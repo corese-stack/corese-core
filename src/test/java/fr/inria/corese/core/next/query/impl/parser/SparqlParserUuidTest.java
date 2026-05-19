@@ -19,7 +19,7 @@ class SparqlParserUuidTest extends AbstractSparqlParserFeatureTest {
     void shouldParseUuid() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(UUID() AS ?id)
@@ -37,7 +37,7 @@ class SparqlParserUuidTest extends AbstractSparqlParserFeatureTest {
     void shouldParseUuidInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(UUID() = ?s)

@@ -148,7 +148,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = queryParser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -172,7 +172,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = queryParser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -196,7 +196,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = queryParser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().namedGraphs());
@@ -220,7 +220,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = queryParser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -246,7 +246,7 @@ class SparqlParserDescribeTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = queryParser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) queryParser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());

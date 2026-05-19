@@ -1,10 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrLenAst;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +18,7 @@ class SparqlParserStrLenTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrLen() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(STRLEN(?s) AS ?len)
@@ -41,7 +37,7 @@ class SparqlParserStrLenTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrLenInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(STRLEN(?s) = 2)

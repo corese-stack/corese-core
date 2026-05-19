@@ -1,13 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.StrDtAst;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +21,7 @@ class SparqlParserStrDtTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrDtInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
                 SELECT * WHERE {
                   ?s ?p ?label .
@@ -48,7 +42,7 @@ class SparqlParserStrDtTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrDtWithLiteralArgument() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
                 SELECT * WHERE {
                   ?s ?p ?label .
@@ -69,7 +63,7 @@ class SparqlParserStrDtTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrDtInFilterComparison() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
                 SELECT * WHERE {
                   ?s ?p ?label .

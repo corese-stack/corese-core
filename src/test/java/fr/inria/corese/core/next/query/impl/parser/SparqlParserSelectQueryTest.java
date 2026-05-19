@@ -948,7 +948,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 } LIMIT 10
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -972,7 +972,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 } LIMIT 10
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -996,7 +996,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 } LIMIT 10
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().namedGraphs());
@@ -1020,7 +1020,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 } LIMIT 10
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -1046,7 +1046,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 } LIMIT 10
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());

@@ -209,6 +209,21 @@ public final class SparqlAstBuilder {
     private ConstructTemplateAst constructTemplate;
 
     /**
+     * Flag for UPDATE queries to be silent or not
+     */
+    private boolean silentFlag = false;
+
+    /**
+     * List of IRIs used in an TO clause in a UPDATE query
+     */
+    private Set<IriAst> sourceGraphSet = new HashSet<>();
+
+    /**
+     * List of IRIs used in an TO clause in a UPDATE query
+     */
+    private Set<IriAst> targetGraphSet = new HashSet<>();
+
+    /**
      * Used for BIND scope checks (variable must not already be visible in the same group).
      */
     private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
@@ -217,6 +232,7 @@ public final class SparqlAstBuilder {
      * Effective base URI after prologue (parser options, then possibly {@code BASE}).
      */
     private String baseUri;
+
     /**
      * Prefix declarations in source order (including redeclarations).
      */
@@ -729,6 +745,7 @@ public final class SparqlAstBuilder {
             case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst, valuesClause);
             case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst, valuesClause);
             case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst, valuesClause);
+            case LOAD -> buildLoadQueryAst(prologueAst);
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
@@ -757,6 +774,39 @@ public final class SparqlAstBuilder {
                     "exitGroup() called while a TriplesBlock/BGP is still open" +
                             " (open bgpStack depth=" + bgpStack.size() + ")");
         }
+    }
+
+    /**
+     * Build the AST for LOAD queries
+     * @param prologueAst prologue
+     * @return a {@link LoadQueryAst}
+     */
+    private LoadQueryAst buildLoadQueryAst(QueryPrologueAst prologueAst) {
+        return new LoadQueryAst(prologueAst, sourceGraphSet, targetGraphSet, silentFlag);
+    }
+
+    /**
+     * Add a source graph IRI for an UPDATE query (FROM clause)
+     * @param iri
+     */
+    public void addSourceGraphIri(IriAst iri) {
+        this.sourceGraphSet.add(iri);
+    }
+
+    /**
+     * Add a target graph IRI for an UPDATE query (TO clause)
+     * @param iri
+     */
+    public void addTargetGraphIri(IriAst iri) {
+        this.targetGraphSet.add(iri);
+    }
+
+    /**
+     * Set the Silent flag of an UPDATE query.
+     * @param silent
+     */
+    public void setSilentFlag(boolean silent) {
+        this.silentFlag = silent;
     }
 
     /**
@@ -933,6 +983,16 @@ public final class SparqlAstBuilder {
     public void enterDescribeQuery() {
         assertTopLevelQueryFormOnly("DESCRIBE");
         queryType = ASTConstants.QUERY_TYPE.DESCRIBE;
+    }
+
+    /**
+     * Signals the start of a LOAD query desclaration
+     */
+    public void enterLoadQuery() {
+        queryType = ASTConstants.QUERY_TYPE.LOAD;
+        this.sourceGraphSet.clear();
+        this.targetGraphSet.clear();
+        this.silentFlag = false;
     }
 
     /**
@@ -1176,6 +1236,14 @@ public final class SparqlAstBuilder {
             return this.iri("()");
         } // NIL = () in SPARQL
         return this.iri(ctx.getText());
+    }
+
+    public TermAst termFromGraphRef(SparqlParser.GraphRefContext ctx) {
+        if (ctx.iriRef() != null) {
+            return termFromIriRef(ctx.iriRef());
+        } else {
+            throw new QueryEvaluationException("Expecting an IRIRef in the Graph clause");
+        }
     }
 
     public List<TermAst> termListFromObjectList(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ObjectListContext ctx) {

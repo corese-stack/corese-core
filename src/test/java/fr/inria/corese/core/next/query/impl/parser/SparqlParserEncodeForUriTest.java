@@ -1,12 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EncodeForUriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.EqualsAst;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +21,7 @@ class SparqlParserEncodeForUriTest extends AbstractSparqlParserFeatureTest {
     void shouldParseEncodeForUriInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(ENCODE_FOR_URI(?label) AS ?encoded)
@@ -45,7 +40,7 @@ class SparqlParserEncodeForUriTest extends AbstractSparqlParserFeatureTest {
     void shouldParseEncodeForUriWithLiteralArgument() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(ENCODE_FOR_URI("Los Angeles") AS ?encoded)
@@ -65,7 +60,7 @@ class SparqlParserEncodeForUriTest extends AbstractSparqlParserFeatureTest {
     void shouldParseEncodeForUriInFilterComparison() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   FILTER(ENCODE_FOR_URI(?label) = "abc")

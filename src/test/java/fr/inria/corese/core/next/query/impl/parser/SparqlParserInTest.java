@@ -1,11 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.InAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.NotInAst;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +22,7 @@ class SparqlParserInTest extends AbstractSparqlParserFeatureTest {
     void shouldParseInWithLiterals() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?x .
                   FILTER(?x IN (1, 2, 3))
@@ -48,7 +44,7 @@ class SparqlParserInTest extends AbstractSparqlParserFeatureTest {
     void shouldParseInEmptyList() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(2 IN ())
@@ -67,7 +63,7 @@ class SparqlParserInTest extends AbstractSparqlParserFeatureTest {
     void shouldParseNotIn() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?x .
                   FILTER(?x NOT IN (1, 2))

@@ -2,12 +2,7 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.MinusAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +46,7 @@ class SparqlParserMinusTest extends AbstractSparqlParserFeatureTest {
     void shouldNotExposeMinusVariablesToFollowingBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   MINUS { ?s ?q ?hidden . }

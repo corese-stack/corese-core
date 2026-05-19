@@ -24,7 +24,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void shouldParseServiceWithIriEndpoint() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       SERVICE <https://dbpedia.org/sparql> {
@@ -52,7 +52,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void serviceBodyShouldContainBgp() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       SERVICE <https://dbpedia.org/sparql> {
@@ -83,7 +83,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void shouldParseSilentService() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       SERVICE SILENT <https://example.org/sparql> {
@@ -105,7 +105,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void shouldParseNonSilentService() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       SERVICE <https://example.org/sparql> {
@@ -128,7 +128,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void shouldParseServiceWithVariableEndpoint() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       ?endpoint a <http://example.org/Service> .
@@ -158,7 +158,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void bgpBeforeAndAfterService() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       ?s a <http://example.org/Type> .
@@ -181,7 +181,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void serviceAndOptional() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       SERVICE <https://remote.org/sparql> {
@@ -202,7 +202,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void nestedServiceInsideOptional() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       ?s a <http://example.org/Type> .
@@ -234,7 +234,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void multipleTriplesSameBgp() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       SERVICE <https://dbpedia.org/sparql> {
@@ -255,7 +255,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
         void serviceBodyWithFilter() {
             SparqlParser parser = newParserDefault();
 
-            QueryAst ast = parser.parse("""
+            SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                     SELECT *
                     WHERE {
                       SERVICE <https://remote.org/sparql> {

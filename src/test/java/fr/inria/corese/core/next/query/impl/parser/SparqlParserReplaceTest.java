@@ -1,11 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.ReplaceAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +21,7 @@ class SparqlParserReplaceTest extends AbstractSparqlParserFeatureTest {
     void shouldParseReplaceWithoutFlagsInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(REPLACE(?label, "core", "CORE") AS ?normalized)
@@ -48,7 +44,7 @@ class SparqlParserReplaceTest extends AbstractSparqlParserFeatureTest {
     void shouldParseReplaceWithFlagsInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(REPLACE(?label, "core", "CORE", "i") AS ?normalized)
