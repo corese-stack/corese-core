@@ -28,7 +28,7 @@ public record DescribeQueryAst(
         SolutionModifierAst solutionModifier,
         QueryPrologueAst prologue,
         ValuesAst valuesClause
-) implements QueryAst {
+) implements SparqlQueryAst {
     public DescribeQueryAst {
         described = described != null ? List.copyOf(described) : List.of();
         if (whereClause == null) {

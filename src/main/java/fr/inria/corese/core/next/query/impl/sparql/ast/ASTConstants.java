@@ -11,6 +11,8 @@ public class ASTConstants {
         DESCRIBE,
         SELECT,
 
+        LOAD,
+
         UNDEFINED
     }
 
