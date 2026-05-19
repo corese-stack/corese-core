@@ -45,16 +45,17 @@ options {
     tokenVocab = SparqlLexer;
 }
 
-queryUnit
-    : query EOF
+query
+    : queryUnit EOF
+    | updateUnit EOF
     ;
 
-query
+queryUnit
     : prologue (selectQuery | constructQuery | describeQuery | askQuery) valuesClause
     ;
 
 updateUnit
-    : update EOF
+    : update
     ;
 
 prologue

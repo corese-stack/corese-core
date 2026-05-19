@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.SparqlQueryAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
 
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse(query);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(query);
         assertEquals("http://ns.inria.fr/test/", ast.prologue().baseIri().raw());
     }
 
@@ -46,7 +47,7 @@ class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
 
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse(query);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(query);
         assertEquals("http://ns.inria.fr/test/", ast.prologue().baseIri().raw());
     }
 
@@ -62,7 +63,7 @@ class SparqlParserPrologueTest extends AbstractSparqlParserFeatureTest {
 
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse(query);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(query);
         assertEquals("http://ns.inria.fr/test/", ast.prologue().baseIri().raw());
     }
 
