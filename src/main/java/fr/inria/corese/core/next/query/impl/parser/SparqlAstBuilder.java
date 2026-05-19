@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
@@ -907,6 +908,7 @@ public final class SparqlAstBuilder {
      */
     public TermAst iri(String raw) {
         if (raw == null) throw new IllegalArgumentException("IRI raw is null");
+        if(raw.equals("a")) return new IriAst("<" + RDF.type.getIRI().stringValue() + ">");
         return new IriAst(raw);
     }
 
