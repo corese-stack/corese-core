@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Build a minimal SPARQL AST for:
@@ -81,7 +82,7 @@ public final class SparqlAstBuilder {
      *                   i.e. the depth before the SERVICE body's {@link #enterGroup()} is invoked.
      *                   After {@link #exitGroup()} pops the service body the stack returns to this
      *                   depth, which is used as the signal to wrap the group in a
-     *                   {@link fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst}.
+     *                   {@link ServiceAst}.
      * @param endpoint   the remote service endpoint (IRI or variable)
      * @param silent     whether the {@code SILENT} keyword was present
      */
@@ -387,7 +388,7 @@ public final class SparqlAstBuilder {
                 expressionBoundNames.stream()
                         .map(s -> s == null ? "" : (s.startsWith("?") || s.startsWith("$") ? s.substring(1).trim() : s.trim()))
                         .filter(s -> !s.isBlank())
-                        .collect(java.util.stream.Collectors.toUnmodifiableSet());
+                        .collect(Collectors.toUnmodifiableSet());
 
         ProjectionAst newProjection = vars.isEmpty()
                 ? ProjectionAsts.selectAll()
@@ -680,7 +681,7 @@ public final class SparqlAstBuilder {
      * Enter SERVICE scope.  Records the current group stack size, the endpoint term and the
      * {@code SILENT} flag so that when {@link #exitGroup()} is called and the stack returns to
      * that size, the closed group is wrapped in a
-     * {@link fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst}.
+     * {@link ServiceAst}.
      *
      * @param endpoint the remote endpoint (IRI or variable)
      * @param silent   {@code true} when the {@code SILENT} keyword was present
@@ -691,7 +692,7 @@ public final class SparqlAstBuilder {
 
     /**
      * Exit SERVICE scope.  No-op: the service body was already wrapped in
-     * {@link fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst} in {@link #exitGroup()}.
+     * {@link ServiceAst} in {@link #exitGroup()}.
      */
     public void exitService() {
     }
@@ -734,20 +735,26 @@ public final class SparqlAstBuilder {
     public QueryAst getResult() {
         if (selectQueryResult != null) return selectQueryResult;
 
-        if (whereClause == null) {
-            throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
+        // Non-update query
+        if (this.queryType == ASTConstants.QUERY_TYPE.ASK || this.queryType == ASTConstants.QUERY_TYPE.CONSTRUCT || this.queryType == ASTConstants.QUERY_TYPE.DESCRIBE || this.queryType == ASTConstants.QUERY_TYPE.SELECT ) {
+            if (whereClause == null) {
+                throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
+            }
+            DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
+            QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
+            return switch (this.queryType) {
+                case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst);
+                case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst);
+                case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst);
+                case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst);
+                default -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
+            };
+        } else {
+            return switch (this.queryType) {
+                case LOAD -> buildLoadQueryAst();
+                default -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
+            };
         }
-        DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
-        QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
-        ValuesAst valuesClause = new ValuesAst(this.values);
-        return switch (this.queryType) {
-            case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst, valuesClause);
-            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst, valuesClause);
-            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst, valuesClause);
-            case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst, valuesClause);
-            case LOAD -> buildLoadQueryAst(prologueAst);
-            case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
-        };
     }
 
     // --- Internal helpers ---
@@ -781,8 +788,8 @@ public final class SparqlAstBuilder {
      * @param prologueAst prologue
      * @return a {@link LoadQueryAst}
      */
-    private LoadQueryAst buildLoadQueryAst(QueryPrologueAst prologueAst) {
-        return new LoadQueryAst(prologueAst, sourceGraphSet, targetGraphSet, silentFlag);
+    private LoadQueryAst buildLoadQueryAst() {
+        return new LoadQueryAst(sourceGraphSet, targetGraphSet, silentFlag);
     }
 
     /**
@@ -1199,12 +1206,12 @@ public final class SparqlAstBuilder {
 
     // ---- term helpers ----
 
-    public TermAst termFromVerb(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VerbContext ctx) {
+    public TermAst termFromVerb(SparqlParser.VerbContext ctx) {
         if (ctx.A() != null) return this.iri("a");
         return termFromVarOrIriRef(ctx.varOrIri());
     }
 
-    public TermAst termFromVarOrTerm(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.VarOrTermContext ctx) {
+    public TermAst termFromVarOrTerm(SparqlParser.VarOrTermContext ctx) {
         if (ctx.var_() != null) return termFromVar(ctx.var_());
         return termFromGraphTerm(ctx.graphTerm());
     }
@@ -1216,7 +1223,7 @@ public final class SparqlAstBuilder {
         return termFromIriRef(ctx.iriRef());
     }
 
-    public TermAst termFromGraphTerm(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.GraphTermContext ctx) {
+    public TermAst termFromGraphTerm(SparqlParser.GraphTermContext ctx) {
         if (ctx.iriRef() != null) {
             return termFromIriRef(ctx.iriRef());
         }
@@ -1246,7 +1253,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public List<TermAst> termListFromObjectList(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ObjectListContext ctx) {
+    public List<TermAst> termListFromObjectList(SparqlParser.ObjectListContext ctx) {
         List<TermAst> out = new ArrayList<>();
         for (var obj : ctx.object_()) {
             out.add(termFromObject(obj));
@@ -1254,12 +1261,12 @@ public final class SparqlAstBuilder {
         return out;
     }
 
-    public TermAst termFromObject(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.Object_Context ctx) {
+    public TermAst termFromObject(SparqlParser.Object_Context ctx) {
         // object_ : graphNode
         return termFromGraphNode(ctx.graphNode());
     }
 
-    public TermAst termFromGraphNode(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.GraphNodeContext ctx) {
+    public TermAst termFromGraphNode(SparqlParser.GraphNodeContext ctx) {
         if (ctx.varOrTerm() != null) return termFromVarOrTerm(ctx.varOrTerm());
         if (ctx.triplesNode() != null) {
             // MVP: pas encore supporté ( [ ... ] ou ( ... ) )
@@ -1269,7 +1276,7 @@ public final class SparqlAstBuilder {
         return this.iri(ctx.getText());
     }
 
-    public TermAst termFromRdfLiteral(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.RdfLiteralContext ctx) {
+    public TermAst termFromRdfLiteral(SparqlParser.RdfLiteralContext ctx) {
         // rdfLiteral : string_ ( LANGTAG | '^^' iriRef )?
 
         String lexical = ctx.string_().getText();
@@ -1285,7 +1292,7 @@ public final class SparqlAstBuilder {
         return this.literal(lexical, lang, datatype);
     }
 
-    public TermAst termFromPrimary(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.PrimaryExpressionContext ctx) {
+    public TermAst termFromPrimary(SparqlParser.PrimaryExpressionContext ctx) {
         if (ctx.brackettedExpression() != null) {
             return termFromBrackettedExpression(ctx.brackettedExpression());
         } else if (ctx.builtInCall() != null) {
@@ -1305,11 +1312,11 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromVar(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.Var_Context ctx) {
+    public TermAst termFromVar(SparqlParser.Var_Context ctx) {
         return this.var(ctx.getText());
     }
 
-    public TermAst termFromBooleanLiteral(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BooleanLiteralContext ctx) {
+    public TermAst termFromBooleanLiteral(SparqlParser.BooleanLiteralContext ctx) {
         if (ctx.FALSE() != null) {
             return new LiteralAst("false", null, XSD.xsdBoolean.getIRI().stringValue());
         } else if (ctx.TRUE() != null) {
@@ -1319,7 +1326,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromIriRefOrFunction(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.IriRefOrFunctionContext ctx) {
+    public TermAst termFromIriRefOrFunction(SparqlParser.IriRefOrFunctionContext ctx) {
         if (ctx.iriRef() != null && ctx.argList() == null) {
             return termFromIriRef(ctx.iriRef());
         } else if (ctx.iriRef() != null && ctx.argList() != null) {
@@ -1331,15 +1338,15 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public List<TermAst> termListFromArgList(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ArgListContext ctx) {
+    public List<TermAst> termListFromArgList(SparqlParser.ArgListContext ctx) {
         return ctx.expression().stream().map(this::termFromExpression).toList();
     }
 
-    public TermAst termFromIriRef(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.IriRefContext ctx) {
+    public TermAst termFromIriRef(SparqlParser.IriRefContext ctx) {
         return this.iri(ctx.getText());
     }
 
-    public TermAst termFromNumericLiteral(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralContext ctx) {
+    public TermAst termFromNumericLiteral(SparqlParser.NumericLiteralContext ctx) {
         if (ctx.numericLiteralUnsigned() != null) {
             return termFromNumericLiteralUnsigned(ctx.numericLiteralUnsigned());
         } else if (ctx.numericLiteralPositive() != null) {
@@ -1351,7 +1358,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromNumericLiteralNegative(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralNegativeContext ctx) {
+    public TermAst termFromNumericLiteralNegative(SparqlParser.NumericLiteralNegativeContext ctx) {
         if (ctx.INTEGER_NEGATIVE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdNegativeInteger.getIRI().stringValue());
         } else if (ctx.DECIMAL_NEGATIVE() != null) {
@@ -1363,7 +1370,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromNumericLiteralPositive(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralPositiveContext ctx) {
+    public TermAst termFromNumericLiteralPositive(SparqlParser.NumericLiteralPositiveContext ctx) {
         if (ctx.INTEGER_POSITIVE() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdPositiveInteger.getIRI().stringValue());
         } else if (ctx.DECIMAL_POSITIVE() != null) {
@@ -1375,7 +1382,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromNumericLiteralUnsigned(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralUnsignedContext ctx) {
+    public TermAst termFromNumericLiteralUnsigned(SparqlParser.NumericLiteralUnsignedContext ctx) {
         if (ctx.INTEGER() != null) {
             return this.literal(ctx.getText(), null, XSD.xsdUnsignedInt.getIRI().stringValue());
         } else if (ctx.DECIMAL() != null) {
@@ -1387,7 +1394,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromBlankNode(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BlankNodeContext ctx) {
+    public TermAst termFromBlankNode(SparqlParser.BlankNodeContext ctx) {
         return this.iri(ctx.getText());
     }
 
@@ -1421,7 +1428,7 @@ public final class SparqlAstBuilder {
         throw new QueryEvaluationException("Unsupported group condition: " + ctx.getText());
     }
 
-    public TermAst termFromConstraint(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConstraintContext ctx) {
+    public TermAst termFromConstraint(SparqlParser.ConstraintContext ctx) {
         if (ctx.builtInCall() != null) {
             return termFromBuiltInCall(ctx.builtInCall());
         } else if (ctx.functionCall() != null) {
@@ -1435,11 +1442,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromBuiltInCall(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BuiltInCallContext ctx) {
-        if (ctx.aggregate() != null) {
-            return termFromAggregate(ctx.aggregate());
-        }
-
+    public TermAst termFromBuiltInCall(SparqlParser.BuiltInCallContext ctx) {
         if (ctx.existsFunc() != null) {
             GroupGraphPatternAst existsPattern = popCapturedExistsPattern();
             if (existsPattern == null) {
@@ -1573,7 +1576,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromExpression(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ExpressionContext ctx) {
+    public TermAst termFromExpression(SparqlParser.ExpressionContext ctx) {
         if (ctx.conditionalOrExpression() != null) {
             return this.termFromConditionalOr(ctx.conditionalOrExpression());
         } else {
@@ -1581,7 +1584,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromConditionalOr(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConditionalOrExpressionContext ctx) {
+    public TermAst termFromConditionalOr(SparqlParser.ConditionalOrExpressionContext ctx) {
         if (ctx.conditionalAndExpression() != null && !ctx.conditionalAndExpression().isEmpty()) {
             if (ctx.conditionalAndExpression().size() > 1) {
                 List<TermAst> args = ctx.conditionalAndExpression().stream().map(this::termFromConditionalAnd).toList();
@@ -1594,7 +1597,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromConditionalAnd(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConditionalAndExpressionContext ctx) {
+    public TermAst termFromConditionalAnd(SparqlParser.ConditionalAndExpressionContext ctx) {
         if (ctx.valueLogical() != null && !ctx.valueLogical().isEmpty()) {
             if (ctx.valueLogical().size() > 1) {
                 List<TermAst> args = ctx.valueLogical().stream().map(this::termFromValueLogical).toList();
@@ -1607,7 +1610,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromValueLogical(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ValueLogicalContext ctx) {
+    public TermAst termFromValueLogical(SparqlParser.ValueLogicalContext ctx) {
         if (ctx.relationalExpression() != null) {
             return this.termFromRelational(ctx.relationalExpression());
         } else {
@@ -1615,7 +1618,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromRelational(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.RelationalExpressionContext ctx) {
+    public TermAst termFromRelational(SparqlParser.RelationalExpressionContext ctx) {
         if (ctx.numericExpression() == null || ctx.numericExpression().isEmpty()) {
             throw new QueryEvaluationException("No numeric termFromExpression found");
         }
@@ -1669,7 +1672,7 @@ public final class SparqlAstBuilder {
         return List.of();
     }
 
-    public TermAst termFromNumeric(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericExpressionContext ctx) {
+    public TermAst termFromNumeric(SparqlParser.NumericExpressionContext ctx) {
         if (ctx.additiveExpression() != null) {
             return this.termFromAdditive(ctx.additiveExpression());
         } else {
@@ -1677,7 +1680,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromAdditive(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.AdditiveExpressionContext ctx) {
+    public TermAst termFromAdditive(SparqlParser.AdditiveExpressionContext ctx) {
         if (ctx.multiplicativeExpression() != null && !ctx.multiplicativeExpression().isEmpty()) {
             if (ctx.multiplicativeExpression().size() > 1
                     || !ctx.numericLiteralNegative().isEmpty()
@@ -1696,11 +1699,11 @@ public final class SparqlAstBuilder {
                         }
                     } else {
                         TermAst rightHand = switch (child) {
-                            case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.MultiplicativeExpressionContext multiplicativeExpressionContext ->
+                            case SparqlParser.MultiplicativeExpressionContext multiplicativeExpressionContext ->
                                     termFromMultiplicative(multiplicativeExpressionContext);
-                            case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralPositiveContext numericLiteralPositiveContext ->
+                            case SparqlParser.NumericLiteralPositiveContext numericLiteralPositiveContext ->
                                     (ExprAst) termFromNumericLiteralPositive(numericLiteralPositiveContext);
-                            case fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.NumericLiteralNegativeContext numericLiteralNegativeContext ->
+                            case SparqlParser.NumericLiteralNegativeContext numericLiteralNegativeContext ->
                                     (ExprAst) termFromNumericLiteralNegative(numericLiteralNegativeContext);
                             case null, default ->
                                     throw new QueryEvaluationException(
@@ -1722,7 +1725,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromMultiplicative(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.MultiplicativeExpressionContext ctx) {
+    public TermAst termFromMultiplicative(SparqlParser.MultiplicativeExpressionContext ctx) {
         if (ctx.unaryExpression() != null && !ctx.unaryExpression().isEmpty()) {
             if (ctx.unaryExpression().size() > 1) {
                 TermAst head = termFromUnary(ctx.unaryExpression().getFirst());
@@ -1758,7 +1761,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromUnary(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.UnaryExpressionContext ctx) {
+    public TermAst termFromUnary(SparqlParser.UnaryExpressionContext ctx) {
         ASTConstants.Constraint op = null;
         if (ctx.PLUS() != null) {
             op = ASTConstants.OPERATOR.PLUS;
@@ -1774,7 +1777,7 @@ public final class SparqlAstBuilder {
         }
     }
 
-    public TermAst termFromBrackettedExpression(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BrackettedExpressionContext ctx) {
+    public TermAst termFromBrackettedExpression(SparqlParser.BrackettedExpressionContext ctx) {
         return termFromExpression(ctx.expression());
     }
 
