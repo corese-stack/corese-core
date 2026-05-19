@@ -37,7 +37,7 @@ public record ConstructQueryAst(
         SolutionModifierAst solutionModifier,
         QueryPrologueAst prologue,
         ValuesAst valuesClause
-            ) implements QueryAst {
+            ) implements SparqlQueryAst {
     public ConstructQueryAst {
         if (constructTemplate == null) {
             constructTemplate = new ConstructTemplateAst(List.of());

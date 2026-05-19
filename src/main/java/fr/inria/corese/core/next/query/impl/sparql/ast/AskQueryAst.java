@@ -16,7 +16,7 @@ import java.util.List;
  * }</pre>
  */
 public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause,
-                          SolutionModifierAst solutionModifier, QueryPrologueAst prologue, ValuesAst valuesClause) implements QueryAst {
+                          SolutionModifierAst solutionModifier, QueryPrologueAst prologue, ValuesAst valuesClause) implements SparqlQueryAst {
 
     public AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause) {
         this(datasetClause, whereClause, null, null, null);
