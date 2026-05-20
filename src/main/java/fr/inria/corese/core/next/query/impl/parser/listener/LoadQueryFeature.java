@@ -17,7 +17,7 @@ public class LoadQueryFeature extends AbstractSparqlFeature {
             this.builder().addSourceGraphIri((IriAst) this.builder().termFromIriRef(ctx.iriRef()));
         }
         if(ctx.graphRef() != null) {
-            this.builder().addSourceGraphIri((IriAst) this.builder().termFromGraphRef(ctx.graphRef()));
+            this.builder().addTargetGraphIri((IriAst) this.builder().termFromGraphRef(ctx.graphRef()));
         }
     }
 }
