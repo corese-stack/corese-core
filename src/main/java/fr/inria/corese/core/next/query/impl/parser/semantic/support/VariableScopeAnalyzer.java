@@ -246,6 +246,10 @@ public final class VariableScopeAnalyzer {
 
             case StrLenAst(TermAst argument) -> collectReferencedVariables(argument, referencedVariables);
 
+            case AggregateAst(
+                    AggregateFunction ignoredFunction, boolean ignoredDistinct, TermAst expression, String ignoredSep) ->
+                    collectReferencedVariables(expression, referencedVariables);
+
             case ConstraintAst ignored -> {
                 // Other constraint shapes are ignored until they are supported here.
             }
