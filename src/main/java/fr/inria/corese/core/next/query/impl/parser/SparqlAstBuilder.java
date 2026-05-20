@@ -735,21 +735,22 @@ public final class SparqlAstBuilder {
     public QueryAst getResult() {
         if (selectQueryResult != null) return selectQueryResult;
 
-        // Non-update query
+        // Interrogation query
         if (this.queryType == ASTConstants.QUERY_TYPE.ASK || this.queryType == ASTConstants.QUERY_TYPE.CONSTRUCT || this.queryType == ASTConstants.QUERY_TYPE.DESCRIBE || this.queryType == ASTConstants.QUERY_TYPE.SELECT ) {
             if (whereClause == null) {
                 throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
             }
             DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
             QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
+            ValuesAst valuesClause = new ValuesAst(this.values);
             return switch (this.queryType) {
-                case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst);
-                case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst);
-                case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst);
-                case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst);
+                case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst, valuesClause);
+                case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst,valuesClause);
+                case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst, valuesClause);
+                case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst, valuesClause);
                 default -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
             };
-        } else {
+        } else { // Update query
             return switch (this.queryType) {
                 case LOAD -> buildLoadQueryAst();
                 default -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
@@ -785,7 +786,6 @@ public final class SparqlAstBuilder {
 
     /**
      * Build the AST for LOAD queries
-     * @param prologueAst prologue
      * @return a {@link LoadQueryAst}
      */
     private LoadQueryAst buildLoadQueryAst() {
@@ -1443,6 +1443,9 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromBuiltInCall(SparqlParser.BuiltInCallContext ctx) {
+        if (ctx.aggregate() != null) {
+            return termFromAggregate(ctx.aggregate());
+        }
         if (ctx.existsFunc() != null) {
             GroupGraphPatternAst existsPattern = popCapturedExistsPattern();
             if (existsPattern == null) {

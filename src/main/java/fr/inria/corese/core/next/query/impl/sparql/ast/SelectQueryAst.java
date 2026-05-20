@@ -9,7 +9,7 @@ import java.util.List;
  * {@link #prologue()} captures PREFIX/BASE for SELECT;
  * for {@link QueryAst} compatibility.
  */
-public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, SolutionModifierAst solutionModifier, QueryPrologueAst prologue, ValuesAst valuesClause) implements QueryAst {
+public record SelectQueryAst(ProjectionAst projection, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, SolutionModifierAst solutionModifier, QueryPrologueAst prologue, ValuesAst valuesClause) implements SparqlQueryAst {
 
     /** Constructor with default projection SELECT *. */
     public SelectQueryAst(GroupGraphPatternAst whereClause) {
