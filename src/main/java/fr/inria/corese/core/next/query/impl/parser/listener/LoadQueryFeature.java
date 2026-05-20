@@ -14,10 +14,10 @@ public class LoadQueryFeature extends AbstractSparqlFeature {
         this.builder().enterLoadQuery();
         this.builder().setSilentFlag(ctx.SILENT() != null);
         if(ctx.iriRef() != null) {
-            this.builder().addSourceGraphIri((IriAst) this.builder().termFromIriRef(ctx.iriRef()));
+            this.builder().setSourceGraphIri((IriAst) this.builder().termFromIriRef(ctx.iriRef()));
         }
         if(ctx.graphRef() != null) {
-            this.builder().addTargetGraphIri((IriAst) this.builder().termFromGraphRef(ctx.graphRef()));
+            this.builder().setTargetGraphIri((IriAst) this.builder().termFromGraphRef(ctx.graphRef()));
         }
     }
 }

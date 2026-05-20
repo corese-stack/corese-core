@@ -128,7 +128,8 @@ final class SparqlQueryAnalyzer {
                 new BindFeature(builder),
                 new ServiceFeature(builder),
                 new ValuesFeature(builder),
-                new LoadQueryFeature(builder)
+                new LoadQueryFeature(builder),
+                new ClearQueryFeature(builder)
         ));
 
         ParseTreeWalker walker = new ParseTreeWalker();

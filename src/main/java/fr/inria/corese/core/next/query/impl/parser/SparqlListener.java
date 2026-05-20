@@ -80,6 +80,16 @@ public final class SparqlListener extends SparqlParserBaseListener {
     }
 
     @Override
+    public void enterClear(SparqlParser.ClearContext ctx) {
+        for (var d : delegates) d.enterClear(ctx);
+    }
+
+    @Override
+    public void exitClear(SparqlParser.ClearContext ctx) {
+        for (var d : delegates) d.exitClear(ctx);
+    }
+
+    @Override
     public void enterWhereClause(SparqlParser.WhereClauseContext ctx) {
         for (var d : delegates) d.enterWhereClause(ctx);
     }

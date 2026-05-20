@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,17 +11,14 @@ import java.util.Set;
  * @param toClause To clause. Set of Graph IRIs
  * @param silent Determine if the resolution of the query must be resolved silently or not.
  */
-public record LoadQueryAst(Set<IriAst> fromClause, Set<IriAst> toClause, boolean silent) implements UpdateQueryAst {
+public record LoadQueryAst(GraphRefAst fromClause, GraphRefAst toClause, boolean silent) implements UpdateQueryAst {
     public LoadQueryAst {
         if(fromClause == null) {
-            fromClause = new HashSet<>();
-        }
-        if(toClause == null) {
-            toClause = new HashSet<>();
+            throw new QueryEvaluationException("Load query must have at least an URI to load from");
         }
     }
 
-    public LoadQueryAst(Set<IriAst> fromClause, Set<IriAst> toClause) {
+    public LoadQueryAst(GraphRefAst fromClause, GraphRefAst toClause) {
         this(fromClause, toClause, false);
     }
 }

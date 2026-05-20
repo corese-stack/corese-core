@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
@@ -217,12 +218,12 @@ public final class SparqlAstBuilder {
     /**
      * List of IRIs used in an TO clause in a UPDATE query
      */
-    private Set<IriAst> sourceGraphSet = new HashSet<>();
+    private GraphRefAst sourceGraph = null;
 
     /**
      * List of IRIs used in an TO clause in a UPDATE query
      */
-    private Set<IriAst> targetGraphSet = new HashSet<>();
+    private GraphRefAst targetGraph = null;
 
     /**
      * Used for BIND scope checks (variable must not already be visible in the same group).
@@ -753,6 +754,7 @@ public final class SparqlAstBuilder {
         } else { // Update query
             return switch (this.queryType) {
                 case LOAD -> buildLoadQueryAst();
+                case CLEAR -> buildClearQueryAst();
                 default -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
             };
         }
@@ -789,23 +791,47 @@ public final class SparqlAstBuilder {
      * @return a {@link LoadQueryAst}
      */
     private LoadQueryAst buildLoadQueryAst() {
-        return new LoadQueryAst(sourceGraphSet, targetGraphSet, silentFlag);
+        return new LoadQueryAst(sourceGraph, targetGraph, silentFlag);
     }
 
     /**
-     * Add a source graph IRI for an UPDATE query (FROM clause)
-     * @param iri
+     * Build the AST for Clear queries
+     * @return a {@link ClearQueryAst}
      */
-    public void addSourceGraphIri(IriAst iri) {
-        this.sourceGraphSet.add(iri);
+    private ClearQueryAst buildClearQueryAst() {
+        return new ClearQueryAst(targetGraph, silentFlag);
     }
 
     /**
-     * Add a target graph IRI for an UPDATE query (TO clause)
+     * Set a source graph IRI for an UPDATE query (FROM clause)
      * @param iri
      */
-    public void addTargetGraphIri(IriAst iri) {
-        this.targetGraphSet.add(iri);
+    public void setSourceGraphIri(IriAst iri) {
+        setSourceGraphIri(GraphRefAsts.graph(iri));
+    }
+
+    /**
+     * Set a source graph reference for an UPDATE query (FROM clause)
+     * @param ast
+     */
+    public void setSourceGraphIri(GraphRefAst ast) {
+        this.sourceGraph = ast;
+    }
+
+    /**
+     * Set a target graph IRI for an UPDATE query (TO clause)
+     * @param iri
+     */
+    public void setTargetGraphIri(IriAst iri) {
+        setTargetGraphIri(GraphRefAsts.graph(iri));
+    }
+
+    /**
+     * Set a target graph IRI for an UPDATE query (TO clause)
+     * @param ast
+     */
+    public void setTargetGraphIri(GraphRefAst ast) {
+        this.targetGraph = ast;
     }
 
     /**
@@ -867,6 +893,10 @@ public final class SparqlAstBuilder {
                 buildSolutionModifier(),
                 prologue,
                 valuesClause);
+    }
+
+    public void exitClearQuery() {
+        this.queryType = ASTConstants.QUERY_TYPE.CLEAR;
     }
 
     /**
@@ -997,8 +1027,6 @@ public final class SparqlAstBuilder {
      */
     public void enterLoadQuery() {
         queryType = ASTConstants.QUERY_TYPE.LOAD;
-        this.sourceGraphSet.clear();
-        this.targetGraphSet.clear();
         this.silentFlag = false;
     }
 
@@ -1874,5 +1902,40 @@ public final class SparqlAstBuilder {
         }
 
         throw new QueryEvaluationException("Unsupported aggregate: " + ctx.getText());
+    }
+
+    public GraphRefAst graphRefFromGraphOrDefault(SparqlParser.GraphOrDefaultContext ctx) {
+        if (ctx.DEFAULT() != null) {
+            return GraphRefAsts.defaultGraph();
+        }
+        if(ctx.iriRef() != null) {
+            IriAst graphIri = (IriAst) termFromIriRef(ctx.iriRef());
+            return GraphRefAsts.graph(graphIri);
+        }
+        throw new QueryEvaluationException("Unexpected value for Graph reference or default " + ctx.getText());
+    }
+
+    public GraphRefAst graphRefFromGraphRef(SparqlParser.GraphRefContext ctx) {
+        if(ctx.iriRef() != null) {
+            IriAst graphIri = (IriAst) termFromIriRef(ctx.iriRef());
+            return GraphRefAsts.graph(graphIri);
+        }
+        throw new QueryEvaluationException("Unexpected value for Graph reference " + ctx.getText());
+    }
+
+    public GraphRefAst graphRefFromGraphRefAll(SparqlParser.GraphRefAllContext ctx) {
+        if (ctx.DEFAULT() != null) {
+            return GraphRefAsts.defaultGraph();
+        }
+        if(ctx.NAMED() != null) {
+            return GraphRefAsts.named();
+        }
+        if(ctx.ALL() != null) {
+            return GraphRefAsts.all();
+        }
+        if(ctx.graphRef() != null) {
+            return graphRefFromGraphRef(ctx.graphRef());
+        }
+        throw new QueryEvaluationException("Unexpected value for Graph reference or default or named or all " + ctx.getText());
     }
 }
