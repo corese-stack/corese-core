@@ -157,6 +157,11 @@ public final class SparqlAstBuilder {
      */
     private final List<OrderConditionAst> orderConditions = new ArrayList<>();
 
+    /**
+     * GROUP BY (top-level ASK / CONSTRUCT / DESCRIBE, or outside any SELECT frame).
+     */
+    private GroupByAst groupBy = new GroupByAst(List.of());
+
     /*
     * having conditions
     */
@@ -172,6 +177,7 @@ public final class SparqlAstBuilder {
         private boolean reduced;
         private Long limit;
         private Long offset;
+        private GroupByAst groupBy = new GroupByAst(List.of());
         private final List<OrderConditionAst> orderConditions = new ArrayList<>();
         private final List<TermAst> havingConditions = new ArrayList<>();
     }
@@ -862,11 +868,24 @@ public final class SparqlAstBuilder {
     }
 
     /**
-     * Builds the solution modifier (DISTINCT, REDUCED, HAVING, ORDER BY, LIMIT, OFFSET) for non-SELECT
-     * query forms and for top-level SELECT when not using a {@link SelectFrame}.
+     * Sets {@code GROUP BY} for the current SELECT subquery frame, or for the top-level query
+     * when no SELECT frame is active (e.g. {@code ASK} / {@code CONSTRUCT}).
+     */
+    public void setGroupBy(GroupByAst groupByAst) {
+        GroupByAst use = groupByAst != null ? groupByAst : new GroupByAst(List.of());
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().groupBy = use;
+        } else {
+            this.groupBy = use;
+        }
+    }
+
+    /**
+     * Builds the solution modifier (GROUP BY, DISTINCT, REDUCED, HAVING, ORDER BY, LIMIT, OFFSET).
      */
     private SolutionModifierAst buildSolutionModifier() {
         return new SolutionModifierAst(
+                this.groupBy,
                 distinct,
                 reduced,
                 this.orderConditions,
@@ -880,6 +899,7 @@ public final class SparqlAstBuilder {
      */
     private SolutionModifierAst buildSolutionModifier(SelectFrame frame) {
         return new SolutionModifierAst(
+                frame.groupBy,
                 frame.distinct,
                 frame.reduced,
                 frame.orderConditions,
@@ -1301,6 +1321,36 @@ public final class SparqlAstBuilder {
 
     public TermAst termFromBlankNode(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BlankNodeContext ctx) {
         return this.iri(ctx.getText());
+    }
+
+    /**
+     * One {@code groupCondition}&nbsp;:&nbsp;{@code builtInCall | functionCall | '(' expression ('AS' var_)? ')' | var_}.
+     * <p>La forme {@code (expr AS ?v)} est résolue comme l’expression de regroupement (le nom optionnel rejoint la
+     * spec en étant porté par la projection SELECT&nbsp;; l’AST minimal ne le duplique pas ici).
+     */
+    public TermAst termFromGroupCondition(SparqlParser.GroupConditionContext ctx) {
+        if (ctx.var_() != null) {
+            return termFromVar(ctx.var_());
+        }
+        if (ctx.builtInCall() != null) {
+            return termFromBuiltInCall(ctx.builtInCall());
+        }
+        if (ctx.functionCall() != null) {
+            SparqlParser.FunctionCallContext fc = ctx.functionCall();
+            IriAst functionName = new IriAst(fc.iriRef().getText());
+            if (fc.argList() == null) {
+                return createFunCall(functionName, List.of());
+            }
+            if (fc.argList().NIL() != null) {
+                return createFunCall(functionName, List.of());
+            }
+            List<TermAst> args = fc.argList().expression().stream().map(this::termFromExpression).toList();
+            return createFunCall(functionName, args);
+        }
+        if (ctx.expression() != null) {
+            return termFromExpression(ctx.expression());
+        }
+        throw new QueryEvaluationException("Unsupported group condition: " + ctx.getText());
     }
 
     public TermAst termFromConstraint(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.ConstraintContext ctx) {

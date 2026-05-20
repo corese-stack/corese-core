@@ -151,6 +151,14 @@ public final class SparqlListener extends SparqlParserBaseListener {
         for(var d : delegates) d.exitFilter_(ctx);
     }
 
+    // ---------- SOLUTION MODIFIER (GROUP BY / LIMIT / OFFSET / ORDER BY) ----------
+    @Override
+    public void exitGroupClause(SparqlParser.GroupClauseContext ctx) {
+        for (var d : delegates) {
+            d.exitGroupClause(ctx);
+        }
+    }
+
     // ---------- SOLUTION MODIFIER (HAVING / ORDER BY / LIMIT / OFFSET) ----------
     @Override
     public void exitHavingClause(SparqlParser.HavingClauseContext ctx) {
