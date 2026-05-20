@@ -8,21 +8,13 @@ import java.util.List;
  * {@code ORDER BY}, {@code LIMIT}, {@code OFFSET}.
  *
  * <ul>
+ *   <li>GROUP BY</li>
  *   <li>DISTINCT / REDUCED</li>
  *   <li>HAVING</li>
  *   <li>ORDER BY</li>
- *   <li>LIMIT</li>
- *   <li>OFFSET</li>
+ *   <li>LIMIT / OFFSET</li>
  * </ul>
- * <p>In SPARQL 1.1 grammar: {@code groupClause? havingClause? orderClause? limitOffsetClauses?}. This type
- * currently models grouping and non-HAVING modifiers; {@code HAVING} is reserved for future work.
- *
- * <ul>
- *   <li>{@code GROUP BY}</li>
- *   <li>{@code DISTINCT} / {@code REDUCED} (carried from the {@code SELECT} clause in the current AST)</li>
- *   <li>{@code ORDER BY}</li>
- *   <li>{@code LIMIT} / {@code OFFSET}</li>
- * </ul>
+ * <p>In SPARQL 1.1 grammar: {@code groupClause? havingClause? orderClause? limitOffsetClauses?}.
  */
 public record SolutionModifierAst(
         GroupByAst groupBy,
@@ -64,7 +56,7 @@ public record SolutionModifierAst(
             List<OrderConditionAst> orderBy,
             Long limit,
             Long offset) {
-        return new SolutionModifierAst(new GroupByAst(List.of()), distinct, reduced, orderBy, limit, offset);
+        return new SolutionModifierAst(new GroupByAst(List.of()), distinct, reduced, orderBy, HavingAst.empty(), limit, offset);
     }
 
     public boolean hasGroupBy() {

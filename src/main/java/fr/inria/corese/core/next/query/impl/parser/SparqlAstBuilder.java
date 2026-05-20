@@ -868,8 +868,6 @@ public final class SparqlAstBuilder {
     }
 
     /**
-     * Builds the solution modifier (DISTINCT, REDUCED, HAVING, ORDER BY, LIMIT, OFFSET) for non-SELECT
-     * query forms and for top-level SELECT when not using a {@link SelectFrame}.
      * Sets {@code GROUP BY} for the current SELECT subquery frame, or for the top-level query
      * when no SELECT frame is active (e.g. {@code ASK} / {@code CONSTRUCT}).
      */
@@ -883,17 +881,17 @@ public final class SparqlAstBuilder {
     }
 
     /**
-     * Builds the solution modifier (GROUP BY, DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT.
+     * Builds the solution modifier (GROUP BY, DISTINCT, REDUCED, HAVING, ORDER BY, LIMIT, OFFSET).
      */
     private SolutionModifierAst buildSolutionModifier() {
         return new SolutionModifierAst(
+                this.groupBy,
                 distinct,
                 reduced,
                 this.orderConditions,
                 new HavingAst(List.copyOf(havingConditions)),
                 limit,
                 offset);
-        return new SolutionModifierAst(this.groupBy, distinct, reduced, this.orderConditions, limit, offset);
     }
 
     /**
@@ -901,14 +899,13 @@ public final class SparqlAstBuilder {
      */
     private SolutionModifierAst buildSolutionModifier(SelectFrame frame) {
         return new SolutionModifierAst(
+                frame.groupBy,
                 frame.distinct,
                 frame.reduced,
                 frame.orderConditions,
                 new HavingAst(List.copyOf(frame.havingConditions)),
                 frame.limit,
                 frame.offset);
-        return new SolutionModifierAst(
-                frame.groupBy, frame.distinct, frame.reduced, frame.orderConditions, frame.limit, frame.offset);
     }
 
     public boolean isOrdered() {
