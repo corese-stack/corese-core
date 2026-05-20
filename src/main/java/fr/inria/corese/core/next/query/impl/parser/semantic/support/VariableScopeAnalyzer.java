@@ -2,7 +2,10 @@ package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +18,44 @@ import java.util.Set;
  * make it visible.
  */
 public final class VariableScopeAnalyzer {
+
+    /**
+     * Collects variables visible from a Query.
+     *
+     * @param query the query to inspect
+     * @return the set of visible variable names, without {@code ?} or {@code $} in the patterns used for the resolution of the query
+     */
+    public Set<String> collectVisibleVariables(QueryAst query) {
+        Set<String> visibleVariables = collectVisibleVariables(query.whereClause());
+        visibleVariables.addAll(collectVisibleVariables(query.valuesClause()));
+        return visibleVariables;
+    }
+
+    /**
+     * Collects variables visible from a VALUES clause.
+     *
+     * @param valuesClause the WHERE clause to inspect
+     * @return the set of visible variable names, without {@code ?} or {@code $}
+     */
+    public Set<String> collectVisibleVariables(ValuesAst valuesClause) {
+        Set<String> visibleVariables = new LinkedHashSet<>();
+
+        if(valuesClause == null) {
+            return visibleVariables;
+        }
+
+        valuesClause.mappings().forEach(valueMappingAst -> {
+            Set<String> varNameSet = new HashSet<>();
+            valueMappingAst.values().keySet().forEach(varAst -> {
+                if(varAst != null) {
+                    varNameSet.add(varAst.name());
+                }
+            });
+            visibleVariables.addAll(varNameSet);
+        });
+
+        return visibleVariables;
+    }
 
     /**
      * Collects variables visible from a WHERE clause.
@@ -89,9 +130,11 @@ public final class VariableScopeAnalyzer {
                 // FILTER does not make a variable visible by itself.
             }
 
-            case ServiceAst(TermAst endpoint, boolean silentFlag, GroupGraphPatternAst servicePattern) ->
+            case ServiceAst(TermAst endpoint, boolean silentFlag, GroupGraphPatternAst servicePattern) -> {
                 // SERVICE exposes variables from its inner graph pattern.
                 collectVisibleVariables(servicePattern, visibleVariables);
+                addIfVariable(endpoint, visibleVariables);
+            }
 
             case SubQueryAst(QueryAst query) -> {
                 if (query instanceof SelectQueryAst select) {

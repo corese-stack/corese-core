@@ -8,4 +8,5 @@ public sealed interface QueryAst permits AskQueryAst, ConstructQueryAst, Describ
     DatasetClauseAst datasetClause();
     GroupGraphPatternAst whereClause();
     QueryPrologueAst prologue();
+    ValuesAst valuesClause();
 }

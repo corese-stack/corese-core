@@ -26,7 +26,8 @@ public record DescribeQueryAst(
         List<TermAst> described,
         GroupGraphPatternAst whereClause,
         SolutionModifierAst solutionModifier,
-        QueryPrologueAst prologue
+        QueryPrologueAst prologue,
+        ValuesAst valuesClause
 ) implements QueryAst {
     public DescribeQueryAst {
         described = described != null ? List.copyOf(described) : List.of();
@@ -42,6 +43,9 @@ public record DescribeQueryAst(
         if(prologue == null) {
             prologue = QueryPrologueAst.empty();
         }
+        if(valuesClause == null) {
+            valuesClause = ValuesAst.none();
+        }
     }
 
     /**
@@ -53,14 +57,14 @@ public record DescribeQueryAst(
             GroupGraphPatternAst whereClause,
             SolutionModifierAst solutionModifier
     ) {
-        this(datasetClause, described, whereClause, solutionModifier, null);
+        this(datasetClause, described, whereClause, solutionModifier, null, null);
     }
 
     /**
      * constructor with default prefix handler and default solution modifier
      */
     public DescribeQueryAst(DatasetClauseAst datasetClause, List<TermAst> described, GroupGraphPatternAst whereClause) {
-        this(datasetClause, described, whereClause, null, null);
+        this(datasetClause, described, whereClause, null, null, null);
     }
 
     /**

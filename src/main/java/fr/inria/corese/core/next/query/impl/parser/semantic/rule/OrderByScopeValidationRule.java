@@ -22,11 +22,16 @@ import java.util.Set;
  * Validates that variables referenced from ORDER BY are visible from the
  * WHERE clause scope.
  */
-public final class OrderByScopeValidationRule implements SemanticValidationRule {
+public final class OrderByScopeValidationRule extends AbstractSemanticValidationRule {
 
     private static final String DIAGNOSTIC_SOURCE = "OrderByScopeValidationRule";
 
     private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
+
+    @Override
+    protected String getDiagnosticSource() {
+        return DIAGNOSTIC_SOURCE;
+    }
 
     @Override
     public List<QueryDiagnostic> validate(QueryAst queryAst) {
@@ -44,7 +49,7 @@ public final class OrderByScopeValidationRule implements SemanticValidationRule 
     }
 
     private List<QueryDiagnostic> validateSelectQuery(SelectQueryAst queryAst) {
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(queryAst.whereClause());
+        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(queryAst);
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
         validateOrderVariables(
                 collectOrderByAvailableVariables(queryAst.projection(), visibleVariables),
@@ -98,16 +103,5 @@ public final class OrderByScopeValidationRule implements SemanticValidationRule 
                 }
             }
         }
-    }
-
-    private QueryDiagnostic buildOutOfScopeDiagnostic(String variableName, String clause) {
-        return new QueryDiagnostic(
-                QueryDiagnostic.Kind.SEMANTIC_ERROR,
-                QueryDiagnostic.Severity.ERROR,
-                "Variable ?" + variableName + " used in " + clause + " is not visible in WHERE clause",
-                -1,
-                -1,
-                "?" + variableName,
-                DIAGNOSTIC_SOURCE);
     }
 }

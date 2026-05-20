@@ -16,10 +16,10 @@ import java.util.List;
  * }</pre>
  */
 public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause,
-                          SolutionModifierAst solutionModifier, QueryPrologueAst prologue) implements QueryAst {
+                          SolutionModifierAst solutionModifier, QueryPrologueAst prologue, ValuesAst valuesClause) implements QueryAst {
 
     public AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause) {
-        this(datasetClause, whereClause, null, null);
+        this(datasetClause, whereClause, null, null, null);
     }
 
     public AskQueryAst {
@@ -34,6 +34,9 @@ public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst w
         }
         if (solutionModifier == null) {
             solutionModifier = SolutionModifierAst.empty();
+        }
+        if(valuesClause == null) {
+            valuesClause = ValuesAst.none();
         }
     }
 }

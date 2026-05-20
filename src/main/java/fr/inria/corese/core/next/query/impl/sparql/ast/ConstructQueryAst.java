@@ -35,7 +35,8 @@ public record ConstructQueryAst(
         DatasetClauseAst datasetClause,
         GroupGraphPatternAst whereClause,
         SolutionModifierAst solutionModifier,
-        QueryPrologueAst prologue
+        QueryPrologueAst prologue,
+        ValuesAst valuesClause
             ) implements QueryAst {
     public ConstructQueryAst {
         if (constructTemplate == null) {
@@ -53,19 +54,22 @@ public record ConstructQueryAst(
         if (prologue == null) {
             prologue = QueryPrologueAst.empty();
         }
+        if(valuesClause == null) {
+            valuesClause = ValuesAst.none();
+        }
     }
 
     /**
      * constructor with default prefix handler
      */
     public ConstructQueryAst(ConstructTemplateAst template, DatasetClauseAst datasetClause, GroupGraphPatternAst whereClause, SolutionModifierAst solutionModifier) {
-        this(template, datasetClause, whereClause, solutionModifier, null);
+        this(template, datasetClause, whereClause, solutionModifier, null, null);
     }
 
     /**
      * constructor with default prefix handler and default solution modifier
      */
     public ConstructQueryAst(ConstructTemplateAst template, GroupGraphPatternAst whereClause) {
-        this(template, DatasetClauseAst.none(), whereClause, SolutionModifierAst.empty(), null);
+        this(template, DatasetClauseAst.none(), whereClause, SolutionModifierAst.empty(), null, null);
     }
 }
