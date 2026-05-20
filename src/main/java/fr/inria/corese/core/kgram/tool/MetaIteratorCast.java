@@ -24,9 +24,6 @@ public class MetaIteratorCast<T1, T2> implements Iterator<T2>, Iterable<T2> {
 		first = tt;
 	}
 	
-	public boolean isEmpty(){
-		return first == null;
-	}
 	
 	public void next(MetaIteratorCast<T1, T2> m){
 		set(m);

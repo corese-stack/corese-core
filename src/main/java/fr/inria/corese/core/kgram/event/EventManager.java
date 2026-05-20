@@ -16,9 +16,6 @@ public class EventManager implements Iterable<EventListener> {
 
     List<EventListener> observers = new Vector<EventListener>();
 
-    public static EventManager create() {
-        return new EventManager();
-    }
 
     public void addEventListener(EventListener el) {
         observers.add(el);
@@ -26,39 +23,6 @@ public class EventManager implements Iterable<EventListener> {
 
     }
 
-    public void removeEventListener(EventListener el) {
-        observers.remove(el);
-    }
-
-    public void removeEventListener(int sort) {
-        for (int i = 0; i < observers.size();) {
-            EventListener el = observers.get(i);
-            if (el.handle(sort)) {
-                observers.remove(el);
-            } else {
-                i++;
-            }
-        }
-    }
-
-    public List<EventListener> getEventListeners() {
-        return observers;
-    }
-
-    public void setObject(Object obj) {
-        for (EventListener el : observers) {
-            el.setObject(obj);
-        }
-    }
-
-    public boolean handle(int sort) {
-        switch (sort) {
-            case Event.START:
-                return isEval;
-            default:
-                return true;
-        }
-    }
 
     @Override
     public Iterator<EventListener> iterator() {

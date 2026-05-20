@@ -26,12 +26,6 @@ public class Distinct {
         list = l;
     }
 
-    /**
-     * @return the byIndex
-     */
-    public static boolean isByIndex() {
-        return byIndex;
-    }
 
     /**
      * @param aByIndex the byIndex to set

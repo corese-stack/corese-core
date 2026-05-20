@@ -57,16 +57,6 @@ class State {
 		count = n;
 	}
 	
-	void incCount(int n){
-		count += n;
-	}
-	
-	boolean endLoop(){
-		if (isBound()){
-            return getCount() >= getMax();
-		}
-		return false;
-	}
 	
 	int getMin(){
 		return getRegex().getMin();
@@ -92,9 +82,6 @@ class State {
 		first = b;
 	}
 	
-	boolean isFirst(){
-		return first;
-	}
 	
 	/**
 	 * exp+ need check loop at once
@@ -103,31 +90,11 @@ class State {
 		check = b;
 	}
 	
-	boolean isPlus(){
-		// check = true for exp+ wich is compiled as exp{1,}
-		//return  isFirst() ;//&& isCheckLoop();
-		return check;
-	}
-	
-	/**
-	 * This state implements a loop such as:
-	 * exp* exp+ exp{}
-	 * return true if we must prevent a loop on visited nodes
-	 * in case of exp{2,} we do not need to check the loop for the first two steps
-	 */
-	boolean isCheckLoop(){
-		return   (! isBound() || // exp*
-				  getCount() >= getMin() || // exp{2,}
-				  check); // exp+
-	}
 	
 	void setLoop(int n){
 		loop = n;
 	}
 	
-	public int getLoop(){
-		return loop;
-	}
 	
 	void compile(){
 		steps = new Step[list.size()];

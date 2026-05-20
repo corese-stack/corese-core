@@ -310,13 +310,6 @@ public class Checker implements ExprType {
 		return and(term(EQ, e1, e2), not(term(GE, e1, e2)));
 	}
 	
-	// PRAGMA: not for simple variable
-	Pattern variable(String name){
-		Pattern var = Pattern.variable(name);
-		Pattern pat = pat(JOKER, JOKER, var);
-		pat.setRec(true);
-		return pat;
-	}
 	
 	Pattern constant(){
 		return Pattern.constant();
@@ -352,9 +345,6 @@ public class Checker implements ExprType {
 	
 	
 
-	boolean isPattern(Expr e){
-		return e instanceof Pattern;
-	}
 	
 	Pattern leLt(){
 		// EXP1 <= EXP2 && EXP1 < EXP2 -> EXP1 = EXP2
@@ -495,9 +485,6 @@ public class Checker implements ExprType {
 		return pat(TERM, ope, e1, e2);
 	}
 	
-	Pattern fun(int ope, Pattern e1){
-		return pat(FUNCTION, ope, e1);
-	}
 	
 	
 	

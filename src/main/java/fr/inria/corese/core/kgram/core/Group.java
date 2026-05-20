@@ -41,9 +41,6 @@ public class Group implements Comparator<Mappings> {
     }
 
 
-    public static void setCompareIndex(boolean b) {
-        compareIndex = b;
-    }
 
     public static Group create(List<Node> lNode) {
         return new Group(lNode);
@@ -100,13 +97,6 @@ public class Group implements Comparator<Mappings> {
         return lm1.compare(m1, m2);
     }
 
-    Node getGroupBy(Mapping map, Node qNode, int n) {
-        if (isDistinct) {
-            return map.getDistinctNode(n);
-        } else {
-            return map.getGroupBy(qNode, n);
-        }
-    }
 
     /**
      * add map in a group by

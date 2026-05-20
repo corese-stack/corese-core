@@ -128,10 +128,6 @@ public class EventImpl implements Event {
 	
 	
 	
-	public static EventImpl create(int type){
-		EventImpl e = new EventImpl(type);
-		return e;
-	}
 	
 	public static EventImpl create(int type, Object obj){
 		EventImpl e = new EventImpl(type, obj);

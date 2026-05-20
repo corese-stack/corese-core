@@ -49,13 +49,6 @@ public class Visit {
         ltable = new LTable();
     }
     
-    void setNode(Regex exp, Node n) {
-        startNode.put(exp, n);
-    }
-    
-    Node getNode(Regex exp) {
-        return startNode.get(exp);
-    }
 
 //    class Table1 extends HashMap<Node, Node> {
 //    }
@@ -103,9 +96,6 @@ public class Visit {
 
     }
 
-    VisitedNode getTable(Regex exp) {
-        return visitedNode.get(exp);
-    }
 
     class VisitedNode {
 
@@ -114,9 +104,6 @@ public class Visit {
         boolean isReverse = false;
         int n;
         
-        int getIndex() {
-            return n;
-        }
 
         VisitedNode(boolean b, int n) {
             this.n = n;
@@ -128,9 +115,6 @@ public class Visit {
             }
         }
         
-        int size() {
-            return table.size();
-        }
         
         void clear() {
             if (table != null) table.clear();
@@ -145,9 +129,6 @@ public class Visit {
             return table.toString();
         }
 
-        Collection<Node> values() {
-            return table.values();
-        }
 
         void add(Node n) {
             if (isReverse) {
@@ -224,9 +205,6 @@ public class Visit {
         return new Visit(isReverse, isCount);
     }
 
-    void clear() {
-        //table.clear();
-    }
 
     /**
      * ************************************
@@ -293,9 +271,6 @@ public class Visit {
         }
     }
     
-    VisitedNode cleanVisitedNode(Regex exp) {
-        return nunset(exp);
-    }
 
     VisitedNode nunset(Regex exp) {
         VisitedNode t = visitedNode.get(exp);
@@ -457,14 +432,6 @@ public class Visit {
         }
     }
     
-    void clearLast() {
-        if (! regexList.isEmpty()) {
-            VisitedNode t = getVisitedNode(regexList.get(regexList.size()-1));
-            if (t != null) {
-                t.clear();
-            }
-        }
-    }
     
     /**
      * New start node: clean the table of visited nodes

@@ -33,10 +33,6 @@ public class ExpHandler {
         setExist(exist).setInSubScope(inSubScope).setBind(bind).setBlank(blank);
     }
 
-    public ExpHandler(boolean exist, boolean inSubScope, boolean bind) {
-        this();
-        setExist(exist).setInSubScope(inSubScope).setBind(bind);
-    }
 
     public ExpHandler(boolean inSubScope, boolean bind) {
         this();
@@ -114,25 +110,16 @@ public class ExpHandler {
         return nodeList;
     }
 
-    public void setNodeList(List<Node> nodeList) {
-        this.nodeList = nodeList;
-    }
 
     public List<Node> getSelectNodeList() {
         return selectNodeList;
     }
 
-    public void setSelectNodeList(List<Node> selectNodeList) {
-        this.selectNodeList = selectNodeList;
-    }
 
     public List<Node> getExistNodeList() {
         return existNodeList;
     }
 
-    public void setExistNodeList(List<Node> existNodeList) {
-        this.existNodeList = existNodeList;
-    }
 
     public boolean isInSubScope() {
         return inSubScope;

@@ -137,12 +137,6 @@ public class PathFinder {
     public final static String INVERSE = "i";
     private boolean isStorePath = true;
 
-    /**
-     * @return the isStorePath
-     */
-    public boolean isStorePath() {
-        return isStorePath;
-    }
 
     /**
      * @param isStorePath the isStorePath to set
@@ -167,18 +161,6 @@ public class PathFinder {
 
     class ITable extends Hashtable<Node, Integer> {
 
-        void setDistance(Node c, int i) {
-            put(c, i); //adistance[i]);
-        }
-
-        int getDistance(Node c) {
-            Integer i = get(c);
-            if (i == null) {
-                return -1;
-            } else {
-                return i;
-            }
-        }
     }
 
     public PathFinder() {
@@ -193,9 +175,6 @@ public class PathFinder {
         store = new HashMap<Integer, Mappings>();
     }
 
-    public static PathFinder create(Producer p, Matcher match, Evaluator eval, Query q) {
-        return new PathFinder(p, match, eval, q);
-    }
     
      public static PathFinder create(Eval eval, Producer p, Query q) {
         PathFinder pf = new PathFinder(p, eval.getMatcher(), eval.getEvaluator(), q);
@@ -207,9 +186,6 @@ public class PathFinder {
         kgram = ev;
     }
      
-    public void setDefaultBreadth(boolean b) {
-        defaultBreadth = b;
-    }
 
     public void set(EventManager man) {
         manager = man;
@@ -319,9 +295,6 @@ public class PathFinder {
         return n;
     }
 
-    void setPathLength(int n) {
-        maxLength = n;
-    }
 
     /**
      * Enumerate all path, return a list of path 50% faster that thread but
@@ -396,20 +369,11 @@ public class PathFinder {
         path.start();
     }
 
-    public void run() {
-        Node cstart = get(memory, index);
-        process(cstart, memory);
-    }
 
     public void stop() {
         isStop = true;
     }
 
-    public void interrupt() {
-        if (path != null) {
-            path.interrupt();
-        }
-    }
 
     /**
      * init at creation time, no need to change. pmax comes from pathLength() &lt;=
@@ -478,10 +442,6 @@ public class PathFinder {
 
     }
 
-    // number of enumerated relations
-    public int getCount() {
-        return count;
-    }
 
     Node get(Environment memory, int i) {
         if (edge == null) {
@@ -1088,20 +1048,6 @@ public class PathFinder {
 
     }
 
-    Regex test(Regex exp) {
-
-        return exp;
-    }
-
-    int reverse(int i) {
-        switch (i) {
-            case 0:
-                return 1;
-            case 1:
-                return 0;
-        }
-        return 0;
-    }
 
     boolean isDistinct(Record stack, Node start, Node target) {
         boolean b = stack.getVisit().isDistinct(start, target);
@@ -1392,9 +1338,6 @@ public class PathFinder {
 
     }
 
-    Regex star(Regex exp) {
-        return exp;
-    }
 
     boolean hasMax(Regex exp) {
         return exp.getMax() != -1 && exp.getMax() != Integer.MAX_VALUE;

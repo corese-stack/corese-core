@@ -40,7 +40,4 @@ public class GraphPath extends Thread {
 	}
 	
 	
-	public void run(){
-		process();
-	}
 }

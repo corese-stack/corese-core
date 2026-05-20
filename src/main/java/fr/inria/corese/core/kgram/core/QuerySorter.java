@@ -264,33 +264,6 @@ public class QuerySorter implements ExpType {
         }
     }
 
-    // put the binding variables to concerned edge
-    void setBind(Exp exp, List<Exp> bindings) {
-        for (Exp bid : bindings) {
-            Node n = bid.get(0).getNode();
-            if (bid.type() == ExpType.Type.OPT_BIND
-                    // no bind (?x = ?y) in case of JOIN
-                    && (!Query.testJoin || bid.isBindCst())) {
-
-                for (Exp g : exp) {
-                    if (((g.isEdge() || g.isPath()) && g.getEdge().contains(n))
-                            && (!bid.isBindCst() || g.bind(bid.first().getNode()))) {
-                        if (g.getBind() == null) {
-                            bid.status(true);
-                            g.setBind(bid);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    boolean contains(Exp exp, Node n) {
-        if (!exp.isEdge()) {
-            return false;
-        }
-        return exp.getEdge().contains(n);
-    }
 
     void compile(Filter f, VString lVar, boolean opt) {
         compile(f.getExp(), lVar, opt);
@@ -400,9 +373,6 @@ public class QuerySorter implements ExpType {
     }
 
     
-    public Sorter getSorter() {
-        return sort;
-    }
 
     
     public void setSorter(Sorter sort) {
@@ -501,9 +471,6 @@ public class QuerySorter implements ExpType {
         return query;
     }
 
-    public void setQuery(Query query) {
-        this.query = query;
-    }
 
     public Producer getProducer() {
         return prod;

@@ -60,9 +60,6 @@ public class StatListener extends EvalListener {
 		return el;
 	}
 	
-	public int getStat(int type){
-		return stat[type];
-	}
 	
 	public boolean send(Event e){
 		total++;
@@ -102,20 +99,6 @@ public class StatListener extends EvalListener {
 		
 	}
 	
-	public String display(){
-		String str = "";
-		for (int i = 0; i<= imax; i++){
-			String s = Integer.toString(i);
-			if (i<=9) s = "0" + s;
-			str += s + " " + status[i] + " " + counter[i];
-			if (counter[i] >0){
-				str += " " + nf.format(((status[i] * 1.0 / counter[i]) * 100.0)) + "%" ;
-			}
-			str += "  :  " + edges[i];
-			str += "\n";
-		}
-		return str;
-	}
 	
 	public String toString(){
 		String str = "";

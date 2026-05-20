@@ -80,9 +80,6 @@ public class Pattern implements ExprType, Expr {
 	}
 	
 	
-	Pattern pat(int type){
-		return new Pattern(type);
-	}
 	
 	Pattern pat(int type, int ope, Pattern e1){
 		return new Pattern(type, ope, e1);
@@ -92,25 +89,6 @@ public class Pattern implements ExprType, Expr {
 		return new Pattern(type, ope, e1, e2);
 	}
 	
-	Pattern not(Pattern e){
-		return pat(BOOLEAN, NOT, e);
-	}
-	
-	Pattern and(Pattern e1, Pattern e2){
-		return pat(BOOLEAN, AND, e1, e2);
-	}
-	
-	Pattern or(Pattern e1, Pattern e2){
-		return pat(BOOLEAN, OR, e1, e2);
-	}
-	
-	Pattern term(int ope, Pattern e1, Pattern e2){
-		return pat(TERM, ope, e1, e2);
-	}
-	
-	Pattern fun(int ope, Pattern e1, Pattern e2){
-		return pat(FUNCTION, ope, e1, e2);
-	}
 	
 	
 	
@@ -143,9 +121,6 @@ public class Pattern implements ExprType, Expr {
 	}
 
 	
-	public Expr getExp() {
-		return exp;
-	}
 
 	
 	public List<Expr> getExpList() {
@@ -193,9 +168,6 @@ public class Pattern implements ExprType, Expr {
 	}
 
 	
-	public void setExp(Expr e) {
-		exp = e;
-	}
 
 	
 	public void setIndex(int index) {
@@ -285,9 +257,6 @@ public class Pattern implements ExprType, Expr {
     }
 
     
-    public void local(Expr var) {
-        
-    }
 
     @Override
     public Expr getDefine() {

@@ -41,11 +41,6 @@ public class EvalListener implements EventListener, User {
         return el;
     }
 
-    public static EvalListener create(int n) {
-        EvalListener el = create();
-        el.index = n;
-        return el;
-    }
 
     void init(boolean b) {
         table = new Hashtable<Integer, Boolean>();
@@ -77,13 +72,6 @@ public class EvalListener implements EventListener, User {
     }
 
 
-    /**
-     * Proxy to User Interaction:
-     * return next, skip, quit, etc.
-     */
-    public void setUser(User b) {
-        user = b;
-    }
 
 
     public boolean send(Event e) {
@@ -254,9 +242,6 @@ public class EvalListener implements EventListener, User {
     }
 
 
-    Node getNode(Node qNode) {
-        return kgram.getEnvironment().getNode(qNode);
-    }
 
     @Override
     public void setObject(Object obj) {
@@ -267,9 +252,6 @@ public class EvalListener implements EventListener, User {
         }
     }
 
-    public Eval getKGRAM() {
-        return kgram;
-    }
 
 
 }

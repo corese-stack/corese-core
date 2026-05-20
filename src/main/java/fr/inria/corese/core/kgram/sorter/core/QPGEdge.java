@@ -76,17 +76,6 @@ public class QPGEdge {
         return n1.equals(n) ? n2 : n1;
     }
 
-    /**
-     * Get the two nodes in a list
-     *
-     * @return
-     */
-    public List<QPGNode> getNodes() {
-        List l = new ArrayList();
-        l.add(n1);
-        l.add(n2);
-        return l;
-    }
 
     @Override
     public String toString() {

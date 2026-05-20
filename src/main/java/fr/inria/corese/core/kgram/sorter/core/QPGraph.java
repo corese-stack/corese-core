@@ -27,14 +27,6 @@ public class QPGraph {
     // map(node, edges)
     private Map<QPGNode, List<QPGEdge>> graph = null;
 
-    public QPGraph(Exp exp, List<Exp> bindings) {
-        this.bindings = bindings;
-        this.nodes = new ArrayList<>();
-        this.edges = new ArrayList<>();
-        
-        createNodes(exp);
-        createEdges();
-    }
 
     public QPGraph(List<Exp> exps, List<Exp> bindings) {
         this.bindings = bindings;
@@ -107,13 +99,6 @@ public class QPGraph {
         }
     }
 
-    /**
-     * Return all the edges contained in the graph
-     *
-     */
-    public List<QPGEdge> getAllEdges() {
-        return this.edges;
-    }
 
     /**
      * Return all the edges with certain type contained in the graph
@@ -252,12 +237,4 @@ public class QPGraph {
         return l;
     }
 
-    /**
-     * Get the list of vairable bound to constants
-     *
-     * @return
-     */
-    public List<Exp> getBindings() {
-        return this.bindings;
-    }
 }

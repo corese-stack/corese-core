@@ -174,23 +174,6 @@ public class Eval implements ExpType, Plugin {
         provider = p;
     }
 
-    public void set(Producer p) {
-        setProducer(p);
-    }
-
-    public void set(Matcher m) {
-        match = m;
-    }
-
-    public void set(Evaluator e) {
-        evaluator = e;
-    }
-
-    @Deprecated
-    public Results exec(Query q) throws SparqlException {
-        Mappings maps = query(q, null);
-        return ResultsImpl.create(maps);
-    }
 
     /**
      * Main eval function
@@ -256,9 +239,6 @@ public class Eval implements ExpType, Plugin {
     public void finish(Query q, Mappings map) {
     }
 
-    public Mappings eval(Node gNode, Query q, Mapping map) throws SparqlException {
-        return eval(gNode, q, map, null);
-    }
 
     /**
      * Mapping m is binding parameter, possibly null
@@ -337,14 +317,6 @@ public class Eval implements ExpType, Plugin {
         }
     }
 
-    /**
-     * External values clause evaluated as join(values, body)
-     */
-    int queryWithJoinValues(Node gNode, Query q, Mappings map)
-            throws SparqlException {
-        Exp values = Exp.create(Type.AND, q.getValues());
-        return evalExp(gNode, q, Exp.create(Type.JOIN, values, q.getBody()), map);
-    }
 
     /**
      * Bind external values one by one in memory and eval one by one
@@ -388,25 +360,6 @@ public class Eval implements ExpType, Plugin {
         getResults().add(m);
     }
 
-    /**
-     * Subquery processed by a function call that return Mappings Producer may
-     * cast the result into Mappings use case: {select xpath(?x, '/book/title')
-     * as ?val where {}} Mappings may be completed by filter (e.g. for casting)
-     * Mappings will be processed later by aggregates and order by/limit etc.
-     */
-    private void function() throws SparqlException {
-        Exp exp = query.getFunction();
-        if (exp == null) {
-            return;
-        }
-        Mappings lMap = eval(exp.getFilter(), memory, exp.getNodeList());
-        if (lMap != null) {
-            for (Mapping map : lMap) {
-                map = complete(map, getProducer());
-                submit(map);
-            }
-        }
-    }
 
     /**
      * additional filter of functional select xpath() as ?val xsd:integer(?val)
@@ -432,33 +385,6 @@ public class Eval implements ExpType, Plugin {
         return map;
     }
 
-    // draft for processing EXTERN expression
-    public void add(Plugin p) {
-        plugin = p;
-    }
-
-    public void setMappings(Mappings lMap) {
-        initialResults = lMap;
-    }
-
-    void debug() {
-        logger.warn(Message.Prefix.LOOP.getString(), nbCall + " " + nbEdge);
-        if (results.size() == 0) {
-            if (query.isFail()) {
-                logger.warn(Message.Prefix.FAIL.getString());
-                for (Filter filter : query.getFailures()) {
-                    logger.warn(filter + " ");
-                }
-            } else {
-                if (maxExp == null) {
-                    logger.warn(Message.Prefix.FAIL_AT.getString(), "init phase, e.g. parameter binding");
-                } else {
-                    logger.warn(Message.Prefix.FAIL_AT.getString(), maxExp);
-                    getTrace().append(String.format("SPARQL fail at: %s", maxExp)).append(System.getProperty("line.separator"));
-                }
-            }
-        }
-    }
 
     StringBuilder getTrace() {
         return getBind().getTrace();
@@ -709,9 +635,6 @@ public class Eval implements ExpType, Plugin {
         return mem;
     }
 
-    void setLevel(int n) {
-        level = n;
-    }
 
     public void setSubEval(boolean b) {
         isSubEval = b;
@@ -769,9 +692,6 @@ public class Eval implements ExpType, Plugin {
         return results;
     }
 
-    void setResult(Mappings r) {
-        results = r;
-    }
 
     // total init (for global query)
     public void init(Query q) {
@@ -1363,14 +1283,6 @@ public class Eval implements ExpType, Plugin {
         return backtrack;
     }
 
-    // stack = just one service: store and return result directly
-    int result(Producer p, Mappings lMap, int n) throws SparqlException {
-        for (Mapping map : lMap) {
-            complete(getQuery(), map, true);
-            solution(p, map, n);
-        }
-        return STOP;
-    }
 
     // process additional variable provided by service
     // such as ?_server_0 in federated mode
@@ -2006,13 +1918,6 @@ public class Eval implements ExpType, Plugin {
         }
     }
 
-    public int nbResult() {
-        return getResults().size();
-    }
-
-    public int getCount() {
-        return nbEdge;
-    }
 
     private boolean match(Edge qEdge, Edge edge, Node gNode, Node graphNode, Memory memory) {
         if (!getMatcher().match(qEdge, edge, memory)) {
@@ -2029,28 +1934,6 @@ public class Eval implements ExpType, Plugin {
         return env.push(p, qEdge, ent, n);
     }
 
-    private boolean match(Node qNode, Node node, Node gNode, Node graphNode) {
-        Memory env = getMemory();
-        if (!getMatcher().match(qNode, node, env)) {
-            return false;
-        }
-        if (gNode == null) {
-            return true;
-        }
-        return getMatcher().match(gNode, graphNode, env);
-    }
-
-    private boolean push(Node qNode, Node node, Node gNode, Node graphNode, int n) {
-        Memory env = getMemory();
-        if (!env.push(qNode, node, n)) {
-            return false;
-        }
-        if (gNode != null && !env.push(gNode, graphNode, n)) {
-            env.pop(qNode);
-            return false;
-        }
-        return true;
-    }
 
     // for path
     private boolean match(Mapping map) {
@@ -2095,9 +1978,6 @@ public class Eval implements ExpType, Plugin {
         }
     }
 
-    public EventManager getEventManager() {
-        return manager;
-    }
 
     public void setEventManager(EventManager man) {
         manager = man;
@@ -2123,9 +2003,6 @@ public class Eval implements ExpType, Plugin {
         this.current = current;
     }
 
-    public Stack getStack() {
-        return current;
-    }
 
     public SPARQLEngine getSPARQLEngine() {
         return sparqlEngine;
@@ -2154,19 +2031,6 @@ public class Eval implements ExpType, Plugin {
 
 
 
-    /*
-     * *************************************************************************
-     *
-     * Alternative interpreter
-     *
-     */
-
-    public void finish() {
-        setStop(true);
-        join.setStop(true);
-        evalGraphNew.setStop(true);
-        optional.setStop(true);
-    }
 
     /**
      * SPARQL algebra requires kgram to compute BGP exp and return Mappings
@@ -2178,18 +2042,6 @@ public class Eval implements ExpType, Plugin {
         return p.getMappings(gNode, from, exp, memory);
     }
 
-    void process(Exp exp, Mapping m) {
-        if (exp.getNodeList() != null) {
-            for (Node qnode : exp.getNodeList()) {
-                Node node = m.getNodeValue(qnode);
-                if (node != null) {
-                    memory.push(qnode, node, -1);
-                }
-            }
-        } else {
-            memory.push(m, 0);
-        }
-    }
 
     /**
      * Evaluate exp with SPARQL Algebra on Mappings, not with Memory stack
@@ -2383,9 +2235,6 @@ public class Eval implements ExpType, Plugin {
         return joinMappings;
     }
 
-    public void setJoinMappings(boolean joinMappings) {
-        this.joinMappings = joinMappings;
-    }
 
     public ResultListener getListener() {
         return listener;

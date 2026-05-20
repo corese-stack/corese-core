@@ -51,11 +51,6 @@ public class Merge extends Group {
 }
 	
 	
-	public Collection<ListMappings> values(){
-		List<ListMappings> ll = new ArrayList<ListMappings>();
-		ll.add(list);
-		return ll;
-	}
 	
 	public Iterable<Mappings> getValues(){
 		return list;

@@ -95,10 +95,6 @@ public class Mappings extends PointerObject
         link = new ArrayList<>();
     }
 
-    Mappings(Mapping map) {
-        this();
-        add(map);
-    }
 
     Mappings(Query q) {
         this();
@@ -218,28 +214,11 @@ public class Mappings extends PointerObject
         return this;
     }
 
-    public void reject(Mapping m) {
-        if (reject == null) {
-            reject = new ArrayList<>();
-        }
-        reject.add(m);
-    }
-
-    void complete() {
-        if (reject != null) {
-            for (Mapping m : reject) {
-                getMappingList().remove(m);
-            }
-        }
-    }
 
     List<Mapping> getList() {
         return getMappingList();
     }
 
-    void setList(List<Mapping> l) {
-        setMappingList(l);
-    }
 
     public void add(Mappings lm) {
         getMappingList().addAll(lm.getMappingList());
@@ -275,13 +254,6 @@ public class Mappings extends PointerObject
         getMappingList().clear();
     }
 
-    public void cleanIndex() {
-        for (Node node : getSelect()) {
-            if (node != null) {
-                node.setIndex(-1);
-            }
-        }
-    }
 
     @Override
     public Query getQuery() {
@@ -377,18 +349,6 @@ public class Mappings extends PointerObject
         select = nodes;
     }
 
-    public void setSelect(Node node) {
-        select = new ArrayList<>(1);
-        select.add(node);
-    }
-
-    public IDatatype getValue(Node qNode) {
-        if (size() == 0) {
-            return null;
-        }
-        Mapping map = get(0);
-        return map.getValue(qNode);
-    }
 
     public List<Node> getNodeValueList(String varString) {
         List<Node> alist = new ArrayList<>();
@@ -420,28 +380,6 @@ public class Mappings extends PointerObject
         return map.getNode(varString);
     }
 
-    public Object getNodeObject(String varString) {
-        if (size() == 0) {
-            return null;
-        }
-        return get(0).getNodeObject(varString);
-    }
-
-    public Node getNode(Node varString) {
-        if (size() == 0) {
-            return null;
-        }
-        Mapping map = get(0);
-        return map.getNode(varString);
-    }
-
-    public Node getQueryNode(String varString) {
-        if (size() == 0) {
-            return null;
-        }
-        Mapping map = get(0);
-        return map.getQueryNode(varString);
-    }
 
     public IDatatype getValue(String varString) {
         Node node = getNode(varString);
@@ -460,32 +398,6 @@ public class Mappings extends PointerObject
         return get(n);
     }
 
-    public Object getValue2(String varString, int n) {
-        return getValue(varString);
-    }
-
-    /**
-     * use case: bind(sparql('select ?x ?y where { ... }') as (?z, ?t)) rename
-     * ?x as ?z and ?y as ?t in all Mapping as well as in Mappings select
-     */
-    public void setNodes(List<Node> nodes) {
-        if (getSelect() != null) {
-            for (Mapping map : this) {
-                map.rename(getSelect(), nodes);
-            }
-            setSelect(nodes);
-        } else {
-            for (Mapping map : this) {
-                map.setNodes(nodes);
-            }
-        }
-    }
-
-    public void fixQueryNodes(Query q) {
-        for (Mapping m : this) {
-            m.fixQueryNodes(q);
-        }
-    }
 
     /**
      * select distinct in case of aggregates, accept Mapping now, distinct will
@@ -553,16 +465,6 @@ public class Mappings extends PointerObject
         isValid = b;
     }
 
-    @Deprecated
-    boolean same(Node n1, Node n2) {
-        if (n1 == null) {
-            return n2 == null;
-        } else if (n2 == null) {
-            return false;
-        } else {
-            return n1.same(n2);
-        }
-    }
 
     /**
      * Query with new modifier
@@ -614,14 +516,6 @@ public class Mappings extends PointerObject
         }
     }
 
-    /**
-     * New order by on this Mappings, after query processing
-     */
-    public void modifyOrderBy() {
-        if (getEval() != null) {
-            modifyOrderBy(getEval(), getQuery());
-        }
-    }
 
     public void modifyOrderBy(Eval eval, Query q) {
         if (!q.getOrderBy().isEmpty()) {
@@ -845,9 +739,6 @@ public class Mappings extends PointerObject
         return compare(n1, n2);
     }
 
-    public void genericSort() {
-        getMappingList().sort(new MappingSorter());
-    }
 
 
 
@@ -894,17 +785,6 @@ public class Mappings extends PointerObject
      *
      */
 
-    /**
-     * select count(?doc) as ?count group by ?person ?date order by ?count
-     * having(?count > 100) TODO: optimize this because we enumerate all
-     * Mappings for each kind of aggregate we could enumerate Mappings once and
-     * compute all aggregates for each map
-     */
-    public void aggregate(Query q, Evaluator evaluator, Environment env, Producer p) throws SparqlException {
-        if (env instanceof Memory) {
-            aggregate(q, evaluator, (Memory) env, p);
-        }
-    }
 
     public void aggregate(Evaluator evaluator, Memory memory, Producer p) throws SparqlException {
         aggregate(getQuery(), evaluator, memory, p);
@@ -1100,17 +980,6 @@ public class Mappings extends PointerObject
         }
     }
 
-    public void dispose() {
-        for (Mapping m : this) {
-            m.dispose();
-        }
-        if (getGroup() != null) {
-            getGroup().dispose();
-        }
-        if (getDistinct() != null) {
-            getDistinct().dispose();
-        }
-    }
 
     public void prepareAggregate(Mapping map, Query q, Map<String, IDatatype> bn, int n) {
         setCount(n);
@@ -1197,11 +1066,6 @@ public class Mappings extends PointerObject
         groupBy(getCreateGroup());
     }
 
-    public Mappings groupBy(List<Exp> list) {
-        Group group = createGroup(list);
-        groupBy(group);
-        return this;
-    }
 
     /**
      * Generate the Mapping list according to the group PRAGMA: replace the
@@ -1238,16 +1102,6 @@ public class Mappings extends PointerObject
         return this;
     }
 
-    public Mappings project(Node q) {
-        Mappings map = create(getQuery());
-        for (Mapping m : this) {
-            Mapping res = m.project(q);
-            if (res != null) {
-                map.add(res);
-            }
-        }
-        return map;
-    }
 
     /**
      * for group by ?o1 .. ?on
@@ -1278,16 +1132,6 @@ public class Mappings extends PointerObject
         group = g;
     }
 
-    /**
-     * Generate a group by list of variables
-     */
-    public Group defineGroup(List<String> list) {
-        ArrayList<Exp> el = new ArrayList<>();
-        for (String name : list) {
-            el.add(getQuery().getSelectExp(name));
-        }
-        return createGroup(el);
-    }
 
     /**
      * group by
@@ -1362,11 +1206,6 @@ public class Mappings extends PointerObject
         return get(0).getCommonNode(map.get(0));
     }
 
-    List<String> getCommonVariables(Mappings map) {
-        HashMap<String, String> t1 = unionVariable();
-        HashMap<String, String> t2 = map.unionVariable();
-        return intersectionVariable(t1, t2);
-    }
 
     List<String> intersectionVariable(HashMap<String, String> t1, HashMap<String, String> t2) {
         ArrayList<String> varList = new ArrayList<>();
@@ -1399,9 +1238,6 @@ public class Mappings extends PointerObject
         return res;
     }
 
-    public Mappings and(Mappings lm) {
-        return join(lm);
-    }
 
     public Mappings join(Mappings lm) {
         Mappings res = Mappings.create(getQuery());
@@ -1524,18 +1360,6 @@ public class Mappings extends PointerObject
         return res;
     }
 
-    public Mappings project(List<Exp> lExp) {
-        return new Mappings();
-    }
-
-    public Mappings rename(List<Exp> lExp) {
-        Mappings res = new Mappings();
-        for (Mapping m : this) {
-            res.add(m.rename(lExp));
-        }
-
-        return res;
-    }
 
     /**
      * Join (var = val) to each Mapping, remove those where var = something else
@@ -1616,12 +1440,6 @@ public class Mappings extends PointerObject
         return cmap;
     }
 
-    public Mappings limit(int n) {
-        while (size() > n) {
-            remove(size() - 1);
-        }
-        return this;
-    }
 
     public Mappings getMappings(Query q, Node varNode, Node val) {
         Mappings map = create(q);
@@ -1642,29 +1460,6 @@ public class Mappings extends PointerObject
         return map.distinct();
     }
 
-    /**
-     * Check if all values of a given variable are in same namespace
-     */
-    void select() {
-        if (size() > 0) {
-            Mapping m = get(0);
-            if (m.size() > 0) {
-                Node varNode = m.getQueryNode(0);
-                if (varNode.isVariable()) {
-                    IDatatype value = m.getValue(varNode);
-                    if (value.isURI()) {
-                        String ns = value.stringValue();
-                        boolean check = check(varNode, ns);
-                        if (check) {
-                            ArrayList<Object> objectArrayList = new ArrayList<>();
-                            objectArrayList.add(varNode);
-                            objectArrayList.add(ns);
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     boolean check(Node varNode, String ns) {
         for (Mapping m : this) {
@@ -1680,22 +1475,6 @@ public class Mappings extends PointerObject
         return true;
     }
 
-    /**
-     * Assign select nodes to all Mapping
-     */
-    public void finish() {
-        if (getSelect() != null) {
-            Node[] nodes = new Node[getSelect().size()];
-            int i = 0;
-            for (Node node : getSelect()) {
-                nodes[i++] = node;
-            }
-
-            for (Mapping map : this) {
-                map.setSelect(nodes);
-            }
-        }
-    }
 
     @Override
     public TripleStore getTripleStore() {
@@ -1746,9 +1525,6 @@ public class Mappings extends PointerObject
         this.delete = lDelete;
     }
 
-    public int nbSolutions() {
-        return nbsolutions;
-    }
 
     void setNbsolutions(int nbsolutions) {
         this.nbsolutions = nbsolutions;
@@ -1841,9 +1617,6 @@ public class Mappings extends PointerObject
         this.error = error;
     }
 
-    public Object getProvenance() {
-        return provenance;
-    }
 
     public void setProvenance(Object provenance) {
         this.provenance = provenance;
@@ -1855,35 +1628,6 @@ public class Mappings extends PointerObject
         }
     }
 
-    public String getLink(String name) {
-        for (var url : getLinkList()) {
-            if (url.contains(name)) {
-                return url;
-            }
-        }
-        return null;
-    }
-
-    public String getLastLink(String name) {
-        for (int i = getLinkList().size() - 1; i >= 0; i--) {
-            var url = getLinkList().get(i);
-            if (url.contains(name)) {
-                return url;
-            }
-        }
-        return null;
-    }
-
-    public String getLink() {
-        if (getLinkList().isEmpty()) {
-            return null;
-        }
-        return getLinkList().get(0);
-    }
-
-    public void setLink(String link) {
-        addLink(link);
-    }
 
     public void addLink(String link) {
         getLinkList().add(link);
@@ -2015,17 +1759,6 @@ public class Mappings extends PointerObject
         return false;
     }
 
-    public Mappings getResult() {
-        Query q = getQuery();
-        ASTQuery ast = getAST();
-        if (ast.hasMetadata(Metadata.SELECTION) && q.getSelection() != null) {
-            return q.getSelection();
-        }
-        if (ast.hasMetadata(Metadata.DISCOVERY) && q.getDiscorevy() != null) {
-            return q.getDiscorevy();
-        }
-        return this;
-    }
 
     class VariableSorter implements Comparator<Mapping> {
 

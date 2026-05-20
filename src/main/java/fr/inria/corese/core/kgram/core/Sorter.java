@@ -54,25 +54,6 @@ public class Sorter {
 
     }
 
-    void check(Query q, Exp exp, List<Node> list) {
-        if (!(exp.isEdge() || exp.isPath())) {
-            return;
-        }
-
-        boolean connect = false;
-
-        for (int i = 0; i < exp.nbNode(); i++) {
-            Node n = exp.getNode(i);
-            if (list.contains(n)) {
-                connect = true;
-                break;
-            }
-        }
-
-        if (!connect) {
-            q.addInfo("Disconnected: ", exp);
-        }
-    }
 
     public boolean leaveFirst() {
         return true;

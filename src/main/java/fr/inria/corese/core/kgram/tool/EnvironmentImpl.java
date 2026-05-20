@@ -28,9 +28,6 @@ public class EnvironmentImpl implements Environment {
 		query = q;
 	}
 	
-	public static EnvironmentImpl create(Query q){
-		return new EnvironmentImpl(q);
-	}
 	
         @Override
 	public int count() {
