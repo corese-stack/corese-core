@@ -20,7 +20,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                     VALUES ?var { "test" <http://ns.inria.fr/test> }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -45,7 +45,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                     VALUES (?var1 ?var2) { ("test1" <http://ns.inria.fr/test1>) ("test2" <http://ns.inria.fr/test2>) }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -87,7 +87,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                 }
                VALUES (?var2 ?var3) { ("test2" <http://ns.inria.fr/test2>) }
                """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -123,7 +123,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                     VALUES ?var { "test" UNDEF }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -147,7 +147,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                     VALUES () { () }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -163,7 +163,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                     VALUES () { ( "test" ) }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
