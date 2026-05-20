@@ -1,6 +1,5 @@
 package fr.inria.corese.core.extension.core;
 
-import fr.inria.corese.core.compiler.eval.Interpreter;
 import fr.inria.corese.core.sparql.api.Computer;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
@@ -13,7 +12,6 @@ import fr.inria.corese.core.kgram.api.query.Producer;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.producer.DataProducer;
-import fr.inria.corese.core.query.PluginTransform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +35,6 @@ public class Core implements FunctionEvaluator {
     private Computer eval;
 
     public Core() {
-    }
-
-    public PluginTransform getPluginTransform() {
-        return (PluginTransform) ((Interpreter)eval).getComputerTransform();
     }
 
     String javaName(IDatatype dt) {
