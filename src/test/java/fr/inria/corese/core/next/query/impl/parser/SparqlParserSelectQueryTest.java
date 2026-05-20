@@ -233,6 +233,45 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should parse SELECT DISTINCT with multiple variables and GROUP BY ?s ?p ?o")
+    void shouldParseDistinctWithMultipleVariablesAndGroupBy() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+            SELECT DISTINCT ?s ?p ?o {
+                ?s ?p ?o
+            }
+            GROUP BY ?s ?p ?o
+            """);
+
+        assertInstanceOf(SelectQueryAst.class, ast);
+        SelectQueryAst select = (SelectQueryAst) ast;
+
+        ProjectionAst projection = select.projection();
+        assertFalse(projection.selectAll());
+        assertEquals(3, projection.variables().size());
+        assertEquals("s", projection.variables().get(0).name());
+        assertEquals("p", projection.variables().get(1).name());
+        assertEquals("o", projection.variables().get(2).name());
+
+        GroupGraphPatternAst where = select.whereClause();
+        assertEquals(1, where.patterns().size());
+        BgpAst bgp = (BgpAst) where.patterns().getFirst();
+        assertEquals(1, bgp.triples().size());
+        TriplePatternAst triple = bgp.triples().getFirst();
+        assertEquals("s", ((VarAst) triple.subject()).name());
+        assertEquals("p", ((VarAst) triple.predicate()).name());
+        assertEquals("o", ((VarAst) triple.object()).name());
+
+        SolutionModifierAst mod = select.solutionModifier();
+        assertTrue(mod.distinct());
+        assertEquals(3, mod.groupBy().expressions().size());
+        assertEquals("s", assertInstanceOf(VarAst.class, mod.groupBy().expressions().get(0)).name());
+        assertEquals("p", assertInstanceOf(VarAst.class, mod.groupBy().expressions().get(1)).name());
+        assertEquals("o", assertInstanceOf(VarAst.class, mod.groupBy().expressions().get(2)).name());
+    }
+
+    @Test
     @DisplayName("Should parse SELECT REDUCED without ORDER BY, LIMIT or OFFSET")
     void shouldParseReducedOnly() {
         SparqlParser parser = newParserDefault();
