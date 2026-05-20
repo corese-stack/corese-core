@@ -6,8 +6,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.LoadQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
 
@@ -25,7 +24,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
         IriAst graphIri = (IriAst) loadQueryAst.fromClause().toArray()[0];
         assertEquals("<http://ns.inria.fr/test>", graphIri.raw());
         assertEquals(0, loadQueryAst.toClause().size());
-        assertEquals(false, loadQueryAst.silent());
+        assertFalse(loadQueryAst.silent());
     }
 
     @Test
@@ -42,7 +41,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
         IriAst graphIri = (IriAst) loadQueryAst.fromClause().toArray()[0];
         assertEquals("<http://ns.inria.fr/test>", graphIri.raw());
         assertEquals(0, loadQueryAst.toClause().size());
-        assertEquals(true, loadQueryAst.silent());
+        assertTrue(loadQueryAst.silent());
     }
 
     @Test
@@ -61,14 +60,14 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
         assertEquals(1, loadQueryAst.toClause().size());
         IriAst targetGraphIri = (IriAst) loadQueryAst.toClause().toArray()[0];
         assertEquals("<http://ns.inria.fr/otherGraph>", targetGraphIri.raw());
-        assertEquals(false, loadQueryAst.silent());
+        assertFalse(loadQueryAst.silent());
     }
 
     @Test
     public void fullSilentQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
-                LOAD <http://ns.inria.fr/test> INTO GRAPH <http://ns.inria.fr/otherGraph>
+                LOAD SILENT <http://ns.inria.fr/test> INTO GRAPH <http://ns.inria.fr/otherGraph>
                 """;
 
         QueryAst queryAst = parser.parse(query);
@@ -80,6 +79,6 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
         assertEquals(1, loadQueryAst.toClause().size());
         IriAst targetGraphIri = (IriAst) loadQueryAst.toClause().toArray()[0];
         assertEquals("<http://ns.inria.fr/otherGraph>", targetGraphIri.raw());
-        assertEquals(true, loadQueryAst.silent());
+        assertTrue(loadQueryAst.silent());
     }
 }
