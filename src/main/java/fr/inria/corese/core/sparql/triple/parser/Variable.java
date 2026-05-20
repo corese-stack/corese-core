@@ -131,7 +131,10 @@ public class Variable extends Atom {
     }
 
     public String getSimpleName() {
-        return getName().substring(1);
+        if(getName().startsWith("?") || getName().startsWith("$")) {
+            return getName().substring(1);
+        }
+        return getName();
     }
 
     public void setPath(boolean b) {

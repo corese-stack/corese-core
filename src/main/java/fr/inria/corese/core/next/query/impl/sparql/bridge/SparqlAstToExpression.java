@@ -93,7 +93,7 @@ public final class SparqlAstToExpression {
     }
 
     private static Constant iriToConstant(IriAst i) {
-        String raw = i.raw().trim();
+        String raw = StringUtils.trimChevronIRIs(i.raw());
         if (raw.startsWith(IOConstants.BLANK_NODE_PREFIX)) {
             return Constant.createBlank(raw.substring(IOConstants.BLANK_NODE_PREFIX.length()));
         }
