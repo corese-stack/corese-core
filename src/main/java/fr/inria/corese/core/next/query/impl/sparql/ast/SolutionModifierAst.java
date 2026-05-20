@@ -5,26 +5,25 @@ import java.util.List;
 /**
  * SPARQL solution modifiers applied after pattern evaluation.
  *
- *  <p>
- *      <ul>
- *          <li>DISTINCT / REDUCED<li/>
- *          <li>ORDER BY<li/>
- *          <li>LIMIT<li/>
- *          <li>OFFSET<li/>
- *      <ul/>
- *  <p/>
- *
+ * <ul>
+ *   <li>DISTINCT / REDUCED</li>
+ *   <li>HAVING</li>
+ *   <li>ORDER BY</li>
+ *   <li>LIMIT</li>
+ *   <li>OFFSET</li>
+ * </ul>
  */
 public record SolutionModifierAst(
         boolean distinct,
         boolean reduced,
         List<OrderConditionAst> orderBy,
+        HavingAst having,
         Long limit,
         Long offset
 ) {
     public SolutionModifierAst {
         orderBy = orderBy != null ? List.copyOf(orderBy) : List.of();
-
+        having = having != null ? having : HavingAst.empty();
         if (distinct && reduced) {
             throw new IllegalArgumentException("DISTINCT and REDUCED are mutually exclusive");
         }
@@ -37,12 +36,14 @@ public record SolutionModifierAst(
     }
 
     public static SolutionModifierAst empty() {
-        return new SolutionModifierAst(false, false, List.of(), null, null);
+        return new SolutionModifierAst(false, false, List.of(), HavingAst.empty(), null, null);
     }
 
     public boolean hasOrderBy() {
         return !orderBy.isEmpty();
     }
+
+    public boolean hasHaving() { return !having.isEmpty(); }
 
     public boolean hasLimit() {
         return limit != null;
