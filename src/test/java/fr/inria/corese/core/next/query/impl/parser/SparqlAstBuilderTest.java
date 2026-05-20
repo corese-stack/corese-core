@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fr.inria.corese.core.next.query.impl.parser.AbstractSparqlParserFeatureTest.expectedRdfTypeIriAst;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -84,7 +85,7 @@ class SparqlAstBuilderTest {
         BgpAst bgp = singleBgp(ast);
 
         assertEquals(2, bgp.triples().size());
-        assertEquals(new TriplePatternAst(new VarAst("s"), new IriAst("a"), new IriAst("foaf:Person")), bgp.triples().get(0));
+        assertEquals(new TriplePatternAst(new VarAst("s"), expectedRdfTypeIriAst(), new IriAst("foaf:Person")), bgp.triples().get(0));
         assertEquals(new TriplePatternAst(new VarAst("s"), new IriAst("foaf:name"), new VarAst("n")), bgp.triples().get(1));
     }
 
