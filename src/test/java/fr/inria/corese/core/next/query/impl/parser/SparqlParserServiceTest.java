@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -70,7 +69,7 @@ class SparqlParserServiceTest extends AbstractSparqlParserFeatureTest {
             BgpAst bgp = (BgpAst) body.patterns().getFirst();
             assertEquals(1, bgp.triples().size());
             assertEquals(new VarAst("s"), bgp.triples().getFirst().subject());
-            assertEquals(new IriAst("<" + RDF.type.getIRI().stringValue() + ">"), bgp.triples().getFirst().predicate());
+            assertEquals(expectedRdfTypeIriAst(), bgp.triples().getFirst().predicate());
             assertEquals(new IriAst("<http://dbpedia.org/ontology/Person>"), bgp.triples().getFirst().object());
         }
     }

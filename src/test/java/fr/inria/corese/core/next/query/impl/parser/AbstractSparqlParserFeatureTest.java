@@ -1,6 +1,16 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+
 public class AbstractSparqlParserFeatureTest {
+
+    /**
+     * Expected {@link IriAst} for the SPARQL shortcut {@code a} ({@code rdf:type}), as produced by {@link SparqlAstBuilder#iri(String)}.
+     */
+    protected static IriAst expectedRdfTypeIriAst() {
+        return new IriAst("<" + RDF.type.getIRI().stringValue() + ">");
+    }
 
     /**
      * create a Default Sparql Parser with default Config

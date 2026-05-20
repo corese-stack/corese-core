@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
@@ -84,7 +83,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
         TriplePatternAst t0 = bgp.triples().getFirst();
         assertEquals("s", ((VarAst) t0.subject()).name());
         assertInstanceOf(IriAst.class, t0.predicate());
-        assertEquals("<" + RDF.type.getIRI().stringValue() + ">", ((IriAst) t0.predicate()).raw());
+        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) t0.predicate()).raw());
 
         TriplePatternAst t1 = bgp.triples().get(1);
         assertEquals("s", ((VarAst) t1.subject()).name());

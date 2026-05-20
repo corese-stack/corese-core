@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 
-import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fr.inria.corese.core.next.query.impl.parser.AbstractSparqlParserFeatureTest.expectedRdfTypeIriAst;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -85,7 +85,7 @@ class SparqlAstBuilderTest {
         BgpAst bgp = singleBgp(ast);
 
         assertEquals(2, bgp.triples().size());
-        assertEquals(new TriplePatternAst(new VarAst("s"), new IriAst("<" + RDF.type.getIRI().stringValue() + ">"), new IriAst("foaf:Person")), bgp.triples().get(0));
+        assertEquals(new TriplePatternAst(new VarAst("s"), expectedRdfTypeIriAst(), new IriAst("foaf:Person")), bgp.triples().get(0));
         assertEquals(new TriplePatternAst(new VarAst("s"), new IriAst("foaf:name"), new VarAst("n")), bgp.triples().get(1));
     }
 
