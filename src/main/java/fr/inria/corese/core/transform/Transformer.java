@@ -1079,7 +1079,8 @@ public class Transformer implements TransformProcessor {
             // use case: same transformer on different graph
             getTransformerMap().put(getTransformation(), this);
         }
-        getQueryEngine().complete(this);
+        /* REMOVED as part of eliminating dependencies to Transformer
+        getQueryEngine().complete(this); */
     }
 
     /**

@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
@@ -136,6 +137,11 @@ public final class SparqlAstBuilder {
     private final Set<IriAst> datasetDefaultGraphs = new LinkedHashSet<>();
     private final Set<IriAst> datasetNamedGraphs = new LinkedHashSet<>();
 
+    /**
+     * VALUES clause (agglomerate all VALUES declarations in the query)
+     */
+    private final List<ValueMappingAst> values = new ArrayList<>();
+
     /** SELECT DISTINCT / REDUCED. Set by SelectQueryFeature when parsing SELECT (DISTINCT | REDUCED)? ... */
     private boolean distinct;
     private boolean reduced;
@@ -156,6 +162,11 @@ public final class SparqlAstBuilder {
      */
     private GroupByAst groupBy = new GroupByAst(List.of());
 
+    /*
+    * having conditions
+    */
+    private final List<TermAst> havingConditions = new ArrayList<>();
+
     /**
      * Per-SELECT frame used to support nested SELECT subqueries.
      */
@@ -168,6 +179,7 @@ public final class SparqlAstBuilder {
         private Long offset;
         private GroupByAst groupBy = new GroupByAst(List.of());
         private final List<OrderConditionAst> orderConditions = new ArrayList<>();
+        private final List<TermAst> havingConditions = new ArrayList<>();
     }
 
     /**
@@ -273,12 +285,15 @@ public final class SparqlAstBuilder {
                 new IriAst(baseUri)
         );
 
+        ValuesAst valuesClause = new ValuesAst(this.values);
+
         SelectQueryAst selectQueryAst = new SelectQueryAst(
                 frame.projection,
                 datasetClauseAst,
                 frame.whereClause,
                 buildSolutionModifier(frame),
-                prologueAst
+                prologueAst,
+                valuesClause
         );
 
         /*
@@ -561,12 +576,16 @@ public final class SparqlAstBuilder {
     // --- Filters ---
 
     /**
-     * Exits a Filter, builds FilterAst and adds it to the current group
+     * Exits a Filter and adds it to the current group
      */
     public void addFilter(FilterAst filter) {
         if (this.hasCurrentGroup()) {
             this.currentGroup().add(filter);
         }
+    }
+
+    public void addValues(List<ValueMappingAst> mappings) {
+        this.values.addAll(mappings);
     }
 
     /**
@@ -592,6 +611,18 @@ public final class SparqlAstBuilder {
                     "Variable ?" + name + " used in BIND is already declared in the same group graph pattern");
         }
         group.add(bind);
+    }
+
+    public void addHavingCondition(TermAst condition) {
+        if (condition == null) {
+            throw new IllegalArgumentException("HAVING condition is null");
+        }
+
+        if (hasCurrentSelect()) {
+            getCurrentSelectFrame().havingConditions.add(condition);
+        } else {
+            havingConditions.add(condition);
+        }
     }
 
     // --- Optional ---
@@ -692,11 +723,12 @@ public final class SparqlAstBuilder {
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);
         QueryPrologueAst prologueAst = new QueryPrologueAst(List.copyOf(prefixDeclarations), new IriAst(baseUri));
+        ValuesAst valuesClause = new ValuesAst(this.values);
         return switch (this.queryType) {
-            case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst);
-            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst);
-            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst);
-            case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst);
+            case ASK -> buildAskQueryAst(datasetClauseAst, prologueAst, valuesClause);
+            case CONSTRUCT -> buildConstructQueryAst(datasetClauseAst, prologueAst, valuesClause);
+            case DESCRIBE -> buildDescribeQueryAst(datasetClauseAst, prologueAst, valuesClause);
+            case SELECT -> buildSelectQueryAst(datasetClauseAst, prologueAst, valuesClause);
             case UNDEFINED -> throw new QueryEvaluationException("Could not determine the type of query during parsing");
         };
     }
@@ -730,14 +762,14 @@ public final class SparqlAstBuilder {
     /**
      * Builds the AST for ASK queries.
      */
-    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
-        return new AskQueryAst(datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
+    private AskQueryAst buildAskQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
+        return new AskQueryAst(datasetClauseAst, whereClause, buildSolutionModifier(), prologue, valuesClause);
     }
 
     /**
      * Builds the AST for SELECT queries.
      */
-    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+    private SelectQueryAst buildSelectQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
         if (hasCurrentSelect()) {
             SelectFrame frame = getCurrentSelectFrame();
             return new SelectQueryAst(
@@ -745,36 +777,39 @@ public final class SparqlAstBuilder {
                     datasetClauseAst,
                     frame.whereClause,
                     buildSolutionModifier(frame),
-                    prologue
+                    prologue,
+                    valuesClause
             );
         }
-        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier(), prologue);
+        return new SelectQueryAst(projection, datasetClauseAst, whereClause, buildSolutionModifier(), prologue, valuesClause);
     }
 
     /**
      * Builds the AST for DESCRIBE queries.
      */
-    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+    private DescribeQueryAst buildDescribeQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
         // TODO #306: validate variable scope for DESCRIBE modifiers when DescribeQueryAst carries them.
         return new DescribeQueryAst(
                 datasetClauseAst,
                 describeResources,
                 whereClause,
                 buildSolutionModifier(),
-                prologue);
+                prologue,
+                valuesClause);
     }
 
     /**
      * Builds the AST for CONSTRUCT queries.
      */
-    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue) {
+    private ConstructQueryAst buildConstructQueryAst(DatasetClauseAst datasetClauseAst, QueryPrologueAst prologue, ValuesAst valuesClause) {
         // TODO #306: validate variable scope for CONSTRUCT modifiers when ConstructQueryAst carries them.
         return new ConstructQueryAst(
                 constructTemplate != null ? constructTemplate : new ConstructTemplateAst(List.of()),
                 datasetClauseAst,
                 whereClause,
                 buildSolutionModifier(),
-                prologue);
+                prologue,
+                valuesClause);
     }
 
     /**
@@ -833,6 +868,8 @@ public final class SparqlAstBuilder {
     }
 
     /**
+     * Builds the solution modifier (DISTINCT, REDUCED, HAVING, ORDER BY, LIMIT, OFFSET) for non-SELECT
+     * query forms and for top-level SELECT when not using a {@link SelectFrame}.
      * Sets {@code GROUP BY} for the current SELECT subquery frame, or for the top-level query
      * when no SELECT frame is active (e.g. {@code ASK} / {@code CONSTRUCT}).
      */
@@ -849,13 +886,27 @@ public final class SparqlAstBuilder {
      * Builds the solution modifier (GROUP BY, DISTINCT, REDUCED, ORDER BY, LIMIT, OFFSET) for SELECT.
      */
     private SolutionModifierAst buildSolutionModifier() {
+        return new SolutionModifierAst(
+                distinct,
+                reduced,
+                this.orderConditions,
+                new HavingAst(List.copyOf(havingConditions)),
+                limit,
+                offset);
         return new SolutionModifierAst(this.groupBy, distinct, reduced, this.orderConditions, limit, offset);
     }
 
     /**
-     * Builds solution modifiers for the current SELECT frame.
+     * Builds solution modifiers for the given SELECT frame.
      */
     private SolutionModifierAst buildSolutionModifier(SelectFrame frame) {
+        return new SolutionModifierAst(
+                frame.distinct,
+                frame.reduced,
+                frame.orderConditions,
+                new HavingAst(List.copyOf(frame.havingConditions)),
+                frame.limit,
+                frame.offset);
         return new SolutionModifierAst(
                 frame.groupBy, frame.distinct, frame.reduced, frame.orderConditions, frame.limit, frame.offset);
     }
@@ -927,6 +978,7 @@ public final class SparqlAstBuilder {
      */
     public TermAst iri(String raw) {
         if (raw == null) throw new IllegalArgumentException("IRI raw is null");
+        if(raw.equals("a")) return new IriAst("<" + RDF.type.getIRI().stringValue() + ">");
         return new IriAst(raw);
     }
 
@@ -1081,6 +1133,11 @@ public final class SparqlAstBuilder {
 
     public ConstraintAst createFunCall(IriAst functionName, List<TermAst> args) {
         return new FunctionCallAst(functionName, args);
+    }
+
+    public AggregateAst createAggregate(
+            AggregateFunction function, boolean distinct, TermAst expression, String groupConcatSeparator) {
+        return new AggregateAst(function, distinct, expression, groupConcatSeparator);
     }
 
     // ---- term helpers ----
@@ -1314,11 +1371,25 @@ public final class SparqlAstBuilder {
     }
 
     public TermAst termFromBuiltInCall(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.BuiltInCallContext ctx) {
+        if (ctx.aggregate() != null) {
+            return termFromAggregate(ctx.aggregate());
+        }
+
         if (ctx.existsFunc() != null) {
-            return new ExistsAst(popCapturedExistsPattern());
-        } else if (ctx.notExistsFunc() != null) {
-            return new NotExistsAst(popCapturedExistsPattern());
-        } else if (ctx.regexExpression() != null) {
+            GroupGraphPatternAst existsPattern = popCapturedExistsPattern();
+            if (existsPattern == null) {
+                throw new QueryEvaluationException("EXISTS { ... } inner pattern was not captured; check listener order");
+            }
+            return new ExistsAst(existsPattern);
+        }
+        if (ctx.notExistsFunc() != null) {
+            GroupGraphPatternAst notExistsPattern = popCapturedExistsPattern();
+            if (notExistsPattern == null) {
+                throw new QueryEvaluationException("NOT EXISTS { ... } inner pattern was not captured; check listener order");
+            }
+            return new NotExistsAst(notExistsPattern);
+        }
+        if (ctx.regexExpression() != null) {
             return termFromRegex(ctx.regexExpression());
         } else if (ctx.strReplaceExpression() != null) {
             return termFromReplace(ctx.strReplaceExpression());
@@ -1691,5 +1762,46 @@ public final class SparqlAstBuilder {
             }
         }
         return out;
+    }
+
+    public TermAst termFromAggregate(SparqlParser.AggregateContext ctx) {
+        boolean distinct = ctx.DISTINCT() != null;
+
+        if (ctx.COUNT() != null) {
+            TermAst expression = null;
+
+            if (ctx.STAR() == null && ctx.expression() != null && !ctx.expression().isEmpty()) {
+                expression = termFromExpression(ctx.expression());
+            }
+            return createAggregate(AggregateFunction.COUNT, distinct, expression, null);
+        }
+
+        if (ctx.SUM() != null) {
+            return createAggregate(AggregateFunction.SUM, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.AVG() != null) {
+            return createAggregate(AggregateFunction.AVG, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.MIN() != null) {
+            return createAggregate(AggregateFunction.MIN, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.MAX() != null) {
+            return createAggregate(AggregateFunction.MAX, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.SAMPLE() != null) {
+            return createAggregate(AggregateFunction.SAMPLE, distinct, termFromExpression(ctx.expression()), null);
+        }
+
+        if (ctx.GROUP_CONCAT() != null) {
+            String sep = ctx.string_() != null ? ctx.string_().getText() : null;
+            return createAggregate(
+                    AggregateFunction.GROUP_CONCAT, distinct, termFromExpression(ctx.expression()), sep);
+        }
+
+        throw new QueryEvaluationException("Unsupported aggregate: " + ctx.getText());
     }
 }

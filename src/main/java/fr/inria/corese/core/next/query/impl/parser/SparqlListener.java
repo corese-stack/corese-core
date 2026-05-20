@@ -159,6 +159,12 @@ public final class SparqlListener extends SparqlParserBaseListener {
         }
     }
 
+    // ---------- SOLUTION MODIFIER (HAVING / ORDER BY / LIMIT / OFFSET) ----------
+    @Override
+    public void exitHavingClause(SparqlParser.HavingClauseContext ctx) {
+        for (var d : delegates) d.exitHavingClause(ctx);
+    }
+
     @Override
     public void exitLimitClause(SparqlParser.LimitClauseContext ctx) {
         for (var d : delegates) d.exitLimitClause(ctx);
@@ -243,5 +249,25 @@ public final class SparqlListener extends SparqlParserBaseListener {
     @Override
     public void exitBind(SparqlParser.BindContext ctx) {
         for (var d : delegates) d.exitBind(ctx);
+    }
+
+    @Override
+    public void enterValuesClause(SparqlParser.ValuesClauseContext ctx) {
+        for (var d : delegates) d.enterValuesClause(ctx);
+    }
+
+    @Override
+    public void exitValuesClause(SparqlParser.ValuesClauseContext ctx) {
+        for (var d : delegates) d.exitValuesClause(ctx);
+    }
+
+    @Override
+    public void enterInlineData(SparqlParser.InlineDataContext ctx) {
+        for (var d : delegates) d.enterInlineData(ctx);
+    }
+
+    @Override
+    public void exitInlineData(SparqlParser.InlineDataContext ctx) {
+        for (var d : delegates) d.exitInlineData(ctx);
     }
 }

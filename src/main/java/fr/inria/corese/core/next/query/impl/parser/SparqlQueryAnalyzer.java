@@ -6,19 +6,7 @@ import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.sparql.options.SparqlAstError;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
-import fr.inria.corese.core.next.query.impl.parser.listener.AskQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.BindFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.ConstructQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.DatasetClauseFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.DescribeQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.FilterFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.MinusFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.PrologueFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.ServiceFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature;
-import fr.inria.corese.core.next.query.impl.parser.listener.UnionFeature;
+import fr.inria.corese.core.next.query.impl.parser.listener.*;
 import fr.inria.corese.core.next.query.impl.parser.semantic.validator.SparqlQuerySemanticValidator;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import org.antlr.v4.runtime.BailErrorStrategy;
@@ -130,6 +118,7 @@ final class SparqlQueryAnalyzer {
                 new SelectQueryFeature(builder),
                 new ConstructQueryFeature(builder),
                 new SolutionModifierFeature(builder),
+                new HavingFeature(builder),
                 new FilterFeature(builder),
                 new UnionFeature(builder),
                 new MinusFeature(builder),
@@ -137,7 +126,8 @@ final class SparqlQueryAnalyzer {
                 new DatasetClauseFeature(builder),
                 new PrologueFeature(builder),
                 new BindFeature(builder),
-                new ServiceFeature(builder)
+                new ServiceFeature(builder),
+                new ValuesFeature(builder)
         ));
 
         ParseTreeWalker walker = new ParseTreeWalker();

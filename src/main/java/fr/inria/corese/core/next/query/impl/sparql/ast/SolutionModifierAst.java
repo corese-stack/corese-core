@@ -7,6 +7,13 @@ import java.util.List;
  * {@code GROUP BY}, {@code DISTINCT} / {@code REDUCED} (syntactically on {@code SELECT} but stored here),
  * {@code ORDER BY}, {@code LIMIT}, {@code OFFSET}.
  *
+ * <ul>
+ *   <li>DISTINCT / REDUCED</li>
+ *   <li>HAVING</li>
+ *   <li>ORDER BY</li>
+ *   <li>LIMIT</li>
+ *   <li>OFFSET</li>
+ * </ul>
  * <p>In SPARQL 1.1 grammar: {@code groupClause? havingClause? orderClause? limitOffsetClauses?}. This type
  * currently models grouping and non-HAVING modifiers; {@code HAVING} is reserved for future work.
  *
@@ -22,13 +29,14 @@ public record SolutionModifierAst(
         boolean distinct,
         boolean reduced,
         List<OrderConditionAst> orderBy,
+        HavingAst having,
         Long limit,
         Long offset
 ) {
     public SolutionModifierAst {
         groupBy = groupBy != null ? groupBy : new GroupByAst(List.of());
         orderBy = orderBy != null ? List.copyOf(orderBy) : List.of();
-
+        having = having != null ? having : HavingAst.empty();
         if (distinct && reduced) {
             throw new IllegalArgumentException("DISTINCT and REDUCED are mutually exclusive");
         }
@@ -44,7 +52,7 @@ public record SolutionModifierAst(
      * Default empty modifiers: no GROUP BY, no DISTINCT/REDUCED, no ORDER BY, no LIMIT or OFFSET.
      */
     public static SolutionModifierAst empty() {
-        return new SolutionModifierAst(new GroupByAst(List.of()), false, false, List.of(), null, null);
+        return new SolutionModifierAst(new GroupByAst(List.of()), false, false, List.of(), HavingAst.empty(), null, null);
     }
 
     /**
@@ -66,6 +74,8 @@ public record SolutionModifierAst(
     public boolean hasOrderBy() {
         return !orderBy.isEmpty();
     }
+
+    public boolean hasHaving() { return !having.isEmpty(); }
 
     public boolean hasLimit() {
         return limit != null;
