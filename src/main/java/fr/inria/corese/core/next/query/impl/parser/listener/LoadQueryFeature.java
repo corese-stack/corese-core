@@ -4,6 +4,9 @@ import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 
+/**
+ * AST feature listener for LOAD SPARQL update query
+ */
 public class LoadQueryFeature extends AbstractSparqlFeature {
 
     public LoadQueryFeature(SparqlAstBuilder builder) {
