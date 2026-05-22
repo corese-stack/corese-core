@@ -13,7 +13,7 @@ plugins {
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
     id("com.gradleup.shadow") version "8.3.7"
-    id("org.sonarqube") version "6.1.0.5360"                    // SonarQube integration
+    id("org.sonarqube") version "7.3.0.8198"                    // SonarQube integration
     id("com.intershop.gradle.javacc") version "5.0.1"           // JavaCC plugin for parsing JavaCC files
     id("antlr")                                                 // Antlr plugin for generating parsers from grammar files
     `eclipse`                                                   // Eclipse plugin for IDE integration
