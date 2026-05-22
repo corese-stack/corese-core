@@ -93,9 +93,8 @@ object Meta {
 java {
     withJavadocJar()                             // Include Javadoc JAR in publications
     withSourcesJar()                             // Include sources JAR in publications
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 /////////////////////////
@@ -228,6 +227,7 @@ mavenPublishing {
 // Set UTF-8 encoding for Java compilation tasks
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+    options.release.set(21)
     options.compilerArgs.add("-Xlint:none")
 }
 
