@@ -23,6 +23,8 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             "Variable ?cityLabel used in SELECT projection is not visible in WHERE clause";
     private static final String GROUP_BY_SCOPE_MESSAGE =
             "Variable ?z used in GROUP BY is not visible in WHERE clause";
+    private static final String HAVING_SCOPE_MESSAGE =
+            "Variable ?z used in HAVING is not visible in WHERE clause";
     private static final String BIND_SCOPE_MESSAGE =
             "Variable ?x used in BIND is already declared in the same group graph pattern";
 
@@ -198,6 +200,16 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                         GROUP BY CONCAT(?s, ?z)
                         """,
                         GROUP_BY_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject HAVING expression using a variable not visible in WHERE",
+                        """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        HAVING (BOUND(?z))
+                        """,
+                        HAVING_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject SELECT projection variables not visible in WHERE",
                         """
