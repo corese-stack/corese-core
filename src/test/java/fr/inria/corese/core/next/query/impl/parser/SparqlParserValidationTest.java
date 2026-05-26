@@ -183,6 +183,14 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                         """,
                         ORDER_BY_SCOPE_MESSAGE),
                 Arguments.of(
+                        "Should reject SELECT expression projection using a variable not visible in WHERE",
+                        """
+                        SELECT (STR(?x) AS ?label) WHERE {
+                            ?s ?p ?o
+                        }
+                        """,
+                        SELECT_PROJECTION_SCOPE_MESSAGE),
+                Arguments.of(
                         "Should reject GROUP BY variable not visible in WHERE",
                         """
                         SELECT ?s WHERE {

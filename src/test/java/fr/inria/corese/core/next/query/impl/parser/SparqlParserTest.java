@@ -275,6 +275,21 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateReturnsSelectExpressionSemanticDiagnostic() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT (STR(?x) AS ?label) WHERE {
+                    ?s ?p ?o
+                }
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(1, result.diagnostics().size());
+        assertEquals("SelectProjectionScopeValidationRule", result.diagnostics().getFirst().source());
+    }
+
+    @Test
     void validateReturnsHavingSemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 

@@ -3,9 +3,14 @@ package fr.inria.corese.core.next.query.impl.parser.listener;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.parser.SparqlQueryAstBuilder;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * SPARQL SELECT query feature: sets query type and projection (SELECT * or SELECT ?v1 ?v2 ...).
@@ -26,6 +31,8 @@ import java.util.List;
  * Nested {@code subSelect} uses the same {@link SparqlAstBuilder} stack frames as a top-level {@code SELECT}.
  */
 public class SelectQueryFeature extends AbstractSparqlFeature implements QueryFeature {
+
+    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
     public SelectQueryFeature(SparqlQueryAstBuilder builder) {
         super(builder);
@@ -80,16 +87,19 @@ public class SelectQueryFeature extends AbstractSparqlFeature implements QueryFe
         }
         List<String> allVars = new ArrayList<>();
         List<String> expressionBoundVars = new ArrayList<>();
+        Map<String, Set<String>> expressionReferencedVariables = new LinkedHashMap<>();
         for (SparqlParser.SelectVarContext selectVar : ctx.selectVar()) {
             if (selectVar.expression() != null) {
                 // (expr AS ?var) — introduces a new variable, not projected from WHERE
                 String varName = selectVar.var_().getText();
                 allVars.add(varName);
                 expressionBoundVars.add(varName);
+                TermAst expressionAst = builder().termFromExpression(selectVar.expression());
+                expressionReferencedVariables.put(varName, variableScopeAnalyzer.collectReferencedVariables(expressionAst));
             } else if (selectVar.var_() != null) {
                 allVars.add(selectVar.var_().getText());
             }
         }
-        queryBuilder().setProjectionVariables(allVars, expressionBoundVars);
+        queryBuilder().setProjectionVariables(allVars, expressionBoundVars, expressionReferencedVariables);
     }
 }

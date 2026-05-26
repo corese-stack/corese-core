@@ -6,8 +6,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +46,31 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
             Set<String> visibleVariables,
             List<QueryDiagnostic> diagnostics
     ) {
-        // TODO: handle SELECT (expr AS ?var) with SPARQL 1.1 support.
         for (VarAst projectedVar : projection.variables()) {
             if (projection.expressionBoundVariables().contains(projectedVar.name())) {
-                // Variable introduced by (expr AS ?var) — not required to be visible in WHERE.
+                validateProjectionExpression(projectedVar.name(), projection, visibleVariables, diagnostics);
                 continue;
             }
             if (!visibleVariables.contains(projectedVar.name())) {
                 diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), "SELECT projection"));
+            }
+        }
+    }
+
+    /**
+     * SELECT expressions introduce the projected variable themselves, but the variables they reference
+     * must still be visible from the query scope.
+     */
+    private void validateProjectionExpression(
+            String projectionVariableName,
+            ProjectionAst projection,
+            Set<String> visibleVariables,
+            List<QueryDiagnostic> diagnostics
+    ) {
+        for (String referencedVariable : projection.expressionReferencedVariables()
+                .getOrDefault(projectionVariableName, Set.of())) {
+            if (!visibleVariables.contains(referencedVariable)) {
+                diagnostics.add(buildOutOfScopeDiagnostic(referencedVariable, "SELECT projection"));
             }
         }
     }

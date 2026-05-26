@@ -202,6 +202,22 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      * @param expressionBoundNames names of variables introduced by {@code (expr AS ?var)}
      */
     public void setProjectionVariables(List<String> variableNames, List<String> expressionBoundNames) {
+        setProjectionVariables(variableNames, expressionBoundNames, Map.of());
+    }
+
+    /**
+     * Sets explicit SELECT variables where some may be introduced by {@code (expr AS ?var)}.
+     * Variable names may include ? or $ prefix.
+     *
+     * @param variableNames                 all projected variable names (plain + expression-bound), in order
+     * @param expressionBoundNames          names of variables introduced by {@code (expr AS ?var)}
+     * @param expressionReferencedVariables referenced variables for each expression-bound projection
+     */
+    public void setProjectionVariables(
+            List<String> variableNames,
+            List<String> expressionBoundNames,
+            Map<String, Set<String>> expressionReferencedVariables
+    ) {
         if (variableNames == null || variableNames.isEmpty()) {
             setProjectionAll();
             return;
@@ -218,9 +234,21 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
                         .filter(s -> !s.isBlank())
                         .collect(Collectors.toUnmodifiableSet());
 
+        Map<String, Set<String>> normalizedReferencedVariables =
+                expressionReferencedVariables == null ? Map.of()
+                        : expressionReferencedVariables.entrySet().stream()
+                        .filter(entry -> entry.getKey() != null)
+                        .collect(Collectors.toUnmodifiableMap(
+                                entry -> trimVariableNames(entry.getKey()),
+                                entry -> entry.getValue() == null ? Set.of() : entry.getValue().stream()
+                                        .filter(Objects::nonNull)
+                                        .map(s -> trimVariableNames(s))
+                                        .filter(s -> !s.isBlank())
+                                        .collect(Collectors.toUnmodifiableSet())));
+
         ProjectionAst newProjection = vars.isEmpty()
                 ? ProjectionAsts.selectAll()
-                : ProjectionAsts.of(vars, expressionBound);
+                : ProjectionAsts.of(vars, expressionBound, normalizedReferencedVariables);
 
         if (hasCurrentSelect()) {
             getCurrentSelectFrame().projection = newProjection;
