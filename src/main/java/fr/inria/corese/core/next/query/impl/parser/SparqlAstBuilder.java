@@ -2,7 +2,6 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
-import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
@@ -15,6 +14,8 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static fr.inria.corese.core.next.util.StringUtils.trimVariableNames;
 
 /**
  * Build a minimal SPARQL AST for:
@@ -380,14 +381,14 @@ public final class SparqlAstBuilder {
             return;
         }
         List<VarAst> vars = variableNames.stream()
-                .map(s -> s == null ? "" : (s.startsWith("?") || s.startsWith("$") ? s.substring(1).trim() : s.trim()))
+                .map(s -> s == null ? "" : trimVariableNames(s))
                 .filter(s -> !s.isBlank())
                 .map(VarAst::new)
                 .toList();
 
         Set<String> expressionBound = expressionBoundNames == null ? Set.of() :
                 expressionBoundNames.stream()
-                        .map(s -> s == null ? "" : (s.startsWith("?") || s.startsWith("$") ? s.substring(1).trim() : s.trim()))
+                        .map(s -> s == null ? "" : trimVariableNames(s))
                         .filter(s -> !s.isBlank())
                         .collect(Collectors.toUnmodifiableSet());
 

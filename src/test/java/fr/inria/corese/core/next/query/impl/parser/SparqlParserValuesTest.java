@@ -1,16 +1,11 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(SparqlParserValuesTest.class);
 
     @Test
     public void inlineSyntaxTest() {

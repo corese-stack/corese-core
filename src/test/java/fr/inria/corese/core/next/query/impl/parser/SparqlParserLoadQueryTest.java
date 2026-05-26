@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
@@ -101,63 +100,55 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
         });
     }
 
-    @Test
-    public void failingDefaultTargetQueryTest() {
+    private void failingSyntaxTest(String query) {
         QueryParser parser = newParserDefault();
-        String query = """
-                LOAD <http://ns.inria.fr/test> INTO DEFAULT
-                """;
 
         assertThrows(QuerySyntaxException.class, () -> {
             parser.parse(query);
         });
+    }
+
+    @Test
+    public void failingDefaultTargetQueryTest() {
+        String query = """
+                LOAD <http://ns.inria.fr/test> INTO DEFAULT
+                """;
+        failingSyntaxTest(query);
     }
 
     @Test
     public void failingNamedSourceQueryTest() {
-        QueryParser parser = newParserDefault();
         String query = """
                 LOAD NAMED INTO GRAPH <http://ns.inria.fr/otherGraph>
                 """;
 
-        assertThrows(QuerySyntaxException.class, () -> {
-            parser.parse(query);
-        });
+        failingSyntaxTest(query);
     }
 
     @Test
     public void failingNamedTargetQueryTest() {
-        QueryParser parser = newParserDefault();
         String query = """
                 LOAD <http://ns.inria.fr/test> INTO NAMED
                 """;
 
-        assertThrows(QuerySyntaxException.class, () -> {
-            parser.parse(query);
-        });
+        failingSyntaxTest(query);
     }
 
     @Test
     public void failingAllSourceQueryTest() {
-        QueryParser parser = newParserDefault();
         String query = """
                 LOAD ALL INTO GRAPH <http://ns.inria.fr/otherGraph>
                 """;
 
-        assertThrows(QuerySyntaxException.class, () -> {
-            parser.parse(query);
-        });
+        failingSyntaxTest(query);
     }
 
     @Test
     public void failingAllTargetQueryTest() {
-        QueryParser parser = newParserDefault();
         String query = """
                 LOAD <http://ns.inria.fr/test> INTO ALL
                 """;
 
-        assertThrows(QuerySyntaxException.class, () -> {
-            parser.parse(query);
-        });
+        failingSyntaxTest(query);
     }
 }

@@ -122,4 +122,11 @@ public class StringUtils {
         }
         return t.toLowerCase();
     }
+
+    /**
+     * Remove starting "?" or "$" and surrounding whitespaces
+     */
+    public static String trimVariableNames(String s) {
+        return s.startsWith("?") || s.startsWith("$") ? s.substring(1).trim() : s.trim();
+    }
 }
