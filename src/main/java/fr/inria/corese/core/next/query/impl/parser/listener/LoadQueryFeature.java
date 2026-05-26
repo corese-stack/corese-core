@@ -13,6 +13,7 @@ public class LoadQueryFeature extends AbstractSparqlFeature {
         super(builder);
     }
 
+    @Override
     public void exitLoad(SparqlParser.LoadContext ctx) {
         this.builder().enterLoadQuery();
         this.builder().setSilentFlag(ctx.SILENT() != null);
