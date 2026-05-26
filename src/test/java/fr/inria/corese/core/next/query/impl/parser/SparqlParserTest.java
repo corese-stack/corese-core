@@ -259,6 +259,22 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateReturnsGroupBySemanticDiagnostic() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT ?s WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?z
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(1, result.diagnostics().size());
+        assertEquals("GroupByScopeValidationRule", result.diagnostics().getFirst().source());
+    }
+
+    @Test
     void validateReturnsDescribeSemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 
