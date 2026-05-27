@@ -295,7 +295,7 @@ public class TestRuleEngine {
 
         String q7 = "select ?r  "
                 + "where { "
-                + "graph eng:operations {  ?r a sp:Construct  }"
+                + "graph eng:queries {  ?r a sp:Construct  }"
                 + "} ";
 
         map = exec.query(q7);

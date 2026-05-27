@@ -10,7 +10,7 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  * Interface to adapt an external storage system to Corese.
- * {@code DataManagerUpdate} for {@code update} and {@code construct} operations.
+ * {@code DataManagerUpdate} for {@code update} and {@code construct} queries.
  * This interface is also used by the internal Corese graph.
  * 
  * @author Olivier Corby

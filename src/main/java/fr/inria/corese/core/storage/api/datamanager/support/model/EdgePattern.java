@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Pattern for matching edges in operations.
+ * Pattern for matching edges in queries.
  */
 public final class EdgePattern {
 

@@ -5,7 +5,7 @@ import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.parser.SparqlQueryAstBuilder;
 
 /**
- * SPARQL 1.0 parser feature that handles {@code DESCRIBE} operations.
+ * SPARQL 1.0 parser feature that handles {@code DESCRIBE} queries.
  *
  * <p>Grammar rule covered:
  * <pre>

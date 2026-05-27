@@ -453,7 +453,7 @@ public class WorkflowProcess implements AbstractProcess {
 
     /**
      * In the st:context graph, retrieve the value of property  of query (subject)
-     * Use case: tutorial where operations ara managed in a st:context named graph
+     * Use case: tutorial where queries ara managed in a st:context named graph
      */
     public IDatatype getContextParamValue(IDatatype subject, String property) {
         IDatatype dtgraph = getContext().get(Context.STL_CONTEXT);

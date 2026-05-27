@@ -113,7 +113,7 @@ public class NSManager extends ASTObject {
     public static final String SPARQL = ExpType.SPARQL;
     public static final String CUSTOM = ExpType.CUSTOM;
     public static final String KPREF = ExpType.KPREF;
-    // extended named graph: eng:describe eng:operations
+    // extended named graph: eng:describe eng:queries
     public static final String KGEXT = ExpType.KGRAM + "extension/";
     // construct extended named graph
     public static final String KGEXTCONS = ExpType.KGRAM + "construct/";

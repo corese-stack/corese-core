@@ -116,13 +116,13 @@ public class Query extends Exp  {
     HashMap<String, Object> pragma;
     // Extended filters: pathNode()
     HashMap<String, Filter> ftable;
-	// Extended operations for type check
+	// Extended queries for type check
     // nb occurrences of predicates in where
     HashMap<String, Integer> ptable;
     HashMap<String, Edge> etable;
     // query for class/property definition checking 
     HashMap<Edge, Query> table;
-    // Extended operations for additional group by
+    // Extended queries for additional group by
     List<Query> queries;
     // implemented by ASTExtension 
     private ASTExtension extension;
@@ -1559,7 +1559,7 @@ public class Query extends Exp  {
     }
 
     /**
-     * Use outer query node index for all (sub) operations
+     * Use outer query node index for all (sub) queries
      */
     int newGlobalNodeIndex() {
         return getOuterQuery().newNodeIndex();

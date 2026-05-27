@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Interface to adapt an external storage system to Corese.
- * {@code DataManagerRead} for {@code select where} SPARQL operations.
+ * {@code DataManagerRead} for {@code select where} SPARQL queries.
  * This interface is not used by the internal Corese graph, specific DataBroker
  * directly process it.
  * 

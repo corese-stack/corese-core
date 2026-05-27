@@ -271,7 +271,7 @@ class QueryOperationsImplTest {
     }
 
     @Test
-    @DisplayName("Multiple operations should return consistent results")
+    @DisplayName("Multiple queries should return consistent results")
     void testMultipleQueriesConsistency() throws DataManagerException {
         Node s = graph.addResource("http://example.org/subject");
         Node p = graph.addProperty("http://example.org/predicate");
