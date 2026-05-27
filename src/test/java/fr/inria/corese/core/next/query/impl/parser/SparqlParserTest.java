@@ -342,6 +342,23 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateReturnsGroupedSelectAllSemanticDiagnostic() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT * WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?s
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(1, result.diagnostics().size());
+        assertEquals("GroupedSelectProjectionValidationRule", result.diagnostics().getFirst().source());
+        assertEquals("SELECT * is not permitted with GROUP BY", result.diagnostics().getFirst().message());
+    }
+
+    @Test
     void validateReturnsSelectExpressionSemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 

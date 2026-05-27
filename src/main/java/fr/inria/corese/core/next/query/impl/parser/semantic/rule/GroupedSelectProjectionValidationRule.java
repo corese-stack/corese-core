@@ -19,7 +19,8 @@ import java.util.Set;
  *
  * <p>For query levels using explicit or implicit grouping, only aggregates and constants
  * may appear in projected expressions. The only exception is that variables projected
- * directly from simple {@code GROUP BY ?var} terms remain legal.</p>
+ * directly from simple {@code GROUP BY ?var} terms remain legal. In addition,
+ * {@code SELECT *} is rejected when an explicit {@code GROUP BY} clause is present.</p>
  */
 public final class GroupedSelectProjectionValidationRule extends AbstractSemanticValidationRule {
 
@@ -38,7 +39,7 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
             return List.of();
         }
         if (selectQueryAst.projection().selectAll()) {
-            return List.of();
+            return validateSelectAllProjection(selectQueryAst);
         }
         if (!isAggregateQueryLevel(selectQueryAst)) {
             return List.of();
@@ -67,6 +68,16 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
         }
 
         return List.copyOf(diagnostics);
+    }
+
+    private List<QueryDiagnostic> validateSelectAllProjection(SelectQueryAst selectQueryAst) {
+        if (!selectQueryAst.solutionModifier().hasGroupBy()) {
+            return List.of();
+        }
+        if (!hasSemanticallyVisibleGroupBy(selectQueryAst)) {
+            return List.of();
+        }
+        return List.of(buildSelectAllGroupedDiagnostic());
     }
 
     private boolean isAggregateQueryLevel(SelectQueryAst selectQueryAst) {
@@ -131,6 +142,17 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
                 -1,
                 -1,
                 "?" + variableName,
+                getDiagnosticSource());
+    }
+
+    private QueryDiagnostic buildSelectAllGroupedDiagnostic() {
+        return new QueryDiagnostic(
+                QueryDiagnostic.Kind.SEMANTIC_ERROR,
+                QueryDiagnostic.Severity.ERROR,
+                "SELECT * is not permitted with GROUP BY",
+                -1,
+                -1,
+                "*",
                 getDiagnosticSource());
     }
 }
