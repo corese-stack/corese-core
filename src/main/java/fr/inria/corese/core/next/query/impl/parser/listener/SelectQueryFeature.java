@@ -87,6 +87,7 @@ public class SelectQueryFeature extends AbstractSparqlFeature implements QueryFe
         }
         List<String> allVars = new ArrayList<>();
         List<String> expressionBoundVars = new ArrayList<>();
+        Map<String, TermAst> expressionTerms = new LinkedHashMap<>();
         Map<String, Set<String>> expressionReferencedVariables = new LinkedHashMap<>();
         for (SparqlParser.SelectVarContext selectVar : ctx.selectVar()) {
             if (selectVar.expression() != null) {
@@ -95,11 +96,12 @@ public class SelectQueryFeature extends AbstractSparqlFeature implements QueryFe
                 allVars.add(varName);
                 expressionBoundVars.add(varName);
                 TermAst expressionAst = builder().termFromExpression(selectVar.expression());
+                expressionTerms.put(varName, expressionAst);
                 expressionReferencedVariables.put(varName, variableScopeAnalyzer.collectReferencedVariables(expressionAst));
             } else if (selectVar.var_() != null) {
                 allVars.add(selectVar.var_().getText());
             }
         }
-        queryBuilder().setProjectionVariables(allVars, expressionBoundVars, expressionReferencedVariables);
+        queryBuilder().setProjectionVariables(allVars, expressionBoundVars, expressionTerms, expressionReferencedVariables);
     }
 }

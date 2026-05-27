@@ -653,6 +653,39 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should accept grouped SELECT expressions that exactly match a GROUP BY expression")
+    void shouldAcceptGroupedSelectExpressionMatchingGroupExpression() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT (CONCAT(?s, ?o) AS ?key) WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY CONCAT(?s, ?o)
+                """);
+
+        SelectQueryAst selectQueryAst = assertInstanceOf(SelectQueryAst.class, ast);
+        ProjectionAst projection = selectQueryAst.projection();
+        assertFalse(projection.selectAll());
+        assertEquals(1, projection.variables().size());
+        assertEquals("key", projection.variables().getFirst().name());
+        assertTrue(projection.expressionBoundVariables().contains("key"));
+    }
+
+    @Test
+    @DisplayName("Should accept grouped SELECT aggregate projections")
+    void shouldAcceptGroupedSelectAggregateProjection() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?s
+                """));
+    }
+
+    @Test
     @DisplayName("Should parse SELECT DISTINCT ?city ?country WHERE with BGP and UNION")
     void shouldParseSelectDistinctWithUnionQueryTest() {
         SparqlParser parser = newParserDefault();

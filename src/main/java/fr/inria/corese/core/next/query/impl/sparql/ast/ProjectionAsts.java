@@ -15,7 +15,7 @@ public final class ProjectionAsts {
 
     /** SELECT * : project all variables from the WHERE clause. */
     public static ProjectionAst selectAll() {
-        return new ProjectionAst(true, List.of(), Set.of(), Map.of());
+        return new ProjectionAst(true, List.of(), Set.of(), Map.of(), Map.of());
     }
 
     /** SELECT ?v1 ?v2 ... : project only the given variables. */
@@ -23,7 +23,7 @@ public final class ProjectionAsts {
         if (variables == null || variables.isEmpty()) {
             return selectAll();
         }
-        return new ProjectionAst(false, List.copyOf(variables), Set.of(), Map.of());
+        return new ProjectionAst(false, List.copyOf(variables), Set.of(), Map.of(), Map.of());
     }
 
     /**
@@ -32,15 +32,16 @@ public final class ProjectionAsts {
      * they are included in {@code variables} but are not required to be visible in the WHERE clause.
      */
     public static ProjectionAst of(List<VarAst> variables, Set<String> expressionBoundVariables) {
-        return of(variables, expressionBoundVariables, Map.of());
+        return of(variables, expressionBoundVariables, Map.of(), Map.of());
     }
 
     /**
-     * SELECT ?v1 (expr AS ?v2) ... with referenced variables retained for expression-bound projections.
+     * SELECT ?v1 (expr AS ?v2) ... with expression metadata retained for expression-bound projections.
      */
     public static ProjectionAst of(
             List<VarAst> variables,
             Set<String> expressionBoundVariables,
+            Map<String, TermAst> expressionTerms,
             Map<String, Set<String>> expressionReferencedVariables
     ) {
         if (variables == null || variables.isEmpty()) {
@@ -50,6 +51,7 @@ public final class ProjectionAsts {
                 false,
                 List.copyOf(variables),
                 expressionBoundVariables != null ? expressionBoundVariables : Set.of(),
+                expressionTerms != null ? expressionTerms : Map.of(),
                 expressionReferencedVariables != null ? expressionReferencedVariables : Map.of());
     }
 }

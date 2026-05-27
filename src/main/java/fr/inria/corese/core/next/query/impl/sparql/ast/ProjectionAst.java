@@ -14,11 +14,13 @@ public record ProjectionAst(
         boolean selectAll,
         List<VarAst> variables,
         Set<String> expressionBoundVariables,
+        Map<String, TermAst> expressionTerms,
         Map<String, Set<String>> expressionReferencedVariables
 ) {
     public ProjectionAst {
         variables = variables != null ? List.copyOf(variables) : List.of();
         expressionBoundVariables = expressionBoundVariables != null ? Set.copyOf(expressionBoundVariables) : Set.of();
+        expressionTerms = expressionTerms != null ? Map.copyOf(expressionTerms) : Map.of();
         expressionReferencedVariables = expressionReferencedVariables != null
                 ? expressionReferencedVariables.entrySet().stream()
                 .collect(java.util.stream.Collectors.toUnmodifiableMap(

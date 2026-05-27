@@ -311,6 +311,22 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateReturnsGroupedSelectProjectionSemanticDiagnostic() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT ?s ?o WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?s
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(1, result.diagnostics().size());
+        assertEquals("GroupedSelectProjectionValidationRule", result.diagnostics().getFirst().source());
+    }
+
+    @Test
     void validateReturnsSelectExpressionSemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 
@@ -333,6 +349,21 @@ class SparqlParserTest {
                 SELECT (?p AS ?price) (STR(?price) AS ?label) WHERE {
                     ?s ?p ?o
                 }
+                """);
+
+        assertTrue(result.isValid());
+        assertTrue(result.diagnostics().isEmpty());
+    }
+
+    @Test
+    void validateAcceptsGroupedSelectExpressionMatchingGroupExpression() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT (CONCAT(?s, ?o) AS ?key) WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY CONCAT(?s, ?o)
                 """);
 
         assertTrue(result.isValid());

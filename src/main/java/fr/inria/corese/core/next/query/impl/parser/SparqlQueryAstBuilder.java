@@ -202,7 +202,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      * @param expressionBoundNames names of variables introduced by {@code (expr AS ?var)}
      */
     public void setProjectionVariables(List<String> variableNames, List<String> expressionBoundNames) {
-        setProjectionVariables(variableNames, expressionBoundNames, Map.of());
+        setProjectionVariables(variableNames, expressionBoundNames, Map.of(), Map.of());
     }
 
     /**
@@ -211,11 +211,13 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      *
      * @param variableNames                 all projected variable names (plain + expression-bound), in order
      * @param expressionBoundNames          names of variables introduced by {@code (expr AS ?var)}
+     * @param expressionTerms               expression AST for each expression-bound projection
      * @param expressionReferencedVariables referenced variables for each expression-bound projection
      */
     public void setProjectionVariables(
             List<String> variableNames,
             List<String> expressionBoundNames,
+            Map<String, TermAst> expressionTerms,
             Map<String, Set<String>> expressionReferencedVariables
     ) {
         if (variableNames == null || variableNames.isEmpty()) {
@@ -234,6 +236,14 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
                         .filter(s -> !s.isBlank())
                         .collect(Collectors.toUnmodifiableSet());
 
+        Map<String, TermAst> normalizedExpressionTerms =
+                expressionTerms == null ? Map.of()
+                        : expressionTerms.entrySet().stream()
+                        .filter(entry -> entry.getKey() != null && entry.getValue() != null)
+                        .collect(Collectors.toUnmodifiableMap(
+                                entry -> trimVariableNames(entry.getKey()),
+                                Map.Entry::getValue));
+
         Map<String, Set<String>> normalizedReferencedVariables =
                 expressionReferencedVariables == null ? Map.of()
                         : expressionReferencedVariables.entrySet().stream()
@@ -248,7 +258,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
 
         ProjectionAst newProjection = vars.isEmpty()
                 ? ProjectionAsts.selectAll()
-                : ProjectionAsts.of(vars, expressionBound, normalizedReferencedVariables);
+                : ProjectionAsts.of(vars, expressionBound, normalizedExpressionTerms, normalizedReferencedVariables);
 
         if (hasCurrentSelect()) {
             getCurrentSelectFrame().projection = newProjection;

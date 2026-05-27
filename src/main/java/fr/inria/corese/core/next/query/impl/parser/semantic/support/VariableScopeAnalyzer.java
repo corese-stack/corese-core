@@ -90,6 +90,18 @@ public final class VariableScopeAnalyzer {
         return referencedVariables;
     }
 
+    /**
+     * Collects variables referenced outside aggregate calls in a term or expression.
+     *
+     * @param term the term or expression to inspect
+     * @return the set of referenced variable names that are not shielded by an aggregate
+     */
+    public Set<String> collectReferencedVariablesOutsideAggregates(TermAst term) {
+        Set<String> referencedVariables = new LinkedHashSet<>();
+        collectReferencedVariablesOutsideAggregates(term, referencedVariables);
+        return referencedVariables;
+    }
+
     private void collectVisibleVariables(PatternAst pattern, Set<String> visibleVariables) {
         if (pattern == null) {
             return;
@@ -254,6 +266,104 @@ public final class VariableScopeAnalyzer {
 
             case ConstraintAst ignored -> {
                 // Other constraint shapes must be added explicitly when scope validation starts relying on them.
+            }
+        }
+    }
+
+    private void collectReferencedVariablesOutsideAggregates(TermAst term, Set<String> referencedVariables) {
+        if (term == null) {
+            return;
+        }
+
+        switch (term) {
+            case VarAst(String name) -> referencedVariables.add(name);
+
+            case AggregateAst ignored -> {
+                // Variables used under an aggregate are handled by aggregate semantics, not raw grouping scope.
+            }
+
+            case UnaryConstraintAst unaryConstraint ->
+                    collectReferencedVariablesOutsideAggregates(unaryConstraint.getArgument(), referencedVariables);
+
+            case BinaryConstraintAst binaryConstraint -> {
+                collectReferencedVariablesOutsideAggregates(binaryConstraint.getLeftArgument(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(binaryConstraint.getRightArgument(), referencedVariables);
+            }
+
+            case FunctionCallAst(TermAst ignored, List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
+                }
+            }
+
+            case BnodeAst bnodeAst ->
+                    collectReferencedVariablesOutsideAggregates(bnodeAst.getLabel(), referencedVariables);
+
+            case TrinaryRegexAst regexAst -> {
+                collectReferencedVariablesOutsideAggregates(regexAst.getString(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(regexAst.getPattern(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(regexAst.getFlags(), referencedVariables);
+            }
+
+            case SubstrAst substrAst -> {
+                collectReferencedVariablesOutsideAggregates(substrAst.getString(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(substrAst.getStart(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(substrAst.getLength(), referencedVariables);
+            }
+
+            case ReplaceAst replaceAst -> {
+                collectReferencedVariablesOutsideAggregates(replaceAst.getString(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(replaceAst.getPattern(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(replaceAst.getReplacement(), referencedVariables);
+                if (replaceAst.hasFlags()) {
+                    collectReferencedVariablesOutsideAggregates(replaceAst.getFlags(), referencedVariables);
+                }
+            }
+
+            case IriAst ignoredIri -> {
+                // Constants do not contribute referenced variables.
+            }
+
+            case LiteralAst ignoredLiteral -> {
+                // Constants do not contribute referenced variables.
+            }
+
+            case IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) -> {
+                collectReferencedVariablesOutsideAggregates(condition, referencedVariables);
+                collectReferencedVariablesOutsideAggregates(thenExpr, referencedVariables);
+                collectReferencedVariablesOutsideAggregates(elseExpr, referencedVariables);
+            }
+
+            case CoalesceAst(List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
+                }
+            }
+
+            case ConcatAst(List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
+                }
+            }
+
+            case InAst(TermAst left, List<TermAst> candidates) -> {
+                collectReferencedVariablesOutsideAggregates(left, referencedVariables);
+                for (TermAst candidate : candidates) {
+                    collectReferencedVariablesOutsideAggregates(candidate, referencedVariables);
+                }
+            }
+
+            case NotInAst(TermAst left, List<TermAst> candidates) -> {
+                collectReferencedVariablesOutsideAggregates(left, referencedVariables);
+                for (TermAst candidate : candidates) {
+                    collectReferencedVariablesOutsideAggregates(candidate, referencedVariables);
+                }
+            }
+
+            case StrLenAst(TermAst argument) -> collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
+
+            case ConstraintAst ignored -> {
+                // Other constraint shapes must be added explicitly when grouped-projection validation starts relying on them.
             }
         }
     }

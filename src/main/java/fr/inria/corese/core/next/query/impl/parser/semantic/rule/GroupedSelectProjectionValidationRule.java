@@ -1,0 +1,133 @@
+package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
+
+import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupByAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Validates explicit SELECT projections in grouped queries.
+ *
+ * <p>For explicit {@code GROUP BY}, projected expressions may either match a grouping
+ * expression exactly, or only reference grouped variables outside aggregate calls.</p>
+ */
+public final class GroupedSelectProjectionValidationRule extends AbstractSemanticValidationRule {
+
+    private static final String DIAGNOSTIC_SOURCE = "GroupedSelectProjectionValidationRule";
+
+    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
+
+    @Override
+    protected String getDiagnosticSource() {
+        return DIAGNOSTIC_SOURCE;
+    }
+
+    @Override
+    public List<QueryDiagnostic> validate(QueryAst queryAst) {
+        if (!(queryAst instanceof SelectQueryAst selectQueryAst)) {
+            return List.of();
+        }
+        if (!selectQueryAst.solutionModifier().hasGroupBy()) {
+            return List.of();
+        }
+        if (selectQueryAst.projection().selectAll()) {
+            return List.of();
+        }
+        if (!hasSemanticallyVisibleGroupBy(selectQueryAst)) {
+            return List.of();
+        }
+
+        ProjectionAst projection = selectQueryAst.projection();
+        GroupByAst groupBy = selectQueryAst.solutionModifier().groupBy();
+        Set<String> groupedVariables = collectDirectGroupedVariables(groupBy);
+        Set<String> availableProjectionAliases = new LinkedHashSet<>();
+        List<QueryDiagnostic> diagnostics = new ArrayList<>();
+
+        for (VarAst projectedVar : projection.variables()) {
+            if (projection.expressionBoundVariables().contains(projectedVar.name())) {
+                validateProjectionExpression(
+                        projectedVar.name(),
+                        projection,
+                        groupBy,
+                        groupedVariables,
+                        availableProjectionAliases,
+                        diagnostics);
+                availableProjectionAliases.add(projectedVar.name());
+                continue;
+            }
+
+            if (!groupedVariables.contains(projectedVar.name()) && !availableProjectionAliases.contains(projectedVar.name())) {
+                diagnostics.add(buildGroupedProjectionDiagnostic(projectedVar.name()));
+            }
+        }
+
+        return List.copyOf(diagnostics);
+    }
+
+    private boolean hasSemanticallyVisibleGroupBy(SelectQueryAst selectQueryAst) {
+        Set<String> visibleVariables = collectVisibleVariables(selectQueryAst);
+        for (TermAst expression : selectQueryAst.solutionModifier().groupBy().expressions()) {
+            for (String referencedVariable : collectReferencedVariables(expression)) {
+                if (!visibleVariables.contains(referencedVariable)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void validateProjectionExpression(
+            String projectionVariableName,
+            ProjectionAst projection,
+            GroupByAst groupBy,
+            Set<String> groupedVariables,
+            Set<String> availableProjectionAliases,
+            List<QueryDiagnostic> diagnostics
+    ) {
+        TermAst expression = projection.expressionTerms().get(projectionVariableName);
+        if (expression == null) {
+            return;
+        }
+        if (groupBy.expressions().contains(expression)) {
+            return;
+        }
+
+        Set<String> allowedVariables = new LinkedHashSet<>(groupedVariables);
+        allowedVariables.addAll(availableProjectionAliases);
+        for (String referencedVariable : variableScopeAnalyzer.collectReferencedVariablesOutsideAggregates(expression)) {
+            if (!allowedVariables.contains(referencedVariable)) {
+                diagnostics.add(buildGroupedProjectionDiagnostic(referencedVariable));
+            }
+        }
+    }
+
+    private Set<String> collectDirectGroupedVariables(GroupByAst groupBy) {
+        Set<String> groupedVariables = new LinkedHashSet<>();
+        for (TermAst expression : groupBy.expressions()) {
+            if (expression instanceof VarAst(String name)) {
+                groupedVariables.add(name);
+            }
+        }
+        return groupedVariables;
+    }
+
+    private QueryDiagnostic buildGroupedProjectionDiagnostic(String variableName) {
+        return new QueryDiagnostic(
+                QueryDiagnostic.Kind.SEMANTIC_ERROR,
+                QueryDiagnostic.Severity.ERROR,
+                "Variable ?" + variableName + " used in SELECT projection must be grouped or aggregated",
+                -1,
+                -1,
+                "?" + variableName,
+                getDiagnosticSource());
+    }
+}
