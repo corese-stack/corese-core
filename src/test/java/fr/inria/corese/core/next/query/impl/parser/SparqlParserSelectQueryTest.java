@@ -620,6 +620,20 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should accept HAVING on a GROUP BY expression alias")
+    void shouldAcceptHavingUsingGroupByExpressionAlias() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?key WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
+                HAVING (BOUND(?key))
+                """));
+    }
+
+    @Test
     @DisplayName("Should accept projection variables visible through OPTIONAL")
     void shouldAcceptProjectionVisibleThroughOptional() {
         SparqlParser parser = newParserDefault();
