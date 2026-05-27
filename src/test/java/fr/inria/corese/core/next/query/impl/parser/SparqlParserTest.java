@@ -500,6 +500,22 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateAcceptsOrderByUsingProjectedAggregateAlias() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?s
+                ORDER BY ?count
+                """);
+
+        assertTrue(result.isValid());
+        assertTrue(result.diagnostics().isEmpty());
+    }
+
+    @Test
     void validateReturnsGroupedOrderBySemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 

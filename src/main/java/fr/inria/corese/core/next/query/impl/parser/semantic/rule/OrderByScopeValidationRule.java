@@ -60,7 +60,8 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
      * ORDER BY is applied before the final projection step. For the current
      * feature set, the variables visible from the WHERE clause remain the source
      * of truth. Explicit projection variables and GROUP BY aliases are added
-     * because they can legally be reused by later SPARQL 1.1 clauses.
+     * because they can legally be reused by ORDER BY. Stricter aggregate-query
+     * semantics are enforced separately by {@link GroupedOrderByValidationRule}.
      */
     private Set<String> collectOrderByAvailableVariables(
             SelectQueryAst queryAst,
@@ -69,7 +70,6 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
         Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
         availableVariables.addAll(queryAst.solutionModifier().groupBy().expressionBoundVariables());
         ProjectionAst projection = queryAst.projection();
-        // TODO: handle SELECT aliases, GROUP BY, and HAVING with SPARQL 1.1 support.
         if (!projection.selectAll()) {
             for (VarAst projectedVar : projection.variables()) {
                 availableVariables.add(projectedVar.name());

@@ -674,6 +674,20 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should accept ORDER BY on a projected aggregate alias")
+    void shouldAcceptOrderByUsingProjectedAggregateAlias() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY ?s
+                ORDER BY ?count
+                """));
+    }
+
+    @Test
     @DisplayName("Should accept projection variables visible through OPTIONAL")
     void shouldAcceptProjectionVisibleThroughOptional() {
         SparqlParser parser = newParserDefault();
