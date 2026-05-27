@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
@@ -19,8 +18,6 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
 
     private static final String DIAGNOSTIC_SOURCE = "SelectProjectionScopeValidationRule";
 
-    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
-
     @Override
     protected String getDiagnosticSource() {
         return DIAGNOSTIC_SOURCE;
@@ -35,7 +32,7 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
             return List.of();
         }
 
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(selectQueryAst);
+        Set<String> visibleVariables = collectVisibleVariables(selectQueryAst);
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
         validateProjectionVariables(selectQueryAst.projection(), visibleVariables, diagnostics);
         return List.copyOf(diagnostics);
@@ -52,7 +49,7 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
                 continue;
             }
             if (!visibleVariables.contains(projectedVar.name())) {
-                diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), "SELECT projection"));
+                diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), ScopeClause.SELECT_PROJECTION));
             }
         }
     }
@@ -67,11 +64,10 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
             Set<String> visibleVariables,
             List<QueryDiagnostic> diagnostics
     ) {
-        for (String referencedVariable : projection.expressionReferencedVariables()
-                .getOrDefault(projectionVariableName, Set.of())) {
-            if (!visibleVariables.contains(referencedVariable)) {
-                diagnostics.add(buildOutOfScopeDiagnostic(referencedVariable, "SELECT projection"));
-            }
-        }
+        addOutOfScopeDiagnostics(
+                projection.expressionReferencedVariables().getOrDefault(projectionVariableName, Set.of()),
+                visibleVariables,
+                ScopeClause.SELECT_PROJECTION,
+                diagnostics);
     }
 }

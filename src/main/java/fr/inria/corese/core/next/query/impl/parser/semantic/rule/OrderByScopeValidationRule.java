@@ -1,8 +1,16 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -16,8 +24,6 @@ import java.util.Set;
 public final class OrderByScopeValidationRule extends AbstractSemanticValidationRule {
 
     private static final String DIAGNOSTIC_SOURCE = "OrderByScopeValidationRule";
-
-    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
     @Override
     protected String getDiagnosticSource() {
@@ -41,7 +47,7 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
     }
 
     private List<QueryDiagnostic> validateSelectQuery(SelectQueryAst queryAst) {
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(queryAst);
+        Set<String> visibleVariables = collectVisibleVariables(queryAst);
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
         validateOrderVariables(
                 collectOrderByAvailableVariables(queryAst.projection(), visibleVariables),
@@ -55,7 +61,7 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
             SolutionModifierAst solutionModifier
     ) {
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(whereClause);
+        Set<String> visibleVariables = collectVisibleVariables(whereClause);
         validateOrderVariables(visibleVariables, solutionModifier, diagnostics);
         return List.copyOf(diagnostics);
     }
@@ -86,14 +92,11 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
             List<QueryDiagnostic> diagnostics
     ) {
         for (OrderConditionAst orderCondition : solutionModifier.orderBy()) {
-            Set<String> referencedVariables = variableScopeAnalyzer
-                    .collectReferencedVariables(orderCondition.expression());
-
-            for (String variableName : referencedVariables) {
-                if (!availableOrderVariables.contains(variableName)) {
-                    diagnostics.add(buildOutOfScopeDiagnostic(variableName, "ORDER BY"));
-                }
-            }
+            addOutOfScopeDiagnostics(
+                    collectReferencedVariables(orderCondition.expression()),
+                    availableOrderVariables,
+                    ScopeClause.ORDER_BY,
+                    diagnostics);
         }
     }
 }

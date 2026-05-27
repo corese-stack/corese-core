@@ -11,6 +11,10 @@ import java.util.*;
  * can appear in the query solutions. A referenced variable is only mentioned
  * in an expression such as FILTER or ORDER BY; mentioning it there does not
  * make it visible.
+ *
+ * <p>Referenced-variable collection is intentionally incremental. When a new
+ * expression shape matters for semantic validation, support should be added
+ * here explicitly instead of inferred elsewhere.</p>
  */
 public final class VariableScopeAnalyzer {
 
@@ -40,18 +44,16 @@ public final class VariableScopeAnalyzer {
     public Set<String> collectVisibleVariables(ValuesAst valuesClause) {
         Set<String> visibleVariables = new LinkedHashSet<>();
 
-        if(valuesClause == null) {
+        if (valuesClause == null) {
             return visibleVariables;
         }
 
         valuesClause.mappings().forEach(valueMappingAst -> {
-            Set<String> varNameSet = new HashSet<>();
             valueMappingAst.values().keySet().forEach(varAst -> {
-                if(varAst != null) {
-                    varNameSet.add(varAst.name());
+                if (varAst != null) {
+                    visibleVariables.add(varAst.name());
                 }
             });
-            visibleVariables.addAll(varNameSet);
         });
 
         return visibleVariables;
@@ -251,7 +253,7 @@ public final class VariableScopeAnalyzer {
                     collectReferencedVariables(expression, referencedVariables);
 
             case ConstraintAst ignored -> {
-                // Other constraint shapes are ignored until they are supported here.
+                // Other constraint shapes must be added explicitly when scope validation starts relying on them.
             }
         }
     }
