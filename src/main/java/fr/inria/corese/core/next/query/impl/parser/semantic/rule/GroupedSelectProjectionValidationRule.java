@@ -126,6 +126,7 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
 
     private Set<String> collectDirectGroupedVariables(GroupByAst groupBy) {
         Set<String> groupedVariables = new LinkedHashSet<>();
+        groupedVariables.addAll(groupBy.expressionBoundVariables());
         for (TermAst expression : groupBy.expressions()) {
             if (expression instanceof VarAst(String name)) {
                 groupedVariables.add(name);

@@ -33,10 +33,19 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
             return List.of();
         }
 
-        Set<String> visibleVariables = collectVisibleVariables(selectQueryAst);
+        Set<String> visibleVariables = collectSelectAvailableVariables(selectQueryAst);
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
         validateProjectionVariables(selectQueryAst.projection(), visibleVariables, diagnostics);
         return List.copyOf(diagnostics);
+    }
+
+    /**
+     * SELECT projections can reuse aliases introduced by {@code GROUP BY (expr AS ?var)}.
+     */
+    private Set<String> collectSelectAvailableVariables(SelectQueryAst selectQueryAst) {
+        Set<String> visibleVariables = new LinkedHashSet<>(collectVisibleVariables(selectQueryAst));
+        visibleVariables.addAll(selectQueryAst.solutionModifier().groupBy().expressionBoundVariables());
+        return visibleVariables;
     }
 
     private void validateProjectionVariables(

@@ -419,6 +419,21 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateAcceptsGroupByExpressionAliasProjection() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT ?key WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
+                """);
+
+        assertTrue(result.isValid());
+        assertTrue(result.diagnostics().isEmpty());
+    }
+
+    @Test
     void validateReturnsHavingSemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 
