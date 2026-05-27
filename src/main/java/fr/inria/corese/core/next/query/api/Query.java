@@ -12,22 +12,22 @@ import fr.inria.corese.core.next.query.api.result.TupleQueryResult;
 public interface Query<T> extends Operation {
 
     /**
-     * The different types of operations supported by the engine:
-     * boolean, graph, and tuple operations.
+     * The different types of queries supported by the engine:
+     * boolean, graph, and tuple queries.
      */
     enum QueryType {
         /**
-         * Boolean operations (e.g., SPARQL ASK) return a single {@code true} / {@code false} result.
+         * Boolean queries (e.g., SPARQL ASK) return a single {@code true} / {@code false} result.
          */
         BOOLEAN,
 
         /**
-         * Graph operations (e.g., SPARQL CONSTRUCT / DESCRIBE) return a sequence of RDF triples.
+         * Graph queries (e.g., SPARQL CONSTRUCT / DESCRIBE) return a sequence of RDF triples.
          */
         GRAPH,
 
         /**
-         * Tuple operations (e.g., SPARQL SELECT) return a sequence of variable bindings.
+         * Tuple queries (e.g., SPARQL SELECT) return a sequence of variable bindings.
          */
         TUPLE
     }
@@ -59,8 +59,8 @@ public interface Query<T> extends Operation {
      * Evaluates the query against the dataset.
      *
      * @return The result type expected: {@link TupleQueryResult}
-     *         for SELECT operations, {@link GraphQueryResult}
-     *         for CONSTRUCT/DESCRIBE operations, or {@link Boolean} for ASK operations
+     *         for SELECT queries, {@link GraphQueryResult}
+     *         for CONSTRUCT/DESCRIBE queries, or {@link Boolean} for ASK queries
      * @throws QueryEvaluationException if an error occurs during query evaluation
      */
     T evaluate() throws QueryEvaluationException;

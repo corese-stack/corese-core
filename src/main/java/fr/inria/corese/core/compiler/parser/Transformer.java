@@ -598,7 +598,7 @@ public class Transformer implements ExpType {
 
     /**
      * subquery is compiled using a new compiler to get fresh new nodes to
-     * prevent type inference on nodes between outer and sub operations
+     * prevent type inference on nodes between outer and sub queries
      */
     Query compileQuery(ASTQuery ast) throws EngineException {
         // new

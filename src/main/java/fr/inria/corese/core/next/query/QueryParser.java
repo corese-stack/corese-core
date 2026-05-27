@@ -6,9 +6,9 @@ import java.io.InputStream;
 import java.io.Reader;
 
 /**
- * A parser for SPARQL operations.
+ * A parser for SPARQL queries.
  *
- * <p>This interface defines methods for parsing SPARQL operations from
+ * <p>This interface defines methods for parsing SPARQL queries from
  * various input sources (InputStream, Reader, or String) and producing
  * a {@link QueryAst} representation.</p>
  *

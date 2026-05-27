@@ -51,7 +51,7 @@ public class UpdateProcess {
     }
 
     /**
-     * Process an update sparql query There may be a list of operations return the
+     * Process an update sparql query There may be a list of queries return the
      * Mappings of the last update ...
      */
     public Mappings update(Query q, Mapping m, Binding bind) throws EngineException {

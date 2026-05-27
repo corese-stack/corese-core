@@ -161,7 +161,7 @@ public class QueryEngine implements Engine {
      * Determines if a query should be cached
      */
     private boolean shouldCache(String queryString) {
-        // Do not cache very long operations or UPDATE operations
+        // Do not cache very long queries or UPDATE queries
         return queryString != null
                 && queryString.length() <= MAX_QUERY_LENGTH_FOR_CACHE
                 && !queryString.toUpperCase().contains("INSERT")
