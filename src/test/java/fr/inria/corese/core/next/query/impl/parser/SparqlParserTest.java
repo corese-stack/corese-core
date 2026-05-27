@@ -500,6 +500,23 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateReturnsGroupedOrderBySemanticDiagnostic() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT ?s WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?s
+                ORDER BY ?o
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(1, result.diagnostics().size());
+        assertEquals("GroupedOrderByValidationRule", result.diagnostics().getFirst().source());
+    }
+
+    @Test
     void validateReturnsDescribeSemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 
