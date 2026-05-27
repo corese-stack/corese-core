@@ -10,10 +10,12 @@ public class ASTConstants {
         CONSTRUCT,
         DESCRIBE,
         SELECT,
+        UNDEFINED
+    }
 
+    public enum UPDATE_QUERY_TYPE {
         LOAD,
         CLEAR,
-
         UNDEFINED
     }
 

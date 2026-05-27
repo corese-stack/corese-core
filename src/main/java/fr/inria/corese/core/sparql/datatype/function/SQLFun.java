@@ -81,7 +81,7 @@ public class SQLFun {
 	 * The results are returned as a list of lists of strings,
 	 * ensuring that all JDBC resources are properly closed.
 	 * <p>
-	 * This is the preferred method for executing SQL queries as it safely handles
+	 * This is the preferred method for executing SQL operations as it safely handles
 	 * resource management by processing the ResultSet internally.
 	 *
 	 * @param uri    The JDBC connection URI.

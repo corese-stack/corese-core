@@ -517,7 +517,7 @@ class StorageModelTest {
         }
 
         @Test
-        @DisplayName("Should allow queries on unmodifiable model")
+        @DisplayName("Should allow operations on unmodifiable model")
         void shouldAllowQueriesOnUnmodifiableModel() throws StorageException {
             when(mockQueryOps.exists(any(StatementPattern.class))).thenReturn(true);
 

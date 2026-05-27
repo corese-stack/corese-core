@@ -52,7 +52,7 @@ public class Context implements Graphable {
     }
 
     /**
-     * -1 is all queries
+     * -1 is all operations
      * 0 is last, 1 is before last ...
      */
     public Node getQueryNode(int n) {

@@ -11,7 +11,7 @@ import fr.inria.corese.core.next.query.api.*;
  * evaluation and data updates.
  * <p>
  * A {@code RepositoryConnection} represents a lightweight session object:
- * it encapsulates the state needed to evaluate SPARQL queries, prepare updates,
+ * it encapsulates the state needed to evaluate SPARQL operations, prepare updates,
  * manage datasets (FROM / FROM NAMED), and optionally participate in transactions.
  * </p>
  *
@@ -100,7 +100,7 @@ public interface RepositoryConnection extends AutoCloseable {
     // --- Dataset for this connection (FROM / FROM NAMED) ---
 
     /**
-     * Sets a connection-scoped dataset used for all queries prepared
+     * Sets a connection-scoped dataset used for all operations prepared
      * by this connection. This overrides any dataset declared inside
      * the query itself.
      *

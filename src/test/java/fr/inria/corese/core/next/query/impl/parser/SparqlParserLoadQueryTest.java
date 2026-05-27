@@ -3,8 +3,9 @@ package fr.inria.corese.core.next.query.impl.parser;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.io.parser.QueryParser;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LoadQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LoadRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,8 +20,11 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
                 """;
 
         QueryAst queryAst = parser.parse(query);
-        assertInstanceOf(LoadQueryAst.class, queryAst);
-        LoadQueryAst loadQueryAst = (LoadQueryAst) queryAst;
+        assertInstanceOf(UpdateRequestAst.class, queryAst);
+        UpdateRequestAst updateRequestAst = (UpdateRequestAst) queryAst;
+        assertEquals(1, updateRequestAst.operations().size());
+        assertInstanceOf(LoadRequestAst.class, updateRequestAst.operations().getFirst());
+        LoadRequestAst loadQueryAst = (LoadRequestAst) updateRequestAst.operations().getFirst();
         assertNotNull(loadQueryAst.fromClause());
         IriAst graphIri = loadQueryAst.fromClause().graph();
         assertEquals("<http://ns.inria.fr/test>", graphIri.raw());
@@ -36,8 +40,11 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
                 """;
 
         QueryAst queryAst = parser.parse(query);
-        assertInstanceOf(LoadQueryAst.class, queryAst);
-        LoadQueryAst loadQueryAst = (LoadQueryAst) queryAst;
+        assertInstanceOf(UpdateRequestAst.class, queryAst);
+        UpdateRequestAst updateRequestAst = (UpdateRequestAst) queryAst;
+        assertEquals(1, updateRequestAst.operations().size());
+        assertInstanceOf(LoadRequestAst.class, updateRequestAst.operations().getFirst());
+        LoadRequestAst loadQueryAst = (LoadRequestAst) updateRequestAst.operations().getFirst();
         assertNotNull(loadQueryAst.fromClause());
         assertNotNull(loadQueryAst.fromClause().graph());
         IriAst graphIri = loadQueryAst.fromClause().graph();
@@ -54,8 +61,11 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
                 """;
 
         QueryAst queryAst = parser.parse(query);
-        assertInstanceOf(LoadQueryAst.class, queryAst);
-        LoadQueryAst loadQueryAst = (LoadQueryAst) queryAst;
+        assertInstanceOf(UpdateRequestAst.class, queryAst);
+        UpdateRequestAst updateRequestAst = (UpdateRequestAst) queryAst;
+        assertEquals(1, updateRequestAst.operations().size());
+        assertInstanceOf(LoadRequestAst.class, updateRequestAst.operations().getFirst());
+        LoadRequestAst loadQueryAst = (LoadRequestAst) updateRequestAst.operations().getFirst();
         assertNotNull(loadQueryAst.fromClause());
         assertNotNull(loadQueryAst.fromClause().graph());
         IriAst graphIri = loadQueryAst.fromClause().graph();
@@ -75,8 +85,11 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
                 """;
 
         QueryAst queryAst = parser.parse(query);
-        assertInstanceOf(LoadQueryAst.class, queryAst);
-        LoadQueryAst loadQueryAst = (LoadQueryAst) queryAst;
+        assertInstanceOf(UpdateRequestAst.class, queryAst);
+        UpdateRequestAst updateRequestAst = (UpdateRequestAst) queryAst;
+        assertEquals(1, updateRequestAst.operations().size());
+        assertInstanceOf(LoadRequestAst.class, updateRequestAst.operations().getFirst());
+        LoadRequestAst loadQueryAst = (LoadRequestAst) updateRequestAst.operations().getFirst();
         assertNotNull(loadQueryAst.fromClause());
         assertNotNull(loadQueryAst.fromClause().graph());
         IriAst graphIri = loadQueryAst.fromClause().graph();

@@ -13,7 +13,7 @@ import java.io.Reader;
  * SELECT/CONSTRUCT/DESCRIBE.</p>
  *
  * <p>Validation is intended to behave like a linter: malformed or semantically
- * invalid queries should be reported through {@link QueryDiagnostic}
+ * invalid operations should be reported through {@link QueryDiagnostic}
  * instances collected in the returned {@link QueryValidationResult}, rather
  * than through query-invalidity exceptions. Technical failures unrelated to the
  * query text itself, such as I/O failures while reading the input, may still

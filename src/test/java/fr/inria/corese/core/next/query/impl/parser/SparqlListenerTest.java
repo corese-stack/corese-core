@@ -37,7 +37,7 @@ class SparqlListenerTest {
     @Test
     void constructorWithDelegatesCopiesList() {
         BgpFeature feature = new BgpFeature(
-                new SparqlAstBuilder(new SparqlParserOptions.Builder().build()));
+                new SparqlQueryAstBuilder(new SparqlParserOptions.Builder().build()));
         List<BgpFeature> mutable = new java.util.ArrayList<>(List.of(feature));
         SparqlListener listener = new SparqlListener(mutable);
         mutable.clear();
@@ -52,7 +52,7 @@ class SparqlListenerTest {
     @Test
     void withSingleBgpDelegateWalkProducesAst() {
         SparqlParserOptions opts = new SparqlParserOptions.Builder().build();
-        SparqlAstBuilder builder = new SparqlAstBuilder(opts);
+        SparqlQueryAstBuilder builder = new SparqlQueryAstBuilder(opts);
         SparqlListener listener = new SparqlListener(List.of(new BgpFeature(builder), new SelectQueryFeature(builder)));
 
         fr.inria.corese.core.next.impl.parser.antlr.SparqlParser antlrParser = createAntlrParser("SELECT * WHERE { ?s ?p ?o }");

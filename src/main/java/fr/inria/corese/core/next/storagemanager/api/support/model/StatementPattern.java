@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Pattern for matching statements in queries.
+ * Pattern for matching statements in operations.
  * Each component can be null to act as a wildcard.
  */
 public class StatementPattern {

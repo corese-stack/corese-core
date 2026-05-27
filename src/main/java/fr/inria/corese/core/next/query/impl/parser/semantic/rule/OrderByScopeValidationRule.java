@@ -36,8 +36,7 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
                     describeQueryAst.solutionModifier());
             // TODO: handle ASK solution modifiers with SPARQL 1.1 support.
             case AskQueryAst ignored -> List.of();
-            case LoadQueryAst ignored -> List.of();
-            case ClearQueryAst ignored -> List.of();
+            case UpdateRequestAst ignored -> List.of();
         };
     }
 

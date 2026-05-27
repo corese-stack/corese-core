@@ -110,31 +110,48 @@ final class SparqlQueryAnalyzer {
     }
 
     private QueryAst buildAst(ParseTree tree, SparqlParserOptions options) {
-        SparqlAstBuilder builder = new SparqlAstBuilder(options);
+        SparqlQueryAstBuilder queryBuilder = new SparqlQueryAstBuilder(options);
+        SparqlUpdateAstBuilder updateBuilder = new SparqlUpdateAstBuilder(options);
 
-        SparqlListener listener = new SparqlListener(List.of(
-                new BgpFeature(builder),
-                new AskQueryFeature(builder),
-                new SelectQueryFeature(builder),
-                new ConstructQueryFeature(builder),
-                new SolutionModifierFeature(builder),
-                new HavingFeature(builder),
-                new FilterFeature(builder),
-                new UnionFeature(builder),
-                new MinusFeature(builder),
-                new DescribeQueryFeature(builder),
-                new DatasetClauseFeature(builder),
-                new PrologueFeature(builder),
-                new BindFeature(builder),
-                new ServiceFeature(builder),
-                new ValuesFeature(builder),
-                new LoadQueryFeature(builder),
-                new ClearQueryFeature(builder)
+        SparqlListener queryListener = new SparqlListener(List.of(
+                new AskQueryFeature(queryBuilder),
+                new ConstructQueryFeature(queryBuilder),
+                new DescribeQueryFeature(queryBuilder),
+                new SelectQueryFeature(queryBuilder),
+                new DatasetClauseFeature(queryBuilder),
+                new HavingFeature(queryBuilder),
+                new SolutionModifierFeature(queryBuilder),
+                new ValuesFeature(queryBuilder),
+                new BgpFeature(queryBuilder),
+                new FilterFeature(queryBuilder),
+                new UnionFeature(queryBuilder),
+                new MinusFeature(queryBuilder),
+                new PrologueFeature(queryBuilder),
+                new BindFeature(queryBuilder),
+                new ServiceFeature(queryBuilder)
+        ));
+
+        SparqlListener updateListener = new SparqlListener(List.of(
+                new ClearRequestFeature(updateBuilder),
+                new LoadRequestFeature(updateBuilder),
+                new BgpFeature(updateBuilder),
+                new BindFeature(updateBuilder),
+                new FilterFeature(updateBuilder),
+                new MinusFeature(updateBuilder),
+                new PrologueFeature(updateBuilder),
+                new ServiceFeature(updateBuilder),
+                new UnionFeature(updateBuilder)
         ));
 
         ParseTreeWalker walker = new ParseTreeWalker();
-        walker.walk(listener, tree);
-        return builder.getResult();
+        walker.walk(updateListener, tree);
+        walker.walk(queryListener, tree);
+
+        try {
+            return queryBuilder.getResult();
+        } catch (QuerySyntaxException | QueryValidationException | IllegalStateException e) {
+            return updateBuilder.getResult();
+        }
     }
 
     private List<QueryDiagnostic> mapSyntaxDiagnostics(List<SparqlAstError> diagnostics) {

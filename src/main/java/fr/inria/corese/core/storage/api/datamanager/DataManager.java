@@ -5,8 +5,8 @@ import fr.inria.corese.core.sparql.triple.parser.HashMapList;
 
 /**
  * Interface to adapt an external storage system to Corese.
- * {@code DataManagerRead} for {@code select where} SPARQL queries.
- * {@code DataManagerUpdate} for {@code update} and {@code construct} queries.
+ * {@code DataManagerRead} for {@code select where} SPARQL operations.
+ * {@code DataManagerUpdate} for {@code update} and {@code construct} operations.
  * 
  * @author Olivier Corby
  * @author Rémi ceres

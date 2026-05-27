@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  * Parses {@code havingClause} ({@code HAVING havingCondition+}) into {@link fr.inria.corese.core.next.query.impl.sparql.ast.HavingAst}
  * conditions on the active {@link SparqlAstBuilder} SELECT frame (or top-level modifier lists for ASK / CONSTRUCT / DESCRIBE).
  */
-public class HavingFeature extends AbstractSparqlFeature {
+public class HavingFeature extends AbstractSparqlQueryFeature {
 
     public HavingFeature(SparqlAstBuilder builder) {
         super(builder);
@@ -18,7 +18,7 @@ public class HavingFeature extends AbstractSparqlFeature {
     @Override
     public void exitHavingClause(SparqlParser.HavingClauseContext ctx) {
         for (SparqlParser.HavingConditionContext condition : ctx.havingCondition()) {
-            builder().addHavingCondition(havingConditionToTerm(condition));
+            queryBuilder().addHavingCondition(havingConditionToTerm(condition));
         }
     }
 
