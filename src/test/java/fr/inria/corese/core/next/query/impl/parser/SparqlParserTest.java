@@ -467,6 +467,23 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateReturnsGroupedHavingSemanticDiagnostic() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT ?s WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?s
+                HAVING (BOUND(?o))
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(1, result.diagnostics().size());
+        assertEquals("GroupedHavingValidationRule", result.diagnostics().getFirst().source());
+    }
+
+    @Test
     void validateAcceptsOrderByUsingGroupByExpressionAlias() {
         SparqlParser parser = new SparqlParser();
 

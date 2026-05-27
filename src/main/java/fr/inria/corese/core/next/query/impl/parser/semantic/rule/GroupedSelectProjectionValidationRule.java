@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupByAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
@@ -26,8 +25,6 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
 
     private static final String DIAGNOSTIC_SOURCE = "GroupedSelectProjectionValidationRule";
 
-    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
-
     @Override
     protected String getDiagnosticSource() {
         return DIAGNOSTIC_SOURCE;
@@ -50,7 +47,7 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
 
         ProjectionAst projection = selectQueryAst.projection();
         GroupByAst groupBy = selectQueryAst.solutionModifier().groupBy();
-        Set<String> groupedVariables = collectDirectGroupedVariables(groupBy);
+        Set<String> groupedVariables = collectGroupedVariableNames(groupBy);
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
 
         for (VarAst projectedVar : projection.variables()) {
@@ -80,36 +77,6 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
         return List.of(buildSelectAllGroupedDiagnostic());
     }
 
-    private boolean isAggregateQueryLevel(SelectQueryAst selectQueryAst) {
-        if (selectQueryAst.solutionModifier().hasGroupBy()) {
-            return true;
-        }
-
-        ProjectionAst projection = selectQueryAst.projection();
-        for (String variableName : projection.expressionBoundVariables()) {
-            if (variableScopeAnalyzer.containsAggregate(projection.expressionTerms().get(variableName))) {
-                return true;
-            }
-        }
-
-        return selectQueryAst.solutionModifier().having().conditions().stream()
-                .anyMatch(variableScopeAnalyzer::containsAggregate)
-                || selectQueryAst.solutionModifier().orderBy().stream()
-                .anyMatch(orderCondition -> variableScopeAnalyzer.containsAggregate(orderCondition.expression()));
-    }
-
-    private boolean hasSemanticallyVisibleGroupBy(SelectQueryAst selectQueryAst) {
-        Set<String> visibleVariables = collectVisibleVariables(selectQueryAst);
-        for (TermAst expression : selectQueryAst.solutionModifier().groupBy().expressions()) {
-            for (String referencedVariable : collectReferencedVariables(expression)) {
-                if (!visibleVariables.contains(referencedVariable)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     private void validateProjectionExpression(
             String projectionVariableName,
             ProjectionAst projection,
@@ -119,20 +86,9 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
         if (expression == null) {
             return;
         }
-        for (String referencedVariable : variableScopeAnalyzer.collectReferencedVariablesOutsideAggregates(expression)) {
+        for (String referencedVariable : collectReferencedVariablesOutsideAggregates(expression)) {
             diagnostics.add(buildGroupedProjectionDiagnostic(referencedVariable));
         }
-    }
-
-    private Set<String> collectDirectGroupedVariables(GroupByAst groupBy) {
-        Set<String> groupedVariables = new LinkedHashSet<>();
-        groupedVariables.addAll(groupBy.expressionBoundVariables());
-        for (TermAst expression : groupBy.expressions()) {
-            if (expression instanceof VarAst(String name)) {
-                groupedVariables.add(name);
-            }
-        }
-        return groupedVariables;
     }
 
     private QueryDiagnostic buildGroupedProjectionDiagnostic(String variableName) {

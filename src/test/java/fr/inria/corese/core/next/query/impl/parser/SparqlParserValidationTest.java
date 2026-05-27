@@ -27,6 +27,8 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             "Variable ?z used in GROUP BY is not visible in WHERE clause";
     private static final String HAVING_SCOPE_MESSAGE =
             "Variable ?z used in HAVING is not visible in WHERE clause";
+    private static final String GROUPED_HAVING_MESSAGE =
+            "Variable ?o used in HAVING must be grouped or aggregated";
     private static final String UNGROUPED_PROJECTION_MESSAGE =
             "Variable ?o used in SELECT projection must be grouped or aggregated";
     private static final String SELECT_ALL_GROUP_BY_MESSAGE =
@@ -304,6 +306,25 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                         HAVING (BOUND(?z))
                         """,
                         HAVING_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject grouped HAVING expression using a variable that is neither grouped nor aggregated",
+                        """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        HAVING (BOUND(?o))
+                        """,
+                        GROUPED_HAVING_MESSAGE),
+                Arguments.of(
+                        "Should reject implicit aggregate HAVING expression using a non-aggregated variable",
+                        """
+                        SELECT (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        HAVING (BOUND(?s))
+                        """,
+                        "Variable ?s used in HAVING must be grouped or aggregated"),
                 Arguments.of(
                         "Should reject SELECT projection variables not visible in WHERE",
                         """

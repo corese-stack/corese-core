@@ -5,12 +5,15 @@ import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScop
 import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupByAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,6 +48,52 @@ public abstract class AbstractSemanticValidationRule implements SemanticValidati
 
     protected final Set<String> collectReferencedVariables(TermAst term) {
         return variableScopeAnalyzer.collectReferencedVariables(term);
+    }
+
+    protected final Set<String> collectReferencedVariablesOutsideAggregates(TermAst term) {
+        return variableScopeAnalyzer.collectReferencedVariablesOutsideAggregates(term);
+    }
+
+    protected final boolean containsAggregate(TermAst term) {
+        return variableScopeAnalyzer.containsAggregate(term);
+    }
+
+    protected final boolean isAggregateQueryLevel(QueryAst queryAst) {
+        if (getSolutionModifier(queryAst).hasGroupBy()) {
+            return true;
+        }
+        if (queryAst instanceof SelectQueryAst selectQueryAst) {
+            for (String variableName : selectQueryAst.projection().expressionBoundVariables()) {
+                if (containsAggregate(selectQueryAst.projection().expressionTerms().get(variableName))) {
+                    return true;
+                }
+            }
+        }
+        return getSolutionModifier(queryAst).having().conditions().stream().anyMatch(this::containsAggregate)
+                || getSolutionModifier(queryAst).orderBy().stream()
+                .anyMatch(orderCondition -> containsAggregate(orderCondition.expression()));
+    }
+
+    protected final boolean hasSemanticallyVisibleGroupBy(QueryAst queryAst) {
+        Set<String> visibleVariables = collectVisibleVariables(queryAst);
+        for (TermAst expression : getSolutionModifier(queryAst).groupBy().expressions()) {
+            for (String referencedVariable : collectReferencedVariables(expression)) {
+                if (!visibleVariables.contains(referencedVariable)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    protected final Set<String> collectGroupedVariableNames(GroupByAst groupByAst) {
+        Set<String> groupedVariables = new LinkedHashSet<>(groupByAst.expressionBoundVariables());
+        for (TermAst expression : groupByAst.expressions()) {
+            if (expression instanceof VarAst(String name)) {
+                groupedVariables.add(name);
+            }
+        }
+        return groupedVariables;
     }
 
     protected final void addOutOfScopeDiagnostics(

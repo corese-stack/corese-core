@@ -599,8 +599,6 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSelectWithGroupByAndHaving() {
         SparqlParser parser = newParserDefault();
 
-        // Aggregates (e.g. COUNT) in SELECT / HAVING are not yet mapped in termFromBuiltInCall;
-        // use a built-in constraint to exercise the HAVING → HavingAst pipeline.
         QueryAst ast = parser.parse("""
                 SELECT ?s
                 WHERE {
@@ -630,6 +628,20 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                 }
                 GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
                 HAVING (BOUND(?key))
+                """));
+    }
+
+    @Test
+    @DisplayName("Should accept HAVING with an aggregate condition")
+    void shouldAcceptHavingUsingAggregateCondition() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?s WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY ?s
+                HAVING (COUNT(?o) > 1)
                 """));
     }
 
