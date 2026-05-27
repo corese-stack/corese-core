@@ -327,6 +327,21 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateReturnsImplicitAggregateProjectionSemanticDiagnostic() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                    ?s ?p ?o
+                }
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(1, result.diagnostics().size());
+        assertEquals("GroupedSelectProjectionValidationRule", result.diagnostics().getFirst().source());
+    }
+
+    @Test
     void validateReturnsSelectExpressionSemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 
@@ -356,7 +371,7 @@ class SparqlParserTest {
     }
 
     @Test
-    void validateAcceptsGroupedSelectExpressionMatchingGroupExpression() {
+    void validateRejectsGroupedSelectExpressionMatchingGroupExpression() {
         SparqlParser parser = new SparqlParser();
 
         QueryValidationResult result = parser.validate("""
@@ -364,6 +379,22 @@ class SparqlParserTest {
                     ?s ?p ?o
                 }
                 GROUP BY CONCAT(?s, ?o)
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(2, result.diagnostics().size());
+        assertTrue(result.diagnostics().stream()
+                .allMatch(diagnostic -> "GroupedSelectProjectionValidationRule".equals(diagnostic.source())));
+    }
+
+    @Test
+    void validateAcceptsImplicitAggregateProjection() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT (COUNT(?o) AS ?count) WHERE {
+                    ?s ?p ?o
+                }
                 """);
 
         assertTrue(result.isValid());

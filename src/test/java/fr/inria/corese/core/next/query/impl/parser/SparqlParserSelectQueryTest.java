@@ -653,23 +653,24 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("Should accept grouped SELECT expressions that exactly match a GROUP BY expression")
-    void shouldAcceptGroupedSelectExpressionMatchingGroupExpression() {
+    @DisplayName("Should accept grouped SELECT constant projections")
+    void shouldAcceptGroupedSelectConstantProjection() {
         SparqlParser parser = newParserDefault();
 
         QueryAst ast = parser.parse("""
-                SELECT (CONCAT(?s, ?o) AS ?key) WHERE {
+                SELECT ?s ("group" AS ?label) WHERE {
                     ?s ?p ?o
                 }
-                GROUP BY CONCAT(?s, ?o)
+                GROUP BY ?s
                 """);
 
         SelectQueryAst selectQueryAst = assertInstanceOf(SelectQueryAst.class, ast);
         ProjectionAst projection = selectQueryAst.projection();
         assertFalse(projection.selectAll());
-        assertEquals(1, projection.variables().size());
-        assertEquals("key", projection.variables().getFirst().name());
-        assertTrue(projection.expressionBoundVariables().contains("key"));
+        assertEquals(2, projection.variables().size());
+        assertEquals("s", projection.variables().getFirst().name());
+        assertEquals("label", projection.variables().get(1).name());
+        assertTrue(projection.expressionBoundVariables().contains("label"));
     }
 
     @Test
@@ -682,6 +683,18 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                     ?s ?p ?o
                 }
                 GROUP BY ?s
+                """));
+    }
+
+    @Test
+    @DisplayName("Should accept implicit aggregate SELECT projections")
+    void shouldAcceptImplicitAggregateProjection() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT (COUNT(?o) AS ?count) WHERE {
+                    ?s ?p ?o
+                }
                 """));
     }
 

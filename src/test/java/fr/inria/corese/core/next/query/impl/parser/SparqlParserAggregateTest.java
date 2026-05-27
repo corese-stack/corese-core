@@ -218,8 +218,8 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAggregateInOrderBy() {
         SparqlParser parser = newParserDefault();
 
-        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
-                SELECT ?s WHERE {
+        QueryAst ast = parser.parse("""
+                SELECT (AVG(?val) AS ?avg) WHERE {
                     ?s ?p ?val
                 }
                 ORDER BY AVG(?val)

@@ -102,6 +102,69 @@ public final class VariableScopeAnalyzer {
         return referencedVariables;
     }
 
+    /**
+     * Returns {@code true} when the given term contains at least one aggregate call.
+     *
+     * @param term the term or expression to inspect
+     * @return {@code true} if an aggregate call occurs anywhere inside the term
+     */
+    public boolean containsAggregate(TermAst term) {
+        if (term == null) {
+            return false;
+        }
+
+        return switch (term) {
+            case AggregateAst ignored -> true;
+
+            case UnaryConstraintAst unaryConstraint ->
+                    containsAggregate(unaryConstraint.getArgument());
+
+            case BinaryConstraintAst binaryConstraint ->
+                    containsAggregate(binaryConstraint.getLeftArgument())
+                            || containsAggregate(binaryConstraint.getRightArgument());
+
+            case FunctionCallAst(TermAst ignored, List<TermAst> arguments) -> arguments.stream()
+                    .anyMatch(this::containsAggregate);
+
+            case BnodeAst bnodeAst -> containsAggregate(bnodeAst.getLabel());
+
+            case TrinaryRegexAst regexAst ->
+                    containsAggregate(regexAst.getString())
+                            || containsAggregate(regexAst.getPattern())
+                            || containsAggregate(regexAst.getFlags());
+
+            case SubstrAst substrAst ->
+                    containsAggregate(substrAst.getString())
+                            || containsAggregate(substrAst.getStart())
+                            || containsAggregate(substrAst.getLength());
+
+            case ReplaceAst replaceAst ->
+                    containsAggregate(replaceAst.getString())
+                            || containsAggregate(replaceAst.getPattern())
+                            || containsAggregate(replaceAst.getReplacement())
+                            || (replaceAst.hasFlags() && containsAggregate(replaceAst.getFlags()));
+
+            case IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) ->
+                    containsAggregate(condition)
+                            || containsAggregate(thenExpr)
+                            || containsAggregate(elseExpr);
+
+            case CoalesceAst(List<TermAst> arguments) -> arguments.stream().anyMatch(this::containsAggregate);
+
+            case ConcatAst(List<TermAst> arguments) -> arguments.stream().anyMatch(this::containsAggregate);
+
+            case InAst(TermAst left, List<TermAst> candidates) ->
+                    containsAggregate(left) || candidates.stream().anyMatch(this::containsAggregate);
+
+            case NotInAst(TermAst left, List<TermAst> candidates) ->
+                    containsAggregate(left) || candidates.stream().anyMatch(this::containsAggregate);
+
+            case StrLenAst(TermAst argument) -> containsAggregate(argument);
+
+            default -> false;
+        };
+    }
+
     private void collectVisibleVariables(PatternAst pattern, Set<String> visibleVariables) {
         if (pattern == null) {
             return;

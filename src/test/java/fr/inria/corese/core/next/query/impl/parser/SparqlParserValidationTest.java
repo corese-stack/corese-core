@@ -259,6 +259,31 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                         """,
                         UNGROUPED_PROJECTION_MESSAGE),
                 Arguments.of(
+                        "Should reject grouped SELECT expression that only reuses GROUP BY expression variables without aggregation",
+                        """
+                        SELECT (CONCAT(?s, ?o) AS ?key) WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY CONCAT(?s, ?o)
+                        """,
+                        "Variable ?s used in SELECT projection must be grouped or aggregated"),
+                Arguments.of(
+                        "Should reject implicit aggregate query projecting a non-aggregated variable",
+                        """
+                        SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        """,
+                        "Variable ?s used in SELECT projection must be grouped or aggregated"),
+                Arguments.of(
+                        "Should reject implicit aggregate query projection expression using a non-aggregated variable",
+                        """
+                        SELECT (STR(?s) AS ?label) (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        """,
+                        "Variable ?s used in SELECT projection must be grouped or aggregated"),
+                Arguments.of(
                         "Should reject HAVING expression using a variable not visible in WHERE",
                         """
                         SELECT ?s WHERE {

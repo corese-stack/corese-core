@@ -15,10 +15,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Validates explicit SELECT projections in grouped queries.
+ * Validates SELECT projections in aggregate query levels.
  *
- * <p>For explicit {@code GROUP BY}, projected expressions may either match a grouping
- * expression exactly, or only reference grouped variables outside aggregate calls.</p>
+ * <p>For query levels using explicit or implicit grouping, only aggregates and constants
+ * may appear in projected expressions. The only exception is that variables projected
+ * directly from simple {@code GROUP BY ?var} terms remain legal.</p>
  */
 public final class GroupedSelectProjectionValidationRule extends AbstractSemanticValidationRule {
 
@@ -36,20 +37,19 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
         if (!(queryAst instanceof SelectQueryAst selectQueryAst)) {
             return List.of();
         }
-        if (!selectQueryAst.solutionModifier().hasGroupBy()) {
-            return List.of();
-        }
         if (selectQueryAst.projection().selectAll()) {
             return List.of();
         }
-        if (!hasSemanticallyVisibleGroupBy(selectQueryAst)) {
+        if (!isAggregateQueryLevel(selectQueryAst)) {
+            return List.of();
+        }
+        if (selectQueryAst.solutionModifier().hasGroupBy() && !hasSemanticallyVisibleGroupBy(selectQueryAst)) {
             return List.of();
         }
 
         ProjectionAst projection = selectQueryAst.projection();
         GroupByAst groupBy = selectQueryAst.solutionModifier().groupBy();
         Set<String> groupedVariables = collectDirectGroupedVariables(groupBy);
-        Set<String> availableProjectionAliases = new LinkedHashSet<>();
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
 
         for (VarAst projectedVar : projection.variables()) {
@@ -57,20 +57,34 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
                 validateProjectionExpression(
                         projectedVar.name(),
                         projection,
-                        groupBy,
-                        groupedVariables,
-                        availableProjectionAliases,
                         diagnostics);
-                availableProjectionAliases.add(projectedVar.name());
                 continue;
             }
 
-            if (!groupedVariables.contains(projectedVar.name()) && !availableProjectionAliases.contains(projectedVar.name())) {
+            if (!groupedVariables.contains(projectedVar.name())) {
                 diagnostics.add(buildGroupedProjectionDiagnostic(projectedVar.name()));
             }
         }
 
         return List.copyOf(diagnostics);
+    }
+
+    private boolean isAggregateQueryLevel(SelectQueryAst selectQueryAst) {
+        if (selectQueryAst.solutionModifier().hasGroupBy()) {
+            return true;
+        }
+
+        ProjectionAst projection = selectQueryAst.projection();
+        for (String variableName : projection.expressionBoundVariables()) {
+            if (variableScopeAnalyzer.containsAggregate(projection.expressionTerms().get(variableName))) {
+                return true;
+            }
+        }
+
+        return selectQueryAst.solutionModifier().having().conditions().stream()
+                .anyMatch(variableScopeAnalyzer::containsAggregate)
+                || selectQueryAst.solutionModifier().orderBy().stream()
+                .anyMatch(orderCondition -> variableScopeAnalyzer.containsAggregate(orderCondition.expression()));
     }
 
     private boolean hasSemanticallyVisibleGroupBy(SelectQueryAst selectQueryAst) {
@@ -88,25 +102,14 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
     private void validateProjectionExpression(
             String projectionVariableName,
             ProjectionAst projection,
-            GroupByAst groupBy,
-            Set<String> groupedVariables,
-            Set<String> availableProjectionAliases,
             List<QueryDiagnostic> diagnostics
     ) {
         TermAst expression = projection.expressionTerms().get(projectionVariableName);
         if (expression == null) {
             return;
         }
-        if (groupBy.expressions().contains(expression)) {
-            return;
-        }
-
-        Set<String> allowedVariables = new LinkedHashSet<>(groupedVariables);
-        allowedVariables.addAll(availableProjectionAliases);
         for (String referencedVariable : variableScopeAnalyzer.collectReferencedVariablesOutsideAggregates(expression)) {
-            if (!allowedVariables.contains(referencedVariable)) {
-                diagnostics.add(buildGroupedProjectionDiagnostic(referencedVariable));
-            }
+            diagnostics.add(buildGroupedProjectionDiagnostic(referencedVariable));
         }
     }
 
