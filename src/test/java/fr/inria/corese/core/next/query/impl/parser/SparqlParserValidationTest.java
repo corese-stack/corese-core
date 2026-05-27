@@ -39,6 +39,26 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Nested
+    class AskValidationTest {
+
+        @Test
+        @DisplayName("Should reject ASK ORDER BY variable not visible in WHERE")
+        void shouldRejectAskOrderByVariableNotVisibleInWhere() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    ASK
+                    WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY ?z
+                """));
+
+            assertEquals(ORDER_BY_SCOPE_MESSAGE, exception.getMessage());
+        }
+    }
+
+    @Nested
     class ConstructValidationTest {
 
         @Test

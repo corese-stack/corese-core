@@ -4,7 +4,6 @@ import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
@@ -34,15 +33,9 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
     public List<QueryDiagnostic> validate(QueryAst queryAst) {
         return switch (queryAst) {
             case SelectQueryAst selectQueryAst -> validateSelectQuery(selectQueryAst);
-            case ConstructQueryAst constructQueryAst -> validateOrderByOnly(
-                    constructQueryAst.whereClause(),
-                    constructQueryAst.solutionModifier());
-            case DescribeQueryAst describeQueryAst -> validateOrderByOnly(
-                    describeQueryAst.whereClause(),
-                    describeQueryAst.solutionModifier());
-            // TODO: handle ASK solution modifiers with SPARQL 1.1 support.
-            case AskQueryAst ignored -> List.of();
-            case UpdateRequestAst ignored -> List.of();
+            case ConstructQueryAst constructQueryAst -> validateOrderByOnly(constructQueryAst);
+            case DescribeQueryAst describeQueryAst -> validateOrderByOnly(describeQueryAst);
+            case AskQueryAst askQueryAst -> validateOrderByOnly(askQueryAst);
         };
     }
 
@@ -56,13 +49,10 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
         return List.copyOf(diagnostics);
     }
 
-    private List<QueryDiagnostic> validateOrderByOnly(
-            GroupGraphPatternAst whereClause,
-            SolutionModifierAst solutionModifier
-    ) {
+    private List<QueryDiagnostic> validateOrderByOnly(QueryAst queryAst) {
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
-        Set<String> visibleVariables = collectVisibleVariables(whereClause);
-        validateOrderVariables(visibleVariables, solutionModifier, diagnostics);
+        Set<String> visibleVariables = collectVisibleVariables(queryAst);
+        validateOrderVariables(visibleVariables, getSolutionModifier(queryAst), diagnostics);
         return List.copyOf(diagnostics);
     }
 

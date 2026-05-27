@@ -259,6 +259,42 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateAcceptsConstructOrderByVariableVisibleInValues() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                CONSTRUCT {
+                    ?s ?p ?o
+                }
+                WHERE {
+                    ?s ?p ?o
+                }
+                VALUES ?rank { 1 }
+                ORDER BY ?rank
+                """);
+
+        assertTrue(result.isValid());
+        assertTrue(result.diagnostics().isEmpty());
+    }
+
+    @Test
+    void validateReturnsAskSemanticDiagnostic() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                ASK
+                WHERE {
+                    ?s ?p ?o
+                }
+                ORDER BY ?z
+                """);
+
+        assertFalse(result.isValid());
+        assertEquals(1, result.diagnostics().size());
+        assertEquals("OrderByScopeValidationRule", result.diagnostics().getFirst().source());
+    }
+
+    @Test
     void validateReturnsGroupBySemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 
