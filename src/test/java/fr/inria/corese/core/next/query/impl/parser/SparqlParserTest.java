@@ -326,6 +326,20 @@ class SparqlParserTest {
     }
 
     @Test
+    void validateAcceptsSelectExpressionUsingEarlierAlias() {
+        SparqlParser parser = new SparqlParser();
+
+        QueryValidationResult result = parser.validate("""
+                SELECT (?p AS ?price) (STR(?price) AS ?label) WHERE {
+                    ?s ?p ?o
+                }
+                """);
+
+        assertTrue(result.isValid());
+        assertTrue(result.diagnostics().isEmpty());
+    }
+
+    @Test
     void validateReturnsHavingSemanticDiagnostic() {
         SparqlParser parser = new SparqlParser();
 

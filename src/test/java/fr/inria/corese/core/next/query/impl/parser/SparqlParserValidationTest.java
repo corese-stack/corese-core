@@ -21,6 +21,8 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             "Variable ?x used in SELECT projection is not visible in WHERE clause";
     private static final String CITY_LABEL_SCOPE_MESSAGE =
             "Variable ?cityLabel used in SELECT projection is not visible in WHERE clause";
+    private static final String LABEL_SCOPE_MESSAGE =
+            "Variable ?label used in SELECT projection is not visible in WHERE clause";
     private static final String GROUP_BY_SCOPE_MESSAGE =
             "Variable ?z used in GROUP BY is not visible in WHERE clause";
     private static final String HAVING_SCOPE_MESSAGE =
@@ -210,6 +212,14 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                         }
                         """,
                         SELECT_PROJECTION_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject SELECT expression projection using a later alias not yet visible in SELECT",
+                        """
+                        SELECT (STR(?label) AS ?copy) (STR(?p) AS ?label) WHERE {
+                            ?s ?p ?o
+                        }
+                        """,
+                        LABEL_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject GROUP BY variable not visible in WHERE",
                         """

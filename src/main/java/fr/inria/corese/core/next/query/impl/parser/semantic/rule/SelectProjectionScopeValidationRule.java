@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,12 +44,14 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
             Set<String> visibleVariables,
             List<QueryDiagnostic> diagnostics
     ) {
+        Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
         for (VarAst projectedVar : projection.variables()) {
             if (projection.expressionBoundVariables().contains(projectedVar.name())) {
-                validateProjectionExpression(projectedVar.name(), projection, visibleVariables, diagnostics);
+                validateProjectionExpression(projectedVar.name(), projection, availableVariables, diagnostics);
+                availableVariables.add(projectedVar.name());
                 continue;
             }
-            if (!visibleVariables.contains(projectedVar.name())) {
+            if (!availableVariables.contains(projectedVar.name())) {
                 diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), ScopeClause.SELECT_PROJECTION));
             }
         }

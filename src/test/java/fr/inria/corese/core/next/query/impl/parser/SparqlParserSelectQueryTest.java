@@ -632,6 +632,27 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should accept SELECT expressions using an alias introduced earlier in the same SELECT clause")
+    void shouldAcceptSelectExpressionUsingEarlierAlias() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT (?p AS ?price) (STR(?price) AS ?label) WHERE {
+                    ?s ?p ?o
+                }
+                """);
+
+        SelectQueryAst selectQueryAst = assertInstanceOf(SelectQueryAst.class, ast);
+        ProjectionAst projection = selectQueryAst.projection();
+        assertFalse(projection.selectAll());
+        assertEquals(2, projection.variables().size());
+        assertEquals("price", projection.variables().get(0).name());
+        assertEquals("label", projection.variables().get(1).name());
+        assertTrue(projection.expressionBoundVariables().contains("price"));
+        assertTrue(projection.expressionBoundVariables().contains("label"));
+    }
+
+    @Test
     @DisplayName("Should parse SELECT DISTINCT ?city ?country WHERE with BGP and UNION")
     void shouldParseSelectDistinctWithUnionQueryTest() {
         SparqlParser parser = newParserDefault();
