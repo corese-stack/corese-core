@@ -9,7 +9,11 @@ import java.util.List;
 public abstract class AbstractUnaryConstraintAst implements UnaryConstraintAst {
     private final TermAst argument;
 
-    protected AbstractUnaryConstraintAst(List<TermAst> args) {
+    public AbstractUnaryConstraintAst(TermAst arg) {
+            this.argument = arg;
+    }
+
+    public AbstractUnaryConstraintAst(List<TermAst> args) {
         if(args.size() == 1) {
             this.argument = args.getFirst();
         } else {
@@ -17,7 +21,7 @@ public abstract class AbstractUnaryConstraintAst implements UnaryConstraintAst {
         }
     }
 
-    public TermAst getArgument() {
+    public TermAst argument() {
         return this.argument;
     }
 

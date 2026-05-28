@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
@@ -12,5 +13,13 @@ public record IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) imple
     @Override
     public String getName() {
         return "IF";
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.condition.accept(visitor);
+        this.thenExpr.accept(visitor);
+        this.elseExpr.accept(visitor);
     }
 }

@@ -83,7 +83,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         YearAst year = assertInstanceOf(YearAst.class, bind.expression());
         assertInstanceOf(NumericExpressionAst.class, year);
-        assertEquals("date", assertInstanceOf(VarAst.class, year.getArgument()).name());
+        assertEquals("date", assertInstanceOf(VarAst.class, year.argument()).name());
     }
 
     @Test
@@ -135,7 +135,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         MonthAst month = assertInstanceOf(MonthAst.class, bind.expression());
         assertInstanceOf(NumericExpressionAst.class, month);
-        assertEquals("date", assertInstanceOf(VarAst.class, month.getArgument()).name());
+        assertEquals("date", assertInstanceOf(VarAst.class, month.argument()).name());
     }
 
     // ── DAY() ────────────────────────────────────────────────────────────────
@@ -156,7 +156,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         DayAst day = assertInstanceOf(DayAst.class, bind.expression());
         assertInstanceOf(NumericExpressionAst.class, day);
-        assertEquals("date", assertInstanceOf(VarAst.class, day.getArgument()).name());
+        assertEquals("date", assertInstanceOf(VarAst.class, day.argument()).name());
     }
 
     // ── HOURS() ──────────────────────────────────────────────────────────────
@@ -177,7 +177,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         HoursAst hours = assertInstanceOf(HoursAst.class, bind.expression());
         assertInstanceOf(NumericExpressionAst.class, hours);
-        assertEquals("dt", assertInstanceOf(VarAst.class, hours.getArgument()).name());
+        assertEquals("dt", assertInstanceOf(VarAst.class, hours.argument()).name());
     }
 
     // ── MINUTES() ────────────────────────────────────────────────────────────
@@ -198,7 +198,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         MinutesAst minutes = assertInstanceOf(MinutesAst.class, bind.expression());
         assertInstanceOf(NumericExpressionAst.class, minutes);
-        assertEquals("dt", assertInstanceOf(VarAst.class, minutes.getArgument()).name());
+        assertEquals("dt", assertInstanceOf(VarAst.class, minutes.argument()).name());
     }
 
     // ── SECONDS() ────────────────────────────────────────────────────────────
@@ -219,7 +219,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         SecondsAst seconds = assertInstanceOf(SecondsAst.class, bind.expression());
         assertInstanceOf(NumericExpressionAst.class, seconds);
-        assertEquals("dt", assertInstanceOf(VarAst.class, seconds.getArgument()).name());
+        assertEquals("dt", assertInstanceOf(VarAst.class, seconds.argument()).name());
     }
 
     // ── TIMEZONE() ───────────────────────────────────────────────────────────
@@ -240,7 +240,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         TimezoneAst timezone = assertInstanceOf(TimezoneAst.class, bind.expression());
         assertInstanceOf(XsdDayTimeDurationExpressionAst.class, timezone);
-        assertEquals("dt", assertInstanceOf(VarAst.class, timezone.getArgument()).name());
+        assertEquals("dt", assertInstanceOf(VarAst.class, timezone.argument()).name());
     }
 
     // ── TZ() ─────────────────────────────────────────────────────────────────
@@ -261,7 +261,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         TzAst tz = assertInstanceOf(TzAst.class, bind.expression());
         assertInstanceOf(SimpleLiteralExpressionAst.class, tz);
-        assertEquals("dt", assertInstanceOf(VarAst.class, tz.getArgument()).name());
+        assertEquals("dt", assertInstanceOf(VarAst.class, tz.argument()).name());
     }
 
     @Test

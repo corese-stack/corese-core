@@ -35,7 +35,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         Md5Ast md5 = assertInstanceOf(Md5Ast.class, bind.expression());
-        assertEquals("label", assertInstanceOf(VarAst.class, md5.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, md5.argument()).name());
         assertEquals("hash", bind.variable().name());
     }
 
@@ -54,7 +54,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         Sha1Ast sha1 = assertInstanceOf(Sha1Ast.class, bind.expression());
-        assertEquals("label", assertInstanceOf(VarAst.class, sha1.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, sha1.argument()).name());
         assertEquals("hash", bind.variable().name());
     }
 
@@ -73,7 +73,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         Sha256Ast sha256 = assertInstanceOf(Sha256Ast.class, bind.expression());
-        assertEquals("label", assertInstanceOf(VarAst.class, sha256.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, sha256.argument()).name());
         assertEquals("hash", bind.variable().name());
     }
 
@@ -92,7 +92,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         Sha384Ast sha384 = assertInstanceOf(Sha384Ast.class, bind.expression());
-        assertEquals("label", assertInstanceOf(VarAst.class, sha384.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, sha384.argument()).name());
         assertEquals("hash", bind.variable().name());
     }
 
@@ -111,7 +111,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         Sha512Ast sha512 = assertInstanceOf(Sha512Ast.class, bind.expression());
-        assertEquals("label", assertInstanceOf(VarAst.class, sha512.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, sha512.argument()).name());
         assertEquals("hash", bind.variable().name());
     }
 

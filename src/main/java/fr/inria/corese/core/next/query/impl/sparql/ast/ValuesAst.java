@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
 
 import java.util.ArrayList;
 import java.util.List;

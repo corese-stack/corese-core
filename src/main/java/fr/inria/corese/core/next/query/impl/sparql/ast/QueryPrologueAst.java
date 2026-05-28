@@ -4,6 +4,7 @@ import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
 
 import java.util.List;
 

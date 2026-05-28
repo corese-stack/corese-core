@@ -164,7 +164,7 @@ public final class VariableScopeAnalyzer {
 
             // Recurse into unary expressions such as STR(?x) or BOUND(?x).
             case UnaryConstraintAst unaryConstraint ->
-                collectReferencedVariables(unaryConstraint.getArgument(), referencedVariables);
+                collectReferencedVariables(unaryConstraint.argument(), referencedVariables);
 
             case BinaryConstraintAst binaryConstraint -> {
                 // Recurse into both operands of binary expressions.
@@ -218,14 +218,14 @@ public final class VariableScopeAnalyzer {
                 collectReferencedVariables(elseExpr, referencedVariables);
             }
 
-            case CoalesceAst(List<TermAst> arguments) -> {
-                for (TermAst argument : arguments) {
+            case CoalesceAst coalesceAst -> {
+                for (TermAst argument : coalesceAst.arguments()) {
                     collectReferencedVariables(argument, referencedVariables);
                 }
             }
 
-            case ConcatAst(List<TermAst> arguments) -> {
-                for (TermAst argument : arguments) {
+            case ConcatAst concatAst -> {
+                for (TermAst argument : concatAst.arguments()) {
                     collectReferencedVariables(argument, referencedVariables);
                 }
             }
@@ -243,8 +243,6 @@ public final class VariableScopeAnalyzer {
                     collectReferencedVariables(candidate, referencedVariables);
                 }
             }
-
-            case StrLenAst(TermAst argument) -> collectReferencedVariables(argument, referencedVariables);
 
             case AggregateAst(
                     AggregateFunction ignoredFunction, boolean ignoredDistinct, TermAst expression, String ignoredSep) ->

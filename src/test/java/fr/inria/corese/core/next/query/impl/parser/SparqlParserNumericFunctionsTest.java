@@ -34,7 +34,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         AbsAst abs = assertInstanceOf(AbsAst.class, bind.expression());
-        assertEquals("x", assertInstanceOf(VarAst.class, abs.getArgument()).name());
+        assertEquals("x", assertInstanceOf(VarAst.class, abs.argument()).name());
         assertEquals("abs", bind.variable().name());
     }
 
@@ -53,7 +53,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
         RoundAst round = assertInstanceOf(RoundAst.class, filter.operator());
-        assertEquals("x", assertInstanceOf(VarAst.class, round.getArgument()).name());
+        assertEquals("x", assertInstanceOf(VarAst.class, round.argument()).name());
     }
 
     @Test
@@ -71,7 +71,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
         CeilAst ceil = assertInstanceOf(CeilAst.class, filter.operator());
-        assertEquals("x", assertInstanceOf(VarAst.class, ceil.getArgument()).name());
+        assertEquals("x", assertInstanceOf(VarAst.class, ceil.argument()).name());
     }
 
     @Test
@@ -89,7 +89,7 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
         FloorAst floor = assertInstanceOf(FloorAst.class, filter.operator());
-        assertEquals("x", assertInstanceOf(VarAst.class, floor.getArgument()).name());
+        assertEquals("x", assertInstanceOf(VarAst.class, floor.argument()).name());
     }
 
     @Test

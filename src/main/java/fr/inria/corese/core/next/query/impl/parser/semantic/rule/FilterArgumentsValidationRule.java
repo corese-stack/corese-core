@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AbstractAstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 
@@ -42,6 +43,19 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
                     )
                 || filterAst.operator() instanceof VarAst
                 || filterAst.operator() instanceof LiteralAst);
+    }
+
+    private class FilterArgumentsValidationVisitor extends AbstractAstVisitor {
+        private final List<QueryDiagnostic> result = new ArrayList<>();
+
+        public List<QueryDiagnostic> getResult() {
+            return result;
+        };
+        public void visit(PatternAst patternAst) {
+            if(patternAst instanceof FilterAst filterAst) {
+                result.add(buildIncorrectTypeDiagnostic(filterAst.operator().getName(), "FILTER", "boolean"));
+            }
+        }
     }
 }
 
