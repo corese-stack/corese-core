@@ -89,6 +89,7 @@ jobs:
         with:
           files: |
             build/test-results/**/*.xml
+          compare_to_earlier_commit: false
 
       - name: Archive test artifacts
         if: failure()
