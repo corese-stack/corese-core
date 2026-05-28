@@ -46,13 +46,12 @@ public final class GroupedOrderByValidationRule extends AbstractSemanticValidati
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
         for (OrderConditionAst orderCondition : getSolutionModifier(queryAst).orderBy()) {
             for (String referencedVariable : collectReferencedVariablesOutsideAggregates(orderCondition.expression())) {
-                if (!availableVariables.contains(referencedVariable)) {
-                    continue;
+                boolean isKnownVariable = availableVariables.contains(referencedVariable);
+                boolean isAllowedAggregateOrderVariable =
+                        groupedVariables.contains(referencedVariable) || projectedVariables.contains(referencedVariable);
+                if (isKnownVariable && !isAllowedAggregateOrderVariable) {
+                    diagnostics.add(buildGroupedOrderByDiagnostic(referencedVariable));
                 }
-                if (groupedVariables.contains(referencedVariable) || projectedVariables.contains(referencedVariable)) {
-                    continue;
-                }
-                diagnostics.add(buildGroupedOrderByDiagnostic(referencedVariable));
             }
         }
         return List.copyOf(diagnostics);

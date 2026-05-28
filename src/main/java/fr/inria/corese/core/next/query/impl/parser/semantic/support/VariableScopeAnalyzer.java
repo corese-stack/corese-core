@@ -48,13 +48,12 @@ public final class VariableScopeAnalyzer {
             return visibleVariables;
         }
 
-        valuesClause.mappings().forEach(valueMappingAst -> {
-            valueMappingAst.values().keySet().forEach(varAst -> {
-                if (varAst != null) {
-                    visibleVariables.add(varAst.name());
-                }
-            });
-        });
+        valuesClause.mappings().forEach(valueMappingAst ->
+                valueMappingAst.values().keySet().forEach(varAst -> {
+                    if (varAst != null) {
+                        visibleVariables.add(varAst.name());
+                    }
+                }));
 
         return visibleVariables;
     }
