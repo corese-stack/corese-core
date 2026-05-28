@@ -10,8 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
@@ -108,6 +107,128 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                 """));
 
             assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
+        }
+    }
+
+    @Nested
+    class FilterValidationTest {
+
+        @Test
+        @DisplayName("Should reject FILTER with numeric operator")
+        void shouldRejectFilterWithNumericOperator() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      FILTER(RAND())
+                    }
+                """));
+
+            assertEquals("RAND used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER with IRI operator")
+        void shouldRejectFilterWithIRIOperator() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      FILTER(DATATYPE("test"^^<http://ns.inria.fr/test>))
+                    }
+                """));
+
+            assertEquals("DATATYPE used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER with datetime operator")
+        void shouldRejectFilterWithDatetime() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      FILTER(NOW())
+                    }
+                """));
+
+            assertEquals("NOW used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER with datetime duration operator")
+        void shouldRejectFilterWithDuration() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      FILTER(DAY(NOW()))
+                    }
+                """));
+
+            assertEquals("DAY used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should let pass FILTER with simple literal operator")
+        void shouldRejectFilterWithStringOperator() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      FILTER(STR("test"^^<http://ns.inria.fr/test>))
+                    }
+                """));
+        }
+
+        @Test
+        @DisplayName("Should let pass FILTER with variable")
+        void shouldRejectFilterWithVariable() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      FILTER(?o)
+                    }
+                """));
+        }
+
+        @Test
+        @DisplayName("Should let pass FILTER with boolean")
+        void shouldRejectFilterWithBoolean() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                    SELECT * WHERE {
+                      ?x ?p ?o .
+                      FILTER(true)
+                    }
+                """));
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER with numeric operator in a nested BGP")
+        void shouldRejectFilterWithNumericOperatorInNestedBGP() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    SELECT * WHERE {
+                      {
+                          ?x ?p ?o .
+                          FILTER(RAND())
+                      } UNION {
+                          ?s ?p ?o .
+                      }
+                    }
+                """));
+
+            assertEquals("RAND used in FILTER should be resolvable to a boolean", exception.getMessage());
         }
     }
 

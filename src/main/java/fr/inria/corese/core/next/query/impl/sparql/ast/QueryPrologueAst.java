@@ -3,6 +3,7 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 import fr.inria.corese.core.next.data.impl.common.util.IRIUtils;
 import fr.inria.corese.core.next.data.impl.io.common.IOConstants;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ import static fr.inria.corese.core.next.util.StringUtils.trimChevronIRIs;
  * For now this type is only attached to {@link SelectQueryAst}; other query forms still expose
  * prefix/base state via {@link fr.inria.corese.core.next.data.api.IPrefixHandler} on {@link QueryAst}.
  */
-public record QueryPrologueAst(List<PrefixDeclarationAst> prefixDeclarations, IriAst baseIri) {
+public record QueryPrologueAst(List<PrefixDeclarationAst> prefixDeclarations, IriAst baseIri) implements VisitableAst {
 
     public QueryPrologueAst {
         prefixDeclarations = prefixDeclarations != null ? List.copyOf(prefixDeclarations) : List.of();
@@ -39,5 +40,14 @@ public record QueryPrologueAst(List<PrefixDeclarationAst> prefixDeclarations, Ir
 
     public static QueryPrologueAst empty() {
         return new QueryPrologueAst(List.of(), new IriAst(IOConstants.getDefaultBaseURI()));
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.prefixDeclarations.forEach(prefixDeclarationAst -> {
+            prefixDeclarationAst.accept(visitor);
+        });
+        this.baseIri.accept(visitor);
     }
 }

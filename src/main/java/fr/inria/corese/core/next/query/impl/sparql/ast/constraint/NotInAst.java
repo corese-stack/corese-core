@@ -16,4 +16,9 @@ public record NotInAst(TermAst left, List<TermAst> candidates) implements Constr
         Objects.requireNonNull(candidates, "candidates");
         candidates = List.copyOf(candidates);
     }
+
+    @Override
+    public String getName() {
+        return "NOT IN";
+    }
 }

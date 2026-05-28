@@ -18,4 +18,8 @@ public class DifferentAst extends AbstractChainableOperatorAst implements Boolea
         return new DifferentAst(args);
     }
 
+    @Override
+    public String getName() {
+        return "!=";
+    }
 }

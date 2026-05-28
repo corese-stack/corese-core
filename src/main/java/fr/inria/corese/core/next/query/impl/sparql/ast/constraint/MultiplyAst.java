@@ -17,4 +17,9 @@ public class MultiplyAst extends AbstractChainableOperatorAst implements Numeric
     protected TermAst create(List<TermAst> args) {
         return new MultiplyAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "MULTIPLY";
+    }
 }

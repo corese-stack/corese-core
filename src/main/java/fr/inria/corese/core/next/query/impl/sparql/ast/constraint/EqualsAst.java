@@ -17,4 +17,9 @@ public class EqualsAst extends AbstractChainableOperatorAst implements BooleanEx
     protected TermAst create(List<TermAst> args) {
         return new EqualsAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "=";
+    }
 }

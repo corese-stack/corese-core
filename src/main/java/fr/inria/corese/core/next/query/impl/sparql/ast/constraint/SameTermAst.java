@@ -20,4 +20,9 @@ public class SameTermAst extends AbstractBinaryFunctionAst implements BooleanExp
             throw new QuerySyntaxException("Unexpected number of arguments for sameTerm function");
         }
     }
+
+    @Override
+    public String getName() {
+        return "SAMETERM";
+    }
 }

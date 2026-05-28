@@ -11,4 +11,9 @@ public class Sha1Ast extends AbstractUnaryConstraintAst implements SimpleLiteral
     public Sha1Ast(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "SHA1";
+    }
 }

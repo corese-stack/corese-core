@@ -18,4 +18,9 @@ public class AddAst extends AbstractChainableOperatorAst implements NumericExpre
     protected TermAst create(List<TermAst> args) {
         return new AddAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "ADD";
+    }
 }

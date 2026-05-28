@@ -16,4 +16,15 @@ public abstract class AbstractSemanticValidationRule implements SemanticValidati
                 "?" + variableName,
                 getDiagnosticSource());
     }
+
+    protected QueryDiagnostic buildIncorrectTypeDiagnostic(String variableName, String clause, String expectedType) {
+        return new QueryDiagnostic(
+                QueryDiagnostic.Kind.SEMANTIC_ERROR,
+                QueryDiagnostic.Severity.ERROR,
+                 variableName + " used in " + clause + " should be resolvable to a " + expectedType,
+                -1,
+                -1,
+                "?" + variableName,
+                getDiagnosticSource());
+    }
 }

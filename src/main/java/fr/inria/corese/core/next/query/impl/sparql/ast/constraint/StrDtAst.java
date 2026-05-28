@@ -12,4 +12,9 @@ public class StrDtAst extends AbstractBinaryFunctionAst implements LiteralExpres
     public StrDtAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "STRDT";
+    }
 }

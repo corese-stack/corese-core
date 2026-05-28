@@ -11,4 +11,9 @@ public class FloorAst extends AbstractUnaryConstraintAst implements NumericExpre
     public FloorAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "FLOOR";
+    }
 }

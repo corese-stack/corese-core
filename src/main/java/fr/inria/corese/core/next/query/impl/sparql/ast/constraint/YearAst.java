@@ -12,4 +12,9 @@ public class YearAst extends AbstractUnaryConstraintAst implements NumericExpres
     public YearAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "YEAR";
+    }
 }

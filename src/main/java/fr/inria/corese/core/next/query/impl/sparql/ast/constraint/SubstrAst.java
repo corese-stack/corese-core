@@ -35,4 +35,9 @@ public final class SubstrAst implements SimpleLiteralExpressionAst {
     public TermAst getLength() {
         return this.lengthArg;
     }
+
+    @Override
+    public String getName() {
+        return "SUBSTR";
+    }
 }

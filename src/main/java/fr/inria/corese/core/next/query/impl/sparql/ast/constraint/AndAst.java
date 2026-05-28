@@ -17,4 +17,9 @@ public class AndAst extends AbstractChainableOperatorAst implements BooleanExpre
     protected TermAst create(List<TermAst> args) {
         return new AndAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "&&";
+    }
 }

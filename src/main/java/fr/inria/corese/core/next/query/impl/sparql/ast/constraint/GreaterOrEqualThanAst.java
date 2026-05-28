@@ -17,4 +17,9 @@ public class GreaterOrEqualThanAst extends AbstractChainableOperatorAst implemen
     protected TermAst create(List<TermAst> args) {
         return new GreaterOrEqualThanAst(args);
     }
+
+    @Override
+    public String getName() {
+        return ">=";
+    }
 }

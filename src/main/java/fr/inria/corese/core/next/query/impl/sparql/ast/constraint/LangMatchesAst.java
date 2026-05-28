@@ -14,4 +14,9 @@ public class LangMatchesAst extends AbstractBinaryFunctionAst implements Boolean
     public LangMatchesAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "LANGMATCHES";
+    }
 }

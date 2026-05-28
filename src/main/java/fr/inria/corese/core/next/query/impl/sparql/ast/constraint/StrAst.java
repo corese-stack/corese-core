@@ -13,4 +13,9 @@ public class StrAst extends AbstractUnaryConstraintAst implements SimpleLiteralE
     public StrAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "STR";
+    }
 }

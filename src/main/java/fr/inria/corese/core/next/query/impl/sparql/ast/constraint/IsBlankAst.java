@@ -12,4 +12,9 @@ public class IsBlankAst extends AbstractUnaryConstraintAst implements BooleanExp
     public IsBlankAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "ISBLANK";
+    }
 }

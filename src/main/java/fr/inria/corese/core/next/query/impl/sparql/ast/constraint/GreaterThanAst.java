@@ -17,4 +17,9 @@ public class GreaterThanAst extends AbstractChainableOperatorAst implements Bool
     protected TermAst create(List<TermAst> args) {
         return new GreaterThanAst(args);
     }
+
+    @Override
+    public String getName() {
+        return ">";
+    }
 }

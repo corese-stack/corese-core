@@ -13,4 +13,9 @@ public record ExistsAst(GroupGraphPatternAst pattern) implements BooleanExpressi
     public ExistsAst {
         Objects.requireNonNull(pattern, "pattern");
     }
+
+    @Override
+    public String getName() {
+        return "EXISTS";
+    }
 }

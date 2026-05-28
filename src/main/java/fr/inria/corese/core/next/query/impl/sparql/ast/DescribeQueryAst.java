@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 import java.util.List;
 
 /**
@@ -73,5 +75,18 @@ public record DescribeQueryAst(
      */
     public boolean isDescribeAll() {
         return described.isEmpty();
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.prologue.accept(visitor);
+        this.datasetClause.accept(visitor);
+        this.described.forEach(termAst -> {
+            termAst.accept(visitor);
+        });
+        this.whereClause.accept(visitor);
+        this.valuesClause.accept(visitor);
+        this.solutionModifier.accept(visitor);
     }
 }

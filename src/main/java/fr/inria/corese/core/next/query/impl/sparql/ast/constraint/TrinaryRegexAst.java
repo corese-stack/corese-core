@@ -39,4 +39,9 @@ public class TrinaryRegexAst implements RegexAst {
     public TermAst getFlags() {
         return this.flags;
     }
+
+    @Override
+    public String getName() {
+        return "REGEX";
+    }
 }

@@ -11,4 +11,9 @@ public class Md5Ast extends AbstractUnaryConstraintAst implements SimpleLiteralE
     public Md5Ast(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "MD5";
+    }
 }

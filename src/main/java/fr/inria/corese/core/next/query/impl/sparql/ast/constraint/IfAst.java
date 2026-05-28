@@ -7,4 +7,10 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
  * Function {@code IF(condition, thenExpr, elseExpr)} in SPARQL 1.1
  * Evaluates condition; if true returns thenExpr, otherwise elseExpr.
  */
-public record IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) implements ConstraintAst {}
+public record IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) implements ConstraintAst {
+
+    @Override
+    public String getName() {
+        return "IF";
+    }
+}

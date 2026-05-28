@@ -17,4 +17,9 @@ public class LowerOrEqualThanAst extends AbstractChainableOperatorAst implements
     protected TermAst create(List<TermAst> args) {
         return new LowerOrEqualThanAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "<=";
+    }
 }

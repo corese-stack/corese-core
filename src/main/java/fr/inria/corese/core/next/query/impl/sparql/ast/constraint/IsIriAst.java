@@ -12,4 +12,9 @@ public class IsIriAst extends AbstractUnaryConstraintAst implements BooleanExpre
     public IsIriAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "ISIRI";
+    }
 }

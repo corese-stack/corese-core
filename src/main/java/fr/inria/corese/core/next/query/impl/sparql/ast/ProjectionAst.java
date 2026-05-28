@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 import java.util.List;
 import java.util.Set;
 
@@ -9,7 +11,7 @@ import java.util.Set;
  * <p>
  * Use {@link ProjectionAsts#selectAll()} and {@link ProjectionAsts#of(List)} to create instances.
  */
-public record ProjectionAst(boolean selectAll, List<VarAst> variables, Set<String> expressionBoundVariables) {
+public record ProjectionAst(boolean selectAll, List<VarAst> variables, Set<String> expressionBoundVariables) implements VisitableAst {
     public ProjectionAst {
         variables = variables != null ? List.copyOf(variables) : List.of();
         expressionBoundVariables = expressionBoundVariables != null ? Set.copyOf(expressionBoundVariables) : Set.of();
@@ -19,5 +21,13 @@ public record ProjectionAst(boolean selectAll, List<VarAst> variables, Set<Strin
         if (!selectAll && variables.isEmpty()) {
             throw new IllegalArgumentException("Explicit projection is empty (use selectAll=true for SELECT *)");
         }
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.variables.forEach(varAst -> {
+            varAst.accept(visitor);
+        });
     }
 }

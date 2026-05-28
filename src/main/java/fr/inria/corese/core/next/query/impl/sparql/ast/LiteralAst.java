@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 /**
  * RDF literal in a triple pattern (lexical form, optional language tag or datatype).
  */
@@ -8,5 +10,15 @@ public record LiteralAst(String lexical, String lang, String datatype) implement
         if (lexical == null) {
             throw new IllegalArgumentException("Literal lexical is null");
         }
+    }
+
+    @Override
+    public String getName() {
+        return this.lexical + " " + this.lang + " " + this.datatype;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 }

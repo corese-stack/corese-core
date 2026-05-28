@@ -13,4 +13,9 @@ public record NotExistsAst(GroupGraphPatternAst pattern) implements BooleanExpre
     public NotExistsAst {
         Objects.requireNonNull(pattern, "pattern");
     }
+
+    @Override
+    public String getName() {
+        return "NOT EXISTS";
+    }
 }

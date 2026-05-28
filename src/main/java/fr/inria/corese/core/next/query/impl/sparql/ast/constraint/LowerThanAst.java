@@ -17,4 +17,9 @@ public class LowerThanAst extends AbstractChainableOperatorAst implements Boolea
     protected TermAst create(List<TermAst> args) {
         return new LowerThanAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "<";
+    }
 }

@@ -51,4 +51,9 @@ public class ReplaceAst implements SimpleLiteralExpressionAst {
     public boolean hasFlags() {
         return flagsArg != null;
     }
+
+    @Override
+    public String getName() {
+        return "REPLACE";
+    }
 }

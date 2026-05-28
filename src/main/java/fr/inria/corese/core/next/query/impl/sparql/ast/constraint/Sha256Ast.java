@@ -11,4 +11,9 @@ public class Sha256Ast extends AbstractUnaryConstraintAst implements SimpleLiter
     public Sha256Ast(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "SHA256";
+    }
 }

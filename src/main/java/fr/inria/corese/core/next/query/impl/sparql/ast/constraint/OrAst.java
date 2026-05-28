@@ -16,4 +16,9 @@ public class OrAst extends AbstractChainableOperatorAst implements BooleanExpres
     protected TermAst create(List<TermAst> args) {
         return new OrAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "||";
+    }
 }

@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 import java.util.List;
 
 /**
@@ -12,8 +14,16 @@ import java.util.List;
  *
  * @param triplePatternAsts triples to instantiate from solution bindings
  */
-public record ConstructTemplateAst(List<TriplePatternAst> triplePatternAsts) {
+public record ConstructTemplateAst(List<TriplePatternAst> triplePatternAsts) implements VisitableAst {
     public ConstructTemplateAst {
         triplePatternAsts = triplePatternAsts != null ? List.copyOf(triplePatternAsts) : List.of();
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.triplePatternAsts.forEach(triplePatternAst -> {
+            triplePatternAst.accept(visitor);
+        });
     }
 }

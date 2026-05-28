@@ -6,4 +6,9 @@ package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
  * This function takes no arguments.
  */
 public class NowAst implements XsdDateTimeExpressionAst {
+
+    @Override
+    public String getName() {
+        return "NOW";
+    }
 }

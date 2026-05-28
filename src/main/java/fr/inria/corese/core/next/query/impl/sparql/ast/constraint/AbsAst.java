@@ -11,4 +11,9 @@ public class AbsAst extends AbstractUnaryConstraintAst implements NumericExpress
     public AbsAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "ABS";
+    }
 }

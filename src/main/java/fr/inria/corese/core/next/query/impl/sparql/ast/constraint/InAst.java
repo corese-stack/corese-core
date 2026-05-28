@@ -16,4 +16,9 @@ public record InAst(TermAst left, List<TermAst> candidates) implements Constrain
         Objects.requireNonNull(candidates, "candidates");
         candidates = List.copyOf(candidates);
     }
+
+    @Override
+    public String getName() {
+        return "IN";
+    }
 }

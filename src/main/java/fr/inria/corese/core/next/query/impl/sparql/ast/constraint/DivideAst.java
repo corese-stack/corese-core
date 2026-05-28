@@ -17,4 +17,9 @@ public class DivideAst extends AbstractChainableOperatorAst implements NumericEx
     protected TermAst create(List<TermAst> args) {
         return new DivideAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "/";
+    }
 }

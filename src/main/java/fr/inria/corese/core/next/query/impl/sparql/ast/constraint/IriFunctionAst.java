@@ -11,4 +11,9 @@ public class IriFunctionAst extends AbstractUnaryConstraintAst implements IriExp
     public IriFunctionAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "IRI";
+    }
 }

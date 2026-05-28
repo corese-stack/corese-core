@@ -11,4 +11,9 @@ public class BooleanNotAst extends AbstractUnaryConstraintAst implements Boolean
     public BooleanNotAst(List<TermAst> arg) {
         super(arg);
     }
+
+    @Override
+    public String getName() {
+        return "!";
+    }
 }

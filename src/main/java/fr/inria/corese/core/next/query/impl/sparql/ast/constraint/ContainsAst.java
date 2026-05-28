@@ -13,4 +13,9 @@ public class ContainsAst extends AbstractBinaryFunctionAst implements BooleanExp
     public ContainsAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "CONTAINS";
+    }
 }

@@ -17,4 +17,10 @@ public record FunctionCallAst(TermAst functionName, List<TermAst> arguments) imp
         }
     }
 
+
+    @Override
+    public String getName() {
+        return "Function call " + functionName;
+    }
+
 }

@@ -11,4 +11,9 @@ public class Sha512Ast extends AbstractUnaryConstraintAst implements SimpleLiter
     public Sha512Ast(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "SHA512";
+    }
 }

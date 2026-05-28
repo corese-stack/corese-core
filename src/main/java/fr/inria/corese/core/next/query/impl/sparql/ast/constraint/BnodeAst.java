@@ -23,4 +23,9 @@ public final class BnodeAst implements ExprAst {
     public TermAst getLabel() {
         return this.label;
     }
+
+    @Override
+    public String getName() {
+        return "BNODE";
+    }
 }

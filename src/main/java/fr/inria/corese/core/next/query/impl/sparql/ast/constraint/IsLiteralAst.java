@@ -12,4 +12,9 @@ public class IsLiteralAst extends AbstractUnaryConstraintAst implements BooleanE
     public IsLiteralAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "ISLITERAL";
+    }
 }

@@ -18,4 +18,9 @@ public class SubtractAst extends AbstractChainableOperatorAst implements Numeric
     protected TermAst create(List<TermAst> args) {
         return new SubtractAst(args);
     }
+
+    @Override
+    public String getName() {
+        return "SUBSTRACT";
+    }
 }

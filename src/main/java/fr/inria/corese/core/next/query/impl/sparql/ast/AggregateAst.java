@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 public record AggregateAst(
         AggregateFunction function,
         boolean distinct,
@@ -18,5 +20,16 @@ public record AggregateAst(
         if (groupConcatSeparator != null && function != AggregateFunction.GROUP_CONCAT) {
             throw new IllegalArgumentException("groupConcatSeparator only allowed for GROUP_CONCAT");
         }
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.expression.accept(visitor);
+    }
+
+    @Override
+    public String getName() {
+        return "AGGREGATE";
     }
 }

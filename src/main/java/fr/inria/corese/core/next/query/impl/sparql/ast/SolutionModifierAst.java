@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 import java.util.List;
 
 /**
@@ -24,7 +26,7 @@ public record SolutionModifierAst(
         HavingAst having,
         Long limit,
         Long offset
-) {
+) implements VisitableAst {
     public SolutionModifierAst {
         groupBy = groupBy != null ? groupBy : new GroupByAst(List.of());
         orderBy = orderBy != null ? List.copyOf(orderBy) : List.of();
@@ -75,5 +77,15 @@ public record SolutionModifierAst(
 
     public boolean hasOffset() {
         return offset != null;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        groupBy.accept(visitor);
+        this.orderBy.forEach(orderConditionAst -> {
+            orderConditionAst.accept(visitor);
+        });
+        this.having.accept(visitor);
     }
 }

@@ -13,4 +13,9 @@ public class LangAst extends AbstractUnaryConstraintAst implements SimpleLiteral
     public LangAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "LANG";
+    }
 }

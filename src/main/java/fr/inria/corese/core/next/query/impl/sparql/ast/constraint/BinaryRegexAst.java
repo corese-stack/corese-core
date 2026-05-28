@@ -31,4 +31,9 @@ public class BinaryRegexAst extends AbstractBinaryFunctionAst implements RegexAs
     public TermAst getPattern() {
         return this.getRightArgument();
     }
+
+    @Override
+    public String getName() {
+        return "REGEX";
+    }
 }

@@ -12,4 +12,9 @@ public class StrLangAst extends AbstractBinaryFunctionAst implements SimpleLiter
     public StrLangAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "STRLANG";
+    }
 }

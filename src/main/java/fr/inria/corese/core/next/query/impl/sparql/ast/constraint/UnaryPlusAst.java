@@ -11,4 +11,9 @@ public class UnaryPlusAst extends AbstractUnaryConstraintAst implements NumericE
     public UnaryPlusAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "+";
+    }
 }

@@ -11,4 +11,9 @@ public class EncodeForUriAst extends AbstractUnaryConstraintAst implements Simpl
     public EncodeForUriAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "ENCODE_FOR_URI";
+    }
 }
