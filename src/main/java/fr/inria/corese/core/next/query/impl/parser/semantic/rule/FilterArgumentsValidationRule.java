@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AbstractAstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
@@ -12,6 +13,7 @@ import java.util.List;
  * This rule checks the operators used in Filter asts
  */
 public final class FilterArgumentsValidationRule extends AbstractSemanticValidationRule {
+
     @Override
     protected String getDiagnosticSource() {
         return FilterArgumentsValidationRule.class.getSimpleName();
@@ -25,19 +27,41 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
     }
 
     /**
-     * Checks that the operators used in FILTER and HAVING are either boolean expression, literal expression (that may return a boolean result or variables)
+     * Check that the given term is either boolean expression, literal expression (that may return a boolean result) or a variable
      */
-    private static boolean checkFilterBoolean(FilterAst filterAst) {
-        return !(filterAst.operator() instanceof BooleanExpressionAst
-                || (filterAst.operator() instanceof LiteralExpressionAst
-                        && ! (filterAst.operator() instanceof XsdDateTimeExpressionAst
-                            || filterAst.operator() instanceof XsdDayTimeDurationExpressionAst
-                            || filterAst.operator() instanceof NumericExpressionAst)
-                    )
-                || filterAst.operator() instanceof FunctionCallAst
-                || filterAst.operator() instanceof IfAst
-                || filterAst.operator() instanceof VarAst
-                || filterAst.operator() instanceof LiteralAst);
+    private static boolean checkTermIsPotentialBoolean(TermAst termAst) {
+        if(termAst instanceof BooleanExpressionAst) {
+            return true;
+        }
+        if(termAst instanceof LiteralExpressionAst literalExpressionAst
+                && ! ( literalExpressionAst instanceof XsdDateTimeExpressionAst
+                || literalExpressionAst instanceof XsdDayTimeDurationExpressionAst
+                || literalExpressionAst instanceof NumericExpressionAst
+            )) { // Is a literal expression that could be a boolean, we cannot know
+            return true;
+        }
+        if(termAst instanceof FunctionCallAst) { // Is a function call that could return a boolean, we cannot know
+            return true;
+        }
+        if(termAst instanceof IfAst ifAst
+                && checkTermIsPotentialBoolean(ifAst.thenExpr())
+                && checkTermIsPotentialBoolean(ifAst.elseExpr())) { // Is a IF that returns potential booleans
+            return true;
+        }
+        if(termAst instanceof LiteralAst(String lexical, String lang, String datatype)) {// is a literal that is a typed as a boolean or the string representation of one
+                if(datatype != null) {
+                    if(datatype.equals(XSD.xsdBoolean.getIRI().stringValue())) {
+                        return true;
+                    }
+                } else {
+                    return lexical.trim().equalsIgnoreCase("true") || lexical.trim().equalsIgnoreCase("false");
+                }
+        }
+        if(termAst instanceof VarAst) { // Is a variable that can be resolved to a boolean
+            return true;
+        }
+
+        return false;
     }
 
     private class FilterArgumentsValidationVisitor extends AbstractAstVisitor {
@@ -47,8 +71,8 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
             return result;
         };
         public void visit(PatternAst patternAst) {
-            if(patternAst instanceof FilterAst filterAst && checkFilterBoolean(filterAst)) {
-                result.add(buildIncorrectTypeDiagnostic(filterAst.operator().getName(), "FILTER", "boolean"));
+            if(patternAst instanceof FilterAst(TermAst operator) && ! checkTermIsPotentialBoolean(operator)) {
+                result.add(buildIncorrectTypeDiagnostic(operator.getName(), "FILTER", "boolean"));
             }
         }
     }
