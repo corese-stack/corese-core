@@ -125,7 +125,7 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
             return result;
         };
         public void visit(PatternAst patternAst) {
-            if(patternAst instanceof FilterAst filterAst) {
+            if(patternAst instanceof FilterAst filterAst && checkFilterBoolean(filterAst)) {
                 result.add(buildIncorrectTypeDiagnostic(filterAst.operator().getName(), "FILTER", "boolean"));
             }
         }
