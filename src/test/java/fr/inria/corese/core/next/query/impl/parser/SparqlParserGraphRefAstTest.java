@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SparqlParserGraphRefAstTest extends AbstractSparqlParserFeatureTest {
 
     @Test
-    public void constructorGraph() {
+    void constructorGraph() {
         IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
         GraphRefAst graphRefAst = new GraphRefAst(graphIri);
         assertNotNull(graphRefAst);
@@ -21,7 +21,7 @@ public class SparqlParserGraphRefAstTest extends AbstractSparqlParserFeatureTest
     }
 
     @Test
-    public void constructorNamed() {
+    void constructorNamed() {
         GraphRefAst graphRefAst = new GraphRefAst(true, false, false);
         assertNotNull(graphRefAst);
         assertTrue(graphRefAst.named());
@@ -31,7 +31,7 @@ public class SparqlParserGraphRefAstTest extends AbstractSparqlParserFeatureTest
     }
 
     @Test
-    public void constructorAll() {
+    void constructorAll() {
         GraphRefAst graphRefAst = new GraphRefAst(false, true, false);
         assertNotNull(graphRefAst);
         assertFalse(graphRefAst.named());
@@ -41,7 +41,7 @@ public class SparqlParserGraphRefAstTest extends AbstractSparqlParserFeatureTest
     }
 
     @Test
-    public void constructorDefault() {
+    void constructorDefault() {
         GraphRefAst graphRefAst = new GraphRefAst(false, false, true);
         assertNotNull(graphRefAst);
         assertFalse(graphRefAst.named());
@@ -51,61 +51,85 @@ public class SparqlParserGraphRefAstTest extends AbstractSparqlParserFeatureTest
     }
 
     @Test
-    public void constructorExclusiveValuesGraphNamed() {
+    void constructorExclusiveValuesGraphNamed() {
+        IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
         assertThrows(QueryEvaluationException.class, () -> {
-            IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
             new GraphRefAst(graphIri, true, false, false);
         });
     }
 
     @Test
-    public void constructorExclusiveValuesGraphAll() {
+    void constructorExclusiveValuesGraphAll() {
+        IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
         assertThrows(QueryEvaluationException.class, () -> {
-            IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
             new GraphRefAst(graphIri, false, true, false);
         });
     }
 
     @Test
-    public void constructorExclusiveValuesGraphDefault() {
+    void constructorExclusiveValuesGraphDefault() {
+        IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
         assertThrows(QueryEvaluationException.class, () -> {
-            IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
             new GraphRefAst(graphIri, false, false, true);
         });
     }
 
     @Test
-    public void constructorExclusiveValuesNamedAll() {
+    void constructorExclusiveValuesNamedAll() {
         assertThrows(QueryEvaluationException.class, () -> {
             new GraphRefAst(true, true, false);
         });
     }
 
     @Test
-    public void constructorExclusiveValuesNamedDefault() {
+    void constructorExclusiveValuesNamedDefault() {
         assertThrows(QueryEvaluationException.class, () -> {
             new GraphRefAst(true, false, true);
         });
     }
 
     @Test
-    public void constructorExclusiveValuesDefaultAll() {
+    void constructorExclusiveValuesDefaultAll() {
         assertThrows(QueryEvaluationException.class, () -> {
             new GraphRefAst(false, true, true);
         });
     }
 
     @Test
-    public void constructorExclusiveValuesNamedDefaultAll() {
+    void constructorExclusiveValuesNamedDefaultAll() {
         assertThrows(QueryEvaluationException.class, () -> {
             new GraphRefAst(true, true, true);
         });
     }
 
     @Test
-    public void constructorExclusiveValuesGraphNamedDefaultAll() {
+    void constructorExclusiveValuesGraphNamedAll() {
+        IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
         assertThrows(QueryEvaluationException.class, () -> {
-            IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
+            new GraphRefAst(graphIri, true, true, false);
+        });
+    }
+
+    @Test
+    void constructorExclusiveValuesGraphNamedDefault() {
+        IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
+        assertThrows(QueryEvaluationException.class, () -> {
+            new GraphRefAst(graphIri, true, false, true);
+        });
+    }
+
+    @Test
+    void constructorExclusiveValuesGraphAllDefault() {
+        IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
+        assertThrows(QueryEvaluationException.class, () -> {
+            new GraphRefAst(graphIri, false, true, true);
+        });
+    }
+
+    @Test
+    void constructorExclusiveValuesGraphNamedDefaultAll() {
+        IriAst graphIri = new IriAst("<http://ns.inria.fr/test>");
+        assertThrows(QueryEvaluationException.class, () -> {
             new GraphRefAst(graphIri, true, true, true);
         });
     }

@@ -938,7 +938,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromGraphs() {
+    void fromGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 SELECT DISTINCT ?c ?o
@@ -960,7 +960,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleGraphs() {
+    void fromMultipleGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 SELECT DISTINCT ?c ?o
@@ -986,7 +986,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromNamedGraphs() {
+    void fromNamedGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 SELECT DISTINCT ?c ?o
@@ -1008,7 +1008,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleNamedGraphs() {
+    void fromMultipleNamedGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 SELECT DISTINCT ?c ?o
@@ -1034,7 +1034,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleMixedGraphs() {
+    void fromMultipleMixedGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 SELECT DISTINCT ?c ?o
@@ -1060,7 +1060,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("Should parse a SELECT Subquery inside WHERE")
-    public void shouldParseASelectWithSubquery() {
+    void shouldParseASelectWithSubquery() {
         SparqlParser parser = newParserDefault();
         QueryAst ast = parser.parse("""
             PREFIX foaf: <http://xmlns.com/foaf/0.1/>

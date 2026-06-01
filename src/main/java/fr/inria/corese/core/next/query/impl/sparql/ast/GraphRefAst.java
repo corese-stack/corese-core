@@ -4,11 +4,25 @@ import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 
 public record GraphRefAst(IriAst graph, boolean named, boolean all, boolean defaultGraph) {
     public GraphRefAst {
-        if(graph == null && !named && !all && !defaultGraph) {
+        int activeTargets = 0;
+        if (graph != null) {
+            activeTargets++;
+        }
+        if (named) {
+            activeTargets++;
+        }
+        if (all) {
+            activeTargets++;
+        }
+        if (defaultGraph) {
+            activeTargets++;
+        }
+        if (activeTargets == 0) {
             throw new QueryEvaluationException("Graph reference does not actually reference any graph");
         }
-        if((!((graph != null) ^ named ^ all ^ defaultGraph)) || (named && all && defaultGraph)) {
-            throw new QueryEvaluationException("Cannot have a Graph reference that is both a specific graph and/or ALL and/or NAMED and/or default at the same time");
+        if (activeTargets != 1) {
+            throw new QueryEvaluationException(
+                    "Graph reference must target exactly one of graph, NAMED, ALL, or DEFAULT");
         }
     }
 

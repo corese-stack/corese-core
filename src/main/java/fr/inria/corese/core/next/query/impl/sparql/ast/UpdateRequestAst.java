@@ -11,9 +11,7 @@ public final class UpdateRequestAst implements QueryAst {
     private final List<UpdateRequestUnitAst> operations;
 
     public UpdateRequestAst(QueryPrologueAst prologue, List<UpdateRequestUnitAst> operations) {
-        if (prologue == null) {
-            this.prologue = QueryPrologueAst.empty();
-        }
+        this.prologue = prologue == null ? QueryPrologueAst.empty() : prologue;
         this.operations = new ArrayList<>();
         if (operations != null) {
             this.operations.addAll(operations);

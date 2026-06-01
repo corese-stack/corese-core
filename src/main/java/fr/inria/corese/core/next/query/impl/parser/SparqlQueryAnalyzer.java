@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
+import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.api.sparql.options.SparqlAstError;
@@ -110,42 +111,7 @@ final class SparqlQueryAnalyzer {
     }
 
     private QueryAst buildAst(ParseTree tree, SparqlParserOptions options) {
-        SparqlQueryAstBuilder queryBuilder = new SparqlQueryAstBuilder(options);
-        SparqlUpdateAstBuilder updateBuilder = new SparqlUpdateAstBuilder(options);
-
-        SparqlListener queryListener = new SparqlListener(List.of(
-                new AskQueryFeature(queryBuilder),
-                new ConstructQueryFeature(queryBuilder),
-                new DescribeQueryFeature(queryBuilder),
-                new SelectQueryFeature(queryBuilder),
-                new DatasetClauseFeature(queryBuilder),
-                new HavingFeature(queryBuilder),
-                new SolutionModifierFeature(queryBuilder),
-                new ValuesFeature(queryBuilder),
-                new BgpFeature(queryBuilder),
-                new FilterFeature(queryBuilder),
-                new UnionFeature(queryBuilder),
-                new MinusFeature(queryBuilder),
-                new PrologueFeature(queryBuilder),
-                new BindFeature(queryBuilder),
-                new ServiceFeature(queryBuilder)
-        ));
-
-        SparqlListener updateListener = new SparqlListener(List.of(
-                new ClearRequestFeature(updateBuilder),
-                new LoadRequestFeature(updateBuilder),
-                new BgpFeature(updateBuilder),
-                new BindFeature(updateBuilder),
-                new FilterFeature(updateBuilder),
-                new MinusFeature(updateBuilder),
-                new PrologueFeature(updateBuilder),
-                new ServiceFeature(updateBuilder),
-                new UnionFeature(updateBuilder)
-        ));
-
-        ParseTreeWalker walker = new ParseTreeWalker();
-    private QueryAst buildAst(ParseTree tree, SparqlParserOptions options) {
-        QueryContext root = (QueryContext) tree;
+        fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.QueryContext root = (fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.QueryContext) tree;
         ParseTreeWalker walker = new ParseTreeWalker();
 
         if (root.queryUnit() != null) {
@@ -188,15 +154,7 @@ final class SparqlQueryAnalyzer {
             return updateBuilder.getResult();
         }
 
-        throw new QueryEvaluationException("Unknown parse root");
-    }
-        walker.walk(queryListener, tree);
-
-        try {
-            return queryBuilder.getResult();
-        } catch (QuerySyntaxException | QueryValidationException | IllegalStateException e) {
-            return updateBuilder.getResult();
-        }
+        throw new QueryEvaluationException("Unknown parse root, could not determine if this is an update request or a query.");
     }
 
     private List<QueryDiagnostic> mapSyntaxDiagnostics(List<SparqlAstError> diagnostics) {

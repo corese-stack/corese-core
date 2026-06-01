@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
 
     @Test
-    public void simpleQueryTest() {
+    void simpleQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 LOAD <http://ns.inria.fr/test>
@@ -33,7 +33,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void simpleSilentQueryTest() {
+    void simpleSilentQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 LOAD SILENT <http://ns.inria.fr/test>
@@ -54,7 +54,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void fullQueryTest() {
+    void fullQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 LOAD <http://ns.inria.fr/test> INTO GRAPH <http://ns.inria.fr/otherGraph>
@@ -78,7 +78,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void fullSilentQueryTest() {
+    void fullSilentQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 LOAD SILENT <http://ns.inria.fr/test> INTO GRAPH <http://ns.inria.fr/otherGraph>
@@ -102,7 +102,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void failingDefaultSourceQueryTest() {
+    void failingDefaultSourceQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 LOAD DEFAULT INTO GRAPH <http://ns.inria.fr/otherGraph>
@@ -122,7 +122,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void failingDefaultTargetQueryTest() {
+    void failingDefaultTargetQueryTest() {
         String query = """
                 LOAD <http://ns.inria.fr/test> INTO DEFAULT
                 """;
@@ -130,7 +130,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void failingNamedSourceQueryTest() {
+    void failingNamedSourceQueryTest() {
         String query = """
                 LOAD NAMED INTO GRAPH <http://ns.inria.fr/otherGraph>
                 """;
@@ -139,7 +139,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void failingNamedTargetQueryTest() {
+    void failingNamedTargetQueryTest() {
         String query = """
                 LOAD <http://ns.inria.fr/test> INTO NAMED
                 """;
@@ -148,7 +148,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void failingAllSourceQueryTest() {
+    void failingAllSourceQueryTest() {
         String query = """
                 LOAD ALL INTO GRAPH <http://ns.inria.fr/otherGraph>
                 """;
@@ -157,7 +157,7 @@ public class SparqlParserLoadQueryTest extends AbstractSparqlParserFeatureTest{
     }
 
     @Test
-    public void failingAllTargetQueryTest() {
+    void failingAllTargetQueryTest() {
         String query = """
                 LOAD <http://ns.inria.fr/test> INTO ALL
                 """;

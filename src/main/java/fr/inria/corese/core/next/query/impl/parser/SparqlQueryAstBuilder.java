@@ -2,8 +2,6 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 
 import java.util.*;
@@ -325,7 +323,7 @@ public class SparqlQueryAstBuilder extends SparqlAstBuilder {
      */
     public QueryAst getResult() {
         if (selectQueryResult != null) return selectQueryResult;
-        if (whereClause == null) {
+        if (whereClause == null && this.queryType != ASTConstants.QUERY_TYPE.DESCRIBE) {
             throw new IllegalStateException("No WHERE clause: did you call exitGroup() for the top-level GroupGraphPattern?");
         }
         DatasetClauseAst datasetClauseAst = new DatasetClauseAst(datasetDefaultGraphs, datasetNamedGraphs);

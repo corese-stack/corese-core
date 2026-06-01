@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
 
     @Test
-    public void inlineSyntaxTest() {
+    void inlineSyntaxTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var {
@@ -33,7 +33,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void fullSyntaxTest() {
+    void fullSyntaxTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var1 ?var2 {
@@ -74,7 +74,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void multipleValuesTest() {
+    void multipleValuesTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var1 ?var2 {
@@ -111,7 +111,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void nilValueSyntaxTest() {
+    void nilValueSyntaxTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var {
@@ -134,7 +134,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void nilVarNilValueSyntaxTest() {
+    void nilVarNilValueSyntaxTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var {
@@ -150,7 +150,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void nilVarSomeValueSyntaxExceptionTest() {
+    void nilVarSomeValueSyntaxExceptionTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var {

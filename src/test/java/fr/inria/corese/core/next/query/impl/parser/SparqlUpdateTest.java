@@ -32,4 +32,14 @@ public class SparqlUpdateTest extends AbstractSparqlParserFeatureTest {
         assertEquals("<http://example.org/b>", second.fromClause().graph().raw());
         assertNull(second.toClause());
     }
+
+    @Test
+    void updateMustKeepItsPrologue() {
+        QueryParser parser = newParserDefault();
+        QueryAst ast = parser.parse("PREFIX ex: <http://example.org/> LOAD ex:src");
+        UpdateRequestAst update = assertInstanceOf(UpdateRequestAst.class, ast);
+
+        assertNotNull(update.prologue());
+        assertEquals(1, update.prologue().prefixDeclarations().size());
+    }
 }

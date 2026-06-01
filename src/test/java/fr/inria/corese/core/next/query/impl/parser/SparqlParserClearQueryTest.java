@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest {
     @Test
-    public void graphQueryTest() {
+    void graphQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR GRAPH <http://ns.inria.fr/test>
@@ -31,7 +31,7 @@ public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest 
     }
 
     @Test
-    public void graphSilentQueryTest() {
+    void graphSilentQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR SILENT GRAPH <http://ns.inria.fr/test>
@@ -51,7 +51,7 @@ public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest 
     }
 
     @Test
-    public void namedQueryTest() {
+    void namedQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR NAMED
@@ -69,7 +69,7 @@ public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest 
     }
 
     @Test
-    public void namedSilentQueryTest() {
+    void namedSilentQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR SILENT NAMED
@@ -87,7 +87,7 @@ public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest 
     }
 
     @Test
-    public void defaultQueryTest() {
+    void defaultQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR DEFAULT
@@ -105,7 +105,7 @@ public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest 
     }
 
     @Test
-    public void defaultSilentQueryTest() {
+    void defaultSilentQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR SILENT DEFAULT
@@ -123,7 +123,7 @@ public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest 
     }
 
     @Test
-    public void allQueryTest() {
+    void allQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR ALL
@@ -141,7 +141,7 @@ public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest 
     }
 
     @Test
-    public void allSilentQueryTest() {
+    void allSilentQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR SILENT ALL
@@ -159,7 +159,7 @@ public class SparqlParserClearQueryTest extends AbstractSparqlParserFeatureTest 
     }
 
     @Test
-    public void failingTooManyQueryTest() {
+    void failingTooManyQueryTest() {
         QueryParser parser = newParserDefault();
         String query = """
                 CLEAR SILENT ALL NAMED GRAPH <http://ns.inria.fr/test>

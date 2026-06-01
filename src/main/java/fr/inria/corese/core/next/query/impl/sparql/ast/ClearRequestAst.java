@@ -6,9 +6,6 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
  * @param silent Determine if the resolution of the query must be resolved silently or not.
  */
 public record ClearRequestAst(GraphRefAst graphRef, boolean silent) implements UpdateRequestUnitAst {
-    public ClearRequestAst {
-    }
-
     /**
      * Construct CLEAR query with empty prologue and a silent flag to false.
      * @param graphRef targeted graph to be cleared
