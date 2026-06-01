@@ -33,6 +33,8 @@ public final class BnodeAst implements ExprAst {
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
-        this.label.accept(visitor);
+        if(this.label != null) {
+            this.label.accept(visitor);
+        }
     }
 }

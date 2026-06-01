@@ -19,16 +19,9 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
 
     @Override
     public List<QueryDiagnostic> validate(QueryAst queryAst) {
-        List<QueryDiagnostic> result = new ArrayList<>();
-        List<PatternAst> filterPatternAst = queryAst.whereClause().patterns().stream().filter(patternAst -> patternAst instanceof FilterAst).toList();
-        List<FilterAst> badFilters = filterPatternAst.stream().filter(patternAst -> {
-           FilterAst filter = (FilterAst) patternAst;
-           return checkFilterBoolean(filter);
-        }).map(patternAst -> (FilterAst) patternAst).toList();
-        badFilters.forEach(patternAst -> {
-            result.add(this.buildIncorrectTypeDiagnostic(patternAst.operator().getName(), "FILTER", "boolean"));
-        });
-        return result;
+        FilterArgumentsValidationVisitor visitor = new FilterArgumentsValidationVisitor();
+        queryAst.accept(visitor);
+        return visitor.getResult();
     }
 
     /**
@@ -41,6 +34,8 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
                             || filterAst.operator() instanceof XsdDayTimeDurationExpressionAst
                             || filterAst.operator() instanceof NumericExpressionAst)
                     )
+                || filterAst.operator() instanceof FunctionCallAst
+                || filterAst.operator() instanceof IfAst
                 || filterAst.operator() instanceof VarAst
                 || filterAst.operator() instanceof LiteralAst);
     }
@@ -52,7 +47,7 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
             return result;
         };
         public void visit(PatternAst patternAst) {
-            if(patternAst instanceof FilterAst filterAst) {
+            if(patternAst instanceof FilterAst filterAst && checkFilterBoolean(filterAst)) {
                 result.add(buildIncorrectTypeDiagnostic(filterAst.operator().getName(), "FILTER", "boolean"));
             }
         }

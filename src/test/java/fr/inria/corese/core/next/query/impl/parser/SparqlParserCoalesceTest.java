@@ -24,15 +24,16 @@ class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(COALESCE(?s, ?p, ?o))
+                  FILTER(COALESCE(?s, ?p, ?o) = "")
                 }
                 """);
 
         assertNotNull(ast);
         FilterAst filter = (FilterAst) ast.whereClause().patterns().getLast();
-        assertInstanceOf(CoalesceAst.class, filter.operator());
-
-        CoalesceAst coalesce = (CoalesceAst) filter.operator();
+        assertInstanceOf(EqualsAst.class, filter.operator());
+        EqualsAst equalsAst = (EqualsAst) filter.operator();
+        assertInstanceOf(CoalesceAst.class, equalsAst.getLeftArgument());
+        CoalesceAst coalesce = (CoalesceAst) equalsAst.getLeftArgument();
         assertEquals(3, coalesce.arguments().size());
         assertInstanceOf(VarAst.class, coalesce.arguments().get(0));
         assertInstanceOf(VarAst.class, coalesce.arguments().get(1));
@@ -73,15 +74,16 @@ class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(COALESCE(?s))
+                  FILTER(COALESCE(?s) = 1)
                 }
                 """);
 
         assertNotNull(ast);
         FilterAst filter = (FilterAst) ast.whereClause().patterns().getLast();
-        assertInstanceOf(CoalesceAst.class, filter.operator());
-
-        CoalesceAst coalesce = (CoalesceAst) filter.operator();
+        assertInstanceOf(EqualsAst.class, filter.operator());
+        EqualsAst equalsAst = (EqualsAst) filter.operator();
+        assertInstanceOf(CoalesceAst.class, equalsAst.getLeftArgument());
+        CoalesceAst coalesce = (CoalesceAst) equalsAst.getLeftArgument();
         assertEquals(1, coalesce.arguments().size());
     }
 

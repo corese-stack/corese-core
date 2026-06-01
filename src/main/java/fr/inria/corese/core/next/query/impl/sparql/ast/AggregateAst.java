@@ -25,7 +25,9 @@ public record AggregateAst(
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
-        this.expression.accept(visitor);
+        if(this.expression != null) {
+            this.expression.accept(visitor);
+        }
     }
 
     @Override

@@ -47,6 +47,8 @@ public final class SubstrAst implements SimpleLiteralExpressionAst {
         visitor.visit(this);
         this.stringArg.accept(visitor);
         this.startArg.accept(visitor);
-        this.lengthArg.accept(visitor);
+        if(this.lengthArg != null) {
+            this.lengthArg.accept(visitor);
+        }
     }
 }

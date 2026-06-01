@@ -1042,7 +1042,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(+ ?s)
+                  FILTER(+ ?s > 0)
                 }
                 """);
 
@@ -1053,12 +1053,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();
-        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
-
-        FilterAst filterAst = (FilterAst) p2;
-        assertInstanceOf(UnaryPlusAst.class, filterAst.operator(), "Filter content should be a unary plus operator");
-
-        UnaryPlusAst t = (UnaryPlusAst) filterAst.operator();
+        FilterAst filterAst = assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+        GreaterThanAst greaterThanAst = assertInstanceOf(GreaterThanAst.class, filterAst.operator(), "Filter content should be a greater than comparison");
+        UnaryPlusAst t = assertInstanceOf(UnaryPlusAst.class, greaterThanAst.getLeftArgument(), "Comparison content should be a unary plus operator");
 
         assertInstanceOf(VarAst.class, t.argument());
 
@@ -1072,7 +1069,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(- ?s)
+                  FILTER(- ?s > 0)
                 }
                 """);
 
@@ -1083,12 +1080,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();
-        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
-
-        FilterAst filterAst = (FilterAst) p2;
-        assertInstanceOf(UnaryMinusAst.class, filterAst.operator(), "Filter content should be a unary minus operator");
-
-        UnaryMinusAst t = (UnaryMinusAst) filterAst.operator();
+        FilterAst filterAst = assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+        GreaterThanAst greaterThanAst = assertInstanceOf(GreaterThanAst.class, filterAst.operator(), "Filter content should be a greater than comparison");
+        UnaryMinusAst t = assertInstanceOf(UnaryMinusAst.class, greaterThanAst.getLeftArgument(), "comparison content should be a unary minus operator");
 
         assertInstanceOf(VarAst.class, t.argument());
         assertEquals("s", ((VarAst) t.argument()).name());

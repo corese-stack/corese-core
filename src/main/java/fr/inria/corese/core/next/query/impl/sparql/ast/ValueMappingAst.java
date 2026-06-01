@@ -22,8 +22,12 @@ public record ValueMappingAst(Map<VarAst, TermAst> values) implements VisitableA
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
         this.values.forEach((varAst, termAst) -> {
-            varAst.accept(visitor);
-            termAst.accept(visitor);
+            if(varAst != null) {
+                varAst.accept(visitor);
+            }
+            if(termAst != null) {
+                termAst.accept(visitor);
+            }
         });
     }
 }

@@ -9,7 +9,11 @@ public record BindAst(TermAst expression, VarAst variable) implements PatternAst
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
-        expression.accept(visitor);
-        variable.accept(visitor);
+        if(this.expression != null) {
+            expression.accept(visitor);
+        }
+        if(this.variable != null) {
+            variable.accept(visitor);
+        }
     }
 }

@@ -2,11 +2,7 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AbsAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.CeilAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FloorAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.RandAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.RoundAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -46,13 +42,14 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(ROUND(?x))
+                  FILTER(ROUND(?x) > 0)
                 }
                 """);
 
         assertNotNull(ast);
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
-        RoundAst round = assertInstanceOf(RoundAst.class, filter.operator());
+        GreaterThanAst greaterThanAst = assertInstanceOf(GreaterThanAst.class, filter.operator());
+        RoundAst round = assertInstanceOf(RoundAst.class, greaterThanAst.getLeftArgument());
         assertEquals("x", assertInstanceOf(VarAst.class, round.argument()).name());
     }
 
@@ -64,13 +61,14 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(CEIL(?x))
+                  FILTER(CEIL(?x) > 0)
                 }
                 """);
 
         assertNotNull(ast);
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
-        CeilAst ceil = assertInstanceOf(CeilAst.class, filter.operator());
+        GreaterThanAst greaterThanAst = assertInstanceOf(GreaterThanAst.class, filter.operator());
+        CeilAst ceil = assertInstanceOf(CeilAst.class, greaterThanAst.getLeftArgument());
         assertEquals("x", assertInstanceOf(VarAst.class, ceil.argument()).name());
     }
 
@@ -82,13 +80,14 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(FLOOR(?x))
+                  FILTER(FLOOR(?x) > 0)
                 }
                 """);
 
         assertNotNull(ast);
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
-        FloorAst floor = assertInstanceOf(FloorAst.class, filter.operator());
+        GreaterThanAst greaterThanAst = assertInstanceOf(GreaterThanAst.class, filter.operator());
+        FloorAst floor = assertInstanceOf(FloorAst.class, greaterThanAst.getLeftArgument());
         assertEquals("x", assertInstanceOf(VarAst.class, floor.argument()).name());
     }
 
@@ -118,13 +117,14 @@ class SparqlParserNumericFunctionsTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(RAND())
+                  FILTER(RAND() > 0)
                 }
                 """);
 
         assertNotNull(ast);
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
-        assertInstanceOf(RandAst.class, filter.operator());
+        GreaterThanAst greaterThanAst = assertInstanceOf(GreaterThanAst.class, filter.operator());
+        assertInstanceOf(RandAst.class, greaterThanAst.getLeftArgument());
     }
 
     @Test

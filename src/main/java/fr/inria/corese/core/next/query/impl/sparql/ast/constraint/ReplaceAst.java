@@ -64,6 +64,8 @@ public class ReplaceAst implements SimpleLiteralExpressionAst {
         this.stringArg.accept(visitor);
         this.patternArg.accept(visitor);
         this.replacementArg.accept(visitor);
-        this.flagsArg.accept(visitor);
+        if(flagsArg != null) {
+            this.flagsArg.accept(visitor);
+        }
     }
 }
