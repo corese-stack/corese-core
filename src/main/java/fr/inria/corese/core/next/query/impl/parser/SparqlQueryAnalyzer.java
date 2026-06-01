@@ -144,7 +144,52 @@ final class SparqlQueryAnalyzer {
         ));
 
         ParseTreeWalker walker = new ParseTreeWalker();
-        walker.walk(updateListener, tree);
+    private QueryAst buildAst(ParseTree tree, SparqlParserOptions options) {
+        QueryContext root = (QueryContext) tree;
+        ParseTreeWalker walker = new ParseTreeWalker();
+
+        if (root.queryUnit() != null) {
+            SparqlQueryAstBuilder queryBuilder = new SparqlQueryAstBuilder(options);
+            SparqlListener queryListener = new SparqlListener(List.of(
+                    new AskQueryFeature(queryBuilder),
+                    new ConstructQueryFeature(queryBuilder),
+                    new DescribeQueryFeature(queryBuilder),
+                    new SelectQueryFeature(queryBuilder),
+                    new DatasetClauseFeature(queryBuilder),
+                    new HavingFeature(queryBuilder),
+                    new SolutionModifierFeature(queryBuilder),
+                    new ValuesFeature(queryBuilder),
+                    new BgpFeature(queryBuilder),
+                    new FilterFeature(queryBuilder),
+                    new UnionFeature(queryBuilder),
+                    new MinusFeature(queryBuilder),
+                    new PrologueFeature(queryBuilder),
+                    new BindFeature(queryBuilder),
+                    new ServiceFeature(queryBuilder)
+            ));
+            walker.walk(queryListener, root.queryUnit());
+            return queryBuilder.getResult();
+        }
+
+        if (root.updateUnit() != null) {
+            SparqlUpdateAstBuilder updateBuilder = new SparqlUpdateAstBuilder(options);
+            SparqlListener updateListener = new SparqlListener(List.of(
+                    new ClearRequestFeature(updateBuilder),
+                    new LoadRequestFeature(updateBuilder),
+                    new BgpFeature(updateBuilder),
+                    new BindFeature(updateBuilder),
+                    new FilterFeature(updateBuilder),
+                    new MinusFeature(updateBuilder),
+                    new PrologueFeature(updateBuilder),
+                    new ServiceFeature(updateBuilder),
+                    new UnionFeature(updateBuilder)
+            ));
+            walker.walk(updateListener, root.updateUnit());
+            return updateBuilder.getResult();
+        }
+
+        throw new QueryEvaluationException("Unknown parse root");
+    }
         walker.walk(queryListener, tree);
 
         try {
