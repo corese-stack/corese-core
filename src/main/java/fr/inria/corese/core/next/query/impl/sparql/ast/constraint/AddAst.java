@@ -21,6 +21,6 @@ public class AddAst extends AbstractChainableOperatorAst implements NumericExpre
 
     @Override
     public String getName() {
-        return "ADD";
+        return "+";
     }
 }
