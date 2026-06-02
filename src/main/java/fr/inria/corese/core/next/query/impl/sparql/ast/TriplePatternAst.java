@@ -13,6 +13,10 @@ public record TriplePatternAst(TermAst subject, TermAst predicate, TermAst objec
         }
     }
 
+    public TriplePatternAst(TermAst subject, TermAst predicate, TermAst object) {
+        this(subject, new PredicatePathAst(predicate), object);
+    }
+
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
