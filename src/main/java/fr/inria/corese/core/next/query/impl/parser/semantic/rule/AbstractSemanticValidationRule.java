@@ -35,5 +35,5 @@ public abstract class AbstractSemanticValidationRule implements SemanticValidati
                 variableName,
                 source);
     }
-    
+
 }

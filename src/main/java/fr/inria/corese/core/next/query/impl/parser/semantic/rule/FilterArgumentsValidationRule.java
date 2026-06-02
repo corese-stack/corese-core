@@ -1,6 +1,5 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
-import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AbstractAstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
@@ -9,6 +8,8 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static fr.inria.corese.core.next.query.impl.parser.semantic.support.SemanticValidationUtils.checkTermIsPotentialBoolean;
 
 /**
  * Validates that FILTER and HAVING expressions are compatible with SPARQL
