@@ -69,10 +69,21 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
 
         public List<QueryDiagnostic> getResult() {
             return result;
-        };
+        }
+
+        @Override
         public void visit(PatternAst patternAst) {
-            if(patternAst instanceof FilterAst(TermAst operator) && ! checkTermIsPotentialBoolean(operator)) {
+            if (patternAst instanceof FilterAst(TermAst operator) && !checkTermIsPotentialBoolean(operator)) {
                 result.add(buildIncorrectTypeDiagnostic(operator.getName(), "FILTER", "boolean"));
+            }
+        }
+
+        @Override
+        public void visit(HavingAst havingAst) {
+            for (TermAst condition : havingAst.conditions()) {
+                if (!checkTermIsPotentialBoolean(condition)) {
+                    result.add(buildIncorrectTypeDiagnostic(condition.getName(), "HAVING", "boolean"));
+                }
             }
         }
     }

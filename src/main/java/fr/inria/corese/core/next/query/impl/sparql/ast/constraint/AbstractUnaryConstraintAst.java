@@ -10,7 +10,10 @@ public abstract class AbstractUnaryConstraintAst implements UnaryConstraintAst {
     private final TermAst argument;
 
     public AbstractUnaryConstraintAst(TermAst arg) {
-            this.argument = arg;
+        if (arg == null) {
+            throw new IllegalArgumentException("arg must be non-null");
+        }
+        this.argument = arg;
     }
 
     public AbstractUnaryConstraintAst(List<TermAst> args) {

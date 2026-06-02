@@ -32,7 +32,8 @@ public abstract class AbstractSemanticValidationRule implements SemanticValidati
                 variableName + " used in " + clause + " should be resolvable to a " + expectedType,
                 -1,
                 -1,
-                "?" + variableName,
+                variableName,
                 source);
+    }
     }
 }

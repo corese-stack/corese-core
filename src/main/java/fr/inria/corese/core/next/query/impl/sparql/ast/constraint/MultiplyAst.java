@@ -20,6 +20,6 @@ public class MultiplyAst extends AbstractChainableOperatorAst implements Numeric
 
     @Override
     public String getName() {
-        return "MULTIPLY";
+        return "*";
     }
 }

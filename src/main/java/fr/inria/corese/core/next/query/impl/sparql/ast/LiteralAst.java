@@ -14,7 +14,13 @@ public record LiteralAst(String lexical, String lang, String datatype) implement
 
     @Override
     public String getName() {
-        return this.lexical + " " + this.lang + " " + this.datatype;
+        if (datatype != null && !datatype.isBlank()) {
+            return lexical + "^^" + datatype;
+        }
+        if (lang != null && !lang.isBlank()) {
+            return lexical + "@" + lang;
+        }
+        return lexical;
     }
 
     @Override

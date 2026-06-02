@@ -3,15 +3,14 @@ package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractUnlimitedArgumentsFunctionAst implements UnlimitedArgumentsFunctionAst {
 
-    private List<TermAst> arguments = new ArrayList<>();
+    private final List<TermAst> arguments;
 
-    public AbstractUnlimitedArgumentsFunctionAst(List<TermAst> arguments) {
-        this.arguments = arguments;
+    protected AbstractUnlimitedArgumentsFunctionAst(List<TermAst> arguments) {
+        this.arguments = arguments != null ? List.copyOf(arguments) : List.of();
     }
 
     @Override
@@ -22,8 +21,10 @@ public abstract class AbstractUnlimitedArgumentsFunctionAst implements Unlimited
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
-        this.arguments.forEach(termAst -> {
-            termAst.accept(visitor);
-        });
+        for (TermAst termAst : arguments) {
+            if (termAst != null) {
+                termAst.accept(visitor);
+            }
+        }
     }
 }

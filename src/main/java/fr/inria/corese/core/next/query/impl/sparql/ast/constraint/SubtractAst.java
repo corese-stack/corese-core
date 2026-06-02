@@ -21,6 +21,6 @@ public class SubtractAst extends AbstractChainableOperatorAst implements Numeric
 
     @Override
     public String getName() {
-        return "SUBSTRACT";
+        return "-";
     }
 }
