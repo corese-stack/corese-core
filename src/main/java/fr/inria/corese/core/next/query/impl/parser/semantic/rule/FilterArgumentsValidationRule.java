@@ -118,17 +118,4 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
             }
         }
     }
-
-    private class FilterArgumentsValidationVisitor extends AbstractAstVisitor {
-        private final List<QueryDiagnostic> result = new ArrayList<>();
-
-        public List<QueryDiagnostic> getResult() {
-            return result;
-        };
-        public void visit(PatternAst patternAst) {
-            if(patternAst instanceof FilterAst filterAst && checkFilterBoolean(filterAst)) {
-                result.add(buildIncorrectTypeDiagnostic(filterAst.operator().getName(), "FILTER", "boolean"));
-            }
-        }
-    }
 }
