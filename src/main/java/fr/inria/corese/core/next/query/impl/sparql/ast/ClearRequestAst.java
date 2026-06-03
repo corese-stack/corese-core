@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 /**
  * Represents the CLEAR operation as defined in the <a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/#clear">SPARQL 1.1 recommendation<a/>.
  * @param graphRef targeted graph to be cleared
@@ -12,5 +14,11 @@ public record ClearRequestAst(GraphRefAst graphRef, boolean silent) implements U
      */
     public ClearRequestAst(GraphRefAst graphRef) {
         this( graphRef, false);
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.graphRef.accept(visitor);
     }
 }

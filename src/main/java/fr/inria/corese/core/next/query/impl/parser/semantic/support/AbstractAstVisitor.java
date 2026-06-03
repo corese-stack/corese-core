@@ -18,6 +18,11 @@ public abstract class AbstractAstVisitor implements AstVisitor {
     }
 
     @Override
+    public void visit(UpdateRequestUnitAst ast) {
+
+    }
+
+    @Override
     public void visit(TermAst ast) {
 
     }
@@ -89,6 +94,11 @@ public abstract class AbstractAstVisitor implements AstVisitor {
 
     @Override
     public void visit(ServiceAst ast) {
+
+    }
+
+    @Override
+    public void visit(GraphRefAst ast) {
 
     }
 }

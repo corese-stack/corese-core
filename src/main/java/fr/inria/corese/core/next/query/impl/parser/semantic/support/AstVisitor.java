@@ -8,6 +8,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 public interface AstVisitor {
     void visit(PatternAst ast);
     void visit(QueryAst ast);
+    void visit(UpdateRequestUnitAst ast);
     void visit(TermAst ast);
     void visit(ProjectionAst ast);
     void visit(QueryPrologueAst ast);
@@ -23,4 +24,5 @@ public interface AstVisitor {
     void visit(OrderConditionAst ast);
     void visit(PrefixDeclarationAst ast);
     void visit(ServiceAst ast);
+    void visit(GraphRefAst ast);
 }
