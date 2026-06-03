@@ -311,6 +311,126 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         }
     }
 
+    @Nested
+    public class OperandTypeTest {
+
+        @Test
+        @DisplayName("Should accept + operator with numerics")
+        void shouldAcceptPlusWithNumerics() {
+            SparqlParser parser = newParserDefault();
+            assertDoesNotThrow(() -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(RAND() + 1 = ?o)
+                           }
+                        """);
+            });
+        }
+
+        @Test
+        @DisplayName("Should accept - operator with numerics")
+        void shouldAcceptMinusWithNumerics() {
+            SparqlParser parser = newParserDefault();
+            assertDoesNotThrow(() -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(STRLEN("test") - 1 = ?o)
+                           }
+                        """);
+            });
+        }
+
+        @Test
+        @DisplayName("Should accept * operator with numerics")
+        void shouldAcceptMultiplyWithNumerics() {
+            SparqlParser parser = newParserDefault();
+            assertDoesNotThrow(() -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(STRLEN("test") * RAND() = ?o)
+                           }
+                        """);
+            });
+        }
+
+        @Test
+        @DisplayName("Should accept / operator with numerics")
+        void shouldAcceptDivideWithNumerics() {
+            SparqlParser parser = newParserDefault();
+            assertDoesNotThrow(() -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(DAY(NOW()) / 2 = ?o)
+                           }
+                        """);
+            });
+        }
+
+        @Test
+        @DisplayName("Should reject + operator with non numerics")
+        void shouldRefusePlusWithNonNumerics() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(RAND() + "one" = ?o)
+                           }
+                        """);
+            });
+            assertEquals("\"one\" used in + should be resolvable to a numeric", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject - operator with non numerics")
+        void shouldAcceptMinusWithNonNumerics() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER((3 - STRENDS("test", "")) = ?o)
+                           }
+                        """);
+            });
+            assertEquals("STRENDS used in - should be resolvable to a numeric", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject * operator with non numerics")
+        void shouldAcceptDivideWithNonNumerics() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(<http://ns.inria.fr/test> / 2 = ?o)
+                           }
+                        """);
+            });
+            assertEquals("<http://ns.inria.fr/test> used in / should be resolvable to a numeric", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject / operator with non numerics")
+        void shouldAcceptMultiplyWithNonNumerics() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(STRLEN("test") * NOW() = ?o)
+                           }
+                        """);
+            });
+            assertEquals("NOW used in * should be resolvable to a numeric", exception.getMessage());
+        }
+    }
+
     private static Stream<Arguments> invalidSelectQueries() {
         return Stream.of(
                 Arguments.of(

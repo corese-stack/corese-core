@@ -3,10 +3,7 @@ package fr.inria.corese.core.next.query.impl.parser.semantic.validator;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
 import fr.inria.corese.core.next.query.api.validation.QueryValidator;
-import fr.inria.corese.core.next.query.impl.parser.semantic.rule.FilterArgumentsValidationRule;
-import fr.inria.corese.core.next.query.impl.parser.semantic.rule.OrderByScopeValidationRule;
-import fr.inria.corese.core.next.query.impl.parser.semantic.rule.SelectProjectionScopeValidationRule;
-import fr.inria.corese.core.next.query.impl.parser.semantic.rule.SemanticValidationRule;
+import fr.inria.corese.core.next.query.impl.parser.semantic.rule.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 
 import java.util.ArrayList;
@@ -24,7 +21,8 @@ public final class SparqlQuerySemanticValidator implements QueryValidator<QueryA
         this(List.of(
                 new SelectProjectionScopeValidationRule(),
                 new OrderByScopeValidationRule(),
-                new FilterArgumentsValidationRule()));
+                new FilterArgumentsValidationRule(),
+                new OperandArgumentNumericTypeValidationRule()));
     }
 
     /** Package-private for tests or future composition of rule sets. */
