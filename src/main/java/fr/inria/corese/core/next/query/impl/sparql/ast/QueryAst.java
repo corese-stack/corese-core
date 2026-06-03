@@ -1,7 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 /**
- * Root interfact for ann abstract syntax trees for operations
+ * Root interface for an abstract syntax trees for operation
  */
 public sealed interface QueryAst permits SparqlQueryAst, UpdateRequestAst {
     QueryPrologueAst prologue();
