@@ -1,26 +1,21 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(SparqlParserValuesTest.class);
-
     @Test
-    public void inlineSyntaxTest() {
+    void inlineSyntaxTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var {
                     VALUES ?var { "test" <http://ns.inria.fr/test> }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -38,14 +33,14 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void fullSyntaxTest() {
+    void fullSyntaxTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var1 ?var2 {
                     VALUES (?var1 ?var2) { ("test1" <http://ns.inria.fr/test1>) ("test2" <http://ns.inria.fr/test2>) }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -79,7 +74,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void multipleValuesTest() {
+    void multipleValuesTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var1 ?var2 {
@@ -87,7 +82,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                 }
                VALUES (?var2 ?var3) { ("test2" <http://ns.inria.fr/test2>) }
                """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -116,14 +111,14 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void nilValueSyntaxTest() {
+    void nilValueSyntaxTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var {
                     VALUES ?var { "test" UNDEF }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -139,7 +134,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void nilVarNilValueSyntaxTest() {
+    void nilVarNilValueSyntaxTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var {
@@ -147,7 +142,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                     VALUES () { () }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);
@@ -155,7 +150,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    public void nilVarSomeValueSyntaxExceptionTest() {
+    void nilVarSomeValueSyntaxExceptionTest() {
         SparqlParser parser = newParserDefault();
         String inlineValueTest = """
                 SELECT ?var {
@@ -163,7 +158,7 @@ public class SparqlParserValuesTest extends AbstractSparqlParserFeatureTest {
                     VALUES () { ( "test" ) }
                 }
                 """;
-        QueryAst ast = parser.parse(inlineValueTest);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(inlineValueTest);
         assertNotNull(ast);
         ValuesAst valuesAst = ast.valuesClause();
         assertNotNull(valuesAst);

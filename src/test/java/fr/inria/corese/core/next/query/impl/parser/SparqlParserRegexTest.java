@@ -1,12 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryRegexAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.TrinaryRegexAst;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +21,7 @@ class SparqlParserRegexTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBinaryRegexInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   FILTER(REGEX(?label, "test"))
@@ -45,7 +40,7 @@ class SparqlParserRegexTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBinaryRegexInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(REGEX(?label, "test") AS ?matches)
@@ -65,7 +60,7 @@ class SparqlParserRegexTest extends AbstractSparqlParserFeatureTest {
     void shouldParseTrinaryRegexInFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   FILTER(REGEX(?label, "test", "i"))
@@ -85,7 +80,7 @@ class SparqlParserRegexTest extends AbstractSparqlParserFeatureTest {
     void shouldParseTrinaryRegexInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(REGEX(?label, "^hello", "i") AS ?matches)

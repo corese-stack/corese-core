@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class SparqlAstBuilderUnionTest {
 
-    private SparqlAstBuilder builder;
+    private SparqlQueryAstBuilder builder;
 
     @BeforeEach
     void setUp() {
-        builder = new SparqlAstBuilder(new SparqlParserOptions.Builder().build());
+        builder = new SparqlQueryAstBuilder(new SparqlParserOptions.Builder().build());
         // All tests operate on a SELECT query
         builder.enterSelectQuery();
     }
@@ -44,7 +44,7 @@ class SparqlAstBuilderUnionTest {
         builder.exitUnion();
         builder.exitGroup();           // }
         builder.exitSelectQuery();
-        return Objects.requireNonNull(builder.getResult()).whereClause();
+        return Objects.requireNonNull((SelectQueryAst)builder.getResult()).whereClause();
     }
 
     /**

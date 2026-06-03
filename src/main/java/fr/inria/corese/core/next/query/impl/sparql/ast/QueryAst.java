@@ -1,12 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 /**
- * Minimal SPARQL query AST (SELECT, ASK, CONSTRUCT, DESCRIBE).
- * Holds the WHERE clause as a group graph pattern; query-specific projection/template can be added later.
+ * Root interface for an abstract syntax trees for operation
  */
-public sealed interface QueryAst permits AskQueryAst, ConstructQueryAst, DescribeQueryAst, SelectQueryAst {
-    DatasetClauseAst datasetClause();
-    GroupGraphPatternAst whereClause();
+public sealed interface QueryAst permits SparqlQueryAst, UpdateRequestAst {
     QueryPrologueAst prologue();
-    ValuesAst valuesClause();
 }

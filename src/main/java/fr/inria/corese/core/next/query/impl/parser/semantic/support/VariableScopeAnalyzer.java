@@ -2,13 +2,8 @@ package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Collects visible and referenced variables from the next SPARQL AST.
@@ -26,8 +21,13 @@ public final class VariableScopeAnalyzer {
      * @return the set of visible variable names, without {@code ?} or {@code $} in the patterns used for the resolution of the query
      */
     public Set<String> collectVisibleVariables(QueryAst query) {
-        Set<String> visibleVariables = collectVisibleVariables(query.whereClause());
-        visibleVariables.addAll(collectVisibleVariables(query.valuesClause()));
+        Set<String> visibleVariables = new TreeSet<>();
+        if(query instanceof WhereClauseQueryAst whereClauseQueryAst) {
+            visibleVariables.addAll(collectVisibleVariables(whereClauseQueryAst.whereClause()));
+        }
+        if(query instanceof SparqlQueryAst sparqlQueryAst) {
+            visibleVariables.addAll(collectVisibleVariables(sparqlQueryAst.valuesClause()));
+        }
         return visibleVariables;
     }
 

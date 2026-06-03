@@ -1,14 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
-import fr.inria.corese.core.next.query.impl.sparql.ast.AggregateAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.AggregateFunction;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("SPARQL 1.1 — Parser and AST : aggregates")
 class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
 
-    private static AggregateAst lastBindAggregate(QueryAst ast) {
+    private static AggregateAst lastBindAggregate(WhereClauseQueryAst ast) {
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         return assertInstanceOf(AggregateAst.class, bind.expression());
     }
@@ -54,7 +47,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseCountWithVariableArgument() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?o .
                     BIND(COUNT(?s) AS ?c)
@@ -74,7 +67,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseCountStar() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?o .
                     BIND(COUNT(*) AS ?c)
@@ -93,7 +86,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseCountDistinct() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?o .
                     BIND(COUNT(DISTINCT ?s) AS ?c)
@@ -111,7 +104,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSum() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?x .
                     BIND(SUM(?x) AS ?sum)
@@ -130,7 +123,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAvgDistinct() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?x .
                     BIND(AVG(DISTINCT ?x) AS ?avg)
@@ -148,17 +141,17 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseMinMaxSample() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst minQ = parser.parse("""
+        SparqlQueryAst minQ = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE { ?s ?p ?x . BIND(MIN(?x) AS ?m) }
                 """);
         assertEquals(AggregateFunction.MIN, lastBindAggregate(minQ).function());
 
-        QueryAst maxQ = parser.parse("""
+        SparqlQueryAst maxQ = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE { ?s ?p ?x . BIND(MAX(?x) AS ?m) }
                 """);
         assertEquals(AggregateFunction.MAX, lastBindAggregate(maxQ).function());
 
-        QueryAst sampleQ = parser.parse("""
+        SparqlQueryAst sampleQ = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE { ?s ?p ?x . BIND(SAMPLE(?x) AS ?m) }
                 """);
         assertEquals(AggregateFunction.SAMPLE, lastBindAggregate(sampleQ).function());
@@ -169,7 +162,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseGroupConcatWithoutSeparator() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?o .
                     BIND(GROUP_CONCAT(?o) AS ?g)
@@ -188,7 +181,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseGroupConcatWithSeparator() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?o .
                     BIND(GROUP_CONCAT(?o ; SEPARATOR = "|") AS ?g)
@@ -205,7 +198,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAggregateInFilterComparison() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?o .
                     FILTER(COUNT(*) > 0)
@@ -225,7 +218,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAggregateInOrderBy() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT ?s WHERE {
                     ?s ?p ?val
                 }
@@ -245,7 +238,7 @@ class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
     void shouldCollectVariablesReferencedInsideAggregate() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                     ?s ?p ?price .
                     BIND(AVG(?price) AS ?a)

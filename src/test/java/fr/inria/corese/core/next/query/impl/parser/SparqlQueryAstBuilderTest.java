@@ -15,28 +15,28 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for SparqlAstBuilder (no ANTLR, no parser).
  */
-class SparqlAstBuilderTest {
+class SparqlQueryAstBuilderTest {
 
-    private SparqlAstBuilder newBuilder() {
+    private SparqlQueryAstBuilder newBuilder() {
         SparqlParserOptions opts = new SparqlParserOptions.Builder()
                 .failFast(true)
                 .collectErrors(true)
                 .build();
-        return new SparqlAstBuilder(opts);
+        return new SparqlQueryAstBuilder(opts);
     }
 
     // ---------- Happy paths ----------
 
     @Test
     void shouldBuildEmptyWhereGroupWhenNoTriples() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.enterSelectQuery();
         b.enterGroup();
         b.exitGroup();
         b.exitSelectQuery();
 
-        QueryAst ast = b.getResult();
+        SparqlQueryAst ast = (SparqlQueryAst) b.getResult();
         assertNotNull(ast);
         assertNotNull(ast.whereClause());
         assertEquals(0, ast.whereClause().patterns().size());
@@ -44,7 +44,7 @@ class SparqlAstBuilderTest {
 
     @Test
     void shouldBuildSingleBgpWithOneTriple() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.setBaseUri(IOConstants.getDefaultBaseURI());
         b.enterSelectQuery();
@@ -70,7 +70,7 @@ class SparqlAstBuilderTest {
 
     @Test
     void shouldBuildSingleBgpWithMultipleTriples() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.enterSelectQuery();
         b.enterGroup();
@@ -81,7 +81,7 @@ class SparqlAstBuilderTest {
         b.exitGroup();
         b.exitSelectQuery();
 
-        QueryAst ast = b.getResult();
+        SparqlQueryAst ast = (SparqlQueryAst) b.getResult();
         BgpAst bgp = singleBgp(ast);
 
         assertEquals(2, bgp.triples().size());
@@ -91,7 +91,7 @@ class SparqlAstBuilderTest {
 
     @Test
     void shouldWrapMinusGroupAsMinusAst() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.enterSelectQuery();
         b.enterGroup();
@@ -125,7 +125,7 @@ class SparqlAstBuilderTest {
 
     @Test
     void shouldAllowMultipleBgpsInSameGroup() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.enterSelectQuery();
         b.enterGroup();
@@ -141,7 +141,7 @@ class SparqlAstBuilderTest {
         b.exitGroup();
         b.exitSelectQuery();
 
-        QueryAst ast = b.getResult();
+        SparqlQueryAst ast = (SparqlQueryAst) b.getResult();
         GroupGraphPatternAst where = ast.whereClause();
 
         assertEquals(2, where.patterns().size());
@@ -157,7 +157,7 @@ class SparqlAstBuilderTest {
 
     @Test
     void shouldNotAddEmptyBgpToGroup() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.enterSelectQuery();
         b.enterGroup();
@@ -166,13 +166,13 @@ class SparqlAstBuilderTest {
         b.exitGroup();
         b.exitSelectQuery();
 
-        QueryAst ast = b.getResult();
+        SparqlQueryAst ast = (SparqlQueryAst) b.getResult();
         assertEquals(0, ast.whereClause().patterns().size(), "Empty TriplesBlock should not create a BGP pattern");
     }
 
     @Test
     void shouldBuildLiteralTerms() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.enterSelectQuery();
         b.enterGroup();
@@ -191,7 +191,7 @@ class SparqlAstBuilderTest {
         b.exitGroup();
         b.exitSelectQuery();
 
-        BgpAst bgp = singleBgp(b.getResult());
+        BgpAst bgp = singleBgp((SparqlQueryAst) b.getResult());
         assertEquals(2, bgp.triples().size());
 
         LiteralAst l1 = (LiteralAst) bgp.triples().get(0).object();
@@ -219,7 +219,7 @@ class SparqlAstBuilderTest {
 
     @Test
     void exitGroupWithOpenBgpShouldThrow() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.enterSelectQuery();
         b.enterGroup();
@@ -235,7 +235,7 @@ class SparqlAstBuilderTest {
 
     @Test
     void exitBgpWithoutEnterBgpShouldThrow() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
 
         b.enterSelectQuery();
         b.enterGroup();
@@ -248,7 +248,7 @@ class SparqlAstBuilderTest {
      */
     @Test
     void askConstructDescribeMustNotStartInsideGraphPattern() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
         b.enterSelectQuery();
         b.enterWhereClause();
         b.enterGroup();
@@ -269,7 +269,7 @@ class SparqlAstBuilderTest {
 
     @Test
     void askConstructDescribeMustNotStartInsideSelectSubqueryFrame() {
-        SparqlAstBuilder b = newBuilder();
+        SparqlQueryAstBuilder b = newBuilder();
         b.enterSelectQuery();
         b.enterWhereClause();
         b.enterGroup();
@@ -305,7 +305,7 @@ class SparqlAstBuilderTest {
 
     // ---------- Helpers ----------
 
-    private static BgpAst singleBgp(QueryAst ast) {
+    private static BgpAst singleBgp(SparqlQueryAst ast) {
         GroupGraphPatternAst where = ast.whereClause();
         assertEquals(1, where.patterns().size(), "Expected exactly 1 pattern in WHERE");
         assertInstanceOf(BgpAst.class, where.patterns().getFirst(), "Expected first pattern to be a BGP");

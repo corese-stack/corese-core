@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class SparqlAstBuilderDescribeTest {
 
-    private SparqlAstBuilder builder;
+    private SparqlQueryAstBuilder builder;
 
     @BeforeEach
     void setUp() {
-        builder = new SparqlAstBuilder(new SparqlParserOptions.Builder().build());
+        builder = new SparqlQueryAstBuilder(new SparqlParserOptions.Builder().build());
         builder.enterDescribeQuery();
     }
 

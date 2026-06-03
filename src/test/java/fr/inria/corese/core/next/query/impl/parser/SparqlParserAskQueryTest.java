@@ -12,10 +12,10 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("should parse a basic ASK WHERE {?s ?p ?o} query")
-    public void shouldParseBasicAskQueryTest() {
+    void shouldParseBasicAskQueryTest() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 ASK WHERE {
                   ?s ?p ?o .
                 }
@@ -47,10 +47,10 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("should parse a short form ASK {uri ?p ?o} query")
-    public void shouldParseShortAskQueryTest() {
+    void shouldParseShortAskQueryTest() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 ASK {
                   <https://ns.inria.fr/corese> ?p ?o .
                 }
@@ -82,7 +82,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("Insertion of a comment before the query should not change the treatment of the query")
-    public void shouldIgnoreCommentBeforeQuery() {
+    void shouldIgnoreCommentBeforeQuery() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 # This is a test comment
@@ -125,7 +125,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("Insertion of a comment after the query should not change the treatment of the query")
-    public void shouldIgnoreCommentAfterQuery() {
+    void shouldIgnoreCommentAfterQuery() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 ASK {
@@ -168,7 +168,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("Insertion of a comment in the middle of the query should not change the treatment of the query")
-    public void shouldIgnoreCommentInTheMiddleOfQuery() {
+    void shouldIgnoreCommentInTheMiddleOfQuery() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 ASK {
@@ -211,7 +211,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromGraphs() {
+    void fromGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 ASK
@@ -221,7 +221,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -233,7 +233,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleGraphs() {
+    void fromMultipleGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 ASK
@@ -245,7 +245,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -259,7 +259,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromNamedGraphs() {
+    void fromNamedGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 ASK
@@ -269,7 +269,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().namedGraphs());
@@ -281,7 +281,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleNamedGraphs() {
+    void fromMultipleNamedGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 ASK
@@ -293,7 +293,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -307,7 +307,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("a list of From graphs can be inserted")
-    public void fromMultipleMixedGraphs() {
+    void fromMultipleMixedGraphs() {
         SparqlParser parser = newParserDefault();
         String commentedQuery = """
                 ASK
@@ -319,7 +319,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
                         <http://ns.inria.fr/test#property> ?o .
                 }
                """;
-        QueryAst queryAst = parser.parse(commentedQuery);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(commentedQuery);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertNotNull(queryAst.datasetClause().graphs());
@@ -333,7 +333,7 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("should parse ASK with a SELECT subquery inside WHERE")
-    public void shouldParseAskWithSubqueryInWhere() {
+    void shouldParseAskWithSubqueryInWhere() {
         SparqlParser parser = newParserDefault();
         QueryAst ast = parser.parse("""
                 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -368,14 +368,14 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
 
     @Test
     @DisplayName("Ask short form with limit")
-    public void shortformWithLimit() {
+    void shortformWithLimit() {
         SparqlParser parser = newParserDefault();
         String query = """
                 ASK  {
                     ?s ?p ?o .
                 } LIMIT 10
                """;
-        QueryAst queryAst = parser.parse(query);
+        SparqlQueryAst queryAst = (SparqlQueryAst) parser.parse(query);
         assertNotNull(queryAst);
         assertNotNull(queryAst.datasetClause());
         assertInstanceOf(AskQueryAst.class, queryAst);

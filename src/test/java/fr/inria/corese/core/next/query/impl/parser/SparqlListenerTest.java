@@ -2,11 +2,8 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlLexer;
 import fr.inria.corese.core.next.query.impl.parser.listener.SelectQueryFeature;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.parser.listener.BgpFeature;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -40,7 +37,7 @@ class SparqlListenerTest {
     @Test
     void constructorWithDelegatesCopiesList() {
         BgpFeature feature = new BgpFeature(
-                new SparqlAstBuilder(new SparqlParserOptions.Builder().build()));
+                new SparqlQueryAstBuilder(new SparqlParserOptions.Builder().build()));
         List<BgpFeature> mutable = new java.util.ArrayList<>(List.of(feature));
         SparqlListener listener = new SparqlListener(mutable);
         mutable.clear();
@@ -55,13 +52,13 @@ class SparqlListenerTest {
     @Test
     void withSingleBgpDelegateWalkProducesAst() {
         SparqlParserOptions opts = new SparqlParserOptions.Builder().build();
-        SparqlAstBuilder builder = new SparqlAstBuilder(opts);
+        SparqlQueryAstBuilder builder = new SparqlQueryAstBuilder(opts);
         SparqlListener listener = new SparqlListener(List.of(new BgpFeature(builder), new SelectQueryFeature(builder)));
 
         fr.inria.corese.core.next.impl.parser.antlr.SparqlParser antlrParser = createAntlrParser("SELECT * WHERE { ?s ?p ?o }");
         new ParseTreeWalker().walk(listener, antlrParser.query());
 
-        QueryAst ast = builder.getResult();
+        SparqlQueryAst ast = (SparqlQueryAst) builder.getResult();
         assertNotNull(ast);
         assertNotNull(ast.whereClause());
         assertEquals(1, ast.whereClause().patterns().size());

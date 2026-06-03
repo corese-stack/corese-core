@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.parser.listener;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
+import fr.inria.corese.core.next.query.impl.parser.SparqlQueryAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.List;
@@ -13,32 +14,36 @@ import java.util.List;
  * <p>Grammar: {@code CONSTRUCT constructTemplate ... whereClause ...}
  * The template uses the same {@code triplesSameSubject} structure as the WHERE clause.
  * Triples in the template are emitted when the parent is {@code ConstructTriplesContext},
- * using {@link SparqlAstBuilder} term helpers → {@link SparqlAstBuilder#addConstructTriple}.
+ * using {@link SparqlAstBuilder} term helpers → {@link SparqlQueryAstBuilder#addConstructTriple}.
  */
-public class ConstructQueryFeature extends AbstractSparqlFeature {
+public class ConstructQueryFeature extends AbstractSparqlFeature implements QueryFeature {
 
-    public ConstructQueryFeature(SparqlAstBuilder builder) {
+    public ConstructQueryFeature(SparqlQueryAstBuilder builder) {
         super(builder);
+    }
+
+    public SparqlQueryAstBuilder queryBuilder() {
+        return (SparqlQueryAstBuilder) builder();
     }
 
     @Override
     public void enterConstructQuery(SparqlParser.ConstructQueryContext ctx) {
-        builder().enterConstructQuery();
+        queryBuilder().enterConstructQuery();
     }
 
     @Override
     public void exitConstructQuery(SparqlParser.ConstructQueryContext ctx) {
-        builder().exitConstructQuery();
+        queryBuilder().exitConstructQuery();
     }
 
     @Override
     public void enterConstructTemplate(SparqlParser.ConstructTemplateContext ctx) {
-        builder().enterConstructTemplate();
+        queryBuilder().enterConstructTemplate();
     }
 
     @Override
     public void exitConstructTemplate(SparqlParser.ConstructTemplateContext ctx) {
-        builder().exitConstructTemplate();
+        queryBuilder().exitConstructTemplate();
     }
 
     /**
@@ -52,14 +57,13 @@ public class ConstructQueryFeature extends AbstractSparqlFeature {
         if (ctx.varOrTerm() == null || ctx.propertyListNotEmpty() == null) {
             return;
         }
-        SparqlAstBuilder b = builder();
-        TermAst subject = b.termFromVarOrTerm(ctx.varOrTerm());
+        TermAst subject = queryBuilder().termFromVarOrTerm(ctx.varOrTerm());
         var propertyList = ctx.propertyListNotEmpty();
         for (int verbIndex = 0; verbIndex < propertyList.verb().size(); verbIndex++) {
-            TermAst predicate = b.termFromVerb(propertyList.verb(verbIndex));
-            List<TermAst> objects = b.termListFromObjectList(propertyList.objectList(verbIndex));
+            TermAst predicate = queryBuilder().termFromVerb(propertyList.verb(verbIndex));
+            List<TermAst> objects = queryBuilder().termListFromObjectList(propertyList.objectList(verbIndex));
             for (TermAst object : objects) {
-                b.addConstructTriple(subject, predicate, object);
+                queryBuilder().addConstructTriple(subject, predicate, object);
             }
         }
     }

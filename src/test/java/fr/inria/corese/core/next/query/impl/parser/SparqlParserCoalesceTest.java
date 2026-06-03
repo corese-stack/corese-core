@@ -6,16 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.CoalesceAst;
 
 @DisplayName("SPARQL 1.1 - Parser and AST : COALESCE")
@@ -26,7 +21,7 @@ class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
     void shouldParseCoalesceWithThreeArgs() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(COALESCE(?s, ?p, ?o))
@@ -52,7 +47,7 @@ class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
     void shouldParseCoalesceInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(COALESCE(?s, "default") AS ?result)
@@ -75,7 +70,7 @@ class SparqlParserCoalesceTest extends AbstractSparqlParserFeatureTest {
     void shouldParseCoalesceWithOneArg() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(COALESCE(?s))

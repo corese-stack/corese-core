@@ -14,6 +14,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.SparqlQueryAst;
 import org.junit.jupiter.api.Test;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
@@ -39,8 +40,8 @@ class SparqlParserTest {
     void parseStringReturnsSameResultAsParseReader() {
         SparqlParser parser = new SparqlParser(new SparqlParserOptions.Builder().build());
 
-        QueryAst fromString = parser.parse(VALID_SELECT_QUERY);
-        QueryAst fromReader = parser.parse(new StringReader(VALID_SELECT_QUERY));
+        SparqlQueryAst fromString = (SparqlQueryAst) parser.parse(VALID_SELECT_QUERY);
+        SparqlQueryAst fromReader = (SparqlQueryAst) parser.parse(new StringReader(VALID_SELECT_QUERY));
 
         assertNotNull(fromString);
         assertNotNull(fromReader);
@@ -55,7 +56,7 @@ class SparqlParserTest {
         SparqlParser parser = new SparqlParser(new SparqlParserOptions.Builder().build());
         byte[] bytes = VALID_SELECT_QUERY.getBytes(StandardCharsets.UTF_8);
 
-        QueryAst ast = parser.parse(new ByteArrayInputStream(bytes));
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(new ByteArrayInputStream(bytes));
 
         assertNotNull(ast);
         assertNotNull(ast.whereClause());
@@ -136,7 +137,7 @@ class SparqlParserTest {
     void parserWithNullConfigParseStillWorks() {
         SparqlParser parser = new SparqlParser((QueryOptions) null);
 
-        QueryAst ast = parser.parse(VALID_SELECT_QUERY);
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse(VALID_SELECT_QUERY);
 
         assertNotNull(ast);
         assertNotNull(ast.whereClause());

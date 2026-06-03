@@ -4,15 +4,13 @@ import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 /**
  * Capture parsing of VALUES. VALUES can be declared both in the WHERE clause (through {@code inlineData}) and outside the query (through {@code valuesClause}).
  */
-public class ValuesFeature extends AbstractSparqlFeature {
+public class ValuesFeature extends AbstractSparqlQueryFeature {
 
     public ValuesFeature(SparqlAstBuilder builder) {
         super(builder);
@@ -51,7 +49,7 @@ public class ValuesFeature extends AbstractSparqlFeature {
                         // Each dataBlockValue is a solution
                         mappingAstList.add(new ValueMappingAst(valueMap));
                     });
-                    this.builder().addValues(mappingAstList);
+                    this.queryBuilder().addValues(mappingAstList);
                 }
             }
         } else if(ctx.var_() == null && ctx.dataBlockValue() != null) {
@@ -109,7 +107,7 @@ public class ValuesFeature extends AbstractSparqlFeature {
                     }
                 });
             }
-            this.builder().addValues(valuesList);
+            this.queryBuilder().addValues(valuesList);
         }
     }
 }

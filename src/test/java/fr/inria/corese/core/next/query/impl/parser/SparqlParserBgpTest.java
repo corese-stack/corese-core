@@ -7,17 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 /**
  * Test if we parse the Basic Graph Pattern (BGP)
@@ -28,7 +21,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSingleTriplePatternInBgp() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                 }
@@ -61,7 +54,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     void shouldParsePropertyListSemicolonAndCommaIntoMultipleTriples() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                 SELECT * WHERE {
                   ?s a foaf:Person ;
@@ -101,7 +94,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     void shouldParseRdfLiteralWithLanguageTag() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example/p> "salut"@fr .
                 }
@@ -123,7 +116,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     void shouldParseRdfLiteralWithDatatype() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
                 SELECT * WHERE {
                   ?s <http://example/p> "12"^^xsd:integer .
@@ -145,7 +138,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     void shouldParsePrefixedNameWithDigitOnlyLocalPart() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX ex: <http://example.org/>
                 SELECT * WHERE {
                   ?s ex:1 ?o .
@@ -163,7 +156,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     void shouldParsePrefixedNameWithHyphenInLocalPart() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX ex: <http://example.org/>
                 SELECT * WHERE {
                   ?s ex:abc-def ?o .
@@ -181,7 +174,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     void shouldParsePrefixedNameWithEscapedReservedCharacterInLocalPart() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX ns: <http://example.org/ns#>
                 SELECT * WHERE {
                   ?s ns:id\\=123 ?o .
@@ -199,7 +192,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     void shouldParsePrefixedNameWithDefaultPrefix() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 PREFIX : <http://example.org/default#>
                 SELECT * WHERE {
                   ?s :foo ?o .
@@ -238,7 +231,7 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
     @Test
     void shouldParseEmptyWhereGroup() {
         SparqlParser parser = newParserDefault();
-        QueryAst ast = parser.parse("SELECT * WHERE { }");
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("SELECT * WHERE { }");
 
         assertNotNull(ast.whereClause());
         // selon ton builder: TriplesBlock absent => pas de BgpAst, donc patterns vide

@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.parser.listener;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
+import fr.inria.corese.core.next.query.impl.parser.SparqlQueryAstBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +11,9 @@ import java.util.List;
  * SPARQL SELECT query feature: sets query type and projection (SELECT * or SELECT ?v1 ?v2 ...).
  * <p>
  * In {@link #enterSelectQuery(SparqlParser.SelectQueryContext)} we:
- * 1. Call {@link SparqlAstBuilder#enterSelectQuery()} to set query type.
+ * 1. Call {@link SparqlQueryAstBuilder#enterSelectQuery()} to set query type.
  * 2. Extract the projection from the parse context (grammar: {@code (var_+ | '*')}) and call
- *    {@link SparqlAstBuilder#setProjectionAll()} or {@link SparqlAstBuilder#setProjectionVariables(List)}.
+ *    {@link SparqlQueryAstBuilder#setProjectionAll()} or {@link SparqlQueryAstBuilder#setProjectionVariables(List)}.
  * <p>
  * The WHERE clause is built by {@link BgpFeature} (enter/exit GroupGraphPattern, TriplesBlock, addTriple).
  * At {@link SparqlAstBuilder#getResult()}, the builder produces a {@link fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst}
@@ -24,43 +25,47 @@ import java.util.List;
  * Top-level {@code query} may be {@code SELECT}, {@code ASK}, {@code CONSTRUCT}, or {@code DESCRIBE}.
  * Nested {@code subSelect} uses the same {@link SparqlAstBuilder} stack frames as a top-level {@code SELECT}.
  */
-public class SelectQueryFeature extends AbstractSparqlFeature {
+public class SelectQueryFeature extends AbstractSparqlFeature implements QueryFeature {
 
-    public SelectQueryFeature(SparqlAstBuilder builder) {
+    public SelectQueryFeature(SparqlQueryAstBuilder builder) {
         super(builder);
+    }
+
+    public SparqlQueryAstBuilder queryBuilder() {
+        return (SparqlQueryAstBuilder) builder();
     }
 
     @Override
     public void enterSelectQuery(SparqlParser.SelectQueryContext ctx) {
-        builder().enterSelectQuery();
+        queryBuilder().enterSelectQuery();
         SparqlParser.SelectClauseContext selectClause = ctx.selectClause();
-        if (selectClause.DISTINCT() != null) { builder().setDistinct(true); }
-        if (selectClause.REDUCED() != null) { builder().setReduced(true); }
+        if (selectClause.DISTINCT() != null) { queryBuilder().setDistinct(true); }
+        if (selectClause.REDUCED() != null) { queryBuilder().setReduced(true); }
 
         extractProjection(selectClause);
     }
 
     @Override
     public void exitSelectQuery(SparqlParser.SelectQueryContext ctx) {
-        builder().exitSelectQuery();
+        queryBuilder().exitSelectQuery();
     }
 
     @Override
     public void enterSubSelect(SparqlParser.SubSelectContext ctx) {
-        builder().enterSelectQuery();
+        queryBuilder().enterSelectQuery();
         SparqlParser.SelectClauseContext selectClause = ctx.selectClause();
         if (selectClause.DISTINCT() != null) {
-            builder().setDistinct(true);
+            queryBuilder().setDistinct(true);
         }
         if (selectClause.REDUCED() != null) {
-            builder().setReduced(true);
+            queryBuilder().setReduced(true);
         }
         extractProjection(selectClause);
     }
 
     @Override
     public void exitSubSelect(SparqlParser.SubSelectContext ctx) {
-        builder().exitSelectQuery();
+        queryBuilder().exitSelectQuery();
     }
 
     /**
@@ -70,7 +75,7 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
      */
     private void extractProjection(SparqlParser.SelectClauseContext ctx) {
         if (ctx.STAR() != null) {
-            builder().setProjectionAll();
+            queryBuilder().setProjectionAll();
             return;
         }
         List<String> allVars = new ArrayList<>();
@@ -85,6 +90,6 @@ public class SelectQueryFeature extends AbstractSparqlFeature {
                 allVars.add(selectVar.var_().getText());
             }
         }
-        builder().setProjectionVariables(allVars, expressionBoundVars);
+        queryBuilder().setProjectionVariables(allVars, expressionBoundVars);
     }
 }

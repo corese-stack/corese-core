@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import org.junit.jupiter.api.Test;
 
@@ -7,13 +8,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AddAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.AndAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.BinaryRegexAst;
@@ -48,7 +42,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseTrueFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(true)
@@ -76,7 +70,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAndFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s && true)
@@ -108,7 +102,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseOrFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT ?s WHERE {
                   ?s ?p ?o .
                   FILTER(?s || true)
@@ -140,7 +134,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseNotFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(! ?s)
@@ -170,7 +164,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBoundFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(Bound( ?s))
@@ -200,7 +194,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIsIriFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(isIri( ?s))
@@ -230,7 +224,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIsUriFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(isUri( ?s))
@@ -260,7 +254,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIsBlankFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(isBlank( ?s))
@@ -290,7 +284,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseIsLiteralFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(isLiteral( ?s))
@@ -320,7 +314,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseStrEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(str(?s) = "test")
@@ -354,7 +348,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseLangEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(lang(?s) = "test")
@@ -388,7 +382,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseDatatypeEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(datatype(?s) = "test")
@@ -422,7 +416,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s = <http://example.com>)
@@ -454,7 +448,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseDifferentFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s != <http://example.com>)
@@ -486,7 +480,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseLowerFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s < <http://example.com>)
@@ -518,7 +512,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseLowerOrEqualFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s <= <http://example.com>)
@@ -550,7 +544,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseGreaterFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s > <http://example.com>)
@@ -582,7 +576,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseGreaterOrEqualFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s >= <http://example.com>)
@@ -614,7 +608,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseDivideEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s / 2 = "test")
@@ -650,7 +644,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseTimesEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s * 2 = "test")
@@ -686,7 +680,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAddsEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s + 2 = "test")
@@ -722,7 +716,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSubstractEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s - 2 = "test")
@@ -758,7 +752,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSameTermFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(sameTerm(?s, <http://example.com>))
@@ -791,7 +785,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseLangMatchesFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(langMatches(?s, "test"))
@@ -823,7 +817,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBinaryRegexFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(REGEX(?s, "test"))
@@ -854,7 +848,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseTrinaryRegexFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(REGEX(?s, "test", "i"))
@@ -888,7 +882,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseFunCallFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(<http://example.org/function>(?s, "test"))
@@ -924,7 +918,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAddsUnaryMinusEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s + - 2 = "test")
@@ -962,7 +956,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseAddSubChainEqualsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s * 2 + ?o - 5 = "test")
@@ -1014,7 +1008,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSubtractWithoutWhitespaceInsideParenthesizedMultiplyExpression() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?x ?p ?discount .
                   ?x ?pricePredicate ?price .
@@ -1045,7 +1039,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseUnaryPlusFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(+ ?s)
@@ -1075,7 +1069,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseUnaryMinusFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(- ?s)
@@ -1104,7 +1098,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseChainedOrFilterLeftAssociatively() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?a || ?b || ?c)
@@ -1130,7 +1124,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseChainedAndFilterLeftAssociatively() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?a && ?b && ?c)
@@ -1156,7 +1150,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSignedNegativeLiteralInAdditiveExpression() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s - -2 = "test")
@@ -1179,7 +1173,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSignedPositiveLiteralInAdditiveExpression() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s + +2 = "test")
@@ -1202,7 +1196,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseMixedMultiplyThenDivideLeftAssociatively() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s * 2 / 3 = "test")
@@ -1229,7 +1223,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseMixedDivideThenMultiplyLeftAssociatively() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(?s / 2 * 3 = "test")
@@ -1256,7 +1250,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseExistsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER EXISTS { ?s ex:email ?e }
@@ -1282,7 +1276,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseNotExistsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER NOT EXISTS { ?s ex:email ?e }
@@ -1308,7 +1302,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseNotOverExistsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(!EXISTS { ?s ex:email ?e })
@@ -1331,7 +1325,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseNotOverNotExistsFilter() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER(!NOT EXISTS { ?s ex:email ?e })
@@ -1354,7 +1348,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseExistsWithMultipleTriples() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER EXISTS {
@@ -1376,7 +1370,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     void shouldParseNotExistsEmpty() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   FILTER NOT EXISTS { }
@@ -1395,7 +1389,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     @Test
     void shouldParseAndBetweenTwoExistsFilters() {
         SparqlParser parser = newParserDefault();
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
           PREFIX ex: <http://example.org/>
           
           SELECT * WHERE {
@@ -1419,7 +1413,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
     @Test
     void shouldParseOrBetweenExistsAndNotExistsFilters() {
         SparqlParser parser = newParserDefault();
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
           PREFIX ex: <http://example.org/>
           
           SELECT * WHERE {

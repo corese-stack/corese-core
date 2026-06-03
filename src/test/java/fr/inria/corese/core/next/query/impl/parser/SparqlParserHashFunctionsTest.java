@@ -6,14 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.Md5Ast;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.Sha1Ast;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.Sha256Ast;
@@ -28,7 +25,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseMd5InBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(MD5(?label) AS ?hash)
@@ -47,7 +44,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSha1InBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(SHA1(?label) AS ?hash)
@@ -66,7 +63,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSha256InBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(SHA256(?label) AS ?hash)
@@ -85,7 +82,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSha384InBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(SHA384(?label) AS ?hash)
@@ -104,7 +101,7 @@ class SparqlParserHashFunctionsTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSha512InBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?label .
                   BIND(SHA512(?label) AS ?hash)

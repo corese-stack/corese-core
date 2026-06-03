@@ -1,26 +1,30 @@
 package fr.inria.corese.core.next.query.impl.parser.listener;
 
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
-import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
+import fr.inria.corese.core.next.query.impl.parser.SparqlQueryAstBuilder;
 
 /**
  * Sparql ASK query as a feature
  * The listener will call {@code enterAskQuery()} and {@code exitAskQuery()}
  */
-public class AskQueryFeature extends AbstractSparqlFeature {
+public class AskQueryFeature extends AbstractSparqlFeature implements QueryFeature {
 
-    public AskQueryFeature(SparqlAstBuilder builder) {
+    public AskQueryFeature(SparqlQueryAstBuilder builder) {
         super(builder);
+    }
+
+    public SparqlQueryAstBuilder queryBuilder() {
+        return (SparqlQueryAstBuilder) builder();
     }
 
     @Override
     public void enterAskQuery(SparqlParser.AskQueryContext ctx) {
-        builder().enterAskQuery();
+        queryBuilder().enterAskQuery();
     }
 
     @Override
     public void exitAskQuery(SparqlParser.AskQueryContext ctx) {
-        builder().exitAskQuery();
+        queryBuilder().exitAskQuery();
     }
 
 

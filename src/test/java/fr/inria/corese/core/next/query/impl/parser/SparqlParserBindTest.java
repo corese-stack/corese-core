@@ -17,7 +17,7 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBindWithVariable() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(?s AS ?x)
@@ -42,7 +42,7 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBindWithConcat() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(CONCAT(?a, ?b) AS ?c)
@@ -71,7 +71,7 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBindWithArithmetic() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(?x + 1 AS ?y)
@@ -95,7 +95,7 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBindWithSubtractWithoutWhitespace() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT ?price WHERE {
                   ?x ?p ?discount .
                   BIND(?p*(1-?discount) AS ?price)
@@ -130,7 +130,7 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBindWithStringLiteral() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND("hello" AS ?label)
@@ -155,7 +155,7 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBindWithIri() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(<http://example.org> AS ?type)
@@ -180,7 +180,7 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
     void shouldParseMultipleBinds() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(?s AS ?x)
@@ -206,7 +206,7 @@ class SparqlParserBindTest extends AbstractSparqlParserFeatureTest {
     void shouldParseBindInsideOptional() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   OPTIONAL { BIND(?s AS ?x) }

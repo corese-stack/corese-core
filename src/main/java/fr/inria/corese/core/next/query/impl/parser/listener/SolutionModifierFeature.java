@@ -10,7 +10,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SolutionModifierFeature extends AbstractSparqlFeature {
+public class SolutionModifierFeature extends AbstractSparqlQueryFeature {
 
     public SolutionModifierFeature(SparqlAstBuilder builder) {
         super(builder);
@@ -22,19 +22,19 @@ public class SolutionModifierFeature extends AbstractSparqlFeature {
         for (SparqlParser.GroupConditionContext gcc : ctx.groupCondition()) {
             terms.add(builder().termFromGroupCondition(gcc));
         }
-        builder().setGroupBy(new GroupByAst(terms));
+        queryBuilder().setGroupBy(new GroupByAst(terms));
     }
 
     @Override
     public void exitLimitClause(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.LimitClauseContext ctx) {
         long limit = Long.parseLong(ctx.INTEGER().getText());
-        builder().setLimit(limit);
+        queryBuilder().setLimit(limit);
     }
 
     @Override
     public void exitOffsetClause(fr.inria.corese.core.next.impl.parser.antlr.SparqlParser.OffsetClauseContext ctx) {
         long offset = Long.parseLong(ctx.INTEGER().getText());
-        builder().setOffset(offset);
+        queryBuilder().setOffset(offset);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SolutionModifierFeature extends AbstractSparqlFeature {
         } else {
             throw new QueryEvaluationException("Unexpected expression in ORDER BY clause " + ctx.getText());
         }
-        this.builder().addOrderExpression(direction, orderExpression);
+        this.queryBuilder().addOrderExpression(direction, orderExpression);
     }
 
 

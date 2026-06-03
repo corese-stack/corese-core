@@ -1,10 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.DayAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.HoursAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.MinutesAst;
@@ -37,7 +34,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseNowInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
                   BIND(NOW() AS ?now)
@@ -75,7 +72,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseYearInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example.org/date> ?date .
                   BIND(YEAR(?date) AS ?y)
@@ -127,7 +124,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseMonthInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example.org/date> ?date .
                   BIND(MONTH(?date) AS ?m)
@@ -148,7 +145,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseDayInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example.org/date> ?date .
                   BIND(DAY(?date) AS ?d)
@@ -169,7 +166,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseHoursInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example.org/dt> ?dt .
                   BIND(HOURS(?dt) AS ?h)
@@ -190,7 +187,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseMinutesInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example.org/dt> ?dt .
                   BIND(MINUTES(?dt) AS ?min)
@@ -211,7 +208,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseSecondsInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example.org/dt> ?dt .
                   BIND(SECONDS(?dt) AS ?sec)
@@ -232,7 +229,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseTimezoneInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example.org/dt> ?dt .
                   BIND(TIMEZONE(?dt) AS ?tz)
@@ -253,7 +250,7 @@ class SparqlParserDateTimeFunctionsTest extends AbstractSparqlParserFeatureTest 
     void shouldParseTzInBind() {
         SparqlParser parser = newParserDefault();
 
-        QueryAst ast = parser.parse("""
+        SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s <http://example.org/dt> ?dt .
                   BIND(TZ(?dt) AS ?tzStr)
