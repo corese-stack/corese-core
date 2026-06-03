@@ -5,14 +5,15 @@ import fr.inria.corese.core.next.query.impl.parser.semantic.support.AbstractAstV
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static fr.inria.corese.core.next.query.impl.parser.semantic.support.SemanticValidationUtils.checkTermIsPotentialNumeric;
 
+/**
+ * Check that the operands and numeric functions use numeric arguments
+ */
 public final class OperandArgumentNumericTypeValidationRule extends AbstractSemanticValidationRule {
 
     @Override
@@ -22,19 +23,17 @@ public final class OperandArgumentNumericTypeValidationRule extends AbstractSema
 
     @Override
     public List<QueryDiagnostic> validate(QueryAst queryAst) {
-        OperandArgumentTypeVisitor visitor = new OperandArgumentTypeVisitor();
+        OperandNumericArgumentTypeVisitor visitor = new OperandNumericArgumentTypeVisitor();
         queryAst.accept(visitor);
         return visitor.getResult();
     }
 
-    private class OperandArgumentTypeVisitor extends AbstractAstVisitor {
+    private class OperandNumericArgumentTypeVisitor extends AbstractAstVisitor {
         private final List<QueryDiagnostic> result = new ArrayList<>();
 
         public List<QueryDiagnostic> getResult() {
             return result;
         }
-
-        ;
 
         @Override
         public void visit(TermAst termAst) {

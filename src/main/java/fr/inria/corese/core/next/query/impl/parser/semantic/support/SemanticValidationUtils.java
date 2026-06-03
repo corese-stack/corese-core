@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
@@ -67,13 +68,17 @@ public class SemanticValidationUtils {
         return false;
     }
 
+
+    /**
+     * Check that the given term is either numeric expression, literal expression typed by a standard numeric datatype, a literal that can be parsed to a numeric or a variable
+     */
     public static boolean checkTermIsPotentialNumeric(TermAst termAst) {
         if (checkTermIsUnknownType(termAst)) {
             return true;
         }
         if (termAst instanceof IfAst ifAst
                 && checkTermIsPotentialNumeric(ifAst.thenExpr())
-                && checkTermIsPotentialNumeric(ifAst.elseExpr())) { // Is a IF that returns potential numerics
+                && checkTermIsPotentialNumeric(ifAst.elseExpr())) { // Is an IF that returns potential numerics
             return true;
         }
         if (termAst instanceof NumericExpressionAst) { // Is a literal expression that could be a numeric, we cannot know
@@ -108,6 +113,9 @@ public class SemanticValidationUtils {
         return false;
     }
 
+    /**
+     * Tries to parse the string as a Double
+     */
     public static boolean checkStringIsNumeric(String lexical) {
         if (lexical == null) {
             return false;
@@ -118,5 +126,24 @@ public class SemanticValidationUtils {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Check if the term is either a variable or an IRI or an expression that can be resolved to an IRI
+     */
+    public static boolean checkTermIsPotentialIri(TermAst termAst) {
+        if(termAst instanceof VarAst) {
+            return true;
+        }
+        if(termAst instanceof IriAst) { // Is an IRI
+            return true;
+        }
+        if (termAst instanceof FunctionCallAst) { // Is a function call that could return a boolean, we cannot know
+            return true;
+        }
+        if(termAst instanceof IriExpressionAst) { // Is a function that can be resolved to an IRI
+            return true;
+        }
+        return false;
     }
 }

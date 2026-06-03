@@ -429,6 +429,154 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             });
             assertEquals("NOW used in * should be resolvable to a numeric", exception.getMessage());
         }
+
+        @Test
+        @DisplayName("Should accept || operator with booleans")
+        void shouldAcceptOrWithBoolean() {
+            SparqlParser parser = newParserDefault();
+            assertDoesNotThrow(() -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(IsIri(?s) || false)
+                           }
+                        """);
+            });
+        }
+
+        @Test
+        @DisplayName("Should accept && operator with booleans")
+        void shouldAcceptAndWithBoolean() {
+            SparqlParser parser = newParserDefault();
+            assertDoesNotThrow(() -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(NOT EXISTS { ?s ?p false } && STRSTARTS("test", "t"))
+                           }
+                        """);
+            });
+        }
+
+        @Test
+        @DisplayName("Should reject || operator with non booleans")
+        void shouldRejectOrWithNonBoolean() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(IsIri(?s) || "potato")
+                           }
+                        """);
+            });
+            assertEquals("\"potato\" used in || should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject && operator with non booleans")
+        void shouldRejectAndWithNonBoolean() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(<http://ns.inria.fr/test> && langMatches("potato", "fr"))
+                           }
+                        """);
+            });
+            assertEquals("<http://ns.inria.fr/test> used in && should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should accept ! operator with booleans")
+        void shouldAcceptNotWithBoolean() {
+            SparqlParser parser = newParserDefault();
+            assertDoesNotThrow(() -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(! NOT EXISTS { ?s ?p false } && STRSTARTS("test", "t"))
+                           }
+                        """);
+            });
+        }
+
+        @Test
+        @DisplayName("Should reject ! operator with non booleans")
+        void shouldRejectNotWithNonBoolean() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(! <http://ns.inria.fr/test>)
+                           }
+                        """);
+            });
+            assertEquals("<http://ns.inria.fr/test> used in ! should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject < operator with IRIs")
+        void shouldRejectLTWithIRIs() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(2 < <http://ns.inria.fr/test>)
+                           }
+                        """);
+            });
+            assertEquals("<http://ns.inria.fr/test> used in < should be resolvable to a not an IRI", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject <= operator with IRIs")
+        void shouldRejectLTEWithIRIs() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(STRLEN("test") <= <http://ns.inria.fr/test>)
+                           }
+                        """);
+            });
+            assertEquals("<http://ns.inria.fr/test> used in <= should be resolvable to a not an IRI", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject > operator with IRIs")
+        void shouldRejectGTWithIRIs() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER("2"^^<http://www.w3.org/2001/XMLSchema#integer> > <http://ns.inria.fr/test>)
+                           }
+                        """);
+            });
+            assertEquals("<http://ns.inria.fr/test> used in > should be resolvable to a not an IRI", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject >= operator with IRIs")
+        void shouldRejectGTEWithIRIs() {
+            SparqlParser parser = newParserDefault();
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(datatype("2"^^<http://www.w3.org/2001/XMLSchema#integer>) >= 4)
+                           }
+                        """);
+            });
+            assertEquals("DATATYPE used in >= should be resolvable to a not an IRI", exception.getMessage());
+        }
+
     }
 
     private static Stream<Arguments> invalidSelectQueries() {

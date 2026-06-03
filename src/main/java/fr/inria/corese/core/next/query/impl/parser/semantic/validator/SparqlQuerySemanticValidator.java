@@ -22,7 +22,9 @@ public final class SparqlQuerySemanticValidator implements QueryValidator<QueryA
                 new SelectProjectionScopeValidationRule(),
                 new OrderByScopeValidationRule(),
                 new FilterArgumentsValidationRule(),
-                new OperandArgumentNumericTypeValidationRule()));
+                new OperandArgumentNumericTypeValidationRule(),
+                new OperandArgumentBooleanTypeValidationRule(),
+                new OperandArgumentIRITypeValidationRule()));
     }
 
     /** Package-private for tests or future composition of rule sets. */
