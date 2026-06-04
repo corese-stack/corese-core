@@ -1,7 +1,5 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
-import com.typesafe.sslconfig.ssl.LessThan;
-import com.typesafe.sslconfig.ssl.LessThanOrEqual;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AbstractAstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
@@ -20,7 +18,7 @@ public class OperandArgumentIRITypeValidationRule extends AbstractSemanticValida
 
     @Override
     protected String getDiagnosticSource() {
-        return OperandArgumentBooleanTypeValidationRule.class.getSimpleName();
+        return OperandArgumentIRITypeValidationRule.class.getSimpleName();
     }
 
     @Override

@@ -20,7 +20,8 @@ public record UpdateRequestAst(QueryPrologueAst prologue, List<UpdateRequestUnit
 
     @Override
     public void accept(AstVisitor visitor) {
-        visitor.visit(this.prologue);
+        visitor.visit(this);
+        this.prologue.accept(visitor);
         this.operations.forEach(updateRequestUnitAst -> updateRequestUnitAst.accept(visitor));
     }
 }

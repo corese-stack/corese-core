@@ -387,7 +387,7 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
         @Test
         @DisplayName("Should reject - operator with non numerics")
-        void shouldAcceptMinusWithNonNumerics() {
+        void shouldRejectMinusWithNonNumerics() {
             SparqlParser parser = newParserDefault();
             QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
                 parser.parse("""
@@ -402,7 +402,7 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
         @Test
         @DisplayName("Should reject * operator with non numerics")
-        void shouldAcceptDivideWithNonNumerics() {
+        void shouldRejectDivideWithNonNumerics() {
             SparqlParser parser = newParserDefault();
             QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
                 parser.parse("""
@@ -417,7 +417,7 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
         @Test
         @DisplayName("Should reject / operator with non numerics")
-        void shouldAcceptMultiplyWithNonNumerics() {
+        void shouldRejectMultiplyWithNonNumerics() {
             SparqlParser parser = newParserDefault();
             QueryValidationException exception = assertThrows(QueryValidationException.class, () -> {
                 parser.parse("""
