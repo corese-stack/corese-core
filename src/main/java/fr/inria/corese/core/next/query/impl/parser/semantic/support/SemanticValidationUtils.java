@@ -132,13 +132,7 @@ public class SemanticValidationUtils {
      * Check if the term is either a variable or an IRI or an expression that can be resolved to an IRI
      */
     public static boolean checkTermIsPotentialIri(TermAst termAst) {
-        if(termAst instanceof VarAst) {
-            return true;
-        }
         if(termAst instanceof IriAst) { // Is an IRI
-            return true;
-        }
-        if (termAst instanceof FunctionCallAst) { // Is a function call that could return a boolean, we cannot know
             return true;
         }
         if(termAst instanceof IriExpressionAst) { // Is a function that can be resolved to an IRI

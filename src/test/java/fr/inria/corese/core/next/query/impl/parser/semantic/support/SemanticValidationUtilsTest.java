@@ -50,7 +50,8 @@ class SemanticValidationUtilsTest {
     @Test
     void checkTermIsPotentialIriTest() {
         assertTrue(checkTermIsPotentialIri(new IriAst("<http://ns.inria.de/test>")));
-        assertTrue(checkTermIsPotentialIri(new VarAst("test")));
+        assertTrue(checkTermIsPotentialIri(new DatatypeAst(List.of(new LiteralAst("1", null, null)))));
+        assertFalse(checkTermIsPotentialIri(new VarAst("test")));
         assertFalse(checkTermIsPotentialIri(new LiteralAst("1", null, null)));
         assertFalse(checkTermIsPotentialIri(new NowAst()));
     }
