@@ -11,7 +11,6 @@ import fr.inria.corese.core.sparql.triple.function.term.Binding;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.Dataset;
 import fr.inria.corese.core.storage.api.datamanager.DataManager;
-import fr.inria.corese.core.transform.TemplateVisitor;
 import fr.inria.corese.core.visitor.solver.QuerySolverVisitorTransformer;
 
 import java.util.ArrayList;
@@ -145,18 +144,9 @@ public class Data {
     }
 
     public Graph getVisitedGraph() {
-        TemplateVisitor vis = getTransformerVisitor();
-        if (vis == null) {
-            return null;
-        }
-        return vis.visitedGraph();
-    }
-
-    public TemplateVisitor getTransformerVisitor() {
-        if (getBinding() == null) {
-            return null;
-        }
-        return (TemplateVisitor) getBinding().getTransformerVisitor();
+    	// removing dependency to corese.core.transform
+    	// method kept for backward dependency
+    	return null;
     }
 
     public String getTemplateResult() {
