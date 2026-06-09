@@ -295,8 +295,4 @@ public class Data {
         return dataManager;
     }
 
-    public void setDataManager(DataManager dataManager) {
-        this.dataManager = dataManager;
-    }
-
 }

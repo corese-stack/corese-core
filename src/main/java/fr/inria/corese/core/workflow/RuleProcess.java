@@ -15,7 +15,6 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 public class RuleProcess extends WorkflowProcess {
 
     RuleEngine.Profile profile = RuleEngine.Profile.STDRL;
-    private RuleEngine engine;
     private boolean onUpdate = false;
 
     public RuleProcess(String p) {
@@ -25,10 +24,6 @@ public class RuleProcess extends WorkflowProcess {
         } else if (path.equals(NSManager.RDFSRL)) {
             profile = RuleEngine.Profile.OWLRL_LITE;
         }
-    }
-
-    public RuleProcess(RuleEngine.Profile p) {
-        profile = p;
     }
 
     @Override
@@ -59,7 +54,6 @@ public class RuleProcess extends WorkflowProcess {
         try {
             RuleEngine re = create(g);
             re.setContext(getContext());
-            setEngine(re);
             re.process();
             Data res = new Data(data.getGraph());
             res.setProcess(this);
@@ -99,13 +93,6 @@ public class RuleProcess extends WorkflowProcess {
         Load ld = Load.create(g);
         ld.parse(p, Loader.format.RULE_FORMAT);
         return ld.getRuleEngine();
-    }
-
-    /**
-     * @param engine the engine to set
-     */
-    public void setEngine(RuleEngine engine) {
-        this.engine = engine;
     }
 
     /**

@@ -9,7 +9,6 @@ import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.core.kgram.api.core.PointerType;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
@@ -33,7 +32,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
     public static final String SHAPE_TRANS          = TransformerUtils.DATASHAPE;
     public static final String FORMAT               = TransformerUtils.TURTLE;
     public static final String FORMAT_HTML          = TransformerUtils.TURTLE_HTML;
-    private static final String NL                  = "\n";
     
     static final String MAIN = TransformerUtils.STL_MAIN;
     static final String SHAPE_NODE  = NSManager.SHAPE + "shapeNode";
@@ -48,7 +46,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
     // draft: evaluate shape4shape on the shape
     ShapeWorkflow validator;
     private boolean validate = false;
-    private boolean shex = false;
     private PreProcessor processor;
     
     public ShapeWorkflow() {}
@@ -126,19 +123,7 @@ public class ShapeWorkflow extends SemanticWorkflow {
         shapeLoader.setProcessor(getProcessor());
         return shapeLoader;
     }
-    
-    
-    Graph graph(IDatatype dt) {
-        if (dt.isURI()) {
-            return parse(dt.getLabel());
-        }
-        else if (dt.pointerType() == PointerType.GRAPH){
-            return (Graph) dt.getPointerObject();
-        }
-        logger.warn("Empty graph: " + dt);
-        return Graph.create();
-    }
-    
+
     Graph parse(String uri) {
         Graph g = Graph.create();
         Load ld = Load.create(g);
@@ -151,46 +136,7 @@ public class ShapeWorkflow extends SemanticWorkflow {
         }
         return Graph.create();
     }
-    
-    public Graph process(Graph g, Graph s, boolean graph, IDatatype... param) {
-        Transformer t = Transformer.create(g, SHAPE_TRANS);
-        t.getContextManager().getContext().export(SHAPE_NAME, DatatypeMap.createObject(s));
-        try {
-            if (graph) {
-                // check whole graph
-                if (param.length == 0) {
-                    // whole shape graph
-                    t.process();
-                } else {
-                    // param = {shape}
-                    //t.template(MAIN, param[0]);
-                    t.process(MAIN, dtgraph, param[0]);
-                }
-            } else {
-                // check node in graph
-                switch (param.length) {
-                    case 1:
-                        // param = {node}
-                        t.process(MAIN, dtnode, param[0]);
-                        break;
-                    case 2:
-                        // TBD: param = {node, shape}
-                        t.process(MAIN, dtnode, param[0], param[1]);
-                        break;
-                }
-            }
-        } catch (EngineException e) {
-            logger.error(e.getMessage());
-        }
 
-        if (t.getVisitor() == null || t.getVisitor().visitedGraph() == null) {
-            return Graph.create();
-        }
-        Graph res = t.getVisitor().visitedGraph();
-        res.init();
-        return res;
-    }
-    
     /**
      * Draft: validate shape with shape4shape.ttl
      * use case:  sw:param [sw:mode sw:validate]
@@ -261,14 +207,6 @@ public class ShapeWorkflow extends SemanticWorkflow {
      */
     public void setValidate(boolean validate) {
         this.validate = validate;
-    }
-
-    /**
-     * @param shex the shex to set
-     */
-    public ShapeWorkflow setShex(boolean shex) {
-        this.shex = shex;
-        return this;
     }
 
     /**

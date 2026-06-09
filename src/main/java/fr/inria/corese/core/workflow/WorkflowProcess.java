@@ -256,9 +256,11 @@ public class WorkflowProcess implements AbstractProcess {
         return false;
     }
 
+/* --- dead code removal ---
     boolean isShape() {
         return true;
     }
+ --- dead code removal --- */
 
     boolean isModify() {
         return !isTransformation();
@@ -439,6 +441,7 @@ public class WorkflowProcess implements AbstractProcess {
         this.time = time;
     }
 
+/* --- dead code removal ---
     public long getMainTime() {
         return getTime();
     }
@@ -450,6 +453,7 @@ public class WorkflowProcess implements AbstractProcess {
     public SPARQLProcess getQueryProcess() {
         return null;
     }
+ --- dead code removal --- */
 
     /**
      * In the st:context graph, retrieve the value of property  of query (subject)

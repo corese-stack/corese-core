@@ -141,7 +141,6 @@ public class WorkflowParser {
     public SemanticWorkflow parse(Graph g, String name) throws LoadException, SafetyException {
         setGraph(g);
         sw.setWorkflowGraph(g);
-        sw.setServerMode(isServerMode());
         Node node = getWorkflowNode(name);
         if (node == null) {
             if (path != null) {
@@ -189,7 +188,6 @@ public class WorkflowParser {
             return map.get(wf.getLabel());
         }
         map.put(wf.getLabel(), sw);
-        sw.setServerMode(isServerMode());
         loop(wf);
         context(wf);
         parseNode(wf);
@@ -409,8 +407,6 @@ public class WorkflowParser {
                     default:
                         IDatatype duri = getValue(URI, dt);
                         IDatatype dbody = getValue(BODY, dt);
-                        IDatatype dtest = getValue(TEST_VALUE, dt);
-                        boolean test = dtest != null && dtest.booleanValue();
 
                         if (duri != null) {
                             String uri = duri.getLabel();
@@ -494,7 +490,7 @@ public class WorkflowParser {
         Loader.format format = (isURL) ? Loader.format.UNDEF_FORMAT : getFormat(sformat);
 
         ShapeWorkflow ap = null;
-        ap = new ShapeWorkflow().setShex(shex);
+        ap = new ShapeWorkflow();
         if (shex) {
             ap.setProcessor(getProcessor());
         }
@@ -631,7 +627,6 @@ public class WorkflowParser {
     }
 
     void complete(SPARQLProcess q, IDatatype dt) {
-        q.setValue(getValue(Context.STL_PATTERN_VALUE, dt));
         q.setProcess(getValue(Context.STL_PROCESS_QUERY, dt));
     }
 

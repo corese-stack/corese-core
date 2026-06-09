@@ -21,10 +21,12 @@ public class TransformationProcess extends WorkflowProcess {
         setPath(p);
     }
 
+/* --- dead code removal ---
     public TransformationProcess(String p, boolean b) {
         this(p);
         isDefault = b;
     }
+ --- dead code removal --- */
 
     @Override
     public boolean isTransformation() {
