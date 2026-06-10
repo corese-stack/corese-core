@@ -355,17 +355,6 @@ public class WorkflowParser {
                 ap = subWorkflow(getGraph().getNode(dt));
             } else {
                 switch (type) {
-
-                /* removed as part of corese.core.transform removal
-                    case DATASHAPE:
-                        ap = datashape(dt, false);
-                        break;
-                    case SHEX:
-                        ap = datashape(dt, true);
-                        break;
-                    case TRANSFORMATION:
-                        ap = transformation(dt);
-                        break; */
                     case RESULT_FORMAT:
                         ap = result(dt);
                         break;
@@ -436,43 +425,6 @@ public class WorkflowParser {
             default:
                 return ResultFormatDef.format.UNDEF_FORMAT;
         }
-    }
-
-    /**
-     * Special case: may get input from Context
-     *_/
-    ShapeWorkflow datashape(IDatatype dt, boolean shex) throws SafetyException {
-        IDatatype dtest = getValue(TEST_VALUE, dt);
-        boolean test = dtest != null && dtest.booleanValue();
-        // format parameter => rdf and shacl input as text (otherwise as URL)
-        String sformat = getStringParam(FORMAT_PARAM);
-        boolean isURL = (sformat == null);
-        // rdf
-        String rdf = getParam(dt, URI, LOAD_PARAM, isURL, isURL);
-        // shacl
-        String shacl = getParam(dt, SHAPE, MODE_PARAM, isURL, isURL);
-        String result = getParam(dt, PATH, PATH);
-
-        Loader.format format = (isURL) ? Loader.format.UNDEF_FORMAT : getFormat(sformat);
-
-        ShapeWorkflow ap = null;
-        ap = new ShapeWorkflow();
-        if (shex) {
-            ap.setProcessor(getProcessor());
-        }
-        ap.create(shacl, rdf, result, !isURL, format, test, false);
-        return ap;
-    }
-
-    Loader.format getFormat(String format) {
-        if (format.equals(TURTLE)) {
-            return Loader.format.TURTLE_FORMAT;
-        } else if (format.equals(RDFXML)) {
-            return Loader.format.RDFXML_FORMAT;
-        } else if (format.equals(JSON_FORMAT)) {
-            return Loader.format.JSONLD_FORMAT;
-        }
-        return Loader.format.UNDEF_FORMAT;
     }
 
     /**
