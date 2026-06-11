@@ -54,6 +54,7 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
                 validateProjectionExpression(
                         projectedVar.name(),
                         projection,
+                        groupedVariables,
                         diagnostics);
                 continue;
             }
@@ -79,6 +80,7 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
     private void validateProjectionExpression(
             String projectionVariableName,
             ProjectionAst projection,
+            Set<String> groupedVariables,
             List<QueryDiagnostic> diagnostics
     ) {
         TermAst expression = projection.expressionTerms().get(projectionVariableName);
@@ -86,7 +88,9 @@ public final class GroupedSelectProjectionValidationRule extends AbstractSemanti
             return;
         }
         for (String referencedVariable : collectReferencedVariablesOutsideAggregates(expression)) {
-            diagnostics.add(buildGroupedProjectionDiagnostic(referencedVariable));
+            if (!groupedVariables.contains(referencedVariable)) {
+                diagnostics.add(buildGroupedProjectionDiagnostic(referencedVariable));
+            }
         }
     }
 

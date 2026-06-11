@@ -755,6 +755,27 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should accept grouped SELECT expression using a variable from GROUP BY ?var")
+    void shouldAcceptGroupedSelectExpressionUsingGroupedVariable() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT ?groupedVar (STR(?groupedVar) AS ?alias) WHERE {
+                    ?groupedVar ?p ?o
+                }
+                GROUP BY ?groupedVar
+                """);
+
+        SelectQueryAst selectQueryAst = assertInstanceOf(SelectQueryAst.class, ast);
+        ProjectionAst projection = selectQueryAst.projection();
+        assertFalse(projection.selectAll());
+        assertEquals(2, projection.variables().size());
+        assertEquals("groupedVar", projection.variables().get(0).name());
+        assertEquals("alias", projection.variables().get(1).name());
+        assertTrue(projection.expressionBoundVariables().contains("alias"));
+    }
+
+    @Test
     @DisplayName("Should parse GROUP BY expression aliases and allow projecting the alias")
     void shouldParseGroupByExpressionAlias() {
         SparqlParser parser = newParserDefault();
