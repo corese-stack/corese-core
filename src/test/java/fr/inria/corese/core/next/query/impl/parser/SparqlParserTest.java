@@ -269,8 +269,8 @@ class SparqlParserTest {
                 WHERE {
                     ?s ?p ?o
                 }
-                VALUES ?rank { 1 }
                 ORDER BY ?rank
+                VALUES ?rank { 1 }
                 """);
 
         assertTrue(result.isValid());
