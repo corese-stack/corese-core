@@ -11,6 +11,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 import java.util.LinkedHashSet;
@@ -35,6 +36,7 @@ public abstract class AbstractSemanticValidationRule implements SemanticValidati
             case ConstructQueryAst constructQueryAst -> constructQueryAst.solutionModifier();
             case DescribeQueryAst describeQueryAst -> describeQueryAst.solutionModifier();
             case AskQueryAst askQueryAst -> askQueryAst.solutionModifier();
+            case UpdateRequestAst ignored -> SolutionModifierAst.empty();
         };
     }
 

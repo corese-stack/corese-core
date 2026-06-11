@@ -7,6 +7,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ValueMappingAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ValuesAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.WhereClauseQueryAst;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +56,8 @@ class VariableScopeAnalyzerTest extends AbstractSparqlParserFeatureTest {
                 }
                 """);
 
-        BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
+        WhereClauseQueryAst whereClauseQueryAst = assertInstanceOf(WhereClauseQueryAst.class, ast);
+        BindAst bind = assertInstanceOf(BindAst.class, whereClauseQueryAst.whereClause().patterns().getLast());
 
         assertEquals(Set.of("s", "p"), analyzer.collectReferencedVariablesOutsideAggregates(bind.expression()));
     }
@@ -78,8 +80,11 @@ class VariableScopeAnalyzerTest extends AbstractSparqlParserFeatureTest {
                 }
                 """);
 
-        BindAst aggregatedBind = assertInstanceOf(BindAst.class, withAggregate.whereClause().patterns().getLast());
-        BindAst plainBind = assertInstanceOf(BindAst.class, withoutAggregate.whereClause().patterns().getLast());
+        WhereClauseQueryAst aggregatedQuery = assertInstanceOf(WhereClauseQueryAst.class, withAggregate);
+        WhereClauseQueryAst plainQuery = assertInstanceOf(WhereClauseQueryAst.class, withoutAggregate);
+
+        BindAst aggregatedBind = assertInstanceOf(BindAst.class, aggregatedQuery.whereClause().patterns().getLast());
+        BindAst plainBind = assertInstanceOf(BindAst.class, plainQuery.whereClause().patterns().getLast());
 
         assertTrue(analyzer.containsAggregate(aggregatedBind.expression()));
         assertFalse(analyzer.containsAggregate(plainBind.expression()));

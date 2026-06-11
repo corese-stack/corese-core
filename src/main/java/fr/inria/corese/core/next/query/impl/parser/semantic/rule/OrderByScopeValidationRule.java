@@ -9,6 +9,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
             case ConstructQueryAst constructQueryAst -> validateOrderByOnly(constructQueryAst);
             case DescribeQueryAst describeQueryAst -> validateOrderByOnly(describeQueryAst);
             case AskQueryAst askQueryAst -> validateOrderByOnly(askQueryAst);
+            case UpdateRequestAst ignored -> List.of();
         };
     }
 
