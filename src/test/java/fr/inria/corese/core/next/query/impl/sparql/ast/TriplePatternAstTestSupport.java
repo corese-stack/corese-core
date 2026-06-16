@@ -20,7 +20,5 @@ public final class TriplePatternAstTestSupport {
         return ((PredicatePathAst) predicate).predicate();
     }
 
-    public static PathAst predicatePath(TermAst term) {
-        return PathAst.from(term);
     }
 }
