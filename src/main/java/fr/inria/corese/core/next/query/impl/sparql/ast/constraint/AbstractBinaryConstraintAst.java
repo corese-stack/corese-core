@@ -1,12 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-
 import java.util.List;
 import java.util.Objects;
+
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
  * Abstract implementation of {@link BinaryConstraintAst}

@@ -15,9 +15,6 @@ public record BgpAst(List<TriplePatternAst> triples) implements PatternAst {
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
-        triples.forEach(triplePatternAst -> {
-            triplePatternAst.accept(visitor);
-        });
+        triples.forEach(triplePatternAst -> triplePatternAst.accept(visitor));
     }
 }
-

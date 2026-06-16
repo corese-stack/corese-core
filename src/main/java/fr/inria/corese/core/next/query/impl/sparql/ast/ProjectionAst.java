@@ -1,18 +1,21 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
-
 import java.util.List;
 import java.util.Set;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
+
 /**
- * SPARQL SELECT projection: either {@code SELECT *} (all variables from the pattern)
+ * SPARQL SELECT projection: either {@code SELECT *} (all variables from the
+ * pattern)
  * or an explicit list of variables {@code SELECT ?s ?p ?o}.
  * <p>
- * Use {@link ProjectionAsts#selectAll()} and {@link ProjectionAsts#of(List)} to create instances.
+ * Use {@link ProjectionAsts#selectAll()} and {@link ProjectionAsts#of(List)} to
+ * create instances.
  */
-public record ProjectionAst(boolean selectAll, List<VarAst> variables, Set<String> expressionBoundVariables) implements VisitableAst {
+public record ProjectionAst(boolean selectAll, List<VarAst> variables, Set<String> expressionBoundVariables)
+        implements VisitableAst {
     public ProjectionAst {
         variables = variables != null ? List.copyOf(variables) : List.of();
         expressionBoundVariables = expressionBoundVariables != null ? Set.copyOf(expressionBoundVariables) : Set.of();
@@ -27,8 +30,6 @@ public record ProjectionAst(boolean selectAll, List<VarAst> variables, Set<Strin
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
-        this.variables.forEach(varAst -> {
-            varAst.accept(visitor);
-        });
+        this.variables.forEach(varAst -> varAst.accept(visitor));
     }
 }

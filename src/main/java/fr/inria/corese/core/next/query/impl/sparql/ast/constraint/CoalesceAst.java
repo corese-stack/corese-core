@@ -1,9 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import java.util.List;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
  * Function {@code COALESCE(expr1, expr2, ...)} in SPARQL 1.1
