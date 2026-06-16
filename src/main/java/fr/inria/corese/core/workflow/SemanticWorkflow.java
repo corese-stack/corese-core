@@ -16,7 +16,6 @@ public class SemanticWorkflow extends CompositeProcess {
     Data data;
     private int loop = -1;
     private Graph workflowGraph;
-    private boolean serverMode = false;
 
     public SemanticWorkflow() {
         super();
@@ -42,21 +41,6 @@ public class SemanticWorkflow extends CompositeProcess {
         insert(p);
         p.subscribe(this);
         return this;
-    }
-
-    public SemanticWorkflow add(WorkflowProcess p, int n) {
-        insert(p, n);
-        p.subscribe(this);
-        return this;
-    }
-
-    SPARQLProcess getEmptyQuery() {
-        for (WorkflowProcess wp : getProcessList()) {
-            if (wp instanceof SPARQLProcess && wp.isEmpty()) {
-                return (SPARQLProcess) wp;
-            }
-        }
-        return null;
     }
 
 
@@ -228,20 +212,6 @@ public class SemanticWorkflow extends CompositeProcess {
      */
     public void setWorkflowGraph(Graph workflowGraph) {
         this.workflowGraph = workflowGraph;
-    }
-
-    /**
-     * @return the serverMode
-     */
-    public boolean isServerMode() {
-        return serverMode;
-    }
-
-    /**
-     * @param serverMode the serverMode to set
-     */
-    public void setServerMode(boolean serverMode) {
-        this.serverMode = serverMode;
     }
 
 }

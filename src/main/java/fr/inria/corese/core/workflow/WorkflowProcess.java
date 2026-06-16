@@ -256,10 +256,6 @@ public class WorkflowProcess implements AbstractProcess {
         return false;
     }
 
-    boolean isShape() {
-        return true;
-    }
-
     boolean isModify() {
         return !isTransformation();
     }
@@ -437,18 +433,6 @@ public class WorkflowProcess implements AbstractProcess {
      */
     public void setTime(long time) {
         this.time = time;
-    }
-
-    public long getMainTime() {
-        return getTime();
-    }
-
-    public boolean isQuery() {
-        return false;
-    }
-
-    public SPARQLProcess getQueryProcess() {
-        return null;
     }
 
     /**
