@@ -114,22 +114,20 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
     class FilterValidationTest {
 
         @Test
-        @DisplayName("Should reject FILTER with numeric operator")
-        void shouldRejectFilterWithNumericOperator() {
+        @DisplayName("Should accept FILTER with numeric operator")
+        void shouldAcceptFilterWithNumericOperator() {
             SparqlParser parser = newParserDefault();
 
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            assertDoesNotThrow(() -> parser.parse("""
                         SELECT * WHERE {
                           ?x ?p ?o .
                           FILTER(RAND())
                         }
                     """));
-
-            assertEquals("RAND used in FILTER should be resolvable to a boolean", exception.getMessage());
         }
 
         @Test
-        @DisplayName("Should reject FILTER with IRI operator")
+        @DisplayName("Should reject FILTER with IRI-returning operator")
         void shouldRejectFilterWithIRIOperator() {
             SparqlParser parser = newParserDefault();
 
@@ -159,18 +157,57 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         }
 
         @Test
-        @DisplayName("Should reject FILTER with datetime duration operator")
-        void shouldRejectFilterWithDuration() {
+        @DisplayName("Should accept FILTER with numeric expression derived from datetime")
+        void shouldAcceptFilterWithDuration() {
             SparqlParser parser = newParserDefault();
 
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            assertDoesNotThrow(() -> parser.parse("""
                         SELECT * WHERE {
                           ?x ?p ?o .
                           FILTER(DAY(NOW()))
                         }
                     """));
+        }
 
-            assertEquals("DAY used in FILTER should be resolvable to a boolean", exception.getMessage());
+        @Test
+        @DisplayName("Should accept FILTER with plain literal")
+        void shouldAcceptFilterWithPlainLiteral() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER("test")
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should accept FILTER with CONCAT result")
+        void shouldAcceptFilterWithConcat() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(CONCAT("te", "st"))
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER when IF condition is not EBV-compatible")
+        void shouldRejectFilterContainingIfWithIncorrectConditionType() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(IF(NOW(), true, false))
+                        }
+                    """));
+
+            assertEquals("IF used in FILTER should be resolvable to a boolean", exception.getMessage());
         }
 
         @Test
@@ -257,11 +294,11 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         }
 
         @Test
-        @DisplayName("Should reject FILTER with numeric operator in a nested BGP")
-        void shouldRejectFilterWithNumericOperatorInNestedBGP() {
+        @DisplayName("Should accept FILTER with numeric operator in a nested BGP")
+        void shouldAcceptFilterWithNumericOperatorInNestedBGP() {
             SparqlParser parser = newParserDefault();
 
-            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            assertDoesNotThrow(() -> parser.parse("""
                         SELECT * WHERE {
                           {
                               ?x ?p ?o .
@@ -271,8 +308,6 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                           }
                         }
                     """));
-
-            assertEquals("RAND used in FILTER should be resolvable to a boolean", exception.getMessage());
         }
     }
 
