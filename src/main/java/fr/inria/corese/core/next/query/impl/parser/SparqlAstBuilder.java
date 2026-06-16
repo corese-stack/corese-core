@@ -9,8 +9,7 @@ import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -1285,12 +1284,108 @@ public abstract class SparqlAstBuilder {
     }
 
     /**
-     * Predicate as a property path.
-     * For simple triples without a composed path, this is just an iriRef or 'a'.
-     * Composed property paths will be expanded in a later phase if needed.
+     * Predicate as a SPARQL 1.1 property path.
      */
-    public TermAst termFromVerbPath(SparqlParser.VerbPathContext ctx) {
-        return this.iri(ctx.getText());
+    public PathAst pathFromVerbPath(SparqlParser.VerbPathContext ctx) {
+        return pathFromPath(ctx.path());
+    }
+
+    public PathAst pathFromPath(SparqlParser.PathContext ctx) {
+        return pathFromPathAlternative(ctx.pathAlternative());
+    }
+
+    private PathAst pathFromPathAlternative(SparqlParser.PathAlternativeContext ctx) {
+        return foldAlternatives(ctx.pathSequence().stream().map(this::pathFromPathSequence).toList());
+    }
+
+    private PathAst pathFromPathSequence(SparqlParser.PathSequenceContext ctx) {
+        return foldSequences(ctx.pathEltOrInverse().stream().map(this::pathFromPathEltOrInverse).toList());
+    }
+
+    private PathAst pathFromPathEltOrInverse(SparqlParser.PathEltOrInverseContext ctx) {
+        if (ctx.CARET() != null) {
+            return new InversePathAst(pathFromPathElt(ctx.pathElt()));
+        }
+        return pathFromPathElt(ctx.pathElt());
+    }
+
+    private PathAst pathFromPathElt(SparqlParser.PathEltContext ctx) {
+        PathAst primary = pathFromPathPrimary(ctx.pathPrimary());
+        SparqlParser.PathModContext mod = ctx.pathMod();
+        if (mod == null) {
+            return primary;
+        }
+        if (mod.QUESTION() != null) {
+            return new OptionalPathAst(primary);
+        }
+        if (mod.STAR() != null) {
+            return new ZeroOrMorePathAst(primary);
+        }
+        if (mod.PLUS() != null) {
+            return new OneOrMorePathAst(primary);
+        }
+        throw new QueryEvaluationException("Unexpected path modifier in " + ctx.getText());
+    }
+
+    private PathAst pathFromPathPrimary(SparqlParser.PathPrimaryContext ctx) {
+        if (ctx.iriRef() != null) {
+            return new PredicatePathAst(termFromIriRef(ctx.iriRef()));
+        }
+        if (ctx.A() != null) {
+            return new PredicatePathAst(iri("a"));
+        }
+        if (ctx.EXCLAMATION() != null) {
+            return pathFromPathNegatedPropertySet(ctx.pathNegatedPropertySet());
+        }
+        if (ctx.path() != null) {
+            return pathFromPath(ctx.path());
+        }
+        throw new QueryEvaluationException("Unexpected path primary in " + ctx.getText());
+    }
+
+    private PathAst pathFromPathNegatedPropertySet(SparqlParser.PathNegatedPropertySetContext ctx) {
+        List<PathAst> excluded;
+        if (ctx.L_PAREN() != null) {
+            excluded = ctx.pathOneInPropertySet().stream().map(this::pathFromPathOneInPropertySet).toList();
+        } else {
+            excluded = List.of(pathFromPathOneInPropertySet(ctx.pathOneInPropertySet().getFirst()));
+        }
+        return new NegatedPropertySetPathAst(excluded);
+    }
+
+    private PathAst pathFromPathOneInPropertySet(SparqlParser.PathOneInPropertySetContext ctx) {
+        if (ctx.CARET() != null) {
+            if (ctx.iriRef() != null) {
+                return new InversePathAst(new PredicatePathAst(termFromIriRef(ctx.iriRef())));
+            }
+            return new InversePathAst(new PredicatePathAst(iri("a")));
+        }
+        if (ctx.iriRef() != null) {
+            return new PredicatePathAst(termFromIriRef(ctx.iriRef()));
+        }
+        return new PredicatePathAst(iri("a"));
+    }
+
+    private PathAst foldAlternatives(List<PathAst> parts) {
+        if (parts.isEmpty()) {
+            throw new QueryEvaluationException("Empty property path alternative");
+        }
+        PathAst result = parts.getFirst();
+        for (int i = 1; i < parts.size(); i++) {
+            result = new AlternativePathAst(result, parts.get(i));
+        }
+        return result;
+    }
+
+    private PathAst foldSequences(List<PathAst> parts) {
+        if (parts.isEmpty()) {
+            throw new QueryEvaluationException("Empty property path sequence");
+        }
+        PathAst result = parts.getFirst();
+        for (int i = 1; i < parts.size(); i++) {
+            result = new SequencePathAst(result, parts.get(i));
+        }
+        return result;
     }
 
     /**

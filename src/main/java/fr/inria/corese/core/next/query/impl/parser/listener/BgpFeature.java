@@ -3,6 +3,8 @@ package fr.inria.corese.core.next.query.impl.parser.listener;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 
 import java.util.List;
 
@@ -96,7 +98,7 @@ public class BgpFeature extends AbstractSparqlFeature {
         int verbSimpleIdx = 0;
 
         for (SparqlParser.ObjectListPathContext objList : objLists) {
-            TermAst p;
+            PathAst predicate;
 
             boolean useVerbPath = verbPathIdx < verbPaths.size() && (
                     verbSimpleIdx >= verbSimples.size() ||
@@ -105,14 +107,14 @@ public class BgpFeature extends AbstractSparqlFeature {
             );
 
             if (useVerbPath) {
-                p = builder().termFromVerbPath(verbPaths.get(verbPathIdx++));
+                predicate = builder().pathFromVerbPath(verbPaths.get(verbPathIdx++));
             } else {
-                p = builder().termFromVerbSimple(verbSimples.get(verbSimpleIdx++));
+                predicate = new PredicatePathAst(builder().termFromVerbSimple(verbSimples.get(verbSimpleIdx++)));
             }
 
             List<TermAst> objects = builder().termListFromObjectListPath(objList);
             for (TermAst o : objects) {
-                builder().addTriple(s, p, o);
+                builder().addTriple(s, predicate, o);
             }
         }
     }
