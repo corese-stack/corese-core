@@ -8,11 +8,33 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
- * This rule checks the operators used in Filter asts
+ * Validates that FILTER and HAVING expressions are compatible with SPARQL
+ * effective boolean value evaluation.
  */
 public final class FilterArgumentsValidationRule extends AbstractSemanticValidationRule {
+
+    private static final String BOOLEAN_DATATYPE = XSD.xsdBoolean.getIRI().stringValue();
+    private static final String STRING_DATATYPE = XSD.xsdString.getIRI().stringValue();
+    private static final Set<String> NUMERIC_DATATYPES = Set.of(
+            XSD.xsdInteger.getIRI().stringValue(),
+            XSD.xsdNonNegativeInteger.getIRI().stringValue(),
+            XSD.xsdNonPositiveInteger.getIRI().stringValue(),
+            XSD.xsdPositiveInteger.getIRI().stringValue(),
+            XSD.xsdNegativeInteger.getIRI().stringValue(),
+            XSD.xsdInt.getIRI().stringValue(),
+            XSD.xsdUnsignedInt.getIRI().stringValue(),
+            XSD.xsdLong.getIRI().stringValue(),
+            XSD.xsdUnsignedLong.getIRI().stringValue(),
+            XSD.xsdDecimal.getIRI().stringValue(),
+            XSD.xsdShort.getIRI().stringValue(),
+            XSD.xsdUnsignedShort.getIRI().stringValue(),
+            XSD.xsdByte.getIRI().stringValue(),
+            XSD.xsdUnsignedByte.getIRI().stringValue(),
+            XSD.xsdFloat.getIRI().stringValue(),
+            XSD.xsdDouble.getIRI().stringValue());
 
     @Override
     protected String getDiagnosticSource() {
@@ -27,41 +49,49 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
     }
 
     /**
-     * Check that the given term is either boolean expression, literal expression (that may return a boolean result) or a variable
+     * Checks whether the given term is statically compatible with SPARQL
+     * effective boolean value evaluation.
      */
-    private static boolean checkTermIsPotentialBoolean(TermAst termAst) {
-        if(termAst instanceof BooleanExpressionAst) {
-            return true;
-        }
-        if(termAst instanceof LiteralExpressionAst literalExpressionAst
-                && ! ( literalExpressionAst instanceof XsdDateTimeExpressionAst
-                || literalExpressionAst instanceof XsdDayTimeDurationExpressionAst
-                || literalExpressionAst instanceof NumericExpressionAst
-            )) { // Is a literal expression that could be a boolean, we cannot know
-            return true;
-        }
-        if(termAst instanceof FunctionCallAst) { // Is a function call that could return a boolean, we cannot know
-            return true;
-        }
-        if(termAst instanceof IfAst ifAst
-                && checkTermIsPotentialBoolean(ifAst.thenExpr())
-                && checkTermIsPotentialBoolean(ifAst.elseExpr())) { // Is a IF that returns potential booleans
-            return true;
-        }
-        if(termAst instanceof LiteralAst(String lexical, String lang, String datatype)) {// is a literal that is a typed as a boolean or the string representation of one
-                if(datatype != null) {
-                    if(datatype.equals(XSD.xsdBoolean.getIRI().stringValue())) {
-                        return true;
-                    }
-                } else {
-                    return lexical.trim().equalsIgnoreCase("true") || lexical.trim().equalsIgnoreCase("false");
-                }
-        }
-        if(termAst instanceof VarAst) { // Is a variable that can be resolved to a boolean
+    private static boolean isPotentiallyEbvCompatible(TermAst termAst) {
+        if (termAst instanceof BooleanExpressionAst
+                || termAst instanceof NumericExpressionAst
+                || termAst instanceof VarAst
+                || termAst instanceof FunctionCallAst
+                || termAst instanceof UnlimitedArgumentsFunctionAst) {
             return true;
         }
 
+        if (termAst instanceof LiteralAst literalAst) {
+            return isEbvCompatibleLiteral(literalAst);
+        }
+
+        if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
+            return isPotentiallyEbvCompatible(condition)
+                    && isPotentiallyEbvCompatible(thenExpr)
+                    && isPotentiallyEbvCompatible(elseExpr);
+        }
+
+        if (termAst instanceof LiteralExpressionAst literalExpressionAst) {
+            return !(literalExpressionAst instanceof XsdDateTimeExpressionAst
+                    || literalExpressionAst instanceof XsdDayTimeDurationExpressionAst);
+        }
+
         return false;
+    }
+
+    private static boolean isEbvCompatibleLiteral(LiteralAst literalAst) {
+        if (literalAst.lang() != null && !literalAst.lang().isBlank()) {
+            return true;
+        }
+
+        String datatype = literalAst.datatype();
+        if (datatype == null) {
+            return true;
+        }
+
+        return BOOLEAN_DATATYPE.equals(datatype)
+                || STRING_DATATYPE.equals(datatype)
+                || NUMERIC_DATATYPES.contains(datatype);
     }
 
     private class FilterArgumentsValidationVisitor extends AbstractAstVisitor {
@@ -73,7 +103,7 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
 
         @Override
         public void visit(PatternAst patternAst) {
-            if (patternAst instanceof FilterAst(TermAst operator) && !checkTermIsPotentialBoolean(operator)) {
+            if (patternAst instanceof FilterAst(TermAst operator) && !isPotentiallyEbvCompatible(operator)) {
                 result.add(buildIncorrectTypeDiagnostic(operator.getName(), "FILTER", "boolean"));
             }
         }
@@ -81,11 +111,10 @@ public final class FilterArgumentsValidationRule extends AbstractSemanticValidat
         @Override
         public void visit(HavingAst havingAst) {
             for (TermAst condition : havingAst.conditions()) {
-                if (!checkTermIsPotentialBoolean(condition)) {
+                if (!isPotentiallyEbvCompatible(condition)) {
                     result.add(buildIncorrectTypeDiagnostic(condition.getName(), "HAVING", "boolean"));
                 }
             }
         }
     }
 }
-
