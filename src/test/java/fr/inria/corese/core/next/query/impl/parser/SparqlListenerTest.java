@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
+import static fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAstTestSupport.simplePredicateTerm;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -67,7 +68,7 @@ class SparqlListenerTest {
         assertEquals(1, bgp.triples().size());
         TriplePatternAst t = bgp.triples().getFirst();
         assertEquals("s", ((VarAst) t.subject()).name());
-        assertEquals("p", ((VarAst) t.predicate()).name());
+        assertEquals("p", ((VarAst) simplePredicateTerm(t)).name());
         assertEquals("o", ((VarAst) t.object()).name());
     }
 

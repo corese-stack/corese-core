@@ -69,11 +69,11 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         TriplePatternAst t = bgp.triples().getFirst();
 
         assertInstanceOf(VarAst.class, t.subject());
-        assertInstanceOf(VarAst.class, t.predicate());
+        assertInstanceOf(VarAst.class, simplePredicateTerm(t));
         assertInstanceOf(VarAst.class, t.object());
 
         assertEquals("s", ((VarAst) t.subject()).name());
-        assertEquals("p", ((VarAst) t.predicate()).name());
+        assertEquals("p", ((VarAst) simplePredicateTerm(t)).name());
         assertEquals("o", ((VarAst) t.object()).name());
 
         // --- PROJECTION ---
@@ -126,11 +126,11 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         TriplePatternAst t = bgp.triples().getFirst();
 
         assertInstanceOf(VarAst.class, t.subject());
-        assertInstanceOf(VarAst.class, t.predicate());
+        assertInstanceOf(VarAst.class, simplePredicateTerm(t));
         assertInstanceOf(VarAst.class, t.object());
 
         assertEquals("s", ((VarAst) t.subject()).name());
-        assertEquals("p", ((VarAst) t.predicate()).name());
+        assertEquals("p", ((VarAst) simplePredicateTerm(t)).name());
         assertEquals("o", ((VarAst) t.object()).name());
 
         // --- PROJECTION ---
@@ -175,7 +175,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         TriplePatternAst t = bgp.triples().getFirst();
 
         assertInstanceOf(VarAst.class, t.subject());
-        assertInstanceOf(VarAst.class, t.predicate());
+        assertInstanceOf(VarAst.class, simplePredicateTerm(t));
         assertInstanceOf(VarAst.class, t.object());
 
         assertEquals("s", ((VarAst) t.subject()).name());
@@ -260,7 +260,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertEquals(1, bgp.triples().size());
         TriplePatternAst triple = bgp.triples().getFirst();
         assertEquals("s", ((VarAst) triple.subject()).name());
-        assertEquals("p", ((VarAst) triple.predicate()).name());
+        assertEquals("p", ((VarAst) simplePredicateTerm(triple)).name());
         assertEquals("o", ((VarAst) triple.object()).name());
 
         SolutionModifierAst mod = select.solutionModifier();
@@ -846,10 +846,10 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertEquals(1, bgp.triples().size(), "BGP should contain 1 triple");
         TriplePatternAst t0 = bgp.triples().getFirst();
         assertInstanceOf(IriAst.class, t0.subject());
-        assertInstanceOf(IriAst.class, t0.predicate());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(t0));
         assertInstanceOf(VarAst.class, t0.object());
         assertEquals("wd:Q458", ((IriAst) t0.subject()).raw());
-        assertEquals("wdt:P150", ((IriAst) t0.predicate()).raw());
+        assertEquals("wdt:P150", ((IriAst) simplePredicateTerm(t0)).raw());
         assertEquals("country", ((VarAst) t0.object()).name());
 
         // Second pattern: UNION of two branches
@@ -869,7 +869,7 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertEquals(1, leftBgp.triples().size());
         TriplePatternAst leftTriple = leftBgp.triples().getFirst();
         assertEquals("country", ((VarAst) leftTriple.subject()).name());
-        assertEquals("wdt:P36", ((IriAst) leftTriple.predicate()).raw());
+        assertEquals("wdt:P36", ((IriAst) simplePredicateTerm(leftTriple)).raw());
         assertEquals("city", ((VarAst) leftTriple.object()).name());
 
         // Right branch: { ?city wdt:P17 ?country. ?city wdt:P31 wd:Q1637706. } → two TriplesBlocks → two BGPs
@@ -887,12 +887,12 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         );
         assertTrue(rightTriples.stream().anyMatch(t ->
                 "city".equals(((VarAst) t.subject()).name())
-                        && "wdt:P17".equals(((IriAst) t.predicate()).raw())
+                        && "wdt:P17".equals(((IriAst) simplePredicateTerm(t)).raw())
                         && "country".equals(((VarAst) t.object()).name())),
                 "Right branch should contain triple ?city wdt:P17 ?country");
         assertTrue(rightTriples.stream().anyMatch(t ->
                 "city".equals(((VarAst) t.subject()).name())
-                        && "wdt:P31".equals(((IriAst) t.predicate()).raw())
+                        && "wdt:P31".equals(((IriAst) simplePredicateTerm(t)).raw())
                         && "wd:Q1637706".equals(((IriAst) t.object()).raw())),
                 "Right branch should contain triple ?city wdt:P31 wd:Q1637706");
 
@@ -941,16 +941,16 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(bgpAst.triples().getFirst().subject());
         assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().subject());
         assertEquals("s", ((VarAst)bgpAst.triples().getFirst().subject()).name());
-        assertInstanceOf(IriAst.class, bgpAst.triples().getFirst().predicate());
-        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) bgpAst.triples().getFirst().predicate()).raw());
+        assertInstanceOf(IriAst.class, TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getFirst()));
+        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getFirst())).raw());
         assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().object());
         assertEquals("c", ((VarAst)bgpAst.triples().getFirst().object()).name());
         assertNotNull(bgpAst.triples().getLast());
         assertNotNull(bgpAst.triples().getLast().subject());
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().subject());
         assertEquals("s", ((VarAst)bgpAst.triples().getLast().subject()).name());
-        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().predicate());
-        assertEquals("p", ((VarAst)bgpAst.triples().getLast().predicate()).name());
+        assertInstanceOf(VarAst.class, TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getLast()));
+        assertEquals("p", ((VarAst) TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getLast())).name());
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
         assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
         assertNotNull(selectQueryAst.solutionModifier());
@@ -994,16 +994,16 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(bgpAst.triples().getFirst().subject());
         assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().subject());
         assertEquals("s", ((VarAst)bgpAst.triples().getFirst().subject()).name());
-        assertInstanceOf(IriAst.class, bgpAst.triples().getFirst().predicate());
-        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) bgpAst.triples().getFirst().predicate()).raw());
+        assertInstanceOf(IriAst.class, TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getFirst()));
+        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getFirst())).raw());
         assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().object());
         assertEquals("c", ((VarAst)bgpAst.triples().getFirst().object()).name());
         assertNotNull(bgpAst.triples().getLast());
         assertNotNull(bgpAst.triples().getLast().subject());
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().subject());
         assertEquals("s", ((VarAst)bgpAst.triples().getLast().subject()).name());
-        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().predicate());
-        assertEquals("p", ((VarAst)bgpAst.triples().getLast().predicate()).name());
+        assertInstanceOf(VarAst.class, TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getLast()));
+        assertEquals("p", ((VarAst) TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getLast())).name());
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
         assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
         assertNotNull(selectQueryAst.solutionModifier());
@@ -1047,16 +1047,16 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(bgpAst.triples().getFirst().subject());
         assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().subject());
         assertEquals("s", ((VarAst)bgpAst.triples().getFirst().subject()).name());
-        assertInstanceOf(IriAst.class, bgpAst.triples().getFirst().predicate());
-        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) bgpAst.triples().getFirst().predicate()).raw());
+        assertInstanceOf(IriAst.class, TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getFirst()));
+        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getFirst())).raw());
         assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().object());
         assertEquals("c", ((VarAst)bgpAst.triples().getFirst().object()).name());
         assertNotNull(bgpAst.triples().getLast());
         assertNotNull(bgpAst.triples().getLast().subject());
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().subject());
         assertEquals("s", ((VarAst)bgpAst.triples().getLast().subject()).name());
-        assertInstanceOf(VarAst.class, bgpAst.triples().getLast().predicate());
-        assertEquals("p", ((VarAst)bgpAst.triples().getLast().predicate()).name());
+        assertInstanceOf(VarAst.class, TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getLast()));
+        assertEquals("p", ((VarAst) TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getLast())).name());
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
         assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
         assertNotNull(selectQueryAst.solutionModifier());
@@ -1100,16 +1100,16 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(bgpAst.triples().getFirst().subject());
         assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().subject());
         assertEquals("s", ((VarAst)bgpAst.triples().getFirst().subject()).name());
-        assertInstanceOf(IriAst.class, bgpAst.triples().getFirst().predicate());
-        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) bgpAst.triples().getFirst().predicate()).raw());
+        assertInstanceOf(IriAst.class, TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getFirst()));
+        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getFirst())).raw());
         assertInstanceOf(VarAst.class, bgpAst.triples().getFirst().object());
         assertEquals("c", ((VarAst)bgpAst.triples().getFirst().object()).name());
         assertNotNull(bgpAst.triples().getLast());
         assertNotNull(bgpAst.triples().getLast().subject());
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().subject());
         assertEquals("s", ((VarAst)bgpAst.triples().getLast().subject()).name());
-        assertInstanceOf(IriAst.class, bgpAst.triples().getLast().predicate());
-        assertEquals("<http://ns.inria.fr/test#property>", ((IriAst)bgpAst.triples().getLast().predicate()).raw());
+        assertInstanceOf(IriAst.class, TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getLast()));
+        assertEquals("<http://ns.inria.fr/test#property>", ((IriAst) TriplePatternAstTestSupport.simplePredicateTerm(bgpAst.triples().getLast())).raw());
         assertInstanceOf(VarAst.class, bgpAst.triples().getLast().object());
         assertEquals("o", ((VarAst)bgpAst.triples().getLast().object()).name());
         assertNotNull(selectQueryAst.solutionModifier());

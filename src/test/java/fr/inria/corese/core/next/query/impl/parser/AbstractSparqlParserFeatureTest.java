@@ -2,6 +2,10 @@ package fr.inria.corese.core.next.query.impl.parser;
 
 import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAstTestSupport;
+
+import static fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAstTestSupport.simplePredicateTerm;
 
 public class AbstractSparqlParserFeatureTest {
 
@@ -31,5 +35,9 @@ public class AbstractSparqlParserFeatureTest {
                 .failFast(failFast)
                 .collectErrors(collectErrors)
                 .build());
+    }
+
+    protected static fr.inria.corese.core.next.query.impl.sparql.ast.TermAst simplePredicateTerm(TriplePatternAst triple) {
+        return TriplePatternAstTestSupport.simplePredicateTerm(triple);
     }
 }

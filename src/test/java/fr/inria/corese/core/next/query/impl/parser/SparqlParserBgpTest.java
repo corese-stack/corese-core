@@ -42,11 +42,11 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
         TriplePatternAst t = bgp.triples().getFirst();
 
         assertInstanceOf(VarAst.class, t.subject());
-        assertInstanceOf(VarAst.class, t.predicate());
+        assertInstanceOf(VarAst.class, simplePredicateTerm(t));
         assertInstanceOf(VarAst.class, t.object());
 
         assertEquals("s", ((VarAst) t.subject()).name());
-        assertEquals("p", ((VarAst) t.predicate()).name());
+        assertEquals("p", ((VarAst) simplePredicateTerm(t)).name());
         assertEquals("o", ((VarAst) t.object()).name());
     }
 
@@ -75,18 +75,18 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
 
         TriplePatternAst t0 = bgp.triples().getFirst();
         assertEquals("s", ((VarAst) t0.subject()).name());
-        assertInstanceOf(IriAst.class, t0.predicate());
-        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) t0.predicate()).raw());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(t0));
+        assertEquals(expectedRdfTypeIriAst().raw(), ((IriAst) simplePredicateTerm(t0)).raw());
 
         TriplePatternAst t1 = bgp.triples().get(1);
         assertEquals("s", ((VarAst) t1.subject()).name());
-        assertInstanceOf(IriAst.class, t1.predicate());
-        assertEquals("foaf:name", ((IriAst) t1.predicate()).raw());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(t1));
+        assertEquals("foaf:name", ((IriAst) simplePredicateTerm(t1)).raw());
         assertEquals("n", ((VarAst) t1.object()).name());
 
         TriplePatternAst t2 = bgp.triples().get(2);
         assertEquals("s", ((VarAst) t2.subject()).name());
-        assertEquals("foaf:name", ((IriAst) t2.predicate()).raw());
+        assertEquals("foaf:name", ((IriAst) simplePredicateTerm(t2)).raw());
         assertEquals("n2", ((VarAst) t2.object()).name());
     }
 
@@ -148,8 +148,8 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
         BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
         TriplePatternAst triple = bgp.triples().getFirst();
 
-        assertInstanceOf(IriAst.class, triple.predicate());
-        assertEquals("ex:1", ((IriAst) triple.predicate()).raw());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals("ex:1", ((IriAst) simplePredicateTerm(triple)).raw());
     }
 
     @Test
@@ -166,8 +166,8 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
         BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
         TriplePatternAst triple = bgp.triples().getFirst();
 
-        assertInstanceOf(IriAst.class, triple.predicate());
-        assertEquals("ex:abc-def", ((IriAst) triple.predicate()).raw());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals("ex:abc-def", ((IriAst) simplePredicateTerm(triple)).raw());
     }
 
     @Test
@@ -184,8 +184,8 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
         BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
         TriplePatternAst triple = bgp.triples().getFirst();
 
-        assertInstanceOf(IriAst.class, triple.predicate());
-        assertEquals("ns:id\\=123", ((IriAst) triple.predicate()).raw());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals("ns:id\\=123", ((IriAst) simplePredicateTerm(triple)).raw());
     }
 
     @Test
@@ -202,8 +202,8 @@ class SparqlParserBgpTest extends AbstractSparqlParserFeatureTest {
         BgpAst bgp = (BgpAst) ast.whereClause().patterns().getFirst();
         TriplePatternAst triple = bgp.triples().getFirst();
 
-        assertInstanceOf(IriAst.class, triple.predicate());
-        assertEquals(":foo", ((IriAst) triple.predicate()).raw());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(triple));
+        assertEquals(":foo", ((IriAst) simplePredicateTerm(triple)).raw());
     }
 
     @Test

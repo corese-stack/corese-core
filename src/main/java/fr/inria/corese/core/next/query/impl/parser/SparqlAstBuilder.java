@@ -9,6 +9,8 @@ import fr.inria.corese.core.next.query.api.exception.QueryValidationException;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -363,17 +365,22 @@ public abstract class SparqlAstBuilder {
     }
 
     /**
-     * Add a triple pattern (?s ?p ?o) to the current BGP (TriplesBlock).
+     * Add a triple pattern to the current BGP (TriplesBlock).
      * This must be called while inside a TriplesBlock.
      */
-    public void addTriple(TermAst s, TermAst p, TermAst o) {
+    public void addTriple(TermAst s, PathAst p, TermAst o) {
         if (bgpStack.isEmpty()) {
-            // This should not happen if listener wiring is correct, but we fail loudly
-            // because BGP boundaries matter (TriplesBlock).
             throw new IllegalStateException("addTriple() called outside of TriplesBlock (BGP). " +
                     "Ensure you call enterBgp() on enterTriplesBlock.");
         }
         bgpStack.peek().add(new TriplePatternAst(s, p, o));
+    }
+
+    /**
+     * Add a triple whose predicate is a single term (IRI, variable, etc.).
+     */
+    public void addTriple(TermAst s, TermAst p, TermAst o) {
+        addTriple(s, new PredicatePathAst(p), o);
     }
 
     // --- Filters ---

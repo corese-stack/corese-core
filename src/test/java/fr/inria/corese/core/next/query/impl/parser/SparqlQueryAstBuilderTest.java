@@ -60,7 +60,7 @@ class SparqlQueryAstBuilderTest {
         QueryAst expected = new SelectQueryAst(
                 new GroupGraphPatternAst(List.of(
                         new BgpAst(List.of(
-                                new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))
+                                TriplePatternAst.of(new VarAst("s"), new VarAst("p"), new VarAst("o"))
                         ))
                 ))
         );
@@ -85,8 +85,8 @@ class SparqlQueryAstBuilderTest {
         BgpAst bgp = singleBgp(ast);
 
         assertEquals(2, bgp.triples().size());
-        assertEquals(new TriplePatternAst(new VarAst("s"), expectedRdfTypeIriAst(), new IriAst("foaf:Person")), bgp.triples().get(0));
-        assertEquals(new TriplePatternAst(new VarAst("s"), new IriAst("foaf:name"), new VarAst("n")), bgp.triples().get(1));
+        assertEquals(TriplePatternAst.of(new VarAst("s"), expectedRdfTypeIriAst(), new IriAst("foaf:Person")), bgp.triples().get(0));
+        assertEquals(TriplePatternAst.of(new VarAst("s"), new IriAst("foaf:name"), new VarAst("n")), bgp.triples().get(1));
     }
 
     @Test
@@ -284,7 +284,7 @@ class SparqlQueryAstBuilderTest {
     @Test
     void bgpAstShouldDefensivelyCopyTriplesList() {
         List<TriplePatternAst> triples = new ArrayList<>();
-        triples.add(new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o")));
+        triples.add(TriplePatternAst.of(new VarAst("s"), new VarAst("p"), new VarAst("o")));
 
         BgpAst bgp = new BgpAst(triples);
         triples.clear();
@@ -295,7 +295,7 @@ class SparqlQueryAstBuilderTest {
     @Test
     void groupGraphPatternAstShouldDefensivelyCopyPatternsList() {
         List<PatternAst> patterns = new ArrayList<>();
-        patterns.add(new BgpAst(List.of(new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o")))));
+        patterns.add(new BgpAst(List.of(TriplePatternAst.of(new VarAst("s"), new VarAst("p"), new VarAst("o")))));
 
         GroupGraphPatternAst group = new GroupGraphPatternAst(patterns);
         patterns.clear();

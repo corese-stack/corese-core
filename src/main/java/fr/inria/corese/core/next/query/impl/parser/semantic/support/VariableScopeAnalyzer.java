@@ -2,6 +2,7 @@ package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.path.*;
 
 import java.util.*;
 
@@ -169,10 +170,9 @@ public final class VariableScopeAnalyzer {
 
         switch (pattern) {
             case BgpAst(List<TriplePatternAst> triples) -> {
-                // Variables come from triple terms.
                 for (TriplePatternAst triple : triples) {
                     addIfVariable(triple.subject(), visibleVariables);
-                    addIfVariable(triple.predicate(), visibleVariables);
+                    collectVisibleVariablesFromPath(triple.predicate(), visibleVariables);
                     addIfVariable(triple.object(), visibleVariables);
                 }
             }
@@ -427,6 +427,29 @@ public final class VariableScopeAnalyzer {
     private void addIfVariable(TermAst term, Set<String> variables) {
         if (term instanceof VarAst(String name)) {
             variables.add(name);
+        }
+    }
+
+    private void collectVisibleVariablesFromPath(PathAst path, Set<String> visibleVariables) {
+        switch (path) {
+            case PredicatePathAst(TermAst predicate) -> addIfVariable(predicate, visibleVariables);
+            case SequencePathAst(PathAst left, PathAst right) -> {
+                collectVisibleVariablesFromPath(left, visibleVariables);
+                collectVisibleVariablesFromPath(right, visibleVariables);
+            }
+            case AlternativePathAst(PathAst left, PathAst right) -> {
+                collectVisibleVariablesFromPath(left, visibleVariables);
+                collectVisibleVariablesFromPath(right, visibleVariables);
+            }
+            case ZeroOrMorePathAst(PathAst inner) -> collectVisibleVariablesFromPath(inner, visibleVariables);
+            case OneOrMorePathAst(PathAst inner) -> collectVisibleVariablesFromPath(inner, visibleVariables);
+            case OptionalPathAst(PathAst inner) -> collectVisibleVariablesFromPath(inner, visibleVariables);
+            case InversePathAst(PathAst inner) -> collectVisibleVariablesFromPath(inner, visibleVariables);
+            case NegatedPropertySetPathAst(List<PathAst> excluded) -> {
+                for (PathAst excludedPath : excluded) {
+                    collectVisibleVariablesFromPath(excludedPath, visibleVariables);
+                }
+            }
         }
     }
 }

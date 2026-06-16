@@ -33,7 +33,7 @@ class SparqlParserConstructQueryTest extends AbstractSparqlParserFeatureTest {
 
         TriplePatternAst templateTriple = construct.constructTemplate().triplePatternAsts().getFirst();
         assertInstanceOf(VarAst.class, templateTriple.subject());
-        assertInstanceOf(VarAst.class, templateTriple.predicate());
+        assertInstanceOf(VarAst.class, simplePredicateTerm(templateTriple));
         assertInstanceOf(VarAst.class, templateTriple.object());
 
         GroupGraphPatternAst where = construct.whereClause();
@@ -106,26 +106,26 @@ class SparqlParserConstructQueryTest extends AbstractSparqlParserFeatureTest {
 
         TriplePatternAst firstTriple = template.triplePatternAsts().get(0);
         assertInstanceOf(VarAst.class, firstTriple.subject());
-        assertInstanceOf(IriAst.class, firstTriple.predicate());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(firstTriple));
         assertInstanceOf(IriAst.class, firstTriple.object());
         assertEquals("x", ((VarAst) firstTriple.subject()).name());
-        assertEquals("vcard:N", ((IriAst) firstTriple.predicate()).raw());
+        assertEquals("vcard:N", ((IriAst) simplePredicateTerm(firstTriple)).raw());
         assertTrue(((IriAst) firstTriple.object()).raw().startsWith("_:"), "object should be a blank node");
 
         TriplePatternAst secondTriple = template.triplePatternAsts().get(1);
         assertInstanceOf(IriAst.class, secondTriple.subject());
-        assertInstanceOf(IriAst.class, secondTriple.predicate());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(secondTriple));
         assertInstanceOf(VarAst.class, secondTriple.object());
         assertTrue(((IriAst) secondTriple.subject()).raw().startsWith("_:"), "subject should be a blank node");
-        assertEquals("vcard:givenName", ((IriAst) secondTriple.predicate()).raw());
+        assertEquals("vcard:givenName", ((IriAst) simplePredicateTerm(secondTriple)).raw());
         assertEquals("gname", ((VarAst) secondTriple.object()).name());
 
         TriplePatternAst thirdTriple = template.triplePatternAsts().get(2);
         assertInstanceOf(IriAst.class, thirdTriple.subject());
-        assertInstanceOf(IriAst.class, thirdTriple.predicate());
+        assertInstanceOf(IriAst.class, simplePredicateTerm(thirdTriple));
         assertInstanceOf(VarAst.class, thirdTriple.object());
         assertTrue(((IriAst) thirdTriple.subject()).raw().startsWith("_:"), "subject should be a blank node");
-        assertEquals("vcard:familyName", ((IriAst) thirdTriple.predicate()).raw());
+        assertEquals("vcard:familyName", ((IriAst) simplePredicateTerm(thirdTriple)).raw());
         assertEquals("fname", ((VarAst) thirdTriple.object()).name());
     }
 
