@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AbstractAstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
