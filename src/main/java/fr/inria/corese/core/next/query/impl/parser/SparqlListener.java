@@ -290,4 +290,14 @@ public final class SparqlListener extends SparqlParserBaseListener {
     public void exitInlineData(SparqlParser.InlineDataContext ctx) {
         for (var d : delegates) d.exitInlineData(ctx);
     }
+
+    @Override
+    public void enterCreate(SparqlParser.CreateContext ctx) {
+        for (var d : delegates) d.enterCreate(ctx);
+    }
+
+    @Override
+    public void exitCreate(SparqlParser.CreateContext ctx) {
+        for (var d : delegates) d.exitCreate(ctx);
+    }
 }
