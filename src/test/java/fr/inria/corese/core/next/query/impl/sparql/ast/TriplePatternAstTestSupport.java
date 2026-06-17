@@ -20,7 +20,7 @@ public final class TriplePatternAstTestSupport {
         return ((PredicatePathAst) predicate).predicate();
     }
 
-    public static PredicatePathAst predicatePath(TermAst term) {
-        return new PredicatePathAst(term);
+    public static PathAst predicatePath(TermAst term) {
+        return PathAst.from(term);
     }
 }

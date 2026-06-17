@@ -3,8 +3,6 @@ package fr.inria.corese.core.next.query.impl.parser.listener;
 import fr.inria.corese.core.next.impl.parser.antlr.SparqlParser;
 import fr.inria.corese.core.next.query.impl.parser.SparqlAstBuilder;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 
 import java.util.List;
 
@@ -86,36 +84,22 @@ public class BgpFeature extends AbstractSparqlFeature {
 
     @Override
     public void exitTriplesSameSubjectPath(SparqlParser.TriplesSameSubjectPathContext ctx) {
-        TermAst s = builder().termFromVarOrTerm(ctx.varOrTerm());
-        var pl = ctx.propertyListPathNotEmpty();
-        if (pl == null) return;
-
-        var verbPaths = pl.verbPath();
-        var verbSimples = pl.verbSimple();
-        var objLists = pl.objectListPath();
-
-        int verbPathIdx = 0;
-        int verbSimpleIdx = 0;
-
-        for (SparqlParser.ObjectListPathContext objList : objLists) {
-            PathAst predicate;
-
-            boolean useVerbPath = verbPathIdx < verbPaths.size() && (
-                    verbSimpleIdx >= verbSimples.size() ||
-                            verbPaths.get(verbPathIdx).getStart().getTokenIndex()
-                                    < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex()
-            );
-
-            if (useVerbPath) {
-                predicate = builder().pathFromVerbPath(verbPaths.get(verbPathIdx++));
-            } else {
-                predicate = new PredicatePathAst(builder().termFromVerbSimple(verbSimples.get(verbSimpleIdx++)));
+        SparqlAstBuilder b = builder();
+        if (ctx.varOrTerm() != null) {
+            var propertyList = ctx.propertyListPathNotEmpty();
+            if (propertyList == null) {
+                return;
             }
-
-            List<TermAst> objects = builder().termListFromObjectListPath(objList);
-            for (TermAst o : objects) {
-                builder().addTriple(s, predicate, o);
-            }
+            b.addTriplesFromPropertyListPath(b.termFromVarOrTerm(ctx.varOrTerm()), propertyList);
+            return;
+        }
+        if (ctx.triplesNodePath() == null) {
+            return;
+        }
+        TermAst subject = b.subjectFromTriplesNodePath(ctx.triplesNodePath());
+        SparqlParser.PropertyListPathContext propertyListPath = ctx.propertyListPath();
+        if (propertyListPath != null && propertyListPath.propertyListPathNotEmpty() != null) {
+            b.addTriplesFromPropertyListPath(subject, propertyListPath.propertyListPathNotEmpty());
         }
     }
 }

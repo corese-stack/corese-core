@@ -3,7 +3,6 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.path.PathAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.path.PredicatePathAst;
 
 /**
  * A single triple pattern (s p o) in a BGP.
@@ -19,7 +18,7 @@ public record TriplePatternAst(TermAst subject, TermAst predicate, TermAst objec
      * Builds a triple whose predicate is a single term (IRI, variable, etc.).
      */
     public static TriplePatternAst of(TermAst subject, TermAst predicate, TermAst object) {
-        return new TriplePatternAst(subject, new PredicatePathAst(predicate), object);
+        return new TriplePatternAst(subject, PathAst.from(predicate), object);
     }
 
     @Override

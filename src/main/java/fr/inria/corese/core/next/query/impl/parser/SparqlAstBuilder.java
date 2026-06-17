@@ -58,6 +58,11 @@ public abstract class SparqlAstBuilder {
     protected final Deque<List<TriplePatternAst>> bgpStack = new ArrayDeque<>();
 
     /**
+     * Counter for anonymous blank nodes created while expanding {@code [ ... ]} and {@code ( ... )} subjects.
+     */
+    private int anonymousBlankNodeCounter;
+
+    /**
      * Stack of currently open SELECT operations (top-level SELECT and nested SELECT subqueries).
      */
     protected final Deque<SelectFrame> selectStack = new ArrayDeque<>();
@@ -379,7 +384,7 @@ public abstract class SparqlAstBuilder {
      * Add a triple whose predicate is a single term (IRI, variable, etc.).
      */
     public void addTriple(TermAst s, TermAst p, TermAst o) {
-        addTriple(s, new PredicatePathAst(p), o);
+        addTriple(s, PathAst.from(p), o);
     }
 
     // --- Filters ---
@@ -1329,10 +1334,10 @@ public abstract class SparqlAstBuilder {
 
     private PathAst pathFromPathPrimary(SparqlParser.PathPrimaryContext ctx) {
         if (ctx.iriRef() != null) {
-            return new PredicatePathAst(termFromIriRef(ctx.iriRef()));
+            return PathAst.from(termFromIriRef(ctx.iriRef()));
         }
         if (ctx.A() != null) {
-            return new PredicatePathAst(iri("a"));
+            return PathAst.from(iri("a"));
         }
         if (ctx.EXCLAMATION() != null) {
             return pathFromPathNegatedPropertySet(ctx.pathNegatedPropertySet());
@@ -1356,14 +1361,14 @@ public abstract class SparqlAstBuilder {
     private PathAst pathFromPathOneInPropertySet(SparqlParser.PathOneInPropertySetContext ctx) {
         if (ctx.CARET() != null) {
             if (ctx.iriRef() != null) {
-                return new InversePathAst(new PredicatePathAst(termFromIriRef(ctx.iriRef())));
+                return new InversePathAst(PathAst.from(termFromIriRef(ctx.iriRef())));
             }
-            return new InversePathAst(new PredicatePathAst(iri("a")));
+            return new InversePathAst(PathAst.from(iri("a")));
         }
         if (ctx.iriRef() != null) {
-            return new PredicatePathAst(termFromIriRef(ctx.iriRef()));
+            return PathAst.from(termFromIriRef(ctx.iriRef()));
         }
-        return new PredicatePathAst(iri("a"));
+        return PathAst.from(iri("a"));
     }
 
     private PathAst foldAlternatives(List<PathAst> parts) {
@@ -1389,6 +1394,119 @@ public abstract class SparqlAstBuilder {
     }
 
     /**
+     * Creates a fresh anonymous blank node label for expanded BGP triples.
+     */
+    public TermAst newAnonymousBlankNode() {
+        return iri("_:b" + anonymousBlankNodeCounter++);
+    }
+
+    /**
+     * Expands a {@code propertyListPathNotEmpty} into triple patterns for the given subject.
+     */
+    public void addTriplesFromPropertyListPath(
+            TermAst subject,
+            SparqlParser.PropertyListPathNotEmptyContext propertyList) {
+        var verbPaths = propertyList.verbPath();
+        var verbSimples = propertyList.verbSimple();
+        var objectLists = propertyList.objectListPath();
+
+        int verbPathIdx = 0;
+        int verbSimpleIdx = 0;
+
+        for (SparqlParser.ObjectListPathContext objectList : objectLists) {
+            PathAst predicate = predicateFromPropertyListPath(
+                    verbPaths, verbSimples, verbPathIdx, verbSimpleIdx);
+            if (verbPathIdx < verbPaths.size()
+                    && (verbSimpleIdx >= verbSimples.size()
+                    || verbPaths.get(verbPathIdx).getStart().getTokenIndex()
+                    < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex())) {
+                verbPathIdx++;
+            } else {
+                verbSimpleIdx++;
+            }
+
+            for (TermAst object : termListFromObjectListPath(objectList)) {
+                addTriple(subject, predicate, object);
+            }
+        }
+    }
+
+    private PathAst predicateFromPropertyListPath(
+            List<SparqlParser.VerbPathContext> verbPaths,
+            List<SparqlParser.VerbSimpleContext> verbSimples,
+            int verbPathIdx,
+            int verbSimpleIdx) {
+        boolean useVerbPath = verbPathIdx < verbPaths.size()
+                && (verbSimpleIdx >= verbSimples.size()
+                || verbPaths.get(verbPathIdx).getStart().getTokenIndex()
+                < verbSimples.get(verbSimpleIdx).getStart().getTokenIndex());
+        if (useVerbPath) {
+            return pathFromVerbPath(verbPaths.get(verbPathIdx));
+        }
+        return PathAst.from(termFromVerbSimple(verbSimples.get(verbSimpleIdx)));
+    }
+
+    /**
+     * Builds triple patterns for a {@code triplesNodePath} subject and returns its head term.
+     */
+    public TermAst subjectFromTriplesNodePath(SparqlParser.TriplesNodePathContext ctx) {
+        if (ctx.blankNodePropertyListPath() != null) {
+            return subjectFromBlankNodePropertyListPath(ctx.blankNodePropertyListPath());
+        }
+        if (ctx.collectionPath() != null) {
+            return subjectFromCollectionPath(ctx.collectionPath());
+        }
+        throw new QueryEvaluationException("Unexpected triples node path: " + ctx.getText());
+    }
+
+    private TermAst subjectFromBlankNodePropertyListPath(
+            SparqlParser.BlankNodePropertyListPathContext ctx) {
+        TermAst blankNode = newAnonymousBlankNode();
+        if (ctx.propertyListPathNotEmpty() != null) {
+            addTriplesFromPropertyListPath(blankNode, ctx.propertyListPathNotEmpty());
+        }
+        return blankNode;
+    }
+
+    private TermAst subjectFromCollectionPath(SparqlParser.CollectionPathContext ctx) {
+        List<SparqlParser.GraphNodePathContext> nodes = ctx.graphNodePath();
+        if (nodes.isEmpty()) {
+            throw new QueryEvaluationException("Empty RDF collection in triple pattern");
+        }
+
+        TermAst head = newAnonymousBlankNode();
+        TermAst current = head;
+        for (int i = 0; i < nodes.size(); i++) {
+            addTriple(current, rdfTerm(RDF.first), termFromGraphNodePath(nodes.get(i)));
+            if (i == nodes.size() - 1) {
+                addTriple(current, rdfTerm(RDF.rest), rdfTerm(RDF.nil));
+            } else {
+                TermAst next = newAnonymousBlankNode();
+                addTriple(current, rdfTerm(RDF.rest), next);
+                current = next;
+            }
+        }
+        return head;
+    }
+
+    /**
+     * Graph node inside a property-path triple (variable/term, blank node property list, or collection).
+     */
+    public TermAst termFromGraphNodePath(SparqlParser.GraphNodePathContext ctx) {
+        if (ctx.varOrTerm() != null) {
+            return termFromVarOrTerm(ctx.varOrTerm());
+        }
+        if (ctx.triplesNodePath() != null) {
+            return subjectFromTriplesNodePath(ctx.triplesNodePath());
+        }
+        throw new QueryEvaluationException("Unexpected graph node path: " + ctx.getText());
+    }
+
+    private TermAst rdfTerm(RDF term) {
+        return new IriAst("<" + term.getIRI().stringValue() + ">");
+    }
+
+    /**
      * Predicate as a simple variable (e.g. ?p used as a predicate).
      */
     public TermAst termFromVerbSimple(SparqlParser.VerbSimpleContext ctx) {
@@ -1402,12 +1520,7 @@ public abstract class SparqlAstBuilder {
     public List<TermAst> termListFromObjectListPath(SparqlParser.ObjectListPathContext ctx) {
         List<TermAst> out = new ArrayList<>();
         for (var objPath : ctx.objectPath()) {
-            var graphNodePath = objPath.graphNodePath();
-            if (graphNodePath.varOrTerm() != null) {
-                out.add(termFromVarOrTerm(graphNodePath.varOrTerm()));
-            } else {
-                out.add(this.iri(graphNodePath.getText()));
-            }
+            out.add(termFromGraphNodePath(objPath.graphNodePath()));
         }
         return out;
     }
