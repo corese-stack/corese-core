@@ -50,7 +50,7 @@ class SparqlParserStrUuidTest extends AbstractSparqlParserFeatureTest {
         EqualsAst equals = assertInstanceOf(EqualsAst.class, filter.operator());
         assertInstanceOf(StrUuidAst.class, equals.getLeftArgument());
         StrAst str = assertInstanceOf(StrAst.class, equals.getRightArgument());
-        assertEquals("s", assertInstanceOf(VarAst.class, str.getArgument()).name());
+        assertEquals("s", assertInstanceOf(VarAst.class, str.argument()).name());
     }
 
     @Test

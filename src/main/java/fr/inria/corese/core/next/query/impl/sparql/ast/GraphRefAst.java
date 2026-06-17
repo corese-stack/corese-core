@@ -1,8 +1,10 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
 
-public record GraphRefAst(IriAst graph, boolean named, boolean all, boolean defaultGraph) {
+public record GraphRefAst(IriAst graph, boolean named, boolean all, boolean defaultGraph) implements VisitableAst {
     public GraphRefAst {
         int activeTargets = 0;
         if (graph != null) {
@@ -32,5 +34,13 @@ public record GraphRefAst(IriAst graph, boolean named, boolean all, boolean defa
 
     public GraphRefAst(boolean named, boolean all, boolean defaultGraph) {
         this(null, named, all, defaultGraph);
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        if(this.graph != null) {
+            this.graph.accept(visitor);
+        }
     }
 }

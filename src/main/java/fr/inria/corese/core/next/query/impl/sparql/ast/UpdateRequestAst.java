@@ -2,6 +2,8 @@ package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import java.util.List;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 /**
  * Represents a series of update operations sharing a prologue
  */
@@ -14,5 +16,11 @@ public record UpdateRequestAst(QueryPrologueAst prologue, List<UpdateRequestUnit
 
     public void addQuery(UpdateRequestUnitAst updateQuery) {
         this.operations.add(updateQuery);
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this.prologue);
+        this.operations.forEach(updateRequestUnitAst -> updateRequestUnitAst.accept(visitor));
     }
 }

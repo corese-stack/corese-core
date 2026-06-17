@@ -31,7 +31,7 @@ class SparqlParserLcaseTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         LcaseAst lcase = assertInstanceOf(LcaseAst.class, bind.expression());
-        assertEquals("label", assertInstanceOf(VarAst.class, lcase.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, lcase.argument()).name());
         assertEquals("lower", bind.variable().name());
     }
 
@@ -50,7 +50,7 @@ class SparqlParserLcaseTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         LcaseAst lcase = assertInstanceOf(LcaseAst.class, bind.expression());
-        LiteralAst literal = assertInstanceOf(LiteralAst.class, lcase.getArgument());
+        LiteralAst literal = assertInstanceOf(LiteralAst.class, lcase.argument());
         assertEquals("\"CORESE\"", literal.lexical());
         assertEquals("lower", bind.variable().name());
     }
@@ -71,7 +71,7 @@ class SparqlParserLcaseTest extends AbstractSparqlParserFeatureTest {
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
         EqualsAst equals = assertInstanceOf(EqualsAst.class, filter.operator());
         LcaseAst lcase = assertInstanceOf(LcaseAst.class, equals.getLeftArgument());
-        assertEquals("label", assertInstanceOf(VarAst.class, lcase.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, lcase.argument()).name());
     }
 
     @Test

@@ -70,7 +70,7 @@ class SparqlParserBnodeTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
         IsBlankAst isBlank = assertInstanceOf(IsBlankAst.class, filter.operator());
-        BnodeAst bnode = assertInstanceOf(BnodeAst.class, isBlank.getArgument());
+        BnodeAst bnode = assertInstanceOf(BnodeAst.class, isBlank.argument());
         assertEquals("label", assertInstanceOf(VarAst.class, bnode.getLabel()).name());
     }
 

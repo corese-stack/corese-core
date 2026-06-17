@@ -13,4 +13,9 @@ public class DatatypeAst extends AbstractUnaryConstraintAst implements IriExpres
     public DatatypeAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "DATATYPE";
+    }
 }

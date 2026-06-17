@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.List;
@@ -34,5 +35,20 @@ public final class SubstrAst implements SimpleLiteralExpressionAst {
 
     public TermAst getLength() {
         return this.lengthArg;
+    }
+
+    @Override
+    public String getName() {
+        return "SUBSTR";
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.stringArg.accept(visitor);
+        this.startArg.accept(visitor);
+        if(this.lengthArg != null) {
+            this.lengthArg.accept(visitor);
+        }
     }
 }

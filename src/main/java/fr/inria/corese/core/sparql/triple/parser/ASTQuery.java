@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.triple.api.ASTVisitable;
+import fr.inria.corese.core.sparql.triple.api.AstVisitable;
 import fr.inria.corese.core.sparql.triple.api.ASTVisitor;
 import fr.inria.corese.core.sparql.triple.cst.Keyword;
 import fr.inria.corese.core.sparql.triple.cst.KeywordPP;
@@ -48,7 +48,7 @@ import java.util.UUID;
  */
 public class ASTQuery 
         extends ASTObject 
-        implements Keyword, ASTVisitable, AST, Message {
+        implements Keyword, AstVisitable, AST, Message {
 
     public static boolean STRICT_MODE;
    

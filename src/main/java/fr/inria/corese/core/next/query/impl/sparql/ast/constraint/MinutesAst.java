@@ -12,4 +12,9 @@ public class MinutesAst extends AbstractUnaryConstraintAst implements NumericExp
     public MinutesAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "MINUTES";
+    }
 }

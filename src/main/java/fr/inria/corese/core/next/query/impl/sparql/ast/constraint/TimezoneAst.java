@@ -13,4 +13,9 @@ public class TimezoneAst extends AbstractUnaryConstraintAst implements XsdDayTim
     public TimezoneAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "TIMEZONE";
+    }
 }

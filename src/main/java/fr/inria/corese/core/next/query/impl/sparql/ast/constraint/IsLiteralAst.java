@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-
 import java.util.List;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
  * Operator {@code IsLiteral(A)}
@@ -11,5 +11,10 @@ import java.util.List;
 public class IsLiteralAst extends AbstractUnaryConstraintAst implements BooleanExpressionAst {
     public IsLiteralAst(List<TermAst> args) {
         super(args);
+    }
+
+    @Override
+    public String getName() {
+        return "ISLITERAL";
     }
 }

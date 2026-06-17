@@ -7,4 +7,14 @@ import java.util.List;
 /**
  * Function {@code CONCAT(expr1, expr2, ...)} in SPARQL 1.1.
  */
-public record ConcatAst(List<TermAst> arguments) implements SimpleLiteralExpressionAst {}
+public class ConcatAst extends AbstractUnlimitedArgumentsFunctionAst {
+
+    public ConcatAst(List<TermAst> arguments) {
+        super(arguments);
+    }
+
+    @Override
+    public String getName() {
+        return "CONCAT";
+    }
+}

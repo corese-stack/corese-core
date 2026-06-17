@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-
 import java.util.List;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
  * Operator {@code isIri(A)} and {@code isUri(A)}
@@ -11,5 +11,10 @@ import java.util.List;
 public class IsIriAst extends AbstractUnaryConstraintAst implements BooleanExpressionAst {
     public IsIriAst(List<TermAst> args) {
         super(args);
+    }
+
+    @Override
+    public String getName() {
+        return "ISIRI";
     }
 }

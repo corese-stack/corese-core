@@ -13,4 +13,9 @@ public class StrBeforeAst extends AbstractBinaryFunctionAst implements SimpleLit
     public StrBeforeAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "STRBEFORE";
+    }
 }

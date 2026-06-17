@@ -8,7 +8,7 @@ package fr.inria.corese.core.sparql.triple.api;
  *
  * @author corby
  */
-public interface ASTVisitable {
+public interface AstVisitable {
     
     	void accept(ASTVisitor visitor);
 

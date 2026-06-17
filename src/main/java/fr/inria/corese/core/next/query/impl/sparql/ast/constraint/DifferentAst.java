@@ -1,9 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-
 import java.util.List;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
  * Operator {@code !=}
@@ -18,4 +17,8 @@ public class DifferentAst extends AbstractChainableOperatorAst implements Boolea
         return new DifferentAst(args);
     }
 
+    @Override
+    public String getName() {
+        return "!=";
+    }
 }

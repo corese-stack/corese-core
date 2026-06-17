@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-
 import java.util.List;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
  *
@@ -13,5 +13,10 @@ import java.util.List;
 public class LangMatchesAst extends AbstractBinaryFunctionAst implements BooleanExpressionAst {
     public LangMatchesAst(List<TermAst> args) {
         super(args);
+    }
+
+    @Override
+    public String getName() {
+        return "LANGMATCHES";
     }
 }

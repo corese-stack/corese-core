@@ -13,4 +13,9 @@ public class TzAst extends AbstractUnaryConstraintAst implements SimpleLiteralEx
     public TzAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "TZ";
+    }
 }

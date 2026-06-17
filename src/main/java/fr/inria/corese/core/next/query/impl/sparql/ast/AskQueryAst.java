@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 import java.util.List;
 
 /**
@@ -38,5 +40,15 @@ public record AskQueryAst(DatasetClauseAst datasetClause, GroupGraphPatternAst w
         if(valuesClause == null) {
             valuesClause = ValuesAst.none();
         }
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.datasetClause.accept(visitor);
+        this.prologue.accept(visitor);
+        this.whereClause.accept(visitor);
+        this.solutionModifier.accept(visitor);
+        this.valuesClause.accept(visitor);
     }
 }
