@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 
 /**
  * Represents the CREATE operation as defined
@@ -28,5 +29,11 @@ public record CreateRequestAst(GraphRefAst graphRef, boolean silent) implements 
      */
     public CreateRequestAst(GraphRefAst graphRef) {
         this(graphRef, false);
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.graphRef.accept(visitor);
     }
 }
