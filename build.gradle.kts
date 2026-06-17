@@ -308,7 +308,7 @@ tasks.named("compileJava") {
 
 // Ensure sources JAR includes generated sources and depends on code generation
 tasks.named<Jar>("sourcesJar") {
-    dependsOn("generateGrammarSource", "javaccSparqlCorese")
+    dependsOn("generateGrammarSource", "generateTestGrammarSource", "javaccSparqlCorese")
     from(javaccGeneratedDir)
     from(antlrPackageDir)
     includeEmptyDirs = false
