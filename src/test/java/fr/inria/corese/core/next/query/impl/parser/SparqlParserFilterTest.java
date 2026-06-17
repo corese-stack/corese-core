@@ -483,7 +483,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(?s < <http://example.com>)
+                  FILTER(?s < 2)
                 }
                 """);
 
@@ -501,11 +501,11 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         LowerThanAst t = (LowerThanAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getLeftArgument());
-        assertInstanceOf(IriAst.class, t.getRightArgument());
+        VarAst varAst = assertInstanceOf(VarAst.class, t.getLeftArgument());
+        LiteralAst literalAst = assertInstanceOf(LiteralAst.class, t.getRightArgument());
 
-        assertEquals("s", ((VarAst) t.getLeftArgument()).name());
-        assertEquals("<http://example.com>", ((IriAst) t.getRightArgument()).raw());
+        assertEquals("s", varAst.name());
+        assertEquals("2", literalAst.lexical());
     }
 
     @Test
@@ -515,7 +515,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(?s <= <http://example.com>)
+                  FILTER(?s <= 3)
                 }
                 """);
 
@@ -533,11 +533,11 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         LowerOrEqualThanAst t = (LowerOrEqualThanAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getLeftArgument());
-        assertInstanceOf(IriAst.class, t.getRightArgument());
+        VarAst varAst = assertInstanceOf(VarAst.class, t.getLeftArgument());
+        LiteralAst literalAst = assertInstanceOf(LiteralAst.class, t.getRightArgument());
 
-        assertEquals("s", ((VarAst) t.getLeftArgument()).name());
-        assertEquals("<http://example.com>", ((IriAst) t.getRightArgument()).raw());
+        assertEquals("s", varAst.name());
+        assertEquals("3", literalAst.lexical());
     }
 
     @Test
@@ -547,7 +547,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(?s > <http://example.com>)
+                  FILTER(?s > 4)
                 }
                 """);
 
@@ -565,11 +565,11 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         GreaterThanAst t = (GreaterThanAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getLeftArgument());
-        assertInstanceOf(IriAst.class, t.getRightArgument());
+        VarAst varAst = assertInstanceOf(VarAst.class, t.getLeftArgument());
+        LiteralAst literalAst = assertInstanceOf(LiteralAst.class, t.getRightArgument());
 
-        assertEquals("s", ((VarAst) t.getLeftArgument()).name());
-        assertEquals("<http://example.com>", ((IriAst) t.getRightArgument()).raw());
+        assertEquals("s", varAst.name());
+        assertEquals("4", literalAst.lexical());
     }
 
     @Test
@@ -579,7 +579,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(?s >= <http://example.com>)
+                  FILTER(?s >= 5)
                 }
                 """);
 
@@ -597,11 +597,11 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         GreaterOrEqualThanAst t = (GreaterOrEqualThanAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getLeftArgument());
-        assertInstanceOf(IriAst.class, t.getRightArgument());
+        VarAst varAst = assertInstanceOf(VarAst.class, t.getLeftArgument());
+        LiteralAst literalAst = assertInstanceOf(LiteralAst.class, t.getRightArgument());
 
-        assertEquals("s", ((VarAst) t.getLeftArgument()).name());
-        assertEquals("<http://example.com>", ((IriAst) t.getRightArgument()).raw());
+        assertEquals("s", varAst.name());
+        assertEquals("5", literalAst.lexical());
     }
 
     @Test
