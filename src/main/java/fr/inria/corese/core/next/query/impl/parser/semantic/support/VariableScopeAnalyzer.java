@@ -136,15 +136,15 @@ public final class VariableScopeAnalyzer {
                 addIfVariable(endpoint, visibleVariables);
             }
 
-            case SubQueryAst(QueryAst query) -> {
-                if (query instanceof SelectQueryAst select) {
-                    ProjectionAst proj = select.projection();
-                    if (proj.selectAll()) {
-                        collectVisibleVariables(select.whereClause(), visibleVariables);
-                    } else {
-                        for (VarAst v : proj.variables()) {
-                            visibleVariables.add(v.name());
-                        }
+            case SubQueryAst(SelectQueryAst select) -> {
+
+                ProjectionAst proj = select.projection();
+
+                if (proj.selectAll()) {
+                    collectVisibleVariables(select.whereClause(), visibleVariables);
+                } else {
+                    for (VarAst v : proj.variables()) {
+                        visibleVariables.add(v.name());
                     }
                 }
             }

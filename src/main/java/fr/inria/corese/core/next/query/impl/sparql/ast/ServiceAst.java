@@ -1,7 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
 
 /**
  * AST node representing a SPARQL {@code SERVICE} graph pattern.
@@ -14,7 +13,7 @@ import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst
  * @param silent   whether the {@code SILENT} keyword was present
  * @param pattern  the graph pattern to evaluate at the remote endpoint
  */
-public record ServiceAst(TermAst endpoint, boolean silent, GroupGraphPatternAst pattern) implements VisitableAst, PatternAst {
+public record ServiceAst(TermAst endpoint, boolean silent, GroupGraphPatternAst pattern) implements PatternAst {
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);

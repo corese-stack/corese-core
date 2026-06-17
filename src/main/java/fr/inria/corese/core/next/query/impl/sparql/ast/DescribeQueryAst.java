@@ -8,7 +8,9 @@ import java.util.List;
  * Abstract Syntax Tree (AST) representation of a SPARQL {@code DESCRIBE} query.
  * DESCRIBE (var|uri)* WHERE { pattern } or DESCRIBE (var|uri)*.
  *
- * <p>Examples:</p>
+ * <p>
+ * Examples:
+ * </p>
  *
  * <pre>{@code
  * DESCRIBE <http://example.org/>
@@ -29,23 +31,22 @@ public record DescribeQueryAst(
         GroupGraphPatternAst whereClause,
         SolutionModifierAst solutionModifier,
         QueryPrologueAst prologue,
-        ValuesAst valuesClause
-) implements SparqlQueryAst {
+        ValuesAst valuesClause) implements SparqlQueryAst {
     public DescribeQueryAst {
         described = described != null ? List.copyOf(described) : List.of();
         if (whereClause == null) {
             whereClause = new GroupGraphPatternAst(List.of());
         }
-        if(datasetClause == null) {
+        if (datasetClause == null) {
             datasetClause = DatasetClauseAst.none();
         }
         if (solutionModifier == null) {
             solutionModifier = SolutionModifierAst.empty();
         }
-        if(prologue == null) {
+        if (prologue == null) {
             prologue = QueryPrologueAst.empty();
         }
-        if(valuesClause == null) {
+        if (valuesClause == null) {
             valuesClause = ValuesAst.none();
         }
     }
@@ -57,8 +58,7 @@ public record DescribeQueryAst(
             DatasetClauseAst datasetClause,
             List<TermAst> described,
             GroupGraphPatternAst whereClause,
-            SolutionModifierAst solutionModifier
-    ) {
+            SolutionModifierAst solutionModifier) {
         this(datasetClause, described, whereClause, solutionModifier, null, null);
     }
 

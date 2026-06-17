@@ -1,9 +1,9 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import java.util.List;
+
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
-
-import java.util.List;
 
 /**
  * SPARQL {@code HAVING} clause: boolean constraints evaluated after grouping.
@@ -24,8 +24,6 @@ public record HavingAst(List<TermAst> conditions) implements VisitableAst {
     @Override
     public void accept(AstVisitor visitor) {
         visitor.visit(this);
-        this.conditions.forEach(conditionAst -> {
-            conditionAst.accept(visitor);
-        });
+        this.conditions.forEach(conditionAst -> conditionAst.accept(visitor));
     }
 }
