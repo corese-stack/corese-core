@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
@@ -16,43 +17,57 @@ class SemanticValidationUtilsTest {
 
     @Test
     void checkTermIsPotentialBooleanTest() {
-        assertTrue(checkTermIsPotentialBoolean(new LiteralAst("true", null, null)));
-        assertTrue(checkTermIsPotentialBoolean(new LiteralAst("potato", null, XSD.xsdBoolean.getIRI().stringValue())));
-        assertTrue(checkTermIsPotentialBoolean(new AndAst(List.of(new LiteralAst("true", null, null), new LiteralAst("true", null, null)))));
-        assertTrue(checkTermIsPotentialBoolean(new VarAst("test")));
-        assertFalse(checkTermIsPotentialBoolean(new IriAst("<http://ns.inria.de/test>")));
-        assertFalse(checkTermIsPotentialBoolean(new NowAst()));
+        assertTrue(isPotentialBooleanCompatible(new LiteralAst("true", null, null)));
+        assertTrue(isPotentialBooleanCompatible(new LiteralAst("potato", null, XSD.xsdBoolean.getIRI().stringValue())));
+        assertTrue(isPotentialBooleanCompatible(new AndAst(List.of(new LiteralAst("true", null, null), new LiteralAst("true", null, null)))));
+        assertTrue(isPotentialBooleanCompatible(new VarAst("test")));
+        assertFalse(isPotentialBooleanCompatible(new IriAst("<http://ns.inria.de/test>")));
+        assertFalse(isPotentialBooleanCompatible(new NowAst()));
     }
 
     @Test
-    void checkTermIsPotentialNumericTest() {
-        assertTrue(checkTermIsPotentialNumeric(new LiteralAst("1", null, null)));
-        assertTrue(checkTermIsPotentialNumeric(new LiteralAst("abc", null, XSD.xsdDouble.getIRI().stringValue())));
-        assertTrue(checkTermIsPotentialNumeric(new VarAst("test")));
-        assertFalse(checkTermIsPotentialNumeric(new IriAst("<http://ns.inria.de/test>")));
-        assertFalse(checkTermIsPotentialNumeric(new NowAst()));
-        assertTrue(checkTermIsPotentialNumeric(new AddAst(List.of(new LiteralAst("1", null, null), new LiteralAst("2", null, null)))));
+    void isPotentialNumericTest() {
+        assertTrue(isPotentialNumeric(new LiteralAst("1", null, null)));
+        assertTrue(isPotentialNumeric(new LiteralAst("abc", null, XSD.xsdDouble.getIRI().stringValue())));
+        assertTrue(isPotentialNumeric(new VarAst("test")));
+        assertFalse(isPotentialNumeric(new IriAst("<http://ns.inria.de/test>")));
+        assertFalse(isPotentialNumeric(new NowAst()));
+        assertTrue(isPotentialNumeric(new AddAst(List.of(new LiteralAst("1", null, null), new LiteralAst("2", null, null)))));
     }
 
     @Test
-    void checkTermIsUnknownTypeTest() {
-        assertTrue(checkTermIsUnknownType(new VarAst("test")));
-        assertFalse(checkTermIsUnknownType(new LiteralAst("true", null, null)));
-        assertFalse(checkTermIsUnknownType(new NowAst()));
+    void isUnknownTypeTest() {
+        assertTrue(isUnknownType(new VarAst("test")));
+        assertFalse(isUnknownType(new LiteralAst("true", null, null)));
+        assertFalse(isUnknownType(new NowAst()));
     }
 
     @Test
-    void checkStringIsNumericTest() {
-        assertTrue(checkStringIsNumeric("1"));
-        assertFalse(checkStringIsNumeric("Potato"));
+    void isNumericTest() {
+        assertTrue(isNumeric("1"));
+        assertFalse(isNumeric("Potato"));
     }
 
     @Test
-    void checkTermIsPotentialIriTest() {
-        assertTrue(checkTermIsPotentialIri(new IriAst("<http://ns.inria.de/test>")));
-        assertTrue(checkTermIsPotentialIri(new DatatypeAst(List.of(new LiteralAst("1", null, null)))));
-        assertFalse(checkTermIsPotentialIri(new VarAst("test")));
-        assertFalse(checkTermIsPotentialIri(new LiteralAst("1", null, null)));
-        assertFalse(checkTermIsPotentialIri(new NowAst()));
+    void isPotentialIriTest() {
+        assertTrue(isPotentialIri(new IriAst("<http://ns.inria.de/test>")));
+        assertTrue(isPotentialIri(new DatatypeAst(List.of(new LiteralAst("1", null, null)))));
+        assertFalse(isPotentialIri(new VarAst("test")));
+        assertFalse(isPotentialIri(new LiteralAst("1", null, null)));
+        assertFalse(isPotentialIri(new NowAst()));
+    }
+
+    @Test
+    void isPotentialStringLiteralTest() {
+        assertTrue(isPotentialStringLiteral(new LiteralAst("test", null, null)));
+        assertTrue(isPotentialStringLiteral(new LiteralAst("test", "en", null)));
+        assertTrue(isPotentialStringLiteral(new LiteralAst("test", null, RDF.langString.getIRI().stringValue())));
+        assertTrue(isPotentialStringLiteral(new LiteralAst("test", null, XSD.xsdString.getIRI().stringValue())));
+        assertTrue(isPotentialStringLiteral(new VarAst("test")));
+        assertTrue(isPotentialStringLiteral(new ConcatAst(List.of())));
+        assertFalse(isPotentialStringLiteral(new LiteralAst("test", null, XSD.xsdDouble.getIRI().stringValue())));
+        assertFalse(isPotentialStringLiteral(new DatatypeAst(List.of(new LiteralAst("1", null, null)))));
+        assertFalse(isPotentialStringLiteral(new IriAst("<http://ns.inria.de/test>")));
+        assertFalse(isPotentialStringLiteral(new NowAst()));
     }
 }

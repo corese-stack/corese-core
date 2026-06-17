@@ -500,11 +500,11 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                 parser.parse("""
                            SELECT * WHERE {
                              ?x ?p ?o .
-                             FILTER(IsIri(?s) || "potato")
+                             FILTER(IsIri(?s) || "potato"^^<http://ns.inria.fr/vegetable>)
                            }
                         """);
             });
-            assertEquals("\"potato\" used in || should be resolvable to a boolean", exception.getMessage());
+            assertEquals("\"potato\"^^<http://ns.inria.fr/vegetable> used in || should be resolvable to a boolean", exception.getMessage());
         }
 
         @Test

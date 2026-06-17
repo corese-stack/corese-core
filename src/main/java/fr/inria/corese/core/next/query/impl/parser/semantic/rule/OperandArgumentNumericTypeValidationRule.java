@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.inria.corese.core.next.query.impl.parser.semantic.support.SemanticValidationUtils.checkTermIsPotentialNumeric;
+import static fr.inria.corese.core.next.query.impl.parser.semantic.support.SemanticValidationUtils.isPotentialNumeric;
 
 /**
  * Check that the operands and numeric functions use numeric arguments
@@ -45,7 +45,7 @@ public final class OperandArgumentNumericTypeValidationRule extends AbstractSema
                                 || unaryConstraintAst instanceof RoundAst
                                 || unaryConstraintAst instanceof UnaryMinusAst
                                 || unaryConstraintAst instanceof UnaryPlusAst)
-                                && !checkTermIsPotentialNumeric(unaryConstraintAst.argument())) {
+                                && !isPotentialNumeric(unaryConstraintAst.argument())) {
                     result.add(buildIncorrectTypeDiagnostic(unaryConstraintAst.argument().getName(), unaryConstraintAst.getName(), "numeric"));
                 }
             }
@@ -56,10 +56,10 @@ public final class OperandArgumentNumericTypeValidationRule extends AbstractSema
                         || binaryConstraintAst instanceof MultiplyAst
                         || binaryConstraintAst instanceof SubtractAst
                 ) {
-                    if (!checkTermIsPotentialNumeric(binaryConstraintAst.getLeftArgument())) {
+                    if (!isPotentialNumeric(binaryConstraintAst.getLeftArgument())) {
                         result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getLeftArgument().getName(), binaryConstraintAst.getName(), "numeric"));
                     }
-                    if (!checkTermIsPotentialNumeric(binaryConstraintAst.getRightArgument())) {
+                    if (!isPotentialNumeric(binaryConstraintAst.getRightArgument())) {
                         result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getRightArgument().getName(), binaryConstraintAst.getName(), "numeric"));
                     }
                 }

@@ -9,7 +9,7 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.inria.corese.core.next.query.impl.parser.semantic.support.SemanticValidationUtils.checkTermIsPotentialIri;
+import static fr.inria.corese.core.next.query.impl.parser.semantic.support.SemanticValidationUtils.isPotentialIri;
 
 /**
  * Check that the comparison operand do not compare IRIs (except for the different != operator)
@@ -42,10 +42,10 @@ public class OperandArgumentIRITypeValidationRule extends AbstractSemanticValida
                     || binaryConstraintAst instanceof LowerOrEqualThanAst
                     || binaryConstraintAst instanceof GreaterThanAst
                     || binaryConstraintAst instanceof GreaterOrEqualThanAst) {
-                    if(checkTermIsPotentialIri(binaryConstraintAst.getLeftArgument())) {
+                    if(isPotentialIri(binaryConstraintAst.getLeftArgument())) {
                         result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getLeftArgument().getName(), binaryConstraintAst.getName(), "not an IRI"));
                     }
-                    if(checkTermIsPotentialIri(binaryConstraintAst.getRightArgument())) {
+                    if(isPotentialIri(binaryConstraintAst.getRightArgument())) {
                         result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getRightArgument().getName(), binaryConstraintAst.getName(), "not an IRI"));
                     }
                 }

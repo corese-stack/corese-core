@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.support;
 
+import fr.inria.corese.core.next.data.impl.common.vocabulary.RDF;
 import fr.inria.corese.core.next.data.impl.common.vocabulary.XSD;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
@@ -7,78 +8,92 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 
-import java.util.List;
+import java.util.Set;
 
 public class SemanticValidationUtils {
+
+    public static final String BOOLEAN_DATATYPE = XSD.xsdBoolean.getIRI().stringValue();
+    public static final Set<String> STRING_DATATYPE = Set.of(
+            XSD.xsdString.getIRI().stringValue(),
+            RDF.langString.getIRI().stringValue());
 
     /**
      * Valid numeric datatypes as defined in https://www.w3.org/TR/sparql11-query/#operandDataTypes
      */
-    private static final List<String> validNumericDatatypes = List.of(
+    public static final Set<String> NUMERIC_DATATYPES = Set.of(
             XSD.xsdInteger.getIRI().stringValue(),
-            XSD.xsdDecimal.getIRI().stringValue(),
-            XSD.xsdFloat.getIRI().stringValue(),
-            XSD.xsdDouble.getIRI().stringValue(),
-            XSD.xsdNonPositiveInteger.getIRI().stringValue(),
-            XSD.xsdNegativeInteger.getIRI().stringValue(),
-            XSD.xsdLong.getIRI().stringValue(),
-            XSD.xsdInt.getIRI().stringValue(),
-            XSD.xsdShort.getIRI().stringValue(),
-            XSD.xsdByte.getIRI().stringValue(),
             XSD.xsdNonNegativeInteger.getIRI().stringValue(),
-            XSD.xsdUnsignedLong.getIRI().stringValue(),
+            XSD.xsdNonPositiveInteger.getIRI().stringValue(),
+            XSD.xsdPositiveInteger.getIRI().stringValue(),
+            XSD.xsdNegativeInteger.getIRI().stringValue(),
+            XSD.xsdInt.getIRI().stringValue(),
             XSD.xsdUnsignedInt.getIRI().stringValue(),
+            XSD.xsdLong.getIRI().stringValue(),
+            XSD.xsdUnsignedLong.getIRI().stringValue(),
+            XSD.xsdDecimal.getIRI().stringValue(),
+            XSD.xsdShort.getIRI().stringValue(),
             XSD.xsdUnsignedShort.getIRI().stringValue(),
+            XSD.xsdByte.getIRI().stringValue(),
             XSD.xsdUnsignedByte.getIRI().stringValue(),
-            XSD.xsdPositiveInteger.getIRI().stringValue()
-    );
+            XSD.xsdFloat.getIRI().stringValue(),
+            XSD.xsdDouble.getIRI().stringValue());
+
+    public static boolean isBooleanCompatible(LiteralAst literalAst) {
+        if (literalAst.lang() != null && !literalAst.lang().isBlank()) {
+            return true;
+        }
+
+        String datatype = literalAst.datatype();
+        if (datatype == null) {
+            return true;
+        }
+
+        return BOOLEAN_DATATYPE.equals(datatype)
+                || STRING_DATATYPE.contains(datatype)
+                || NUMERIC_DATATYPES.contains(datatype);
+    }
 
     /**
-     * Check that the given term is either boolean expression, literal expression (that may return a boolean result) or a variable
+     * Checks whether the given term is statically compatible with SPARQL
+     * effective boolean value evaluation.
      */
-    public static boolean checkTermIsPotentialBoolean(TermAst termAst) {
-        if (checkTermIsUnknownType(termAst)) {
+    public static boolean isPotentialBooleanCompatible(TermAst termAst) {
+        if (termAst instanceof BooleanExpressionAst
+                || termAst instanceof NumericExpressionAst
+                || termAst instanceof VarAst
+                || termAst instanceof FunctionCallAst
+                || termAst instanceof UnlimitedArgumentsFunctionAst) {
             return true;
         }
-        if (termAst instanceof BooleanExpressionAst) {
-            return true;
+
+        if (termAst instanceof LiteralAst literalAst) {
+            return isBooleanCompatible(literalAst);
         }
-        if (termAst instanceof LiteralExpressionAst literalExpressionAst
-                && !(literalExpressionAst instanceof XsdDateTimeExpressionAst
-                || literalExpressionAst instanceof XsdDayTimeDurationExpressionAst
-                || literalExpressionAst instanceof NumericExpressionAst
-        )) { // Is a literal expression that could be a boolean, we cannot know
-            return true;
+
+        if (termAst instanceof IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr)) {
+            return isPotentialBooleanCompatible(condition)
+                    && isPotentialBooleanCompatible(thenExpr)
+                    && isPotentialBooleanCompatible(elseExpr);
         }
-        if (termAst instanceof IfAst ifAst
-                && checkTermIsPotentialBoolean(ifAst.thenExpr())
-                && checkTermIsPotentialBoolean(ifAst.elseExpr())) { // Is a IF that returns potential booleans
-            return true;
-        }
-        if (termAst instanceof LiteralAst(
-                String lexical, String lang, String datatype
-        )) {// is a literal that is a typed as a boolean or the string representation of one
-            if (datatype != null) {
-                return datatype.equals(XSD.xsdBoolean.getIRI().stringValue());
-            } else {
-                return lexical.trim().equalsIgnoreCase("true") || lexical.trim().equalsIgnoreCase("false");
-            }
+
+        if (termAst instanceof LiteralExpressionAst literalExpressionAst) {
+            return !(literalExpressionAst instanceof XsdDateTimeExpressionAst
+                    || literalExpressionAst instanceof XsdDayTimeDurationExpressionAst);
         }
 
         return false;
     }
 
-
     /**
      * Check that the given term is either numeric expression, literal expression typed by a standard numeric datatype, a literal that can be parsed to a numeric or a variable
      */
-    public static boolean checkTermIsPotentialNumeric(TermAst termAst) {
-        if (checkTermIsUnknownType(termAst)) {
+    public static boolean isPotentialNumeric(TermAst termAst) {
+        if (isUnknownType(termAst)) {
             return true;
         }
         if (termAst instanceof IfAst ifAst
-                && checkTermIsPotentialNumeric(ifAst.thenExpr())
-                && checkTermIsPotentialNumeric(ifAst.elseExpr())) { // Is an IF that returns potential numerics
+                && isPotentialNumeric(ifAst.thenExpr())
+                && isPotentialNumeric(ifAst.elseExpr())) { // Is an IF that returns potential numerics
             return true;
         }
         if (termAst instanceof NumericExpressionAst) { // Is a literal expression that could be a numeric, we cannot know
@@ -86,9 +101,9 @@ public class SemanticValidationUtils {
         }
         if (termAst instanceof LiteralAst(String lexical, String lang, String datatype)) {
             if(datatype != null) {
-                return validNumericDatatypes.contains(datatype); // Datatype is an URI of an standard numeric datatype
+                return NUMERIC_DATATYPES.contains(datatype); // Datatype is an URI of an standard numeric datatype
             } else {
-                return checkStringIsNumeric(lexical); // The string value can be parsed to a numeric value
+                return isNumeric(lexical); // The string value can be parsed to a numeric value
             }
         }
 
@@ -99,7 +114,7 @@ public class SemanticValidationUtils {
      * Check if the given term type cannot be determined at query parsing, it will be checked at query resolution.
      *
      */
-    public static boolean checkTermIsUnknownType(TermAst termAst) {
+    public static boolean isUnknownType(TermAst termAst) {
         if (termAst instanceof VarAst) { // Is a variable that can be resolved to a boolean
             return true;
         }
@@ -116,7 +131,7 @@ public class SemanticValidationUtils {
     /**
      * Tries to parse the string as a Double
      */
-    public static boolean checkStringIsNumeric(String lexical) {
+    public static boolean isNumeric(String lexical) {
         if (lexical == null) {
             return false;
         }
@@ -131,13 +146,33 @@ public class SemanticValidationUtils {
     /**
      * Check if the term is either a variable or an IRI or an expression that can be resolved to an IRI
      */
-    public static boolean checkTermIsPotentialIri(TermAst termAst) {
+    public static boolean isPotentialIri(TermAst termAst) {
         if(termAst instanceof IriAst) { // Is an IRI
             return true;
         }
-        if(termAst instanceof IriExpressionAst) { // Is a function that can be resolved to an IRI
-            return true;
+        // Is a function that can be resolved to an IRI
+        return termAst instanceof IriExpressionAst;
+    }
+
+    /**
+     * Check if the term is a literal that can be considered as a string argument as defined in the SPARQL 1.1 recommendation
+     */
+    public static boolean isStringLiteral(TermAst termAst) {
+        if(termAst instanceof LiteralAst(String lexical, String lang, String datatype) && lexical != null) {
+            if(lang != null) {
+                return true;
+            }
+            if(datatype == null) {
+                return true;
+            }
+            if(STRING_DATATYPE.contains(datatype)) {
+                return true;
+            }
         }
         return false;
+    }
+
+    public static boolean isPotentialStringLiteral(TermAst termAst) {
+        return isUnknownType(termAst) || isStringLiteral(termAst) || termAst instanceof SimpleLiteralExpressionAst;
     }
 }

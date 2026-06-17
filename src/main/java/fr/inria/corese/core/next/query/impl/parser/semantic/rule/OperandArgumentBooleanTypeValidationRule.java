@@ -12,7 +12,8 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.OrAst;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.inria.corese.core.next.query.impl.parser.semantic.support.SemanticValidationUtils.checkTermIsPotentialBoolean;
+import static fr.inria.corese.core.next.query.impl.parser.semantic.support.SemanticValidationUtils.isPotentialBooleanCompatible;
+
 
 public class OperandArgumentBooleanTypeValidationRule extends AbstractSemanticValidationRule {
     @Override
@@ -37,17 +38,17 @@ public class OperandArgumentBooleanTypeValidationRule extends AbstractSemanticVa
         @Override
         public void visit(TermAst termAst) {
             if(termAst instanceof BooleanNotAst booleanNotAst) {
-                if(! checkTermIsPotentialBoolean( booleanNotAst.argument())) {
+                if(! isPotentialBooleanCompatible( booleanNotAst.argument())) {
                     result.add(buildIncorrectTypeDiagnostic(booleanNotAst.argument().getName(), booleanNotAst.getName(), "boolean"));
                 }
             }
             if(termAst instanceof BinaryConstraintAst binaryConstraintAst) {
                 if(binaryConstraintAst instanceof AndAst
                     || binaryConstraintAst instanceof OrAst) {
-                    if(! checkTermIsPotentialBoolean( binaryConstraintAst.getLeftArgument())) {
+                    if(! isPotentialBooleanCompatible( binaryConstraintAst.getLeftArgument())) {
                         result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getLeftArgument().getName(), binaryConstraintAst.getName(), "boolean"));
                     }
-                    if(! checkTermIsPotentialBoolean( binaryConstraintAst.getRightArgument())) {
+                    if(! isPotentialBooleanCompatible( binaryConstraintAst.getRightArgument())) {
                         result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getRightArgument().getName(), binaryConstraintAst.getName(), "boolean"));
                     }
                 }
