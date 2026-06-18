@@ -12,15 +12,15 @@ import java.util.Set;
 
 public class SemanticValidationUtils {
 
-    public static final String BOOLEAN_DATATYPE = XSD.xsdBoolean.getIRI().stringValue();
-    public static final Set<String> STRING_DATATYPE = Set.of(
+    private static final String BOOLEAN_DATATYPE = XSD.xsdBoolean.getIRI().stringValue();
+    private static final Set<String> STRING_DATATYPE = Set.of(
             XSD.xsdString.getIRI().stringValue(),
             RDF.langString.getIRI().stringValue());
 
     /**
      * Valid numeric datatypes as defined in https://www.w3.org/TR/sparql11-query/#operandDataTypes
      */
-    public static final Set<String> NUMERIC_DATATYPES = Set.of(
+    private static final Set<String> NUMERIC_DATATYPES = Set.of(
             XSD.xsdInteger.getIRI().stringValue(),
             XSD.xsdNonNegativeInteger.getIRI().stringValue(),
             XSD.xsdNonPositiveInteger.getIRI().stringValue(),
@@ -172,6 +172,10 @@ public class SemanticValidationUtils {
         return false;
     }
 
+
+    /**
+     * Check if the term is either a variable or a literal that can be considered as a string argument as defined in the SPARQL 1.1 recommendation
+     */
     public static boolean isPotentialStringLiteral(TermAst termAst) {
         return isUnknownType(termAst) || isStringLiteral(termAst) || termAst instanceof SimpleLiteralExpressionAst;
     }
