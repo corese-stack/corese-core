@@ -383,4 +383,24 @@ public class SparqlParserAskQueryTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(askQueryAst.solutionModifier());
         assertEquals(10L, askQueryAst.solutionModifier().limit());
     }
+
+    @Test
+    @DisplayName("ASK should parse ORDER BY on a visible variable")
+    public void shouldParseAskWithOrderBy() {
+        SparqlParser parser = newParserDefault();
+        QueryAst queryAst = parser.parse("""
+                ASK
+                WHERE {
+                    ?s ?p ?o .
+                }
+                ORDER BY ?s
+                """);
+
+        assertInstanceOf(AskQueryAst.class, queryAst);
+        AskQueryAst askQueryAst = (AskQueryAst) queryAst;
+        assertNotNull(askQueryAst.solutionModifier());
+        assertEquals(1, askQueryAst.solutionModifier().orderBy().size());
+        assertInstanceOf(VarAst.class, askQueryAst.solutionModifier().orderBy().getFirst().expression());
+        assertEquals("s", ((VarAst) askQueryAst.solutionModifier().orderBy().getFirst().expression()).name());
+    }
 }

@@ -8,7 +8,11 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.GroupByAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SolutionModifierFeature extends AbstractSparqlQueryFeature {
 
@@ -19,10 +23,29 @@ public class SolutionModifierFeature extends AbstractSparqlQueryFeature {
     @Override
     public void exitGroupClause(SparqlParser.GroupClauseContext ctx) {
         List<TermAst> terms = new ArrayList<>(ctx.groupCondition().size());
+        Set<String> expressionBoundVariables = new LinkedHashSet<>();
+        Map<String, TermAst> expressionTerms = new LinkedHashMap<>();
         for (SparqlParser.GroupConditionContext gcc : ctx.groupCondition()) {
-            terms.add(builder().termFromGroupCondition(gcc));
+            TermAst expression = builder().termFromGroupCondition(gcc);
+            terms.add(expression);
+            if (gcc.expression() != null && gcc.var_() != null) {
+                String aliasName = normalizeVariableName(gcc.var_().getText());
+                expressionBoundVariables.add(aliasName);
+                expressionTerms.put(aliasName, expression);
+            }
         }
-        queryBuilder().setGroupBy(new GroupByAst(terms));
+        queryBuilder().setGroupBy(new GroupByAst(terms, expressionBoundVariables, expressionTerms));
+    }
+
+    private String normalizeVariableName(String rawName) {
+        if (rawName == null) {
+            return "";
+        }
+        String trimmed = rawName.trim();
+        if (trimmed.startsWith("?") || trimmed.startsWith("$")) {
+            return trimmed.substring(1).trim();
+        }
+        return trimmed;
     }
 
     @Override

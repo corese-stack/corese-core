@@ -874,10 +874,14 @@ public abstract class SparqlAstBuilder {
 
     /**
      * One {@code groupCondition}&nbsp;:&nbsp;{@code builtInCall | functionCall | '(' expression ('AS' var_)? ')' | var_}.
-     * <p>La forme {@code (expr AS ?v)} est résolue comme l’expression de regroupement (le nom optionnel rejoint la
-     * spec en étant porté par la projection SELECT&nbsp;; l’AST minimal ne le duplique pas ici).
+     * <p>La forme {@code (expr AS ?v)} est résolue comme l’expression de regroupement.
+     * L’alias éventuel est capturé par {@link fr.inria.corese.core.next.query.impl.parser.listener.SolutionModifierFeature}
+     * puis porté par {@link GroupByAst}.
      */
     public TermAst termFromGroupCondition(SparqlParser.GroupConditionContext ctx) {
+        if (ctx.expression() != null) {
+            return termFromExpression(ctx.expression());
+        }
         if (ctx.var_() != null) {
             return termFromVar(ctx.var_());
         }
@@ -895,9 +899,6 @@ public abstract class SparqlAstBuilder {
             }
             List<TermAst> args = fc.argList().expression().stream().map(this::termFromExpression).toList();
             return createFunCall(functionName, args);
-        }
-        if (ctx.expression() != null) {
-            return termFromExpression(ctx.expression());
         }
         throw new QueryEvaluationException("Unsupported group condition: " + ctx.getText());
     }

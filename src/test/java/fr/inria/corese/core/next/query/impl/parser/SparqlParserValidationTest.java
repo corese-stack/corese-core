@@ -20,6 +20,20 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             "Variable ?x used in SELECT projection is not visible in WHERE clause";
     private static final String CITY_LABEL_SCOPE_MESSAGE =
             "Variable ?cityLabel used in SELECT projection is not visible in WHERE clause";
+    private static final String LABEL_SCOPE_MESSAGE =
+            "Variable ?label used in SELECT projection is not visible in WHERE clause";
+    private static final String GROUP_BY_SCOPE_MESSAGE =
+            "Variable ?z used in GROUP BY is not visible in WHERE clause";
+    private static final String HAVING_SCOPE_MESSAGE =
+            "Variable ?z used in HAVING is not visible in WHERE clause";
+    private static final String GROUPED_HAVING_MESSAGE =
+            "Variable ?o used in HAVING must be grouped or aggregated";
+    private static final String GROUPED_ORDER_BY_MESSAGE =
+            "Variable ?o used in ORDER BY must be grouped or aggregated";
+    private static final String UNGROUPED_PROJECTION_MESSAGE =
+            "Variable ?o used in SELECT projection must be grouped or aggregated";
+    private static final String SELECT_ALL_GROUP_BY_MESSAGE =
+            "SELECT * is not permitted with GROUP BY";
     private static final String BIND_SCOPE_MESSAGE =
             "Variable ?x used in BIND is already declared in the same group graph pattern";
 
@@ -31,6 +45,26 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
         QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse(query));
 
         assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @Nested
+    class AskValidationTest {
+
+        @Test
+        @DisplayName("Should reject ASK ORDER BY variable not visible in WHERE")
+        void shouldRejectAskOrderByVariableNotVisibleInWhere() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                    ASK
+                    WHERE {
+                        ?s ?p ?o
+                    }
+                    ORDER BY ?z
+                """));
+
+            assertEquals(ORDER_BY_SCOPE_MESSAGE, exception.getMessage());
+        }
     }
 
     @Nested
@@ -378,6 +412,140 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                                 ORDER BY IF(BOUND(?o), ?o, ?z)
                                 """,
                         ORDER_BY_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject SELECT expression projection using a variable not visible in WHERE",
+                        """
+                        SELECT (STR(?x) AS ?label) WHERE {
+                            ?s ?p ?o
+                        }
+                        """,
+                        SELECT_PROJECTION_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject SELECT expression projection using a later alias not yet visible in SELECT",
+                        """
+                        SELECT (STR(?label) AS ?copy) (STR(?p) AS ?label) WHERE {
+                            ?s ?p ?o
+                        }
+                        """,
+                        LABEL_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject GROUP BY variable not visible in WHERE",
+                        """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?z
+                        """,
+                        GROUP_BY_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject GROUP BY expression using a variable not visible in WHERE",
+                        """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY CONCAT(?s, ?z)
+                        """,
+                        GROUP_BY_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject grouped SELECT projection variable that is neither grouped nor aggregated",
+                        """
+                        SELECT ?s ?o WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        """,
+                        UNGROUPED_PROJECTION_MESSAGE),
+                Arguments.of(
+                        "Should reject grouped SELECT expression using a variable that is neither grouped nor aggregated",
+                        """
+                        SELECT ?s (STR(?o) AS ?label) WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        """,
+                        UNGROUPED_PROJECTION_MESSAGE),
+                Arguments.of(
+                        "Should reject grouped SELECT expression that only reuses GROUP BY expression variables without aggregation",
+                        """
+                        SELECT (CONCAT(?s, ?o) AS ?key) WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY CONCAT(?s, ?o)
+                        """,
+                        "Variable ?s used in SELECT projection must be grouped or aggregated"),
+                Arguments.of(
+                        "Should reject implicit aggregate query projecting a non-aggregated variable",
+                        """
+                        SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        """,
+                        "Variable ?s used in SELECT projection must be grouped or aggregated"),
+                Arguments.of(
+                        "Should reject implicit aggregate query projection expression using a non-aggregated variable",
+                        """
+                        SELECT (STR(?s) AS ?label) (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        """,
+                        "Variable ?s used in SELECT projection must be grouped or aggregated"),
+                Arguments.of(
+                        "Should reject SELECT * when GROUP BY is present",
+                        """
+                        SELECT * WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        """,
+                        SELECT_ALL_GROUP_BY_MESSAGE),
+                Arguments.of(
+                        "Should reject HAVING expression using a variable not visible in WHERE",
+                        """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        HAVING (BOUND(?z))
+                        """,
+                        HAVING_SCOPE_MESSAGE),
+                Arguments.of(
+                        "Should reject grouped HAVING expression using a variable that is neither grouped nor aggregated",
+                        """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        HAVING (BOUND(?o))
+                        """,
+                        GROUPED_HAVING_MESSAGE),
+                Arguments.of(
+                        "Should reject implicit aggregate HAVING expression using a non-aggregated variable",
+                        """
+                        SELECT (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        HAVING (BOUND(?s))
+                        """,
+                        "Variable ?s used in HAVING must be grouped or aggregated"),
+                Arguments.of(
+                        "Should reject grouped ORDER BY expression using a variable that is neither grouped nor aggregated",
+                        """
+                        SELECT ?s WHERE {
+                            ?s ?p ?o
+                        }
+                        GROUP BY ?s
+                        ORDER BY ?o
+                        """,
+                        GROUPED_ORDER_BY_MESSAGE),
+                Arguments.of(
+                        "Should reject implicit aggregate ORDER BY expression using a non-aggregated variable",
+                        """
+                        SELECT (COUNT(?o) AS ?count) WHERE {
+                            ?s ?p ?o
+                        }
+                        ORDER BY ?s
+                        """,
+                        "Variable ?s used in ORDER BY must be grouped or aggregated"),
                 Arguments.of(
                         "Should reject SELECT projection variables not visible in WHERE",
                         """

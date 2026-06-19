@@ -11,6 +11,10 @@ import java.util.*;
  * can appear in the query solutions. A referenced variable is only mentioned
  * in an expression such as FILTER or ORDER BY; mentioning it there does not
  * make it visible.
+ *
+ * <p>Referenced-variable collection is intentionally incremental. When a new
+ * expression shape matters for semantic validation, support should be added
+ * here explicitly instead of inferred elsewhere.</p>
  */
 public final class VariableScopeAnalyzer {
 
@@ -40,19 +44,16 @@ public final class VariableScopeAnalyzer {
     public Set<String> collectVisibleVariables(ValuesAst valuesClause) {
         Set<String> visibleVariables = new LinkedHashSet<>();
 
-        if(valuesClause == null) {
+        if (valuesClause == null) {
             return visibleVariables;
         }
 
-        valuesClause.mappings().forEach(valueMappingAst -> {
-            Set<String> varNameSet = new HashSet<>();
-            valueMappingAst.values().keySet().forEach(varAst -> {
-                if(varAst != null) {
-                    varNameSet.add(varAst.name());
-                }
-            });
-            visibleVariables.addAll(varNameSet);
-        });
+        valuesClause.mappings().forEach(valueMappingAst ->
+                valueMappingAst.values().keySet().forEach(varAst -> {
+                    if (varAst != null) {
+                        visibleVariables.add(varAst.name());
+                    }
+                }));
 
         return visibleVariables;
     }
@@ -86,6 +87,79 @@ public final class VariableScopeAnalyzer {
         Set<String> referencedVariables = new LinkedHashSet<>();
         collectReferencedVariables(term, referencedVariables);
         return referencedVariables;
+    }
+
+    /**
+     * Collects variables referenced outside aggregate calls in a term or expression.
+     *
+     * @param term the term or expression to inspect
+     * @return the set of referenced variable names that are not shielded by an aggregate
+     */
+    public Set<String> collectReferencedVariablesOutsideAggregates(TermAst term) {
+        Set<String> referencedVariables = new LinkedHashSet<>();
+        collectReferencedVariablesOutsideAggregates(term, referencedVariables);
+        return referencedVariables;
+    }
+
+    /**
+     * Returns {@code true} when the given term contains at least one aggregate call.
+     *
+     * @param term the term or expression to inspect
+     * @return {@code true} if an aggregate call occurs anywhere inside the term
+     */
+    public boolean containsAggregate(TermAst term) {
+        if (term == null) {
+            return false;
+        }
+
+        return switch (term) {
+            case AggregateAst ignored -> true;
+
+            case UnaryConstraintAst unaryConstraint ->
+                    containsAggregate(unaryConstraint.argument());
+
+            case BinaryConstraintAst binaryConstraint ->
+                    containsAggregate(binaryConstraint.getLeftArgument())
+                            || containsAggregate(binaryConstraint.getRightArgument());
+
+            case FunctionCallAst(TermAst ignored, List<TermAst> arguments) -> arguments.stream()
+                    .anyMatch(this::containsAggregate);
+
+            case BnodeAst bnodeAst -> containsAggregate(bnodeAst.getLabel());
+
+            case TrinaryRegexAst regexAst ->
+                    containsAggregate(regexAst.getString())
+                            || containsAggregate(regexAst.getPattern())
+                            || containsAggregate(regexAst.getFlags());
+
+            case SubstrAst substrAst ->
+                    containsAggregate(substrAst.getString())
+                            || containsAggregate(substrAst.getStart())
+                            || containsAggregate(substrAst.getLength());
+
+            case ReplaceAst replaceAst ->
+                    containsAggregate(replaceAst.getString())
+                            || containsAggregate(replaceAst.getPattern())
+                            || containsAggregate(replaceAst.getReplacement())
+                            || (replaceAst.hasFlags() && containsAggregate(replaceAst.getFlags()));
+
+            case IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) ->
+                    containsAggregate(condition)
+                            || containsAggregate(thenExpr)
+                            || containsAggregate(elseExpr);
+
+            case CoalesceAst coalesceAst -> coalesceAst.arguments().stream().anyMatch(this::containsAggregate);
+
+            case ConcatAst concatAst -> concatAst.arguments().stream().anyMatch(this::containsAggregate);
+
+            case InAst(TermAst left, List<TermAst> candidates) ->
+                    containsAggregate(left) || candidates.stream().anyMatch(this::containsAggregate);
+
+            case NotInAst(TermAst left, List<TermAst> candidates) ->
+                    containsAggregate(left) || candidates.stream().anyMatch(this::containsAggregate);
+
+            default -> false;
+        };
     }
 
     private void collectVisibleVariables(PatternAst pattern, Set<String> visibleVariables) {
@@ -249,7 +323,103 @@ public final class VariableScopeAnalyzer {
                     collectReferencedVariables(expression, referencedVariables);
 
             case ConstraintAst ignored -> {
-                // Other constraint shapes are ignored until they are supported here.
+                // Other constraint shapes must be added explicitly when scope validation starts relying on them.
+            }
+        }
+    }
+
+    private void collectReferencedVariablesOutsideAggregates(TermAst term, Set<String> referencedVariables) {
+        if (term == null) {
+            return;
+        }
+
+        switch (term) {
+            case VarAst(String name) -> referencedVariables.add(name);
+
+            case AggregateAst ignored -> {
+                // Variables used under an aggregate are handled by aggregate semantics, not raw grouping scope.
+            }
+
+            case UnaryConstraintAst unaryConstraint ->
+                    collectReferencedVariablesOutsideAggregates(unaryConstraint.argument(), referencedVariables);
+
+            case BinaryConstraintAst binaryConstraint -> {
+                collectReferencedVariablesOutsideAggregates(binaryConstraint.getLeftArgument(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(binaryConstraint.getRightArgument(), referencedVariables);
+            }
+
+            case FunctionCallAst(TermAst ignored, List<TermAst> arguments) -> {
+                for (TermAst argument : arguments) {
+                    collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
+                }
+            }
+
+            case BnodeAst bnodeAst ->
+                    collectReferencedVariablesOutsideAggregates(bnodeAst.getLabel(), referencedVariables);
+
+            case TrinaryRegexAst regexAst -> {
+                collectReferencedVariablesOutsideAggregates(regexAst.getString(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(regexAst.getPattern(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(regexAst.getFlags(), referencedVariables);
+            }
+
+            case SubstrAst substrAst -> {
+                collectReferencedVariablesOutsideAggregates(substrAst.getString(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(substrAst.getStart(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(substrAst.getLength(), referencedVariables);
+            }
+
+            case ReplaceAst replaceAst -> {
+                collectReferencedVariablesOutsideAggregates(replaceAst.getString(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(replaceAst.getPattern(), referencedVariables);
+                collectReferencedVariablesOutsideAggregates(replaceAst.getReplacement(), referencedVariables);
+                if (replaceAst.hasFlags()) {
+                    collectReferencedVariablesOutsideAggregates(replaceAst.getFlags(), referencedVariables);
+                }
+            }
+
+            case IriAst ignoredIri -> {
+                // Constants do not contribute referenced variables.
+            }
+
+            case LiteralAst ignoredLiteral -> {
+                // Constants do not contribute referenced variables.
+            }
+
+            case IfAst(TermAst condition, TermAst thenExpr, TermAst elseExpr) -> {
+                collectReferencedVariablesOutsideAggregates(condition, referencedVariables);
+                collectReferencedVariablesOutsideAggregates(thenExpr, referencedVariables);
+                collectReferencedVariablesOutsideAggregates(elseExpr, referencedVariables);
+            }
+
+            case CoalesceAst coalesceAst -> {
+                for (TermAst argument : coalesceAst.arguments()) {
+                    collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
+                }
+            }
+
+            case ConcatAst concatAst -> {
+                for (TermAst argument : concatAst.arguments()) {
+                    collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
+                }
+            }
+
+            case InAst(TermAst left, List<TermAst> candidates) -> {
+                collectReferencedVariablesOutsideAggregates(left, referencedVariables);
+                for (TermAst candidate : candidates) {
+                    collectReferencedVariablesOutsideAggregates(candidate, referencedVariables);
+                }
+            }
+
+            case NotInAst(TermAst left, List<TermAst> candidates) -> {
+                collectReferencedVariablesOutsideAggregates(left, referencedVariables);
+                for (TermAst candidate : candidates) {
+                    collectReferencedVariablesOutsideAggregates(candidate, referencedVariables);
+                }
+            }
+
+            case ConstraintAst ignored -> {
+                // Other constraint shapes must be added explicitly when grouped-projection validation starts relying on them.
             }
         }
     }

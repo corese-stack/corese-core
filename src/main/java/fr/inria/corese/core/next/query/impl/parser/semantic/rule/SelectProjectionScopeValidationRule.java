@@ -1,15 +1,13 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,8 +18,6 @@ import java.util.Set;
 public final class SelectProjectionScopeValidationRule extends AbstractSemanticValidationRule {
 
     private static final String DIAGNOSTIC_SOURCE = "SelectProjectionScopeValidationRule";
-
-    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
 
     @Override
     protected String getDiagnosticSource() {
@@ -37,10 +33,19 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
             return List.of();
         }
 
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(selectQueryAst);
+        Set<String> visibleVariables = collectSelectAvailableVariables(selectQueryAst);
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
         validateProjectionVariables(selectQueryAst.projection(), visibleVariables, diagnostics);
         return List.copyOf(diagnostics);
+    }
+
+    /**
+     * SELECT projections can reuse aliases introduced by {@code GROUP BY (expr AS ?var)}.
+     */
+    private Set<String> collectSelectAvailableVariables(SelectQueryAst selectQueryAst) {
+        Set<String> visibleVariables = new LinkedHashSet<>(collectVisibleVariables(selectQueryAst));
+        visibleVariables.addAll(selectQueryAst.solutionModifier().groupBy().expressionBoundVariables());
+        return visibleVariables;
     }
 
     private void validateProjectionVariables(
@@ -48,15 +53,33 @@ public final class SelectProjectionScopeValidationRule extends AbstractSemanticV
             Set<String> visibleVariables,
             List<QueryDiagnostic> diagnostics
     ) {
-        // TODO: handle SELECT (expr AS ?var) with SPARQL 1.1 support.
+        Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
         for (VarAst projectedVar : projection.variables()) {
             if (projection.expressionBoundVariables().contains(projectedVar.name())) {
-                // Variable introduced by (expr AS ?var) — not required to be visible in WHERE.
+                validateProjectionExpression(projectedVar.name(), projection, availableVariables, diagnostics);
+                availableVariables.add(projectedVar.name());
                 continue;
             }
-            if (!visibleVariables.contains(projectedVar.name())) {
-                diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), "SELECT projection"));
+            if (!availableVariables.contains(projectedVar.name())) {
+                diagnostics.add(buildOutOfScopeDiagnostic(projectedVar.name(), ScopeClause.SELECT_PROJECTION));
             }
         }
+    }
+
+    /**
+     * SELECT expressions introduce the projected variable themselves, but the variables they reference
+     * must still be visible from the query scope.
+     */
+    private void validateProjectionExpression(
+            String projectionVariableName,
+            ProjectionAst projection,
+            Set<String> visibleVariables,
+            List<QueryDiagnostic> diagnostics
+    ) {
+        addOutOfScopeDiagnostics(
+                projection.expressionReferencedVariables().getOrDefault(projectionVariableName, Set.of()),
+                visibleVariables,
+                ScopeClause.SELECT_PROJECTION,
+                diagnostics);
     }
 }

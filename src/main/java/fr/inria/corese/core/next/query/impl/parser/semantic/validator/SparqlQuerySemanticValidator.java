@@ -4,6 +4,11 @@ import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
 import fr.inria.corese.core.next.query.api.validation.QueryValidationResult;
 import fr.inria.corese.core.next.query.api.validation.QueryValidator;
 import fr.inria.corese.core.next.query.impl.parser.semantic.rule.FilterArgumentsValidationRule;
+import fr.inria.corese.core.next.query.impl.parser.semantic.rule.GroupByScopeValidationRule;
+import fr.inria.corese.core.next.query.impl.parser.semantic.rule.GroupedHavingValidationRule;
+import fr.inria.corese.core.next.query.impl.parser.semantic.rule.GroupedOrderByValidationRule;
+import fr.inria.corese.core.next.query.impl.parser.semantic.rule.GroupedSelectProjectionValidationRule;
+import fr.inria.corese.core.next.query.impl.parser.semantic.rule.HavingScopeValidationRule;
 import fr.inria.corese.core.next.query.impl.parser.semantic.rule.OrderByScopeValidationRule;
 import fr.inria.corese.core.next.query.impl.parser.semantic.rule.SelectProjectionScopeValidationRule;
 import fr.inria.corese.core.next.query.impl.parser.semantic.rule.SemanticValidationRule;
@@ -23,6 +28,11 @@ public final class SparqlQuerySemanticValidator implements QueryValidator<QueryA
     public SparqlQuerySemanticValidator() {
         this(List.of(
                 new SelectProjectionScopeValidationRule(),
+                new GroupedSelectProjectionValidationRule(),
+                new GroupedHavingValidationRule(),
+                new GroupedOrderByValidationRule(),
+                new GroupByScopeValidationRule(),
+                new HavingScopeValidationRule(),
                 new OrderByScopeValidationRule(),
                 new FilterArgumentsValidationRule()));
     }

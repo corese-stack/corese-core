@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
@@ -8,17 +9,28 @@ import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst
 
 /**
  * SPARQL SELECT projection: either {@code SELECT *} (all variables from the
- * pattern)
- * or an explicit list of variables {@code SELECT ?s ?p ?o}.
- * <p>
- * Use {@link ProjectionAsts#selectAll()} and {@link ProjectionAsts#of(List)} to
+ * pattern) or an explicit list of variables {@code SELECT ?s ?p ?o}.
+ *
+ * <p>Use {@link ProjectionAsts#selectAll()} and {@link ProjectionAsts#of(List)} to
  * create instances.
  */
-public record ProjectionAst(boolean selectAll, List<VarAst> variables, Set<String> expressionBoundVariables)
-        implements VisitableAst {
+public record ProjectionAst(
+        boolean selectAll,
+        List<VarAst> variables,
+        Set<String> expressionBoundVariables,
+        Map<String, TermAst> expressionTerms,
+        Map<String, Set<String>> expressionReferencedVariables
+) implements VisitableAst {
     public ProjectionAst {
         variables = variables != null ? List.copyOf(variables) : List.of();
         expressionBoundVariables = expressionBoundVariables != null ? Set.copyOf(expressionBoundVariables) : Set.of();
+        expressionTerms = expressionTerms != null ? Map.copyOf(expressionTerms) : Map.of();
+        expressionReferencedVariables = expressionReferencedVariables != null
+                ? expressionReferencedVariables.entrySet().stream()
+                .collect(java.util.stream.Collectors.toUnmodifiableMap(
+                        Map.Entry::getKey,
+                        entry -> Set.copyOf(entry.getValue())))
+                : Map.of();
         if (selectAll && !variables.isEmpty()) {
             throw new IllegalArgumentException("selectAll is true but variables is non-empty");
         }

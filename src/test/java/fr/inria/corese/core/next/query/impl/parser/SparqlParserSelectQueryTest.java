@@ -599,8 +599,6 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     void shouldParseSelectWithGroupByAndHaving() {
         SparqlParser parser = newParserDefault();
 
-        // Aggregates (e.g. COUNT) in SELECT / HAVING are not yet mapped in termFromBuiltInCall;
-        // use a built-in constraint to exercise the HAVING → HavingAst pipeline.
         QueryAst ast = parser.parse("""
                 SELECT ?s
                 WHERE {
@@ -620,6 +618,76 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
+    @DisplayName("Should accept HAVING on a GROUP BY expression alias")
+    void shouldAcceptHavingUsingGroupByExpressionAlias() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?key WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
+                HAVING (BOUND(?key))
+                """));
+    }
+
+    @Test
+    @DisplayName("Should accept HAVING with an aggregate condition")
+    void shouldAcceptHavingUsingAggregateCondition() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?s WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY ?s
+                HAVING (COUNT(?o) > 1)
+                """));
+    }
+
+    @Test
+    @DisplayName("Should accept ORDER BY on a GROUP BY expression alias")
+    void shouldAcceptOrderByUsingGroupByExpressionAlias() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?key WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
+                ORDER BY ?key
+                """));
+    }
+
+    @Test
+    @DisplayName("Should accept ORDER BY with an aggregate expression")
+    void shouldAcceptOrderByUsingAggregateExpression() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY ?s
+                ORDER BY COUNT(?o)
+                """));
+    }
+
+    @Test
+    @DisplayName("Should accept ORDER BY on a projected aggregate alias")
+    void shouldAcceptOrderByUsingProjectedAggregateAlias() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                  ?s ?p ?o
+                }
+                GROUP BY ?s
+                ORDER BY ?count
+                """));
+    }
+
+    @Test
     @DisplayName("Should accept projection variables visible through OPTIONAL")
     void shouldAcceptProjectionVisibleThroughOptional() {
         SparqlParser parser = newParserDefault();
@@ -628,6 +696,117 @@ class SparqlParserSelectQueryTest extends AbstractSparqlParserFeatureTest {
                     SELECT ?o WHERE {
                         OPTIONAL { ?s ?p ?o }
                     }
+                """));
+    }
+
+    @Test
+    @DisplayName("Should accept SELECT expressions using an alias introduced earlier in the same SELECT clause")
+    void shouldAcceptSelectExpressionUsingEarlierAlias() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT (?p AS ?price) (STR(?price) AS ?label) WHERE {
+                    ?s ?p ?o
+                }
+                """);
+
+        SelectQueryAst selectQueryAst = assertInstanceOf(SelectQueryAst.class, ast);
+        ProjectionAst projection = selectQueryAst.projection();
+        assertFalse(projection.selectAll());
+        assertEquals(2, projection.variables().size());
+        assertEquals("price", projection.variables().get(0).name());
+        assertEquals("label", projection.variables().get(1).name());
+        assertTrue(projection.expressionBoundVariables().contains("price"));
+        assertTrue(projection.expressionBoundVariables().contains("label"));
+    }
+
+    @Test
+    @DisplayName("Should accept grouped SELECT constant projections")
+    void shouldAcceptGroupedSelectConstantProjection() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT ?s ("group" AS ?label) WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?s
+                """);
+
+        SelectQueryAst selectQueryAst = assertInstanceOf(SelectQueryAst.class, ast);
+        ProjectionAst projection = selectQueryAst.projection();
+        assertFalse(projection.selectAll());
+        assertEquals(2, projection.variables().size());
+        assertEquals("s", projection.variables().getFirst().name());
+        assertEquals("label", projection.variables().get(1).name());
+        assertTrue(projection.expressionBoundVariables().contains("label"));
+    }
+
+    @Test
+    @DisplayName("Should accept grouped SELECT aggregate projections")
+    void shouldAcceptGroupedSelectAggregateProjection() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT ?s (COUNT(?o) AS ?count) WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY ?s
+                """));
+    }
+
+    @Test
+    @DisplayName("Should accept grouped SELECT expression using a variable from GROUP BY ?var")
+    void shouldAcceptGroupedSelectExpressionUsingGroupedVariable() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT ?groupedVar (STR(?groupedVar) AS ?alias) WHERE {
+                    ?groupedVar ?p ?o
+                }
+                GROUP BY ?groupedVar
+                """);
+
+        SelectQueryAst selectQueryAst = assertInstanceOf(SelectQueryAst.class, ast);
+        ProjectionAst projection = selectQueryAst.projection();
+        assertFalse(projection.selectAll());
+        assertEquals(2, projection.variables().size());
+        assertEquals("groupedVar", projection.variables().get(0).name());
+        assertEquals("alias", projection.variables().get(1).name());
+        assertTrue(projection.expressionBoundVariables().contains("alias"));
+    }
+
+    @Test
+    @DisplayName("Should parse GROUP BY expression aliases and allow projecting the alias")
+    void shouldParseGroupByExpressionAlias() {
+        SparqlParser parser = newParserDefault();
+
+        QueryAst ast = parser.parse("""
+                SELECT ?key WHERE {
+                    ?s ?p ?o
+                }
+                GROUP BY (CONCAT(STR(?s), STR(?o)) AS ?key)
+                """);
+
+        SelectQueryAst selectQueryAst = assertInstanceOf(SelectQueryAst.class, ast);
+        ProjectionAst projection = selectQueryAst.projection();
+        assertFalse(projection.selectAll());
+        assertEquals(1, projection.variables().size());
+        assertEquals("key", projection.variables().getFirst().name());
+
+        assertEquals(1, selectQueryAst.solutionModifier().groupBy().expressions().size());
+        assertTrue(selectQueryAst.solutionModifier().groupBy().expressionBoundVariables().contains("key"));
+        assertTrue(selectQueryAst.solutionModifier().groupBy().expressionTerms().containsKey("key"));
+    }
+
+    @Test
+    @DisplayName("Should accept implicit aggregate SELECT projections")
+    void shouldAcceptImplicitAggregateProjection() {
+        SparqlParser parser = newParserDefault();
+
+        assertDoesNotThrow(() -> parser.parse("""
+                SELECT (COUNT(?o) AS ?count) WHERE {
+                    ?s ?p ?o
+                }
                 """));
     }
 

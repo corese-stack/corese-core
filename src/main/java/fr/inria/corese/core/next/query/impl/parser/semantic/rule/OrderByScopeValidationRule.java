@@ -1,8 +1,16 @@
 package fr.inria.corese.core.next.query.impl.parser.semantic.rule;
 
 import fr.inria.corese.core.next.query.api.validation.QueryDiagnostic;
-import fr.inria.corese.core.next.query.impl.parser.semantic.support.VariableScopeAnalyzer;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstructQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DescribeQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.QueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UpdateRequestAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -17,8 +25,6 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
 
     private static final String DIAGNOSTIC_SOURCE = "OrderByScopeValidationRule";
 
-    private final VariableScopeAnalyzer variableScopeAnalyzer = new VariableScopeAnalyzer();
-
     @Override
     protected String getDiagnosticSource() {
         return DIAGNOSTIC_SOURCE;
@@ -28,50 +34,44 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
     public List<QueryDiagnostic> validate(QueryAst queryAst) {
         return switch (queryAst) {
             case SelectQueryAst selectQueryAst -> validateSelectQuery(selectQueryAst);
-            case ConstructQueryAst constructQueryAst -> validateOrderByOnly(
-                    constructQueryAst.whereClause(),
-                    constructQueryAst.solutionModifier());
-            case DescribeQueryAst describeQueryAst -> validateOrderByOnly(
-                    describeQueryAst.whereClause(),
-                    describeQueryAst.solutionModifier());
-            // TODO: handle ASK solution modifiers with SPARQL 1.1 support.
-            case AskQueryAst ignored -> List.of();
+            case ConstructQueryAst constructQueryAst -> validateOrderByOnly(constructQueryAst);
+            case DescribeQueryAst describeQueryAst -> validateOrderByOnly(describeQueryAst);
+            case AskQueryAst askQueryAst -> validateOrderByOnly(askQueryAst);
             case UpdateRequestAst ignored -> List.of();
         };
     }
 
     private List<QueryDiagnostic> validateSelectQuery(SelectQueryAst queryAst) {
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(queryAst);
+        Set<String> visibleVariables = collectVisibleVariables(queryAst);
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
         validateOrderVariables(
-                collectOrderByAvailableVariables(queryAst.projection(), visibleVariables),
+                collectOrderByAvailableVariables(queryAst, visibleVariables),
                 queryAst.solutionModifier(),
                 diagnostics);
         return List.copyOf(diagnostics);
     }
 
-    private List<QueryDiagnostic> validateOrderByOnly(
-            GroupGraphPatternAst whereClause,
-            SolutionModifierAst solutionModifier
-    ) {
+    private List<QueryDiagnostic> validateOrderByOnly(QueryAst queryAst) {
         List<QueryDiagnostic> diagnostics = new ArrayList<>();
-        Set<String> visibleVariables = variableScopeAnalyzer.collectVisibleVariables(whereClause);
-        validateOrderVariables(visibleVariables, solutionModifier, diagnostics);
+        Set<String> visibleVariables = collectVisibleVariables(queryAst);
+        validateOrderVariables(visibleVariables, getSolutionModifier(queryAst), diagnostics);
         return List.copyOf(diagnostics);
     }
 
     /**
      * ORDER BY is applied before the final projection step. For the current
      * feature set, the variables visible from the WHERE clause remain the source
-     * of truth, and explicit projection variables are added to keep the rule
-     * ready for SELECT-specific extensions.
+     * of truth. Explicit projection variables and GROUP BY aliases are added
+     * because they can legally be reused by ORDER BY. Stricter aggregate-query
+     * semantics are enforced separately by {@link GroupedOrderByValidationRule}.
      */
     private Set<String> collectOrderByAvailableVariables(
-            ProjectionAst projection,
+            SelectQueryAst queryAst,
             Set<String> visibleVariables
     ) {
         Set<String> availableVariables = new LinkedHashSet<>(visibleVariables);
-        // TODO: handle SELECT aliases, GROUP BY, and HAVING with SPARQL 1.1 support.
+        availableVariables.addAll(queryAst.solutionModifier().groupBy().expressionBoundVariables());
+        ProjectionAst projection = queryAst.projection();
         if (!projection.selectAll()) {
             for (VarAst projectedVar : projection.variables()) {
                 availableVariables.add(projectedVar.name());
@@ -86,14 +86,11 @@ public final class OrderByScopeValidationRule extends AbstractSemanticValidation
             List<QueryDiagnostic> diagnostics
     ) {
         for (OrderConditionAst orderCondition : solutionModifier.orderBy()) {
-            Set<String> referencedVariables = variableScopeAnalyzer
-                    .collectReferencedVariables(orderCondition.expression());
-
-            for (String variableName : referencedVariables) {
-                if (!availableOrderVariables.contains(variableName)) {
-                    diagnostics.add(buildOutOfScopeDiagnostic(variableName, "ORDER BY"));
-                }
-            }
+            addOutOfScopeDiagnostics(
+                    collectReferencedVariables(orderCondition.expression()),
+                    availableOrderVariables,
+                    ScopeClause.ORDER_BY,
+                    diagnostics);
         }
     }
 }
