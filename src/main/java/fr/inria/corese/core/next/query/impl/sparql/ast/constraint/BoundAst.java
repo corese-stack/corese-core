@@ -13,4 +13,9 @@ public class BoundAst extends AbstractUnaryConstraintAst implements BooleanExpre
     public BoundAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "BOUND";
+    }
 }

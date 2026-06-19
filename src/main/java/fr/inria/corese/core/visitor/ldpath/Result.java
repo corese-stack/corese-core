@@ -1,9 +1,6 @@
 package fr.inria.corese.core.visitor.ldpath;
 
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.kgram.api.core.DatatypeValue;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
@@ -18,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;;
 

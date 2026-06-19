@@ -11,4 +11,9 @@ public class UnaryMinusAst extends AbstractUnaryConstraintAst implements Numeric
     public UnaryMinusAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "-";
+    }
 }

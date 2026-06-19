@@ -13,4 +13,9 @@ public class StrEndsAst extends AbstractBinaryFunctionAst implements BooleanExpr
     public StrEndsAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "STRENDS";
+    }
 }

@@ -31,7 +31,7 @@ class SparqlParserIriTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         IriFunctionAst iri = assertInstanceOf(IriFunctionAst.class, bind.expression());
-        assertEquals("lex", assertInstanceOf(VarAst.class, iri.getArgument()).name());
+        assertEquals("lex", assertInstanceOf(VarAst.class, iri.argument()).name());
         assertEquals("iri", bind.variable().name());
     }
 
@@ -50,7 +50,7 @@ class SparqlParserIriTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         IriFunctionAst iri = assertInstanceOf(IriFunctionAst.class, bind.expression());
-        assertEquals("lex", assertInstanceOf(VarAst.class, iri.getArgument()).name());
+        assertEquals("lex", assertInstanceOf(VarAst.class, iri.argument()).name());
         assertEquals("iri", bind.variable().name());
     }
 
@@ -70,7 +70,7 @@ class SparqlParserIriTest extends AbstractSparqlParserFeatureTest {
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
         EqualsAst equals = assertInstanceOf(EqualsAst.class, filter.operator());
         IriFunctionAst iri = assertInstanceOf(IriFunctionAst.class, equals.getLeftArgument());
-        assertEquals("lex", assertInstanceOf(VarAst.class, iri.getArgument()).name());
+        assertEquals("lex", assertInstanceOf(VarAst.class, iri.argument()).name());
         assertEquals("<http://example.org/resource>", assertInstanceOf(IriAst.class, equals.getRightArgument()).raw());
     }
 

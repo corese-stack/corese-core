@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
 import fr.inria.corese.core.next.query.api.exception.QueryEvaluationException;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 
 /**
  * Represents the LOAD operation as defined in the <a href="https://www.w3.org/TR/2013/REC-sparql11-update-20130321/#load">SPARQL 1.1 recommendation<a/>.
@@ -23,5 +24,15 @@ public record LoadRequestAst(GraphRefAst fromClause, GraphRefAst toClause, boole
      */
     public LoadRequestAst(GraphRefAst fromClause, GraphRefAst toClause) {
         this(fromClause, toClause, false);
+    }
+
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.fromClause.accept(visitor);
+        if(this.toClause != null) {
+            this.toClause.accept(visitor);
+        }
     }
 }

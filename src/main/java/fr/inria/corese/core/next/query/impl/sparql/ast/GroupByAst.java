@@ -1,5 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,11 +19,10 @@ public record GroupByAst(
         List<TermAst> expressions,
         Set<String> expressionBoundVariables,
         Map<String, TermAst> expressionTerms
-) {
+) implements VisitableAst {
     public GroupByAst(List<TermAst> expressions) {
         this(expressions, Set.of(), Map.of());
     }
-
     public GroupByAst {
         expressions = expressions != null ? List.copyOf(expressions) : List.of();
         expressionBoundVariables = expressionBoundVariables != null ? Set.copyOf(expressionBoundVariables) : Set.of();
@@ -29,5 +31,11 @@ public record GroupByAst(
 
     public boolean isEmpty() {
         return expressions.isEmpty();
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.expressions.forEach(termAst -> termAst.accept(visitor));
     }
 }

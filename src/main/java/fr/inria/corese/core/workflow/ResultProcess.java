@@ -14,10 +14,6 @@ public class ResultProcess extends WorkflowProcess {
     public ResultProcess() {
     }
 
-    public ResultProcess(ResultFormatDef.format type) {
-        format = type;
-    }
-
     @Override
     public Data run(Data data) throws EngineException {
         Data res = new Data(this, data.getMappings(), data.getGraph());

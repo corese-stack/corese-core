@@ -116,7 +116,7 @@ public final class VariableScopeAnalyzer {
             case AggregateAst ignored -> true;
 
             case UnaryConstraintAst unaryConstraint ->
-                    containsAggregate(unaryConstraint.getArgument());
+                    containsAggregate(unaryConstraint.argument());
 
             case BinaryConstraintAst binaryConstraint ->
                     containsAggregate(binaryConstraint.getLeftArgument())
@@ -148,17 +148,15 @@ public final class VariableScopeAnalyzer {
                             || containsAggregate(thenExpr)
                             || containsAggregate(elseExpr);
 
-            case CoalesceAst(List<TermAst> arguments) -> arguments.stream().anyMatch(this::containsAggregate);
+            case CoalesceAst coalesceAst -> coalesceAst.arguments().stream().anyMatch(this::containsAggregate);
 
-            case ConcatAst(List<TermAst> arguments) -> arguments.stream().anyMatch(this::containsAggregate);
+            case ConcatAst concatAst -> concatAst.arguments().stream().anyMatch(this::containsAggregate);
 
             case InAst(TermAst left, List<TermAst> candidates) ->
                     containsAggregate(left) || candidates.stream().anyMatch(this::containsAggregate);
 
             case NotInAst(TermAst left, List<TermAst> candidates) ->
                     containsAggregate(left) || candidates.stream().anyMatch(this::containsAggregate);
-
-            case StrLenAst(TermAst argument) -> containsAggregate(argument);
 
             default -> false;
         };
@@ -212,15 +210,15 @@ public final class VariableScopeAnalyzer {
                 addIfVariable(endpoint, visibleVariables);
             }
 
-            case SubQueryAst(QueryAst query) -> {
-                if (query instanceof SelectQueryAst select) {
-                    ProjectionAst proj = select.projection();
-                    if (proj.selectAll()) {
-                        collectVisibleVariables(select.whereClause(), visibleVariables);
-                    } else {
-                        for (VarAst v : proj.variables()) {
-                            visibleVariables.add(v.name());
-                        }
+            case SubQueryAst(SelectQueryAst select) -> {
+
+                ProjectionAst proj = select.projection();
+
+                if (proj.selectAll()) {
+                    collectVisibleVariables(select.whereClause(), visibleVariables);
+                } else {
+                    for (VarAst v : proj.variables()) {
+                        visibleVariables.add(v.name());
                     }
                 }
             }
@@ -240,7 +238,7 @@ public final class VariableScopeAnalyzer {
 
             // Recurse into unary expressions such as STR(?x) or BOUND(?x).
             case UnaryConstraintAst unaryConstraint ->
-                collectReferencedVariables(unaryConstraint.getArgument(), referencedVariables);
+                collectReferencedVariables(unaryConstraint.argument(), referencedVariables);
 
             case BinaryConstraintAst binaryConstraint -> {
                 // Recurse into both operands of binary expressions.
@@ -294,14 +292,14 @@ public final class VariableScopeAnalyzer {
                 collectReferencedVariables(elseExpr, referencedVariables);
             }
 
-            case CoalesceAst(List<TermAst> arguments) -> {
-                for (TermAst argument : arguments) {
+            case CoalesceAst coalesceAst -> {
+                for (TermAst argument : coalesceAst.arguments()) {
                     collectReferencedVariables(argument, referencedVariables);
                 }
             }
 
-            case ConcatAst(List<TermAst> arguments) -> {
-                for (TermAst argument : arguments) {
+            case ConcatAst concatAst -> {
+                for (TermAst argument : concatAst.arguments()) {
                     collectReferencedVariables(argument, referencedVariables);
                 }
             }
@@ -319,8 +317,6 @@ public final class VariableScopeAnalyzer {
                     collectReferencedVariables(candidate, referencedVariables);
                 }
             }
-
-            case StrLenAst(TermAst argument) -> collectReferencedVariables(argument, referencedVariables);
 
             case AggregateAst(
                     AggregateFunction ignoredFunction, boolean ignoredDistinct, TermAst expression, String ignoredSep) ->
@@ -345,7 +341,7 @@ public final class VariableScopeAnalyzer {
             }
 
             case UnaryConstraintAst unaryConstraint ->
-                    collectReferencedVariablesOutsideAggregates(unaryConstraint.getArgument(), referencedVariables);
+                    collectReferencedVariablesOutsideAggregates(unaryConstraint.argument(), referencedVariables);
 
             case BinaryConstraintAst binaryConstraint -> {
                 collectReferencedVariablesOutsideAggregates(binaryConstraint.getLeftArgument(), referencedVariables);
@@ -396,14 +392,14 @@ public final class VariableScopeAnalyzer {
                 collectReferencedVariablesOutsideAggregates(elseExpr, referencedVariables);
             }
 
-            case CoalesceAst(List<TermAst> arguments) -> {
-                for (TermAst argument : arguments) {
+            case CoalesceAst coalesceAst -> {
+                for (TermAst argument : coalesceAst.arguments()) {
                     collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
                 }
             }
 
-            case ConcatAst(List<TermAst> arguments) -> {
-                for (TermAst argument : arguments) {
+            case ConcatAst concatAst -> {
+                for (TermAst argument : concatAst.arguments()) {
                     collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
                 }
             }
@@ -421,8 +417,6 @@ public final class VariableScopeAnalyzer {
                     collectReferencedVariablesOutsideAggregates(candidate, referencedVariables);
                 }
             }
-
-            case StrLenAst(TermAst argument) -> collectReferencedVariablesOutsideAggregates(argument, referencedVariables);
 
             case ConstraintAst ignored -> {
                 // Other constraint shapes must be added explicitly when grouped-projection validation starts relying on them.

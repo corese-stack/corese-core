@@ -11,4 +11,9 @@ public class CeilAst extends AbstractUnaryConstraintAst implements NumericExpres
     public CeilAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "CEIL";
+    }
 }

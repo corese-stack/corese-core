@@ -11,4 +11,9 @@ public class UcaseAst extends AbstractUnaryConstraintAst implements SimpleLitera
     public UcaseAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "UCASE";
+    }
 }

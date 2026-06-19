@@ -10,8 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
@@ -77,14 +76,14 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             SparqlParser parser = newParserDefault();
 
             QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    CONSTRUCT {
-                        ?s ?p ?o
-                    }
-                    WHERE {
-                        ?s ?p ?o
-                    }
-                    ORDER BY ?z
-                """));
+                        CONSTRUCT {
+                            ?s ?p ?o
+                        }
+                        WHERE {
+                            ?s ?p ?o
+                        }
+                        ORDER BY ?z
+                    """));
 
             assertEquals(ORDER_BY_SCOPE_MESSAGE, exception.getMessage());
         }
@@ -99,12 +98,12 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             SparqlParser parser = newParserDefault();
 
             QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    DESCRIBE ?s
-                    WHERE {
-                        ?s ?p ?o
-                    }
-                    ORDER BY ?z
-                """));
+                        DESCRIBE ?s
+                        WHERE {
+                            ?s ?p ?o
+                        }
+                        ORDER BY ?z
+                    """));
 
             assertEquals(ORDER_BY_SCOPE_MESSAGE, exception.getMessage());
         }
@@ -119,11 +118,11 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             SparqlParser parser = newParserDefault();
 
             QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    SELECT * WHERE {
-                      ?x ?p ?o .
-                      BIND(?o AS ?x)
-                    }
-                """));
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          BIND(?o AS ?x)
+                        }
+                    """));
 
             assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
         }
@@ -134,14 +133,215 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
             SparqlParser parser = newParserDefault();
 
             QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
-                    SELECT * WHERE {
-                      ?s ?p ?o .
-                      BIND(?s AS ?x)
-                      BIND(?p AS ?x)
-                    }
-                """));
+                        SELECT * WHERE {
+                          ?s ?p ?o .
+                          BIND(?s AS ?x)
+                          BIND(?p AS ?x)
+                        }
+                    """));
 
             assertEquals(BIND_SCOPE_MESSAGE, exception.getMessage());
+        }
+    }
+
+    @Nested
+    class FilterValidationTest {
+
+        @Test
+        @DisplayName("Should accept FILTER with numeric operator")
+        void shouldAcceptFilterWithNumericOperator() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(RAND())
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER with IRI-returning operator")
+        void shouldRejectFilterWithIRIOperator() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(DATATYPE("test"^^<http://ns.inria.fr/test>))
+                        }
+                    """));
+
+            assertEquals("DATATYPE used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER with datetime operator")
+        void shouldRejectFilterWithDatetime() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(NOW())
+                        }
+                    """));
+
+            assertEquals("NOW used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should accept FILTER with numeric expression derived from datetime")
+        void shouldAcceptFilterWithDuration() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(DAY(NOW()))
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should accept FILTER with plain literal")
+        void shouldAcceptFilterWithPlainLiteral() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER("test")
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should accept FILTER with CONCAT result")
+        void shouldAcceptFilterWithConcat() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(CONCAT("te", "st"))
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER when IF condition is not EBV-compatible")
+        void shouldRejectFilterContainingIfWithIncorrectConditionType() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(IF(NOW(), true, false))
+                        }
+                    """));
+
+            assertEquals("IF used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should let pass FILTER with simple literal operator")
+        void shouldAcceptFilterWithStringOperator() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(STR("test"^^<http://ns.inria.fr/test>))
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should let pass FILTER with variable")
+        void shouldAcceptFilterWithVariable() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(?o)
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should let pass FILTER with boolean")
+        void shouldAcceptFilterWithBoolean() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          ?x ?p ?o .
+                          FILTER(true)
+                        }
+                    """));
+        }
+
+        @Test
+        @DisplayName("Should let pass FILTER containing a IF that returns boolean or any acceptable AST type.")
+        void shouldAcceptFilterContainingIfWithCorrectType() {
+            SparqlParser parser = newParserDefault();
+            assertDoesNotThrow(() -> {
+                parser.parse("""
+                           SELECT * WHERE {
+                             ?x ?p ?o .
+                             FILTER(IF(?s, true, ?o))
+                           }
+                        """);
+            });
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER containing a IF that does not returns boolean or any acceptable AST type.")
+        void shouldRejectFilterContainingIfWithIncorrectType() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                       SELECT * WHERE {
+                         ?x ?p ?o .
+                         FILTER(IF(?s, 4, <http://test.inria.fr>))
+                       }
+                    """));
+
+            assertEquals("IF used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should reject FILTER containing a IF that does not returns only boolean or any acceptable AST type.")
+        void shouldRejectFilterContainingIfWithIncorrectTypeMix() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+                       SELECT * WHERE {
+                         ?x ?p ?o .
+                         FILTER(IF(?s, true, <http://test.inria.fr>))
+                       }
+                    """));
+
+            assertEquals("IF used in FILTER should be resolvable to a boolean", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should accept FILTER with numeric operator in a nested BGP")
+        void shouldAcceptFilterWithNumericOperatorInNestedBGP() {
+            SparqlParser parser = newParserDefault();
+
+            assertDoesNotThrow(() -> parser.parse("""
+                        SELECT * WHERE {
+                          {
+                              ?x ?p ?o .
+                              FILTER(RAND())
+                          } UNION {
+                              ?s ?p ?o .
+                          }
+                        }
+                    """));
         }
     }
 
@@ -150,67 +350,67 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                 Arguments.of(
                         "Should reject SELECT * with ORDER BY variable not visible in WHERE",
                         """
-                        SELECT * WHERE {
-                            ?s ?p ?o
-                        }
-                        ORDER BY ?z
-                        """,
+                                SELECT * WHERE {
+                                    ?s ?p ?o
+                                }
+                                ORDER BY ?z
+                                """,
                         ORDER_BY_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject projection variable only referenced in FILTER",
                         """
-                        SELECT ?x WHERE {
-                          ?s ?p ?o .
-                          FILTER(BOUND(?x))
-                        }
-                        """,
+                                SELECT ?x WHERE {
+                                  ?s ?p ?o .
+                                  FILTER(BOUND(?x))
+                                }
+                                """,
                         SELECT_PROJECTION_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject projection variable not visible through UNION",
                         """
-                        SELECT ?cityLabel
-                        WHERE {
-                          { ?country wdt:P36 ?city. }
-                          UNION
-                          { ?city wdt:P17 ?country. }
-                        }
-                        """,
+                                SELECT ?cityLabel
+                                WHERE {
+                                  { ?country wdt:P36 ?city. }
+                                  UNION
+                                  { ?city wdt:P17 ?country. }
+                                }
+                                """,
                         CITY_LABEL_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject ORDER BY variable not visible in WHERE",
                         """
-                        SELECT ?s WHERE {
-                            ?s ?p ?o
-                        }
-                        ORDER BY ?z
-                        """,
+                                SELECT ?s WHERE {
+                                    ?s ?p ?o
+                                }
+                                ORDER BY ?z
+                                """,
                         ORDER_BY_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject multiple ORDER BY clauses when one variable is not visible in WHERE",
                         """
-                        SELECT ?s WHERE {
-                            ?s ?p ?o
-                        }
-                        ORDER BY ?s ?z
-                        """,
+                                SELECT ?s WHERE {
+                                    ?s ?p ?o
+                                }
+                                ORDER BY ?s ?z
+                                """,
                         ORDER_BY_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject ORDER BY expression using a variable not visible in WHERE",
                         """
-                        SELECT ?s WHERE {
-                            ?s ?p ?o
-                        }
-                        ORDER BY STR(?z)
-                        """,
+                                SELECT ?s WHERE {
+                                    ?s ?p ?o
+                                }
+                                ORDER BY STR(?z)
+                                """,
                         ORDER_BY_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject ORDER BY IF expression using a variable not visible in WHERE",
                         """
-                        SELECT ?s WHERE {
-                            ?s ?p ?o
-                        }
-                        ORDER BY IF(BOUND(?o), ?o, ?z)
-                        """,
+                                SELECT ?s WHERE {
+                                    ?s ?p ?o
+                                }
+                                ORDER BY IF(BOUND(?o), ?o, ?z)
+                                """,
                         ORDER_BY_SCOPE_MESSAGE),
                 Arguments.of(
                         "Should reject SELECT expression projection using a variable not visible in WHERE",
@@ -349,10 +549,10 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
                 Arguments.of(
                         "Should reject SELECT projection variables not visible in WHERE",
                         """
-                        SELECT ?x WHERE {
-                            ?s ?p ?o
-                        }
-                        """,
+                                SELECT ?x WHERE {
+                                    ?s ?p ?o
+                                }
+                                """,
                         SELECT_PROJECTION_SCOPE_MESSAGE));
     }
 }

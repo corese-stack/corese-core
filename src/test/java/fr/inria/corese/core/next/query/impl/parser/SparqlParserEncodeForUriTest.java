@@ -31,7 +31,7 @@ class SparqlParserEncodeForUriTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         EncodeForUriAst encode = assertInstanceOf(EncodeForUriAst.class, bind.expression());
-        assertEquals("label", assertInstanceOf(VarAst.class, encode.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, encode.argument()).name());
         assertEquals("encoded", bind.variable().name());
     }
 
@@ -50,7 +50,7 @@ class SparqlParserEncodeForUriTest extends AbstractSparqlParserFeatureTest {
         assertNotNull(ast);
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         EncodeForUriAst encode = assertInstanceOf(EncodeForUriAst.class, bind.expression());
-        LiteralAst literal = assertInstanceOf(LiteralAst.class, encode.getArgument());
+        LiteralAst literal = assertInstanceOf(LiteralAst.class, encode.argument());
         assertEquals("\"Los Angeles\"", literal.lexical());
         assertEquals("encoded", bind.variable().name());
     }
@@ -71,7 +71,7 @@ class SparqlParserEncodeForUriTest extends AbstractSparqlParserFeatureTest {
         FilterAst filter = assertInstanceOf(FilterAst.class, ast.whereClause().patterns().getLast());
         EqualsAst equals = assertInstanceOf(EqualsAst.class, filter.operator());
         EncodeForUriAst encode = assertInstanceOf(EncodeForUriAst.class, equals.getLeftArgument());
-        assertEquals("label", assertInstanceOf(VarAst.class, encode.getArgument()).name());
+        assertEquals("label", assertInstanceOf(VarAst.class, encode.argument()).name());
     }
 
     @Test

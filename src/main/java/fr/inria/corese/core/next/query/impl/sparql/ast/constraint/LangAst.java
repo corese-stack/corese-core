@@ -1,8 +1,8 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-
 import java.util.List;
+
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 /**
  * Operator {@code lang(A)}
@@ -12,5 +12,10 @@ import java.util.List;
 public class LangAst extends AbstractUnaryConstraintAst implements SimpleLiteralExpressionAst {
     public LangAst(List<TermAst> args) {
         super(args);
+    }
+
+    @Override
+    public String getName() {
+        return "LANG";
     }
 }

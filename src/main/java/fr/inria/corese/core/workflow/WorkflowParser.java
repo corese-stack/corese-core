@@ -16,8 +16,6 @@ import fr.inria.corese.core.sparql.exceptions.SafetyException;
 import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.Context;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
-import fr.inria.corese.core.transform.ContextBuilder;
-import fr.inria.corese.core.transform.TransformerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +70,8 @@ public class WorkflowParser {
     public static final String RESULT = PREF + "result";
     public static final String GRAPH = PREF + "graph";
     public static final String MODE = PREF + "mode";
+    public static final String RDFXML = NSManager.STL + "rdfxml";
+
     public static final String IF = PREF + "if";
     public static final String THEN = PREF + "then";
     public static final String ELSE = PREF + "else";
@@ -95,6 +95,7 @@ public class WorkflowParser {
     public static final String MODE_PARAM = Context.STL_MODE;
     public static final String TEXT_PARAM = Context.STL_ARG;
     public static final String JSON_FORMAT = NSManager.STL + "json";
+    public static final String TURTLE = NSManager.STL + "turtle";
     static final String[] propertyList = {NAME, DEBUG, DISPLAY, RESULT, MODE, COLLECT};
     static final ArrayList<String> topLevel;
     private static final Logger logger = LoggerFactory.getLogger(WorkflowParser.class);
@@ -141,7 +142,6 @@ public class WorkflowParser {
     public SemanticWorkflow parse(Graph g, String name) throws LoadException, SafetyException {
         setGraph(g);
         sw.setWorkflowGraph(g);
-        sw.setServerMode(isServerMode());
         Node node = getWorkflowNode(name);
         if (node == null) {
             if (path != null) {
@@ -189,9 +189,9 @@ public class WorkflowParser {
             return map.get(wf.getLabel());
         }
         map.put(wf.getLabel(), sw);
-        sw.setServerMode(isServerMode());
         loop(wf);
-        context(wf);
+        // removed as part of removing transform ...
+        // context(wf);
         parseNode(wf);
         complete(sw, wf.getValue());
         return sw;
@@ -318,38 +318,6 @@ public class WorkflowParser {
         }
     }
 
-    /**
-     * [] a sw:Workflow ;
-     * sw:param [ sw:test 12 ]
-     * Parse sw:param as Workflow Context.
-     */
-    void context(Node wf) {
-        Node c = getNode(PARAM, wf);
-        if (c == null) {
-            c = getNode(STL_PARAM, wf);
-            if (c != null) {
-                logger.error("Use " + PARAM + " instead of " + STL_PARAM);
-            }
-        }
-        if (c != null) {
-            parseContext(c);
-        }
-    }
-
-    void parseContext(Node c) {
-        ContextBuilder cb = new ContextBuilder(getGraph());
-        if (getContext() != null) {
-            // wp workflow already has a Context
-            // complete wp context with current specification
-            // use case: server profile has a st:param Context
-            // and workflow has a sw:param Context
-            // result: merge them
-            cb.setContext(getContext());
-        }
-        Context context = cb.process(c);
-        sw.setContext(context);
-    }
-
     void complete(Graph g) {
         if (sw.getContext() != null) {
             complete(sw.getContext(), g);
@@ -387,16 +355,6 @@ public class WorkflowParser {
                 ap = subWorkflow(getGraph().getNode(dt));
             } else {
                 switch (type) {
-
-                    case DATASHAPE:
-                        ap = datashape(dt, false);
-                        break;
-                    case SHEX:
-                        ap = datashape(dt, true);
-                        break;
-                    case TRANSFORMATION:
-                        ap = transformation(dt);
-                        break;
                     case RESULT_FORMAT:
                         ap = result(dt);
                         break;
@@ -409,8 +367,6 @@ public class WorkflowParser {
                     default:
                         IDatatype duri = getValue(URI, dt);
                         IDatatype dbody = getValue(BODY, dt);
-                        IDatatype dtest = getValue(TEST_VALUE, dt);
-                        boolean test = dtest != null && dtest.booleanValue();
 
                         if (duri != null) {
                             String uri = duri.getLabel();
@@ -453,11 +409,6 @@ public class WorkflowParser {
         return ap;
     }
 
-    TransformationProcess transformation(IDatatype dt) throws SafetyException {
-        String uri = getParam(dt, URI, MODE_PARAM, true, true);
-        return new TransformationProcess(uri);
-    }
-
     ResultProcess result(IDatatype dt) {
         ResultProcess r = new ResultProcess();
         IDatatype dtformat = getValue(FORMAT, dt);
@@ -474,43 +425,6 @@ public class WorkflowParser {
             default:
                 return ResultFormatDef.format.UNDEF_FORMAT;
         }
-    }
-
-    /**
-     * Special case: may get input from Context
-     */
-    ShapeWorkflow datashape(IDatatype dt, boolean shex) throws SafetyException {
-        IDatatype dtest = getValue(TEST_VALUE, dt);
-        boolean test = dtest != null && dtest.booleanValue();
-        // format parameter => rdf and shacl input as text (otherwise as URL)
-        String sformat = getStringParam(FORMAT_PARAM);
-        boolean isURL = (sformat == null);
-        // rdf
-        String rdf = getParam(dt, URI, LOAD_PARAM, isURL, isURL);
-        // shacl
-        String shacl = getParam(dt, SHAPE, MODE_PARAM, isURL, isURL);
-        String result = getParam(dt, PATH, PATH);
-
-        Loader.format format = (isURL) ? Loader.format.UNDEF_FORMAT : getFormat(sformat);
-
-        ShapeWorkflow ap = null;
-        ap = new ShapeWorkflow().setShex(shex);
-        if (shex) {
-            ap.setProcessor(getProcessor());
-        }
-        ap.create(shacl, rdf, result, !isURL, format, test, false);
-        return ap;
-    }
-
-    Loader.format getFormat(String format) {
-        if (format.equals(TransformerUtils.TURTLE)) {
-            return Loader.format.TURTLE_FORMAT;
-        } else if (format.equals(TransformerUtils.RDFXML)) {
-            return Loader.format.RDFXML_FORMAT;
-        } else if (format.equals(TransformerUtils.JSON)) {
-            return Loader.format.JSONLD_FORMAT;
-        }
-        return Loader.format.UNDEF_FORMAT;
     }
 
     /**
@@ -631,7 +545,6 @@ public class WorkflowParser {
     }
 
     void complete(SPARQLProcess q, IDatatype dt) {
-        q.setValue(getValue(Context.STL_PATTERN_VALUE, dt));
         q.setProcess(getValue(Context.STL_PROCESS_QUERY, dt));
     }
 

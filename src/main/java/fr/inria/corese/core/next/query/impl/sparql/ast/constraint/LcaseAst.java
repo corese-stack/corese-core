@@ -11,4 +11,9 @@ public class LcaseAst extends AbstractUnaryConstraintAst implements SimpleLitera
     public LcaseAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "LCASE";
+    }
 }

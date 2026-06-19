@@ -11,4 +11,9 @@ public class Sha384Ast extends AbstractUnaryConstraintAst implements SimpleLiter
     public Sha384Ast(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "SHA384";
+    }
 }

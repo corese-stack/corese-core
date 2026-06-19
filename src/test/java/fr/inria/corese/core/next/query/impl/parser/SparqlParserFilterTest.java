@@ -155,9 +155,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         BooleanNotAst t = (BooleanNotAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getArgument());
+        assertInstanceOf(VarAst.class, t.argument());
 
-        assertEquals("s", ((VarAst) t.getArgument()).name());
+        assertEquals("s", ((VarAst) t.argument()).name());
     }
 
     @Test
@@ -185,9 +185,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         BoundAst t = (BoundAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getArgument());
+        assertInstanceOf(VarAst.class, t.argument());
 
-        assertEquals("s", ((VarAst) t.getArgument()).name());
+        assertEquals("s", ((VarAst) t.argument()).name());
     }
 
     @Test
@@ -215,9 +215,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         IsIriAst t = (IsIriAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getArgument());
+        assertInstanceOf(VarAst.class, t.argument());
 
-        assertEquals("s", ((VarAst) t.getArgument()).name());
+        assertEquals("s", ((VarAst) t.argument()).name());
     }
 
     @Test
@@ -245,9 +245,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         IsIriAst t = (IsIriAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getArgument());
+        assertInstanceOf(VarAst.class, t.argument());
 
-        assertEquals("s", ((VarAst) t.getArgument()).name());
+        assertEquals("s", ((VarAst) t.argument()).name());
     }
 
     @Test
@@ -275,9 +275,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         IsBlankAst t = (IsBlankAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getArgument());
+        assertInstanceOf(VarAst.class, t.argument());
 
-        assertEquals("s", ((VarAst) t.getArgument()).name());
+        assertEquals("s", ((VarAst) t.argument()).name());
     }
 
     @Test
@@ -305,9 +305,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         IsLiteralAst t = (IsLiteralAst) filterAst.operator();
 
-        assertInstanceOf(VarAst.class, t.getArgument());
+        assertInstanceOf(VarAst.class, t.argument());
 
-        assertEquals("s", ((VarAst) t.getArgument()).name());
+        assertEquals("s", ((VarAst) t.argument()).name());
     }
 
     @Test
@@ -340,8 +340,8 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         StrAst strAst = (StrAst) t.getLeftArgument();
 
-        assertInstanceOf(VarAst.class, strAst.getArgument());
-        assertEquals("s", ((VarAst) strAst.getArgument()).name());
+        assertInstanceOf(VarAst.class, strAst.argument());
+        assertEquals("s", ((VarAst) strAst.argument()).name());
     }
 
     @Test
@@ -374,8 +374,8 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         LangAst strAst = (LangAst) t.getLeftArgument();
 
-        assertInstanceOf(VarAst.class, strAst.getArgument());
-        assertEquals("s", ((VarAst) strAst.getArgument()).name());
+        assertInstanceOf(VarAst.class, strAst.argument());
+        assertEquals("s", ((VarAst) strAst.argument()).name());
     }
 
     @Test
@@ -408,8 +408,8 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
 
         DatatypeAst strAst = (DatatypeAst) t.getLeftArgument();
 
-        assertInstanceOf(VarAst.class, strAst.getArgument());
-        assertEquals("s", ((VarAst) strAst.getArgument()).name());
+        assertInstanceOf(VarAst.class, strAst.argument());
+        assertEquals("s", ((VarAst) strAst.argument()).name());
     }
 
     @Test
@@ -948,8 +948,8 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals("s", ((VarAst) addAst.getLeftArgument()).name());
         assertInstanceOf(UnaryMinusAst.class, addAst.getRightArgument());
         UnaryMinusAst rightUnaryMinusAst = (UnaryMinusAst) addAst.getRightArgument();
-        assertInstanceOf(LiteralAst.class, rightUnaryMinusAst.getArgument());
-        assertEquals("2", ((LiteralAst) rightUnaryMinusAst.getArgument()).lexical());
+        assertInstanceOf(LiteralAst.class, rightUnaryMinusAst.argument());
+        assertEquals("2", ((LiteralAst) rightUnaryMinusAst.argument()).lexical());
     }
 
     @Test
@@ -1042,7 +1042,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(+ ?s)
+                  FILTER(+ ?s > 0)
                 }
                 """);
 
@@ -1053,16 +1053,13 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();
-        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+        FilterAst filterAst = assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+        GreaterThanAst greaterThanAst = assertInstanceOf(GreaterThanAst.class, filterAst.operator(), "Filter content should be a greater than comparison");
+        UnaryPlusAst t = assertInstanceOf(UnaryPlusAst.class, greaterThanAst.getLeftArgument(), "Comparison content should be a unary plus operator");
 
-        FilterAst filterAst = (FilterAst) p2;
-        assertInstanceOf(UnaryPlusAst.class, filterAst.operator(), "Filter content should be a unary plus operator");
+        assertInstanceOf(VarAst.class, t.argument());
 
-        UnaryPlusAst t = (UnaryPlusAst) filterAst.operator();
-
-        assertInstanceOf(VarAst.class, t.getArgument());
-
-        assertEquals("s", ((VarAst) t.getArgument()).name());
+        assertEquals("s", ((VarAst) t.argument()).name());
     }
 
     @Test
@@ -1072,7 +1069,7 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         SparqlQueryAst ast = (SparqlQueryAst) parser.parse("""
                 SELECT * WHERE {
                   ?s ?p ?o .
-                  FILTER(- ?s)
+                  FILTER(- ?s > 0)
                 }
                 """);
 
@@ -1083,15 +1080,12 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertEquals(2, where.patterns().size(), "WHERE should contain 2 pattern (BGP + FILTER)");
 
         PatternAst p2 = where.patterns().getLast();
-        assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+        FilterAst filterAst = assertInstanceOf(FilterAst.class, p2, "Last pattern should be a filter");
+        GreaterThanAst greaterThanAst = assertInstanceOf(GreaterThanAst.class, filterAst.operator(), "Filter content should be a greater than comparison");
+        UnaryMinusAst t = assertInstanceOf(UnaryMinusAst.class, greaterThanAst.getLeftArgument(), "comparison content should be a unary minus operator");
 
-        FilterAst filterAst = (FilterAst) p2;
-        assertInstanceOf(UnaryMinusAst.class, filterAst.operator(), "Filter content should be a unary minus operator");
-
-        UnaryMinusAst t = (UnaryMinusAst) filterAst.operator();
-
-        assertInstanceOf(VarAst.class, t.getArgument());
-        assertEquals("s", ((VarAst) t.getArgument()).name());
+        assertInstanceOf(VarAst.class, t.argument());
+        assertEquals("s", ((VarAst) t.argument()).name());
     }
 
     @Test
@@ -1314,9 +1308,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(BooleanNotAst.class, filterAst.operator());
 
         BooleanNotAst booleanNotAst = (BooleanNotAst) filterAst.operator();
-        assertInstanceOf(ExistsAst.class, booleanNotAst.getArgument());
+        assertInstanceOf(ExistsAst.class, booleanNotAst.argument());
 
-        ExistsAst existsAst = (ExistsAst) booleanNotAst.getArgument();
+        ExistsAst existsAst = (ExistsAst) booleanNotAst.argument();
         assertNotNull(existsAst.pattern());
         assertFalse(existsAst.pattern().patterns().isEmpty());
     }
@@ -1337,9 +1331,9 @@ class SparqlParserFilterTest extends AbstractSparqlParserFeatureTest {
         assertInstanceOf(BooleanNotAst.class, filterAst.operator());
 
         BooleanNotAst booleanNotAst = (BooleanNotAst) filterAst.operator();
-        assertInstanceOf(NotExistsAst.class, booleanNotAst.getArgument());
+        assertInstanceOf(NotExistsAst.class, booleanNotAst.argument());
 
-        NotExistsAst notExistsAst = (NotExistsAst) booleanNotAst.getArgument();
+        NotExistsAst notExistsAst = (NotExistsAst) booleanNotAst.argument();
         assertNotNull(notExistsAst.pattern());
         assertFalse(notExistsAst.pattern().patterns().isEmpty());
     }

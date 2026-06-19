@@ -37,34 +37,19 @@ public class SPARQLProcess extends WorkflowProcess {
         return level;
     }
 
-    /**
-     * @param level the level to set
-     */
-    public void setLevel(Level level) {
-        this.level = level;
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(SPARQLProcess.class);
     static final String NL = "\n";
     static final NSManager nsm = NSManager.create();
     private static final String PARAM = "$param";
     private static final String ARG = "$arg";
     private static final String MODE = "$mode";
-    private static final String PATTERN = "$pattern";
     private boolean userQuery = false;
     private Level level = Level.USER_DEFAULT;
     Level saveContextLevel = Level.USER_DEFAULT;
     Level saveBindingLevel;
-    private IDatatype param;
-    private IDatatype value;
-    private IDatatype option;
     private IDatatype process;
 
     private String query;
-
-    public SPARQLProcess(String q) {
-        this(q, null);
-    }
 
     public SPARQLProcess(String q, String path) {
         this.query = q;
@@ -309,41 +294,6 @@ public class SPARQLProcess extends WorkflowProcess {
     }
 
     /**
-     * @param query the query to set
-     */
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
-    /**
-     * @return the param
-     */
-    public IDatatype getParam() {
-        return param;
-    }
-
-    /**
-     * @return the value
-     */
-    public IDatatype getValue() {
-        return value;
-    }
-
-    /**
-     * @param value the value to set
-     */
-    public void setValue(IDatatype value) {
-        this.value = value;
-    }
-
-    /**
-     * @return the option
-     */
-    public IDatatype getOption() {
-        return option;
-    }
-
-    /**
      * @return the process
      */
     public IDatatype getProcess() {
@@ -362,13 +312,6 @@ public class SPARQLProcess extends WorkflowProcess {
      */
     public boolean isUserQuery() {
         return userQuery;
-    }
-
-    /**
-     * @param userQuery the userQuery to set
-     */
-    public void setUserQuery(boolean userQuery) {
-        this.userQuery = userQuery;
     }
 
 }

@@ -11,4 +11,9 @@ public class RoundAst extends AbstractUnaryConstraintAst implements NumericExpre
     public RoundAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "ROUND";
+    }
 }

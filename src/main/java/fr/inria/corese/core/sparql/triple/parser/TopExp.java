@@ -1,6 +1,6 @@
 package fr.inria.corese.core.sparql.triple.parser;
 
-import fr.inria.corese.core.sparql.triple.api.ASTVisitable;
+import fr.inria.corese.core.sparql.triple.api.AstVisitable;
 import fr.inria.corese.core.sparql.triple.api.ASTVisitor;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * @author corby
  *
  */
-public class TopExp implements ASTVisitable {
+public class TopExp implements AstVisitable {
    
     public boolean isGenerated() {
         return generated;

@@ -13,4 +13,9 @@ public class StrAfterAst extends AbstractBinaryFunctionAst implements SimpleLite
     public StrAfterAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "STRAFTER";
+    }
 }

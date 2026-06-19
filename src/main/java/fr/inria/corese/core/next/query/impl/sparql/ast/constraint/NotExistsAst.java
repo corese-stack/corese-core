@@ -1,5 +1,6 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
 import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 
 import java.util.Objects;
@@ -12,5 +13,16 @@ public record NotExistsAst(GroupGraphPatternAst pattern) implements BooleanExpre
 
     public NotExistsAst {
         Objects.requireNonNull(pattern, "pattern");
+    }
+
+    @Override
+    public String getName() {
+        return "NOT EXISTS";
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.pattern.accept(visitor);
     }
 }

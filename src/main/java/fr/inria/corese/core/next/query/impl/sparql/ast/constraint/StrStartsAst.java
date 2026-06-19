@@ -13,4 +13,9 @@ public class StrStartsAst extends AbstractBinaryFunctionAst implements BooleanEx
     public StrStartsAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "STRSTARTS";
+    }
 }

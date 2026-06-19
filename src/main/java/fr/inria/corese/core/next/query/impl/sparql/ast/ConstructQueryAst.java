@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 import java.util.List;
 
 /**
@@ -71,5 +73,16 @@ public record ConstructQueryAst(
      */
     public ConstructQueryAst(ConstructTemplateAst template, GroupGraphPatternAst whereClause) {
         this(template, DatasetClauseAst.none(), whereClause, SolutionModifierAst.empty(), null, null);
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
+        this.constructTemplate.accept(visitor);
+        this.datasetClause.accept(visitor);
+        this.whereClause.accept(visitor);
+        this.solutionModifier.accept(visitor);
+        this.prologue.accept(visitor);
+        this.valuesClause.accept(visitor);
     }
 }

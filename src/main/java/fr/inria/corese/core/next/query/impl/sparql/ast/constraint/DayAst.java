@@ -12,4 +12,9 @@ public class DayAst extends AbstractUnaryConstraintAst implements NumericExpress
     public DayAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "DAY";
+    }
 }

@@ -18,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("SPARQL 1.1 — Parser and AST : aggregates")
 class SparqlParserAggregateTest extends AbstractSparqlParserFeatureTest {
 
+    /**
+     * gets the last Pattern of the where clause, assuming it is an Aggregate
+     */
     private static AggregateAst lastBindAggregate(WhereClauseQueryAst ast) {
         BindAst bind = assertInstanceOf(BindAst.class, ast.whereClause().patterns().getLast());
         return assertInstanceOf(AggregateAst.class, bind.expression());

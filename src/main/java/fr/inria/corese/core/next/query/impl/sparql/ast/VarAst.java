@@ -1,5 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+
 /**
  * Variable in a triple pattern (e.g. ?s, $x).
  */
@@ -8,5 +10,15 @@ public record VarAst(String name) implements TermAst {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Variable name is null or blank");
         }
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public void accept(AstVisitor visitor) {
+        visitor.visit(this);
     }
 }

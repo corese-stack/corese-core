@@ -127,25 +127,25 @@ public final class SparqlAstToExpression {
             case DivideAst divideAst ->
                     Term.create("/", convert(divideAst.getLeftArgument()), convert(divideAst.getRightArgument()));
             case UnaryPlusAst unaryPlusAst ->
-                    Term.create("+", convert(unaryPlusAst.getArgument()));
+                    Term.create("+", convert(unaryPlusAst.argument()));
             case UnaryMinusAst unaryMinusAst ->
-                    Term.create("-", convert(unaryMinusAst.getArgument()));
+                    Term.create("-", convert(unaryMinusAst.argument()));
             case BooleanNotAst booleanNotAst ->
-                    Term.create("!", convert(booleanNotAst.getArgument()));
+                    Term.create("!", convert(booleanNotAst.argument()));
             case BoundAst boundAst ->
-                    functionTerm(Processor.BOUND, convert(boundAst.getArgument()));
+                    functionTerm(Processor.BOUND, convert(boundAst.argument()));
             case IsIriAst isIriAst ->
-                    functionTerm("isIRI", convert(isIriAst.getArgument()));
+                    functionTerm("isIRI", convert(isIriAst.argument()));
             case IsBlankAst isBlankAst ->
-                    functionTerm("isBlank", convert(isBlankAst.getArgument()));
+                    functionTerm("isBlank", convert(isBlankAst.argument()));
             case IsLiteralAst isLiteralAst ->
-                    functionTerm("isLiteral", convert(isLiteralAst.getArgument()));
+                    functionTerm("isLiteral", convert(isLiteralAst.argument()));
             case StrAst strAst ->
-                    functionTerm("str", convert(strAst.getArgument()));
+                    functionTerm("str", convert(strAst.argument()));
             case LangAst langAst ->
-                    functionTerm("lang", convert(langAst.getArgument()));
+                    functionTerm("lang", convert(langAst.argument()));
             case DatatypeAst datatypeAst ->
-                    functionTerm("datatype", convert(datatypeAst.getArgument()));
+                    functionTerm("datatype", convert(datatypeAst.argument()));
             case SameTermAst sameTermAst ->
                     functionTerm("sameTerm", convert(sameTermAst.getLeftArgument()), convert(sameTermAst.getRightArgument()));
             case LangMatchesAst langMatchesAst ->
@@ -183,23 +183,23 @@ public final class SparqlAstToExpression {
             case StrDtAst strDtAst ->
                     functionTerm(Processor.STRDT, convert(strDtAst.getLeftArgument()), convert(strDtAst.getRightArgument()));
             case IriFunctionAst iriFunctionAst ->
-                    functionTerm("iri", convert(iriFunctionAst.getArgument()));
+                    functionTerm("iri", convert(iriFunctionAst.argument()));
             case LcaseAst lcaseAst ->
-                    functionTerm("lcase", convert(lcaseAst.getArgument()));
+                    functionTerm("lcase", convert(lcaseAst.argument()));
             case UcaseAst ucaseAst ->
-                    functionTerm("ucase", convert(ucaseAst.getArgument()));
+                    functionTerm("ucase", convert(ucaseAst.argument()));
             case EncodeForUriAst encodeForUriAst ->
-                    functionTerm("encode_for_uri", convert(encodeForUriAst.getArgument()));
+                    functionTerm("encode_for_uri", convert(encodeForUriAst.argument()));
             case Md5Ast md5Ast ->
-                    functionTerm("md5", convert(md5Ast.getArgument()));
+                    functionTerm("md5", convert(md5Ast.argument()));
             case Sha1Ast sha1Ast ->
-                    functionTerm("sha1", convert(sha1Ast.getArgument()));
+                    functionTerm("sha1", convert(sha1Ast.argument()));
             case Sha256Ast sha256Ast ->
-                    functionTerm("sha256", convert(sha256Ast.getArgument()));
+                    functionTerm("sha256", convert(sha256Ast.argument()));
             case Sha384Ast sha384Ast ->
-                    functionTerm("sha384", convert(sha384Ast.getArgument()));
+                    functionTerm("sha384", convert(sha384Ast.argument()));
             case Sha512Ast sha512Ast ->
-                    functionTerm("sha512", convert(sha512Ast.getArgument()));
+                    functionTerm("sha512", convert(sha512Ast.argument()));
             case ExistsAst existsAst ->
                     throw new UnsupportedOperationException(
                             "EXISTS { ... } conversion requires GroupGraphPatternAst → Exp (see CoreseAstQueryBuilder)");

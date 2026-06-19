@@ -12,4 +12,9 @@ public class MonthAst extends AbstractUnaryConstraintAst implements NumericExpre
     public MonthAst(List<TermAst> args) {
         super(args);
     }
+
+    @Override
+    public String getName() {
+        return "MONTH";
+    }
 }
