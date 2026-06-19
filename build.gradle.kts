@@ -54,8 +54,7 @@ javacc {
 sourceSets {
     main {
         java {
-            srcDir(javaccGeneratedDir)
-            srcDir(antlrGeneratedDir)
+            setSrcDirs(listOf("src/main/java", javaccGeneratedDir, antlrPackageDir))
         }
     }
 }
@@ -311,7 +310,7 @@ tasks.named("compileJava") {
 tasks.named<Jar>("sourcesJar") {
     dependsOn("generateGrammarSource", "javaccSparqlCorese")
     from(javaccGeneratedDir)
-    from(antlrGeneratedDir)
+    from(antlrPackageDir)
     includeEmptyDirs = false
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
