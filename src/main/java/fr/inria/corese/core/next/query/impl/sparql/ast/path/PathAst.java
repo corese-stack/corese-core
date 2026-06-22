@@ -1,8 +1,11 @@
 package fr.inria.corese.core.next.query.impl.sparql.ast.path;
 
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.AstVisitor;
+import fr.inria.corese.core.next.query.impl.parser.semantic.support.VisitableAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 
 public sealed interface PathAst
+        extends VisitableAst
         permits PredicatePathAst,
         SequencePathAst,
         AlternativePathAst,
@@ -10,7 +13,7 @@ public sealed interface PathAst
         OneOrMorePathAst,
         OptionalPathAst,
         InversePathAst,
-        NegatedPropertySetPathAst {
+        NegatedPropertySetPathAst{
 
     /**
      * Wraps a single term (IRI, variable, etc.) as a property path.
