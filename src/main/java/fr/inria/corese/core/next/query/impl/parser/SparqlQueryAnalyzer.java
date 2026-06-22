@@ -141,6 +141,7 @@ final class SparqlQueryAnalyzer {
             SparqlUpdateAstBuilder updateBuilder = new SparqlUpdateAstBuilder(options);
             SparqlListener updateListener = new SparqlListener(List.of(
                     new ClearRequestFeature(updateBuilder),
+                    new CreateRequestFeature(updateBuilder),
                     new LoadRequestFeature(updateBuilder),
                     new BgpFeature(updateBuilder),
                     new BindFeature(updateBuilder),

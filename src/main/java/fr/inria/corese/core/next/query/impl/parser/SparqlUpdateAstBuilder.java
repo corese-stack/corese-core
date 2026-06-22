@@ -58,6 +58,15 @@ public class SparqlUpdateAstBuilder extends SparqlAstBuilder{
         }
     }
 
+    public CreateRequestAst createToAst(SparqlParser.CreateContext ctx) {
+        boolean silentFlag = ctx.SILENT() != null;
+        if (ctx.graphRef() != null) {
+            GraphRefAst targetGraphRef = this.graphRefFromGraphRef(ctx.graphRef());
+            return new CreateRequestAst(targetGraphRef, silentFlag);
+        }
+        throw new QueryEvaluationException("No target graph reference found in CREATE query");
+    }
+
     public void addRequest(UpdateRequestUnitAst ast) {
         this.updateRequestAst.add(ast);
     }
