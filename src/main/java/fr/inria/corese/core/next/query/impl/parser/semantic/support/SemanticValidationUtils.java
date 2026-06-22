@@ -38,6 +38,9 @@ public class SemanticValidationUtils {
             XSD.xsdFloat.getIRI().stringValue(),
             XSD.xsdDouble.getIRI().stringValue());
 
+    private SemanticValidationUtils() {
+    }
+
     public static boolean isBooleanCompatible(LiteralAst literalAst) {
         if (literalAst.lang() != null && !literalAst.lang().isBlank()) {
             return true;
@@ -115,17 +118,9 @@ public class SemanticValidationUtils {
      *
      */
     public static boolean isUnknownType(TermAst termAst) {
-        if (termAst instanceof VarAst) { // Is a variable that can be resolved to a boolean
-            return true;
-        }
-        if (termAst instanceof FunctionCallAst) { // Is a function call that could return a boolean, we cannot know
-            return true;
-        }
-        if(termAst instanceof SimpleLiteralExpressionAst) { // Could be a string un-typed but still representing a known type. will be filtered at resolution
-            return true;
-        }
-
-        return false;
+        return termAst instanceof VarAst
+                || termAst instanceof FunctionCallAst
+                || termAst instanceof SimpleLiteralExpressionAst;
     }
 
     /**
@@ -136,7 +131,7 @@ public class SemanticValidationUtils {
             return false;
         }
         try {
-            double d = Double.parseDouble(lexical);
+            Double.parseDouble(lexical);
         } catch (NumberFormatException nfe) {
             return false;
         }

@@ -15,6 +15,7 @@ import static fr.inria.corese.core.next.query.impl.parser.semantic.support.Seman
  * Check that the operands and numeric functions use numeric arguments
  */
 public final class OperandArgumentNumericTypeValidationRule extends AbstractSemanticValidationRule {
+    private static final String NUMERIC_TYPE = "numeric";
 
     @Override
     protected String getDiagnosticSource() {
@@ -37,31 +38,36 @@ public final class OperandArgumentNumericTypeValidationRule extends AbstractSema
 
         @Override
         public void visit(TermAst termAst) {
-            if (termAst instanceof UnaryConstraintAst unaryConstraintAst) {
-                if (
-                        (unaryConstraintAst instanceof AbsAst
-                                || unaryConstraintAst instanceof CeilAst
-                                || unaryConstraintAst instanceof FloorAst
-                                || unaryConstraintAst instanceof RoundAst
-                                || unaryConstraintAst instanceof UnaryMinusAst
-                                || unaryConstraintAst instanceof UnaryPlusAst)
-                                && !isPotentialNumeric(unaryConstraintAst.argument())) {
-                    result.add(buildIncorrectTypeDiagnostic(unaryConstraintAst.argument().getName(), unaryConstraintAst.getName(), "numeric"));
-                }
+            if (termAst instanceof UnaryConstraintAst unaryConstraintAst
+                    && (unaryConstraintAst instanceof AbsAst
+                    || unaryConstraintAst instanceof CeilAst
+                    || unaryConstraintAst instanceof FloorAst
+                    || unaryConstraintAst instanceof RoundAst
+                    || unaryConstraintAst instanceof UnaryMinusAst
+                    || unaryConstraintAst instanceof UnaryPlusAst)
+                    && !isPotentialNumeric(unaryConstraintAst.argument())) {
+                result.add(buildIncorrectTypeDiagnostic(
+                        unaryConstraintAst.argument().getName(),
+                        unaryConstraintAst.getName(),
+                        NUMERIC_TYPE));
             }
 
-            if (termAst instanceof BinaryConstraintAst binaryConstraintAst) { // Numeric only operands
-                if (binaryConstraintAst instanceof AddAst
-                        || binaryConstraintAst instanceof DivideAst
-                        || binaryConstraintAst instanceof MultiplyAst
-                        || binaryConstraintAst instanceof SubtractAst
-                ) {
-                    if (!isPotentialNumeric(binaryConstraintAst.getLeftArgument())) {
-                        result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getLeftArgument().getName(), binaryConstraintAst.getName(), "numeric"));
-                    }
-                    if (!isPotentialNumeric(binaryConstraintAst.getRightArgument())) {
-                        result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getRightArgument().getName(), binaryConstraintAst.getName(), "numeric"));
-                    }
+            if (termAst instanceof BinaryConstraintAst binaryConstraintAst
+                    && (binaryConstraintAst instanceof AddAst
+                    || binaryConstraintAst instanceof DivideAst
+                    || binaryConstraintAst instanceof MultiplyAst
+                    || binaryConstraintAst instanceof SubtractAst)) {
+                if (!isPotentialNumeric(binaryConstraintAst.getLeftArgument())) {
+                    result.add(buildIncorrectTypeDiagnostic(
+                            binaryConstraintAst.getLeftArgument().getName(),
+                            binaryConstraintAst.getName(),
+                            NUMERIC_TYPE));
+                }
+                if (!isPotentialNumeric(binaryConstraintAst.getRightArgument())) {
+                    result.add(buildIncorrectTypeDiagnostic(
+                            binaryConstraintAst.getRightArgument().getName(),
+                            binaryConstraintAst.getName(),
+                            NUMERIC_TYPE));
                 }
             }
         }

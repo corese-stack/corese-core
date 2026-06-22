@@ -37,17 +37,22 @@ public class OperandArgumentIRITypeValidationRule extends AbstractSemanticValida
 
         @Override
         public void visit(TermAst termAst) {
-            if(termAst instanceof BinaryConstraintAst binaryConstraintAst) {
-                if(binaryConstraintAst instanceof LowerThanAst
+            if (termAst instanceof BinaryConstraintAst binaryConstraintAst
+                    && (binaryConstraintAst instanceof LowerThanAst
                     || binaryConstraintAst instanceof LowerOrEqualThanAst
                     || binaryConstraintAst instanceof GreaterThanAst
-                    || binaryConstraintAst instanceof GreaterOrEqualThanAst) {
-                    if(isPotentialIri(binaryConstraintAst.getLeftArgument())) {
-                        result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getLeftArgument().getName(), binaryConstraintAst.getName(), "not an IRI"));
-                    }
-                    if(isPotentialIri(binaryConstraintAst.getRightArgument())) {
-                        result.add(buildIncorrectTypeDiagnostic(binaryConstraintAst.getRightArgument().getName(), binaryConstraintAst.getName(), "not an IRI"));
-                    }
+                    || binaryConstraintAst instanceof GreaterOrEqualThanAst)) {
+                if (isPotentialIri(binaryConstraintAst.getLeftArgument())) {
+                    result.add(buildIncorrectTypeDiagnostic(
+                            binaryConstraintAst.getLeftArgument().getName(),
+                            binaryConstraintAst.getName(),
+                            "not an IRI"));
+                }
+                if (isPotentialIri(binaryConstraintAst.getRightArgument())) {
+                    result.add(buildIncorrectTypeDiagnostic(
+                            binaryConstraintAst.getRightArgument().getName(),
+                            binaryConstraintAst.getName(),
+                            "not an IRI"));
                 }
             }
         }
