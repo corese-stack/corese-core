@@ -202,9 +202,6 @@ public interface IDatatype
         return set(DatatypeMap.key(name), DatatypeMap.newInstance(value));
     }
 
-    default IDatatype set(String name, boolean value) {
-        return set(DatatypeMap.key(name), DatatypeMap.newInstance(value));
-    }
 
     /**
      * this datatype: iterable of json (or map)
@@ -362,13 +359,6 @@ public interface IDatatype
 
     String toSparql(boolean prefix, boolean xsd, boolean skipUndefPrefix, NSManager nsm);
 
-    default String trace() {
-        return String.format("trace: %s code: %s datatype: %s label: %s",
-                this,
-                getCode(),
-                getDatatypeURI(),
-                getLabel());
-    }
 
     // Used by XMLLiteral to store a XML DOM
     @Override

@@ -17,9 +17,6 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
     private static int count = 0;
     private List<IDatatype> list;
 
-    public CoreseList(String value) {
-        super(value);
-    }
 
     public CoreseList() {
         super(SEED + count++);
@@ -46,14 +43,6 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         return new CoreseList(list);
     }
 
-    // cannot add()
-    public static CoreseList create(IDatatype[] dts) {
-        return new CoreseList(dts);
-    }
-
-    public static CoreseList create() {
-        return new CoreseList(new ArrayList<>());
-    }
 
     @Override
     public IDatatype getDatatype() {
@@ -133,9 +122,6 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         return list;
     }
 
-    public void set(IDatatype[] dts) {
-        list = Arrays.asList(dts);
-    }
 
     @Override
     public List<IDatatype> getValues() {
@@ -395,14 +381,6 @@ public class CoreseList extends CoreseExtension implements IDatatypeList {
         return list.contains(elem) ? TRUE : FALSE;
     }
 
-    // because list has its own compareTo (see above)
-    @Override
-    public int mapCompareTo(IDatatype dt) {
-        if (dt.isList()) {
-            return getLabel().compareTo(dt.getLabel());
-        }
-        return super.compareTo(dt);
-    }
 
     /**
      * this is a list of json objects

@@ -26,10 +26,6 @@ public class CoreseURILiteral extends CoreseStringableImpl {
     public CoreseURILiteral() {
     }
 
-    public CoreseURILiteral(String value) {
-        super(value);
-
-    }
 
     @Override
     public IDatatype getDatatype() {

@@ -90,9 +90,6 @@ public class SPIN implements ASTVisitor {
         sb.append(NL);
     }
 
-    public ASTBuffer getBuffer() {
-        return sb;
-    }
 
     public void setBuffer(ASTBuffer s) {
         sb = s;
@@ -958,16 +955,6 @@ public class SPIN implements ASTVisitor {
         return bn;
     }
 
-    void process(Variable var) {
-        String name = var.getLabel();
-        String bn = tvar.get(name);
-        if (bn == null) {
-            bn = blank(var);
-            tvar.put(name, bn);
-        }
-
-        sb.append(bn);
-    }
 
     void displayVar() {
         for (String var : tvar.keySet()) {

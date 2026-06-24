@@ -7,14 +7,6 @@ package fr.inria.corese.core.sparql.exceptions;
  * more explicit and easier to manage by callers.
  */
 public class SQLFunException extends RuntimeException {
-    /**
-     * Constructs a new SQLFunException with the specified detail message.
-     *
-     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
-     */
-    public SQLFunException(String message) {
-        super(message);
-    }
 
     /**
      * Constructs a new SQLFunException with the specified detail message and cause.

@@ -131,12 +131,6 @@ public class CoreseStringLiteral extends CoreseStringableImpl {
         }
     }
 
-    /**
-     * @return the manager
-     */
-    public IStorage getManager() {
-        return manager;
-    }
 
     /**
      * @param manager the manager to set

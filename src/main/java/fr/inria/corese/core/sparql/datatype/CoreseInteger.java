@@ -335,28 +335,6 @@ public class CoreseInteger extends CoreseNumber {
 //    }
 //    
 //    @Override
-//    public IDatatype minus(IDatatype dt) {
-//        switch (dt.getCode()) {
-//            case DOUBLE:
-//                return CoreseDouble.create(doubleValue() - dt.doubleValue());
-//            case FLOAT:
-//                return new CoreseFloat(floatValue() - dt.floatValue());
-//            case DECIMAL:
-//                return CoreseDecimal.create(doubleValue() - dt.doubleValue());
-//            case INTEGER:
-//                try {
-//                    return CoreseInteger.create(Math.subtractExact(longValue(), dt.longValue()));
-//                } catch (ArithmeticException e) {
-//                    return null;
-//                }
-//        }
-//        return null;
-//    }
-    
-    @Override
-    public IDatatype minus(long val) {
-        return CoreseInteger.create(longValue() - val);
-    }
 
     @Override
     public String getLowerCaseLabel() {
@@ -373,8 +351,4 @@ public class CoreseInteger extends CoreseNumber {
         return str;
     }
 
-    @Override
-    public boolean isInteger() {
-        return true;
-    }
 }

@@ -122,17 +122,6 @@ public class Expression extends TopExp
         return this;
     }
 
-    public Expression and(Expression e2) {
-        if (e2 == null) {
-            return this;
-        } else {
-            return Term.create(Keyword.SEAND, this, e2);
-        }
-    }
-
-    public Expression star() {
-        return Term.function(Term.STAR, this);
-    }
 
     @Override
     public String getShortName() {
@@ -170,9 +159,6 @@ public class Expression extends TopExp
         return exp;
     }
 
-    public String getKey() {
-        return toString();
-    }
 
     public void setName(String str) {
         name = str;
@@ -216,9 +202,6 @@ public class Expression extends TopExp
     public void setPublic(boolean b) {
     }
 
-    public boolean isArray() {
-        return false;
-    }
 
     boolean isAtom() {
         return false;
@@ -255,10 +238,6 @@ public class Expression extends TopExp
         return false;
     }
     
-    // because triple reference is BlankNode
-    public boolean isStrictBlankNode() {
-        return isBlankNode() && ! isTriple();
-    }
 
     public boolean isTerm() {
         return false;
@@ -284,9 +263,6 @@ public class Expression extends TopExp
         return false;
     }
     
-    public boolean isTemplate() {   
-        return false;
-    }
         
     @Override
     public boolean isFuncall() {
@@ -318,9 +294,6 @@ public class Expression extends TopExp
         return null;
     }
 
-    public String getSrcDatatype() {
-        return null;
-    }
 
     public boolean isAnd() {
         return false;
@@ -413,9 +386,6 @@ public class Expression extends TopExp
         return false;
     }
 
-    boolean isOrVarEqCst(Variable var) {
-        return false;
-    }
 
     @Override
     public boolean isStar() {
@@ -471,9 +441,6 @@ public class Expression extends TopExp
         return false;
     }
 
-    public boolean isType(ASTQuery ast, Variable var, int type) {
-        return false;
-    }
 
     public boolean isVisited() {
         return false;
@@ -530,13 +497,6 @@ public class Expression extends TopExp
         jc.toJava(this, arg);
     }
 
-    /**
-     * Translate some terms like : different(?x ?y ?z) -> (?x != ?y &amp;&amp; ?y != ?z
-     * &amp;&amp; ?x != ?z)
-     */
-    public Expression process() {
-        return this;
-    }
 
     /**
      * use case: select fun(?x) as ?y rewrite occurrences of ?y as fun(?x)
@@ -545,9 +505,6 @@ public class Expression extends TopExp
         return this;
     }
 
-    public Expression rewrite() {
-        return this;
-    }
 
     /**
      * ***********************************************************
@@ -599,28 +556,6 @@ public class Expression extends TopExp
         return true;
     }
     
-    public boolean isBound2(List<Variable> varList) {
-        List<String> list = getVariables();
-        for (String name : list){
-            boolean bound = false;
-            for (Variable var : varList) {
-                if (name.equals(var.getLabel())) {
-                    bound = true;
-                    break;
-                }
-            }
-            if (! bound) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public List<Constant> getConstants() {
-        ArrayList<Constant> l = new ArrayList<Constant>();
-        getConstants(l);
-        return l;
-    }
 
     void getConstants(List<Constant> l) {
     }
@@ -899,10 +834,6 @@ public class Expression extends TopExp
     public void setModality(String mod) {
     }
 
-    @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visit(this);
-    }
     
     public void walk(Walker walker) {
         //logger.debug("walk exp: {}" , this);
@@ -954,9 +885,6 @@ public class Expression extends TopExp
         return null;
     }
     
-    public boolean hasMetadata(int type) {
-        return false;
-    }
     
     @Override
     public Collection<String> getMetadataList() {
@@ -1026,9 +954,6 @@ public class Expression extends TopExp
         this.ast = ast;
     }
 
-    public boolean hasAST() {
-        return ast != null;
-    }
 
     @Override
     public PointerType pointerType() {
@@ -1063,9 +988,6 @@ public class Expression extends TopExp
         return null;
     }
 
-    public IDatatype eval(Computer eval, Environment env, Producer p) {
-        return eval(eval, env, p, new IDatatype[0]);
-    }
 
     public IDatatype eval(Computer eval, Environment env, Producer p, IDatatype[] param) {
         return null;

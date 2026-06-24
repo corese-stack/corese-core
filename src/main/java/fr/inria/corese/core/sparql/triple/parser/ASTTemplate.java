@@ -119,14 +119,6 @@ public class ASTTemplate {
         return ast.createFunction(ast.createQName(FUN_TEMPLATE_CONCAT), arg);
     }
 
-    /**
-     * vbox() if (type.equals(VBOX) &amp;&amp; el.size() > 1){ // add NL between
-     * elements Term t = createFunction(nl); for (int i=1; i&lt;el.size(); ){
-     * el.add(i, t); i += 2; } } @param s
-     */
-    public void setGroupSeparator(String s) {
-        groupSeparator = s;
-    }
 
     public void addTemplate(Expression at) {       
         template.add(at);
@@ -282,10 +274,6 @@ public class ASTTemplate {
         return t;
     }
 
-    Term compile(Constant cst) {
-        Term t = ast.createFunction(ast.createQName(FUN_PROCESS_URI), cst);
-        return t;
-    }
 
     /**
      *
@@ -301,17 +289,6 @@ public class ASTTemplate {
         return t;
     }
 
-    /**
-     * Aggregate that build the result of a template when there are several
-     * results default is group_concat draft: agg_and
-     */
-    static void setTemplateAggregate(String s) {
-        FUN_TEMPLATE_AGG = s;
-    }
-
-    static void setTemplateConcat(String s) {
-        FUN_TEMPLATE_CONCAT = s;
-    }
 
     Constant getEmpty() {
         if (empty == null) {
@@ -320,9 +297,6 @@ public class ASTTemplate {
         return empty;
     }
 
-    Variable templateVariable(Variable var) {
-        return Variable.create(KGRAMVAR + countVar++);
-    } 
 
      String getSeparator() {
         return templateSeparator;

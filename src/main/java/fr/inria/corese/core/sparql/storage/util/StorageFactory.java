@@ -28,13 +28,4 @@ public class StorageFactory {
         }
     }
 
-    /**
-     * Create persistent manager using default parameters
-     * 
-     * @param type
-     * @return 
-     */
-    public static IStorage create(int type) {
-        return create(type, null);
-    }
 }

@@ -77,11 +77,6 @@ public class Dataset extends ASTObject {
         return new Dataset(c);
     }
     
-    public static Dataset create(ProcessVisitor vis) {
-        Dataset ds = new Dataset();
-        ds.setVisitor(vis);
-        return ds;
-    }
     
     public static Dataset create(Binding b) {
         Dataset ds = new Dataset();
@@ -89,12 +84,6 @@ public class Dataset extends ASTObject {
         return ds;
     }
 
-    public static Dataset create(List<Constant> f, List<Constant> n) {
-        if (f == null && n == null) {
-            return null;
-        }
-        return new Dataset(f, n);
-    }
 
     public static Dataset newInstance(List<String> f, List<String> n) {
         if (f == null && n == null) {
@@ -103,16 +92,6 @@ public class Dataset extends ASTObject {
         return newInstance(f, n);
     }
 
-    public static Dataset instance(List<String> f, List<String> n) {
-        List<Constant> from = null, named = null;
-        if (f != null) {
-            from = cast(f);
-        }
-        if (n != null) {
-            named = cast(n);
-        }
-        return new Dataset(from, named);
-    }
     
     static List<Constant> cast(List<String> list) {
         ArrayList<Constant> from = new ArrayList<>();
@@ -194,19 +173,6 @@ public class Dataset extends ASTObject {
 
     }
 
-    public Dataset remFrom(String s) {
-        if (getFrom() != null) {
-            getFrom().remove(Constant.create(s));
-        }
-        return this;
-    }
-
-    public Dataset remNamed(String s) {
-        if (getNamed() != null) {
-            getNamed().remove(Constant.create(s));
-        }
-        return this;
-    }
 
     public void addFrom(Constant s) {
         if (getFrom() == null) {
@@ -244,12 +210,6 @@ public class Dataset extends ASTObject {
         return context;
     }
 
-    public Context getCreateContext() {
-        if (getContext() == null) {
-            setContext(new Context());
-        }
-        return getContext();
-    }
 
    
     public void setContext(Context context) {
@@ -264,17 +224,6 @@ public class Dataset extends ASTObject {
         return this;
     }
 
-    public Level getLevel() {
-        if (getContext() == null) {
-            return Level.USER_DEFAULT;
-        }
-        return getContext().getLevel();
-    }
-
-    public Dataset set(Context c) {
-        setContext(c);
-        return this;
-    }
 
     @Override
     public PointerType pointerType() {
@@ -341,13 +290,6 @@ public class Dataset extends ASTObject {
         return m;
     }
 
-    public void setTemplateVisitor(Object vis) {
-        templateVisitor = vis;
-    }
-
-    public Object getTemplateVisitor() {
-        return templateVisitor;
-    }
 
    
     public void setFrom(List<Constant> from) {
@@ -381,14 +323,6 @@ public class Dataset extends ASTObject {
     }
 
     
-    public List<String> getUriList() {
-        return uriList;
-    }
-
-    
-    public void setUriList(List<String> uriList) {
-        this.uriList = uriList;
-    }
 
     public Metadata getMetadata() {
         return metadata;
@@ -403,10 +337,6 @@ public class Dataset extends ASTObject {
         return load;
     }
 
-    public Dataset setLoad(boolean load) {
-        this.load = load;
-        return this;
-    }
 
     public ProcessVisitor getVisitor() {
         return visitor;
@@ -480,9 +410,6 @@ public class Dataset extends ASTObject {
         return index;
     }
 
-    public void setIndex(List<String> index) {
-        this.index = index;
-    }
 
     public String getStoragePath() {
         return storagePath;

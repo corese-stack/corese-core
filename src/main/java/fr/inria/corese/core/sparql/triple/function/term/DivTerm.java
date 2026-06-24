@@ -18,9 +18,6 @@ public class DivTerm extends BinaryFunction {
     public DivTerm(){
     }
   
-    public DivTerm(String name){
-        super(name);
-    }
     
     public DivTerm(String name, Expression e1, Expression e2){
         super(name, e1, e2);

@@ -37,12 +37,5 @@ public class HashMapList<T> extends HashMap<String, List<T>> {
         }
     }
     
-    public boolean booleanValue(String key) {
-        T value = getFirst(key);
-        if (value == null) {
-            return false;
-        }
-        return value.toString().equals(TRUE);
-    }
     
 }

@@ -36,9 +36,6 @@ public class ParserSparql1 {
         return new ParserSparql1(aq);
     }
 
-    public ASTQuery getAST() {
-        return ast;
-    }
 
     ParserSparql1(ASTQuery aq) {
         if (aq.getText() != null) {

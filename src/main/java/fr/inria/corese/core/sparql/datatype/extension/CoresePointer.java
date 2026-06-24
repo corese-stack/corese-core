@@ -32,9 +32,6 @@ public class CoresePointer extends CoreseUndefLiteral {
 
     Pointerable pobject;
 
-    public CoresePointer(Pointerable obj) {
-        this(obj.getDatatypeLabel(), obj);
-    }
 
 
     public CoresePointer(String name, Pointerable obj) {
@@ -169,12 +166,6 @@ public class CoresePointer extends CoreseUndefLiteral {
         return DatatypeMap.createUndef(getContent(), getDatatypeURI());
     }
 
-    public String display2() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"").append(getContent()).append("\"");
-        sb.append("^^").append(nsm().toPrefix(getDatatypeURI()));
-        return sb.toString();
-    }
 
     @Override
     public boolean equalsWE(IDatatype dt) throws CoreseDatatypeException {
@@ -190,15 +181,6 @@ public class CoresePointer extends CoreseUndefLiteral {
         return super.equalsWE(dt);
     }
 
-    public boolean equalsWE2(IDatatype dt) throws CoreseDatatypeException {
-        if (dt.getCode() != IDatatype.Datatype.UNDEF || getDatatype() != dt.getDatatype()) {
-            return super.equalsWE(dt);
-        }
-        if (getPointerObject() == null || dt.getPointerObject() == null) {
-            return getPointerObject() == dt.getPointerObject();
-        }
-        return getPointerObject().equals(dt.getPointerObject());
-    }
 
     /**
      * Pragma: they have same pointer type

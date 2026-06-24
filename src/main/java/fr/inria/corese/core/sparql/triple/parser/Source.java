@@ -75,9 +75,6 @@ public class Source extends SourceExp {
         leaf = s;
     }
 
-    boolean isState() {
-        return state;
-    }
 
     @Override
     public boolean isGraph() {
@@ -89,9 +86,6 @@ public class Source extends SourceExp {
         isRec = b;
     }
 
-    public boolean isRec() {
-        return isRec;
-    }
 
     @Override
     public ASTBuffer toString(ASTBuffer sb) {

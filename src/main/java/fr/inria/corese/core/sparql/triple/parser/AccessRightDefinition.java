@@ -31,10 +31,6 @@ public class AccessRightDefinition {
     
     public class AccessMap extends HashMap<String, AccessRight.AccessRights> {
 
-        public AccessMap define(String uri, AccessRight.AccessRights b) {
-            put(uri, b);
-            return this;
-        }
 
         /**
          * return URI access right if any
@@ -96,11 +92,6 @@ public class AccessRightDefinition {
         setInheritDefault(true);
     }
     
-    public void clear() {
-        getNodeAccess().clear();
-        getPredicateAccess().clear();
-        getGraphAccess().clear();
-    }
     
     public void inherit(AccessRightDefinition acc) {
         getNodeAccess().inherit(acc.getNodeAccess());
@@ -140,28 +131,11 @@ public class AccessRightDefinition {
         return combine(getSubject(edge), combine(getObject(edge), combine(getPredicate(edge), getGraph(edge))));
     }  
 
-    /**
-     * Namespace of current overload URI of default
-     */
-    AccessRight.AccessRights getAccessWithDefault(Edge edge) {
-        AccessRight.AccessRights subject = get(getSubject(edge), getSingleton().getSubject(edge));
-        AccessRight.AccessRights object = get(getObject(edge), getSingleton().getObject(edge));
-        AccessRight.AccessRights pred = get(getPredicate(edge), getSingleton().getPredicate(edge));
-        AccessRight.AccessRights graph = get(getGraph(edge), getSingleton().getGraph(edge));
-        return combine(subject, combine(object, combine(pred, graph)));
-    }
 
     AccessRight.AccessRights get(AccessRight.AccessRights current, AccessRight.AccessRights defaut) {
         return (current == null) ? defaut : current;
     }
 
-    AccessRight.AccessRights getAccess2(Edge edge, AccessRight.AccessRights def) {
-        AccessRight.AccessRights res = getAccessOrDefault(edge);
-        if (res == null) {
-            return def;
-        }
-        return res;
-    }
 
     AccessRight.AccessRights getAccessOrDefault(Edge edge) {
         AccessRight.AccessRights res = getAccessBasic(edge);
@@ -213,15 +187,6 @@ public class AccessRightDefinition {
         return (b1.getByteValue() > b2.getByteValue()) ? b1 : b2;
     }
 
-    AccessRight.AccessRights lessRestricted(AccessRight.AccessRights b1, AccessRight.AccessRights b2) {
-        if (b1 == null) {
-            return b2;
-        }
-        if (b2 == null) {
-            return b1;
-        }
-        return b1.getByteValue() < b2.getByteValue() ? b1 : b2;
-    }
 
   
     // return null when there is no uri access right
@@ -257,12 +222,6 @@ public class AccessRightDefinition {
         return getNodeAccess();
     }
 
-    /**
-     * @param nodeAccess the nodeAccess to set
-     */
-    public void setNode(AccessMap nodeAccess) {
-        this.setNodeAccess(nodeAccess);
-    }
 
     /**
      * @return the graphAccess
@@ -271,12 +230,6 @@ public class AccessRightDefinition {
         return getGraphAccess();
     }
 
-    /**
-     * @param graphAccess the graphAccess to set
-     */
-    public void setGraph(AccessMap graphAccess) {
-        this.setGraphAccess(graphAccess);
-    }
 
     /**
      * @return the predicateAccess
@@ -285,19 +238,6 @@ public class AccessRightDefinition {
         return getPredicateAccess();
     }
 
-    /**
-     * @param predicateAccess the predicateAccess to set
-     */
-    public void setPredicate(AccessMap predicateAccess) {
-        this.setPredicateAccess(predicateAccess);
-    }
-
-    /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
 
     /**
      * @param debug the debug to set
@@ -362,12 +302,6 @@ public class AccessRightDefinition {
         this.predicateAccess = predicateAccess;
     }
 
-    /**
-     * @return the inheritDefault
-     */
-    public boolean isInheritDefault() {
-        return inheritDefault;
-    }
 
     /**
      * @param inheritDefault the inheritDefault to set

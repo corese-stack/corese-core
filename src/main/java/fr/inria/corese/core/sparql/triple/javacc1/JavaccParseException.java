@@ -40,13 +40,6 @@ public class JavaccParseException extends ParseException {
         return message;
     }
 
-    public Vector getExpectedToken() {
-        return expectedToken;
-    }
-
-    public String getEncouteredToken() {
-        return encouteredToken;
-    }
 
     private void setExpectedToken() {
         String expected = "";

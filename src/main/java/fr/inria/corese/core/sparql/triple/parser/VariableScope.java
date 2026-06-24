@@ -110,13 +110,6 @@ public class VariableScope {
         return exist;
     }
 
-    /**
-     * @param exist the exist to set
-     */
-    public VariableScope setExist(boolean exist) {
-        this.exist = exist;
-        return this;
-    }
    
     
     

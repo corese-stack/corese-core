@@ -31,10 +31,6 @@ public class EngineException extends SparqlException {
         super(e);
     }
     
-    public EngineException(Exception e, URLServer url) {
-        super(e);
-        setURL(url);
-    }
     
     public EngineException(Exception e, String m) {
         super(e, m);
@@ -60,12 +56,6 @@ public class EngineException extends SparqlException {
         return new EngineException(e);
     }
     
-    public Exception getException() {
-        if (getCause() instanceof Exception) {
-            return (Exception) getCause();
-        }
-        return null;
-    }
 
     public boolean isSafetyException() {
         return false;

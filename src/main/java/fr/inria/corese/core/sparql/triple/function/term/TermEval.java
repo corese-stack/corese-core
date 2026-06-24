@@ -45,10 +45,6 @@ public class TermEval extends Term {
     public static final String SERVICE_MESS = "Service unauthorized";
     
     
-    public TermEval(String name, Expression e1, Expression e2, Expression e3) {
-        super(name, e1, e2);
-        add(e3);
-    }
 
     public TermEval(String name, Expression e1, Expression e2) {
         super(name, e1, e2);
@@ -167,13 +163,6 @@ public class TermEval extends Term {
         return Access.accept(feature, b.getAccessLevel());
     }
     
-    public boolean reject(Feature feature, Binding b) {
-        return Access.reject(feature, b.getAccessLevel());
-    }
-    
-    public boolean reject(Feature feature, Binding b, String uri) {
-        return Access.reject(feature, b.getAccessLevel(), uri);
-    }
     
     public void check(Feature feature, Binding b, String uri, String mes) throws SafetyException {
         Access.check(feature, b.getAccessLevel(), uri, mes);

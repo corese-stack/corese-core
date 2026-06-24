@@ -236,38 +236,12 @@ public class NSManager extends ASTObject {
         return nsm;
     }
 
-    /**
-     * Import nsm definitions
-     */
-    public NSManager complete(NSManager nsm) {
-        if (getBase() == null) {
-            setBase(nsm.getBase());
-        }
-        for (String p : nsm.getPrefixSet()) {
-            definePrefix(p, nsm.getNamespace(p));
-        }
-        return this;
-    }
 
     public void init() {
         initDefault();
         defNamespace();
     }
 
-    public Iterable<String> getNamespaces() {
-        return tns.keySet();
-    }
-
-    public Iterable<String> getPrefixes() {
-        return getPrefixEnum();
-    }
-
-    public void clear() {
-        tns.clear();
-        index.clear();
-        tprefix.clear();
-        count = 0;
-    }
 
     /**
      * application specific namespace/prefix if any
@@ -351,13 +325,6 @@ public class NSManager extends ASTObject {
         return isSystem(namespace(uri));
     }
 
-    public boolean isNamespace(String ns) {
-        return tns.containsKey(ns);
-    }
-
-    public static boolean isNumber(String ns) {
-        return number.get(ns) != null;
-    }
 
     /**
      * Define a namespace, returns the prefix
@@ -441,12 +408,6 @@ public class NSManager extends ASTObject {
         return tprefix.keySet();
     }
 
-    public int getIndex(String ns) {
-        if (getPrefix(ns) == null) {
-            defNamespace(ns);
-        }
-        return index.get(ns);
-    }
 
     public String toPrefix(String nsname) {
         return toPrefix(nsname, false);
@@ -459,13 +420,6 @@ public class NSManager extends ASTObject {
         return toPrefix(nsname, false, true);
     }
 
-    /**
-     * toPrefix() unless there are forbidden characters such as ( ) in this case
-     * return <uri>
-     */
-    public String toPrefixURI(String nsname) {
-        return toPrefixURI(nsname, true);
-    }
 
     public String toPrefixURI(String nsname, boolean skip) {
         return toPrefixURI(nsname, skip, false);
@@ -613,13 +567,6 @@ public class NSManager extends ASTObject {
         return str;
     }
 
-    boolean isAbsoluteURI(String s) {
-        try {
-            return new URI(s).isAbsolute();
-        } catch (URISyntaxException e) {
-        }
-        return false;
-    }
 
     String resolve(String str) {
         if (str.equals("")) {
@@ -642,13 +589,6 @@ public class NSManager extends ASTObject {
         return toString(null, false, true);
     }
 
-    public String toString(String title) {
-        return toString(title, false, true);
-    }
-
-    public String toString(String title, boolean all) {
-        return toString(title, all, true);
-    }
 
     public String toString(String title, boolean all, boolean bas) {
         if (title == null) {
@@ -780,23 +720,6 @@ public class NSManager extends ASTObject {
         return null;
     }
 
-    public String getPackage(String qname) {
-        String ns = getQNamespace(qname);
-        int ind = ns.indexOf(KeywordPP.CORESE_PREFIX);
-        if (ind != 0) {
-            return ns;
-        }
-        ns = ns.substring(KeywordPP.CORESE_PREFIX.length());
-        if (ns.endsWith(".")) {
-            ns = ns.substring(0, ns.length() - 1);
-        }
-        return ns;
-
-    }
-
-    public String toNamespaceBN(String str) {
-        return toNamespaceB(str);
-    }
 
     @Override
     public int size() {
@@ -807,13 +730,6 @@ public class NSManager extends ASTObject {
         return size() > def.size();
     }
 
-    public String stripns(String name, String namespace, boolean refp) {
-        // if namespace not null, removes it
-        // if refp add a #
-        return ((namespace != null) && (inNamespace(name, namespace)))
-                ? ((refp) ? HASH + strip(name) : strip(name))
-                : name;
-    }
 
     public String strip(String name) {
         // remove namespace and #
@@ -837,9 +753,6 @@ public class NSManager extends ASTObject {
         return name;
     }
 
-    public static String domain(String uri) {
-        return domain(uri, true);
-    }
 
     public static String domain(String uri, boolean scheme) {
         try {
@@ -861,18 +774,6 @@ public class NSManager extends ASTObject {
         }
     }
 
-    public boolean sysNamespace(String name) {
-        for (String ns : def.keySet()) {
-            if (inNamespace(name, ns)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isPredefinedTransformation(String uri) {
-        return inNamespace(uri, STL);
-    }
 
     public static boolean isPredefinedNamespace(String uri) {
         return isResource(uri);
@@ -903,14 +804,6 @@ public class NSManager extends ASTObject {
         }
     }
 
-    public static boolean isURI(String str) {
-        for (String pro : protocol) {
-            if (str.startsWith(pro)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * path = http://ns.inria.fr/corese/rule/owl.rul
@@ -961,27 +854,6 @@ public class NSManager extends ASTObject {
         return "";
     }
 
-    /*
-     * return last occurrence of pat (e.g. '/') in str
-     * if pat is last, find preceding occurrence
-     */
-    static int getIndex(String str, char pat) {
-        int index = str.lastIndexOf(pat);
-        if (index == str.length() - 1) {
-            logger.debug(str + " " + index + " " + str.lastIndexOf(pat, index));
-            return str.lastIndexOf(pat, index - 1);
-        } else {
-            return index;
-        }
-    }
-
-    public static String putNamespace(String ns, String label) {
-        return ns + label;
-    }
-
-    public String getDefaultNamespaces() {
-        return defaultNamespaces;
-    }
 
     @Override
     public PointerType pointerType() {

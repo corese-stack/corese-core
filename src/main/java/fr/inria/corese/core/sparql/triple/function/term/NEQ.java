@@ -18,9 +18,6 @@ public class NEQ extends BinaryFunction {
     public NEQ(){
     }
     
-    public NEQ(String name){
-        super(name);
-    }
     
     public NEQ(String name, Expression e1, Expression e2){
         super(name, e1, e2);

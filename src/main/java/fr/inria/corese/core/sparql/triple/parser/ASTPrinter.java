@@ -360,9 +360,6 @@ public class ASTPrinter implements KeywordPP {
     }
 
    
-    public void setLambda(boolean lambda) {
-        this.lambda = lambda;
-    }
 
     
     public ASTBuffer getBuffer() {
@@ -378,10 +375,6 @@ public class ASTPrinter implements KeywordPP {
         return service;
     }
 
-    public ASTPrinter setService(boolean service) {
-        this.service = service;
-        return this;
-    }
     
 
 }

@@ -73,12 +73,6 @@ public class Access {
             return value;
         } 
                 
-        public Level min(Level r2) {
-            if (this.getValue() <= r2.getValue()) {
-                return this;
-            }
-            return r2;
-        }
         
         // does this action level provide access to feature level 
         boolean provide(Level featureLevel) {
@@ -191,9 +185,6 @@ public class Access {
         return ! SKIP;
     }
     
-    public Access singleton() {
-        return singleton;
-    }
     
     
     private static FeatureLevel driver() {
@@ -216,19 +207,11 @@ public class Access {
         driver().put(feature, accessRight);
     }
     
-    public static Level setValue(Feature feature, Level accessRight) {
-        Level level = get(feature);
-        driver().put(feature, accessRight);
-        return level;
-    }
    
     public static Level get(Feature feature) {
         return driver().get(feature);
     }
       
-    public static boolean provide(Feature feature) {
-        return accept(feature, USER_DEFAULT);
-    }
     
     // tune level value if the server is protected or not 
     // if the server is not protected, public -> default
@@ -304,16 +287,6 @@ public class Access {
         }
     }
     
-    // used by server
-    public static List<String> selectNamespace(Feature feature, Level level, List<String> list) {
-        ArrayList<String> alist = new ArrayList<>();
-        for (String uri : list) {
-            if (acceptNamespace(feature, level, uri)) {
-                alist.add(uri);
-            }
-        }
-        return alist;
-    }
     
     // by default, isDefaultResultWhenEmptyAccept() is false
     // DataManagerJava initGraph() set it true in order to authorize xt:read()
@@ -327,35 +300,6 @@ public class Access {
         AccessNamespace.define(ns, b);
     }
     
-    public static void define(Feature feature, Level accessRight) {
-        set(feature, accessRight); 
-    }
-    
-    static boolean  isFile(String ns) {
-        return ns.startsWith("/");
-    }
-    
-    static String toFile(String ns) {
-        return "file://" + ns;
-    }
-    
-    public static boolean reject(Feature feature) {
-        return ! accept(feature);
-    }
-    
-    
-    public static Level getLevel(Level actionLevel) {        
-        return actionLevel;
-    }
-    
-    /**
-     * Used by server to grant access right to server query (user query or system query)
-     * user = true : user query coming from http request
-     * Return access level granted to query 
-     */
-    public static Level getQueryAccessLevel(boolean user) {
-        return getQueryAccessLevel(user, false);
-    }
     
     /**
      * return access level granted to user query
@@ -381,15 +325,6 @@ public class Access {
     
 
     
-    public static void setLinkedFeature(boolean b) {
-         setLinkedFunction(b);
-         setLinkedTransformation(b);
-//         setLinkedRule(b);
-    }
-    
-    public static void setReadFile(boolean b) {
-         setFeature(READ_FILE, b);
-    }
     
     public static void setFeature(Feature feature, boolean b) {
         if (b) {
@@ -410,10 +345,6 @@ public class Access {
         setFeature(LINKED_TRANSFORMATION, b);
     }
     
-    // everything is forbiden to DEFAULT level
-    public static void restrict() {
-        singleton = new Access(DENIED);
-    }
     
     
     public static Mode getMode() {
@@ -426,9 +357,6 @@ public class Access {
         //logger.info("setMode : ", singleton);
     }
     
-    public static boolean isServerMode() {
-        return mode == SERVER;
-    }
     
     void initMode() {
         switch (mode) {
@@ -493,21 +421,6 @@ public class Access {
         set(READ, PUBLIC);
     }
     
-    /**
-     * protected mode:
-     * some features are protected
-     *
-     */
-    public static void protect() {
-        setProtect(true);
-        deny(READ_WRITE);
-        deny(WRITE);
-        deny(SUPER_WRITE);
-        deny(HTTP);
-        deny(JAVA_FUNCTION);
-        deny(LINKED_FUNCTION);
-        // other features are PRIVATE and user query is PUBLIC
-    }
     
       /**
      * @return the protect

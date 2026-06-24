@@ -69,13 +69,6 @@ public class CoreseMap extends CoreseExtension {
         return map;
     }
 
-    public void incr(IDatatype key) {
-        IDatatype num = get(key);
-        if (num == null) {
-            num = DatatypeMap.newInstance(0);
-        }
-        set(key, num.intValue() + 1);
-    }
 
     public void set(IDatatype key, int val) {
         set(key, DatatypeMap.newInstance(val));
@@ -114,9 +107,6 @@ public class CoreseMap extends CoreseExtension {
         return DatatypeMap.createList(map.keySet());
     }
 
-    public IDatatype values() {
-        return DatatypeMap.createList(map.values());
-    }
 
     @Override
     public Iterator<IDatatype> iterator() {
@@ -138,9 +128,6 @@ public class CoreseMap extends CoreseExtension {
         return true;
     }
 
-    public JSONObject toJSON() {
-        return jsonCast().getNodeObject();
-    }
 
     public CoreseJSON jsonCast() {
         CoreseJSON dt = new CoreseJSON(new JSONObject());
@@ -152,9 +139,6 @@ public class CoreseMap extends CoreseExtension {
         return dt;
     }
 
-    public IDatatype toJSONDatatype() {
-        return jsonCast();
-    }
 
     @Override
     public Iterable<IDatatype> getLoop() {

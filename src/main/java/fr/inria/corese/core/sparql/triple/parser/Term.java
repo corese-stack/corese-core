@@ -1388,10 +1388,6 @@ public class Term extends Expression {
         isCount = b;
     }
 
-    @Override
-    public boolean isTerm(String oper) {
-        return name.equals(oper);
-    }
 
     @Override
     public boolean isFunction() {
@@ -1527,9 +1523,6 @@ public class Term extends Expression {
         args.add(exp);
     }
 
-    public void add(int i, Expression exp) {
-        args.add(i, exp);
-    }
 
     public void setArg(int i, Expression exp) {
         args.set(i, exp);
@@ -1548,13 +1541,6 @@ public class Term extends Expression {
         return args.get(n);
     }
 
-    public String getOper() {
-        return getName();
-    }
-
-    public void setOper(String str) {
-        setName(str);
-    }
 
     /**
      * use case: select fun(?x) as ?y rewrite occurrences of ?y as fun(?x)
@@ -1684,15 +1670,6 @@ public class Term extends Expression {
         return lExp;
     }
 
-    @Override
-    public IDatatype[] getArguments(int n) {
-        if (arguments == null) {
-            arguments = new IDatatype[n];
-        } else {
-            java.util.Arrays.fill(arguments, null);
-        }
-        return arguments;
-    }
 
     public void setExpList(List<Expr> l) {
         lExp = l;
@@ -1716,9 +1693,6 @@ public class Term extends Expression {
         return exist;
     }
 
-    public Exist getExistPattern() {
-        return exist;
-    }
 
     public Exp getExistContent() {
         if (exist == null) {
@@ -1770,11 +1744,6 @@ public class Term extends Expression {
     
    
     
-    void checkFeature(Feature feat, ASTQuery ast, String mess) throws EngineException  {
-        if (reject(feat, ast)) {
-            throw new SafetyException(mess);
-        }
-    }
     
     boolean reject(Feature feat, ASTQuery ast) {
         return Access.reject(feat, ast.getLevel());

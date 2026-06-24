@@ -116,14 +116,6 @@ public class FileHandler {
 		}
 	}
 
-	/**
-	 * Get the offset of the buffer regarding to the mapped file
-	 *
-	 * @return
-	 */
-	public long getBufferOffset() {
-		return bufferOffset;
-	}
 
 	/**
 	 * Return the remaining space that be used for storing data

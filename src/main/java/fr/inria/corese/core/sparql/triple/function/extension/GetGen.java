@@ -51,15 +51,6 @@ public class GetGen extends TermEval {
     }
     
        
-    /**
-     * Generic get with variable name and index
-     * may be unbound, return specific UNDEF value because null would be considered an error  
-     * embedding let will let the variable unbound, see getConstantValue()
-     * it can be catched with bound(var) or coalesce(var)
-     */
-    public static IDatatype gget(IDatatype dt, IDatatype var){
-        return gget(dt, var, DatatypeMap.ZERO);
-    }
     
     static IDatatype last(IDatatype dt, IDatatype ind) {
         if (! dt.isList()) {

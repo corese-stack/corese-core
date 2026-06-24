@@ -105,9 +105,6 @@ public class ASTBuffer  {
         return done;
     }
 
-    public void setDone(HashMap<Triple, Triple> done) {
-        this.done = done;
-    }
     
     /**
      * Do not print (nested) rdf star triple twice

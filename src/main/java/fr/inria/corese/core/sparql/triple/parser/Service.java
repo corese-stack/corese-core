@@ -42,11 +42,6 @@ public class Service extends SourceExp {
         return s;
     }
     
-    public static Service create(Atom serv, List<Atom> list, Exp body, boolean b) {
-        Service s = new Service(serv, body, b);
-        s.setServiceList(list);
-        return s;
-    }
     
     static Atom getDefaultService(List<Atom> list) {
         if (list.isEmpty()) {
@@ -64,9 +59,6 @@ public class Service extends SourceExp {
         return create(list, body, false);
     }
     
-    public static Service newInstance(List<String> list, Exp body) {
-        return create(getList(list), body, false);
-    }
     
     public boolean isUndefined() {
         return getServiceName().getLabel().equals(UNDEFINED_SERVER);

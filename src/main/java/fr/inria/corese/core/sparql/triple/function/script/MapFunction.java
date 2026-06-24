@@ -226,29 +226,6 @@ public class MapFunction extends Funcall {
 //                    }
 //                }
 //                else {
-//                    add(mlist, dt, mapmerge);
-//                }
-//            }
-//            return DatatypeMap.createList(mlist);
-//        }
-//        else if (maplist){
-//            return DatatypeMap.createList(res); 
-//        }
-//        else if (mapfindlist){
-//            return DatatypeMap.createList(sub);
-//        }
-//        else if (mapfindelem){
-//            return null;
-//        }
-//        return TRUE;
-//    }
-    
-    // if list size is <= i,  focus on last element of the list
-    // use case: maplist(?fun, ?list, xt:list(?lst))
-    // The second ?lst argument is itself a list and we do not want to iterate this one
-    IDatatype getValue(IDatatype dt, int i) {
-        return (i < dt.size()) ? dt.get(i) : dt.get(dt.size() - 1);
-    }
     
     void add(List<IDatatype> list, IDatatype dt, boolean merge){
         if (merge){

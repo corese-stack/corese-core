@@ -54,26 +54,6 @@ public class SQLFun {
 		}
 	}
 
-	/**
-	 * Executes an SQL query, allowing the specification of a custom JDBC driver.
-	 * The results are returned as a list of lists of strings,
-	 * ensuring that all JDBC resources are properly closed.
-	 *
-	 * @param uri            The JDBC connection URI
-	 * @param driverDatatype The IDatatype containing the fully qualified class name of the JDBC driver.
-	 * @param login          The database connection username.
-	 * @param passwd         The database password.
-	 * @param query          The SQL query string to execute.
-	 * @return A list of lists of strings representing the query results.
-	 * Each inner list is a row. Returns an empty list if the query yields no results,
-	 * or null if an unrecoverable error occurs.
-	 */
-	public List<List<String>> sql(IDatatype uri, IDatatype driverDatatype,
-								  IDatatype login, IDatatype passwd, IDatatype query) {
-		loadJdbcDriver(driverDatatype.getLabel());
-
-		return sql(uri, login, passwd, query);
-	}
 
 	/**
 	 * Executes an SQL query, assuming an appropriate JDBC driver has already been loaded

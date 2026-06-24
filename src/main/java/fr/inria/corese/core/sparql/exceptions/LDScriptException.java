@@ -14,10 +14,6 @@ public class LDScriptException extends EngineException {
         this.dt = dt;
     }
     
-    public LDScriptException(IDatatype dt, boolean b) {
-        this.dt = dt;
-        setStop(b);
-    }
     
     @Override
     public IDatatype getDatatypeValue() {

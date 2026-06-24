@@ -199,19 +199,6 @@ public class CoreseJSON extends CoreseExtension {
         }
     }
 
-    /**
-     * path = (p1 (p2 p3)* p4)
-     * exp  = (p2 p3)*
-     */
-    void star(IDatatype path, int i) {
-        IDatatype exp = path.get(i);
-        // 1) skip exp
-        path(path, i + 1);
-
-        // 2) 
-        // path' = (p1 exp exp* p4)
-
-    }
 
     /**
      * obj is result of preceding path step
