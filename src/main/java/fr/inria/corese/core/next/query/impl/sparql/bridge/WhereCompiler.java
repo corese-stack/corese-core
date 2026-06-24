@@ -6,6 +6,7 @@ import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
+import fr.inria.corese.core.next.query.kgram.core.Query;
 import fr.inria.corese.core.next.query.kgram.tool.NodeImpl;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
 import fr.inria.corese.core.sparql.triple.parser.Expression;
@@ -142,6 +143,7 @@ public final class WhereCompiler {
         Node variable = toNode(bind.variable());
         Exp exp = Exp.create(Type.BIND);
         exp.setFilter(filter);
+        exp.setFunctional(filter.isFunctional());
         exp.setNode(variable);
         return exp;
     }
@@ -152,7 +154,7 @@ public final class WhereCompiler {
     private Exp compileService(ServiceAst service) {
         Node endpoint = toNode(service.endpoint());
         Exp endpointNode = Exp.create(Type.NODE, endpoint);
-        Exp body = compile(service.pattern());
+        Query body = Query.create(compile(service.pattern()));
         Exp exp = Exp.create(Type.SERVICE, endpointNode, body);
         exp.setSilent(service.silent());
         return exp;

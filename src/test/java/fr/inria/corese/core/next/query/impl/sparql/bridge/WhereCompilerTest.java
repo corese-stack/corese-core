@@ -1,6 +1,7 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.FunctionCallAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +22,7 @@ class WhereCompilerTest {
 
 
     @Test
-    @DisplayName("OPTIONAL en left join (first = partie obligatoire, rest = partie optionnelle)")
+    @DisplayName("OPTIONAL as a left join (first = mandatory part, rest = optional part)")
     void compilesOptionalAsLeftJoin() {
         BgpAst mandatory = new BgpAst(List.of(
                 new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))));
@@ -40,7 +41,7 @@ class WhereCompilerTest {
 
 
     @Test
-    @DisplayName("UNION binaire de ses deux branches")
+    @DisplayName("UNION of its two branches")
     void compilesUnion() {
         UnionAst union = new UnionAst(
                 group(new BgpAst(List.of(
@@ -58,7 +59,7 @@ class WhereCompilerTest {
 
 
     @Test
-    @DisplayName("FILTER ajouté après le BGP dans le groupe")
+    @DisplayName("FILTER added after the BGP in the group")
     void compilesFilter() {
         BgpAst bgp = new BgpAst(List.of(
                 new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))));
@@ -74,7 +75,7 @@ class WhereCompilerTest {
 
 
     @Test
-    @DisplayName("MINUS folded avec le pattern précédent")
+    @DisplayName("MINUS folded with the preceding pattern")
     void compilesMinus() {
         BgpAst main = new BgpAst(List.of(
                 new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))));
@@ -86,14 +87,14 @@ class WhereCompilerTest {
         assertTrue(body.isAnd());
         Exp minusExp = body.get(0);
         assertTrue(minusExp.isMinus(), "MINUS node");
-        assertTrue(minusExp.first().isAnd(), "left part est le pattern précédent");
+        assertTrue(minusExp.first().isAnd(), "left part is the preceding pattern");
         assertTrue(minusExp.first().get(0).isBGP());
-        assertTrue(minusExp.rest().isAnd(), "right part est le corps du MINUS");
+        assertTrue(minusExp.rest().isAnd(), "right part is the MINUS body");
     }
 
 
     @Test
-    @DisplayName("BIND produit un Exp avec filter et node variable")
+    @DisplayName("BIND produces an Exp with a filter and a target variable node")
     void compilesBind() {
         BindAst bind = new BindAst(new VarAst("x"), new VarAst("y"));
 
@@ -102,12 +103,12 @@ class WhereCompilerTest {
         assertEquals(1, body.size());
         Exp bindExp = body.get(0);
         assertTrue(bindExp.isBind(), "BIND node");
-        assertNotNull(bindExp.getFilter(), "filter porte l'expression");
-        assertNotNull(bindExp.getNode(), "node porte la variable cible");
+        assertNotNull(bindExp.getFilter(), "filter carries the expression");
+        assertNotNull(bindExp.getNode(), "node carries the target variable");
     }
 
     @Test
-    @DisplayName("SERVICE produit un Exp avec endpoint et corps")
+    @DisplayName("SERVICE produces an Exp with an endpoint and a body")
     void compilesService() {
         ServiceAst service = new ServiceAst(
                 new IriAst("<http://example.org/>"),
@@ -119,12 +120,52 @@ class WhereCompilerTest {
 
         Exp serviceExp = body.get(0);
         assertTrue(serviceExp.isService(), "SERVICE node");
-        assertFalse(serviceExp.isSilent(), "pas de flag SILENT");
-        assertTrue(serviceExp.rest().isAnd(), "le corps est un groupe AND");
+        assertFalse(serviceExp.isSilent(), "no SILENT flag");
+        assertTrue(serviceExp.rest().isQuery(), "the body is a Query");
+        assertTrue(serviceExp.rest().getQuery().getBody().isAnd(), "the Query body is an AND group");
     }
 
     @Test
-    @DisplayName("SERVICE SILENT positionne le flag isSilent")
+    @DisplayName("SERVICE rest() exposes a Query for the runtime (exp.rest().getQuery() != null)")
+    void serviceRestShouldExposeAQueryForRuntime() {
+        ServiceAst service = new ServiceAst(
+                new IriAst("<http://example.org/>"),
+                false,
+                group(new BgpAst(List.of(
+                        new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
+
+        Exp serviceExp = new WhereCompiler().compile(service);
+
+        assertTrue(serviceExp.isService());
+        assertNotNull(serviceExp.rest().getQuery(), "SERVICE runtime expects a query body");
+    }
+
+    @Test
+    @DisplayName("BGP ?s ?p ?o — variable predicate exposed via getEdgeVariable()")
+    void edgeExposesVariablePredicateAsEdgeVariable() {
+        Exp bgp = new WhereCompiler().compile(new BgpAst(List.of(
+                new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o")))));
+
+        Exp edgeExp = bgp.get(0);
+        assertNotNull(edgeExp.getEdge().getEdgeVariable(), "variable predicate should be exposed as edge variable");
+        assertTrue(edgeExp.getEdge().getEdgeVariable().isVariable());
+    }
+
+    @Test
+    @DisplayName("BIND propagates the filter's isFunctional flag (e.g. unnest)")
+    void bindShouldPropagateFunctionalFlag() {
+        BindAst bind = new BindAst(
+                new FunctionCallAst(new IriAst("<http://example.org/unnest>"), List.of(new VarAst("x"))),
+                new VarAst("y"));
+
+        Exp bindExp = new WhereCompiler().compile(bind);
+
+        assertTrue(bindExp.getFilter().isFunctional());
+        assertTrue(bindExp.isFunctional(), "BIND exp should propagate functional flag");
+    }
+
+    @Test
+    @DisplayName("SERVICE SILENT sets the isSilent flag")
     void compilesServiceSilent() {
         ServiceAst service = new ServiceAst(
                 new IriAst("<http://example.org/>"),
@@ -135,6 +176,6 @@ class WhereCompilerTest {
         Exp serviceExp = compiler.compile(service);
 
         assertTrue(serviceExp.isService());
-        assertTrue(serviceExp.isSilent(), "flag SILENT activé");
+        assertTrue(serviceExp.isSilent(), "SILENT flag enabled");
     }
 }

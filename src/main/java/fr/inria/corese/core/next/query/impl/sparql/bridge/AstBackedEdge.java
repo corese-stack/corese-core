@@ -37,6 +37,11 @@ final class AstBackedEdge implements Edge {
     }
 
     @Override
+    public Node getEdgeVariable() {
+        return predicate.isVariable() ? predicate : null;
+    }
+
+    @Override
     public String getEdgeLabel() {
         return predicate.getLabel();
     }
@@ -44,6 +49,20 @@ final class AstBackedEdge implements Edge {
     @Override
     public Node getGraph() {
         return null;
+    }
+    
+    @Override
+    public boolean contains(Node node) {
+        if (node == null) {
+            return false;
+        }
+        for (int i = 0; i < nbNode(); i++) {
+            Node n = getNode(i);
+            if (n != null && (n == node || n.same(node))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
