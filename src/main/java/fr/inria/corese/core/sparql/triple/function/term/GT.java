@@ -18,9 +18,6 @@ public class GT extends BinaryFunction {
     public GT(){
     }
     
-    public GT(String name){
-        super(name);
-    }
     
     public GT(String name, Expression e1, Expression e2){
         super(name, e1, e2);

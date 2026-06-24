@@ -290,10 +290,6 @@ public class Metadata extends ASTObject
         return null;
     }
 
-    public Metadata share(Metadata meta) {
-        add(meta);
-        return this;
-    }
 
     public Metadata add(String str) {
         map.put(str, str);
@@ -336,12 +332,6 @@ public class Metadata extends ASTObject
         }
     }
 
-    public void set(Type type, List<String> list) {
-        String name = name(type);
-        if (name != null) {
-            set(name, list);
-        }
-    }
 
     public void set(String name, List<String> list) {
         if (!list.isEmpty()) {
@@ -378,23 +368,6 @@ public class Metadata extends ASTObject
         return hasMetadata(str);
     }
 
-    public boolean hasMetadata(Type... type) {
-        for (Type val : type) {
-            if (hasMetadata(val)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasMetadata(String... type) {
-        for (String val : type) {
-            if (hasMetadata(val)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public boolean hasMetadata(String name) {
         return map.containsKey(name);
@@ -412,9 +385,6 @@ public class Metadata extends ASTObject
         }
     }
 
-    public HashMap<String, String> getMap() {
-        return map;
-    }
 
     public String getValue(Type type) {
         return getValue(name(type));
@@ -428,21 +398,6 @@ public class Metadata extends ASTObject
         return literal.get(type);
     }
 
-    public int intValue(Type type) {
-        IDatatype dt = getDatatypeValue(type);
-        if (dt == null) {
-            return -1;
-        }
-        return dt.intValue();
-    }
-
-    public boolean hasDatatypeValue(Type type) {
-        return getDatatypeValue(type) != null;
-    }
-
-    public boolean hasDatatypeValue(String type) {
-        return getDatatypeValue(type) != null;
-    }
 
     public String getStringValue(Type type) {
         String value = getValue(type);
@@ -560,27 +515,5 @@ public class Metadata extends ASTObject
 
     // ________________________________________________
 
-    // @graph <server1> <g1> <g2> <server2> <g3>
-    public List<String> getGraphList(String service) {
-        List<String> graphList = getValues(Type.FROM);
-        List<String> serverList = getValues(Type.FEDERATE);
-        ArrayList<String> res = new ArrayList<>();
-        boolean find = false;
-        if (graphList != null && serverList != null) {
-            for (String str : graphList) {
-                if (find) {
-                    if (serverList.contains(str)) {
-                        break;
-                    } else {
-                        res.add(str);
-                    }
-                } else if (str.equals(service)) {
-                    find = true;
-                }
-            }
-        }
-
-        return res;
-    }
 
 }

@@ -17,9 +17,6 @@ public class MinusTerm extends BinaryFunction {
            
     public MinusTerm(){}
 
-    public MinusTerm(String name){
-        super(name);
-    }
     
     public MinusTerm(String name, Expression e1, Expression e2) {
         super(name, e1, e2);       

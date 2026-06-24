@@ -21,9 +21,6 @@ public class RDFList extends And {
         list = l;
     }
     
-    public static RDFList create() {
-        return new RDFList();
-    }
 
     @Override
     public boolean isRDFList() {
@@ -34,13 +31,6 @@ public class RDFList extends And {
         return first;
     }
 
-    void setHead(Atom e) {
-        first = e;
-    }
-
-    void setList(List<Atom> l) {
-        list = l;
-    }
 
     public List<Atom> getList() {
         return list;

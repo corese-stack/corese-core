@@ -46,35 +46,12 @@ public class LoadTurtle {
         setLoader(r, c, base);
     }
 
-    public static LoadTurtle create(InputStream read, Creator cr, String base) {
-        LoadTurtle p = new LoadTurtle(read, cr, base);
-        return p;
-    }
 
     public static LoadTurtle create(Reader read, Creator cr, String base) {
         LoadTurtle p = new LoadTurtle(read, cr, base);
         return p;
     }
 
-    public static LoadTurtle create(String file, Creator cr) {
-        FileReader read;
-        try {
-            read = new FileReader(file);
-            LoadTurtle p = new LoadTurtle(read, cr, file);
-            return p;
-        } catch (FileNotFoundException e) {
-            logger.error("Operation failure", e);
-        }
-        return null;
-    }
-
-    void setCreator(Creator c) {
-        create = c;
-    }
-
-    public Creator getCreator() {
-        return create;
-    }
 
     private void setLoader(InputStream stream, Creator c, String base) {
         parser = new SparqlCorese(stream);

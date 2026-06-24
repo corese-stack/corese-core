@@ -9,9 +9,6 @@ public class CoreseStringBuilder extends CoreseString {
 		value = null;
 	}
 	
-	public static CoreseStringBuilder create(StringBuilder s){
-		return new CoreseStringBuilder(s);
-	}
 	
         @Override
 	public String getLabel(){
@@ -26,10 +23,6 @@ public class CoreseStringBuilder extends CoreseString {
 		return sb;
 	}
         
-        @Override
-        public void setStringBuilder(StringBuilder s){
-            sb = s;
-	}
         
 
 }

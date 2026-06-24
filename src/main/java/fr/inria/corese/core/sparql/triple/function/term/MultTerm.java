@@ -18,9 +18,6 @@ public class MultTerm extends BinaryFunction {
     public MultTerm(){
     }
     
-    public MultTerm(String name){
-        super(name);
-    }
     
     public MultTerm(String name, Expression e1, Expression e2){
         super(name, e1, e2);

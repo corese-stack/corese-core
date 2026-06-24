@@ -192,13 +192,6 @@ public class BasicGraphPattern extends And {
         add(e);
     }
 
-    public BasicGraphPattern duplicate() {
-        BasicGraphPattern bgp = new BasicGraphPattern();
-        for (Exp exp : this) {
-            bgp.add(exp);
-        }
-        return bgp;
-    }
 
     @Override
     public boolean isBGP() {
@@ -213,39 +206,6 @@ public class BasicGraphPattern extends And {
         return sb;
     }
     
-    public ASTBuffer toStringBasic() {
-        ASTBuffer sb = new ASTBuffer();
-        super.toString(sb);
-        return sb;
-    }
-    
-    /**
-     * This function add a new blank bode in the hashtable bnodes
-     *
-     * @param s1 The name of the blank node in the query
-     * @param v The new blank node
-     */
-    public void addBNodes(String s1, Variable v) {
-        if (bnodes == null) {
-            bnodes = new Hashtable<String, Variable>();
-        }
-        bnodes.put(s1, v);
-    }
-
-    /**
-     * This function return the blank node that corresponds to the string s in
-     * the BasicGraphPattern part of the query
-     *
-     * @param s The name of the blank node in the query
-     * @return
-     */
-    public Variable getBNode(String s) {
-        if (bnodes == null) {
-            return null;
-        } else {
-            return bnodes.get(s);
-        }
-    }
 
     /**
      * To check that inner optional have their variable bound by their embeding
@@ -332,29 +292,6 @@ public class BasicGraphPattern extends And {
         return ok;
     }
 
-    public boolean validate2(ASTQuery ast, boolean exist) {
-        boolean ok = true;
-        List<Variable> list = null;
-
-        for (Exp exp : getBody()) {
-            if (exp.isBGP()) {
-                // in a new BGP, there is no binding
-                list = ast.getStack();
-                ast.newStack();
-            }
-
-            boolean b = exp.validate(ast, exist);
-            if (!b) {
-                ok = false;
-            }
-
-            if (exp.isBGP()) {
-                ast.addStack(list);
-            }
-        }
-
-        return ok;
-    }
 
     /**
      * SPARQL Constraint: Two occurrences of same blank must not be separated by

@@ -41,10 +41,6 @@ public class ExpressionList extends ArrayList<Expression> {
                 add(e);
 	}
         
-        public ExpressionList(List<Expression> l) {
-		this();
-                addAll(l);
-	}
 	
 	public void setDistinct(boolean b){
 		isDistinct = b;
@@ -96,9 +92,6 @@ public class ExpressionList extends ArrayList<Expression> {
         return ! list.isEmpty() || nested;
     }
     
-    public void setNested(boolean b){
-        nested = b;
-    }
    
      /**
      * @return the list
@@ -107,12 +100,6 @@ public class ExpressionList extends ArrayList<Expression> {
         return list;
     }
 
-    /**
-     * @param list the list to set
-     */
-    public void setList(List<ExpressionList> list) {
-        this.list = list;
-    }
     
     public void add(ExpressionList l){
         list.add(l);

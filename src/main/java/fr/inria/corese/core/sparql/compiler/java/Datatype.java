@@ -148,9 +148,6 @@ public class Datatype {
         return str.replace("\\$", "\\\\$").replace("\\\n", " ");
     }
 
-    String stringasdt(String str) {
-        return string(DatatypeMap.newInstance(str));
-    }
 
     String variable(String str) {
         return string(DatatypeMap.newInstance(str));
@@ -198,9 +195,6 @@ public class Datatype {
         }
     }
 
-    String newInstance(int val) {
-        return newInteger(val);
-    }
 
     String newInteger(long val) {
         switch ((int) val) {
@@ -244,9 +238,6 @@ public class Datatype {
         return String.format("DatatypeMap.newFloat(%s)", val);
     }
 
-    String newInstance(long val) {
-        return String.format("DatatypeMap.newLong(%s)", val);
-    }
 
     String newInstance(boolean val) {
         if (val) {

@@ -47,9 +47,6 @@ public class ASTExtension implements Extension {
            return metadata.get(name);
         }
         
-        HashMap<String, Function> getMetadata() {
-            return metadata;
-        }
                     
         // @before -> f1 ; @after -> f2
         void setMetadata(Function exp) {
@@ -107,10 +104,6 @@ public class ASTExtension implements Extension {
         }
     }
     
-    public ASTExtension(String n){
-        this();
-        name = n;
-    }
     
     FunMap getMap(Expr exp){
         return getMap(exp.arity());
@@ -228,32 +221,12 @@ public class ASTExtension implements Extension {
         }
     }
     
-    /**
-     * Use case: Transformation st:profile exports its functions to transformation
-     * They are declared as public
-     * Hence Interpreter isPublic() is OK.
-     */
-     public void setPublic(boolean b){
-        for (FunMap m : getMaps()){
-            for (Function e : m.values()){
-                e.setPublic(b);
-            }
-        }
-    }
 
     @Override
     public boolean isDefined(Expr exp) {
         return getMap(exp).containsKey(exp.getLabel());
     }
 
-    /**
-     * exp: st:fac(?n) values: #[10] actual values of parameters return body of
-     * fun
-     * @param exp
-     */
-    public Function get(Expr exp, Object[] values) {
-        return getMap(exp).get(exp.getLabel());
-    }
 
     @Override
     public Function get(Expr exp) {
@@ -337,33 +310,6 @@ public class ASTExtension implements Extension {
         return sb.toString();
     }
 
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return the pack
-     */
-    public Object getPackage() {
-        return pack;
-    }
-
-    /**
-     * @param pack the pack to set
-     */
-    public void setPackage(Object pack) {
-        this.pack = pack;
-    }
     
     /**
      * @return the extension
@@ -404,12 +350,6 @@ public class ASTExtension implements Extension {
         this.hierarchy = hierarchy;
     }
     
-     /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
 
     /**
      * @param debug the debug to set

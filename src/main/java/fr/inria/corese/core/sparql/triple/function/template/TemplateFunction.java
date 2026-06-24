@@ -30,9 +30,6 @@ public class TemplateFunction extends LDScript {
         super(name);
     }
     
-    public boolean isTemplate() {   
-        return true;
-    }
               
   /**
      * st:format (e1, st:number(), e2)
@@ -113,12 +110,6 @@ public class TemplateFunction extends LDScript {
         return Arrays.copyOfRange(obj, n, obj.length);
     }
     
-    String getLabel(IDatatype dt) {
-        if (dt == null) {
-            return null;
-        }
-        return dt.getLabel();
-    }
      
      boolean isAll() {
           return oper() == ExprType.APPLY_TEMPLATES_ALL

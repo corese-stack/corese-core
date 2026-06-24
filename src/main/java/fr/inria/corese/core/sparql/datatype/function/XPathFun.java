@@ -54,9 +54,6 @@ public class XPathFun {
         
     }
     
-    public XPathFun(boolean bindex) {
-        setNameIndex(bindex);
-    }
     
     // bindex = true :  label of Node is tag name + index
     // bindex = false : label of Node is tag name only    
@@ -64,10 +61,6 @@ public class XPathFun {
         bindex = b;
     }
 
-    public void init(NSManager nsm, VariableResolver res, boolean constant) {
-        init(nsm, constant);
-        set(res);
-    }
 
     public void init(NSManager nsm, boolean constant) {
         isXPathConstant = constant;

@@ -190,17 +190,11 @@ public class Basic extends Update {
         return silent;
     }
 
-    public void setGraph(String g) {
-        graph = g;
-    }
 
     public void setGraph(Constant g) {
         agraph = g;
     }
 
-    public void setTarget(String t) {
-        target = t;
-    }
 
     public void setTarget(Constant t) {
         atarget = t;
@@ -210,9 +204,6 @@ public class Basic extends Update {
         return atarget;
     }
 
-    public void setURI(String t) {
-        uri = t;
-    }
 
     public void setURI(Constant t) {
         auri = t;

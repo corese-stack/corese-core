@@ -35,12 +35,6 @@ public class Record {
         this.expression = expression;
     }
 
-    /**
-     * @return the uri
-     */
-    public String getUri() {
-        return uri;
-    }
 
     /**
      * @param uri the uri to set

@@ -12,39 +12,5 @@ import org.json.JSONObject;
  */
 public class LinkedResultLog extends JSONObject implements URLParam {
     
-    public void setLink(String key, String value) {
-        put(key, value);
-    }
-    
-    public void setLink(String key, JSONObject obj) {
-        put(key, obj);
-    }
-    
-    public void addLink(String name, JSONObject obj) {
-        JSONArray arr = null; 
-        if (has(name)) {
-            arr = getJSONArray(name);
-        }
-        else {
-            arr = new JSONArray();
-            put(name, arr);
-        }
-        arr.put(obj);
-    }
-    
-    public JSONObject create(String query) {
-        JSONObject obj = new JSONObject();
-        obj.put(QUERY, query);       
-        return obj;
-    }
-    
-    public JSONObject create(String query, String result) {
-        JSONObject obj = new JSONObject();
-        obj.put(QUERY, query);    
-        if (result != null) {
-            obj.put(RESULT, result);            
-        }
-        return obj;
-    }
     
 }

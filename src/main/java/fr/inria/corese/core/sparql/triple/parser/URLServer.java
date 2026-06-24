@@ -53,11 +53,6 @@ public class URLServer implements URLParam {
         init(param);
     }
     
-    // service clause
-    public URLServer(Node node) {
-        this(node.getLabel());
-        setNode(node);
-    }
     
     @Override
     public String toString() {
@@ -102,13 +97,6 @@ public class URLServer implements URLParam {
         return getMap().getFirst(name);
     }
     
-    public String getVariable(String name) {
-        String value = getParameter(name);        
-        if (value != null && isVariable(value)) {
-            return extractVariable(value);
-        }
-        return null;
-    }
     
     String extractVariable(String value) {
         return value.substring(1, value.length()-1);
@@ -352,18 +340,6 @@ public class URLServer implements URLParam {
     
 
     
-    public void decode(Context c) {
-        if (hasParameter()) {
-            for (String key : getMap().keySet()) {
-                if (isEncoded(key)) {
-                    if (isShare(key) && !c.hasValue(key)) {
-                        c.add(EXPORT, key);
-                    }
-                    c.set(key, getParameterList(key));
-                }
-            }
-        }
-    }
     
     static String clean(String name, String pref) {
         if (name.startsWith(pref)) {
@@ -387,9 +363,6 @@ public class URLServer implements URLParam {
         return value.startsWith("{") && value.endsWith("}");
     }
     
-    public boolean hasMethod() {
-        return getParameter("method") != null;
-    }
     
     public boolean isGET() {
         String method = getParameter("method");
@@ -449,9 +422,6 @@ public class URLServer implements URLParam {
         return url;
     }
     
-    public String getLogURL() {
-        return getURL();
-    }
     
     public String getLogURLNumber() {
         return String.format("%s.%s", getServer(), getNumber());
@@ -502,12 +472,6 @@ public class URLServer implements URLParam {
         this.dataset = dataset;
     }
     
-    public String getURLParameter() {
-         if (getDataset()==null) {
-             return null;
-         }
-         return getDataset().getURLParameter();
-    }
     
     public boolean isStorage() {
         return getServer().startsWith(STORE);

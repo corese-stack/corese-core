@@ -184,9 +184,6 @@ public class Binding implements Binder {
         return varList.size() > 0 || level.size() > 0;
     }
     
-    public boolean isEmpty() {
-        return size() == 0 && getGlobalVariableNames().isEmpty();
-    }
 
     int getIndex(Expr var) {
         return currentLevel + var.getIndex();
@@ -413,9 +410,6 @@ public class Binding implements Binder {
         }
     }
 
-    String pretty(int n) {
-        return "(" + ((n < 10) ? ("0" + n) : n) + ")";
-    }
 
     // todo:  why not level ???
     @Override
@@ -432,13 +426,6 @@ public class Binding implements Binder {
         return level.get(level.size() - 1);
     }
 
-    public int getCurrentLevel() {
-        return (level.isEmpty()) ? 0 : getLevel();
-    }
-    
-    public int getCurrentVariableLevel() {
-        return varList.isEmpty() ? 0 : varList.size() - 1;
-    }
     
     // global variable
     public IDatatype getVariable(String name) {
@@ -459,15 +446,6 @@ public class Binding implements Binder {
         return getGlobalVariableValues().get(name);
     }
     
-    public IDatatype popBasicGlobalVariable(String name) {
-        IDatatype dt = getGlobalVariableValues().get(name);
-        setGlobalVariable(name, null);
-        return dt;
-    }
-    
-    public IDatatype getGlobalVariableBasic(String name) {
-        return getGlobalVariableValues().get(name);
-    } 
     
     public Binding setVariable(String name, IDatatype val) {
         return bind(new VariableLocal(name), val);
@@ -492,9 +470,6 @@ public class Binding implements Binder {
         return getSingleton().getVariable(name);
     }
     
-    public boolean hasVariable() {
-        return ! getGlobalVariableValues().isEmpty();
-    }
     
     // must be LocalVariable, i.e. LDScript Variable
     public Binding bind(Variable var, IDatatype val) {
@@ -669,9 +644,6 @@ public class Binding implements Binder {
         globalValue = m;
     }
 
-    public int getCount() {
-        return count;
-    }
 
     /**
      * return(dt) LDScript function set boolean result field to true
@@ -798,17 +770,6 @@ public class Binding implements Binder {
     }
     
     
-    public static int getDefaultValue(String name, int value) {
-        IDatatype dt = getStaticVariable(name);
-        return (dt == null) ? value: dt.intValue();
-    }
-    
-    public Context getCreateContext() {
-        if (getContext() == null) {
-            setContext(new Context());
-        }
-        return getContext();
-    }
 
     public Context getContext() {
         return context;
@@ -818,9 +779,6 @@ public class Binding implements Binder {
         this.context = context;
     }
     
-    public void set(Context c) {
-        share(c);
-    }
     
     public void share(Context c) {
         setContext(c);
@@ -932,13 +890,6 @@ public class Binding implements Binder {
         this.report = report;
     }
 
-    public Object getTransformerVisitor() {
-        return getShare().getTransformerVisitor();
-    }
-
-    public void setTransformerVisitor(Object transformerVisitor) {
-        getShare().setTransformerVisitor(transformerVisitor);
-    }
 
     public Share getShare() {
         return share;
@@ -948,10 +899,5 @@ public class Binding implements Binder {
         this.share = share;
     }
     
-    // service parameter
-    public void init(HashMapList<String> map) {
-        IDatatype dt = DatatypeMap.cast(map);
-        setGlobalVariable(SERVICE_PARAM, dt);
-    }
     
 }

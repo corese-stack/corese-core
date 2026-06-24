@@ -123,37 +123,21 @@ public class Atom extends Expression implements ElementClause {
         return false;
     }
 
-    public boolean isIsall() {
-        return isall;
-    }
-
-    public void setIsall(boolean isall) {
-        this.isall = isall;
-    }
 
     public boolean isIsdirect() {
         return isdirect;
     }
 
-    public void setIsdirect(boolean isdirect) {
-        this.isdirect = isdirect;
-    }
 
     public boolean isIsone() {
         return isone;
     }
 
-    public void setIsone(boolean isone) {
-        this.isone = isone;
-    }
 
     public int getStar() {
         return star;
     }
 
-    public void setPath(int star) {
-        this.star = star;
-    }
 
     @Override
     public Atom getAtom() {
@@ -170,9 +154,6 @@ public class Atom extends Expression implements ElementClause {
         return null;
     }
 
-    public Atom getElement() {
-        return this;
-    }
 
     boolean validateData(ASTQuery ast) {
         if (isBlankOrBlankNode()) {

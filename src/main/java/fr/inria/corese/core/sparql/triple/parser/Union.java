@@ -76,9 +76,6 @@ public class Union extends Binary {
         }
     }
     
-    String getOper() {
-        return Keyword.SEOR;
-    }
 
     @Override
     public ASTBuffer toString(ASTBuffer sb) {

@@ -18,9 +18,6 @@ public class GE extends BinaryFunction {
     public GE(){
     }
    
-    public GE(String name){
-        super(name);
-    }
     
     public GE(String name, Expression e1, Expression e2){
         super(name, e1, e2);

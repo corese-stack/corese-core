@@ -61,21 +61,11 @@ public class ContextLog implements URLParam, LogKey {
         setSubjectMap(new SubjectMap());
     }
     
-    synchronized ContextLog getSynchonizedLog() {
-        return this;
-    }
 
     String getSubject() {
         return SUBJECT;
     }
     
-    public PropertyMap getPropertyMap() {
-        return getSubjectMap().getPropertyMap(getSubject());
-    }
-
-    public PropertyMap getPropertyMap(String subject) {
-        return getSubjectMap().getPropertyMap(subject);
-    }
 
     public IDatatype get(String subject, String property) {
         return getSubjectMap().get(subject, property);
@@ -85,18 +75,6 @@ public class ContextLog implements URLParam, LogKey {
         return getSubjectMap().get(subject, getPredicate(property));
     }
     
-    public List<List<String>> getLabelList(String property) {
-        ArrayList<List<String>> list = new ArrayList<>();
-        
-        for (String url : keySet()) {
-            IDatatype dt = getLabel(url, property);
-            if (dt != null) {
-                list.add(List.of(url, property, dt.getLabel()));
-            }
-        }
-        
-        return list;
-    }
     
     public String getString(String subject, String property) {
         IDatatype dt = get(subject, property);
@@ -106,21 +84,11 @@ public class ContextLog implements URLParam, LogKey {
         return dt.getLabel();
     }
     
-    public List<String> getStringList(String subject, String property) {
-        return getSubjectMap().getStringList(subject, property);
-    }
     
     public List<String> getStringList(String property) {
         return getSubjectMap().getStringList(getSubject(), property);
     }
     
-     public String getStringElement(String property, int n) {
-        List<String> list = getSubjectMap().getStringList(getSubject(), property);
-        if (n < list.size()) {
-            return list.get(n);
-        }
-        return null;
-    }
     
     
     public List<String> getStringListDistinct(String property) {
@@ -145,15 +113,6 @@ public class ContextLog implements URLParam, LogKey {
         return getMappings(getSubject(), property);
     } 
     
-    public String getMessage() {       
-        for (int i = getLinkList().size()-1; i>=0; i--) {
-            String url = getLinkList().get(i);
-            if (url.contains(MES)) {
-                return url;
-            }
-        }
-        return null;
-    }
     
     public Mappings getMappings(String subject, String property) {
         IDatatype dt = getSubjectMap().get(subject, property);
@@ -166,9 +125,6 @@ public class ContextLog implements URLParam, LogKey {
         return null;
     }
 
-    public ASTQuery getAST(String property) {
-        return getAST(getSubject(), property);
-    }
 
     public ASTQuery getAST(String subject, String property) {
         IDatatype dt = getSubjectMap().get(subject, property);
@@ -181,17 +137,11 @@ public class ContextLog implements URLParam, LogKey {
         return null;
     }
     
-    public String getString(String property) {
-        return getString(getSubject(), property);
-    }
 
     public void set(String property, String value) {
         getSubjectMap().set(getSubject(), property, value);
     }
 
-    public void set(String property, int value) {
-        getSubjectMap().set(getSubject(), property, value);
-    }
 
     public void incr(String subject, String property, int value) {
         getSubjectMap().incr(subject, property, value);
@@ -208,9 +158,6 @@ public class ContextLog implements URLParam, LogKey {
         getSubjectMap().set(subject, property, value);
     }
     
-    public void setLabel(String subject, String property, String value) {
-        getSubjectMap().set(subject, getPredicate(property), value);
-    }
     
     public void defLabel(String subject, String property, String value) {
         getSubjectMap().set(subject, getPredicate(property), value);
@@ -252,30 +199,11 @@ public class ContextLog implements URLParam, LogKey {
         getSubjectMap().add(getSubject(), property, value);
     }
     
-    public void add(String property, IDatatype value) {
-        getSubjectMap().add(getSubject(), property, value);
-    }
-    
-    public void addDistinct(String property, IDatatype value) {
-        addDistinct(getSubject(), property, value);
-    }
-
-    // add value to list of value
-    public void add(String subject, String property, String value) {
-        getSubjectMap().add(subject, property, value);
-    }
-    
-    public void add(String subject, String property, IDatatype value) {
-        getSubjectMap().add(subject, property, value);
-    }
     
     public void addDistinct(String subject, String property, IDatatype value) {
         getSubjectMap().addDistinct(subject, property, value);
     }
 
-    public void add(String subject, String property, Object value) {
-        getSubjectMap().add(subject, property, value);
-    }
 
     @Override
     public String toString() {
@@ -331,9 +259,6 @@ public class ContextLog implements URLParam, LogKey {
         file.close();
     }
 
-    public boolean isEmpty() {
-        return getSubjectMap().isEmpty();
-    }
 
     public List<EngineException> getExceptionList() {
         return exceptionList;
@@ -347,24 +272,11 @@ public class ContextLog implements URLParam, LogKey {
         getExceptionList().add(e);
     }
        
-    public String getLink() {
-        if (getLinkList().isEmpty()) {
-            return null;
-        }
-        return getLinkList().get(0);
-    }
 
     public List<String> getLinkList() {
         return linkList;
     }
 
-    public void setLink(List<String> linkList) {
-        this.linkList = linkList;
-    }
-
-    public void addLink(String url) {
-        getLinkList().add(url);
-    }
     
     public void addLink(List<String> linkList) {
         getLinkList().addAll(linkList);
@@ -461,21 +373,6 @@ public class ContextLog implements URLParam, LogKey {
         return shareable;
     }
     
-    /*****************************
-     * 
-     * JSON message
-     * 
-     *****************************/
-    
-    
-    
-    /**
-     * Copy data from ContextLog into json message
-     * Copy endpoint exceptions
-     */
-    public JSONObject message() {
-        return message(new JSONObject());
-    }
 
     public JSONObject message(JSONObject json) {
         messageHeader(json);
@@ -606,16 +503,6 @@ public class ContextLog implements URLParam, LogKey {
         this.trace = trace;
     }
     
-    public Mappings getLastInputMappings() {
-        String last = getLast(ENDPOINT_CALL);
-        if (last != null) {
-            IDatatype dt = get(last, LogKey.INPUT);
-            if (dt != null) {
-                return dt.getPointerObject().getMappings();
-            }
-        }
-        return null;
-    }
 
     public String getLast(String name) {
         IDatatype list = get(name);
@@ -629,9 +516,6 @@ public class ContextLog implements URLParam, LogKey {
         return formatList;
     }
 
-    public void setFormatList(List<String> formatList) {
-        this.formatList = formatList;
-    }
 
     public ASTQuery getASTIndex() {
         return astIndex;

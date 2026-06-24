@@ -267,17 +267,6 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
         return env;
     }
 
-    public void append(Exp e) {
-        add(e);
-    }
-
-    public void append(Expression e) {
-        add(e);
-    }
-
-    boolean isRegexp(String uri) {
-        return uri.indexOf(".*") != -1;
-    }
 
 //	void process(ASTQuery aq){
 //		aq.setQuery(this);
@@ -295,11 +284,6 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
         return this;
     }
 
-    void setNegation(boolean b) {
-    }
-
-    void setCard(String card) {
-    }
 
     public void setRec(boolean b) {
     }
@@ -309,12 +293,6 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
         return display(sb);
     }
 
-    Exp myget(int i) {
-        if (i >= size()) {
-            return null;
-        }
-        return get(i);
-    }
 
     public ASTBuffer display(ASTBuffer sb) {
         int i = 0;
@@ -372,9 +350,6 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
         return false;
     }
 
-    public boolean isStatement() {
-        return isBGP() || isUnion() || isMinus() || isOptional() || isGraph();
-    }
 
     public boolean isOption() {
         return false;
@@ -460,9 +435,6 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
         return false;
     }
 
-    public boolean isScore() {
-        return false;
-    }
 
     public boolean isQuery() {
         return false;
@@ -476,17 +448,6 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
         return false;
     }
 
-    public boolean isNegation() {
-        return false;
-    }
-
-    public boolean isForall() {
-        return false;
-    }
-
-    public boolean isIfThenElse() {
-        return false;
-    }
 
     public boolean isExist() {
         return false;
@@ -551,10 +512,6 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
         return true;
     }
 
-    @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visit(this);
-    }
 
     /**
      * Searching filters (localize())
@@ -608,9 +565,6 @@ public abstract class Exp extends TopExp implements Iterable<Exp> {
         return new ExtractList().getRDFList(this, list);
     }
     
-    public List<BasicGraphPattern> getBGPWithBnodeVariable(List<BasicGraphPattern> list) {
-        return new ExtractList().getBGPWithBnodeVariable(this, list);
-    }
     
     public List<BasicGraphPattern> getBGPWithBnodeVariable(List<BasicGraphPattern> list, FederateMerge fm) {
         return new ExtractList().getBGPWithBnodeVariable(this, list, fm);

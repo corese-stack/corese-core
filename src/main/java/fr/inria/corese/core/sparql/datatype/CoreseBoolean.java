@@ -129,15 +129,6 @@ public class CoreseBoolean extends CoreseStringLiteral {
         }
     }
 
-    public static String getNormalizedLabel2(String label) {
-        if (label.equals(STRUE) || label.equals("1")) {
-            return STRUE;
-        } else if (label.equals(SFALSE) || label.equals("0")) {
-            return SFALSE;
-        } else {
-            return null;
-        }
-    }
 
     @Override
     public boolean equalsWE(IDatatype iod) throws CoreseDatatypeException {

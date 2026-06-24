@@ -137,13 +137,6 @@ public class Composite extends Update {
         return sb;
     }
     
-    public Exp getDelete() {
-        return getPattern(Update.Keyword.DELETE);
-    }
-    
-    public Exp getInsert() {
-        return getPattern(Update.Keyword.INSERT);
-    }
     
     Exp getPattern(Update.Keyword type) {
         for (Composite cc : getUpdates()) {

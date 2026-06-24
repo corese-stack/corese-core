@@ -19,9 +19,6 @@ public class Values extends Exp {
     Binding bind;
     private boolean moved = false;
 
-    Values(List<Variable> var, List<List<Constant>> lval) {
-
-    }
 
     Values() {
         lval = new ArrayList();
@@ -174,19 +171,11 @@ public class Values extends Exp {
         this.lvar = lvar;
     }
     
-    public void setVariable(Variable var) {
-        ArrayList<Variable> l = new ArrayList<>();
-        l.add(var);
-        setVariables(l);
-    }
    
     public List<Variable> getVarList() {
         return lvar;
     }
 
-    void setValues(List<List<Constant>> lval) {
-        this.lval = lval;
-    }
 
     public void addValues(List<Constant> l) {
         lval.add(l);
@@ -231,9 +220,6 @@ public class Values extends Exp {
     }
 
     
-    public Expression getExp() {
-        return exp;
-    }
     
     public Expression getExpression() {
         return exp;

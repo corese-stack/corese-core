@@ -39,9 +39,6 @@ public class CoreseDate extends CoreseDatatype {
         }
     }
 
-    public static CoreseDate today() {
-        return new CoreseDate(TODAY);
-    }
 
     @Override
     public IDatatype.Datatype getCode() {

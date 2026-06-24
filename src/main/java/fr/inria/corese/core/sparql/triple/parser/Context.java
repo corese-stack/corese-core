@@ -120,10 +120,6 @@ public class Context extends ASTObject implements URLParam {
         setLevel(level);
     }
     
-    public Context(AccessRight access) {
-        this();
-        setAccessRight(access);
-    }
 
     @Override
     public String toString() {        
@@ -176,11 +172,6 @@ public class Context extends ASTObject implements URLParam {
         return table.keySet();
     }
     
-    public Context copy(){
-        Context c = new Context();
-        c.copy(this);
-        return c;
-    }
     
      public void complete(Context source) {
         IDatatype export = source.get(Context.STL_EXPORT);
@@ -255,23 +246,6 @@ public class Context extends ASTObject implements URLParam {
         return DatatypeMap.createObject(this);
     }
     
-    public IDatatype getNamedContextList() {
-        ArrayList<IDatatype> list = new ArrayList<>();
-        if (getNamedContext() != null) {
-            for (String name : getNamedContext().keySet()) {
-                list.add(DatatypeMap.newResourceOrLiteral(name));
-            }
-        }
-        return DatatypeMap.newInstance(list);
-    }
-    
-    public IDatatype getNamedContextDatatypeValue(String name) {
-        if (getNamedContext() == null || getContext(name) == null) {
-            return null;
-        }
-        Context c = getContext(name);
-        return c.getDatatypeValue();
-    }
     
     public IDatatype cget(IDatatype name, IDatatype slot){
         return getContext(name).get(slot);
@@ -304,9 +278,6 @@ public class Context extends ASTObject implements URLParam {
         return this;
     }
     
-     public Context setName(String name, IDatatype value) {
-        return set(NSManager.STL+name, value);
-    }
     
     public Context export(String name, IDatatype value) {
         table.put(name, value);
@@ -331,9 +302,6 @@ public class Context extends ASTObject implements URLParam {
     }
 
     
-    public Context exportName(String name, IDatatype value) {
-        return export(NSManager.STL+name, value);
-    }
 
     public Context set(String name, String str) {
         if (str == null) {
@@ -421,102 +389,31 @@ public class Context extends ASTObject implements URLParam {
         return this;
     }
 
-    public Context setTransform(String str) {
-        return setURI(STL_TRANSFORM, str);
-    }
-
-    public String getTransform() {
-        return stringValue(STL_TRANSFORM);
-    }
-
-    public Context setProfile(String str) {
-        return setURI(STL_PROFILE, str);
-    }
 
     public String getProfile() {
         return stringValue(STL_PROFILE);
     }
 
-    public Context setURI(String str) {
-        return setURI(STL_URI, str);
-    }
-    
-     public Context setMode(String str) {
-        return setURI(STL_MODE, str);
-    }
-     
-    public Context setParam(String str) {
-        return set(STL_PARAM, str);
-    }
-    
-    public Context setFormat(String str) {
-        return setURI(STL_FORMAT, str);
-    }
 
     public String getURI() {
         return stringValue(STL_URI);
     }
     
-    public Context setProtocol(String str){
-        return setURI(STL_PROTOCOL, str);
-    }
 
     public Context setQueryString(String str) {
         return set(STL_QUERY, str);
     }
 
-    // add values clause to query
-    public Context addValue(String value) {
-        String squery = getQueryString();
-        if (getURI() == null && squery != null) {
-            setQueryString(squery + value);
-        }
-        return this;
-    }
 
     public String getQueryString() {
         return stringValue(STL_QUERY);
     }
 
-    public Context setName(String str) {
-        return setURI(STL_NAME, str);
-    }
-
-    public String getName() {
-        return stringValue(STL_NAME);
-    }
-
-    public Context setService(String str) {
-        return set(STL_SERVICE, str);
-    }
-    
-    public Context setServer(String str) {
-        return setURI(STL_SERVER, str);
-    }
-    
-    public Context setRemoteHost(String remoteHost) {
-         return set(STL_REMOTE_HOST, remoteHost);
-    }
-    
-    public Context setTitle(String str) {
-        return setURI(STL_TITLE, str);
-    }
-    
-    public Context setTitle(IDatatype dt) {
-        return set(STL_TITLE, dt);
-    }
     
     public String getService() {
         return stringValue(STL_SERVICE);
     }
     
-    public Context setLang(String str) {
-        return set(STL_LANG, str);
-    }
-
-    public String getLang() {
-        return stringValue(STL_LANG);
-    }
 
 
     public IDatatype get(String name) {
@@ -575,41 +472,11 @@ public class Context extends ASTObject implements URLParam {
     }
     
     
-    public boolean hasValue(String name, String value) {
-        IDatatype dt = table.get(name);
-        return dt != null && dt.getLabel().equals(value);
-    }
-    
-    public boolean hasValue(String name, IDatatype value) {
-        IDatatype dt = table.get(name);
-        return dt != null && dt.equals(value);
-    }
     
     public boolean hasValue(String name) {
         return get(name) != null;
     }
     
-    public boolean hasEveryValue(String... name) {
-        for (String key : name) {
-            if (! hasValue(key)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    public boolean hasAnyValue(String... name) {
-        for (String key : name) {
-            if (hasValue(key)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public IDatatype getName(String name) {
-        return get(NSManager.STL+name);
-    }
 
     public String stringValue(String name) {
         IDatatype dt = table.get(name);
@@ -645,9 +512,6 @@ public class Context extends ASTObject implements URLParam {
         this.userQuery = userQuery;
     }
 
-    public void setServerProfile(IDatatype obj) {
-        set(STL_SERVER_PROFILE, obj);
-    }
     
     @Override
     public PointerType pointerType(){
@@ -687,27 +551,6 @@ public class Context extends ASTObject implements URLParam {
         this.context = context;
     }         
 
-    /**
-     * @return the bind
-     */
-    public Binding getBind() {
-        return bind;
-    }
-
-    /**
-     * @param bind the bind to set
-     */
-    public Context setBind(Binding bind) {
-        this.bind = bind;
-        return this;
-    }
-
-    /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
 
     /**
      * @param debug the debug to set
@@ -830,26 +673,6 @@ public class Context extends ASTObject implements URLParam {
     }
     
     
-    /**
-     * mode=demo 
-     * get parameter value list of demo (from global Context from urlprofile.ttl)
-     * get value of parameter name in parameter value list
-     */
-    public String getDefaultValue(List<String> modeList, String name) {
-        for (String mode : modeList) {
-            // get value of parameter name in parameter list of mode
-            IDatatype dt = getValueInList(mode, name);
-            if (dt != null) {
-                return dt.getLabel();
-            }
-        }
-        // try default mode * (use case: query parameter is required before any context & default processing) 
-        IDatatype dt = getValueInList(STAR, name);
-        if (dt != null) {
-            return dt.getLabel();
-        }
-        return null;
-    }
     
      /**
      * Get parameter values associated to endpoint URL or to mode in server global Context gc
@@ -924,30 +747,6 @@ public class Context extends ASTObject implements URLParam {
         }
     }
     
-    /**
-     * name = st:all
-     * return (st:xml st:json) 
-     * from urlprofile.ttl transformation st:equivalent definition
-     * PRAGMA: this Context is server global Context
-     */
-    public void prepare(String name, List<String> list) {
-        name = nsm().toNamespace(name);
-        List<String> alist = getStringList(name);
-        if (alist == null) {
-            list.add(name);
-        } else {
-            list.addAll(alist);
-        }
-    }
-    
-    String complete(String uri, String key, String val) {
-        if (uri.contains("?")) {
-            uri = String.format("%s&%s=%s", uri, key, val);
-        } else {
-            uri = String.format("%s?%s=%s", uri, key, val);
-        }
-        return uri;
-    }
 
     public String getKey() {
         return key;
@@ -957,12 +756,6 @@ public class Context extends ASTObject implements URLParam {
         this.key = key;
     }
 
-    public String getCreateKey() {
-        if (getKey() == null) {
-            setKey(UUID.randomUUID().toString());
-        }
-        return getKey();
-    }
     
     public HashMap<String, IDatatype> getHashMap() {
         return table;
@@ -972,25 +765,11 @@ public class Context extends ASTObject implements URLParam {
         return getHashMap().keySet();
     }
     
-    public JSONObject json() {
-        JSONObject json = new JSONObject();
-        
-        for (String key : keySet()) {
-            IDatatype dt = get(key);
-            DatatypeMap.set(json, key, dt);
-        }
-        
-        return json;
-    }
 
     public ASTQuery getAST() {
         return ast;
     }
 
-    public Context setAST(ASTQuery ast) {
-        this.ast = ast;
-        return this;
-    }
 
     public boolean isFederateIndex() {
         return federateIndex;
@@ -1001,9 +780,6 @@ public class Context extends ASTObject implements URLParam {
         return this;
     }
 
-    public boolean isDiscovery() {
-        return discovery;
-    }
 
     public Context setDiscovery(boolean discovery) {
         this.discovery = discovery;

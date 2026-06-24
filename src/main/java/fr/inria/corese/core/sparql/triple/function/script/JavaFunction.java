@@ -25,11 +25,5 @@ public class JavaFunction extends LDScript {
 //        }
     }
     
-    /**
-     * @param reject the reject to set
-     */
-    public void setReject(boolean reject) {
-        this.reject = reject;
-    }
     
 }

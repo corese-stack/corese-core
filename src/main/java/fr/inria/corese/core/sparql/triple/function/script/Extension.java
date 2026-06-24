@@ -164,53 +164,6 @@ public class Extension extends LDScript {
         }
     }
 
-    /**
-     * Eval with param already computed Use case: xt:main(), xt:produce(?q)
-     *
-     * @param eval
-     * @param b
-     * @param env
-     * @param p
-     * @param param
-     * @return
-     */
-    @Override
-    public IDatatype eval(Computer eval, Binding b, Environment env, Producer p, IDatatype[] param) throws EngineException {
-        if (function == null) {
-            function = getDefine(this, env);
-            if (function == null) {
-                logger.error("Undefined function: " + this);
-                return null;
-            }
-        }
-
-        Expression fun = function.getSignature();
-        IDatatype dt;
-        b.set(function, fun.getExpList(), param);
-        if (function.isSystem()) {
-            //fr.inria.corese.core.kgram.core.Eval cc = eval.getComputerEval(env, p, function);
-            fr.inria.corese.core.kgram.core.Eval cc = getComputerEval(eval.getEvaluator(), env, p, function);
-            // PRAGMA: b = cc.getEnvironment().getBind()
-            dt = function.getBody().eval(cc.getEvaluator(), b, cc.getEnvironment(), p);
-        } else {
-            dt = function.getBody().eval(eval, b, env, p);
-        }
-        b.unset(function, fun.getExpList());
-
-        if (dt == null) {
-            return null;
-        }
-        //return DatatypeMap.getResultValue(dt);
-        return b.resultValue(dt);
-
-    }
-
-    /**
-     * @return the tailRecursion
-     */
-    public boolean isTailRecursion() {
-        return tailRecursion;
-    }
 
     /**
      * @param tailRecursion the tailRecursion to set
