@@ -29,7 +29,6 @@ public class Context extends ASTObject implements URLParam {
     public static final String STL_NAME     = STL + "name"; // query path name
     public static final String STL_SERVICE  = STL + "service"; // /srv/template/
     public static final String STL_SERVER   = STL + "server";  //  http://corese.inria.fr
-    public static final String STL_PROFILE  = STL + "profile"; // st:dbpedia
     public static final String STL_SERVER_PROFILE = STL + "definition"; // profile.ttl graph
     public static final String STL_TRANSFORM = STL + "transform"; // st:navlab
     public static final String STL_LOD_PROFILE = STL + "lodprofile"; 
@@ -163,9 +162,7 @@ public class Context extends ASTObject implements URLParam {
         if (getService() != null) {
             sb.append("  Service: ").append(getService());
         }
-        if (getProfile() != null) {
-            sb.append("  Profile: ").append( nsm().toPrefix(getProfile()));
-        }
+
         if (get(STL_REMOTE_HOST) != null) {
             sb.append("  Host: ").append(get(STL_REMOTE_HOST).getLabel());
         }
@@ -427,14 +424,6 @@ public class Context extends ASTObject implements URLParam {
 
     public String getTransform() {
         return stringValue(STL_TRANSFORM);
-    }
-
-    public Context setProfile(String str) {
-        return setURI(STL_PROFILE, str);
-    }
-
-    public String getProfile() {
-        return stringValue(STL_PROFILE);
     }
 
     public Context setURI(String str) {
