@@ -146,6 +146,19 @@ class SparqlParserValidationTest extends AbstractSparqlParserFeatureTest {
 
     @Nested
     class FilterValidationTest {
+        @Test
+        void shouldRejectConcatUsedAsNumericOperand() {
+            SparqlParser parser = newParserDefault();
+
+            QueryValidationException exception = assertThrows(QueryValidationException.class, () -> parser.parse("""
+            SELECT * WHERE {
+              ?x ?p ?o .
+              FILTER(CONCAT("1", "2") + 1 = ?o)
+            }
+            """));
+
+            assertEquals("CONCAT used in + should be resolvable to a numeric", exception.getMessage());
+        }
 
         @Test
         @DisplayName("Should accept FILTER with numeric operator")

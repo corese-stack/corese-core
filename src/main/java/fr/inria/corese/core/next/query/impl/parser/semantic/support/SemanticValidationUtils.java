@@ -119,8 +119,7 @@ public class SemanticValidationUtils {
      */
     public static boolean isUnknownType(TermAst termAst) {
         return termAst instanceof VarAst
-                || termAst instanceof FunctionCallAst
-                || termAst instanceof SimpleLiteralExpressionAst;
+                || termAst instanceof FunctionCallAst;
     }
 
     /**
