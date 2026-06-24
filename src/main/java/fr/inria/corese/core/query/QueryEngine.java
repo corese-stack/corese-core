@@ -11,7 +11,6 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTExtension;
 import fr.inria.corese.core.sparql.triple.parser.Access.Level;
 import fr.inria.corese.core.sparql.triple.parser.Dataset;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class QueryEngine implements Engine {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryEngine.class);
-
-    public static final String STL_PROFILE = NSManager.STL + "profile";
 
     // Cache configuration
     private static final int DEFAULT_CACHE_SIZE = 100;
@@ -254,27 +251,6 @@ public class QueryEngine implements Engine {
         }
     }
 
-    /** REMOVED as part of eliminating dependencies to Transformer
-     * called once with this transformer map and
-     * may be called again with outer transformer map if any
-     * map belongs to current or outer transformer
-     * current transformer may inherit table from outer transformer
-     * hence all subtransformers share same table
-     * table: transformation -> Transformer
-     *_/
-    public void complete(Transformer trans) {
-        complete();
-        for (Query q : getTemplates()) {
-            trans.complete(q);
-            complete(q);
-        }
-        for (Query q : getNamedTemplates()) {
-            trans.complete(q);
-            complete(q);
-        }
-    }
-    */
-
     void complete(Query q) {
         q.setTransformationTemplate(true);
         q.setListPath(true);
@@ -285,26 +261,6 @@ public class QueryEngine implements Engine {
             ArrayList<Query> queryArrayList = new ArrayList<>(1);
             queryArrayList.add(table.get(name));
             tableList.put(name, queryArrayList);
-        }
-    }
-
-    /**
-     * templates inherit template st:profile function definitions
-     */
-    public void profile() {
-        Query profile = getTemplate(STL_PROFILE);
-        if ((profile != null) && (profile.getExtension() != null)) {
-            // share profile function definitions in templates
-            fr.inria.corese.core.compiler.parser.Transformer tr = fr.inria.corese.core.compiler.parser.Transformer.create();
-            ASTExtension ext = profile.getExtension();
-            tr.definePublic(ext, profile, false);
-
-            for (Query t : getTemplates()) {
-                addExtension(t, ext);
-            }
-            for (Query t : getNamedTemplates()) {
-                addExtension(t, ext);
-            }
         }
     }
 
@@ -352,10 +308,7 @@ public class QueryEngine implements Engine {
     }
 
     public Query getTemplate() {
-        Query q = getTemplate(STL_PROFILE);
-        if (q != null) {
-            return q;
-        } else if (getTemplates().isEmpty()) {
+        if (getTemplates().isEmpty()) {
             for (Query qq : table.values()) {
                 return qq;
             }
