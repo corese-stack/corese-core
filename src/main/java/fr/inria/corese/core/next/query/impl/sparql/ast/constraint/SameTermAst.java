@@ -2,8 +2,6 @@ package fr.inria.corese.core.next.query.impl.sparql.ast.constraint;
 
 import fr.inria.corese.core.next.query.api.exception.QuerySyntaxException;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -11,11 +9,9 @@ import java.util.List;
  * Function {@code sameTerm(term1, term2)}
  */
 public class SameTermAst extends AbstractBinaryFunctionAst implements BooleanExpressionAst {
-    private static final Logger logger = LoggerFactory.getLogger(SameTermAst.class);
 
     public SameTermAst(List<TermAst> args) {
         super(args);
-        logger.debug("{}", args);
         if (args.size() != 2) {
             throw new QuerySyntaxException("Unexpected number of arguments for sameTerm function");
         }
