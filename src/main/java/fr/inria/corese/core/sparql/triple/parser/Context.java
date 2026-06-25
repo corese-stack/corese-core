@@ -386,10 +386,6 @@ public class Context extends ASTObject implements URLParam {
         return this;
     }
 
-    public String getProfile() {
-        return stringValue(STL_PROFILE);
-    }
-
     public String getURI() {
         return stringValue(STL_URI);
     }
