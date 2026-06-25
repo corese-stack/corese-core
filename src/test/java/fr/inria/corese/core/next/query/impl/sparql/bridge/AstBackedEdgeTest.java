@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("AstBackedEdge: contains() and getEdgeVariable()")
+@DisplayName("AstBackedEdge: contains(), getEdgeVariable() and getGraph()")
 class AstBackedEdgeTest {
 
     @Test
@@ -62,5 +62,29 @@ class AstBackedEdgeTest {
                 new NodeImpl(Constant.createResource("http://example.org/p")),
                 new NodeImpl(Variable.create("o")));
         assertNull(withIriPredicate.getEdgeVariable());
+    }
+
+    @Test
+    @DisplayName("getGraph() is null for the default graph (engine represents it as null)")
+    void defaultGraphIsNull() {
+        AstBackedEdge edge = new AstBackedEdge(
+                new NodeImpl(Variable.create("s")),
+                new NodeImpl(Variable.create("p")),
+                new NodeImpl(Variable.create("o")));
+
+        assertNull(edge.getGraph());
+    }
+
+    @Test
+    @DisplayName("getGraph() returns the graph node passed to the constructor")
+    void explicitGraphIsReturned() {
+        Node graph = new NodeImpl(Constant.createResource("http://example.org/g"));
+        AstBackedEdge edge = new AstBackedEdge(
+                new NodeImpl(Variable.create("s")),
+                new NodeImpl(Variable.create("p")),
+                new NodeImpl(Variable.create("o")),
+                graph);
+
+        assertSame(graph, edge.getGraph());
     }
 }

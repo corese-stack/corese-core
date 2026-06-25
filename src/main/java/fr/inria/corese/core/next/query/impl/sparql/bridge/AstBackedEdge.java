@@ -14,11 +14,17 @@ final class AstBackedEdge implements Edge {
     private final Node subject;
     private final Node predicate;
     private final Node object;
+    private final Node graph;
 
     AstBackedEdge(Node subject, Node predicate, Node object) {
+        this(subject, predicate, object, null);
+    }
+
+    AstBackedEdge(Node subject, Node predicate, Node object, Node graph) {
         this.subject = Objects.requireNonNull(subject, "subject");
         this.predicate = Objects.requireNonNull(predicate, "predicate");
         this.object = Objects.requireNonNull(object, "object");
+        this.graph = graph;
     }
 
     @Override
@@ -46,11 +52,15 @@ final class AstBackedEdge implements Edge {
         return predicate.getLabel();
     }
 
+    /**
+     * The graph this triple pattern is matched in, or {@code null} for the default graph.
+     *
+     */
     @Override
     public Node getGraph() {
-        return null;
+        return graph;
     }
-    
+
     @Override
     public boolean contains(Node node) {
         if (node == null) {
