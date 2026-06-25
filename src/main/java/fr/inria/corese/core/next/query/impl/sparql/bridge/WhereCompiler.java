@@ -155,6 +155,8 @@ public final class WhereCompiler {
         Node endpoint = toNode(service.endpoint());
         Exp endpointNode = Exp.create(Type.NODE, endpoint);
         Query body = Query.create(compile(service.pattern()));
+        body.setService(true);
+        body.setSilent(service.silent());
         Exp exp = Exp.create(Type.SERVICE, endpointNode, body);
         exp.setSilent(service.silent());
         return exp;

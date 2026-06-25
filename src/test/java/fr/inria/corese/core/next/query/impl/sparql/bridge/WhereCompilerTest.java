@@ -178,4 +178,19 @@ class WhereCompilerTest {
         assertTrue(serviceExp.isService());
         assertTrue(serviceExp.isSilent(), "SILENT flag enabled");
     }
+
+    @Test
+    @DisplayName("SERVICE body query is marked as a service query")
+    void serviceBodyShouldBeMarkedAsServiceQuery() {
+        ServiceAst service = new ServiceAst(
+                new IriAst("<http://example.org/>"),
+                false,
+                group(new BgpAst(List.of(
+                        new TriplePatternAst(new VarAst("s"), new VarAst("p"), new VarAst("o"))))));
+
+        Exp serviceExp = new WhereCompiler().compile(service);
+
+        assertTrue(serviceExp.rest().getQuery().isService(),
+                "SERVICE body query should be marked as service");
+    }
 }
