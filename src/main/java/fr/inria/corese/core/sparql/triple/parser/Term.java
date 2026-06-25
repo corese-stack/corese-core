@@ -1466,7 +1466,11 @@ public class Term extends Expression {
         if (isAggregate(getLabel())) {
             return true;
         }
-        for (Expr exp : getExpList()) {
+        List<Expr> expList = getExpList();
+        if (expList == null) {
+            return false;
+        }
+        for (Expr exp : expList) {
             if (exp.isRecAggregate()) {
                 return true;
             }
