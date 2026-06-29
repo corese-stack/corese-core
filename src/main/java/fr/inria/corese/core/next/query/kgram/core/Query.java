@@ -139,6 +139,7 @@ public class Query extends Exp  {
     private boolean isInsert = false;
     boolean isDelete = false;
     boolean isUpdate = false;
+    boolean isAsk = false;
     boolean isCheckLoop = false;
     boolean isListGroup = false;
     boolean isListPath = true;
@@ -658,7 +659,7 @@ public class Query extends Exp  {
 
 
     public boolean isSelect(){
-        return ! (isConstruct() || isUpdate() || isInsert() || isDelete());
+        return ! (isConstruct() || isUpdate() || isInsert() || isDelete() || isAsk());
     }
 
     public boolean isConstruct() {
@@ -683,6 +684,14 @@ public class Query extends Exp  {
 
     public void setUpdate(boolean b) {
         isUpdate = b;
+    }
+
+    public boolean isAsk() {
+        return isAsk;
+    }
+
+    public void setAsk(boolean b) {
+        isAsk = b;
     }
 
     public boolean isTest() {

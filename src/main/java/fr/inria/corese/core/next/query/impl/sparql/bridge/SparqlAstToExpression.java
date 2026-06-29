@@ -6,12 +6,9 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.*;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.util.StringUtils;
 import fr.inria.corese.core.sparql.datatype.RDF;
-import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
-import fr.inria.corese.core.sparql.triple.parser.Processor;
-import fr.inria.corese.core.sparql.triple.parser.Term;
-import fr.inria.corese.core.sparql.triple.parser.Variable;
+import fr.inria.corese.core.sparql.triple.parser.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -60,8 +57,21 @@ public final class SparqlAstToExpression {
      */
     public static Filter toNextFilter(TermAst filterExpression) {
         Expression exprTree = convert(filterExpression);
+        initializeExpList(exprTree);
         AstBackedExpr expr = new AstBackedExpr(exprTree, Optional.of(filterExpression));
         return expr.getFilter();
+    }
+
+    /**
+     * Initializes the {@code Expr} list ({@code lExp}) of every {@link Term} in the tree.
+     */
+    private static void initializeExpList(Expression expression) {
+        if (expression instanceof Term term) {
+            for (Expression arg : term.getArgs()) {
+                initializeExpList(arg);
+            }
+            term.setExpList(new ArrayList<>(term.getArgs()));
+        }
     }
 
     private static Constant literalToConstant(LiteralAst l) {
