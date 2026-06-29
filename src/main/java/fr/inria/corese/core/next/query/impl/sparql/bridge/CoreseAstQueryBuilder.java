@@ -16,7 +16,6 @@ import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
-import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Query;
 import fr.inria.corese.core.next.query.kgram.tool.NodeImpl;
 import fr.inria.corese.core.sparql.triple.parser.Atom;
@@ -316,5 +315,86 @@ public final class CoreseAstQueryBuilder {
         if (solutionModifier.hasOffset()) {
             query.setOffset(Math.toIntExact(solutionModifier.offset()));
         }
+    }
+
+    static Node toNode(TermAst term) {
+        Expression expression = SparqlAstToExpression.convert(term);
+        if (expression instanceof Atom atom) {
+            return new NodeImpl(atom);
+        }
+        throw new IllegalArgumentException(
+                "A query term must be a variable, IRI or literal, got: "
+                        + term.getClass().getSimpleName());
+    }
+
+    /**
+     * Converts a SPARQL {@code FILTER} clause by converting {@link FilterAst#operator()} the same way as
+     * {@link #toNextFilter(TermAst)}.
+     */
+    public Filter toNextFilter(FilterAst filterClause) {
+        Objects.requireNonNull(filterClause, "filterClause");
+        return toNextFilter(filterClause.operator());
+    }
+
+    /**
+     * Converts a filter expression carried as {@link TermAst}: must be a {@link ConstraintAst}.
+     */
+    public Filter toNextFilter(TermAst filterExpression) {
+        Objects.requireNonNull(filterExpression, "filterExpression");
+        if (!(filterExpression instanceof ConstraintAst constraint)) {
+            throw new IllegalArgumentException(
+                    "FILTER expects a ConstraintAst, got: " + filterExpression.getClass().getName());
+        }
+        return toNextFilter(constraint);
+    }
+
+    /**
+     * Converts a constraint tree (boolean filter expression) into a KGRAM {@link Filter}.
+     */
+    public Filter toNextFilter(ConstraintAst filterExpression) {
+        Objects.requireNonNull(filterExpression, "filterExpression");
+        return SparqlAstToExpression.toNextFilter(filterExpression);
+    }
+
+    public Query toQuery(DescribeQueryAst describe) {
+        Objects.requireNonNull(describe, "describe");
+        rejectUnsupportedClauses(describe.datasetClause(), describe.valuesClause(), describe.solutionModifier());
+
+        Exp body = whereCompiler.compile(describe.whereClause());
+        Query query = Query.create(body);
+        query.setDescribe(true);
+
+        List<Node> nodes = new ArrayList<>();
+        for (TermAst term : describe.described()) {
+            nodes.add(toNode(term));
+        }
+        query.setDescribeList(nodes);
+
+        return query;
+    }
+
+    private static void rejectUnsupportedClauses(DatasetClauseAst dataset, ValuesAst values, SolutionModifierAst mod) {
+        if (!dataset.graphs().isEmpty() || !dataset.namedGraphs().isEmpty()) {
+            throw new UnsupportedOperationException(
+                    "FROM / FROM NAMED is not supported yet (dataset handling is a follow-up)");
+        }
+        if (!values.mappings().isEmpty()) {
+            throw new UnsupportedOperationException(
+                    "Inline VALUES is not supported yet (values handling is a follow-up)");
+        }
+        if (mod.hasOrderBy() || mod.hasGroupBy() || mod.hasHaving()
+                || mod.hasLimit() || mod.hasOffset() || mod.distinct() || mod.reduced()) {
+            throw new UnsupportedOperationException(
+                    "Solution modifiers (ORDER BY, GROUP BY, HAVING, LIMIT, OFFSET, DISTINCT, REDUCED) are not supported for DESCRIBE");
+        }
+    }
+
+    private static Node toNode(TermAst term) {
+        Expression e = SparqlAstToExpression.convert(term);
+        if (e instanceof Atom atom) {
+            return new NodeImpl(atom);
+        }
+        throw new IllegalArgumentException(
+                "A DESCRIBE term must be a variable or IRI, got: " + term.getClass().getSimpleName());
     }
 }

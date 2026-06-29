@@ -123,7 +123,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("toNextQuery(null) throws NullPointerException")
+    @DisplayName("toNextQuery((AskQueryAst) null) throws NullPointerException")
     void rejectsNullAsk() {
         assertThrows(NullPointerException.class, () -> builder.toNextQuery((AskQueryAst) null));
     }

@@ -80,6 +80,8 @@ public class Query extends Exp  {
             //selectWithExp, 
             orderBy, groupBy;
     List<Filter> failure, pathFilter, funList;
+    private List<Node> describeList = new ArrayList<>();
+
     List<String> errors, info;
     Exp having, construct, delete;
 	// gNode is a local graph node when subquery has no ?g in its select 
@@ -140,6 +142,7 @@ public class Query extends Exp  {
     boolean isDelete = false;
     boolean isUpdate = false;
     boolean isAsk = false;
+    boolean isDescribe = false;
     boolean isCheckLoop = false;
     boolean isListGroup = false;
     boolean isListPath = true;
@@ -693,7 +696,21 @@ public class Query extends Exp  {
     public void setAsk(boolean b) {
         isAsk = b;
     }
+    public boolean isDescribe() {
+        return isDescribe;
+    }
 
+    public void setDescribe(boolean b) {
+        isDescribe = b;
+    }
+
+    public List<Node> getDescribeList() {
+        return describeList;
+    }
+
+    public void setDescribeList(List<Node> list) {
+        describeList = list;
+    }
     public boolean isTest() {
         return isTest;
     }
