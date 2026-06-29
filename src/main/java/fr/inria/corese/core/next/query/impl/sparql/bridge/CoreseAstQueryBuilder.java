@@ -1,10 +1,21 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
-import fr.inria.corese.core.next.query.kgram.core.Exp;
+import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Query;
+import fr.inria.corese.core.next.query.kgram.tool.NodeImpl;
+import fr.inria.corese.core.sparql.triple.parser.Atom;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,41 +23,65 @@ import java.util.Objects;
  */
 public final class CoreseAstQueryBuilder {
 
-    public CoreseAstQueryBuilder() {
-    }
-
     private final WhereCompiler whereCompiler = new WhereCompiler();
 
     /**
      * Builds a KGRAM {@link Query} from a SPARQL {@code ASK} query AST.
      */
-    public Query toQuery(AskQueryAst ask) {
-        Objects.requireNonNull(ask, "ask");
-        rejectUnsupportedClauses(ask);
+    public Query toNextQuery(AskQueryAst askQueryAst) {
+        Objects.requireNonNull(askQueryAst, "askQueryAst");
+        rejectUnsupportedClauses(askQueryAst);
 
-        Exp body = whereCompiler.compile(ask.whereClause());
-        Query query = Query.create(body);
+        Query query = Query.create(whereCompiler.compile(askQueryAst.whereClause()));
+        applyDataset(query, askQueryAst.datasetClause());
+        applySolutionModifier(query, askQueryAst.solutionModifier());
         query.setAsk(true);
-
         return query;
     }
 
-    private static void rejectUnsupportedClauses(AskQueryAst ask) {
-        DatasetClauseAst dataset = ask.datasetClause();
-        if (!dataset.graphs().isEmpty() || !dataset.namedGraphs().isEmpty()) {
-            throw new UnsupportedOperationException(
-                    "FROM / FROM NAMED is not supported yet for ASK (dataset handling is a follow-up)");
-        }
-        if (!ask.valuesClause().mappings().isEmpty()) {
+    private static void rejectUnsupportedClauses(AskQueryAst askQueryAst) {
+        if (!askQueryAst.valuesClause().mappings().isEmpty()) {
             throw new UnsupportedOperationException(
                     "Inline VALUES is not supported yet for ASK (values handling is a follow-up)");
         }
-        SolutionModifierAst mod = ask.solutionModifier();
+        SolutionModifierAst mod = askQueryAst.solutionModifier();
         if (mod.hasOrderBy() || mod.hasGroupBy() || mod.hasHaving()
-                || mod.hasLimit() || mod.hasOffset() || mod.distinct() || mod.reduced()) {
+                || mod.distinct() || mod.reduced()) {
             throw new UnsupportedOperationException(
-                    "Solution modifiers (ORDER BY, GROUP BY, HAVING, LIMIT, OFFSET, DISTINCT, REDUCED) are not supported for ASK");
+                    "Solution modifiers (ORDER BY, GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for ASK");
         }
+    }
+
+    private void applyDataset(Query query, DatasetClauseAst datasetClause) {
+        query.setFrom(toNodeList(datasetClause.graphs()));
+        query.setNamed(toNodeList(datasetClause.namedGraphs()));
+    }
+
+    private List<Node> toNodeList(Iterable<IriAst> iris) {
+        List<Node> nodes = new ArrayList<>();
+        for (IriAst iri : iris) {
+            nodes.add(toNode(iri));
+        }
+        return nodes;
+    }
+
+    private void applySolutionModifier(Query query, SolutionModifierAst solutionModifier) {
+        if (solutionModifier.hasLimit()) {
+            query.setLimit(Math.toIntExact(solutionModifier.limit()));
+        }
+        if (solutionModifier.hasOffset()) {
+            query.setOffset(Math.toIntExact(solutionModifier.offset()));
+        }
+    }
+
+    static Node toNode(TermAst term) {
+        Expression expression = SparqlAstToExpression.convert(term);
+        if (expression instanceof Atom atom) {
+            return new NodeImpl(atom);
+        }
+        throw new IllegalArgumentException(
+                "A query term must be a variable, IRI or literal, got: "
+                        + term.getClass().getSimpleName());
     }
 
     /**

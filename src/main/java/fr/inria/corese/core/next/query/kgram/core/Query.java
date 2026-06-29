@@ -659,7 +659,7 @@ public class Query extends Exp  {
 
 
     public boolean isSelect(){
-        return ! (isConstruct() || isUpdate() || isInsert() || isDelete());
+        return ! (isConstruct() || isUpdate() || isInsert() || isDelete() || isAsk());
     }
 
     public boolean isConstruct() {

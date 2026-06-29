@@ -190,6 +190,15 @@ class QueryTest {
             boolean result = query.isSelect();
             assertTrue(result, "Should be select query by default");
         }
+
+        @Test
+        @DisplayName("Should not report ASK queries as SELECT")
+        void testAskIsNotSelect() {
+            query.setAsk(true);
+
+            assertTrue(query.isAsk(), "Query should be flagged as ASK");
+            assertFalse(query.isSelect(), "ASK query should not be reported as SELECT");
+        }
     }
 
     @Nested

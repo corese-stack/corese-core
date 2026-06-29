@@ -7,9 +7,6 @@ import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Exp;
 import fr.inria.corese.core.next.query.kgram.core.Query;
-import fr.inria.corese.core.next.query.kgram.tool.NodeImpl;
-import fr.inria.corese.core.sparql.triple.parser.Atom;
-import fr.inria.corese.core.sparql.triple.parser.Expression;
 
 import java.util.Objects;
 
@@ -19,9 +16,6 @@ import java.util.Objects;
  * evaluate.
  */
 public final class WhereCompiler {
-
-    public WhereCompiler() {
-    }
 
     public Exp compile(GroupGraphPatternAst where) {
         Objects.requireNonNull(where, "where");
@@ -54,20 +48,22 @@ public final class WhereCompiler {
     private Exp compileGroup(GroupGraphPatternAst group) {
         Exp body = Exp.create(Type.AND);
         for (PatternAst element : group.patterns()) {
-            if (element instanceof OptionalAst(PatternAst ast)) {
-                Exp left = body;
-                Exp right = compile(ast);
-                Exp optionalExp = Exp.create(Type.OPTIONAL, left, right);
-                body = Exp.create(Type.AND);
-                body.add(optionalExp);
-            } else if (element instanceof MinusAst(GroupGraphPatternAst pattern)) {
-                Exp left = body;
-                Exp right = compile(pattern);
-                Exp minusExp = Exp.create(Type.MINUS, left, right);
-                body = Exp.create(Type.AND);
-                body.add(minusExp);
-            } else {
-                body.add(compile(element));
+            switch (element) {
+                case OptionalAst(PatternAst ast) -> {
+                    Exp left = body;
+                    Exp right = compile(ast);
+                    Exp optionalExp = Exp.create(Type.OPTIONAL, left, right);
+                    body = Exp.create(Type.AND);
+                    body.add(optionalExp);
+                }
+                case MinusAst(GroupGraphPatternAst pattern) -> {
+                    Exp left = body;
+                    Exp right = compile(pattern);
+                    Exp minusExp = Exp.create(Type.MINUS, left, right);
+                    body = Exp.create(Type.AND);
+                    body.add(minusExp);
+                }
+                default -> body.add(compile(element));
             }
         }
         return body;
@@ -83,20 +79,10 @@ public final class WhereCompiler {
     }
 
     private Edge toEdge(TriplePatternAst triple) {
-        Node subject = toNode(triple.subject());
-        Node predicate = toNode(triple.predicate());
-        Node object = toNode(triple.object());
+        Node subject = CoreseAstQueryBuilder.toNode(triple.subject());
+        Node predicate = CoreseAstQueryBuilder.toNode(triple.predicate());
+        Node object = CoreseAstQueryBuilder.toNode(triple.object());
         return new AstBackedEdge(subject, predicate, object);
-    }
-
-    private Node toNode(TermAst term) {
-        Expression expression = SparqlAstToExpression.convert(term);
-        if (expression instanceof Atom atom) {
-            return new NodeImpl(atom);
-        }
-        throw new IllegalArgumentException(
-                "A triple-pattern term must be a variable, IRI or literal, got: "
-                        + term.getClass().getSimpleName());
     }
 
 
@@ -140,7 +126,7 @@ public final class WhereCompiler {
      */
     private Exp compileBind(BindAst bind) {
         Filter filter = SparqlAstToExpression.toNextFilter(bind.expression());
-        Node variable = toNode(bind.variable());
+        Node variable = CoreseAstQueryBuilder.toNode(bind.variable());
         Exp exp = Exp.create(Type.BIND);
         exp.setFilter(filter);
         exp.setFunctional(filter.isFunctional());
@@ -152,7 +138,7 @@ public final class WhereCompiler {
      * Compiles {@code SERVICE <endpoint> { ... }} into a KGRAM {@link Exp}.
      */
     private Exp compileService(ServiceAst service) {
-        Node endpoint = toNode(service.endpoint());
+        Node endpoint = CoreseAstQueryBuilder.toNode(service.endpoint());
         Exp endpointNode = Exp.create(Type.NODE, endpoint);
         Query body = Query.create(compile(service.pattern()));
         body.setService(true);
