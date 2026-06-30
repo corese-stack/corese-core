@@ -18,9 +18,6 @@ public class LT extends BinaryFunction {
     public LT(){
     }
  
-    public LT(String name){
-        super(name);
-    }
     
     public LT(String name, Expression e1, Expression e2){
         super(name, e1, e2);

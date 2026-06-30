@@ -17,12 +17,6 @@ public class TopExp implements AstVisitable {
         return generated;
     }
 
-    /**
-     * @param generated the generated to set
-     */
-    public void setGenerated(boolean generated) {
-        this.generated = generated;
-    }
     private boolean generated = false;
 
     @Override
@@ -44,9 +38,6 @@ public class TopExp implements AstVisitable {
         return toString();
     }
 
-    public StringBuffer toJava(StringBuffer sb) {
-        return toString(sb);
-    }
 
     @Override
     public void accept(ASTVisitor visitor) {
@@ -61,16 +52,6 @@ public class TopExp implements AstVisitable {
         return getVariables(VariableScope.inscope);
     }
 
-    public List<Variable> getAllVariables() {
-        return getVariables(VariableScope.allscope);
-    }
-    
-    // if statement: consider filter and statement inscope 
-    // if filter:    consider filter
-    // use case: when called on object of type Exp that contains a filter (Triple as Filter)
-    public List<Variable> getFilterVariables() {
-        return getVariables(VariableScope.filterscope);
-    }
     
     /**
      * List of variables of statement Exp (bgp, optional, union, etc.) and/or filter Expression

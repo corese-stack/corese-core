@@ -395,12 +395,6 @@ public class ExpressionVisitorVariable implements ExpressionVisitor {
         return functionDefinition;
     }
 
-    /**
-     * @param functionDefinition the functionDefinition to set
-     */
-    public void setFunctionDefinition(boolean functionDefinition) {
-        this.functionDefinition = functionDefinition;
-    }
     
      /**
      * @return the nbVariable

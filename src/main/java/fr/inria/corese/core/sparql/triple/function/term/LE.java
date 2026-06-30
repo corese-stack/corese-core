@@ -18,9 +18,6 @@ public class LE extends BinaryFunction {
     public LE(){
     }
  
-    public LE(String name){
-        super(name);
-    }
     
     public LE(String name, Expression e1, Expression e2){
         super(name, e1, e2);

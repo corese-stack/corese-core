@@ -18,9 +18,6 @@ public class PlusTerm extends BinaryFunction {
     public PlusTerm(){
     }
     
-    public PlusTerm(String name){
-        super(name);
-    }
     
     public PlusTerm(String name, Expression e1, Expression e2){
         super(name, e1, e2);

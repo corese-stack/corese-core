@@ -17,10 +17,6 @@ public class NotTerm extends TermEval {
     public NotTerm() {       
     }
 
-    public NotTerm(String name) {
-        super(name);
-        setArity(1);
-    }
 
     public NotTerm(String name, Expression e1) {
         super(name, e1);

@@ -33,9 +33,6 @@ public class SubjectMap extends HashMap<String, PropertyMap> implements LogKey {
         return sort(keySet());
     }
 
-    public StringBuilder display() {       
-        return display(new StringBuilder());
-    }
         
     public StringBuilder display(StringBuilder sb) {
         for (String sub : getKeys()) {

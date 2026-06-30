@@ -26,10 +26,6 @@ public class Statement  extends LDScript {
         setFunction(true);
     }
     
-    @Override
-    public boolean isStatement(){
-        return true;
-    }
     
     /**
      * @return the nbVariable

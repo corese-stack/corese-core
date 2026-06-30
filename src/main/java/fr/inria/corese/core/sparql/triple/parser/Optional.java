@@ -56,9 +56,6 @@ public class Optional extends Binary {
         add(e2);
     }
     
-    public static Optional create(Exp e1, Exp e2) {
-        return new Optional(e1, e2);
-    }
 
     public static Optional create(Exp exp) {
         return new Optional(exp);
@@ -72,9 +69,6 @@ public class Optional extends Binary {
         return get(0).validate(env, n + 1);
     }
 
-    String getOper() {
-        return "option";
-    }
 
     // corese option {}
     @Override

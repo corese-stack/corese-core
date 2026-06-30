@@ -31,10 +31,6 @@ public class LDScript extends TermEval {
         super(name, e1, e2);
     }
     
-    @Override
-    public boolean isLDScript() {
-        return true;
-    }
     
     @Override
     public Expression prepare(ASTQuery ast) throws EngineException {
@@ -44,9 +40,6 @@ public class LDScript extends TermEval {
     }
     
     
-    public boolean isDefined(Expr exp) {
-        return getExtension().isDefined(exp);
-    }
 
     public Function getDefine(Expr exp, Environment env) {
         ASTExtension ext = env.getExtension();
@@ -60,9 +53,6 @@ public class LDScript extends TermEval {
         return getExtension().get(exp);
     }
 
-    public Function getDefine(String name) {
-        return getExtension().get(name);
-    }
 
     public Function getDefineGenerate(Expr exp, Environment env, String name, int n)
             throws EngineException {
@@ -138,9 +128,6 @@ public class LDScript extends TermEval {
         return getExtension().getMethod(name, type, param);
     }
 
-    public void define(Function exp) {
-        getExtension().define(exp);
-    }
 
     public ASTExtension getExtension() {
         return ASTExtension.getSingleton();

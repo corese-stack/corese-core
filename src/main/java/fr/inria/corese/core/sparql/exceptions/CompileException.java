@@ -9,7 +9,4 @@ public class CompileException extends QuerySemanticException {
 
 	public CompileException() {}
 	
-	public CompileException(String mes) {
-		super(mes);
-	}
 }

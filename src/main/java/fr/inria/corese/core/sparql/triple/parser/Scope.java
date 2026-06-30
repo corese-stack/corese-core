@@ -14,9 +14,5 @@ public class Scope extends BasicGraphPattern {
 		return new Scope(e);
 	}
 	
-        @Override
-	public boolean isScope(){
-		return true;
-	}
 	
 }

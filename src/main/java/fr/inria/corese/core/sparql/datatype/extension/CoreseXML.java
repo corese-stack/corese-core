@@ -331,12 +331,6 @@ public class CoreseXML extends CoreseExtension {
         return node.getParentNode();
     }
 
-    IDatatype getTagName(Node node) {
-        if (node.getNodeType() == Node.ELEMENT_NODE) {
-            return DatatypeMap.newInstance(getElement(node).getTagName());
-        }
-        return getNodeName(node);
-    }
 
     IDatatype getNodeName(Node node) {
         return DatatypeMap.newInstance(node.getNodeName());
@@ -480,9 +474,6 @@ public class CoreseXML extends CoreseExtension {
         return getNameBasic(node);
     }
 
-    String getNameIndex(Node node) {
-        return node.getNodeName() + "_" + count++;
-    }
 
     String getNameBasic(Node node) {
         return node.getNodeName();

@@ -54,9 +54,5 @@ public  class CoreseFloat extends CoreseDouble{
 			return code;
 		}
 	
-        @Override
-	public boolean isFloat(){
-		return true;
-	}
 
 }

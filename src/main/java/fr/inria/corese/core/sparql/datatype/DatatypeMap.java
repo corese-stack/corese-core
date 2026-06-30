@@ -230,9 +230,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return new CoreseFloat(result);
     }
 
-    public static IDatatype newInstance(IDatatype.Datatype result) {
-        return getValue(result);
-    }
 
     public static IDatatype create(int result) {
         return new CoreseInteger(result);
@@ -246,12 +243,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return new CoreseDecimal(result);
     }
 
-    /**
-     * Use case: LDScript Java compiler
-     */
-    public static IDatatype newLong(long result) {
-        return new CoreseGenericInteger(result);
-    }
 
     public static IDatatype newInteger(int result) {
         return getValue(result);
@@ -269,9 +260,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return newInstance(result);
     }
 
-    public static IDatatype newFloat(double result) {
-        return new CoreseFloat((float) result);
-    }
 
     public static IDatatype newDecimal(double result) {
         return new CoreseDecimal(result);
@@ -365,9 +353,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return newResource(ns + name);
     }
 
-    public static IDatatype uri(String ns, String name) {
-        return newResource(ns + name);
-    }
 
     public static IDatatype newDate() {
         return new CoreseDateTime();
@@ -377,23 +362,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return new CoreseDate(date);
     }
 
-    static String clean(String date) {
-        String[] str = date.split("T");
-        String[] adate = str[0].split("-");
-        if (adate.length == 3 && adate[2].length() == 4) {
-            String mydate = adate[2] + "-" + adate[1] + "-" + adate[0];
-            if (str.length == 1) {
-                return mydate;
-            } else {
-                return mydate + "T" + str[1];
-            }
-        }
-        return date;
-    }
-
-    public static IDatatype newDate(Date date) {
-        return newInstance(date);
-    }
 
     public static IDatatype newInstance(XMLGregorianCalendar date) {
         return new CoreseDate(date);
@@ -440,13 +408,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return new CoreseDateTime(date);
     }
 
-    /**
-     * Create a datatype. If it is a not well formed number, create a
-     * CoreseUndef
-     */
-    public static IDatatype createLiteral(String label, String datatype) {
-        return createLiteral(label, datatype, null);
-    }
 
     public static IDatatype createLiteral(String label, String datatype, String lang) {
         IDatatype dt = null;
@@ -468,11 +429,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return CoreseDatatype.create(javaType, datatype, label, lang);
     }
 
-    public static IDatatype newXMLLiteral(String label, org.w3c.dom.Node node) {
-        IDatatype dt = new CoreseXMLLiteral(label);
-        dt.setObject(node);
-        return dt;
-    }
 
     public static IDatatype newXMLObject(String label, org.w3c.dom.Node node) {
         return xml(label, node);
@@ -600,9 +556,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return json(param);
     }
 
-    public static IDatatype map(String... param) {
-        return init(map(), param);
-    }
 
     public static CoreseJSON json(JSONObject obj) {
         return new CoreseJSON(obj);
@@ -649,9 +602,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return new CoreseJSON(new JSONObject());
     }
 
-    public static CoreseXML xml(org.w3c.dom.Node node) {
-        return new CoreseXML(node);
-    }
 
     public static CoreseXML xml(String str, org.w3c.dom.Node node) {
         return new CoreseXML(str, node);
@@ -661,14 +611,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return new CoreseList(ldt);
     }
 
-    public static IDatatype newList(Enumeration en) {
-        IDatatype list = DatatypeMap.list();
-        while (en.hasMoreElements()) {
-            Object name = en.nextElement();
-            list.getList().add(DatatypeMap.castObject(name));
-        }
-        return list;
-    }
 
     public static CoreseList newList(IDatatype... ldt) {
         return new CoreseList(ldt);
@@ -714,13 +656,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return newList(list);
     }
 
-    public static IDatatype newResourceList(List<String> alist) {
-        ArrayList<IDatatype> list = new ArrayList<>();
-        for (String str : alist) {
-            list.add(newResource(str));
-        }
-        return newList(list);
-    }
 
     public static IDatatype newList(List<IDatatype> l) {
         return new CoreseList(l);
@@ -752,9 +687,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return new CoreseIterate(start, end, step);
     }
 
-    public static IDatatype newInstance(IDatatype... ldt) {
-        return new CoreseList(ldt);
-    }
 
     public static IDatatype createList() {
         return createList(new ArrayList<>(0));
@@ -770,11 +702,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return dt;
     }
 
-    public static IDatatype createList(IDatatype dt) {
-        ArrayList<IDatatype> ldt = new ArrayList<IDatatype>();
-        ldt.add(dt);
-        return CoreseList.create(ldt);
-    }
 
     public static IDatatype createList(Collection<IDatatype> ldt) {
         IDatatype dt = CoreseList.create(ldt);
@@ -800,13 +727,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         LITERAL_AS_STRING = !b;
     }
 
-    public static boolean isLiteralAsString() {
-        return LITERAL_AS_STRING;
-    }
-
-    public static void setLiteralAsString(boolean b) {
-        LITERAL_AS_STRING = b;
-    }
 
     static String datatypeURI(String lang) {
         if (LITERAL_AS_STRING && (lang == null || lang.equals(""))) {
@@ -849,21 +769,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return dt;
     }
 
-    public static IDatatype createTripleReference(Edge e) {
-        IDatatype dt = new CoreseTriple(blankID());
-        dt.setEdge(e);
-        return dt;
-    }
-
-    // dt1 share dt2
-    public static void shareTripleReference(IDatatype dt1, IDatatype dt2) {
-        if (dt2.isTriple()) {
-            dt1.setTriple(true);
-            if (dt2.getPointerObject() != null && dt1.getPointerObject() == null) {
-                dt1.setPointerObject(dt2.getPointerObject());
-            }
-        }
-    }
 
     /**
      * *****************************
@@ -888,25 +793,16 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return isLiteral(dt) && !dt.hasLang();
     }
 
-    public static boolean isInteger(IDatatype dt) {
-        return dt.getCode() == IDatatype.Datatype.INTEGER;
-    }
 
     public static boolean isLong(IDatatype dt) {
         return dt.getCode() == IDatatype.Datatype.INTEGER && dt.getDatatypeURI().equals(fr.inria.corese.core.sparql.datatype.XSD.xsdlong);
     }
 
-    public static boolean isFloat(IDatatype dt) {
-        return dt.getCode() == IDatatype.Datatype.FLOAT;
-    }
 
     public static boolean isDouble(IDatatype dt) {
         return dt.getCode() == IDatatype.Datatype.DOUBLE;
     }
 
-    public static boolean isDecimal(IDatatype dt) {
-        return dt.getCode() == IDatatype.Datatype.DECIMAL;
-    }
 
     public static IDatatype getTZ(IDatatype dt) {
         if (!dt.isDate()) {
@@ -1049,16 +945,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
                 || c == '-' || c == '.' || c == '_' || c == '~';
     }
 
-    public static boolean isBound(IDatatype dt) {
-        return dt != UNBOUND;
-    }
-
-    public static IDatatype size(IDatatype dt) {
-        if (!dt.isList()) {
-            return null;
-        }
-        return dt.length();
-    }
 
     public static IDatatype first(IDatatype dt) {
         if (!dt.isList()) {
@@ -1158,13 +1044,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return list.getList().last(n);
     }
 
-    public static IDatatype set(IDatatype list, IDatatype n, IDatatype val) {
-        if (!list.isList()) {
-            return null;
-        }
-        list.getList().set(n, val);
-        return val;
-    }
 
     public static IDatatype remove(IDatatype list, IDatatype elem) {
         if (list.isList()) {
@@ -1183,13 +1062,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return list;
     }
 
-    public static IDatatype listResource(List<String> args) {
-        ArrayList<IDatatype> list = new ArrayList<>();
-        for (String uri : args) {
-            list.add(newResource(uri));
-        }
-        return newList(list);
-    }
 
     public static IDatatype list(IDatatype... args) {
         ArrayList<IDatatype> val = new ArrayList<>(args.length);
@@ -1212,12 +1084,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return dt.getList().sort();
     }
 
-    public static IDatatype member(IDatatype elem, IDatatype list) {
-        if (!list.isList()) {
-            return null;
-        }
-        return list.getList().member(elem);
-    }
 
     public static CoreseXML getXML(IDatatype dt) {
         if (dt instanceof CoreseXML) {
@@ -1301,17 +1167,11 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
         return dt;
     }
 
-    public static IDatatype getPublicDatatypeValue() {
-        return TRUE.getPublicDatatypeValue();
-    }
 
     public static DatatypeMap getDatatypeMap() {
         return dm;
     }
 
-    public static DatatypeMap getSingleton() {
-        return dm;
-    }
 
     public static boolean isLiteralDatatype(IDatatype type) {
         String label = type.getLabel();
@@ -1543,13 +1403,6 @@ public class DatatypeMap implements Cst, RDF, DatatypeValueFactory {
 
     }
 
-    IDatatype create(String label, String datatype, String lang) {
-        if (getType(datatype) == IDatatype.Datatype.STRING) {
-            return new CoreseString(label);
-        }
-
-        return null;
-    }
 
     @Override
     public Node nodeList(List<Node> list) {

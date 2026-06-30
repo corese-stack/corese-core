@@ -39,29 +39,6 @@ public class Score extends And {
     score = name;
   }
   
-  public static Score create(Atom name, Exp exp){
-	  if (! (exp instanceof And)){
-		  exp = new And(exp);
-	  }
-	  Score s = new Score(name.getName(), exp);
-	  s.id = name;
-	  return s;
-  }
-  
-  public Atom getName(){
-	  return id;
-  }
-  
-  public boolean isScore(){
-	  return true;
-  }
-
-
-  Exp duplicate(){
-    Score exp = new Score();
-    exp.score = score;
-    return exp;
-  }
 
 //  void setScore(Vector<String> names){
 //    Vector<String> vec = names;

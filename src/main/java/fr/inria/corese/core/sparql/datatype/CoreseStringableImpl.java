@@ -126,30 +126,11 @@ public abstract class CoreseStringableImpl extends CoreseDatatype {
 
     }
 
-    //optimization
-    public boolean contains(String label) {
-        return getLowerCaseLabel().contains(label.toLowerCase());
-    }
-
-    public boolean startsWith(String label) {
-        return getLabel().startsWith(label);
-    }
 
     @Override
     public String getNormalizedLabel() {
         return getLabel();
     }
 
-    public static String getNormalizedLabel(String label) {
-        return label;
-    }
-
-    public boolean equals(String siod) {
-        return getLabel().equals(siod);
-    }
-
-    int intCompare(CoreseStringableImpl icod) {
-        return getLabel().compareTo(icod.getLabel());
-    }
 
 }

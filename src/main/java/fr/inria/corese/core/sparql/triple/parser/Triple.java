@@ -87,9 +87,6 @@ public class Triple extends Exp implements Pointerable {
         setID();
     }
 
-    public Triple(int num) {
-        id = num;
-    }
 
     // subject pred::var object
     Triple(Atom sub, Constant pred, Variable var, Atom obj) {
@@ -109,12 +106,6 @@ public class Triple extends Exp implements Pointerable {
         return t;
     }
 
-    public static Triple create(Atom src, Atom sub, Constant pred, Atom obj) {
-        Triple t = new Triple(sub, pred, null, obj);
-        t.source = src;
-        t.setID();
-        return t;
-    }
 
     public static Triple create(Atom sub, Constant pred, Variable var, Atom obj) {
         Triple t = new Triple(sub, pred, var, obj);
@@ -122,9 +113,6 @@ public class Triple extends Exp implements Pointerable {
         return t;
     }
 
-    public static Triple create(String subject, String property, String value) {
-        return create(null, subject, property, value);
-    }
 
     public static Triple create(String source,
             String subject, String property, String value) {
@@ -217,9 +205,6 @@ public class Triple extends Exp implements Pointerable {
         return ccid++;
     }
 
-    public void setID(int num) {
-        id = num;
-    }
 
     /**
      * **********************************************************************
@@ -227,42 +212,11 @@ public class Triple extends Exp implements Pointerable {
      * path : p[2] p{2} return uri triple
      */
 
-    /**
-     * Util functions
-     *
-     * @return
-     */
-    public String getResource() {
-        return subject.getName();
-    }
-
-    public String getValue() {
-        return object.getName();
-    }
-
-    public String getSourceName() {
-        if (source == null) {
-            return null;
-        }
-        return source.getName();
-    }
 
     public Atom getSource() {
         return source;
     }
 
-    public void setVSource(Atom at) {
-        source = at;
-    }
-
-    @Override
-    public void setRec(boolean b) {
-        isRec = b;
-    }
-
-    public boolean isRec() {
-        return isRec;
-    }
 
     public Atom getExp(int i) {
         switch (i) {
@@ -297,23 +251,6 @@ public class Triple extends Exp implements Pointerable {
         }
     }
 
-    public boolean similar(Triple t2) {
-        for (int i = 0; i < getArity(); i++) {
-            if (getArg(i) == null || t2.getArg(i) == null) {
-                if (getArg(i) != t2.getArg(i)) {
-                    return false;
-                }
-            }
-            if (!getArg(i).getName().equals(t2.getArg(i).getName())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public void setArg(int i, Atom exp) {
-        setExp(i, exp);
-    }
 
     public void setExp(int i, Atom exp) {
         switch (i) {
@@ -368,14 +305,6 @@ public class Triple extends Exp implements Pointerable {
         return list;
     }
     
-    public boolean hasTripleReference() {
-        for (Atom at : getArgList()) {
-            if (at.isTriple()) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public void setSubject(Atom e1) {
         subject = e1;
@@ -401,40 +330,17 @@ public class Triple extends Exp implements Pointerable {
         mode = m;
     }
 
-    public int getStar() {
-        return star;
-    }
-
-    public void setStar(int s) {
-        star = s;
-    }
 
     public boolean isType() {
         return istype;
     }
 
-    public void setType(boolean b) {
-        istype = b;
-    }
     
     public boolean isList() {
         return getProperty().getLabel().equals(RDF.FIRST) ||
                getProperty().getLabel().equals(RDF.REST);
     }
     
-    public boolean isSameAs() {
-        return getProperty().getLabel().equals(OWL_SAME_AS);
-    }
-
-
-    /**
-     *
-     * @param str
-     * @return
-     */
-    String clean(String str) {
-        return str;
-    }
     
     public String toNestedTriple() {
         return String.format("<<%s>>", toTriple());
@@ -557,31 +463,6 @@ public class Triple extends Exp implements Pointerable {
         return sb;
     }
     
-    @Deprecated
-    public ASTBuffer toStringBasic(ASTBuffer sb) {
-        if (getSource() != null) {
-            sb.append(getSource()).append(SPACE);
-        }
-
-        String s = getSubject().toString();
-        String p = propertyToString();
-        String o = getObject().toString();
-      
-        if (getSubject().isTripleWithTriple() && getSubject().getTriple().isAsserted()
-                && displayAsTriple()) {
-            // this = t q v with t = s p o
-            // ::=
-            // s p o {| q v |}
-            sb.append(String.format("%s {| %s %s |} .", getSubject().toTriple(), p, o));
-        }
-        else if (getArgs() == null || (hasReference() && displayAsTriple())) {
-            // std triple
-            sb.append(String.format("%s %s %s .", s, p, o));
-        } else {
-            tuple(sb, s, p, o);
-         }
-      return sb;
-    }
     
         // Exp display() check triple.isDisplayable()
     @Override
@@ -599,22 +480,6 @@ public class Triple extends Exp implements Pointerable {
                 || predicate.getName().equals(getRootPropertyQN());
     }
 
-    public void setExp(boolean b) {
-        isexp = b;
-    }
-
-    /**
-     * This triple will generate a relation in the graph not an exp, not an
-     * rdf:type with a constant value
-     */
-    @Override
-    public boolean isRelation() {
-        if (istype) {
-            return (object.isVariable());
-        } else {
-            return !isexp;
-        }
-    }
 
 //    public boolean isExp() {
 //        return isexp;
@@ -640,12 +505,6 @@ public class Triple extends Exp implements Pointerable {
         return env;
     }
 
-    /**
-     * Does triple bind this variable ?
-     */
-    public boolean bind(Variable var) {
-        return bind(var.getName());
-    }
     
     void getTripleVariables(VariableScope sort, List<Variable> list) {
         getSubject().getVariables(sort, list);
@@ -672,18 +531,6 @@ public class Triple extends Exp implements Pointerable {
         return false;
     }
 
-    public Triple rewrite(Variable v1, Variable v2) {
-        if (getSubject().equals(v1)) {
-            setSubject(v2);
-        }
-        if (getObject().equals(v1)) {
-            setObject(v2);
-        }
-        if (getVariable() != null && getVariable().equals(v1)) {
-            setVariable(v2);
-        }
-        return this;
-    }
 
     public boolean bind(Expression e) {
         // @todo: use getFilterVariables()
@@ -700,38 +547,17 @@ public class Triple extends Exp implements Pointerable {
         return isoption;
     }
 
-    public int getID() {
-        return id;
-    }
-
-    Triple lastTriple() {
-        return this;
-    }
-
-    public void setTOption(boolean b) {
-        isoption = b;
-    }
 
     @Override
     public void setOption(boolean b) {
         isoption = b;
     }
 
-    public void setVariable(String var) {
-        variable = new Variable(var);
-    }
 
     public void setVariable(Variable var) {
         variable = var;
     }
 
-    public boolean isDirect() {
-        return isdirect;
-    }
-
-    public boolean isOne() {
-        return false;
-    }
 
     public boolean isPath() {
         return variable != null && variable.isPath();
@@ -752,12 +578,6 @@ public class Triple extends Exp implements Pointerable {
         //isone = b;
     }
 
-    public String getVariableName() {
-        if (variable == null) {
-            return null;
-        }
-        return variable.getName();
-    }
     
     @Override
     public boolean equals(Object obj) {
@@ -803,15 +623,6 @@ public class Triple extends Exp implements Pointerable {
         }
     }
 
-    public void setPredicate(Atom at) {
-        if (at.isVariable()) {
-            setProperty(Constant.createResource(getRootPropertyQN()));
-            setVariable(at.getVariable());
-        } else {
-            setVariable((Variable) null);
-            setProperty(at.getConstant());
-        }
-    }
 
     public Variable getVariable() {
         return variable;
@@ -917,9 +728,6 @@ public class Triple extends Exp implements Pointerable {
         return !subject.isBlankNode() && !object.isBlankNode();
     }
 
-    public boolean contains(Atom at) {
-        return subject.equals(at) || object.equals(at) || predicate.equals(at) || variable.equals(at);
-    }
 
     @Override
     void visit(ExpressionVisitor v) {

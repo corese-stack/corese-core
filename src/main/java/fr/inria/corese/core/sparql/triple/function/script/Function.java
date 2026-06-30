@@ -58,9 +58,6 @@ public class Function extends Statement {
     public Function() {
     }
 
-    public Function(Term fun, Expression body) {
-        this(fun, null, body, false);
-    }
 
     public Function(Term fun, Constant type, Expression body, boolean lambda) {
         super(Processor.FUNCTION, fun, body);
@@ -80,9 +77,6 @@ public class Function extends Statement {
         return getSignature();
     }
 
-    public Constant getReturnType() {
-        return type;
-    }
 
     public IDatatype getReturnDatatype() {
         return (type == null) ? null : type.getDatatypeValue();
@@ -127,13 +121,6 @@ public class Function extends Statement {
         return getTable().get(var.getLabel());
     }
 
-    public IDatatype getDatatype(Variable var) {
-        Constant cst = getType(var);
-        if (cst != null) {
-            return cst.getDatatypeValue();
-        }
-        return null;
-    }
 
     @Override
     public Expression compile(ASTQuery ast) throws EngineException {
@@ -264,13 +251,6 @@ public class Function extends Statement {
         }
     }
 
-    /**
-     * @return the isTest
-     */
-    @Override
-    public boolean isTester() {
-        return isTest;
-    }
 
     /**
      * @param isTest the isTest to set
@@ -381,9 +361,6 @@ public class Function extends Statement {
         getBody().tailRecursion(this);
     }
 
-    private Expression lastStatement() {
-        return this;
-    }
 
     /**
      * Replace arg by var in the body

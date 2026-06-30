@@ -13,9 +13,6 @@ public class SourceExp extends And {
     SourceExp() {
     }
 
-    SourceExp(Exp exp) {
-        super(exp);
-    }
 
     SourceExp(Atom at, Exp exp) {
         super(exp);

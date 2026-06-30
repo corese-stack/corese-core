@@ -27,11 +27,6 @@ public class Let extends Statement {
 
     public Let() {}
     
-    public Let(Expression def, Expression body) {
-        super(Processor.LET, def, body);
-        setDeclaration(def);
-        setBody(body);
-    }
     
     public Let(Expression def, Expression body, boolean dyn) {
         super(Processor.LET, def, body);

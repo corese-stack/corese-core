@@ -69,13 +69,6 @@ public class JavaCompiler {
         init();
     }
 
-    /**
-     * target Java class name
-     */
-    public JavaCompiler(String name) {
-        this();
-        record(name);
-    }
 
 
     @Override
@@ -83,28 +76,6 @@ public class JavaCompiler {
         return sb.toString();
     }
 
-    /**
-     * Main function to compile AST functions
-     */
-    public JavaCompiler compile(ASTQuery ast) throws IOException, EngineException {
-        this.ast = ast;
-        path(ast);
-        head.process(getPackage(), name);
-        compile(ast.getDefine());
-        compile(ast.getDefineLambda());
-        trailer();
-        write();
-        return this;
-    }
-
-    public JavaCompiler compile(Query q) throws IOException {
-        this.ast = q.getAST();
-        path(ast);
-        head.process(getPackage(), name);
-        trailer();
-        write();
-        return this;
-    }
 
     public void compile(ASTExtension ext) throws EngineException {
         for (Function exp : ext.getFunctionList()) {
@@ -408,9 +379,6 @@ public class JavaCompiler {
         }
     }
 
-    String javaName(String name) {
-        return NSManager.nstrip(name);
-    }
 
     String mapName(Term term) {
         switch (term.oper()) {
@@ -690,13 +658,6 @@ public class JavaCompiler {
         define(OR, "||");
     }
 
-    /**
-     * Java name in let (select where) in function
-     * sh:path() -> jc:sh_path()
-     */
-    public void setJavaName(String name, String java) {
-        javaName.put(name, java);
-    }
 
     public String getJavaName(String name) {
         return javaName.get(name);
@@ -765,10 +726,6 @@ public class JavaCompiler {
         defineTermName();
     }
 
-    boolean skip(String name) {
-        Boolean b = skip.get(name);
-        return b != null && b;
-    }
 
     void path(ASTQuery ast) {
         if (ast.hasMetadata(Metadata.Type.PATH)) {
@@ -863,19 +820,6 @@ public class JavaCompiler {
         return sb;
     }
 
-    /**
-     * @return the function
-     */
-    public Function getFunction() {
-        return function;
-    }
-
-    /**
-     * @param function the function to set
-     */
-    public void setFunction(Function function) {
-        this.function = function;
-    }
 
     /**
      * @return the current

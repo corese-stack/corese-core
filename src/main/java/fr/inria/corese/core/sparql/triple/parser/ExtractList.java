@@ -45,16 +45,6 @@ public class ExtractList implements FederateMerge {
     }
     
     // @todo
-    // s p [ q r ] . s q v
-    // bgp = s p [q r]
-    // merge s q v in bgp because it share variable s with bgp
-    List<BasicGraphPattern> bgpComplete(Exp exp, List<BasicGraphPattern> list, FederateMerge fm) {
-        for (Exp ee : exp) {
-            if (ee.isTriple()) {
-            }
-        }
-        return list;
-     }
     
      @Override
     public boolean merge(Triple t) {

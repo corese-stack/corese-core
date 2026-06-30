@@ -27,9 +27,6 @@ public class CoreseString extends CoreseStringLiteral {
 
   }
   
-  public static CoreseString create(String str){
-	  return new CoreseString(str);
-  }
 
   @Override
   public IDatatype getDatatype(){

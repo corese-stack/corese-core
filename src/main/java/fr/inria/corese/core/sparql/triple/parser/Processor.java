@@ -478,13 +478,6 @@ public class Processor {
 		term = t;
 	}
         
-        Term getTerm() {
-            return term;
-        }
-        
-        public static Processor create(){
-            return new Processor();
-        }
 			
 	
 	// filter(exist {PAT})
@@ -1112,9 +1105,6 @@ public class Processor {
             define(key, value);
         }
         
-        static void defextoper(String key, int value) throws EngineException{
-            defextoper(key, value, 2);
-        }
          
         static void defextoper(String key, int value, int arity) throws EngineException{
             define(key, value);
@@ -1147,9 +1137,6 @@ public class Processor {
             return ast;
         }
         
-        boolean fixed(String name){
-            return  fixed.containsKey(name);
-        }
 	       
 	
 	static int getOper(Term term){
@@ -1189,8 +1176,6 @@ public class Processor {
         return n;
     }
         	
-	public static void finish(){
-	}
 	
 		       
         void preprocess(Term term, ASTQuery ast){
@@ -1362,14 +1347,6 @@ public class Processor {
 		//sql = new SQLFun();
 	}
 	
-	// @deprecated
-	public ResultSet sql(IDatatype uri, IDatatype login, IDatatype passwd, IDatatype query){
-		return null; //return sql.sql(uri, login, passwd, query);
-	}
-	
-	public ResultSet sql(IDatatype uri, IDatatype driver, IDatatype login, IDatatype passwd, IDatatype query){
-		return null; //return sql.sql(uri, driver, login, passwd, query);
-	}
 	
 	/**
 	 * xpath(?g, '/book/title')
@@ -1380,9 +1357,6 @@ public class Processor {
 		xfun.init(ast.getNSM(),  !true);
 	}
 	
-	public XPathFun getXPathFun(){
-		return xfun;
-	}
 	
 	public IDatatype xpath(IDatatype doc, IDatatype exp){
 		try {
@@ -1395,9 +1369,6 @@ public class Processor {
 		return null;
 	}
 	
-	public VariableResolver getResolver(){
-		return xfun.getResolver();
-	}
 	
 	public void setResolver(VariableResolver res){
 		xfun.set(res);
@@ -1481,31 +1452,6 @@ public class Processor {
     }
 	
 	
-	/**
-	 * Eval external method
-	 */
-	public Object eval(IDatatype[] args){
-		if (! isCorrect()) {
-                    return null;
-                }
-		try {
-			return getMethod().invoke(getProcessor(), args);
-		} 
-		catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			logger.error("Operation failure", e);
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			logger.error("Operation failure", e);
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			logger.error("Operation failure", e);
-		}
-                catch (NullPointerException ex){
-                    
-                }
-		return null;
-	}
         
         void compileCustom(Term term, ASTQuery ast){
             name = term.getLabel().substring(CUSTOM.length());

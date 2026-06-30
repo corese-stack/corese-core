@@ -74,13 +74,6 @@ public class CoreseDecimal extends CoreseDouble {
         return new CoreseDecimal(value);
     }
 
-    public static CoreseDecimal create(int value) {
-        return new CoreseDecimal(value);
-    }
-
-    public static CoreseDecimal create(String value) throws CoreseDatatypeException {
-        return new CoreseDecimal(value);
-    }
 
     @Override
     public void setValue(double value) {
@@ -121,10 +114,6 @@ public class CoreseDecimal extends CoreseDouble {
         return code;
     }
 
-    @Override
-    public boolean isDecimal() {
-        return true;
-    }
 
     @Override
     public BigDecimal decimalValue() {

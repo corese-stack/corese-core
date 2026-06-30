@@ -26,11 +26,6 @@ public class ASTFactory {
          return expandMatch(matchTerm);
     }
     
-    List<Expression> defLetList(Variable var, Constant type, Expression exp) {
-        ArrayList<Expression> list = new ArrayList<>();
-        list.add(defLet(var, type, exp));
-        return list;
-    }
     
     Term defLet(Variable var, Constant type, Expression exp) {
         return Term.create("=", var, exp);
@@ -50,9 +45,6 @@ public class ASTFactory {
         return let(list, body, false);
     }
     
-    Let let(List<Expression> el, Expression body) {
-        return let(el, body, false);
-    }
     
     // new version where let has several declarations
     Let defineLet2(List<Expression> el, Expression body, int n, boolean dynamic) {
@@ -284,11 +276,6 @@ public class ASTFactory {
         return defLet(var, fun);
     }
     
-    Term defRest(Variable var, Expression exp, int i) {
-        Term fun = createFunction(createQName(Processor.FUN_XT_GREST), exp);
-        fun.add(Constant.create(i));
-        return defLet(var, fun);
-    }
     
     /**
      * Generate a subList starting at ith element of target list

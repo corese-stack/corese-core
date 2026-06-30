@@ -176,17 +176,11 @@ public class ASTSelector {
         return tripleService;
     }
 
-    public void setTripleService(HashMap<Triple, List<Atom>> tripleService) {
-        this.tripleService = tripleService;
-    }
 
     public HashMap<BasicGraphPattern, List<Atom>> getBgpService() {
         return bgpService;
     }
 
-    public void setBgpService(HashMap<BasicGraphPattern, List<Atom>> bgpService) {
-        this.bgpService = bgpService;
-    }
 
     public HashMap<BasicGraphPattern, Boolean> getBgpFail() {
         return bgpFail;

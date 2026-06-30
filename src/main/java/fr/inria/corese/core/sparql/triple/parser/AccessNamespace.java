@@ -46,10 +46,6 @@ public class AccessNamespace {
         }
     }
     
-    public static void clean() {
-         singleton().clear();
-         singleton().init();      
-    }
     
     public static AccessNamespace singleton() {
         return singleton;
@@ -82,9 +78,6 @@ public class AccessNamespace {
         return singleton().forbid.match(ns);
     }
     
-    public static boolean access(String ns) {
-        return singleton().accept(ns);
-    }
     public static boolean access(String ns, boolean resultWhenEmptyAccept) {
         return singleton().accept(ns, resultWhenEmptyAccept);
     }

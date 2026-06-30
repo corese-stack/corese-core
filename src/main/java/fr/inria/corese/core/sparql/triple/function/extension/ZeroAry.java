@@ -19,9 +19,6 @@ public class ZeroAry extends TermEval {
 
     public ZeroAry() {}
     
-    public ZeroAry(String name) {
-        super(name);
-    }
 
     @Override
     public IDatatype eval(Computer eval, Binding b, Environment env, Producer p) throws EngineException {

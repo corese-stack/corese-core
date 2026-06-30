@@ -98,10 +98,6 @@ public class CoreseDatatype
         return dt;
     }
 
-    @Deprecated
-    public static IDatatype create(String valueJType, String label) throws CoreseDatatypeException {
-        return create(valueJType, null, label, null);
-    }
 
     /**
      * Create a datatype. If it is a not well formed number, create a
@@ -1242,9 +1238,6 @@ public class CoreseDatatype
         return this;
     }
 
-    public boolean isPath() {
-        return false;
-    }
 
     /**
      * **************************************************************

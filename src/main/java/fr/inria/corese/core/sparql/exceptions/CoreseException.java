@@ -24,29 +24,10 @@ public class CoreseException extends Exception {
 	public CoreseException() {
 	}
 
-	public CoreseException(String msg, String obj) {
-		super(msg);
-		object = obj;
-	}
 
 	public CoreseException(String msg) {
 		super(msg);
 	}
 
-	public CoreseException(Throwable cause) {
-		super(cause);
-	}
-
-	public CoreseException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
-
-	public Object getObject() {
-		return object;
-	}
-
-	public void setObject(Object obj) { //modif Olivier Savoie pour le repackaging
-		object = obj;
-	}
 
 }

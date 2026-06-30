@@ -33,13 +33,6 @@ public class And extends Exp {
 		add(exp2);
 	}
 	
-	public static And create(Exp exp1){
-		return new And(exp1);
-	}
-	
-	public static And create(Exp exp1, Exp exp2){
-		return new And(exp1, exp2);
-	}
 	
         @Override
 	public boolean isAnd(){
@@ -71,9 +64,6 @@ public class And extends Exp {
 	
 	
 
-	String getOper() {
-		return Keyword.SEAND;
-	}
 
     public boolean isStack() {
         return stack;

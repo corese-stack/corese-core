@@ -428,9 +428,6 @@ public class ParserHandler {
         insideDelete = false;
     }
 
-    public boolean isInsideDelete() {
-        return insideDelete;
-    }
 
     public void enterDeleteData() {
         insideDeleteData = true;
@@ -440,9 +437,6 @@ public class ParserHandler {
         insideDeleteData = false;
     }
 
-    public boolean isInsideDeleteData() {
-        return insideDeleteData;
-    }
 
     public boolean isInsideValues() {
         return insideValues;
@@ -456,9 +450,6 @@ public class ParserHandler {
         return errorList;
     }
 
-    public void setErrorList(ArrayList<EngineException> errorList) {
-        this.errorList = errorList;
-    }
 
     boolean isTurtleLoader() {
         return turtleLoader;
@@ -468,9 +459,6 @@ public class ParserHandler {
         turtleLoader = b;
     }
 
-    boolean isSparqlParser() {
-        return !isTurtleLoader();
-    }
 
     public Creator getCreate() {
         return create;

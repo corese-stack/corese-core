@@ -108,17 +108,6 @@ public class Constant extends Atom {
         return new Constant(Integer.toString(n), RDFS.xsdinteger);
     }
 
-    public static Constant create(long n) {
-        return new Constant(Long.toString(n), RDFS.xsdinteger);
-    }
-
-    public static Constant create(double d) {
-        return new Constant(Double.toString(d), RDFS.xsddouble);
-    }
-
-    public static Constant create(float d) {
-        return new Constant(Float.toString(d), RDFS.xsdfloat);
-    }
 
     public static Constant create(boolean b) {
         return new Constant((b) ? "true" : "false", RDFS.xsdboolean);
@@ -141,9 +130,6 @@ public class Constant extends Atom {
         return datatype;
     }
 
-    void setDatatype(String str) {
-        datatype = str;
-    }
 
     boolean hasRealDatatype() {
         if (datatype == null) {
@@ -172,9 +158,6 @@ public class Constant extends Atom {
         jc.toJava(this, arg);
     }
     
-    public static void setString(boolean b) {
-        stringDatatype = b;
-    }
     
     static boolean isString() {
         return stringDatatype ;
@@ -242,10 +225,6 @@ public class Constant extends Atom {
         return sb;
     }
 
-    public StringBuffer toString2(StringBuffer sb) {
-        sb.append(getDatatypeValue().toString());
-        return sb;
-    }
 
     /**
      * Escape special chars Add surrounding quotes to a string literal
@@ -342,9 +321,6 @@ public class Constant extends Atom {
         return getDatatypeValue().sameTerm(c.getDatatypeValue());
     }
 
-    static String getJavaType(String datatypeURI) {
-        return dm.getJType(nsm().toNamespace(datatypeURI));
-    }
 
     @Override
     public IDatatype getDatatypeValue() {
@@ -374,12 +350,6 @@ public class Constant extends Atom {
         return cst;
     }
     
-    public static Constant createList(Constant cst) {
-        IDatatype dt = cst.getDatatypeValue();
-        IDatatype list = DatatypeMap.newList(dt);
-        Constant res = Constant.create(list);
-        return res;
-    }
     
     @Override
      public Constant duplicate() {
@@ -452,9 +422,6 @@ public class Constant extends Atom {
         return weight;
     }
 
-    public boolean isNumber() {
-        return dt.isNumber();
-    }
 
     @Override
     public boolean isResource() {
@@ -482,9 +449,6 @@ public class Constant extends Atom {
         return var;
     }
 
-    public boolean isQName() {
-        return isQName;
-    }
 
     public void setQName(boolean isQName) {
         this.isQName = isQName;

@@ -51,9 +51,6 @@ public class CoreseIterate extends CoreseUndefLiteral implements Iterator<IDatat
         return true;
     }
 
-    void setStep(int step) {
-        this.step = step;
-    }
 
     @Override
     public IDatatype getDatatype() {

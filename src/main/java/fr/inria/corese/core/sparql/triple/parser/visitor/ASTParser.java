@@ -392,9 +392,6 @@ public class ASTParser implements Walker, URLParam {
         return nbService;
     }
 
-    public void setNbService(int nbService) {
-        this.nbService = nbService;
-    }
 
     public boolean isBnode() {
         return bnode;
@@ -424,9 +421,6 @@ public class ASTParser implements Walker, URLParam {
         return ast;
     }
 
-    public void setAST(ASTQuery ast) {
-        this.ast = ast;
-    }
 
     int last() {
         return getStack().size() - 1;
@@ -453,8 +447,5 @@ public class ASTParser implements Walker, URLParam {
         return stack;
     }
 
-    public void setStack(ArrayList<ASTQuery> stack) {
-        this.stack = stack;
-    }
 
 }

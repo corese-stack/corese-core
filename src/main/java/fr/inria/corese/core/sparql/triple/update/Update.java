@@ -75,17 +75,6 @@ public class Update extends TopExp {
         return astu;
     }
 
-    public ASTQuery getASTQuery() {
-        return astu.getASTQuery();
-    }
-
-    public String expand(String name) {
-        if (name == null) {
-            return null;
-        }
-        String res = getNSM().toNamespaceB(name);
-        return res;
-    }
 
     public Constant getGraphName() {
         return null;

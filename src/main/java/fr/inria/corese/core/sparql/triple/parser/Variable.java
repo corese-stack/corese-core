@@ -194,9 +194,6 @@ public class Variable extends Atom {
         }
     }
 
-    public boolean isType(int type) {
-        return false;
-    }
 
     @Override
     public boolean isVariable() {
@@ -315,23 +312,6 @@ public class Variable extends Atom {
         setType(type);
     }
 
-    /**
-     * @return the var
-     */
-    public Variable getVariableProxy() {
-        return proxy;
-    }
-
-    public Variable getProxyOrSelf() {
-        return (proxy == null) ? this : proxy;
-    }
-
-    /**
-     * @param var the var to set
-     */
-    public void setVariableProxy(Variable var) {
-        this.proxy = var;
-    }
 
     @Override
     public Variable getDefinition() {

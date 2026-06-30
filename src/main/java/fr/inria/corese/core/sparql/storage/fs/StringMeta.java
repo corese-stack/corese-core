@@ -22,37 +22,21 @@ public class StringMeta {
         this.length = length;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getFid() {
         return fid;
     }
 
-    public void setFid(int fid) {
-        this.fid = fid;
-    }
 
     public long getOffset() {
         return offset;
     }
 
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
 
     public int getLength() {
         return length;
     }
 
-    public void setLength(int length) {
-        this.length = length;
-    }
 
     @Override
     public String toString() {

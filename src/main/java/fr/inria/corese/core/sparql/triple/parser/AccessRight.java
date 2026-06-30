@@ -103,18 +103,6 @@ public class AccessRight {
         split();
     }
     
-    public AccessRight(AccessRights access) {
-        this();
-        setAccess(access);
-    }
-
-    public AccessRight(AccessRights delete, AccessRights insert, AccessRights where) {
-        this();
-        setDefine(insert);
-        setDelete(delete);
-        setInsert(insert);
-        setWhere(where);
-    }
     
     @Override
     public String toString() {
@@ -129,21 +117,10 @@ public class AccessRight {
         return this;
     }
     
-    public void inheritDefault() {
-        getAccessRightDefinition().inheritDefault();
-    }
-    
-    public void splitInheritDefault() {
-        getInsertRightDefinition().inheritDefault();
-        getDeleteRightDefinition().inheritDefault();
-    }
       
     
     public static boolean accept(AccessRights right) {
         return right != AccessRights.NONE;
-    }
-    public static boolean reject(AccessRights right) {
-        return right == AccessRights.NONE;
     }
     
     
@@ -190,9 +167,6 @@ public class AccessRight {
         }
     }
     
-    public static boolean reject(AccessRights query, AccessRights target) {
-        return ! accept(query, target);
-    }
     
     /**
      * Use case: delete target edge
@@ -201,9 +175,6 @@ public class AccessRight {
         return ! isActive() || accept(query.getLevel(), target.getLevel());
     } 
     
-    public static boolean acceptDeleteStatus(Edge query, Edge target) {
-        return isSuperUser(query.getLevel());
-    }  
     
     // specific test for query = target = 0
     public static boolean acceptBI(AccessRights query, AccessRights target) {
@@ -237,13 +208,6 @@ public class AccessRight {
     }
    
     
-    public void setDeleteBasic(Edge edge) {
-        edge.setLevel(getDelete());
-    }
-    
-    public void setInsertBasic(Edge edge) {
-        edge.setLevel(getInsert());
-    }
     
     public void setInsertNS(Edge edge) {
         edge.setLevel(getInsertRightDefinition().getAccess(edge, getDefine()));
@@ -253,12 +217,6 @@ public class AccessRight {
         edge.setLevel(getDeleteRightDefinition().getAccess(edge, getDelete()));
     }
     
-    /**
-     * @return the update
-     */
-    public boolean isUpdate() {
-        return update;
-    }
     
     // Called by Construct
     public boolean isInsert() {
@@ -269,12 +227,6 @@ public class AccessRight {
         return accept(getDelete());
     }
 
-    /**
-     * @param update the update to set
-     */
-    public void setUpdate(boolean update) {
-        this.update = update;
-    }
 
     /**
      * @return the delete
@@ -304,15 +256,6 @@ public class AccessRight {
         this.insert = insert;
     }
     
-    /**
-     * to be used in order to align the insert clause
-     * with the define clause
-     * 
-     */
-    public void setDefineInsert(AccessRights insert) {
-        setDefine(insert);
-        setInsert(insert);
-    }
 
     /**
      * @return the where
@@ -372,26 +315,6 @@ public class AccessRight {
         this.deleteRightDefinition = accessRightDefinition;
     }
     
-    /**
-     * @return the AccessRights enum value corresponding to the given URI string, NONE if not found
-     */
-    public static AccessRights getLevel(String level) {
-        if(level.equalsIgnoreCase(AccessRights.UNDEFINED.getURI())) {
-            return AccessRights.UNDEFINED;
-        } else if(level.equalsIgnoreCase(AccessRights.PUBLIC.getURI())) {
-            return AccessRights.PUBLIC;
-        } else if(level.equalsIgnoreCase(AccessRights.PRIVATE.getURI())) {
-                return AccessRights.PRIVATE;
-        } else if(level.equalsIgnoreCase(AccessRights.PROTECTED.getURI())) {
-                return AccessRights.PROTECTED;
-        } else if(level.equalsIgnoreCase(AccessRights.RESTRICTED.getURI())) {
-                return AccessRights.RESTRICTED;
-        } else if(level.equalsIgnoreCase(AccessRights.SUPER_USER.getURI())) {
-                return AccessRights.SUPER_USER;
-        } else {
-                return AccessRights.NONE;
-        }
-    }
 
     /**
      * @return the AccessRights enum value corresponding to the given byte value, NONE if not found
@@ -414,13 +337,6 @@ public class AccessRight {
         }
     }
     
-    public static void setMode(String mode) {
-        switch (mode) {
-            case EQ_ACCESS_MODE: eqMode(); break;
-            case BI_ACCESS_MODE: biMode(); break;
-            default: gtMode(); break;
-        }
-    }
    
     public static int getMode() {
         return mode;
@@ -443,34 +359,6 @@ public class AccessRight {
     }
     
 
-    /**
-     * @return the debug
-     */
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /**
-     * @param debug the debug to set
-     */
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-        getAccessRightDefinition().setDebug(debug);
-    }
-
-    /**
-     * @return the inheritDefault
-     */
-    public static boolean isInheritDefault() {
-        return inheritDefault;
-    }
-
-    /**
-     * @param aInheritDefault the inheritDefault to set
-     */
-    public static void setInheritDefault(boolean aInheritDefault) {
-        inheritDefault = aInheritDefault;
-    }
 
     /**
      * @return the define
@@ -516,10 +404,6 @@ public class AccessRight {
         this.whereMax = whereMax;
     }
     
-    public void setWhere(AccessRights min, AccessRights max) {
-        setWhereMin(min);
-        setWhereMax(max);
-    }
 
     /**
      * @return the whereList
@@ -528,12 +412,6 @@ public class AccessRight {
         return whereList;
     }
 
-    /**
-     * @param whereList the whereList to set
-     */
-    public void setWhereList(AccessRights... whereList) {
-        this.whereList = whereList;
-    }
 
    
 }

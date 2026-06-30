@@ -18,9 +18,6 @@ public class EQ extends BinaryFunction {
     public EQ(){
     }
  
-    public EQ(String name){
-        super(name);
-    }
     
     public EQ(String name, Expression e1, Expression e2){
         super(name, e1, e2);
