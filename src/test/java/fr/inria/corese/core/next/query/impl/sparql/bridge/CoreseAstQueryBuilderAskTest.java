@@ -2,7 +2,18 @@ package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.impl.parser.AbstractSparqlParserFeatureTest;
 import fr.inria.corese.core.next.query.impl.parser.SparqlParser;
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.LiteralAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ValueMappingAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ValuesAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.constraint.GreaterThanAst;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Query;
@@ -13,7 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
 
@@ -109,7 +125,7 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
     @Test
     @DisplayName("toNextQuery(null) throws NullPointerException")
     void rejectsNullAsk() {
-        assertThrows(NullPointerException.class, () -> builder.toNextQuery(null));
+        assertThrows(NullPointerException.class, () -> builder.toNextQuery((AskQueryAst) null));
     }
 
     @Test
@@ -139,16 +155,16 @@ class CoreseAstQueryBuilderAskTest extends AbstractSparqlParserFeatureTest {
     }
 
     @Test
-    @DisplayName("ORDER BY stays out of scope for this first ASK increment")
-    void rejectsOrderBy() {
+    @DisplayName("ORDER BY is mapped onto the runtime ASK query when it is already directly supported")
+    void appliesOrderBy() {
         AskQueryAst ask = assertInstanceOf(AskQueryAst.class,
                 newParserDefault().parse("ASK WHERE { ?s ?p ?o . } ORDER BY ?s"));
 
-        UnsupportedOperationException error =
-                assertThrows(UnsupportedOperationException.class, () -> builder.toNextQuery(ask));
+        Query query = builder.toNextQuery(ask);
 
-        assertEquals("Solution modifiers (ORDER BY, GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for ASK",
-                error.getMessage());
+        assertEquals(1, query.getOrderBy().size());
+        assertEquals("s", query.getOrderBy().getFirst().getNode().getLabel());
+        assertFalse(query.getOrderBy().getFirst().status());
     }
 
     private static List<String> labels(List<Node> nodes) {

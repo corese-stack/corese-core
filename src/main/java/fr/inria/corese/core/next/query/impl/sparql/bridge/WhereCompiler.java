@@ -1,6 +1,15 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
-import fr.inria.corese.core.next.query.impl.sparql.ast.*;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BgpAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.BindAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.MinusAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.OptionalAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.PatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.ServiceAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.TriplePatternAst;
+import fr.inria.corese.core.next.query.impl.sparql.ast.UnionAst;
 import fr.inria.corese.core.next.query.kgram.api.core.Edge;
 import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
@@ -17,15 +26,27 @@ import java.util.Objects;
  */
 public final class WhereCompiler {
 
+    /**
+     * Compiles a full SPARQL {@code WHERE} clause into the runtime body carried by a
+     * KGRAM {@link Query}.
+     *
+     * <p>This is the main entry point of the compiler. It expects the root
+     * {@link GroupGraphPatternAst} produced by the parser for a complete
+     * {@code WHERE { ... }} block.</p>
+     */
     public Exp compile(GroupGraphPatternAst where) {
         Objects.requireNonNull(where, "where");
         return compileGroup(where);
     }
 
     /**
-     * Dispatch a single {@link PatternAst} element to its KGRAM {@link Exp}.
+     * Compiles a single {@link PatternAst} node.
+     *
+     * <p>This package-visible dispatcher is used inside the bridge while recursively
+     * traversing a {@code WHERE} tree, and by same-package tests that exercise one
+     * pattern kind in isolation.</p>
      */
-    public Exp compile(PatternAst pattern) {
+    Exp compile(PatternAst pattern) {
         Objects.requireNonNull(pattern, "pattern");
         return switch (pattern) {
             case BgpAst bgp -> compileBgp(bgp);
@@ -40,7 +61,6 @@ public final class WhereCompiler {
                     "WHERE compilation not yet supported for: " + pattern.getClass().getSimpleName());
         };
     }
-
 
     /**
      * {@code { e1 e2 ... en }} becomes an {@code AND} of the compiled elements.
@@ -69,7 +89,6 @@ public final class WhereCompiler {
         return body;
     }
 
-
     private Exp compileBgp(BgpAst bgp) {
         Exp pattern = Exp.create(Type.BGP);
         for (TriplePatternAst triple : bgp.triples()) {
@@ -85,19 +104,16 @@ public final class WhereCompiler {
         return new AstBackedEdge(subject, predicate, object);
     }
 
-
     private Exp compileFilter(FilterAst filter) {
         Filter nextFilter = SparqlAstToExpression.toNextFilter(filter);
         return Exp.create(Type.FILTER, nextFilter);
     }
-
 
     private Exp compileUnion(UnionAst union) {
         Exp left = compile(union.left());
         Exp right = compile(union.right());
         return Exp.create(Type.UNION, left, right);
     }
-
 
     /**
      * Compiles a bare {@link OptionalAst}, i.e. one that is not folded with a
