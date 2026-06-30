@@ -27,7 +27,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX());
 
-        Query query = builder.toQuery(describe);
+        Query query = builder.toNextQuery(describe);
 
         assertTrue(query.isDescribe(), "query flagged as DESCRIBE");
         assertTrue(query.getBody().isAnd(), "WHERE compiled into the body");
@@ -41,7 +41,7 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new IriAst("<http://example.org/x>")), null);
 
-        Query query = builder.toQuery(describe);
+        Query query = builder.toNextQuery(describe);
 
         assertTrue(query.isDescribe());
         assertTrue(query.getBody().isAnd(), "default empty WHERE compiles to an empty AND");
@@ -56,32 +56,39 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(), whereBindingX());
 
-        Query query = builder.toQuery(describe);
+        Query query = builder.toNextQuery(describe);
 
         assertTrue(query.isDescribe());
         assertTrue(query.getDescribeList().isEmpty(), "DESCRIBE * carries no explicit node");
     }
 
     @Test
-    @DisplayName("FROM / FROM NAMED is not supported yet → UnsupportedOperationException")
-    void rejectsDatasetClause() {
+    @DisplayName("FROM / FROM NAMED are applied to the query dataset")
+    void appliesDatasetClause() {
         DatasetClauseAst dataset = new DatasetClauseAst(
-                Set.of(new IriAst("http://example.org/g")), Set.of());
+                Set.of(new IriAst("http://example.org/g")),
+                Set.of(new IriAst("http://example.org/n")));
         DescribeQueryAst describe = new DescribeQueryAst(
                 dataset, List.of(new VarAst("x")), whereBindingX());
 
-        assertThrows(UnsupportedOperationException.class, () -> builder.toQuery(describe));
+        Query query = builder.toNextQuery(describe);
+
+        assertEquals(1, query.getFrom().size(), "FROM applied");
+        assertEquals(1, query.getNamed().size(), "FROM NAMED applied");
     }
 
     @Test
-    @DisplayName("FROM NAMED is not supported yet → UnsupportedOperationException")
-    void rejectsFromNamedClause() {
-        DatasetClauseAst dataset = new DatasetClauseAst(
-                Set.of(), Set.of(new IriAst("http://example.org/g")));
+    @DisplayName("LIMIT / OFFSET are applied to the query")
+    void appliesLimitAndOffset() {
+        SolutionModifierAst mod = SolutionModifierAst.withoutGroupBy(
+                false, false, List.of(), 5L, 2L);
         DescribeQueryAst describe = new DescribeQueryAst(
-                dataset, List.of(new VarAst("x")), whereBindingX());
+                DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), mod);
 
-        assertThrows(UnsupportedOperationException.class, () -> builder.toQuery(describe));
+        Query query = builder.toNextQuery(describe);
+
+        assertEquals(5, query.getLimit(), "LIMIT applied");
+        assertEquals(2, query.getOffset(), "OFFSET applied");
     }
 
     @Test
@@ -92,22 +99,23 @@ class CoreseAstQueryBuilderDescribeTest {
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), null, null, values);
 
-        assertThrows(UnsupportedOperationException.class, () -> builder.toQuery(describe));
+        assertThrows(UnsupportedOperationException.class, () -> builder.toNextQuery(describe));
     }
 
     @Test
-    @DisplayName("Solution modifiers (LIMIT) are not supported yet → UnsupportedOperationException")
-    void rejectsSolutionModifier() {
-        SolutionModifierAst mod = SolutionModifierAst.withoutGroupBy(false, false, List.of(), 10L, null);
+    @DisplayName("Unsupported solution modifier (e.g. DISTINCT) → UnsupportedOperationException")
+    void rejectsUnsupportedModifier() {
+        SolutionModifierAst mod = SolutionModifierAst.withoutGroupBy(
+                true, false, List.of(), null, null); // DISTINCT
         DescribeQueryAst describe = new DescribeQueryAst(
                 DatasetClauseAst.none(), List.of(new VarAst("x")), whereBindingX(), mod);
 
-        assertThrows(UnsupportedOperationException.class, () -> builder.toQuery(describe));
+        assertThrows(UnsupportedOperationException.class, () -> builder.toNextQuery(describe));
     }
 
     @Test
-    @DisplayName("toQuery(null) throws NullPointerException")
+    @DisplayName("toNextQuery((DescribeQueryAst) null) throws NullPointerException")
     void rejectsNull() {
-        assertThrows(NullPointerException.class, () -> builder.toQuery((DescribeQueryAst) null));
+        assertThrows(NullPointerException.class, () -> builder.toNextQuery((DescribeQueryAst) null));
     }
 }

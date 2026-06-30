@@ -1,19 +1,12 @@
 package fr.inria.corese.core.next.query.impl.sparql.bridge;
 
 import fr.inria.corese.core.next.query.impl.sparql.ast.AskQueryAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ASTConstants;
 import fr.inria.corese.core.next.query.impl.sparql.ast.ConstraintAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.DatasetClauseAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.FilterAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.GroupGraphPatternAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.IriAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.OrderConditionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.ProjectionAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.SelectQueryAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.SolutionModifierAst;
 import fr.inria.corese.core.next.query.impl.sparql.ast.TermAst;
-import fr.inria.corese.core.next.query.impl.sparql.ast.VarAst;
-import fr.inria.corese.core.next.query.kgram.api.core.ExpType.Type;
 import fr.inria.corese.core.next.query.kgram.api.core.Filter;
 import fr.inria.corese.core.next.query.kgram.api.core.Node;
 import fr.inria.corese.core.next.query.kgram.core.Query;
@@ -207,6 +200,39 @@ public final class CoreseAstQueryBuilder {
         return query;
     }
 
+    /**
+     * Builds a KGRAM {@link Query} from a SPARQL {@code DESCRIBE} query AST.
+     */
+    public Query toNextQuery(DescribeQueryAst describeQueryAst) {
+        Objects.requireNonNull(describeQueryAst, "describeQueryAst");
+        rejectUnsupportedClauses(describeQueryAst);
+
+        Query query = Query.create(whereCompiler.compile(describeQueryAst.whereClause()));
+        applyDataset(query, describeQueryAst.datasetClause());
+        applySolutionModifier(query, describeQueryAst.solutionModifier());
+        query.setDescribe(true);
+
+        List<Node> nodes = new ArrayList<>();
+        for (TermAst term : describeQueryAst.described()) {
+            nodes.add(toNode(term));
+        }
+        query.setDescribeList(nodes);
+        return query;
+    }
+
+    private static void rejectUnsupportedClauses(DescribeQueryAst describeQueryAst) {
+        if (!describeQueryAst.valuesClause().mappings().isEmpty()) {
+            throw new UnsupportedOperationException(
+                    "Inline VALUES is not supported yet for DESCRIBE (values handling is a follow-up)");
+        }
+        SolutionModifierAst mod = describeQueryAst.solutionModifier();
+        if (mod.hasOrderBy() || mod.hasGroupBy() || mod.hasHaving()
+                || mod.distinct() || mod.reduced()) {
+            throw new UnsupportedOperationException(
+                    "Solution modifiers (ORDER BY, GROUP BY, HAVING, DISTINCT, REDUCED) are not supported for DESCRIBE");
+        }
+    }
+
     private void applyDataset(Query query, DatasetClauseAst datasetClause) {
         query.setFrom(toNodeList(datasetClause.graphs()));
         query.setNamed(toNodeList(datasetClause.namedGraphs()));
@@ -354,47 +380,5 @@ public final class CoreseAstQueryBuilder {
     public Filter toNextFilter(ConstraintAst filterExpression) {
         Objects.requireNonNull(filterExpression, "filterExpression");
         return SparqlAstToExpression.toNextFilter(filterExpression);
-    }
-
-    public Query toQuery(DescribeQueryAst describe) {
-        Objects.requireNonNull(describe, "describe");
-        rejectUnsupportedClauses(describe.datasetClause(), describe.valuesClause(), describe.solutionModifier());
-
-        Exp body = whereCompiler.compile(describe.whereClause());
-        Query query = Query.create(body);
-        query.setDescribe(true);
-
-        List<Node> nodes = new ArrayList<>();
-        for (TermAst term : describe.described()) {
-            nodes.add(toNode(term));
-        }
-        query.setDescribeList(nodes);
-
-        return query;
-    }
-
-    private static void rejectUnsupportedClauses(DatasetClauseAst dataset, ValuesAst values, SolutionModifierAst mod) {
-        if (!dataset.graphs().isEmpty() || !dataset.namedGraphs().isEmpty()) {
-            throw new UnsupportedOperationException(
-                    "FROM / FROM NAMED is not supported yet (dataset handling is a follow-up)");
-        }
-        if (!values.mappings().isEmpty()) {
-            throw new UnsupportedOperationException(
-                    "Inline VALUES is not supported yet (values handling is a follow-up)");
-        }
-        if (mod.hasOrderBy() || mod.hasGroupBy() || mod.hasHaving()
-                || mod.hasLimit() || mod.hasOffset() || mod.distinct() || mod.reduced()) {
-            throw new UnsupportedOperationException(
-                    "Solution modifiers (ORDER BY, GROUP BY, HAVING, LIMIT, OFFSET, DISTINCT, REDUCED) are not supported for DESCRIBE");
-        }
-    }
-
-    private static Node toNode(TermAst term) {
-        Expression e = SparqlAstToExpression.convert(term);
-        if (e instanceof Atom atom) {
-            return new NodeImpl(atom);
-        }
-        throw new IllegalArgumentException(
-                "A DESCRIBE term must be a variable or IRI, got: " + term.getClass().getSimpleName());
     }
 }
