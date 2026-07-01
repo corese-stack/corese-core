@@ -18,10 +18,10 @@ public final class SparqlBuiltinFunctionNameResolver {
      * Resolves the function name from a term that must be an {@link IriAst}.
      */
     public static String fromFunctionTerm(TermAst functionName) {
-        if (!(functionName instanceof IriAst i)) {
+        if (!(functionName instanceof IriAst(String raw))) {
             throw new IllegalArgumentException("Function name must be IriAst, got " + functionName);
         }
-        return localNameFromIriToken(i.raw());
+        return localNameFromIriToken(raw);
     }
 
 
